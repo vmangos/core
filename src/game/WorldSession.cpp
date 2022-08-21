@@ -262,8 +262,7 @@ bool WorldSession::ForcePlayerLogoutDelay()
         }
         else if (sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
         {
-            sLog.Player(this, LOG_CHAR, LOG_LVL_BASIC, "Account: %d (IP: %s) Lost socket for character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName(), _player->GetGUIDLow());
-            sWorld.LogCharacter(GetPlayer(), "LostSocket");
+            sLog.Player(this, LOG_CHAR, "LostSocket", LOG_LVL_BASIC, "");
             GetPlayer()->OnDisconnected();
             GetPlayer()->SaveToDB();
             SetDisconnectedSession();
@@ -497,8 +496,8 @@ void WorldSession::LogoutPlayer(bool Save)
     {
         bool inWorld = _player->IsInWorld() && _player->FindMap();
 
-        sLog.Player(this, LOG_CHAR, LOG_LVL_BASIC, "Account: %d (IP: %s) Logout Character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() , _player->GetGUIDLow());
-        sWorld.LogCharacter(_player, "Logout");
+        sLog.Player(this, LOG_CHAR, "Logout", LOG_LVL_DETAIL, "");
+
         if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
             DoLootRelease(lootGuid);
 

@@ -71,6 +71,7 @@ struct LogFilterData
     bool defaultState;
 };
 
+// TODO: Get rid of these, in favor of additional log types
 constexpr LogFilterData logFilterData[] =
 {
     { "transport_moves",     "LogFilter_TransportMoves",     true  },
@@ -173,6 +174,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
         uint32 GetConsoleLevel() const { return m_consoleLevel; }
         uint32 GetFileLevel() const { return m_fileLevel; }
+        uint32 GetDbLevel() const { return m_dbLevel; }
         void SetConsoleLevel(LogLevel level);
         void SetFileLevel(LogLevel level);
 
@@ -200,6 +202,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         // log/console control
         LogLevel m_consoleLevel;
         LogLevel m_fileLevel;
+        LogLevel m_dbLevel;
         const uint16 m_defaultColor;
 
         // include timestamp in console output

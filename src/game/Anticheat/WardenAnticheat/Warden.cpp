@@ -58,7 +58,7 @@ void Warden::LoadScriptedScans()
 
     WardenWin::LoadScriptedScans();
 
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, ">> %u scripted Warden scans loaded from anticheat module", sWardenScanMgr.Count() - start);
+    sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, ">> %u scripted Warden scans loaded from anticheat module", sWardenScanMgr.Count() - start);
 }
 
 Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumber &K) :
@@ -82,7 +82,7 @@ Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumbe
 
     _xor = inputKey[0];
 
-    sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Initializing for account %u ip %s", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
+    sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Initializing");
 
     ByteBuffer pkt(1 + _module->hash.size() + _module->key.size() + 4);
 
@@ -102,7 +102,7 @@ void Warden::RequestChallenge()
 {
     MANGOS_ASSERT(!!_module && !_module->crk.empty());
 
-    sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Sending challenge to account %u", _session->GetAccountId());
+    sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Sending challenge");
 
     StopTimeoutClock();
 
@@ -144,14 +144,14 @@ void Warden::HandleChallengeResponse(ByteBuffer &buff)
 
     _xor = _crk->clientKey[0];
 
-    sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Challenge response validated.  Warden packet encryption initialized.");
+    sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Challenge response validated.  Warden packet encryption initialized.");
 
     _crk = nullptr;
 }
 
 void Warden::SendModuleToClient()
 {
-    sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Sending module to account %u ip %s", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
+    sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Sending module");
 
     StopTimeoutClock();
 
@@ -174,7 +174,7 @@ void Warden::SendModuleToClient()
 
     _moduleSendPending = true;
 
-    sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Module transfer complete");
+    sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Module transfer complete");
 }
 
 std::vector<std::shared_ptr<const Scan>> Warden::SelectScans(ScanFlags flags) const
@@ -226,7 +226,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
         auto const startSize = scan.wpos();
         auto const startStringSize = strings.size();
 
-        sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Requesting scan \"%s\"", (*i)->comment.c_str());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Requesting scan \"%s\"", (*i)->comment.c_str());
         (*i)->Build(this, strings, scan);
 
         // if the scan did not change the buffer size or the string size, consider
@@ -407,7 +407,7 @@ void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::share
     // Append names to message.
     message = "Player " + playerName + " (Account " + accountName + ") " + message;
 
-    sLog.Out(LOG_ANTICHEAT, LOG_LVL_BASIC, message.c_str());
+    sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, message.c_str());
     sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "WardenAnticheat", message.c_str());
 }
 
@@ -434,13 +434,13 @@ void Warden::HandlePacket(WorldPacket& recvData)
     {
         if (_moduleSendPending)
         {
-            sLog.Out(LOG_ANTICHEAT, LOG_LVL_BASIC, "Account %u IP %s failed to load module.  Kicking.", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
+            sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to load module.  Kicking.", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
             _session->KickPlayer();
             _moduleSendPending = false;
             break;
         }
 
-        sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Account - %u get opcode 00 - Load module failed or module is missing...", _session->GetAccountId());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Client needs module sent");
         SendModuleToClient();
         break;
     }
@@ -448,7 +448,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
     case WARDEN_CMSG_MODULE_OK:
     {
         _moduleSendPending = false;
-        sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Account - %u get opcode 01 - Module has loaded. Recv answer....", _session->GetAccountId());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Module loaded");
         RequestChallenge();
         break;
     }
@@ -479,13 +479,13 @@ void Warden::HandlePacket(WorldPacket& recvData)
     // FIXME: Find when/why/how this actually happens and how to handle it
     case WARDEN_CMSG_MEM_CHECKS_RESULT:
     {
-        sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Account - %u received opcode 03", _session->GetAccountId());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Received opcode 03");
         break;
     }
 
     case WARDEN_CMSG_HASH_RESULT:
     {
-        sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Account - %u received opcode 04", _session->GetAccountId());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Received hash result");
 
         HandleChallengeResponse(recvData);
 
@@ -508,7 +508,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
     case WARDEN_CMSG_MODULE_FAILED:
     {
-        sLog.Out(LOG_ANTICHEAT, LOG_LVL_BASIC, "Account - %u received opcode 05 - Module load failed!", _session->GetAccountId());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Module load failed.  Kicking.");
         _session->KickPlayer();
         break;
     }
@@ -526,7 +526,7 @@ void Warden::Update()
 {
     if (!!_timeoutClock && WorldTimer::getMSTime() > _timeoutClock)
     {
-        sLog.Out(LOG_ANTICHEAT, LOG_LVL_BASIC, "Account %u ip %s timeout", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Client response timeout.  Kicking.");
         _session->KickPlayer();
         return;
     }

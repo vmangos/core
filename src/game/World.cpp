@@ -2883,20 +2883,6 @@ void World::LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount,
     logStmt.Execute();
 }
 
-void World::LogCharacter(Player* character, char const* action)
-{
-    sLog.Player(character->GetSession(), LOG_CHAR, action, LOG_LVL_BASIC, "");
-}
-
-void World::LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, char const* action)
-{
-    if (!LogsDatabase || !sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHARACTERS))
-        return;
-    ASSERT(sess);
-    sLog.Player(sess, LOG_CHAR, action, LOG_LVL_BASIC, "Character %s action %s account %u IP %s",
-        charName.c_str(), action, sess->GetAccountId(), sess->GetRemoteAddress().c_str());
-}
-
 void World::LogChat(WorldSession* sess, char const* type, std::string const& msg, PlayerPointer target, uint32 chanId, char const* chanStr)
 {
     ASSERT(sess);

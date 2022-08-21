@@ -85,7 +85,7 @@ WardenModuleMgr::WardenModuleMgr()
         }
         catch (const std::runtime_error & e)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to load %s - %s\n", mod.c_str(), e.what());
+            sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to load %s - %s\n", mod.c_str(), e.what());
             continue;
         }
     }

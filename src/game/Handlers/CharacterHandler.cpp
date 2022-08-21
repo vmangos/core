@@ -335,11 +335,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
 
         data << (uint8)CHAR_CREATE_SUCCESS;
         SendPacket(&data);
-
-        std::string IP_str = GetRemoteAddress();
-        sLog.Player(GetAccountId(), LOG_CHAR, LOG_LVL_BASIC,
-            "Account: %d (IP: %s) Create Character:[%s] (guid: %u)",
-            GetAccountId(), IP_str.c_str(), name.c_str(), guidLow);
     }
     else
     {
@@ -382,8 +377,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
     if (accountId != GetAccountId())
         return;
 
-    std::string IP_str = GetRemoteAddress();
-    sLog.Player(GetAccountId(), LOG_CHAR, LOG_LVL_BASIC, "Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    sLog.Player(this, LOG_CHAR, "Delete", LOG_LVL_BASIC, "Character %s guid %u", name.c_str(), guid);
 
     // If the character is online (ALT-F4 logout for example)
     if (Player* onlinePlayer = sObjectAccessor.FindPlayer(guid))
@@ -394,8 +388,6 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_CHAR_DELETE, 1);
     data << (uint8)CHAR_DELETE_SUCCESS;
     SendPacket(&data);
-
-    sWorld.LogCharacter(this, lowguid, name, "Delete");
 }
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
@@ -724,10 +716,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     std::string IP_str = GetRemoteAddress();
 
-    sLog.Player(this, LOG_CHAR, LOG_LVL_DETAIL, "Account: %d (IP: %s) Login Character:[%s] (guid: %u)%s",
-             GetAccountId(), IP_str.c_str(), pCurrChar->GetName(), pCurrChar->GetGUIDLow(), alreadyOnline ? " Player was already online" : "");
-    
-    sWorld.LogCharacter(pCurrChar, "Login");
+    sLog.Player(this, LOG_CHAR, "Login", LOG_LVL_DETAIL, alreadyOnline ? "Player was already online" : "");
     
     if (!alreadyOnline && !pCurrChar->IsStandingUp() && !pCurrChar->HasUnitState(UNIT_STAT_STUNNED))
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);

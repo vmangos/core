@@ -788,8 +788,8 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
     if (splineId == m_lastSplineId)
     {
         AddMessageToPacketLog("HandleSplineDone: spline id == last spline id == " + std::to_string(splineId));
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HandleSplineDone: Player %s from account id %u sent spline done opcode for spline id %u twice",
-            me->GetName(), m_session->GetAccountId(), splineId);
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_MINIMAL, "HandleSplineDone: Player sent spline done opcode for spline id %u twice",
+            splineId);
         return false;
     }
 
@@ -799,8 +799,8 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
     if (distance > 10.0f)
     {
         AddMessageToPacketLog("HandleSplineDone: distance to spline destination is " + std::to_string(distance));
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HandleSplineDone: Player %s from account id %u sent spline done opcode with position that is %g yards away from destination",
-            me->GetName(), m_session->GetAccountId(), distance);
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_MINIMAL, "HandleSplineDone: Player sent spline done opcode with position that is %g yards away from destination",
+            distance);
         return false;
     }
 

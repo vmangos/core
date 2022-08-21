@@ -470,6 +470,11 @@ DebuffLimit = 0
 #        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
 #        Default: 2
 #
+#    LogLevel.DB
+#        Database level of logging
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
+#
 #    LogTime
 #        Include time in server console output [hh:mm:ss]
 #        Default: 0 (no time)
@@ -622,6 +627,7 @@ LogSQL = 1
 PidFile = ""
 LogLevel.Console = 2
 LogLevel.File = 2
+LogLevel.DB = 2
 LogTime = 0
 LogFilter_TransportMoves = 1
 LogFilter_CreatureMoves = 1

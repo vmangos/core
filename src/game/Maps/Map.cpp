@@ -3260,8 +3260,7 @@ void Map::CrashUnload()
         if (player)
         {
             WorldSession* session = player->GetSession();
-            sLog.Player(session, LOG_CHAR, LOG_LVL_DETAIL, "Account: %d (IP: %s) Logout Character:[%s] (guid: %u)", session->GetAccountId(), session->GetRemoteAddress().c_str(), player->GetName() , player->GetGUIDLow());
-            sWorld.LogCharacter(player, "Logout");
+            sLog.Player(session, LOG_CHAR, "Logout", LOG_LVL_DETAIL, "");
             session->SetPlayer(nullptr);
             player->SaveInventoryAndGoldToDB(); // Prevent possible exploits
             player->UninviteFromGroup();

@@ -129,7 +129,9 @@ Log::Log() :
     // Main log file settings
     m_includeTime = sConfig.GetBoolDefault("LogTime", false);
     m_consoleLevel = LogLevel(sConfig.GetIntDefault("LogLevel.Console", 2));
-    m_fileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 2));
+    m_fileLevel = LogLevel(sConfig.GetIntDefault("LogLevel.File", 2));
+    m_dbLevel = LogLevel(sConfig.GetIntDefault("LogLevel.DB", 2));
+
 
     // Smartlog data
     InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));

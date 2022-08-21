@@ -14340,7 +14340,7 @@ void Player::LogModifyMoney(int32 d, char const* type, ObjectGuid fromGuid, uint
     if (uint32(abs(d)) > sWorld.getConfig(CONFIG_UINT32_LOG_MONEY_TRADES_TRESHOLD) || GetSession()->GetSecurity() > SEC_PLAYER)
     {
         sLog.Player(GetSession(), LOG_MONEY_TRADES, type, LOG_LVL_BASIC, "%s gets %ic (data: %u|%s)",
-            type, GetShortDescription().c_str(), d, data, fromGuid.GetString().c_str());
+            GetShortDescription().c_str(), d, data, fromGuid.GetString().c_str());
         if (d > 0)
             sWorld.LogMoneyTrade(fromGuid, GetObjectGuid(), d, type, data);
         else
@@ -16453,7 +16453,7 @@ bool Player::SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string co
     masterPlayer.SaveToDB();
     PlayerCacheData* cacheData = sObjectMgr.InsertPlayerInCache(guidlow, raceId, classId, gender, session->GetAccountId(), name, startingLevel, zoneId);
     sObjectMgr.UpdatePlayerCachedPosition(cacheData, info->mapId, info->positionX, info->positionY, info->positionZ, info->orientation, false);
-    sWorld.LogCharacter(session, guidlow, name, "Create");
+    sLog.Player(session, LOG_CHAR, "Create", LOG_LVL_BASIC, "Character %s guid %u", name.c_str(), guidlow);
 
     return true;
 }
@@ -22233,15 +22233,22 @@ void PlayerLogFormatted(uint32 accountId, WorldSession const* session, LogType l
         stmt.addNull();
     }
 
-    log << "): " << text;
+    log << ")";
+
+    if (!text.empty())
+        log << ": " << text;
 
     sLog.Out(logType, logLevel, log.str().c_str());
 
     // TODO: additional settings for database logging
-    if ((logType == LOG_CHAT && sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHAT)) ||
-        (logType == LOG_MONEY_TRADES && sWorld.getConfig(CONFIG_BOOL_LOGSDB_TRADES)) ||
-        (logType == LOG_CHAR && sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHARACTERS)) ||
-        (logType == LOG_BG && sWorld.getConfig(CONFIG_BOOL_LOGSDB_BATTLEGROUNDS)))
+    if (logLevel > sLog.GetDbLevel() ||
+        (logType == LOG_CHAT && !sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHAT)) ||
+        (logType == LOG_MONEY_TRADES && !sWorld.getConfig(CONFIG_BOOL_LOGSDB_TRADES)) ||
+        (logType == LOG_CHAR && !sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHARACTERS)) ||
+        (logType == LOG_BG && !sWorld.getConfig(CONFIG_BOOL_LOGSDB_BATTLEGROUNDS)))
+    {
+    }
+    else
     {
         stmt.addString(text);
         stmt.Execute();
@@ -22270,7 +22277,7 @@ void Log::Player(WorldSession const* session, LogType logType, char const* subTy
 
 }
 
-void Log::Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...)
+void Log:: Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...)
 {
     char buff[4096];
     va_list ap;
