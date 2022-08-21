@@ -359,6 +359,13 @@ bool ChatHandler::HandleGameObjectDeleteCommand(char* args)
         return false;
     }
 
+    if (sScriptMgr.IsGameObjectGuidReferencedInScripts(obj->GetDBTableGUIDLow()))
+    {
+        SendSysMessage("You cannot delete this spawn because its guid is referenced in a script.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     if (ObjectGuid ownerGuid = obj->GetOwnerGuid())
     {
         Unit* owner = ObjectAccessor::GetUnit(*m_session->GetPlayer(), ownerGuid);

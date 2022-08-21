@@ -1257,6 +1257,7 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
         }
         case TARGET_T_CREATURE_WITH_GUID:
         {
+            m_referencedCreatureGuids.insert(targetParam1);
             if (!sObjectMgr.GetCreatureData(targetParam1))
             {
                 if (!sObjectMgr.IsExistingCreatureGuid(targetParam1))
@@ -1285,6 +1286,7 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
         }
         case TARGET_T_GAMEOBJECT_WITH_GUID:
         {
+            m_referencedGameObjectGuids.insert(targetParam1);
             if (!sObjectMgr.GetGOData(targetParam1))
             {
                 if (!sObjectMgr.IsExistingGameObjectGuid(targetParam1))
