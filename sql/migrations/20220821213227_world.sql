@@ -1941,7 +1941,7 @@ DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (1203, 1202, 1201);
 DELETE FROM `pool_template` WHERE `entry` IN (1203, 1202, 1201);
 
 SET @OGUID = 22630;
-SET @PTEMPLATE = 3662;
+SET @PTEMPLATE = 43800;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 1734, 1, -9199.83, -2166.79, 21.1069, 2.30383, 0, 0, 0.913545, 0.406738, 300, 300, 100, 1, 0, 0, 0, 10),
