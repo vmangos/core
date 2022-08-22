@@ -7915,6 +7915,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                     }
 
                     loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false);
+                    loot->GenerateMoneyLoot(go->GetGOInfo()->MinMoneyLoot, go->GetGOInfo()->MaxMoneyLoot);
                     if (go->GetInstanceId())
                         go->GetMap()->BindToInstanceOrRaid(this, go->GetRespawnTimeEx(), false);
 
@@ -7965,7 +7966,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                         break;
                     default:
                         loot->FillLoot(item->GetEntry(), LootTemplates_Item, this, true, item->GetProto()->MaxMoneyLoot == 0);
-                        loot->generateMoneyLoot(item->GetProto()->MinMoneyLoot, item->GetProto()->MaxMoneyLoot);
+                        loot->GenerateMoneyLoot(item->GetProto()->MinMoneyLoot, item->GetProto()->MaxMoneyLoot);
                         item->SetLootState(ITEM_LOOT_CHANGED);
                         item->SetGeneratedLoot(true);
                         break;
