@@ -11,9 +11,6 @@ INSERT INTO `migrations` VALUES ('20220820203350');
 -- Correct respawn times of existing chests (source: CMangos)
 UPDATE `gameobject` SET `spawntimesecsmin`=300, `spawntimesecsmax`=900 WHERE `guid` IN (1397,1454,26749,26756,34797,34798,45106,45110,49528,49529);
 
--- Battered Chest should contain some coins (PTR test) - range is guessed.
-UPDATE `gameobject_template` SET `mingold`=10, `maxgold`=50 WHERE `entry`=2843;
-
 -- Insert missing spawn location for Battered Chest (id: 2843)
 -- Elwynn Forest
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
