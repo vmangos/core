@@ -11,7 +11,7 @@ INSERT INTO `migrations` VALUES ('20220820203350');
 -- Correct respawn times of existing chests (source: CMangos)
 UPDATE `gameobject` SET `spawntimesecsmin`=300, `spawntimesecsmax`=900 WHERE `guid` IN (1397,1454,26749,26756,34797,34798,45106,45110,49528,49529);
 
--- Battered Chest should contain some coins (PTR test) TODO: this seem to have no effect ingame!
+-- Battered Chest should contain some coins (PTR test) - range is guessed.
 UPDATE `gameobject_template` SET `mingold`=10, `maxgold`=50 WHERE `entry`=2843;
 
 -- Insert missing spawn location for Battered Chest (id: 2843)
