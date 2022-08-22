@@ -2961,7 +2961,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 (@OGUID+37, 1329, 'Mithril Deposit - Azshara', 10),
 (@OGUID+38, 1329, 'Mithril Deposit - Azshara', 10),
 (@OGUID+39, 1329, 'Mithril Deposit - Azshara', 10),
-(@OGUID+39, 43524, 'Mithril Deposit - Dustwallow Marsh', 10);
+(@OGUID+40, 43524, 'Mithril Deposit - Dustwallow Marsh', 10);
 
 -- Gold Vein / Mithril Deposit in Blasted Lands
 SET @OGUID = 427400;
