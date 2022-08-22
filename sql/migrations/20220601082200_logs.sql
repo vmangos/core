@@ -27,7 +27,7 @@ CREATE TABLE `logs_player` (
   ) NOT NULL,
   `subtype` VARCHAR(20),
   `account` INT UNSIGNED NOT NULL,
-  `ip` VARCHAR(16) NOT NULL,
+  `ip` VARCHAR(16),
   `guid` INT,
   `name` VARCHAR(20),
   `map` INT UNSIGNED,

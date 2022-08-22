@@ -1716,7 +1716,7 @@ void ChatHandler::ExecuteCommand(char const* text)
                 {
                     Player* p = m_session->GetPlayer();
                     ObjectGuid sel_guid = p->GetSelectionGuid();
-                    sLog.Player(GetAccountId(), LOG_GM, LOG_LVL_BASIC,
+                    sLog.Player(m_session, LOG_GM, LOG_LVL_BASIC,
                         "Command: %s [Player: %s (Group Leader \"%s\", Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
                         realCommandFull.c_str(), p->GetName(), p->GetGroup() ? p->GetGroup()->GetLeaderGuid().GetString().c_str() : "NULL",
                         GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(), sel_guid.GetString().c_str());
@@ -1733,10 +1733,10 @@ void ChatHandler::ExecuteCommand(char const* text)
                 if (m_session && command->Flags & COMMAND_FLAGS_CRITICAL)
                 {
                     if (Unit* target = GetSelectedUnit())
-                        sLog.Player(m_session->GetAccountId(), LOG_GM_CRITICAL, LOG_LVL_BASIC,
+                        sLog.Player(m_session, LOG_GM_CRITICAL, LOG_LVL_BASIC,
                             "%s: %s. Selected %s. Map %u", m_session->GetUsername().c_str(), realCommandFull.c_str(), target->GetObjectGuid().GetString().c_str(), target->GetMapId());
                     else
-                        sLog.Player(m_session->GetAccountId(), LOG_GM_CRITICAL, LOG_LVL_BASIC,
+                        sLog.Player(m_session, LOG_GM_CRITICAL, LOG_LVL_BASIC,
                             "%s: %s.", m_session->GetUsername().c_str(), realCommandFull.c_str());
                 }
             }
