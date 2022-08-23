@@ -299,15 +299,16 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (pMover->GetObjectGuid() != m_clientMoverGuid)
         return;
+
+    // currently being moved by server
+    if (!pMover->movespline->Finalized())
+        return;
         
     Player* pPlayerMover = pMover->ToPlayer();
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (pPlayerMover && pPlayerMover->IsBeingTeleported())
-    {
-        recvData.rpos(recvData.wpos());                   // prevent warnings spam
         return;
-    }
 
     /* extract packet */
     MovementInfo movementInfo = pPlayerMover ? pPlayerMover->m_movementInfo : MovementInfo();
