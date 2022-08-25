@@ -549,7 +549,7 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
 
 void Creature::InitializeReactState()
 {
-    if (IsTotem() || IsTrigger() || !CanHaveTarget() || GetCreatureType() == CREATURE_TYPE_CRITTER)
+    if (IsTotem() || IsTrigger() || !CanHaveTarget())
         SetReactState(REACT_PASSIVE);
     else if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO))
         SetReactState(REACT_DEFENSIVE);
