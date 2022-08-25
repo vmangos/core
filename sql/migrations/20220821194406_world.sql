@@ -5975,7 +5975,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+10, 1279, 0, 'Blasted Lands - Gold Vein / Mithril Deposit', 0),
 (@PTEMPLATE+11, 1279, 0, 'Blasted Lands - Gold Vein / Mithril Deposit', 0);
 
--- Small Thorium Vein / Truesilver Deposit
+-- Truesilver Deposit / Small Thorium Vein
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1280, 1278));
 DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (1280, 1278);
 DELETE FROM `pool_template` WHERE `entry` IN (1280, 1278);
@@ -6018,82 +6018,82 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+34, 2047, 0, -10872.9, -2727.42, 9.55622, 5.53269, 0, 0, -0.366501, 0.930418, 300, 300, 100, 1, 0, 0, 0, 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(@PTEMPLATE+1, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+2, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+3, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+4, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+5, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+6, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+7, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+8, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+9, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+10, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+11, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+12, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+13, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+14, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+15, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+16, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+17, 1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10);
+(@PTEMPLATE+1, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+2, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+3, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+4, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+5, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+6, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+7, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+8, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+9, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+10, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+11, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+12, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+13, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+14, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+15, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+16, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+17, 1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(@OGUID+1, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+2, @PTEMPLATE+2, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+3, @PTEMPLATE+3, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+4, @PTEMPLATE+4, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+5, @PTEMPLATE+5, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+6, @PTEMPLATE+6, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+7, @PTEMPLATE+7, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+8, @PTEMPLATE+8, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+9, @PTEMPLATE+9, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+10, @PTEMPLATE+10, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+11, @PTEMPLATE+11, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+12, @PTEMPLATE+12, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+13, @PTEMPLATE+13, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+14, @PTEMPLATE+14, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+15, @PTEMPLATE+15, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+16, @PTEMPLATE+16, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+17, @PTEMPLATE+17, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+18, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+19, @PTEMPLATE+2, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+20, @PTEMPLATE+3, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+21, @PTEMPLATE+4, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+22, @PTEMPLATE+5, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+23, @PTEMPLATE+6, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+24, @PTEMPLATE+7, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+25, @PTEMPLATE+8, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+26, @PTEMPLATE+9, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+27, @PTEMPLATE+10, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+28, @PTEMPLATE+11, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+29, @PTEMPLATE+12, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+30, @PTEMPLATE+13, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+31, @PTEMPLATE+14, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+32, @PTEMPLATE+15, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+33, @PTEMPLATE+16, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+34, @PTEMPLATE+17, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10);
+(@OGUID+1, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+6, @PTEMPLATE+6, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+7, @PTEMPLATE+7, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+8, @PTEMPLATE+8, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+9, @PTEMPLATE+9, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+10, @PTEMPLATE+10, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+11, @PTEMPLATE+11, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+12, @PTEMPLATE+12, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+13, @PTEMPLATE+13, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+14, @PTEMPLATE+14, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+15, @PTEMPLATE+15, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+16, @PTEMPLATE+16, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+17, @PTEMPLATE+17, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+18, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+19, @PTEMPLATE+2, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+20, @PTEMPLATE+3, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+21, @PTEMPLATE+4, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+22, @PTEMPLATE+5, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+23, @PTEMPLATE+6, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+24, @PTEMPLATE+7, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+25, @PTEMPLATE+8, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+26, @PTEMPLATE+9, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+27, @PTEMPLATE+10, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+28, @PTEMPLATE+11, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+29, @PTEMPLATE+12, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+30, @PTEMPLATE+13, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+31, @PTEMPLATE+14, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+32, @PTEMPLATE+15, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+33, @PTEMPLATE+16, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+34, @PTEMPLATE+17, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(1359, 10, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit (Master Pool)', 0, 0, 0, 10);
+(1359, 10, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(@PTEMPLATE+1, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+2, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+3, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+4, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+5, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+6, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+7, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+8, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+9, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+10, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+11, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+12, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+13, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+14, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+15, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+16, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+17, 1359, 0, 'Blasted Lands - Small Thorium Vein / Truesilver Deposit', 0);
+(@PTEMPLATE+1, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+2, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+3, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+4, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+5, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+6, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+7, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+8, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+9, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+10, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+11, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+12, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+13, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+14, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+15, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+16, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+17, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0);
 
--- Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory
+-- Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory
 SET @OGUID = 28525;
 SET @PTEMPLATE = 22909;
 
@@ -6124,35 +6124,35 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+24, 150079, 0, -10530.1, -3547.74, -9.48959, 3.00195, 0, 0, 0.997563, 0.0697661, 300, 300, 100, 1, 0, 0, 0, 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(@PTEMPLATE+1, 10, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10);
+(@PTEMPLATE+1, 10, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(@OGUID+1, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+2, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+3, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+4, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+5, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+6, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+7, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+8, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+9, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+10, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+11, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+12, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+13, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+14, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+15, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+16, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+17, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+18, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+19, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+20, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+21, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+22, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+23, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(@OGUID+24, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10);
+(@OGUID+1, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+2, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+3, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+4, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+5, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+6, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+7, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+8, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+9, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+10, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+11, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+12, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+13, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+14, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+15, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+16, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+17, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+18, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+19, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+20, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+21, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+22, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+23, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10),
+(@OGUID+24, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory', 10);
 
--- Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit
+-- Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein
 SET @OGUID = 3996000;
 SET @PTEMPLATE = 8800;
 
@@ -6171,30 +6171,30 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+12, 2047, 0, -11126.9, -3365.38, 58.9554, 4.67748, 0, 0, -0.719339, 0.694659, 300, 300, 100, 1, 0, 0, 0, 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(@PTEMPLATE+1, 1, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+2, 1, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@PTEMPLATE+3, 1, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10);
+(@PTEMPLATE+1, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+2, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@PTEMPLATE+3, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(@OGUID+1, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+2, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+3, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+4, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+5, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+6, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+7, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+8, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+9, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+10, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+11, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10),
-(@OGUID+12, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit - Blasted Lands', 10);
+(@OGUID+1, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+4, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+5, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+6, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+7, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+8, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+9, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+10, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+11, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10),
+(@OGUID+12, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands', 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(1280, 1, 'Blasted Lands - Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit (Master Pool)', 0, 0, 0, 10);
+(1280, 1, 'Blasted Lands - Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(@PTEMPLATE+1, 1280, 0, 'Blasted Lands - Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+2, 1280, 0, 'Blasted Lands - Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+3, 1280, 0, 'Blasted Lands - Gold Vein / Mithril Deposit / Small Thorium Vein / Truesilver Deposit', 0);
+(@PTEMPLATE+1, 1280, 0, 'Blasted Lands - Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+2, 1280, 0, 'Blasted Lands - Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+3, 1280, 0, 'Blasted Lands - Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein', 0);
 
 
 -- End of migration.
