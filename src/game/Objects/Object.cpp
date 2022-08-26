@@ -2965,6 +2965,26 @@ Player* WorldObject::FindNearestPlayer(float range) const
     return target;
 }
 
+Player* WorldObject::FindNearestHostilePlayer(float range) const
+{
+    Player* target = nullptr;
+    MaNGOS::NearestHostileUnitCheck check(this, range);
+    MaNGOS::PlayerLastSearcher<MaNGOS::NearestHostileUnitCheck> searcher(target, check);
+    Cell::VisitWorldObjects(this, searcher, range);
+
+    return target;
+}
+
+Player* WorldObject::FindNearestFriendlyPlayer(float range) const
+{
+    Player* target = nullptr;
+    MaNGOS::NearestFriendlyUnitCheck check(this, range);
+    MaNGOS::PlayerLastSearcher<MaNGOS::NearestFriendlyUnitCheck> searcher(target, check);
+    Cell::VisitWorldObjects(this, searcher, range);
+
+    return target;
+}
+
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const
 {
     CellPair pair(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));

@@ -105,7 +105,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_NONE,               //  53
     CONDITION_REQ_TARGET_WORLDOBJECT, //  54
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  55
-    CONDITION_REQ_TARGET_UNIT,        //  56
+    CONDITION_REQ_TARGET_WORLDOBJECT, //  56
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -602,11 +602,11 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             switch (m_value1)
             {
                 case 0:
-                    return (bool)target->ToUnit()->FindNearestPlayer(m_value2);
+                    return (bool)target->FindNearestPlayer(m_value2);
                 case 1:
-                    return (bool)target->ToUnit()->FindNearestHostilePlayer(m_value2);
+                    return (bool)target->FindNearestHostilePlayer(m_value2);
                 case 2:
-                    return (bool)target->ToUnit()->FindNearestFriendlyPlayer(m_value2);
+                    return (bool)target->FindNearestFriendlyPlayer(m_value2);
             }
             return false;
         }

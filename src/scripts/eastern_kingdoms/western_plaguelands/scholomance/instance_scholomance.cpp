@@ -200,6 +200,7 @@ struct instance_scholomance : public ScriptedInstance
             case TYPE_MALICIA:
             case TYPE_ILLUCIABAROV:
             case TYPE_VIEWING_ROOM_DOOR:
+            case TYPE_DARKREAVER:
                 m_auiEncounter[uiType] = uiData;
                 break;
             default:
