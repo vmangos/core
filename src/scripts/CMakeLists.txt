@@ -208,8 +208,8 @@ set (SCRIPTS_SRCS
     kalimdor/feralas/dire_maul/boss_tendris_warpwood.cpp
     kalimdor/feralas/dire_maul/boss_zevrim.cpp
     kalimdor/feralas/dire_maul/dreadsteed_ritual.cpp
-    kalimdor/feralas/dire_maul//npc_j_eevee.h
-    kalimdor/feralas/dire_maul//npc_j_eevee.cpp
+    kalimdor/feralas/dire_maul/npc_j_eevee.h
+    kalimdor/feralas/dire_maul/npc_j_eevee.cpp
     kalimdor/feralas/dire_maul/instance_dire_maul.cpp
     kalimdor/moonglade/boss_omen.cpp
     kalimdor/moonglade/moonglade.cpp
