@@ -4,7 +4,6 @@ set(LIBRARY_NAME scripts)
 set (SCRIPTS_SRCS 
     ScriptLoader.h
     custom/custom.h
-    custom/npc_j_eevee.h
     eastern_kingdoms/burning_steppes/blackrock_depths/blackrock_depths.h
     eastern_kingdoms/burning_steppes/blackrock_spire/blackrock_spire.h
     eastern_kingdoms/burning_steppes/blackwing_lair/blackwing_lair.h
@@ -44,7 +43,6 @@ set (SCRIPTS_SRCS
     custom/gmisland.cpp
     custom/npc_escort.cpp
     custom/zero_creatures.cpp
-    custom/npc_j_eevee.cpp
     eastern_kingdoms/alterac_mountains/alterac_mountains.cpp
     eastern_kingdoms/arathi_highlands/arathi_highlands.cpp
     eastern_kingdoms/blasted_lands/blasted_lands.cpp
@@ -210,6 +208,8 @@ set (SCRIPTS_SRCS
     kalimdor/feralas/dire_maul/boss_tendris_warpwood.cpp
     kalimdor/feralas/dire_maul/boss_zevrim.cpp
     kalimdor/feralas/dire_maul/dreadsteed_ritual.cpp
+    kalimdor/feralas/dire_maul//npc_j_eevee.h
+    kalimdor/feralas/dire_maul//npc_j_eevee.cpp
     kalimdor/feralas/dire_maul/instance_dire_maul.cpp
     kalimdor/moonglade/boss_omen.cpp
     kalimdor/moonglade/moonglade.cpp

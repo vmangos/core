@@ -4,7 +4,7 @@
 
 #include "scriptPCH.h"
 #include "dire_maul.h"
-#include "../../../custom/npc_j_eevee.h"
+#include "npc_j_eevee.h"
 
 enum
 {
