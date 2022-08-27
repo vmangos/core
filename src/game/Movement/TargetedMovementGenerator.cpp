@@ -141,8 +141,22 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     PathType pathType = path.getPathType();
     m_bReachable = pathType & (PATHFIND_NORMAL | PATHFIND_DEST_FORCED);
     
-    if (!petFollowing && pathType == PATHFIND_NOPATH)
-        return;    
+    if (!petFollowing)
+    {
+        if (pathType == PATHFIND_NOPATH)
+            return;
+
+        if (isPet)
+        {
+            // prevent pets from going through closed doors
+            path.CutPathWithDynamicLoS();
+            if (path.getPath().size() == 2 && path.Length() < 0.1f)
+            {
+                m_bReachable = false;
+                return;
+            }
+        }
+    }
 
     if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH))
         m_bReachable = true;

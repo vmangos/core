@@ -26,10 +26,10 @@ EndScriptData */
 
 enum
 {
-    SAY_AGGRO                           = -1090024,
-    SAY_PHASE                           = -1090025,
-    SAY_BOMB                            = -1090026,
-    SAY_SLAY                            = -1090027,
+    SAY_AGGRO                           = 6173,
+    SAY_PHASE                           = 6174,
+    SAY_BOMB                            = 6176,
+    SAY_SLAY                            = 6175,
 
     SPELL_ACTIVATE_BOMB_A               = 11511,            // Target Dest = -530.754 670.571 -313.784
     SPELL_ACTIVATE_BOMB_B               = 11795,            // Target Dest = -530.754 670.571 -313.784

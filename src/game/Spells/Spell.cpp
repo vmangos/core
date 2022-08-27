@@ -1065,6 +1065,23 @@ void Spell::AddGOTarget(GameObject* pTarget, SpellEffectIndex effIndex)
     if (m_spellInfo->Effect[effIndex] == 0)
         return;
 
+    // do not exceed max gobject targets
+    if (m_spellInfo->MaxAffectedTargets)
+    {
+        uint32 targetsForEffect = 0;
+        for (auto& ihit : m_UniqueGOTargetInfo)
+        {
+            if (ihit.deleted)
+                continue;
+
+            if (ihit.effectMask & (1 << effIndex))
+                targetsForEffect++;
+        }
+
+        if (targetsForEffect >= m_spellInfo->MaxAffectedTargets)
+            return;
+    }
+
     ObjectGuid targetGUID = pTarget->GetObjectGuid();
 
     // Lookup target in already in list
@@ -1704,7 +1721,9 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
 
             // for delayed spells ignore not visible explicit target
             if (m_delayed && unit == m_targets.getUnitTarget() &&
-               !unit->IsVisibleForOrDetect(m_caster, m_caster, false))
+               !unit->IsVisibleForOrDetect(m_caster, m_caster, false) &&
+                // dead creatures don't see alive players, but spells should still hit
+                !(unit->IsPlayer() && unit->IsAlive() && m_caster->IsCreature() && m_casterUnit->IsDead()))
             {
                 pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 ResetEffectDamageAndHeal();
@@ -8744,7 +8763,7 @@ void Spell::OnSpellLaunch()
     }
     
     bool triggerAutoAttack = unitTarget != m_casterUnit && !m_spellInfo->IsPositiveSpell() && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET);
-    m_casterUnit->GetMotionMaster()->MoveCharge(unitTarget, GetSpellBatchingEffectDelay(unitTarget), triggerAutoAttack);
+    m_casterUnit->GetMotionMaster()->MoveCharge(unitTarget, m_delayed ? GetSpellBatchingEffectDelay(unitTarget) : 0, triggerAutoAttack);
 }
 
 bool Spell::HasModifierApplied(SpellModifier* mod)

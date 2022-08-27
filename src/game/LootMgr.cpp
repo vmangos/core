@@ -39,15 +39,15 @@ static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] =
     CONFIG_FLOAT_RATE_DROP_ITEM_ARTIFACT,                                // ITEM_QUALITY_ARTIFACT
 };
 
-LootStore LootTemplates_Creature("creature_loot_template",     "creature entry",                 true);
-LootStore LootTemplates_Disenchant("disenchant_loot_template",   "item disenchant id",             true);
-LootStore LootTemplates_Fishing("fishing_loot_template",      "area id",                        true);
-LootStore LootTemplates_Gameobject("gameobject_loot_template",   "gameobject lootid",              true);
-LootStore LootTemplates_Item("item_loot_template",         "item entry with ITEM_FLAG_LOOTABLE", true);
-LootStore LootTemplates_Mail("mail_loot_template",         "mail template id",               false);
-LootStore LootTemplates_Pickpocketing("pickpocketing_loot_template", "creature pickpocket lootid",     true);
-LootStore LootTemplates_Reference("reference_loot_template",    "reference id",                   false);
-LootStore LootTemplates_Skinning("skinning_loot_template",     "creature skinning id",           true);
+LootStore LootTemplates_Creature(     "creature_loot_template",      "creature entry",                     true);
+LootStore LootTemplates_Disenchant(   "disenchant_loot_template",    "item disenchant id",                 true);
+LootStore LootTemplates_Fishing(      "fishing_loot_template",       "area id",                            true);
+LootStore LootTemplates_Gameobject(   "gameobject_loot_template",    "gameobject lootid",                  true);
+LootStore LootTemplates_Item(         "item_loot_template",          "item entry with ITEM_FLAG_LOOTABLE", true);
+LootStore LootTemplates_Mail(         "mail_loot_template",          "mail template id",                   false);
+LootStore LootTemplates_Pickpocketing("pickpocketing_loot_template", "creature pickpocket lootid",         true);
+LootStore LootTemplates_Reference(    "reference_loot_template",     "reference id",                       false);
+LootStore LootTemplates_Skinning(     "skinning_loot_template",      "creature skinning id",               true);
 
 class LootTemplate::LootGroup                               // A set of loot definitions for items (refs are not allowed)
 {
@@ -725,7 +725,7 @@ void Loot::NotifyQuestItemRemoved(uint8 questIndex)
     }
 }
 
-void Loot::generateMoneyLoot(uint32 minAmount, uint32 maxAmount)
+void Loot::GenerateMoneyLoot(uint32 minAmount, uint32 maxAmount)
 {
     if (maxAmount > 0)
     {

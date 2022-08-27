@@ -1529,8 +1529,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 8897:                                 // Destroy Rocket Boots
                 {
                     m_caster->CastSpell(unitTarget, 8893, true);
-                    m_caster->CastSpell(unitTarget, 13158, true);
-
                     return;
                 }
                 case 23185:                                 // Aura of Frost
