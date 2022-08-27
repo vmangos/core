@@ -403,7 +403,6 @@ UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Sil
 
 -- The Barrens
 UPDATE `pool_gameobject` SET `description`= 'Tin Vein (3764) / Silver Vein - Barrens' WHERE  `guid` IN (34669, 34670, 34684, 34686, 34687, 34688, 34698, 34702, 34703, 34661, 34729, 34730);
-UPDATE pool_gameobject SET description = 'Copper Vein (3763) - Barrens' WHERE pool_entry = 2588;
 UPDATE `pool_template` SET `description` = 'Tin Vein (3764) / Silver Vein - Barrens' WHERE `entry` IN (1920, 1860, 1861, 1875, 1877, 1878, 1879, 1889, 1893, 1894, 1921);
 
 -- Tin Vein / Silver Vein
