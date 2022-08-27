@@ -92,10 +92,8 @@ struct boss_jandicebarovAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->SetVisibility(VISIBILITY_ON);
 
-        if (sWorld.GetWowPatch() > WOW_PATCH_108 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVE_EVENTS))
-        {
+        if (sWorld.GetWowPatch() >= WOW_PATCH_109)
             DoCastSpellIfCan(m_creature, SPELL_DROP_JOURNAL, CF_TRIGGERED);
-        }
     }
 
     void DamageTaken(Unit* /*pDealer*/, uint32& uiDamage) override
