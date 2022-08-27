@@ -94,13 +94,13 @@ UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Tin Vein / Sil
 UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Silver Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
 
 -- Tin Vein / Silver Vein / Incendicite Mineral Vein (1610)
-UPDATE `pool_gameobject` SET `chance` = 80 WHERE `description` = "Tin Vein / Silver Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
-UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Silver Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
-UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Silver Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1610);
+UPDATE `pool_gameobject` SET `chance` = 80 WHERE `description` = "Tin Vein / Silver Vein / Incendicite Mineral Vein (1610) - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Silver Vein / Incendicite Mineral Vein (1610) - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Silver Vein / Incendicite Mineral Vein (1610) - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1610);
 
 -- Gold Vein / Iron Deposit
-UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Tin Vein / Silver Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
-UPDATE `pool_gameobject` SET `chance` = 70 WHERE `description` = "Tin Vein / Silver Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
+UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Gold Vein / Iron Deposit - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 70 WHERE `description` = "Gold Vein / Iron Deposit - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
 
 
 -- Loch Modan
