@@ -159,7 +159,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 
 -- Tin Vein / Silver Vein in Hillsbrad
 SET @OGUID = 43272;
-SET @PTEMPLATE = 21663;
+SET @PTEMPLATE = 21700;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID, 1732, 0, 306.792, -1082.6, 93.0067, 4.27606, 0, 0, -0.843391, 0.5373, 300, 300, 100, 1, 0, 0, 0, 10),
