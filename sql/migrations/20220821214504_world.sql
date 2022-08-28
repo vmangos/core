@@ -4435,11 +4435,11 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (389473, 1735, 0, -13946.2, 220.203, 18.3835, 5.09636, 0, 0, -0.559193, 0.829038, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 389462 at 49.843273 yards.
 (43804, 1735, 0, -11919.8, 178.668, 40.417, 3.89209, 0, 0, -0.930417, 0.366502, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32486 at 129.085312 yards.
-(29534, 1735, 0, -12741.6, -451.591, 32.6192, 5.3058, 0, 0, -0.469471, 0.882948, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 29533 at 165.302887 yards.
+(43805, 1735, 0, -12741.6, -451.591, 32.6192, 5.3058, 0, 0, -0.469471, 0.882948, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 29533 at 165.302887 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (389473, 1175, 'Iron Deposits in Stranglethorn', 10),
 (43804, 1175, 'Iron Deposits in Stranglethorn', 10),
-(29534, 1175, 'Iron Deposits in Stranglethorn', 10);
+(43805, 1175, 'Iron Deposits in Stranglethorn', 10);
 
 -- Missing Iron Deposit spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
