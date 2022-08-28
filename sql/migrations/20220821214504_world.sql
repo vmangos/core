@@ -4645,7 +4645,7 @@ UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iro
 
 UPDATE `gameobject` SET `position_x`=1632.36, `position_y`=-2385.01, `position_z`=73.8914, `orientation`=0.558504, `rotation0`=0, `rotation1`=0, `rotation2`=0.275637, `rotation3`=0.961262 WHERE `guid` IN (261426, 261407);
 UPDATE `gameobject` SET `position_x`=2207.13, `position_y`=-1719.47, `position_z`=81.9363, `orientation`=1.50098, `rotation0`=0, `rotation1`=0, `rotation2`=0.681998, `rotation3`=0.731354 WHERE `guid` IN (261431, 261412);
-UPDATE `gameobject` SET `position_x`=-7509.1, `position_y`=1091.58,, `position_z`=-1.2318, `orientation`=-0.803857, `rotation0`=0, `rotation1`=0, `rotation2`=-0.803857, `rotation3`=0.594823 WHERE `guid` IN (23530, 23501);
+UPDATE `gameobject` SET `position_x`=-7509.1, `position_y`=1091.58, `position_z`=-1.2318, `orientation`=-0.803857, `rotation0`=0, `rotation1`=0, `rotation2`=-0.803857, `rotation3`=0.594823 WHERE `guid` IN (23530, 23501);
 
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
