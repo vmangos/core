@@ -419,6 +419,22 @@ UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Tin Vein (3764
 UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein (3764) / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
 
 
+-- The Hinterlands
+-- Gold Vein / Mithril Deposit / Truesilver Deposit
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Hinterlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 80 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Hinterlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Hinterlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
+
+-- Small Thorium Vein / Truesilver Deposit
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Hinterlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 324);
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Hinterlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
+
+-- Silver Vein / Gold Vein / Iron Deposit
+UPDATE `pool_gameobject` SET `chance` = 15 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Hinterlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 15 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Hinterlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 70 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Hinterlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
+
+
 -- End of migration.
 END IF;
 END??
