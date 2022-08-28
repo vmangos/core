@@ -4479,7 +4479,7 @@ UPDATE `pool_template` SET `description`='Tin Vein / Silver Vein / Iron Deposit 
 
 -- Missing Iron Deposit spawns in Stonetalon Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(28419, 1735, 1, 471.047, 1521.84, 31.6324, 6.14356, 0, 0, -0.0697556, 0.997564, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28372 at 64.179543 yards.
+(28419, 1735, 1, 471.047, 1521.84, 31.6324, 6.14356, 0, 0, -0.0697556, 0.997564, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 28372 at 64.179543 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (28419, 2299, 'Tin Vein / Silver Vein / Iron Deposit - Stonetalon Mountains', 10);
 UPDATE `pool_gameobject` SET `description`='Tin Vein / Silver Vein / Iron Deposit - Stonetalon Mountains' WHERE `pool_entry` = 2299;
@@ -4612,14 +4612,14 @@ UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Truesilv
 
 -- Missing Truesilver Deposit spawns in Searing Gorge.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(26370, 2047, 0, -6727.07, -1085.87, 185.576, 0.994837, 0, 0, 0.477159, 0.878817, 300, 300, 1, 100, 5, 10), -- Closest existing guid is 26367 at 102.620529 yards.
+(26370, 2047, 0, -6727.07, -1085.87, 185.576, 0.994837, 0, 0, 0.477159, 0.878817, 300, 300, 1, 100, 5, 10); -- Closest existing guid is 26367 at 102.620529 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (26370, 4053, 'Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George', 10);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE `pool_entry` = 4053;
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE  `entry`=4053;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(26371, 2047, 0, -7040.85, -1749.85, 259.663, 0.104719, 0, 0, 0.0523357, 0.99863, 300, 300, 1, 100, 5, 10), -- Closest existing guid is 26365 at 8.728897 yards.
+(26371, 2047, 0, -7040.85, -1749.85, 259.663, 0.104719, 0, 0, 0.0523357, 0.99863, 300, 300, 1, 100, 5, 10); -- Closest existing guid is 26365 at 8.728897 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (26371, 4027, 'Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George', 10);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE `pool_entry` = 4027;
