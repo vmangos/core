@@ -4754,7 +4754,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = 2857;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(16857, 1733, 0, 192.598, 601.971, 50.1232, 2.40855, 0, 0, 0.93358, 0.358368, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 16829 at 84.169327 yards.
+(16857, 1733, 0, 192.598, 601.971, 50.1232, 2.40855, 0, 0, 0.93358, 0.358368, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 16829 at 84.169327 yards.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
 (@PTEMPLATE, 1, 'Tin Vein / Silver Vein - Silverpine Forest', 10);
 DELETE FROM `pool_gameobject` WHERE `guid` = 9687;
@@ -4765,7 +4765,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE, 1354, 0, 'Silverpine Forest - Tin Vein / Silver Vein', 0);
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(427016, 1733, 0, 404.157, 1015.15, 108.756, 0.418879, 0, 0, 0.207911, 0.978148, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 427015 at 173.235062 yards.
+(427016, 1733, 0, 404.157, 1015.15, 108.756, 0.418879, 0, 0, 0.207911, 0.978148, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 427015 at 173.235062 yards.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
 (@PTEMPLATE+1, 1, 'Tin Vein / Silver Vein - Silverpine Forest', 10);
 DELETE FROM `pool_gameobject` WHERE `guid` = 42061;
@@ -4800,15 +4800,15 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+2, 1733, 1, 2480.12, -2480.06, 183.31, 5.2709, 0, 0, -0.484809, 0.87462, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5715 at 125.684624 yards.
 (@OGUID+3, 1733, 1, 1470.32, -2110.5, 96.8607, 0.366518, 0, 0, 0.182235, 0.983255, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5745 at 17.269676 yards.
 (@OGUID+4, 1733, 1, 2810.71, -1888.54, 194.402, 2.23402, 0, 0, 0.898793, 0.438373, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5925 at 405.831543 yards.
-(@OGUID+5, 1733, 1, 1737.65, -3504.75, 144.517, 4.15388, 0, 0, -0.874619, 0.48481, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 427336 at 353.134094 yards.
+(@OGUID+5, 1733, 1, 1737.65, -3504.75, 144.517, 4.15388, 0, 0, -0.874619, 0.48481, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 427336 at 353.134094 yards.
 (@OGUID+6, 1734, 1, 2185.05, -2803.73, 128.734, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 427021 at 80.155540 yards.
 (@OGUID+7, 1734, 1, 2480.12, -2480.06, 183.31, 5.2709, 0, 0, -0.484809, 0.87462, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5715 at 125.684624 yards.
 (@OGUID+8, 1734, 1, 1470.32, -2110.5, 96.8607, 0.366518, 0, 0, 0.182235, 0.983255, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5745 at 17.269676 yards.
 (@OGUID+9, 1734, 1, 2810.71, -1888.54, 194.402, 2.23402, 0, 0, 0.898793, 0.438373, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5925 at 405.831543 yards.
-(@OGUID+10, 1734, 1, 1737.65, -3504.75, 144.517, 4.15388, 0, 0, -0.874619, 0.48481, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 427336 at 353.134094 yards.
+(@OGUID+10, 1734, 1, 1737.65, -3504.75, 144.517, 4.15388, 0, 0, -0.874619, 0.48481, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 427336 at 353.134094 yards.
 (@OGUID+11, 1735, 1, 2185.05, -2803.73, 128.734, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 427021 at 80.155540 yards.
 (@OGUID+12, 1735, 1, 2480.12, -2480.06, 183.31, 5.2709, 0, 0, -0.484809, 0.87462, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5715 at 125.684624 yards.
-(@OGUID+13, 1735, 1, 1470.32, -2110.5, 96.8607, 0.366518, 0, 0, 0.182235, 0.983255, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 5745 at 17.269676 yards.
+(@OGUID+13, 1735, 1, 1470.32, -2110.5, 96.8607, 0.366518, 0, 0, 0.182235, 0.983255, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5745 at 17.269676 yards.
 (@OGUID+14, 1735, 1, 2810.71, -1888.54, 194.402, 2.23402, 0, 0, 0.898793, 0.438373, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5925 at 405.831543 yards.
 (@OGUID+15, 1735, 1, 1737.65, -3504.75, 144.517, 4.15388, 0, 0, -0.874619, 0.48481, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 427336 at 353.134094 yards.
 
