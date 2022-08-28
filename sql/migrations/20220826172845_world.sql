@@ -175,10 +175,6 @@ UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Gold Vein / Mi
 UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Blasted Lands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 324);
 UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Blasted Lands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
 
--- Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory
-UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 150082);
-UPDATE `pool_gameobject` SET `chance` = 70 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 150079);
-
 -- Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein
 UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
 UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit / Small Thorium Vein - Blasted Lands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
