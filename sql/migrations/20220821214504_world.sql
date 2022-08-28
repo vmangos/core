@@ -4328,11 +4328,11 @@ UPDATE `pool_template` SET `description`='Silver Vein / Gold Vein / Iron Deposit
 
 -- Missing Silver Vein spawns in Desolace.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(20856, 1733, 1, -1328.47, 2576.41, 116.466, 3.7001, 0, 0, -0.961261, 0.27564, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 20855 at 109.725983 yards.
+(43800, 1733, 1, -1328.47, 2576.41, 116.466, 3.7001, 0, 0, -0.961261, 0.27564, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 20855 at 109.725983 yards.
 (20865, 1733, 1, -1619.46, 1323.85, 85.8146, 1.0472, 0, 0, 0.5, 0.866025, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 20863 at 150.197464 yards.
 (427042, 1733, 1, -956.861, 1253.08, 111.268, 1.01229, 0, 0, 0.484809, 0.87462, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 427003 at 91.542076 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(20856, 321, 'Silver Veins in Desolace', 10),
+(43800, 321, 'Silver Veins in Desolace', 10),
 (20865, 321, 'Silver Veins in Desolace', 10),
 (427042, 321, 'Silver Veins in Desolace', 10);
 
