@@ -4361,11 +4361,11 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 
 -- Missing Gold Vein spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(10623, 1734, 0, 264.654, -44.6943, 124.458, 5.11382, 0, 0, -0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10622 at 205.485077 yards.
+(43803, 1734, 0, 264.654, -44.6943, 124.458, 5.11382, 0, 0, -0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10622 at 205.485077 yards.
 (6488, 1734, 0, 502.952, -1391.69, 72.4759, 6.03884, 0, 0, -0.121869, 0.992546, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 6487 at 492.425018 yards.
 (6489, 1734, 0, 444.871, -1604.78, 68.803, 1.83259, 0, 0, 0.793353, 0.608762, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 6487 at 701.278015 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(10623, 1353, 'Gold Veins in Alterac Mountains', 10),
+(43803, 1353, 'Gold Veins in Alterac Mountains', 10),
 (6488, 1353, 'Gold Veins in Alterac Mountains', 10),
 (6489, 1353, 'Gold Veins in Alterac Mountains', 10);
 
