@@ -4379,7 +4379,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 
 -- Missing Gold Vein spawns in Arathi Highlands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(34589, 1734, 0, -1819.15, -2011.03, 66.5258, 2.02458, 0, 0, 0.848047, 0.529921, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 34445 at 109.545471 yards.
+(34589, 1734, 0, -1819.15, -2011.03, 66.5258, 2.02458, 0, 0, 0.848047, 0.529921, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 34445 at 109.545471 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (34589, 2466, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Arathi Highlands', 10);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Truesilver Deposit - Arathi Highlands' WHERE `pool_entry` = 2466;
@@ -4792,7 +4792,7 @@ SET @OGUID = 27313;
 SET @PTEMPLATE = 2860;
 
 DELETE FROM `gameobject` WHERE `guid` IN (55688, 55697, 55676, 55690, 55695);
-SELETE FROM `pool_gameobject` WHERE `guid` IN (55688, 55697, 55676, 55690, 55695);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (55688, 55697, 55676, 55690, 55695);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 1733, 1, 2185.05, -2803.73, 128.734, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 427021 at 80.155540 yards.
 (@OGUID+2, 1733, 1, 2480.12, -2480.06, 183.31, 5.2709, 0, 0, -0.484809, 0.87462, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5715 at 125.684624 yards.
