@@ -2307,52 +2307,52 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+20, 324, 0, -714.288, -3791.05, 227.137, 0, 0, 0, 0, 1, 300, 300, 100, 1, 0, 0, 0, 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(@PTEMPLATE+1, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+2, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+3, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+4, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+5, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+6, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+7, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+8, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+9, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@PTEMPLATE+10, 1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10);
+(@PTEMPLATE+1, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+2, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+3, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+4, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+5, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+6, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+7, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+8, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+9, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@PTEMPLATE+10, 1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(@OGUID+1, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+2, @PTEMPLATE+2, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+3, @PTEMPLATE+3, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+4, @PTEMPLATE+4, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+5, @PTEMPLATE+5, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+6, @PTEMPLATE+6, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+7, @PTEMPLATE+7, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+8, @PTEMPLATE+8, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+9, @PTEMPLATE+9, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+10, @PTEMPLATE+10, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+11, @PTEMPLATE+1, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+12, @PTEMPLATE+2, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+13, @PTEMPLATE+3, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+14, @PTEMPLATE+4, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+15, @PTEMPLATE+5, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+16, @PTEMPLATE+6, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+17, @PTEMPLATE+7, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+18, @PTEMPLATE+8, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+19, @PTEMPLATE+9, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10),
-(@OGUID+20, @PTEMPLATE+10, 'Small Thorium Vein / Truesilver Deposit - Hinterlands', 10);
+(@OGUID+1, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+6, @PTEMPLATE+6, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+7, @PTEMPLATE+7, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+8, @PTEMPLATE+8, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+9, @PTEMPLATE+9, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+10, @PTEMPLATE+10, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+11, @PTEMPLATE+1, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+12, @PTEMPLATE+2, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+13, @PTEMPLATE+3, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+14, @PTEMPLATE+4, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+15, @PTEMPLATE+5, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+16, @PTEMPLATE+6, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+17, @PTEMPLATE+7, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+18, @PTEMPLATE+8, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+19, @PTEMPLATE+9, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10),
+(@OGUID+20, @PTEMPLATE+10, 'Truesilver Deposit / Small Thorium Vein - Hinterlands', 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(1070, 4, 'Hinterlands - Small Thorium Veins / Truesilver Deposits (Master Pool)', 0, 0, 0, 10);
+(1070, 4, 'Hinterlands - Truesilver Deposit / Small Thorium Vein (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(@PTEMPLATE+1, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+2, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+3, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+4, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+5, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+6, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+7, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+8, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+9, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0),
-(@PTEMPLATE+10, 1070, 0, 'Hinterlands - Small Thorium Vein / Truesilver Deposit', 0);
+(@PTEMPLATE+1, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+2, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+3, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+4, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+5, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+6, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+7, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+8, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+9, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+10, 1070, 0, 'Hinterlands - Truesilver Deposit / Small Thorium Vein', 0);
 
 -- Silver Vein / Gold Vein / Iron Deposit
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (279, 415, 1358, 402));
