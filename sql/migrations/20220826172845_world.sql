@@ -192,14 +192,14 @@ UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark I
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Silver Vein / Iron Deposit - Searing George' WHERE  `guid` IN (38453, 38353, 38253, 38510, 38410, 38310);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE  `guid` IN (38467, 38367, 38267, 38494, 38394, 38294, 38499, 38399, 38299, 29699, 38542, 38442, 38342);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein - Searing George' WHERE  `guid` IN (38497, 38397, 38297, 38503, 38403, 38303, 38515, 38415, 38315, 38516, 38416, 38316);
-UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Silver Vein / Iron Deposit - Searing George' WHERE  `entry` IN (4066, 4009);
-UPDATE `pool_pool` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Silver Vein / Iron Deposit - Searing George' WHERE  `pool_id` IN (4066, 4009);
+UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein - Searing George' WHERE  `entry` IN (4066, 4009);
+UPDATE `pool_pool` SET `description`='Searing George - Gold Vein / Mithril Deposit / Dark Iron Deposit / Silver Vein / Iron Deposit' WHERE  `pool_id` IN (4066, 4009);
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein - Searing George' WHERE  `entry` IN (4053, 4059, 4071, 4072);
-UPDATE `pool_pool` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein - Searing George' WHERE  `pool_id` IN (4053, 4059, 4071, 4072);
+UPDATE `pool_pool` SET `description`='Searing George - Gold Vein / Mithril Deposit / Dark Iron Deposit / Silver Vein / Iron Deposit' WHERE  `pool_id` IN (4053, 4059, 4071, 4072);
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George' WHERE  `entry` IN (4001, 4004, 4016, 4017, 4020, 4022, 4024, 4027, 4031, 4032, 4034, 4035, 4037, 4039, 4045, 4048, 4052, 4060, 4061, 4062, 4093, 4095);
-UPDATE `pool_pool` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George' WHERE  `pool_id` IN (4001, 4004, 4016, 4017, 4020, 4022, 4024, 4027, 4031, 4032, 4034, 4035, 4037, 4039, 4045, 4048, 4052, 4060, 4061, 4062, 4093, 4095);
+UPDATE `pool_pool` SET `description`='Searing George - Gold Vein / Mithril Deposit / Dark Iron Deposit / Silver Vein / Iron Deposit' WHERE  `pool_id` IN (4001, 4004, 4016, 4017, 4020, 4022, 4024, 4027, 4031, 4032, 4034, 4035, 4037, 4039, 4045, 4048, 4052, 4060, 4061, 4062, 4093, 4095);
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE  `entry` IN (4023, 4050, 4055, 4098);
-UPDATE `pool_pool` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE  `pool_id` IN (4023, 4050, 4055, 4098);
+UPDATE `pool_pool` SET `Searing George - Gold Vein / Mithril Deposit / Dark Iron Deposit / Silver Vein / Iron Deposit' WHERE  `pool_id` IN (4023, 4050, 4055, 4098);
 
 -- Gold Vein / Mithril Deposit / Dark Iron Deposit
 UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Gold Vein / Mithril Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
