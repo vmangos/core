@@ -4443,28 +4443,28 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 
 -- Missing Iron Deposit spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(35397, 1735, 0, -71.7572, -460.453, 102.154, 0.698131, 0, 0, 0.34202, 0.939693, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 35396 at 242.846436 yards.
+(43806, 1735, 0, -71.7572, -460.453, 102.154, 0.698131, 0, 0, 0.34202, 0.939693, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 35396 at 242.846436 yards.
 (427153, 1735, 0, 995.454, -632.881, 124.128, 2.56563, 0, 0, 0.958819, 0.284016, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 427132 at 121.343155 yards.
 (10572, 1735, 0, 412.711, -672.618, 179.944, 1.09956, 0, 0, 0.522498, 0.85264, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10571 at 207.291656 yards.
 (10573, 1735, 0, 595.001, -651.02, 153.667, 4.20625, 0, 0, -0.861629, 0.507539, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10571 at 22.153973 yards.
-(33183, 1735, 0, 581.203, -703.03, 153.828, 6.16101, 0, 0, -0.0610485, 0.998135, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33182 at 41.961742 yards.
+(43807, 1735, 0, 581.203, -703.03, 153.828, 6.16101, 0, 0, -0.0610485, 0.998135, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33182 at 41.961742 yards.
 (427184, 1735, 0, 247.102, -286.261, 153.984, 1.23918, 0, 0, 0.580703, 0.814116, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 427121 at 13.477481 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(35397, 1068, 'Iron Deposits in Alterac Mountains', 10),
+(43806, 1068, 'Iron Deposits in Alterac Mountains', 10),
 (427153, 1068, 'Iron Deposits in Alterac Mountains', 10),
 (10572, 1068, 'Iron Deposits in Alterac Mountains', 10),
 (10573, 1068, 'Iron Deposits in Alterac Mountains', 10),
-(33183, 1068, 'Iron Deposits in Alterac Mountains', 10),
+(43807, 1068, 'Iron Deposits in Alterac Mountains', 10),
 (427184, 1068, 'Iron Deposits in Alterac Mountains', 10);
 
 -- Missing Iron Deposit spawns in Desolace.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(10591, 1735, 1, -857.031, 1367.46, 74.1345, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10589 at 133.737106 yards.
-(6254, 1735, 1, -1628.29, 1604.64, 91.5897, 1.90241, 0, 0, 0.814116, 0.580703, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 6253 at 114.213814 yards.
+(43817, 1735, 1, -857.031, 1367.46, 74.1345, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10589 at 133.737106 yards.
+(43808, 1735, 1, -1628.29, 1604.64, 91.5897, 1.90241, 0, 0, 0.814116, 0.580703, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 6253 at 114.213814 yards.
 (10249, 1735, 1, -1636.06, 2065.69, 75.1803, 5.81195, 0, 0, -0.233445, 0.97237, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 10248 at 303.454742 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(10591, 1141, 'Iron Deposits in Desolace', 10),
-(6254, 1141, 'Iron Deposits in Desolace', 10),
+(43817, 1141, 'Iron Deposits in Desolace', 10),
+(43808, 1141, 'Iron Deposits in Desolace', 10),
 (10249, 1141, 'Iron Deposits in Desolace', 10);
 
 -- Missing Iron Deposit spawns in Wetlands.
@@ -4533,10 +4533,10 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 -- Missing Mithril Deposit spawns in Desolace.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (220455, 2040, 1, -2118.6, 1952.15, 73.0367, 0.226892, 0, 0, 0.113203, 0.993572, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 220405 at 112.664383 yards.
-(7061, 2040, 1, -1930.25, 1766.63, 74.6961, 1.20428, 0, 0, 0.566406, 0.824126, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7060 at 5.517547 yards.
+(43809, 2040, 1, -1930.25, 1766.63, 74.6961, 1.20428, 0, 0, 0.566406, 0.824126, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7060 at 5.517547 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (220455, 1146, 'Mithril Deposits in Desolace', 10),
-(7061, 1146, 'Mithril Deposits in Desolace', 10);
+(43809, 1146, 'Mithril Deposits in Desolace', 10);
 
 -- Missing Mithril Deposit spawns in The Hinterlands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
@@ -4556,29 +4556,29 @@ UPDATE `pool_template` SET `description`='Silver Vein / Gold Vein / Iron Deposit
 
 -- Missing Truesilver Deposit spawns in Azshara.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(48489, 2047, 1, 4689.64, -5369.46, 118.006, 6.00393, 0, 0, -0.139173, 0.990268, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48486 at 1134.194092 yards.
+(43810, 2047, 1, 4689.64, -5369.46, 118.006, 6.00393, 0, 0, -0.139173, 0.990268, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48486 at 1134.194092 yards.
 (14128, 2047, 1, 3801.09, -4842.9, 158.188, 0.209439, 0, 0, 0.104528, 0.994522, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 14127 at 1291.380615 yards.
 (14129, 2047, 1, 2930.96, -4063.48, 121.14, 4.01426, 0, 0, -0.906307, 0.422619, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 14127 at 123.712982 yards.
 (14130, 2047, 1, 3036.39, -4058.49, 123.179, 1.25664, 0, 0, 0.587785, 0.809017, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 14127 at 217.791107 yards.
-(48490, 2047, 1, 4373.93, -6309.83, 96.4017, 2.18166, 0, 0, 0.887011, 0.461749, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48486 at 366.321930 yards.
-(48491, 2047, 1, 3973.14, -5413.5, 124.489, 3.31614, 0, 0, -0.996194, 0.087165, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 48486 at 1301.465210 yards.
+(43811, 2047, 1, 4373.93, -6309.83, 96.4017, 2.18166, 0, 0, 0.887011, 0.461749, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48486 at 366.321930 yards.
+(43812, 2047, 1, 3973.14, -5413.5, 124.489, 3.31614, 0, 0, -0.996194, 0.087165, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 48486 at 1301.465210 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(48489, 1244, 'Truesilver Deposits in Azshara', 10),
+(43810, 1244, 'Truesilver Deposits in Azshara', 10),
 (14128, 1244, 'Truesilver Deposits in Azshara', 10),
 (14129, 1244, 'Truesilver Deposits in Azshara', 10),
 (14130, 1244, 'Truesilver Deposits in Azshara', 10),
-(48490, 1244, 'Truesilver Deposits in Azshara', 10),
-(48491, 1244, 'Truesilver Deposits in Azshara', 10);
+(43811, 1244, 'Truesilver Deposits in Azshara', 10),
+(43812, 1244, 'Truesilver Deposits in Azshara', 10);
 
 -- Missing Truesilver Deposit spawns in Stranglethorn Vale.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(11681, 2047, 0, -12851.3, 268.715, 19.0539, 1.69297, 0, 0, 0.748956, 0.66262, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 11679 at 1021.360413 yards.
-(11682, 2047, 0, -13258.2, -211.438, 35.7719, 2.1293, 0, 0, 0.874619, 0.48481, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 11679 at 896.735352 yards.
-(11683, 2047, 0, -13118.3, 164.409, 42.8251, 2.1293, 0, 0, 0.874619, 0.48481, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 11679 at 792.008057 yards.
+(43813, 2047, 0, -12851.3, 268.715, 19.0539, 1.69297, 0, 0, 0.748956, 0.66262, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 11679 at 1021.360413 yards.
+(43814, 2047, 0, -13258.2, -211.438, 35.7719, 2.1293, 0, 0, 0.874619, 0.48481, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 11679 at 896.735352 yards.
+(43815, 2047, 0, -13118.3, 164.409, 42.8251, 2.1293, 0, 0, 0.874619, 0.48481, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 11679 at 792.008057 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(11681, 1178, 'Truesilver Deposits in Stranglethorn', 10),
-(11682, 1178, 'Truesilver Deposits in Stranglethorn', 10),
-(11683, 1178, 'Truesilver Deposits in Stranglethorn', 10);
+(43813, 1178, 'Truesilver Deposits in Stranglethorn', 10),
+(43814, 1178, 'Truesilver Deposits in Stranglethorn', 10),
+(43815, 1178, 'Truesilver Deposits in Stranglethorn', 10);
 
 -- Missing Truesilver Deposit spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
@@ -4633,9 +4633,9 @@ UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark I
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE  `entry`=4086;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(26359, 2047, 0, -6612.19, -721.802, 248.035, 4.10153, 0, 0, -0.887011, 0.461749, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 26354 at 183.764740 yards.
+(43816, 2047, 0, -6612.19, -721.802, 248.035, 4.10153, 0, 0, -0.887011, 0.461749, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 26354 at 183.764740 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(26359, 4076, 'Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George', 10);
+(43816, 4076, 'Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George', 10);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George' WHERE `pool_entry` = 4076;
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George' WHERE  `entry`=4076;
 
@@ -4698,19 +4698,19 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 
 -- Missing Mithril Deposit spawns in Blasted Lands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(28616, 150079, 0, -10625, -3655, -15.6897, 3.64774, 0, 0, -0.968147, 0.250381, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28537 at 70.261040 yards.
-(28617, 150079, 0, -10705.5, -3127.19, 29.0701, 4.34587, 0, 0, -0.824126, 0.566406, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28541 at 69.681274 yards.
-(28618, 150079, 0, -10818.7, -3475.05, -21.4749, 5.65487, 0, 0, -0.309016, 0.951057, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28543 at 180.995743 yards.
-(28619, 150079, 0, -10613, -3328.92, -7.07186, 4.36332, 0, 0, -0.819152, 0.573577, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28543 at 76.930832 yards.
-(28620, 150079, 0, -10780.1, -3291.37, -10.1236, 3.78737, 0, 0, -0.948323, 0.317306, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28543 at 156.411591 yards.
-(28621, 150079, 0, -10661.6, -3303.15, -9.63558, 4.60767, 0, 0, -0.743144, 0.669131, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 28543 at 87.271095 yards.
+(28620, 150079, 0, -10625, -3655, -15.6897, 3.64774, 0, 0, -0.968147, 0.250381, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28537 at 70.261040 yards.
+(28621, 150079, 0, -10705.5, -3127.19, 29.0701, 4.34587, 0, 0, -0.824126, 0.566406, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28541 at 69.681274 yards.
+(28622, 150079, 0, -10818.7, -3475.05, -21.4749, 5.65487, 0, 0, -0.309016, 0.951057, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28543 at 180.995743 yards.
+(28623, 150079, 0, -10613, -3328.92, -7.07186, 4.36332, 0, 0, -0.819152, 0.573577, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28543 at 76.930832 yards.
+(28624, 150079, 0, -10780.1, -3291.37, -10.1236, 3.78737, 0, 0, -0.948323, 0.317306, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 28543 at 156.411591 yards.
+(28625, 150079, 0, -10661.6, -3303.15, -9.63558, 4.60767, 0, 0, -0.743144, 0.669131, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 28543 at 87.271095 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(28616, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(28617, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(28618, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(28619, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
 (28620, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
-(28621, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10);
+(28621, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
+(28622, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
+(28623, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
+(28624, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10),
+(28625, 22910, 'Small Thorium Vein / Truesilver Deposit - Blasted Lands - Garrison Armory', 10);
 
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
