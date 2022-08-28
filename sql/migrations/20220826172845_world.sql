@@ -203,11 +203,11 @@ UPDATE `pool_gameobject` SET `chance` = 60 WHERE `description` = "Gold Vein / Mi
 UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 165658);
 
 -- Gold Vein / Mithril Deposit / Dark Iron Deposit / Silver Vein / Iron Deposit
-UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Silver Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
-UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Gold Vein / Silver Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
-UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Gold Vein / Silver Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 165658);
-UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Silver Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
-UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Gold Vein / Silver Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
+UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 165658);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
 
 -- Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
