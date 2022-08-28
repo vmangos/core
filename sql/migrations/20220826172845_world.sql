@@ -220,10 +220,10 @@ UPDATE `pool_gameobject` SET `chance` = 25 WHERE `description` = "Gold Vein / Mi
 UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 324);
 
 -- Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit
-UPDATE `pool_gameobject` SET `chance` = 15 WHERE `description` = " Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
-UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = " Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
-UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = " Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 165658);
-UPDATE `pool_gameobject` SET `chance` = 15 WHERE `description` = " Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
+UPDATE `pool_gameobject` SET `chance` = 15 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
+UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 165658);
+UPDATE `pool_gameobject` SET `chance` = 15 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
 
 -- Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein
 UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
