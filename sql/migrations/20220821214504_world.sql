@@ -4388,7 +4388,7 @@ UPDATE `pool_gameobject` SET `chance`=10 WHERE  `guid`=28144;
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Truesilver Deposit - Arathi Highlands' WHERE  `entry`=2466;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(427450, 1734, 0, -1824.19, -1799.81, 60.5315, 1.79769, 0, 0, 0.782608, 0.622515, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 427428 at 157.990891 yards.
+(427450, 1734, 0, -1824.19, -1799.81, 60.5315, 1.79769, 0, 0, 0.782608, 0.622515, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 427428 at 157.990891 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (427450, 2465, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Arathi Highlands', 10);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Truesilver Deposit - Arathi Highlands' WHERE `pool_entry` = 2465;
