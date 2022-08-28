@@ -4627,12 +4627,14 @@ UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iro
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (26372, 2047, 0, -6560.44, -824.799, 297.716, 3.6652, 0, 0, -0.965925, 0.258821, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 26362 at 104.411003 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (26372, 4086, 'Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George', 10);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE `pool_entry` = 4086;
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit / Small Thorium Vein - Searing George' WHERE  `entry`=4086;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(26359, 2047, 0, -6612.19, -721.802, 248.035, 4.10153, 0, 0, -0.887011, 0.461749, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 26354 at 183.764740 yards.
+(26359, 2047, 0, -6612.19, -721.802, 248.035, 4.10153, 0, 0, -0.887011, 0.461749, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 26354 at 183.764740 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (26359, 4076, 'Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George', 10);
 UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George' WHERE `pool_entry` = 4076;
 UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Dark Iron Deposit / Truesilver Deposit - Searing George' WHERE  `entry`=4076;
