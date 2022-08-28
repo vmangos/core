@@ -4352,12 +4352,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (43801, 1734, 0, -11922.4, 306.106, 20.0254, 3.80482, 0, 0, -0.945518, 0.325568, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32096 at 129.085312 yards.
 (43258, 1734, 0, -12906.5, 387.039, 53.7599, 3.6652, 0, 0, -0.965925, 0.258821, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 43256 at 854.948914 yards.
 (6571, 1734, 0, -11681.5, 317.656, 43.8298, 5.86431, 0, 0, -0.207911, 0.978148, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 6570 at 121.268135 yards.
-(12287, 1734, 0, -13796.6, 610.099, 43.7884, 1.0472, 0, 0, 0.5, 0.866025, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 12286 at 418.383362 yards.
+(43802, 1734, 0, -13796.6, 610.099, 43.7884, 1.0472, 0, 0, 0.5, 0.866025, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 12286 at 418.383362 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
 (43801, 1176, 'Gold Veins in Stranglethorn', 10),
 (43258, 1176, 'Gold Veins in Stranglethorn', 10),
 (6571, 1176, 'Gold Veins in Stranglethorn', 10),
-(12287, 1176, 'Gold Veins in Stranglethorn', 10);
+(43802, 1176, 'Gold Veins in Stranglethorn', 10);
 
 -- Missing Gold Vein spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
