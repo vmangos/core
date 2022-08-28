@@ -4187,10 +4187,10 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (33196, 1732, 0, 225.675, -72.2974, 110.061, 1.95477, 0, 0, 0.829038, 0.559193, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33195 at 248.217819 yards.
 (42200, 1732, 0, 244.997, -10.5061, 83.3397, 0.209439, 0, 0, 0.104528, 0.994522, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33195 at 266.550751 yards.
 (33198, 1732, 0, 12.0793, -148.168, 130.97, 3.3685, 0, 0, -0.993571, 0.113208, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33195 at 121.186020 yards.
-(32280, 1732, 0, -185.258, 375.062, 116.572, 1.02974, 0, 0, 0.492423, 0.870356, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32279 at 69.703323 yards.
-(32281, 1732, 0, -161.117, 398.667, 105.474, 4.08407, 0, 0, -0.891006, 0.453991, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32279 at 96.789047 yards.
-(33200, 1732, 0, 75.6466, -78.375, 114.581, 2.02458, 0, 0, 0.848047, 0.529921, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33195 at 105.404190 yards.
-(33201, 1732, 0, -130.354, -149.858, 120.737, 1.97222, 0, 0, 0.833885, 0.551938, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 33195 at 161.181259 yards.
+(42201, 1732, 0, -185.258, 375.062, 116.572, 1.02974, 0, 0, 0.492423, 0.870356, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32279 at 69.703323 yards.
+(42202, 1732, 0, -161.117, 398.667, 105.474, 4.08407, 0, 0, -0.891006, 0.453991, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32279 at 96.789047 yards.
+(42203, 1732, 0, 75.6466, -78.375, 114.581, 2.02458, 0, 0, 0.848047, 0.529921, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33195 at 105.404190 yards.
+(42204, 1732, 0, -130.354, -149.858, 120.737, 1.97222, 0, 0, 0.833885, 0.551938, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 33195 at 161.181259 yards.
 
 -- Missing Tin Vein spawns in Hillsbrad Foothills. (add to pool 17008)
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
