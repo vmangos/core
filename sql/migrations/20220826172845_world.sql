@@ -130,10 +130,10 @@ UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Gold Vein / Ir
 UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
 
 -- Tin Vein / Silver Vein / Gold Vein / Iron Deposit
-UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
-UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
-UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
-UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
+UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Tin Vein / Silver Vein / Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Silver Vein / Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Silver Vein / Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Tin Vein / Silver Vein / Gold Vein / Iron Deposit - Duskwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
 
 
 -- Westfall
