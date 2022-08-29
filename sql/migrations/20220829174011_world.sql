@@ -450,7 +450,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+2, 1359, 0, 'Blasted Lands - Truesilver Deposit / Small Thorium Vein', 0);
 
 -- Pool Remaining Objects Not in Pools
-SET @OGUID = 21010;
+SET @OGUID = 200010;
 SET @PTEMPLATE = 33000;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -470,7 +470,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (@PTEMPLATE, 4350, 0, 'Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein - Searing George', 0);
 
-SET @OGUID = 21014;
+SET @OGUID = 200014;
 SET @PTEMPLATE = 33001;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -490,7 +490,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (@PTEMPLATE, 4350, 0, 'Gold Vein / Mithril Deposit / Dark Iron Deposit / Small Thorium Vein - Searing George', 0);
 
-SET @OGUID = 21018;
+SET @OGUID = 200018;
 SET @PTEMPLATE =33002;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
