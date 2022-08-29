@@ -1756,6 +1756,27 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         m_modifier.periodictime = 5 * IN_MILLISECONDS; // expected to tick with 5 sec period
                         return;
                     }
+                    case 27852: // [Event: Scourge Invasion] [PH] Kill Summoner Buff
+                    {
+                        Unit* pCaster = GetCaster();
+                        if (!pCaster)
+                            return;
+
+                        if (Player* pPlayer = ToPlayer(target))
+                        {
+                            pPlayer->CastSpell(pCaster, 27894, true); // Kill Summoner, who will Summon Boss
+                        }
+                        return;
+                    }
+                    case 31316: // [Event: Scourge Invasion] Summon Boss Buff
+                    {
+                        Unit* caster = GetCaster();
+                        if (!caster)
+                            return;
+
+                        caster->CastSpell(caster, 31315, true); // Summon Boss
+                        return;
+                    }
                     case 21827: // Frostwolf Aura DND
                     case 21863: // Alterac Ram Aura DND
                     {

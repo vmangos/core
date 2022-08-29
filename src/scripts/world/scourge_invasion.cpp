@@ -232,11 +232,11 @@ bool UncommonMinionspawner(Creature* pSummoner) // Rare Minion Spawner.
 
     /*
     The chance or timer for a Rare minion spawn is unknown and i don't see an exact pattern for a spawn sequence.
-    Sniffed are: 19669 Minions and 90 Rares (Ratio: 217 to 1).
+    I have sniffed 17000 Minion spawns and 30 Rare spawns.
     */
-    uint32 chance = urand(1, 217);
-    if (chance > 1)
-        return false; // Above 1 = Minion, else Rare.
+    uint32 chance = urand(1, 17030);
+    if (chance > 30)
+        return false; // Above 32 = Minion, else Rare.
 
     return true;
 }
@@ -255,7 +255,7 @@ uint32 GetFindersAmount(Creature* pShard)
 
 /*
 Circle
-*/
+
 class GoCircle : public GameObjectAI
 {
 public:
@@ -269,24 +269,7 @@ GameObjectAI* GetAI_GoCircle(GameObject* pGameObject)
 {
     return new GoCircle(pGameObject);
 }
-
-/*
-Necropolis
 */
-class GoNecropolis : public GameObjectAI
-{
-public:
-    GoNecropolis(GameObject* pGameObject) : GameObjectAI(pGameObject)
-    {
-        me->SetActiveObjectState(true);
-        me->SetVisibilityModifier(3000.0f);
-    }
-};
-
-GameObjectAI* GetAI_GoNecropolis(GameObject* go)
-{
-    return new GoNecropolis(go);
-}
 
 /*
 Mouth of Kel'Thuzad
@@ -296,7 +279,7 @@ struct MouthAI : public ScriptedAI
     MouthAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_events.Reset();
-        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
+        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, (IN_MILLISECONDS * HOUR));
     }
 
     EventMap m_events;
@@ -311,12 +294,14 @@ struct MouthAI : public ScriptedAI
             {
                 ChangeZoneEventStatus(m_creature, true);
                 m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
-                DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1, BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                DoScriptText(PickRandomValue(
+                    BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5
+                ), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
                 break;
             }
             case EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP:
             {
-                DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2, BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_3), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_2), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
                 ChangeZoneEventStatus(m_creature, false);
                 m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
                 m_creature->RemoveFromWorld();
@@ -334,8 +319,10 @@ struct MouthAI : public ScriptedAI
             switch (Events)
             {
                 case EVENT_MOUTH_OF_KELTHUZAD_YELL:
-                    DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_RANDOM_1, BCT_MOUTH_OF_KELTHUZAD_RANDOM_2, BCT_MOUTH_OF_KELTHUZAD_RANDOM_3, BCT_MOUTH_OF_KELTHUZAD_RANDOM_4), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
-                    m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
+                    DoScriptText(PickRandomValue(
+                        BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5
+                    ), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                    m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, (IN_MILLISECONDS * HOUR));
                     break;
             }
         }
@@ -349,7 +336,7 @@ CreatureAI* GetAI_Mouth(Creature* pCreature)
 
 /*
 Necropolis
-*/
+
 struct NecropolisAI : public ScriptedAI
 {
     NecropolisAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -376,6 +363,8 @@ CreatureAI* GetAI_Necropolis(Creature* pCreature)
 {
     return new NecropolisAI(pCreature);
 }
+*/
+
 
 /*
 Necropolis Health
@@ -387,7 +376,7 @@ struct NecropolisHealthAI : public ScriptedAI
         m_creature->SetVisibilityModifier(3000.0f);
     }
 
-    int m_zapped = 0; // 3 = death.
+    //int m_zapped = 0; // 3 = death.
 
     void Reset() override {}
 
@@ -397,11 +386,13 @@ struct NecropolisHealthAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_ZAP_NECROPOLIS, true);
 
         // Just to make sure it finally dies!
+
+        /*
         if (spell->Id == SPELL_ZAP_NECROPOLIS)
         {
             if (++m_zapped >= 3)
                 m_creature->DoKillUnit(m_creature);
-        }
+        }*/
     }
 
     void JustDied(Unit* pKiller) override
@@ -458,98 +449,6 @@ CreatureAI* GetAI_NecropolisHealth(Creature* pCreature)
 }
 
 /*
-Necropolis Proxy
-*/
-struct NecropolisProxyAI : public ScriptedAI
-{
-    NecropolisProxyAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_creature->SetActiveObjectState(true);
-        m_creature->SetVisibilityModifier(3000.0f);
-        Reset();
-    }
-
-    void Reset() override {}
-
-    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
-    {
-        switch (spell->Id)
-        {
-            case SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES:
-                m_creature->CastSpell(m_creature, SPELL_COMMUNIQUE_PROXY_TO_RELAY, true);
-                break;
-            case SPELL_COMMUNIQUE_RELAY_TO_PROXY:
-                m_creature->CastSpell(m_creature, SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS, true);
-                break;
-            case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
-                if (Creature* pHealth = m_creature->FindNearestCreature(NPC_NECROPOLIS_HEALTH, 200.0f))
-                    m_creature->CastSpell(pHealth, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
-                break;
-        }
-    }
-
-    void SpellHitTarget(Unit* pTarget, SpellEntry const* spell) override
-    {
-        // Make sure m_creature despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
-        if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            m_creature->RemoveFromWorld();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override {}
-};
-
-CreatureAI* GetAI_NecropolisProxy(Creature* pCreature)
-{
-    return new NecropolisProxyAI(pCreature);
-}
-
-/*
-Necropolis Relay
-*/
-struct NecropolisRelayAI : public ScriptedAI
-{
-    NecropolisRelayAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_creature->SetActiveObjectState(true);
-        m_creature->SetVisibilityModifier(3000.0f);
-        Reset();
-    }
-
-    void Reset() override {}
-
-    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
-    {
-        switch (spell->Id)
-        {
-            case SPELL_COMMUNIQUE_PROXY_TO_RELAY:
-                m_creature->CastSpell(m_creature, SPELL_COMMUNIQUE_RELAY_TO_CAMP, true);
-                break;
-            case SPELL_COMMUNIQUE_CAMP_TO_RELAY:
-                m_creature->CastSpell(m_creature, SPELL_COMMUNIQUE_RELAY_TO_PROXY, true);
-                break;
-            case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
-                if (Creature* pProxy = m_creature->FindNearestCreature(NPC_NECROPOLIS_PROXY, 200.0f))
-                    m_creature->CastSpell(pProxy, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
-                break;
-        }
-    }
-
-    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
-    {
-        // Make sure m_creature despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
-        if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            m_creature->RemoveFromWorld();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override {}
-};
-
-CreatureAI* GetAI_NecropolisRelay(Creature* pCreature)
-{
-    return new NecropolisRelayAI(pCreature);
-}
-
-/*
 Necrotic Shard
 */
 struct NecroticShard : public ScriptedAI
@@ -566,7 +465,7 @@ struct NecroticShard : public ScriptedAI
         {
             m_finders = GetFindersAmount(m_creature);                       // Count all finders to limit Minions spawns.
             m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_BUTTRESS, 0); // Spawn Cultists every 60 minutes.
-            m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
+            //m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
         }
         else
         {
@@ -578,37 +477,55 @@ struct NecroticShard : public ScriptedAI
         }
     }
 
-    void Reset() override {}
+    void Reset() override 
+    {
+        m_creature->SetCorpseDelay(0);
+    }
 
     void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
+            /*
             case SPELL_ZAP_CRYSTAL_CORPSE:
             {
-                m_creature->DealDamage(m_creature, (m_creature->GetMaxHealth() / 4), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                 Damage to a Damaged Necrotic Shard is always:
+                    - 4 x 100 damage from Cultists death: Spell 28041 (SPELL_DAMAGE_CRYSTAL).
+                    - 4 x 763 damage from Shadow of Dooms death (thats MaxHealth from a Shard 3052 / 4 = 763): Spell 28056 (SPELL_ZAP_CRYSTAL_CORPSE).
+                    - around 100 damage every 5 seconds if the Cultists have despawned (still needs to be checked from sniffs): Spell 28056 (SPELL_ZAP_CRYSTAL_CORPSE).
+
+                if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD)
+                {
+                    if (pCaster != m_creature) // Casted by Shadow of Doom.
+                        m_creature->DealDamage(m_creature, (m_creature->GetMaxHealth() / 4), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                    else // Casted by Damaged Necrotic Shard.
+                        m_creature->DealDamage(m_creature, (92), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                }
                 break;
             }
+        */
             case SPELL_COMMUNIQUE_RELAY_TO_CAMP:
             {
                 m_creature->CastSpell(m_creature, SPELL_CAMP_RECEIVES_COMMUNIQUE, true);
                 break;
             }
+            /*
             case SPELL_CHOOSE_CAMP_TYPE:
             {
                 m_creature->CastSpell(m_creature, PickRandomValue(SPELL_CAMP_TYPE_GHOUL_SKELETON, SPELL_CAMP_TYPE_GHOST_GHOUL, SPELL_CAMP_TYPE_GHOST_SKELETON), true);
                 break;
-            }
+            }*/
             case SPELL_CAMP_RECEIVES_COMMUNIQUE:
             {
                 if (!GetCampType(m_creature) && m_creature->GetEntry() == NPC_NECROTIC_SHARD)
                 {
                     m_finders = GetFindersAmount(m_creature);
                     m_creature->CastSpell(m_creature, SPELL_CHOOSE_CAMP_TYPE, true);
-                    m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
+                    //m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
                 }
                 break;
             }
+            /*
             case SPELL_FIND_CAMP_TYPE:
             {
                 // Don't spawn more Minions than finders.
@@ -623,7 +540,7 @@ struct NecroticShard : public ScriptedAI
                 else if (m_creature->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON))
                     pCaster->CastSpell(pCaster, SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON, true);
                 break;
-            }
+            }*/
         }
     }
 
@@ -686,7 +603,7 @@ struct NecroticShard : public ScriptedAI
                 case EVENT_SHARD_MINION_SPAWNER_SMALL:
                 {
                     /*
-                    This is a placeholder for SPELL_MINION_SPAWNER_SMALL [27887] which also activates unknown, not sniffable objects, which possibly checks whether a minion is in his range
+                    This is a placeholder for SPELL_MINION_SPAWNER_SMALL [27887] which also activates up to 3 x (181111,181155,181156: GOBJ_MINION_SPAWNER_*), not sniffable objects, which possibly checks whether a minion is in his range
                     and happens every 15 seconds for both, Necrotic Shard and Damaged Necrotic Shard.
                     */
 
@@ -694,7 +611,7 @@ struct NecroticShard : public ScriptedAI
                     int finderAmount = urand(1, 3); // Up to 3 spawns.
 
                     std::list<Creature*> finderList;
-                    GetCreatureListWithEntryInGrid(finderList, m_creature, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
+                    GetCreatureListWithEntryInGrid(finderList, m_creature, { NPC_SCOURGE_INVASION_MINION_FINDER }, 65.0f);
                     if (finderList.empty())
                         return;
 
@@ -721,28 +638,37 @@ struct NecroticShard : public ScriptedAI
                         */
                         if (pFinder->AI()->DoCastSpellIfCan(m_creature, SPELL_FIND_CAMP_TYPE, CF_TRIGGERED) == CAST_OK)
                         {
-                            pFinder->SetRespawnDelay(urand(150, 200)); // Values are from Sniffs (rounded). Shortest and Longest respawn time from a finder on the same spot.
+                            pFinder->SetRespawnDelay(urand(160, 185)); // Values are from Sniffs. Shortest and Longest respawn time from a finder on the same spot.
                             pFinder->DisappearAndDie();
                             finderCounter++;
                         }
                     }
+
+                    // A Damaged Necrotic Shard without Cultists or Dooms kills himself.
+                    if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD)
+                    {
+                        std::list<Creature*> buttressList;
+                        GetCreatureListWithEntryInGrid(buttressList, m_creature, { NPC_CULTIST_ENGINEER, NPC_SHADOW_OF_DOOM }, DEFAULT_VISIBILITY_DISTANCE);
+                        if (buttressList.empty())
+                            m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL_CORPSE, true);
+                    }
+
                     m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 5000);
                     break;
                 }
                 case EVENT_SHARD_MINION_SPAWNER_BUTTRESS:
                 {
                     /*
-                    This is a placeholder for SPELL_MINION_SPAWNER_BUTTRESS [27888] which also activates unknown, not sniffable gamebjects
-                    and happens every hour if a Damaged Necrotic Shard is activ. The Cultists despawning after 1 hour,
-                    so this just resets everything and spawn them again and Refill the Health of the Shard.
+                    This is a placeholder for SPELL_MINION_SPAWNER_BUTTRESS [27888] which also activates 4 x 181112 (GOBJ_BUTTRESS_SPAWNER). It summons the Cultists
+                    and happens every hour if a Damaged Necrotic Shard is activ. The Cultists dying after 1 hour
+                    and the Shard damages itself until death every 5 seconds.
                     */
-                    m_creature->SetFullHealth();
-                    // Despawn all remaining Shadows before respawning the Cultists?
+
+                    // Despawn all remaining Shadows before summoning the Cultists?
                     DespawnShadowsOfDoom(m_creature);
-                    // Respawn the Cultists.
+                    // Summon the Cultists.
                     SummonCultists(m_creature);
 
-                    m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_BUTTRESS, IN_MILLISECONDS * HOUR);
                     break;
                 }
             }
@@ -798,7 +724,6 @@ struct MinionspawnerAI : public ScriptedAI
                     if (Creature* pMinion = m_creature->SummonCreature(Entry, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
                     {
                         pMinion->SetWanderDistance(1.0f); // Seems to be very low.
-                        m_creature->SendSpellGo(m_creature, SPELL_MINION_SPAWN_IN);
                     }
                     break;
                 }
@@ -814,7 +739,7 @@ CreatureAI* GetAI_Minionspawner(Creature* pCreature)
 
 /*
 npc_cultist_engineer
-*/
+
 struct npc_cultist_engineer : public ScriptedAI
 {
     npc_cultist_engineer(Creature* pCreature) : ScriptedAI(pCreature)
@@ -824,19 +749,17 @@ struct npc_cultist_engineer : public ScriptedAI
 
     EventMap m_events;
 
-    void Reset() override {}
+    void Reset() override
+    {
+        //m_creature->CastSpell(m_creature, SPELL_SELF_STUN_DND, true);
+    }
 
     void JustDied(Unit*) override
     {
         if (Creature* pShard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
         {
             pShard->CastSpell(pShard, SPELL_DAMAGE_CRYSTAL, true);
-            // Remove the Purple aura if the first Cultist dies.
-            pShard->RemoveAurasDueToSpell(SPELL_BUTTRESS_CHANNEL);
-            pShard->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
         }
-        if (GameObject* pGameObject = m_creature->FindNearestGameObject(GOBJ_SUMMONER_SHIELD, CONTACT_DISTANCE))
-            pGameObject->Delete();
     }
 
     void UpdateAI(uint32 const diff) override
@@ -851,11 +774,8 @@ struct npc_cultist_engineer : public ScriptedAI
                 {
                     if (Creature* pShard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
                     {
-                        m_creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
-                        m_creature->SetChannelObjectGuid(pShard->GetObjectGuid());
-                        // If all 4 Cultists are channeling, the Shard has this Aura.
-                        pShard->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
-                        pShard->AddAura(SPELL_BUTTRESS_CHANNEL);
+                        //m_creature->SetCastingTarget(pShard);
+                        m_creature->CastSpell(m_creature, SPELL_BUTTRESS_CHANNEL, true);
                     }
                 }
             }
@@ -864,27 +784,10 @@ struct npc_cultist_engineer : public ScriptedAI
 
     void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
-        if (uiEvent == 7166 && uiData == 0)
-        {
-            if (Player* pPlayer = ToPlayer(pInvoker))
-            {
-                // Player summons a Shadow of Doom for 1 hour.
-                if (Creature* pShadow = pPlayer->SummonCreature(NPC_SHADOW_OF_DOOM, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * IN_MILLISECONDS, true, 5000))
-                {
-                    pShadow->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-                    pShadow->SetFacingToObject(pPlayer);
-                    pShadow->AI()->OnScriptEventHappened(NPC_SHADOW_OF_DOOM, 0, pPlayer);
-                    pPlayer->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
-                }
-                pPlayer->SendSpellGo(pPlayer, SPELL_SUMMON_BOSS);
-                m_creature->CastSpell(m_creature, SPELL_QUIET_SUICIDE, true);
-            }
-        }
-        else if (uiEvent == NPC_CULTIST_ENGINEER)
+        if (uiEvent == NPC_CULTIST_ENGINEER)
         {
             m_creature->SetCorpseDelay(10); // Corpse despawns 10 seconds after a Shadow of Doom spawns.
             m_creature->CastSpell(m_creature, SPELL_CREATE_SUMMONER_SHIELD, true);
-            m_creature->CastSpell(m_creature, SPELL_MINION_SPAWN_IN, true);
             m_events.ScheduleEvent(EVENT_CULTIST_CHANNELING, 1000);
         }
     }
@@ -894,6 +797,7 @@ CreatureAI* GetAI_npc_cultist_engineer(Creature* pCreature)
 {
     return new npc_cultist_engineer(pCreature);
 }
+*/
 
 /*
 npc_minion
@@ -908,12 +812,20 @@ struct ScourgeMinion : public ScriptedAI
     }
 
     EventMap m_events;
+    bool bSpawn = false;
 
     void Reset()
     {
         switch (m_creature->GetEntry())
         {
             case NPC_SHADOW_OF_DOOM:
+                if (!bSpawn)
+                {
+                    bSpawn = true;
+                    m_events.ScheduleEvent(EVENT_DOOM_START_ATTACK, 5000); // Remove Flag (immune to Players) after 5 seconds.
+                    // Pickup random emote like here: https://youtu.be/evOs9aJa2Jw?t=229
+                    DoScriptText(PickRandomValue(BCT_SHADOW_OF_DOOM_TEXT_0, BCT_SHADOW_OF_DOOM_TEXT_1, BCT_SHADOW_OF_DOOM_TEXT_2, BCT_SHADOW_OF_DOOM_TEXT_3), m_creature, nullptr, CHAT_TYPE_SAY);
+                }
                 m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
                 m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
                 break;
@@ -928,13 +840,6 @@ struct ScourgeMinion : public ScriptedAI
         if (!pInvoker)
             return;
 
-        if (uiEvent == NPC_SHADOW_OF_DOOM)
-        {
-            m_events.ScheduleEvent(EVENT_DOOM_START_ATTACK, 5000); // Remove Flag (immune to Players) after 5 seconds.
-            // Pickup random emote like here: https://youtu.be/evOs9aJa2Jw?t=229
-            m_creature->MonsterSay(PickRandomValue(BCT_SHADOW_OF_DOOM_TEXT_0, BCT_SHADOW_OF_DOOM_TEXT_1, BCT_SHADOW_OF_DOOM_TEXT_2, BCT_SHADOW_OF_DOOM_TEXT_3), LANG_UNIVERSAL, pInvoker->ToUnit());
-            m_creature->CastSpell(m_creature, SPELL_SPAWN_SMOKE, true);
-        }
         if (uiEvent == NPC_FLAMESHOCKER)
             m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
     }
@@ -986,7 +891,7 @@ struct ScourgeMinion : public ScriptedAI
 
                     if (TemporarySummon* pMe = dynamic_cast<TemporarySummon*>(m_creature))
                     {
-                        // Shadow of Doom seems to attack the Summoner here.
+                        // Shadow of Doom seems to attack the Summoner here (also if you are stealthed).
                         if (Player* pPlayer = ToPlayer(pMe->GetSummoner()))
                         {
                             if (pPlayer->IsWithinLOSInMap(m_creature))
@@ -1209,7 +1114,6 @@ struct PallidHorrorAI : public ScriptedAI
                 {
                     float angle = (float(i) * (M_PI / (amount / static_cast<float>(2)))) + m_creature->GetOrientation();
                     pFlameshocker->JoinCreatureGroup(m_creature, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
-                    pFlameshocker->CastSpell(pFlameshocker, SPELL_MINION_SPAWN_IN, true);
                     m_flameshockers.insert(pFlameshocker->GetObjectGuid());
                 }
             }   
@@ -1316,7 +1220,6 @@ struct PallidHorrorAI : public ScriptedAI
                             if (Creature* pFlameshocker = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 3000))
                             {
                                 m_flameshockers.insert(pFlameshocker->GetObjectGuid());
-                                pFlameshocker->CastSpell(pFlameshocker, SPELL_MINION_SPAWN_IN, true);
                                 pFlameshocker->AI()->OnScriptEventHappened(NPC_FLAMESHOCKER, 0, pFlameshocker);
                             }
                         }
@@ -1344,11 +1247,6 @@ void AddSC_scourge_invasion()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "scourge_invasion_necropolis";
-    newscript->GetAI = &GetAI_Necropolis;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "scourge_invasion_mouth";
     newscript->GetAI = &GetAI_Mouth;
     newscript->RegisterSelf();
@@ -1356,16 +1254,6 @@ void AddSC_scourge_invasion()
     newscript = new Script;
     newscript->Name = "scourge_invasion_necropolis_health";
     newscript->GetAI = &GetAI_NecropolisHealth;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_necropolis_relay";
-    newscript->GetAI = &GetAI_NecropolisRelay;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_necropolis_proxy";
-    newscript->GetAI = &GetAI_NecropolisProxy;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -1379,23 +1267,8 @@ void AddSC_scourge_invasion()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "scourge_invasion_cultist_engineer";
-    newscript->GetAI = &GetAI_npc_cultist_engineer;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "scourge_invasion_minion";
     newscript->GetAI = &GetAI_ScourgeMinion;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_go_circle";
-    newscript->GOGetAI = &GetAI_GoCircle;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_go_necropolis";
-    newscript->GOGetAI = &GetAI_GoNecropolis;
     newscript->RegisterSelf();
 
     newscript = new Script;

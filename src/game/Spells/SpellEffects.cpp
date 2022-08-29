@@ -418,6 +418,32 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         m_caster->CastSpell(unitTarget, 27766, true);
                         break;
                     }
+                    case 28056:                             // [Event: Scourge Invasion] Zap Crystal Corpse
+                    {
+                        if (unitTarget->GetEntry() == 16172) // Damaged Necrotic Shard
+                        {
+                            unitTarget->SetArmor(0);
+                            if (m_caster->GetEntry() == 16143) // Casted by Shadow of Doom.
+                                damage = unitTarget->GetMaxHealth() / 4.0f;
+                            else // Casted by Damaged Necrotic Shard. https://classic.wowhead.com/spell=348571/zap-crystal-corpse
+                                damage = unitTarget->GetMaxHealth() / 100.0f * 6.0f;
+                        }
+                        break;
+                    }
+                    case 28386:                             // [Event: Scourge Invasion] Zap Necropolis
+                    {
+                        if (unitTarget->GetEntry() == 16421) // Necropolis health
+                        {
+                            /*
+                            There are always 3 Necrotic Shards spawns per Necropolis. This Spell is castet on the NPC "Necropolis Health" if a Shard dies and does 40 Physical damage.
+                            NPC "Necropolis Health" has 42 health. 42 health / 3 Shards = 14 damage.
+                            This is just a workaround to get it always working properly if someone messing up health or armor from the npc.
+                            */
+                            unitTarget->SetArmor(0);
+                            damage = unitTarget->GetMaxHealth() / 3.0f;
+                        }
+                        break;
+                    }
                 }
                 break;
             }
@@ -589,15 +615,41 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }, 1);
                     return;
                 }
+                case 28351: // [Event: Scourge Invasion] Communique, Camp-to-Relay, Death
+                {
+                    // Make sure m_casterUnit gets removed from the map to avoid getting hit by Purple bolt again after respawn.
+                    m_casterUnit->RemoveFromWorld();
+                    return;
+                }
                 case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
-                    if (!m_casterUnit->IsInCombat())
-                        m_casterUnit->CastSpell(m_casterUnit, 17680, false);
+                    m_casterUnit->CastSpell(m_casterUnit, 17680, false);
                     return;
                 }
                 case 28345: // [Event: Scourge Invasion] (Communique Trigger) triggers (Communique, Camp-to-Relay)?
                 {
                     unitTarget->CastSpell(unitTarget, 28281, true);
+                    return;
+                }
+                case 27894: // [Event: Scourge Invasion] Kill Summoner, who will Summon Boss
+                {
+                    if (Player* pPlayer = ToPlayer(m_casterUnit))
+                    {
+                        pPlayer->CastSpell(pPlayer, 31316, true); // Summon Boss Buff
+                        unitTarget->CastSpell(unitTarget, 3617, true);  // Quiet Suicide
+                    }
+                    return;
+                }
+                case 28203: // [Event: Scourge Invasion] Find Camp Type
+                {
+                    // Lets the finder spawn the associated spawner.
+                    if (unitTarget->HasAura(28197))
+                        m_casterUnit->CastSpell(m_casterUnit, 28186, true);
+                    else if (unitTarget->HasAura(28198))
+                        m_casterUnit->CastSpell(m_casterUnit, 27883, true);
+                    else if (unitTarget->HasAura(28199))
+                        m_casterUnit->CastSpell(m_casterUnit, 28187, true);
+
                     return;
                 }
                 case 23383: // Alliance Flag Click
@@ -5032,6 +5084,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 27697, true);
                     unitTarget->CastSpell(unitTarget, 27698, true);
                     unitTarget->CastSpell(unitTarget, 27699, true);
+                    return;
+                }
+                case 28201:                                 // [Event: Scourge Invasion] Choose Camp Type
+                {
+                    unitTarget->CastSpell(unitTarget, PickRandomValue(28199, 28198, 28197), true);
                     return;
                 }
                 case 28374:                                 // Decimate (Naxxramas: Gluth)

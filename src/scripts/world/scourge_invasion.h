@@ -18,153 +18,164 @@
 
 enum ScourgeInvasionSpells
 {
-    SPELL_SPIRIT_PARTICLES_PURPLE               = 28126, // Purple Minions Aura.
+    SPELL_SPIRIT_PARTICLES_PURPLE                   = 28126, // Purple Minions Aura.
 
     // GameObject Necropolis
-    SPELL_SUMMON_NECROPOLIS_CRITTERS            = 27866, // Spawns NPCs Necropolis Health and Necropolis.
+    SPELL_SUMMON_NECROPOLIS_CRITTERS                = 27866, // Spawns NPCs Necropolis Health and Necropolis.
 
     // Necropolis Health -> Necropolis
-    SPELL_DESPAWNER_OTHER                       = 28349, // Casted by the NPC "Necropolis health" after getting hit by,
-                                                         // on the NPC "Necropolis" which destroys itself and the Necropolis Object.
+    SPELL_DESPAWNER_OTHER                           = 28349, // Casted by the NPC "Necropolis health" after getting hit by,
+                                                             // on the NPC "Necropolis" which destroys itself and the Necropolis Object.
 
     // Necropolis Health
-    SPELL_ZAP_NECROPOLIS                        = 28386, // There are always 3 Necrotic Shards spawns per Necropolis. This Spell is castet on the NPC "Necropolis Health" if a Shard dies and does 40 Physical damage.
-                                                         // NPC "Necropolis Health" has 42 health. 42 health / 3 Shards = 14 damage.
-                                                         // We have set the armor value from the NPC "Necropolis Health" to 950 to reduce the damage from 40 to 14.
+    SPELL_ZAP_NECROPOLIS                            = 28386, // There are always 3 Necrotic Shards spawns per Necropolis. This Spell is castet on the NPC "Necropolis Health" if a Shard dies and does 40 Physical damage.
+                                                             // NPC "Necropolis Health" has 42 health. 42 health / 3 Shards = 14 damage.
 
     // Necropolis -> Proxy
-    SPELL_COMMUNIQUE_TIMER_NECROPOLIS           = 28395, // Periodically triggers 28373 Communique, Necropolis-to-Proxies every 15 seconds.
-    SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES      = 28373, // purple bolt Visual (BIG).
+    SPELL_COMMUNIQUE_TIMER_NECROPOLIS               = 28395, // Periodically triggers 28373 Communique, Necropolis-to-Proxies every 15 seconds.
+    SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES          = 28373, // purple bolt Visual (BIG).
 
     // Proxy -> Necropolis
-    SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS        = 28367, // Purple bolt Visual (SMALL).
+    SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS            = 28367, // Purple bolt Visual (SMALL).
 
     // Proxy -> Relay
-    SPELL_COMMUNIQUE_PROXY_TO_RELAY             = 28366, // purple bolt Visual (BIG).
+    SPELL_COMMUNIQUE_PROXY_TO_RELAY                 = 28366, // purple bolt Visual (BIG).
 
     // Relay -> Proxy
-    SPELL_COMMUNIQUE_RELAY_TO_PROXY             = 28365, // Purple bolt Visual (SMALL).
+    SPELL_COMMUNIQUE_RELAY_TO_PROXY                 = 28365, // Purple bolt Visual (SMALL).
 
     // Relay -> Shard
-    SPELL_COMMUNIQUE_RELAY_TO_CAMP              = 28326, // Purple bolt Visual (BIG).
+    SPELL_COMMUNIQUE_RELAY_TO_CAMP                  = 28326, // Purple bolt Visual (BIG).
 
     // Shard
-    SPELL_CREATE_CRYSTAL                        = 28344, // Spawn a Necrotic Shard.
-    SPELL_CREATE_CRYSTAL_CORPSE                 = 27895, // Summon (Damaged Necrotic Shard).
-    SPELL_CAMP_RECEIVES_COMMUNIQUE              = 28449, // Impact Visual.
-    SPELL_COMMUNIQUE_TIMER_CAMP                 = 28346, // Cast on npc_necrotic_shard on spawn? Periodically triggers 28345 Communique Trigger every 35 seconds.
-    SPELL_COMMUNIQUE_TRIGGER                    = 28345, // Triggers 28281 SPELL_COMMUNIQUE_CAMP_TO_RELAY via void Spell::EffectDummy.
-    SPELL_DAMAGE_CRYSTAL                        = 28041, // 100 Damage (Physical). Casted on itself, if 16143 (Shadow of Doom) spawns.
-    SPELL_SOUL_REVIVAL                          = 28681, // Increases all damage caused by 10%.
-    SPELL_CAMP_TYPE_GHOST_SKELETON              = 28197, // Camp Type, tells the NPC "Scourge Invasion Minion, finder" which Camp type the Shard has.
-    SPELL_CAMP_TYPE_GHOST_GHOUL                 = 28198, // ""
-    SPELL_CAMP_TYPE_GHOUL_SKELETON              = 28199, // ""
-    SPELL_MINION_SPAWNER_SMALL                  = 27887, // Triggers 27885 (Disturb Minion Trap, small) every 5 seconds. Activates up to 3 unknown Objects wich spawns the Minions.
-    SPELL_MINION_SPAWNER_BUTTRESS               = 27888, // Triggers 27886 (Disturb Minion Trap, Buttress) every 1 hour. Activates unknown Objects, They may also spawn the Cultists.
-    SPELL_CHOOSE_CAMP_TYPE                      = 28201, // casted by Necrotic Shard.
+    SPELL_CREATE_CRYSTAL                            = 28344, // Spawn a Necrotic Shard.
+    SPELL_CREATE_CRYSTAL_CORPSE                     = 27895, // Summon (Damaged Necrotic Shard).
+    SPELL_CAMP_RECEIVES_COMMUNIQUE                  = 28449, // Impact Visual.
+    SPELL_COMMUNIQUE_TIMER_CAMP                     = 28346, // Cast on npc_necrotic_shard on spawn? Periodically triggers 28345 Communique Trigger every 35 seconds.
+    SPELL_COMMUNIQUE_TRIGGER                        = 28345, // Triggers 28281 SPELL_COMMUNIQUE_CAMP_TO_RELAY via void Spell::EffectDummy.
+    SPELL_DAMAGE_CRYSTAL                            = 28041, // 100 Damage (Physical). Casted on itself, if 16143 (Shadow of Doom) spawns.
+    SPELL_SOUL_REVIVAL                              = 28681, // Increases all damage caused by 10%.
+    SPELL_CAMP_TYPE_GHOST_SKELETON                  = 28197, // Camp Type, tells the NPC "Scourge Invasion Minion, finder" which Camp type the Shard has.
+    SPELL_CAMP_TYPE_GHOST_GHOUL                     = 28198, // ""
+    SPELL_CAMP_TYPE_GHOUL_SKELETON                  = 28199, // ""
+    SPELL_DISTURB_MINION_TRAP_SMALL                 = 27885, // Activates up to 3 x (181111,181155,181156: GOBJ_MINION_SPAWNER_*) wich spawns the Minions.
+    SPELL_DISTURB_MINION_TRAP_BUTTRESS              = 27886, // Activates 181112 (GOBJ_BUTTRESS_SPAWNER), They spawn the Cultists.
+    SPELL_MINION_SPAWNER_SMALL                      = 27887, // Triggers 27885 (Disturb Minion Trap, small) every 5 seconds.
+    SPELL_MINION_SPAWNER_BUTTRESS                   = 27888, // Triggers 27886 (Disturb Minion Trap, Buttress) every 1 hour.
+    SPELL_CHOOSE_CAMP_TYPE                          = 28201, // Casted by Necrotic Shard and Damaged Necrotic Shard on spawn.
 
     // Shard -> Relay
-    SPELL_COMMUNIQUE_CAMP_TO_RELAY              = 28281, // Purple bolt Visual (SMALL)
-    SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH        = 28351, // Visual when Damaged Necrotic Shard dies.
+    SPELL_COMMUNIQUE_CAMP_TO_RELAY                  = 28281, // Purple bolt Visual (SMALL)
+    SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH            = 28351, // Visual when Damaged Necrotic Shard dies.
 
     // Camp - Minion spawning system
-    SPELL_FIND_CAMP_TYPE                        = 28203, // casted by Scourge Invasion Minion, finder.
+    SPELL_FIND_CAMP_TYPE                            = 28203, // casted by Scourge Invasion Minion, finder on Shards.
 
     // Scourge Invasion Minion, spawner, Ghost/Ghoul
-    SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL     = 27883,
+    SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL         = 27883,
 
     // Scourge Invasion Minion, spawner, Ghost/Skeleton
-    SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON  = 28186,
+    SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON      = 28186,
 
     // Scourge Invasion Minion, spawner, Ghoul/Skeleton
-    SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON  = 28187,
+    SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON      = 28187,
 
     // Minions Spells
-    SPELL_ZAP_CRYSTAL                           = 28032, // 15 damage to a Necrotic Shard on death.
-    SPELL_MINION_SPAWN_IN                       = 28234, // Pink Lightning.
-    SPELL_SPIRIT_SPAWN_OUT                      = 17680, // Makes invisible.
-    SPELL_MINION_DESPAWN_TIMER                  = 28090, // Triggers 28091 (Despawner, self) every 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
-    SPELL_CONTROLLER_TIMER                      = 28095, // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (Unknown who is casting this).
-    SPELL_DESPAWNER_SELF                        = 28091, // Trigger from Spell above.
-    SPELL_SUMMON_SCOURGE_CONTROLLER             = 28092,
+    SPELL_ZAP_CRYSTAL_SUMMON_ZAPPER                 = 28031, // Summons 16182 (Crystal Zapper).
+    SPELL_ZAP_CRYSTAL                               = 28032, // 15 damage to a Necrotic Shard on death.
+    SPELL_MINION_SPAWN_IN                           = 28234, // Pink Lightning.
+    SPELL_SPIRIT_SPAWN_OUT                          = 17680, // Makes invisible.
+    SPELL_MINION_DESPAWN_TIMER                      = 28090, // Triggers 28091 (Despawner, self) every 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
+    SPELL_CONTROLLER_TIMER                          = 28095, // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (Unknown who is casting this).
+    SPELL_DESPAWNER_SELF                            = 28091, // Trigger from Spell above.
+    SPELL_SUMMON_SCOURGE_CONTROLLER                 = 28092, // Summons 16214 (NPC_NECROPOLIS_CONTROLLER).
 
     // Minion Abilities
-    SPELL_SCOURGE_STRIKE                        = 28265, // Pink Lightning (Instakill).
-    SPELL_ENRAGE                                = 8599,  // Used by 16141 (Ghoul Berserker).
-    SPELL_BONE_SHARDS                           = 17014, // [shortest sniff CD: 16,583 seconds] Used by 16299 (Skeletal Shocktrooper).
-    SPELL_INFECTED_BITE                         = 7367,  // [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker).
-    SPELL_DEMORALIZING_SHOUT                    = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier).
-    SPELL_SUNDER_ARMOR                          = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier).
-    SPELL_SHADOW_WORD_PAIN                      = 589,   // Used by 16438 (Skeletal Trooper).
-    SPELL_DUAL_WIELD                            = 674,   // Used by Skeletal Soldier and Skeletal Shocktrooper.
+    SPELL_SCOURGE_STRIKE                            = 28265, // Pink Lightning (Instakill).
+    SPELL_ENRAGE                                    = 8599,  // Used by 16141 (Ghoul Berserker).
+    SPELL_BONE_SHARDS                               = 17014, // [shortest sniff CD: 16,583 seconds] Used by 16299 (Skeletal Shocktrooper).
+    SPELL_INFECTED_BITE                             = 7367,  // [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker).
+    SPELL_DEMORALIZING_SHOUT                        = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier).
+    SPELL_SUNDER_ARMOR                              = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier).
+    SPELL_SHADOW_WORD_PAIN                          = 589,   // Used by 16438 (Skeletal Trooper).
+    SPELL_DUAL_WIELD                                = 674,   // Used by Skeletal Soldier and Skeletal Shocktrooper.
 
     // Marks of the Dawn
-    SPELL_CREATE_LESSER_MARK_OF_THE_DAWN        = 28319, // Create Lesser Mark of the Dawn.
-    SPELL_CREATE_MARK_OF_THE_DAWN               = 28320, // Create Mark of the Dawn.
-    SPELL_CREATE_GREATER_MARK_OF_THE_DAWN       = 28321, // Create Greater Mark of the Dawn.
+    SPELL_CREATE_LESSER_MARK_OF_THE_DAWN            = 28319, // Create Lesser Mark of the Dawn.
+    SPELL_CREATE_MARK_OF_THE_DAWN                   = 28320, // Create Mark of the Dawn.
+    SPELL_CREATE_GREATER_MARK_OF_THE_DAWN           = 28321, // Create Greater Mark of the Dawn.
 
     // Rare Minions
-    SPELL_KNOCKDOWN                             = 16790, // Used by 14697 (Lumbering Horror).
-    SPELL_TRAMPLE                               = 5568,  // Used by 14697 (Lumbering Horror).
-    SPELL_AURA_OF_FEAR                          = 28313, // Used by 14697 (Lumbering Horror).
-    SPELL_RIBBON_OF_SOULS                       = 16243, // [shortest sniff CD: 1,638 seconds] Used by 16379 (Spirit of the Damned).
-    SPELL_PSYCHIC_SCREAM                        = 22884, // or 26042, used by 16379 (Spirit of the Damned).
-    SPELL_MINION_DESPAWN_TIMER_UNCOMMON         = 28292, // Triggers 28091 (Despawner, self) every 10 minutes. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
-    SPELL_ARCANE_BOLT                           = 13748, /* 20720 Used by 16380 (Bone Witch).
-                                                         https://classicdb.ch/?npc=16380#abilities says 13748 but 20720 is the only "Arcane Bolt" whichs requires no mana.
-                                                         Danage is very high, so i guess it has a very long cd.
-                                                         Spell description in the Bestiary is: Hurls a magical bolt at an enemy, inflicting Arcane damage.
-                                                         */
-
-    // Cultist Engineer
-    SPELL_CREATE_SUMMONER_SHIELD                = 28132, // Summon Object - Temporary (181142),
-                                                         // Casted exactly the same time with 28234 (Minion Spawn-in) on spawn.
-    SPELL_BUTTRESS_CHANNEL                      = 28078, // Channeled by Cultist Engineer on Damaged Necrotic Shard shortly after spawning.
-    SPELL_BUTTRESS_TRAP                         = 28054, // Unknown.
-    SPELL_KILL_SUMMONER_SUMMON_BOSS             = 28250, // Reagents, 1 Necrotic Rune
-                                                         
-    // Probably used to spawn Shadow of Doom.   Casting sequence (All these [x] spells are being casted the following order within 1-2 seconds):
-    SPELL_PH_KILL_SUMMONER_BUFF                 = 27852, // [1] Casted by Cultist on Player.
-    SPELL_KILL_SUMMONER_WHO_WILL_SUMMON_BOSS    = 27894, // [2] Casted by Player on Cultist.
-    SPELL_QUIET_SUICIDE                         = 3617,  // [3] Instakill, casted exactly same time as 31316 (Summon Boss Buff).
-    SPELL_SUMMON_BOSS_BUFF                      = 31316, // [4] Summon Boss Buff, casted on Player
-    SPELL_SUMMON_BOSS                           = 31315, /* [5] Reagents, 8 Necrotic Rune, Summon (Shadow of Doom) for 1 hour.
-                                                             The question is: What happens after this hour if the Shadow of Doom despawns?
-                                                             Do the cultists respawn and channeling again on the damaged shard or
-                                                             Does the Necrotic crystal respawn without Cultists or Shadows of Doom?
+    SPELL_KNOCKDOWN                                 = 16790, // Used by 14697 (Lumbering Horror).
+    SPELL_TRAMPLE                                   = 5568,  // Used by 14697 (Lumbering Horror).
+    SPELL_AURA_OF_FEAR                              = 28313, // Used by 14697 (Lumbering Horror).
+    SPELL_RIBBON_OF_SOULS                           = 16243, // [shortest sniff CD: 1,638 seconds] Used by 16379 (Spirit of the Damned).
+    SPELL_PSYCHIC_SCREAM                            = 22884, // or 26042, used by 16379 (Spirit of the Damned).
+    SPELL_MINION_DESPAWN_TIMER_UNCOMMON             = 28292, // Triggers 28091 (Despawner, self) every 10 minutes. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
+    SPELL_ARCANE_BOLT                               = 13748, /* 20720 Used by 16380 (Bone Witch).
+                                                             https://classicdb.ch/?npc=16380#abilities says 13748 but 20720 is the only "Arcane Bolt" whichs requires no mana.
+                                                             Danage is very high, so i guess it has a very long cd.
+                                                             Spell description in the Bestiary is: Hurls a magical bolt at an enemy, inflicting Arcane damage.
                                                              */
 
+    // Cultist Engineer
+    SPELL_PH_SUMMON_BUTTRESS                        = 28024, // Summon (Cultist Engineer) for 1 hour.
+    SPELL_CREATE_SUMMONER_SHIELD                    = 28132, // Summon Object - Temporary (181142),
+                                                             // Casted exactly the same time with 28234 (Minion Spawn-in) on spawn.
+    SPELL_BUTTRESS_CHANNEL                          = 28078, // Channeled by Cultist Engineer on Damaged Necrotic Shard shortly after spawning.
+    SPELL_BUTTRESS_TRAP                             = 28054, // Unknown.
+    SPELL_KILL_SUMMONER_SUMMON_BOSS                 = 28250, // Reagents, 1 Necrotic Rune
+    SPELL_SELF_STUN_DND                             = 29826,
+                                                         
+    // Probably used to spawn Shadow of Doom.       Casting sequence (All these [x] spells are being casted the following order within 1-2 seconds):
+    SPELL_PH_KILL_SUMMONER_BUFF                     = 27852, // [1] Casted by Cultist on Player.
+    SPELL_KILL_SUMMONER_WHO_WILL_SUMMON_BOSS        = 27894, // [2] Casted by Player on Cultist.
+    SPELL_QUIET_SUICIDE                             = 3617,  // [3] Instakill, casted exactly same time as 31316 (Summon Boss Buff).
+    SPELL_SUMMON_BOSS_BUFF                          = 31316, // [4] Summon Boss Buff, casted by Cultist on Player
+    SPELL_SUMMON_BOSS                               = 31315, // [5] Reagents, 8 Necrotic Rune, Summon (Shadow of Doom) for 1 hour.
+
     // Shadow of Doom
-    SPELL_SPAWN_SMOKE                           = 10389, // Spawning Visual.
-    SPELL_ZAP_CRYSTAL_CORPSE                    = 28056, // Casted on Shard if Shadow of Doom dies.
-    SPELL_MINDFLAY                              = 16568,
-    SPELL_FEAR                                  = 12542,
+    SPELL_SPAWN_SMOKE                               = 10389, // Spawning Visual.
+    SPELL_ZAP_CRYSTAL_CORPSE                        = 28056, // Casted on Shard if Shadow of Doom dies.
+    SPELL_MINDFLAY                                  = 16568,
+    SPELL_FEAR                                      = 12542,
+    
+    // Trap GameObjects
+    SPELL_PH_SUMMON_MINION_PARENT_GHOST_GHOUL       = 28183,
+    SPELL_PH_SUMMON_MINION_PARENT_GHOST_SKELETON    = 28184,
+    SPELL_PH_SUMMON_MINION_PARENT_GHOUL_SKELETON    = 28185,
 
     // Pallid Horror - Patchwerk Terror (also uses: 28315)
-    SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL       = 28424, // Alliance.
-    SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL         = 28699, // Horde.
-    SPELL_DAMAGE_VS_GUARDS                      = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard).
+    SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL           = 28424, // Alliance.
+    SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL             = 28699, // Horde.
+    SPELL_DAMAGE_VS_GUARDS                          = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard).
 
     // Flameshocker (also uses: 28234, 17680)
-    SPELL_FLAMESHOCKERS_TOUCH                   = 28314, // [shortest sniff CD: 30 seconds]
-    SPELL_FLAMESHOCKERS_REVENGE                 = 28323, // On death. 
-    SPELL_FLAMESHOCKERS_TOUCH2                  = 28329, // [shortest sniff CD: 30 seconds]
-    SPELL_FLAMESHOCKER_IMMOLATE_VISUAL          = 28330
+    SPELL_FLAMESHOCKERS_TOUCH                       = 28314, // [shortest sniff CD: 30 seconds]
+    SPELL_FLAMESHOCKERS_REVENGE                     = 28323, // On death. 
+    SPELL_FLAMESHOCKERS_TOUCH2                      = 28329, // [shortest sniff CD: 30 seconds]
+    SPELL_FLAMESHOCKER_IMMOLATE_VISUAL              = 28330
 
     /*
     These spells are not used by any NPCs or GameObjects.
     The [PH] in the name means it's a placeholder. Blizzard often adds that to the names of things they add to the game but haven't finalized.
     The fact that the [PH] is still there means the quest was never finished. (Google)
-        SPELL_PH_SUMMON_MINION_PARENT_GHOST_GHOUL       = 28183,
-        SPELL_PH_SUMMON_MINION_PARENT_GHOST_SKELETON    = 28184,
-        SPELL_PH_SUMMON_MINION_PARENT_GHOUL_SKELETON    = 28185,
-        SPELL_PH_GET_TOKEN                              = 27922, // Create Item "Necrotic Rune".
-        SPELL_PH_BUTTRESS_ACTIVATOR                     = 28086,
-        SPELL_PH_CRYSTAL_CORPSE_DESPAWN                 = 28020,
-        SPELL_PH_CRYSTAL_CORPSE_TIMER                   = 28018, // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
-        SPELL_PH_CYSTAL_BAZOOKA                         = 27849,
-        SPELL_PH_SUMMON_BUTTRESS                        = 28024, // Summon (Cultist Engineer) for 1 hour.
-        SPELL_DND_SUMMON_CRYSTAL_MINION_FINDER          = 28227,
+        SPELL_OPEN_CIRCLE                                   = 28278, // Probably activates 181136 (Circle) to summon the Necrotic Shard, Caster unknown.
+        SPELL_PH_GET_TOKEN                                  = 27922, // Create Item "Necrotic Rune".
+        SPELL_PH_BUTTRESS_ACTIVATOR                         = 28086,
+        SPELL_PH_CRYSTAL_CORPSE_DESPAWN                     = 28020,
+        SPELL_PH_CRYSTAL_CORPSE_TIMER                       = 28018, // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
+        SPELL_PH_CYSTAL_BAZOOKA                             = 27849,
+        SPELL_DND_SUMMON_CRYSTAL_MINION_FINDER              = 28227,
+        SPELL_CREATE_MINION_TRAP_GHOUL_SKELETON             = 28194,
+        SPELL_CREATE_MINION_TRAP_GHOST_GHOUL                = 28195,
+        SPELL_CREATE_MINION_TRAP_GHOST_SKELETON             = 28196,
+        SPELL_DND_SUMMON_CRYSTAL_MINION_GHOST               = 28175,
+        SPELL_DND_SUMMON_CRYSTAL_MINION_SKELETON            = 28177,
+        SPELL_DND_SUMMON_CRYSTAL_MINION_GHOUL               = 28179,
+        SPELL_DND_SUMMON_CRYSTAL_MINION_GHOUL_UNCOMMON      = 28289,
+        SPELL_DND_SUMMON_CRYSTAL_MINION_GHOST_UNCOMMON      = 28290,
+        SPELL_DND_SUMMON_CRYSTAL_MINION_SKELETON_UNCOMMON   = 28291,
     */
 };
 
@@ -178,15 +189,17 @@ enum ScourgeInvasionNPC
     NPC_DAMAGED_NECROTIC_SHARD                          = 16172,
     NPC_CULTIST_ENGINEER                                = 16230,
     NPC_SHADOW_OF_DOOM                                  = 16143,
+    NPC_CRYSTAL_ZAPPER                                  = 16182, // Probably casts 28031 (Zap Crystal, Summon Zapper) on a damaged necrotic Shard if all Cultists and Dooms are despawned.
 
     // Camp Helpers (invisible)
-    NPC_SCOURGE_INVASION_MINION_FINDER                  = 16356, // Casting 28203 (Find Camp Type).
-    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL     = 16306,
-    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON  = 16336,
-    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON  = 16338,
+    NPC_SCOURGE_INVASION_MINION_FINDER                  = 16356, // Casting 28203 (Find Camp Type) on spawn and despawns 2 seconds later.
+    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL     = 16306, // Casting 28183 ([PH] Summon Minion parent (ghost/ghoul)) on spawn and despawns 2 seconds later.
+    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON  = 16336, // Casting 28184 ([PH] Summon Minion parent (ghost/skeleton)) on spawn and despawns 2 seconds later.
+    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON  = 16338, // Casting 28185 ([PH] Summon Minion parent (ghoul/skeleton)) on spawn and despawns 2 seconds later.
 
     // Necropolis Helpers (invisible)
     NPC_NECROPOLIS                                      = 16401,
+    NPC_NECROPOLIS_CONTROLLER                           = 16214, // Not found in sniffs yet.
     NPC_NECROPOLIS_HEALTH                               = 16421,
     NPC_NECROPOLIS_PROXY                                = 16398,
     NPC_NECROPOLIS_RELAY                                = 16386,
@@ -196,7 +209,10 @@ enum ScourgeInvasionNPC
     NPC_GHOUL_BERSERKER                                 = 16141,
     NPC_SPECTRAL_SOLDIER                                = 16298,
 
-    // Rare Minions
+    /* Rare Minions
+    I sniffed out 17000 minion spawns and 32 rare spawns. That means a rare spawn ratio of 1 to 531.25.
+    I have also seen multiple Rare spawns per Camp, but maybe it's also an "WoW Classic issue".
+    */
     NPC_LUMBERING_HORROR                                = 14697,
     NPC_BONE_WITCH                                      = 16380,
     NPC_SPIRIT_OF_THE_DAMNED                            = 16379,
@@ -249,12 +265,15 @@ enum ScourgeInvasionMisc
 {
     ITEM_NECROTIC_RUNE                                  = 22484,
 
-    // Invisible Objects
-    GOBJ_BUTTRESS_TRAP                                  = 181112, // [Guessed] Those objects can't be sniffed and are not available in any database.
+    // [From TrinityCore's Bruteforce DB] Invisible Objects: Those objects can't be sniffed.
+    GOBJ_BUTTRESS_SPAWNER                               = 181112, // Casts 28024 ([PH] Summon Buttress) on use.
 
-    GOBJ_SUMMON_MINION_TRAP_GHOST_GHOUL                 = 181111, // Object is not in sniffed files or any database such as WoWHead, but spell 28196 (Create Minion Trap: Ghost/Skeleton) should probably summon them.
-    GOBJ_SUMMON_MINION_TRAP_GHOST_SKELETON              = 181155, // ""
-    GOBJ_SUMMON_MINION_TRAP_GHOUL_SKELETON              = 181156, // ""
+    GOBJ_MINION_SPAWNER_GHOST_GHOUL                     = 181111, // Casts 27883 ([PH] Summon Minion (trap: ghost/ghoul))) on use.
+    GOBJ_MINION_SPAWNER_GHOST_SKELETON                  = 181155, // Casts 28186 ([PH] Summon Minion (trap: ghost/skeleton))) on use.
+    GOBJ_MINION_SPAWNER_GHOUL_SKELETON                  = 181156, // Casts 28187 ([PH] Summon Minion (trap: ghoul/skeleton))) on use.
+
+    GOBJ_MINION_SPAWNER_FINDER                          = 181163, // Casts 28227 ((DND) Summon Crystal Minion, finder) on use.
+    GOBJ_NECROPOLIS_CRITTER_SPAWNER                     = 181214, // Casts 27866 (Summon Necropolis critters) on use.
 
     // Visible Objects
     GOBJ_SUMMON_CIRCLE                                  = 181136,
@@ -275,10 +294,10 @@ enum ScourgeInvasionMisc
     GOBJ_NECROPOLIS_CITY                                = 181172, // Necropolis at the Citys (scale 2.5).
 
     // These timers may fail if you set it under 1 minute.
-    ZONE_ATTACK_TIMER_MIN                               = 60 * 45, // 45 min.
-    ZONE_ATTACK_TIMER_MAX                               = 60 * 60, // 60 min.
-    CITY_ATTACK_TIMER_MIN                               = 60 * 45, // 45 min.
-    CITY_ATTACK_TIMER_MAX                               = 60 * 60, // 60 min.
+    ZONE_ATTACK_TIMER_MIN                               = MINUTE * 45, // 45 min.
+    ZONE_ATTACK_TIMER_MAX                               = MINUTE * 60, // 60 min.
+    CITY_ATTACK_TIMER_MIN                               = MINUTE * 45, // 45 min.
+    CITY_ATTACK_TIMER_MAX                               = MINUTE * 60, // 60 min.
 
     ZONEID_WINTERSPRING                                 = 618,
     ZONEID_AZSHARA                                      = 16,
@@ -384,6 +403,11 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_SI_TANARIS_REMAINING               = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_TANARIS
 };
 
+enum ScourgeInvasionGossipScripts
+{
+    GOSSIP_CULTIST_SUMMON_SHADOW                = 7166
+};
+
 enum ScourgeInvasionQuests
 {
     QUEST_UNDER_THE_SHADOW                      = 9153,
@@ -455,49 +479,49 @@ enum ScourgeInvasionLang
     BCT_STORMWIND_BOLVAR_2                             = 12318, // Good work, one and all!  The Scourge at the castle have been defeated.
 
     // Misc
-    BCT_CULTIST_ENGINEER_OPTION                        = 12112, // Use 8 necrotic runes and disrupt his ritual.
-    BCT_GIVE_MAGIC_ITEM_OPTION                         = 12302, // Give me one of your magic items.
-    BCT_SHADOW_OF_DOOM_TEXT_0                          = 12420, // Our dark master has noticed your trifling, and sends me to bring a message... of doom!
-    BCT_SHADOW_OF_DOOM_TEXT_1                          = 12421, // These heroics mean nothing, $c.  Your future is sealed and your soul is doomed to servitude!
-    BCT_SHADOW_OF_DOOM_TEXT_2                          = 12422, // Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
-    BCT_SHADOW_OF_DOOM_TEXT_3                          = 12243, // You will not stop our deepening shadow, $c.  Now... join us!  Join the ranks of the Chosen!
-    BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1         = 13121, // Spawn.
-    BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2         = 13125, // Spawn. 53 min between 2-3 in sniffs.
-    BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1          = 13165, // Despawn.
-    BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2          = 13164, // Despawn.
-    BCT_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_3          = 13163, // Despawn.
-    BCT_MOUTH_OF_KELTHUZAD_RANDOM_1                    = 13126, // Random.
-    BCT_MOUTH_OF_KELTHUZAD_RANDOM_2                    = 13124, // Random.
-    BCT_MOUTH_OF_KELTHUZAD_RANDOM_3                    = 13122, // 180 seconds between 5-6 in sniffs.
-    BCT_MOUTH_OF_KELTHUZAD_RANDOM_4                    = 13123, // Random. 30 min between 8-2 in sniffs.
-    BCT_ARGENT_EMISSARY_OPTION_0                       = 12176, // What's happening?
-    BCT_ARGENT_EMISSARY_OPTION_1                       = 12207, // What can I do?
-    BCT_ARGENT_EMISSARY_OPTION_2                       = 12434, // Where are we battling the Scourge?
-    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0          = 12198, // Is Winterspring currently under attack?
-    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1          = 12201, // Is Tanaris currently under attack?
-    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2          = 12203, // Are the Blasted Lands currently under attack?
-    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3          = 12205, // Are the Burning Steppes currently under attack?
-    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4          = 12476, // Is Azshara currently under attack?
-    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5          = 12477, // Are the Eastern Plaguelands currently under attack?
-    BCT_ARGENT_EMISSARY_OPTION_3                       = 12398, // How many battles have we won?
-    BCT_ARGENT_EMISSARY_OPTION                         = 12478, // I have another question.
+    BCT_CULTIST_ENGINEER_OPTION                         = 12112, // Use 8 necrotic runes and disrupt his ritual.
+    BCT_GIVE_MAGIC_ITEM_OPTION                          = 12302, // Give me one of your magic items.
+    BCT_SHADOW_OF_DOOM_TEXT_0                           = 12420, // Our dark master has noticed your trifling, and sends me to bring a message... of doom!
+    BCT_SHADOW_OF_DOOM_TEXT_1                           = 12421, // These heroics mean nothing, $c.  Your future is sealed and your soul is doomed to servitude!
+    BCT_SHADOW_OF_DOOM_TEXT_2                           = 12422, // Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
+    BCT_SHADOW_OF_DOOM_TEXT_3                           = 12243, // You will not stop our deepening shadow, $c.  Now... join us!  Join the ranks of the Chosen!
+    BCT_MOUTH_OF_KELTHUZAD_TEXT_0                       = 13121, // start, random - Can you feel it, pathetic creatures? The pall over this land is but a precursor. Soon your precious holdings will be in our grasp! You will fall before the might of the Scourge!
+    BCT_MOUTH_OF_KELTHUZAD_TEXT_1                       = 13122, // random - Despair, mortals! Your doom has come!
+    BCT_MOUTH_OF_KELTHUZAD_TEXT_2                       = 13123, // start, random - Let this gloom serve to remind you: the shadow of the Scourge is all-encompassing! There is no escape!
+    BCT_MOUTH_OF_KELTHUZAD_TEXT_3                       = 13124, // random - As you fall in battle, we continue to grow in strength. There is only one inevitable outcome. Prepare for your end!
+    BCT_MOUTH_OF_KELTHUZAD_TEXT_4                       = 13125, // start, random - Forward, my minions! Forward! Let none stand in our way!
+    BCT_MOUTH_OF_KELTHUZAD_TEXT_5                       = 13126, // start, random - Cower before our might! Flee! There will be no victory for the living!
+    BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_0              = 13165, // defeat - You may think you have won, worms, but against the might of the Scourge there is no victory for the living! You have not seen the last of us!
+    BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_1              = 13164, // defeat - You dare disrupt our works here?! The master will not be pleased. Take this time to prepare yourselves... when we return, there will be nothing but death and destruction in our wake!
+    BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_2              = 13163, // defeat - So, the frail members of the living have some teeth after all. Take this place, then, for the time being. We will return, twice as strong, and your paltry forces will fall!
+    BCT_ARGENT_EMISSARY_OPTION_0                        = 12176, // What's happening?
+    BCT_ARGENT_EMISSARY_OPTION_1                        = 12207, // What can I do?
+    BCT_ARGENT_EMISSARY_OPTION_2                        = 12434, // Where are we battling the Scourge?
+    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0           = 12198, // Is Winterspring currently under attack?
+    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1           = 12201, // Is Tanaris currently under attack?
+    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2           = 12203, // Are the Blasted Lands currently under attack?
+    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3           = 12205, // Are the Burning Steppes currently under attack?
+    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4           = 12476, // Is Azshara currently under attack?
+    BCT_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5           = 12477, // Are the Eastern Plaguelands currently under attack?
+    BCT_ARGENT_EMISSARY_OPTION_3                        = 12398, // How many battles have we won?
+    BCT_ARGENT_EMISSARY_OPTION                          = 12478, // I have another question.
 
-    BCT_CULTIST_ENGINEER_GOSSIP                        = 8436, // 12111 - This cultist is in a deep trance...
-    BCT_ARGENT_DAWN_GOSSIP_150_WINS                    = 8525, // 12299 - The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.
-    BCT_ARGENT_DAWN_GOSSIP_100_WINS                    = 8526, // 12300 - The battle goes well. The Scourge forces seem weakened. I believe it will only be a matter of time before we drive them from our shores. I will turn my magics to you, to aid in this struggle.
-    BCT_ARGENT_DAWN_GOSSIP_50_WINS                     = 8527, // 12301 - The first steps of our fight against the Scourge go well. We have had some successes, and hopefully my assistance can aid you in bringing future success to the battle.
-    BCT_ARGENT_EMISSARY_GOSSIP                         = 8434, // 12109 - The time has come for Horde and Alliance to look towards Northrend and the invasion of the Lich King. In recent days, territories across Kalimdor and the Eastern Kingdoms have come under attack. Will you take up arms to save your land from destruction at their hands?
-    BCT_ARGENT_EMISSARY_AWNSER_0                       = 8471, // 12180 - The tides of war have come again. From the cold north, the Lich King's necropolises have laid siege to
-    BCT_ARGENT_EMISSARY_AWNSER_1                       = 8486, // 12209 - The Scourge are establishing small staging points in the places under attack, receiving communications and other assistance from the necropolises that fly overhead. From what we can tell, the only way to root them out is by killing the ground forces that surround the points.
-    BCT_ARGENT_EMISSARY_AWNSER_2                       = 8573, // 12435 - The Lich King brought only small forces to bear against each of Azeroth's capital cities, while their main forces periodically attack the following lands:$B$BAzshara, the Blasted Lands, the Burning Steppes, the Tanaris Desert, the Eastern Plaguelands and Winterspring.
-    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_0          = 8480, // 12199 - Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault.Your assistance would help them greatly.$B$BNumber of Necropolises remaining : $2284W
-    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_1          = 8482, // 12202 - It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
-    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_2          = 8483, // 12204 - The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
-    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_3          = 8484, // 12206 - If additional support is not soon sent to the Burning Steppes, I fear the Scourge will establish a base of operations there. If you can, you should go there to aid the defenders.$B$BNumber of Necropolises remaining: $2281W
-    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_4          = 8593, // 12474 - The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
-    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_5          = 8594, // 12475 - The Scourge infestation grows in the Eastern Plaguelands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2282W
-    BCT_ARGENT_EMISSARY_AWBSER_3_0                     = 8551, // 12399 - We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over.
-    BCT_ARGENT_EMISSARY_AWBSER_3_1                     = 8554, // 12402 - We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them.
-    BCT_ARGENT_EMISSARY_AWBSER_3_2                     = 8555, // 12403 - We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
-    BCT_ARGENT_EMISSARY_FREE_OF_SCOURGE                = 8481  // For the time being, that area is free of Scourge influence. I fear it will only be a matter of time before they return.
+    BCT_CULTIST_ENGINEER_GOSSIP                         = 8436, // 12111 - This cultist is in a deep trance...
+    BCT_ARGENT_DAWN_GOSSIP_150_WINS                     = 8525, // 12299 - The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.
+    BCT_ARGENT_DAWN_GOSSIP_100_WINS                     = 8526, // 12300 - The battle goes well. The Scourge forces seem weakened. I believe it will only be a matter of time before we drive them from our shores. I will turn my magics to you, to aid in this struggle.
+    BCT_ARGENT_DAWN_GOSSIP_50_WINS                      = 8527, // 12301 - The first steps of our fight against the Scourge go well. We have had some successes, and hopefully my assistance can aid you in bringing future success to the battle.
+    BCT_ARGENT_EMISSARY_GOSSIP                          = 8434, // 12109 - The time has come for Horde and Alliance to look towards Northrend and the invasion of the Lich King. In recent days, territories across Kalimdor and the Eastern Kingdoms have come under attack. Will you take up arms to save your land from destruction at their hands?
+    BCT_ARGENT_EMISSARY_AWNSER_0                        = 8471, // 12180 - The tides of war have come again. From the cold north, the Lich King's necropolises have laid siege to
+    BCT_ARGENT_EMISSARY_AWNSER_1                        = 8486, // 12209 - The Scourge are establishing small staging points in the places under attack, receiving communications and other assistance from the necropolises that fly overhead. From what we can tell, the only way to root them out is by killing the ground forces that surround the points.
+    BCT_ARGENT_EMISSARY_AWNSER_2                        = 8573, // 12435 - The Lich King brought only small forces to bear against each of Azeroth's capital cities, while their main forces periodically attack the following lands:$B$BAzshara, the Blasted Lands, the Burning Steppes, the Tanaris Desert, the Eastern Plaguelands and Winterspring.
+    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_0           = 8480, // 12199 - Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault.Your assistance would help them greatly.$B$BNumber of Necropolises remaining : $2284W
+    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_1           = 8482, // 12202 - It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
+    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_2           = 8483, // 12204 - The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
+    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_3           = 8484, // 12206 - If additional support is not soon sent to the Burning Steppes, I fear the Scourge will establish a base of operations there. If you can, you should go there to aid the defenders.$B$BNumber of Necropolises remaining: $2281W
+    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_4           = 8593, // 12474 - The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
+    BCT_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_5           = 8594, // 12475 - The Scourge infestation grows in the Eastern Plaguelands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2282W
+    BCT_ARGENT_EMISSARY_AWBSER_3_0                      = 8551, // 12399 - We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over.
+    BCT_ARGENT_EMISSARY_AWBSER_3_1                      = 8554, // 12402 - We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them.
+    BCT_ARGENT_EMISSARY_AWBSER_3_2                      = 8555, // 12403 - We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
+    BCT_ARGENT_EMISSARY_FREE_OF_SCOURGE                 = 8481  // For the time being, that area is free of Scourge influence. I fear it will only be a matter of time before they return.
 };
