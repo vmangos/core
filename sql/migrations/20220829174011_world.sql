@@ -618,6 +618,9 @@ UPDATE `gameobject` SET `animprogress`=100 WHERE `guid` IN (25268, 40010, 40009,
 UPDATE `gameobject` SET `animprogress`=100, `state`=1 WHERE  `guid`=43257;
 UPDATE `gameobject` SET `spawn_flags`=0 WHERE  `guid` IN (14214, 14213, 14223, 14222);
 
+-- Remove Empty Templates
+DELETE FROM `pool_template` WHERE  `entry` IN (1245, 3662, 409);
+
 -- Update Counters
 UPDATE `pool_template` SET `max_limit`=4 WHERE  `entry`=1262;
 UPDATE `pool_template` SET `max_limit`=13 WHERE  `entry`=1271;
