@@ -8710,16 +8710,12 @@ void Unit::StopMoving(bool force)
         return;
 
     Movement::MoveSplineInit init(*this, "StopMoving");
-    if (GenericTransport* t = GetTransport()) {
+    if (GenericTransport* t = GetTransport())
         init.SetTransport(t->GetGUIDLow());
-    }
 
-    if (!movespline->Finalized() || force) {
+    if (!movespline->Finalized() || force)
+    {
         init.SetStop(); // Will trigger CMSG_MOVE_SPLINE_DONE from client.
-        init.Launch();
-    }
-    else if (!IsPlayer()) {
-        init.SetFacing(GetOrientation());
         init.Launch();
     }
 
