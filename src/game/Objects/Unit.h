@@ -234,7 +234,7 @@ struct CharmInfo
     void SetCommandState(CommandStates state) { m_commandState = state; }
     CommandStates GetCommandState() const { return m_commandState; }
     bool HasCommandState(CommandStates state) const { return m_commandState == state; }
-    void SetReactState(ReactStates st) { m_reactState = st; }
+    void SetReactState(ReactStates state) { m_reactState = state; }
     ReactStates GetReactState() const { return m_reactState; }
     bool HasReactState(ReactStates state) const { return m_reactState == state; }
 
@@ -500,6 +500,9 @@ class Unit : public SpellCaster
         bool HasUnitState(uint32 f) const { return m_stateFlags & f; }
         void ClearUnitState(uint32 f) { m_stateFlags &= ~f; }
         uint32 GetUnitState() const { return m_stateFlags; }
+        void SetReactState(ReactStates state);
+        ReactStates GetReactState() const;
+        bool HasReactState(ReactStates state) const;
         void UpdateControl();
         bool CanFreeMove() const { return !HasUnitState(UNIT_STAT_NO_FREE_MOVE) && !GetOwnerGuid(); }
         uint32 GetCreatureType() const;
@@ -1186,6 +1189,7 @@ class Unit : public SpellCaster
 
         CharmInfo* GetCharmInfo() const { return m_charmInfo; }
         CharmInfo* InitCharmInfo(Unit* charm);
+        void ClearCharmInfo();
         void HandlePetCommand(CommandStates command, Unit* pTarget);
 
         Unit* GetOwner() const;

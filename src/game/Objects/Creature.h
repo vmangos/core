@@ -162,9 +162,9 @@ class Creature : public Unit
         bool CanSwim() const override { return IsPet() || GetCreatureInfo()->inhabit_type & INHABIT_WATER; }
         bool CanFly()  const override { return !IsPet() && GetCreatureInfo()->inhabit_type & INHABIT_AIR; }
 
-        void SetReactState(ReactStates st) { m_reactState = st; }
-        ReactStates GetReactState() const { return m_reactState; }
-        bool HasReactState(ReactStates state) const { return (m_reactState == state); }
+        void SetCreatureReactState(ReactStates st) { m_reactState = st; }
+        ReactStates GetCreatureReactState() const { return m_reactState; }
+        bool HasCreatureReactState(ReactStates state) const { return (m_reactState == state); }
         void InitializeReactState();
 
         bool IsTrainerOf(Player* player, bool msg) const;

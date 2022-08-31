@@ -21,7 +21,7 @@ void ScriptedPetAI::MoveInLineOfSight(Unit* pWho)
     if (m_creature->GetVictim())
         return;
 
-    if (!m_creature->GetCharmInfo() || !m_creature->GetCharmInfo()->HasReactState(REACT_AGGRESSIVE))
+    if (!m_creature->HasReactState(REACT_AGGRESSIVE))
         return;
 
     if (!pWho || !m_creature->IsValidAttackTarget(pWho) || !pWho->IsVisibleForOrDetect(m_creature, m_creature, true) ||
@@ -49,7 +49,7 @@ void ScriptedPetAI::AttackedBy(Unit* pAttacker)
     if (m_creature->GetVictim())
         return;
 
-    if (m_creature->GetCharmInfo() && !m_creature->GetCharmInfo()->HasReactState(REACT_PASSIVE) &&
+    if (!m_creature->HasReactState(REACT_PASSIVE) &&
         m_creature->CanReachWithMeleeAutoAttack(pAttacker))
         AttackStart(pAttacker);
 }
@@ -106,7 +106,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
             ResetPetCombat();
             return;
         }
-        else if (pTarget->HasAuraPetShouldAvoidBreaking() && m_creature->GetCharmInfo() && (m_creature->GetCharmInfo()->GetReactState() != REACT_AGGRESSIVE))
+        else if (pTarget->HasAuraPetShouldAvoidBreaking() && m_creature->GetCharmInfo() && (m_creature->GetReactState() != REACT_AGGRESSIVE))
         {
             m_creature->InterruptNonMeleeSpells(false);
             m_creature->AttackStop(true);
@@ -123,7 +123,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
         if (!pOwner)
             return;
 
-        if (pOwner->IsInCombat() && !m_creature->GetCharmInfo()->HasReactState(REACT_PASSIVE))
+        if (pOwner->IsInCombat() && !m_creature->HasReactState(REACT_PASSIVE))
         {
             // Not correct in all cases.
             // When mob initiate attack by spell, pet should not start attack before spell landed.

@@ -101,8 +101,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 // no break
                 case REACT_DEFENSIVE:                       //recovery
                 case REACT_AGGRESSIVE:                      //activete
-                    if (pCharmedCreature)
-                        pCharmedCreature->SetReactState(ReactStates(spellid));
+                    charmInfo->SetReactState(ReactStates(spellid));
                     break;
             }
             break;

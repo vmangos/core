@@ -550,11 +550,11 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
 void Creature::InitializeReactState()
 {
     if (IsTotem() || IsTrigger() || !CanHaveTarget())
-        SetReactState(REACT_PASSIVE);
+        SetCreatureReactState(REACT_PASSIVE);
     else if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO))
-        SetReactState(REACT_DEFENSIVE);
+        SetCreatureReactState(REACT_DEFENSIVE);
     else
-        SetReactState(REACT_AGGRESSIVE);
+        SetCreatureReactState(REACT_AGGRESSIVE);
 }
 
 uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data /*= nullptr*/, CreatureDataAddon const* addon /*= nullptr*/, GameEventCreatureData const* eventData /*=nullptr*/, float* scale /*=nullptr*/)

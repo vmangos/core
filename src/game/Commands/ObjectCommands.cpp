@@ -21,6 +21,7 @@
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
+#include "ScriptMgr.h"
 #include "Util.h"
 #include "GameEventMgr.h"
 #include "GridNotifiers.h"
