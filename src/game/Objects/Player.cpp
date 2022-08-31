@@ -17498,7 +17498,7 @@ void Player::PetSpellInitialize()
     WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 1 + 1 + 2 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 1);
     data << pet->GetObjectGuid();
     data << uint32(0);
-    data << uint8(pet->GetReactState());
+    data << uint8(charmInfo->GetReactState());
     data << uint8(charmInfo->GetCommandState());
     data << uint8(0);
     data << uint8(pet->IsEnabled() ? 0x0 : 0x8);
@@ -17545,9 +17545,20 @@ void Player::PossessSpellInitialize()
         return;
     }
 
+    int32 duration = 0;
+    auto const& possesAuras = charm->GetAurasByType(SPELL_AURA_MOD_POSSESS);
+    for (auto const& aura : possesAuras)
+    {
+        if (aura->GetCasterGuid() == GetObjectGuid() && aura->GetAuraDuration() > 0)
+        {
+            duration = aura->GetAuraDuration();
+            break;
+        }
+    }
+
     WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 4 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 1);
     data << charm->GetObjectGuid();
-    data << uint32(0);
+    data << int32(duration);
     data << uint32(0);
 
     charmInfo->BuildActionBar(&data);
@@ -17588,11 +17599,24 @@ void Player::CharmSpellInitialize()
         }
     }
 
+    int32 duration = 0;
+    auto const& charmAuras = charm->GetAurasByType(SPELL_AURA_MOD_CHARM);
+    for (auto const& aura : charmAuras)
+    {
+        if (aura->GetCasterGuid() == GetObjectGuid() && aura->GetAuraDuration() > 0)
+        {
+            duration = aura->GetAuraDuration();
+            break;
+        }
+    }
+
     WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 1 + 1 + 2 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 4 * addlist + 1);
     data << charm->GetObjectGuid();
-    data << uint32(0x00000000);
-
-    data << uint8(charmInfo->GetReactState()) << uint8(charmInfo->GetCommandState()) << uint16(0);
+    data << int32(duration);
+    data << uint8(charmInfo->GetReactState());
+    data << uint8(charmInfo->GetCommandState());
+    data << uint8(0);
+    data << uint8(0);
 
     charmInfo->BuildActionBar(&data);
 

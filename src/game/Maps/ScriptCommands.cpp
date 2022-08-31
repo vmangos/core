@@ -1710,7 +1710,10 @@ bool Map::ScriptCommand_SetReactState(ScriptInfo const& script, WorldObject* sou
         return ShouldAbortScript(script);
     }
 
-    pSource->SetReactState(ReactStates(script.setReactState.state));
+    if (CharmInfo* pCharmInfo = pSource->GetCharmInfo())
+        pCharmInfo->SetReactState(ReactStates(script.setReactState.state));
+
+    pSource->SetCreatureReactState(ReactStates(script.setReactState.state));
 
     return false;
 }

@@ -2378,7 +2378,7 @@ void Pet::SetEnabled(bool on)
 
     WorldPacket data(SMSG_PET_MODE, 12);
     data << GetObjectGuid();
-    data << uint8(GetReactState());
+    data << uint8(GetCharmInfo()->GetReactState());
     data << uint8(GetCharmInfo()->GetCommandState());
     data << uint8(0);
     data << uint8(m_enabled ? 0x0 : 0x8);

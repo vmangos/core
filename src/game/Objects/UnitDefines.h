@@ -496,6 +496,22 @@ enum CommandStates
     COMMAND_DISMISS = 3
 };
 
+inline char const* CommandStateToString(uint32 commandState)
+{
+    switch (commandState)
+    {
+        case COMMAND_STAY:
+            return "Stay";
+        case COMMAND_FOLLOW:
+            return "Follow";
+        case COMMAND_ATTACK:
+            return "Attack";
+        case COMMAND_DISMISS:
+            return "Dismiss";
+    }
+    return "UNKNOWN";
+}
+
 enum ActionBarIndex
 {
     ACTION_BAR_INDEX_START = 0,

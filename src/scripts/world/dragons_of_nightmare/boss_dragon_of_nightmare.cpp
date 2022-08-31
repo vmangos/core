@@ -129,9 +129,7 @@ struct npc_dream_fogAI : ScriptedPetAI
 {
     explicit npc_dream_fogAI(Creature* pCreature) : ScriptedPetAI(pCreature)
     {
-        if (m_creature->GetCharmInfo())
-            m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
-
+        m_creature->SetReactState(REACT_AGGRESSIVE);
         npc_dream_fogAI::Reset();
         npc_dream_fogAI::ResetCreature();
     }

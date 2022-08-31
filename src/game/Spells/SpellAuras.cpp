@@ -3187,6 +3187,9 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         pTarget->UpdateControl();
         pTarget->SetWalk(false);
 
+        if (!pTarget->IsPet())
+            pTarget->ClearCharmInfo();
+
         if (Creature* pCreature = pTarget->ToCreature())
         {
             if (!pCreature->HasUnitState(UNIT_STAT_CAN_NOT_REACT))
@@ -3354,9 +3357,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
         target->AttackStop();
         target->InterruptNonMeleeSpells(false);
 
-        if (caster->IsPlayer()) // Units will make the controlled player attack (MoveChase)
-            target->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-
         if (Creature* pCreatureTarget = target->ToCreature())
         {
             if (pCreatureTarget->AI() && pCreatureTarget->AI()->SwitchAiAtControl())
@@ -3399,6 +3399,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (Player* pPlayerCaster = caster->ToPlayer())
         {
             pPlayerCaster->CharmSpellInitialize();
+            target->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
             UpdateData newData;
             target->BuildValuesUpdateBlockForPlayerWithFlags(newData, pPlayerCaster, UF_FLAG_OWNER_ONLY);
@@ -3485,6 +3486,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
         target->StopMoving();
         target->GetMotionMaster()->Clear(false);
         target->GetMotionMaster()->MoveIdle();
+
+        if (!target->IsPet())
+            target->ClearCharmInfo();
 
         if (pCreatureTarget)
         {

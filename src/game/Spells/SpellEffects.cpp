@@ -3896,7 +3896,7 @@ void Spell::EffectTameCreature(SpellEffectIndex /*eff_idx*/)
     }
 
     pet->GetCharmInfo()->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
-    pet->SetReactState(REACT_DEFENSIVE);
+    pet->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
     pet->AIM_Initialize();
     pet->InitPetCreateSpells();
     pet->SetHealth(pet->GetMaxHealth());
