@@ -204,6 +204,14 @@ UPDATE `gameobject_involvedrelation` SET `quest` = 4447 WHERE `id` = 173324;
 UPDATE `gameobject_questrelation` SET `quest` = 4462 WHERE `id` = 174684;
 UPDATE `gameobject_involvedrelation` SET `quest`=4462 WHERE `id` = 174684;
 
+-- Add Merithra of the Dream Missing Gossip
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(6766, 8113, 0, 15727);
+
+-- Add Arygos  Missing Gossip
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(6767, 8111, 0, 15727);
+
 
 -- End of migration.
 END IF;
