@@ -64,9 +64,8 @@ class PetAI : public CreatureAI
 
         void UpdateAllies();
 
-        bool hasMelee;
-        std::set<uint64> m_AllySet;
         uint32 m_updateAlliesTimer;
+        std::set<uint64> m_AllySet;
 
         std::pair<Unit*, ePetSelectTargetReason> SelectNextTarget(bool allowAutoSelect) const;
         void HandleReturnMovement();
