@@ -132,6 +132,78 @@ INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 -- Apprentice Fishing and Cooking Dont Require Level 5
 UPDATE `npc_trainer` SET `reqlevel`= 0 WHERE `spell` IN (2551, 7733);
 
+-- Update Felwood Plant Quests
+UPDATE `quest_template` SET `CompleteScript` = 0 WHERE `entry` = 4443;
+DELETE FROM `quest_end_scripts` WHERE `id` = 4443;
+
+UPDATE `quest_template` SET `CompleteEmote` = 0 WHERE `entry` IN (4117, 4443, 4444, 4445, 4446, 4461, 4448, 2523, 2878, 3363, 4114, 4116);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 3595, `spawntimesecsmax` = 3595 WHERE `id` IN ( 164887, 173327, 174599, 174600, 174601, 174602, 174603, 174604, 174708, 174709, 164886, 171939, 171942, 174594, 174595, 174596, 174598, 174712, 174713, 174597, 164888, 173284, 174605, 174606, 174607, 174686, 164885, 173324, 174608, 174684);
+
+UPDATE `quest_template` SET `QuestFlags` = 264 WHERE `entry` = 4445;
+
+UPDATE `quest_template` SET `QuestFlags` = 264, `RewXP` = 560 WHERE `entry` = 4467;
+
+UPDATE `quest_template` SET `CompleteEmote` = 0 WHERE `entry` IN (4403, 1514, 998);
+
+UPDATE `gameobject_questrelation` SET `quest` = 3363 WHERE `id` = 174595;
+UPDATE `gameobject_involvedrelation` SET `quest` = 3363 WHERE `id` = 174595;
+
+UPDATE `gameobject_questrelation` SET `quest` = 2878 WHERE `id` = 174594;
+UPDATE `gameobject_involvedrelation` SET `quest` = 2878 WHERE `id` = 174594;
+
+UPDATE `gameobject_involvedrelation` SET `quest` = 4114 WHERE `id` = 174596;
+UPDATE `gameobject_questrelation` SET `quest` = 4114 WHERE `id` = 174596;
+
+UPDATE `gameobject` SET `id` = 174597 WHERE `guid` = 48958;
+INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (174597, 4116, 0, 10);
+INSERT INTO `gameobject_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (174597, 4116, 0, 10);
+
+UPDATE `gameobject_questrelation` SET `quest` = 4118 WHERE `id` = 174598;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4118 WHERE `id` = 174598;
+
+UPDATE `gameobject_questrelation` SET `quest` = 2523 WHERE `id` = 171942;
+UPDATE `gameobject_involvedrelation` SET `quest` = 2523 WHERE `id` = 171942;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4401 WHERE `id` = 171939;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4401 WHERE `id` = 171939;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4113 WHERE `id` = 164886;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4113 WHERE `id` = 164886;
+
+UPDATE `gameobject_questrelation` SET `quest` = 998 WHERE `id` = 174599;
+UPDATE `gameobject_involvedrelation` SET `quest` = 998 WHERE `id` = 174599;
+
+UPDATE `gameobject_questrelation` SET `quest` = 996 WHERE `id` = 174600;
+UPDATE `gameobject_involvedrelation` SET `quest` = 996 WHERE `id` = 174600;
+
+UPDATE `gameobject_questrelation` SET `quest` = 1514 WHERE `id` = 173327;
+UPDATE `gameobject_involvedrelation` SET `quest` = 1514 WHERE `id` = 173327;
+
+UPDATE `gameobject_involvedrelation` SET `quest` = 4403 WHERE `id` = 174601;
+UPDATE `gameobject_questrelation` SET `quest` = 4403 WHERE `id` = 174601;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4343 WHERE `id` = 174602;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4343 WHERE `id` = 174602;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4222 WHERE `id` = 174603;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4222 WHERE `id` = 174603;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4221 WHERE `id` = 174604;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4221 WHERE `id` = 174604;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4115 WHERE `id` = 164887;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4115 WHERE `id` = 164887;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4448 WHERE `id` = 174608;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4448 WHERE `id` = 174608;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4447 WHERE `id` = 173324;
+UPDATE `gameobject_involvedrelation` SET `quest` = 4447 WHERE `id` = 173324;
+
+UPDATE `gameobject_questrelation` SET `quest` = 4462 WHERE `id` = 174684;
+UPDATE `gameobject_involvedrelation` SET `quest`=4462 WHERE `id` = 174684;
+
 
 -- End of migration.
 END IF;
