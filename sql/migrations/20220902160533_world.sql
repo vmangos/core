@@ -106,6 +106,24 @@ UPDATE `creature` SET `position_x`=2433.82, `position_y`=586.784, `position_z`=1
 UPDATE `creature` SET `position_x`=2410.72, `position_y`=602.581, `position_z`=129.689 WHERE  `guid`=34804;
 UPDATE `creature` SET `wander_distance`=5 WHERE  `guid`=50190;
 
+-- Add Missing Skinning Templates
+UPDATE `creature_template` SET `skinning_loot_id`='1817' WHERE  `entry`=10077 AND `patch`=0;
+
+UPDATE `creature_template` SET `skinning_loot_id`=8976 WHERE  `entry`=8976 AND `patch`=0;
+INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
+(8976, 8170, 60, 1, 1, 1, 0, 0, 10),
+(8976, 15416, 20, 1, 1, 1, 0, 0, 10),
+(8976, 8165, 10, 1, 1, 1, 0, 0, 10),
+(8976, 8171, 5, 1, 1, 1, 0, 0, 10),
+(8976, 4304, 5, 1, 1, 1, 0, 0, 10);
+
+UPDATE `creature_template` SET `skinning_loot_id`=14233 WHERE  `entry`=8976 AND `patch`=0;
+INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
+(14233, 4234, 90, 1, 1, 1, 0, 0, 10),
+(14233, 4304, 10, 1, 1, 1, 0, 0, 10);
+
+UPDATE `creature_template` SET `skinning_loot_id`=728 WHERE  `entry`=14232 AND `patch`=0;
+
 
 -- End of migration.
 END IF;
