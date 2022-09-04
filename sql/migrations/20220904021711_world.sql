@@ -194,6 +194,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (15481, 75, 2536.600586, -6260.703125, 104.609329, 100.000000, 0, 0.000000, 0);
 UPDATE `creature` SET `position_x`=2530.98, `position_y`=-6259.5, `position_z`=104.012, `orientation`=2.93098, `movement_type`=2 WHERE `id`=15481;
 
+-- Remove wrong mod of Aura of Frost.
+DELETE FROM `spell_mod` WHERE `Id`=23185;
+
 
 -- End of migration.
 END IF;
