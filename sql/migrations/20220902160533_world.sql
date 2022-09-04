@@ -100,6 +100,12 @@ DELETE FROM `creature_loot_template` WHERE `item` =23198 AND `entry` !=10435; --
 -- Correct Badge of the Swarmguard Data
 UPDATE `spell_proc_event` SET `ppmRate` = 10 WHERE `entry` = 26480;
 
+-- Unstuck Creatures
+UPDATE `creature` SET `position_x`=634.3214, `position_y`=-1760.85, `position_z`=35.417 WHERE  `guid`=16635;
+UPDATE `creature` SET `position_x`=2433.82, `position_y`=586.784, `position_z`=119.387 WHERE  `guid`=34954;
+UPDATE `creature` SET `position_x`=2410.72, `position_y`=602.581, `position_z`=129.689 WHERE  `guid`=34804;
+UPDATE `creature` SET `wander_distance`=5 WHERE  `guid`=50190;
+
 
 -- End of migration.
 END IF;
