@@ -129,6 +129,9 @@ INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 (142122, 2781, 0, 10),
 (142122, 2875, 0, 10);
 
+-- Apprentice Fishing and Cooking Dont Require Level 5
+UPDATE `npc_trainer` SET `reqlevel`= 0 WHERE `spell` IN (2551, 7733);
+
 
 -- End of migration.
 END IF;
