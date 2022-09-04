@@ -3539,10 +3539,23 @@ void Aura::HandleFeignDeath(bool apply, bool Real)
         HostileReference* pReference = pTarget->GetHostileRefManager().getFirst();
         while (pReference)
         {
-            if (Creature* refTarget = ToCreature(pReference->getSourceUnit()))
+            if (Unit* refTarget = pReference->getSourceUnit())
             {
-                if (!refTarget->GetCharmerOrOwnerOrSelf()->IsPlayer() && refTarget->IsWithinDistInMap(pTarget, refTarget->GetAttackDistance(pTarget))
-                    && pTarget->MagicSpellHitResult(refTarget, GetHolder()->GetSpellProto(), nullptr) != SPELL_MISS_NONE)
+                // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                // - Feign death is no longer resisted by players.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+                if (refTarget->IsPlayer() || refTarget->GetCharmerOrOwnerOrSelf()->IsPlayer())
+                {
+                    pReference = pReference->next();
+                    continue;
+                }
+                float const distance = static_cast<Creature*>(refTarget)->GetAttackDistance(pTarget);
+#else
+                float const distance = 30.0f;
+#endif
+
+                if (refTarget->IsWithinDistInMap(pTarget, distance) &&
+                    pTarget->MagicSpellHitResult(refTarget, GetHolder()->GetSpellProto(), nullptr) != SPELL_MISS_NONE)
                 {
                     success = false;
                     break;
