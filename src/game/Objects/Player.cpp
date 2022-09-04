@@ -1404,6 +1404,7 @@ bool Player::CheckMirrorTimerDeactivation(MirrorTimer::Type timer) const
             return false;
     }
 }
+
 void Player::OnMirrorTimerExpirationPulse(MirrorTimer::Type timer)
 {
     switch (timer)
@@ -1433,6 +1434,7 @@ void Player::OnMirrorTimerExpirationPulse(MirrorTimer::Type timer)
             return;
     }
 }
+
 uint32 Player::GetMirrorTimerMaxDuration(MirrorTimer::Type timer) const
 {
     switch (timer)
@@ -1449,6 +1451,7 @@ uint32 Player::GetMirrorTimerMaxDuration(MirrorTimer::Type timer) const
             return 0;
     }
 }
+
 SpellAuraHolder const* Player::GetMirrorTimerBuff(MirrorTimer::Type timer) const
 {
     switch (timer)
@@ -18917,7 +18920,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
             ObjectGuid t_guid = target->GetObjectGuid();
 
             // Make sure mobs who become out of range leave combat before grid unload.
-            if (target->IsCreature() && IsInCombat() && !GetMap()->IsDungeon())
+            if (target->IsCreature() && target->FindMap() && IsInCombat() && !GetMap()->IsDungeon())
                 BeforeVisibilityDestroy((Creature*)target);
 
             target->BuildOutOfRangeUpdateBlock(data);
@@ -22164,7 +22167,7 @@ bool Player::IsInCombatWithCreature(Creature const* pCreature)
 
     while (pReference)
     {
-        if (pCreature == pReference->getSourceUnit())
+        if (pReference->isValid() && pCreature == pReference->getSourceUnit())
             return true;
 
         pReference = pReference->next();
