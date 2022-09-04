@@ -124,6 +124,11 @@ INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `g
 
 UPDATE `creature_template` SET `skinning_loot_id`=728 WHERE  `entry`=14232 AND `patch`=0;
 
+-- Add Missing Quests to Gameobject
+INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(142122, 2781, 0, 10),
+(142122, 2875, 0, 10);
+
 
 -- End of migration.
 END IF;
