@@ -30,12 +30,6 @@ SET @POOL2 := 20025;
 SET @POOL3 := 20026;
 SET @POOL4 := 20027;
 SET @POOL5 := 20028;
-SET @POOL6 := 20029;
-SET @POOL7 := 20030;
-SET @POOL8 := 20031;
-SET @POOL9 := 20032;
-SET @POOL10 := 20033;
-SET @POOL11 := 20034;
 
 --  Missing spawns at Teldrassil
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
