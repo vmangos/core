@@ -2390,8 +2390,16 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_UNIT_CASTER_PET:
         {
-            Pet* tmpUnit = m_casterUnit ? m_casterUnit->GetPet() : nullptr;
-            if (!tmpUnit) break;
+            Unit* tmpUnit = nullptr;
+            if (m_casterUnit)
+            {
+                tmpUnit = m_casterUnit->GetPet();
+                if (!tmpUnit)
+                    tmpUnit = ToCreature(m_casterUnit->GetCharm());
+            }
+            if (!tmpUnit)
+                break;
+
             targetUnitMap.push_back(tmpUnit);
             break;
         }
@@ -5798,7 +5806,13 @@ SpellCastResult Spell::CheckCast(bool strict)
         {
             if (j == TARGET_UNIT_CASTER_PET)
             {
-                Pet* pet = m_casterUnit ? m_casterUnit->GetPet() : nullptr;
+                Unit* pet = nullptr;
+                if (m_casterUnit)
+                {
+                    pet = m_casterUnit->GetPet();
+                    if (!pet)
+                        pet = ToCreature(m_casterUnit->GetCharm());
+                }
                 if (!pet)
                 {
                     if (m_triggeredByAuraSpell)              // not report pet not existence for triggered spells
