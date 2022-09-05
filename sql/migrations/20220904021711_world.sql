@@ -197,6 +197,8 @@ UPDATE `creature` SET `position_x`=2530.98, `position_y`=-6259.5, `position_z`=1
 -- Remove wrong mod of Aura of Frost.
 DELETE FROM `spell_mod` WHERE `Id`=23185;
 
+-- Remove wrong mod of Aura of Nature.
+DELETE FROM `spell_mod` WHERE `Id`=25044;
 
 -- End of migration.
 END IF;

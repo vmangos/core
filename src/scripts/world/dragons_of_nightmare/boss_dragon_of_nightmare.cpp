@@ -60,7 +60,7 @@ void boss_dragon_of_nightmareAI::UpdateAI(uint32 const uiDiff)
 {
     if (m_uiAuraOfNatureTimer <= uiDiff)
     {
-        if (DoCastSpellIfCan(m_creature, SPELL_AURA_OF_NATURE) == CAST_OK)
+        if (m_creature->IsInCombat() && DoCastSpellIfCan(m_creature, SPELL_AURA_OF_NATURE) == CAST_OK)
             m_uiAuraOfNatureTimer = urand(3000, 5000);
     }
     else
