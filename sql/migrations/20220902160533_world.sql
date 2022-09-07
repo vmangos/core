@@ -92,24 +92,24 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
  
 (47056, 1994, 0, 0, 0, 1, 10938.40234375000, 930.25122070312500, 1340.9490966796875, 3.188395738601684570, 300, 300, 5, 100, 0, 1, 0, 0, 0, 10);
 
-UPDATE `creature_template` SET `auras` = '11919' WHERE  `entry`=1994;
+UPDATE `creature_template` SET `auras` = '11919' WHERE `entry`=1994;
 
 -- Remove incorrect drops for Idol of Brutality
-DELETE FROM `creature_loot_template` WHERE `item` =23198 AND `entry` !=10435; -- Magistrate Barthilas
+DELETE FROM `creature_loot_template` WHERE `item` =23198 AND `entry` != 10435; -- Magistrate Barthilas
 
 -- Correct Badge of the Swarmguard Data
 UPDATE `spell_proc_event` SET `ppmRate` = 10 WHERE `entry` = 26480;
 
 -- Unstuck Creatures
-UPDATE `creature` SET `position_x`=634.3214, `position_y`=-1760.85, `position_z`=35.417 WHERE  `guid`=16635;
-UPDATE `creature` SET `position_x`=2433.82, `position_y`=586.784, `position_z`=119.387 WHERE  `guid`=34954;
-UPDATE `creature` SET `position_x`=2410.72, `position_y`=602.581, `position_z`=129.689 WHERE  `guid`=34804;
+UPDATE `creature` SET `position_x`=634.3214, `position_y`=-1760.85, `position_z`=35.417 WHERE `guid`=16635;
+UPDATE `creature` SET `position_x`=2433.82, `position_y`=586.784, `position_z`=119.387 WHERE `guid`=34954;
+UPDATE `creature` SET `position_x`=2410.72, `position_y`=602.581, `position_z`=129.689 WHERE `guid`=34804;
 UPDATE `creature` SET `wander_distance`=5 WHERE  `guid`=50190;
 
 -- Add Missing Skinning Templates
-UPDATE `creature_template` SET `skinning_loot_id`='1817' WHERE  `entry`=10077 AND `patch`=0;
+UPDATE `creature_template` SET `skinning_loot_id`='1817' WHERE `entry`=10077 AND `patch`=0;
 
-UPDATE `creature_template` SET `skinning_loot_id`=8976 WHERE  `entry`=8976 AND `patch`=0;
+UPDATE `creature_template` SET `skinning_loot_id`=8976 WHERE `entry`=8976 AND `patch`=0;
 INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
 (8976, 8170, 60, 1, 1, 1, 0, 0, 10),
 (8976, 15416, 20, 1, 1, 1, 0, 0, 10),
@@ -117,12 +117,12 @@ INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `g
 (8976, 8171, 5, 1, 1, 1, 0, 0, 10),
 (8976, 4304, 5, 1, 1, 1, 0, 0, 10);
 
-UPDATE `creature_template` SET `skinning_loot_id`=14233 WHERE  `entry`=8976 AND `patch`=0;
+UPDATE `creature_template` SET `skinning_loot_id`=14233 WHERE `entry`=14233 AND `patch`=0;
 INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
 (14233, 4234, 90, 1, 1, 1, 0, 0, 10),
 (14233, 4304, 10, 1, 1, 1, 0, 0, 10);
 
-UPDATE `creature_template` SET `skinning_loot_id`=728 WHERE  `entry`=14232 AND `patch`=0;
+UPDATE `creature_template` SET `skinning_loot_id`=728 WHERE `entry`=14232 AND `patch`=0;
 
 -- Add Missing Quests to Gameobject
 INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
@@ -140,9 +140,9 @@ UPDATE `quest_template` SET `CompleteEmote` = 0 WHERE `entry` IN (4117, 4443, 44
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 3595, `spawntimesecsmax` = 3595 WHERE `id` IN ( 164887, 173327, 174599, 174600, 174601, 174602, 174603, 174604, 174708, 174709, 164886, 171939, 171942, 174594, 174595, 174596, 174598, 174712, 174713, 174597, 164888, 173284, 174605, 174606, 174607, 174686, 164885, 173324, 174608, 174684);
 
-UPDATE `quest_template` SET `QuestFlags` = 264 WHERE `entry` = 4445;
+-- UPDATE `quest_template` SET `QuestFlags` = 264 WHERE `entry` = 4445;
 
-UPDATE `quest_template` SET `QuestFlags` = 264, `RewXP` = 560 WHERE `entry` = 4467;
+-- UPDATE `quest_template` SET `QuestFlags` = 264, `RewXP` = 560 WHERE `entry` = 4467;
 
 UPDATE `quest_template` SET `CompleteEmote` = 0 WHERE `entry` IN (4403, 1514, 998);
 
