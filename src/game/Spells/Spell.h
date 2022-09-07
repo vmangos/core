@@ -461,6 +461,7 @@ class Spell
         void SetClientStarted(bool isClientStarted);
         bool IsTriggered() const       { return m_IsTriggeredSpell; }
         bool IsTriggeredByAura() const { return m_triggeredByAuraSpell; }
+        bool IsTriggeredByProc() const;
         bool IsCastByItem() const      { return m_CastItem; }
         void SetCastItem(Item* item)
         {
