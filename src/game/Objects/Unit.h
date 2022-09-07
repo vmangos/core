@@ -65,7 +65,6 @@ struct PlayerMovementPendingChange
     uint32 time = 0;
     float newValue = 0.0f; // used if speed or height change
     bool apply = false; // used if movement flag change
-    bool resent = false; // sending change again because client didn't reply
     ObjectGuid controller;
 
     struct KnockbackInfo

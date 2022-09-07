@@ -2119,7 +2119,7 @@ Anticheat.ForbiddenArea.Threshold = 1
 Anticheat.ForbiddenArea.Penalty = 3
 
 # Time to wait for movement change ack
-Movement.PendingAckResponseTime = 2000
+Movement.PendingAckResponseTime = 4000
 
 ###################################################################################################################
 # GAME MASTER SETTINGS
