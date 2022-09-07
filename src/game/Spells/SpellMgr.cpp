@@ -3860,6 +3860,33 @@ void SpellMgr::LoadSpells()
         //spell->RequiredAuraVision = fields[148].GetUInt32();
         spell->Custom = fields[149].GetUInt32();
 
+        // It seems that in vanilla when the Amplitude of a
+        // periodic aura was 0, it defaulted to a 5 seconds timer.
+        // Check out Violet Tragan (Item 8526, Spell 6727).
+        // There are comments from vanilla saying it does
+        // damage every 5 seconds, while TBC comments say
+        // it does no damage, so behavior changed then.
+        // In classic the spell was edited in 1.13.6 and
+        // the timer was set to 5000, as it didn't work before.
+        for (int i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; ++i)
+        {
+            switch (spell->EffectApplyAuraName[i])
+            {
+                case SPELL_AURA_PERIODIC_DAMAGE:
+                case SPELL_AURA_PERIODIC_HEAL:
+                case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+                case SPELL_AURA_PERIODIC_ENERGIZE:
+                case SPELL_AURA_PERIODIC_LEECH:
+                case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+                case SPELL_AURA_PERIODIC_MANA_FUNNEL:
+                case SPELL_AURA_PERIODIC_MANA_LEECH:
+                case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                case SPELL_AURA_POWER_BURN_MANA:
+                    if (spell->EffectAmplitude[i] == 0)
+                        spell->EffectAmplitude[i] = 5000;
+                    break;
+            }
+        }
         
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
         for (int i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; ++i)
