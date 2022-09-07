@@ -22204,8 +22204,8 @@ void PlayerLogFormatted(uint32 accountId, WorldSession const* session, LogType l
             log << ", name " << player->GetName();
             stmt.addString(player->GetName());
 
-            log << ", map " << player->GetMap()->GetId();
-            stmt.addUInt32(player->GetMap()->GetId());
+            log << ", map " << player->GetMapId();
+            stmt.addUInt32(player->GetMapId());
 
             log << ", pos " << player->GetPositionX() << ", " << player->GetPositionY() << ", " << player->GetPositionZ();
             stmt.addFloat(player->GetPositionX());
