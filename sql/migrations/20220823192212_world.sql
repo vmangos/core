@@ -29,7 +29,7 @@ SET @POOL5 := 20012;
 --  Missing spawns at Tirisfal
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@CHEST1,106318,0,2036.27,-455.528,35.8657,2.25147,0,0,0.902585,0.430512,300,900,100,1,0,0,0,10),  -- Balnir Farmstead
-(@CHEST2 ,106318,0,2155.44,-510.988,81.639,3.99681,0,0,-0.909961,0.414694,300,900,100,1,0,0,0,10),  -- Crusader Outpost
+(@CHEST2 ,106318,0,2155.44,-510.988,81.639,3.99681,0,0,-0.909961,0.414694,300,900,100,1,0,0,0,10), -- Crusader Outpost
 (@CHEST3,106318,0,2342.99,1319.23,34.0111,4.55531,0,0,-0.760406,0.649449,300,900,100,1,0,0,0,10),  -- Solliden Farmstead
 (@CHEST4,106318,0,2550.12,783.427,110.544,3.07177,0,0,0.999391,0.0349061,300,900,100,1,0,0,0,10),  -- Agamand Mills
 (@CHEST5,106318,0,2603.06,1464.46,-10.673,2.53072,0,0,0.953716,0.300708,300,900,100,1,0,0,0,10),   -- Whispering Shore
@@ -61,9 +61,9 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `f
 (@CHEST7,@POOL3,0,'Battered Chests (106318) - Tirisfal - Garren\'s Haunt #2','0','0','10'),
 (@CHEST3,@POOL4,0,'Battered Chests (106318) - Tirisfal - Solliden and Balnir Farmstead #1','0','0','10'),
 (@CHEST1,@POOL4,0,'Battered Chests (106318) - Tirisfal - Solliden and Balnir Farmstead #2','0','0','10'),
-(45251,@POOL5,0,'Battered Chests (106318) - Tirisfal - Tirisfal - Crusader Outposts #1','0','0','10'),
-(@CHEST2 ,@POOL5,0,'Battered Chests (106318) - Tirisfal - Tirisfal - Crusader Outposts #2','0','0','10'),
-(45240,@POOL5,0,'Battered Chests (106318) - Tirisfal - Tirisfal - Crusader Outposts #3','0','0','10');
+(45251,@POOL5,0,'Battered Chests (106318) - Tirisfal - Crusader Outposts #1','0','0','10'),
+(@CHEST2 ,@POOL5,0,'Battered Chests (106318) - Tirisfal - Crusader Outposts #2','0','0','10'),
+(45240,@POOL5,0,'Battered Chests (106318) - Tirisfal - Crusader Outposts #3','0','0','10');
 
 -- End of migration.
 END IF;
