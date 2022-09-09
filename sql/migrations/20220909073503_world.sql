@@ -155,7 +155,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `f
 (12396,@POOL9,0,'Battered Chests (106318) - Durotar - Razorwind Canyon #1',0,0,10),
 (@CHEST20,@POOL9,0,'Battered Chests (106318) - Durotar - Razorwind Canyon #2',0,0,10),
 (@CHEST22,@POOL9,0,'Battered Chests (106318) - Durotar - Razorwind Canyon #3',0,0,10),
-(12637,@POOL10,0,'Battered Chests (106318) - Durotar - Echo Isles #1',0,0,10);
+(12637,@POOL10,0,'Battered Chests (106318) - Durotar - Echo Isles #1',0,0,10),
 (@CHEST1,@POOL10,0,'Battered Chests (106318) - Durotar - Echo Isles #2',0,0,10);
 
 -- End of migration.
