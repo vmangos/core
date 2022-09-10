@@ -946,7 +946,7 @@ bool Aura::CanProcFrom(SpellEntry const* spell, uint32 EventProcEx, uint32 procE
             {
                 // Passive spells can`t trigger if need hit (exclude cases when procExtra include non-active flags)
                 if ((EventProcEx & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT) & procEx) && !active &&
-                   !(EventProcEx & (PROX_EX_NO_DAMAGE_MASK)& procEx))
+                   !(EventProcEx & (PROX_EX_NO_DAMAGE_MASK) & procEx))
                     return false;
             }
         }
