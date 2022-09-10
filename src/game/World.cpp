@@ -903,7 +903,7 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_CHARGE, "Movement.ExtrapolateChargePosition", true);
     setConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET, "Movement.ExtrapolatePetPosition", true);
-    setConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME, "Movement.PendingAckResponseTime", 2000);
+    setConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME, "Movement.PendingAckResponseTime", 4000);
     setConfigMinMax(CONFIG_UINT32_MAX_POINTS_PER_MVT_PACKET, "Movement.MaxPointsPerPacket", 80, 5, 10000);
     setConfigMinMax(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER, "Movement.RelocationVmapsCheckDelay", 0, 0, 2000);
 
@@ -1152,16 +1152,22 @@ void World::LoadConfigSettings(bool reload)
     sLog.InitSmartlogGuids(sConfig.GetStringDefault("Smartlog.ExtraGuids", ""));
 }
 
-void charactersDatabaseWorkerThread()
+void CharactersDatabaseWorkerThread()
 {
+    time_t lastCheckTime = 0;
     CharacterDatabase.ThreadStart();
     while (!sWorld.IsStopped())
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        if (CharacterDatabase.HasAsyncQuery())
-            continue;
-        Player::DeleteOldCharacters();
-        sObjectMgr.ReturnOrDeleteOldMails(true);
+        time_t const now = time(nullptr);
+        if ((lastCheckTime + 30 * MINUTE) < now)
+        {
+            if (CharacterDatabase.HasAsyncQuery())
+                continue;
+            Player::DeleteOldCharacters();
+            sObjectMgr.ReturnOrDeleteOldMails(true);
+            lastCheckTime = now;
+        }
     }
     CharacterDatabase.ThreadEnd();
 }
@@ -1772,7 +1778,7 @@ void World::SetInitialWorldSettings()
         std::make_unique<MovementBroadcaster>(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
 
-    m_charDbWorkerThread.reset(new std::thread(&charactersDatabaseWorkerThread));
+    m_charDbWorkerThread.reset(new std::thread(&CharactersDatabaseWorkerThread));
 
     sLog.outString();
     sLog.outString("==========================================================");

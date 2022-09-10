@@ -1021,6 +1021,17 @@ enum ProcFlagsEx
     PROC_EX_CAST_END            = 0x0080000,                // Procs on end of cast only
 };
 
+#define PROX_EX_NO_DAMAGE_MASK (PROC_EX_MISS    | \
+                                PROC_EX_RESIST  | \
+                                PROC_EX_DODGE   | \
+                                PROC_EX_PARRY   | \
+                                PROC_EX_BLOCK   | \
+                                PROC_EX_EVADE   | \
+                                PROC_EX_IMMUNE  | \
+                                PROC_EX_DEFLECT | \
+                                PROC_EX_ABSORB  | \
+                                PROC_EX_REFLECT)
+
 // original names, do not edit
 enum SpellCategories
 {

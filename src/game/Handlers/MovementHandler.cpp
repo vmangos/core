@@ -29,6 +29,7 @@
 #include "Transport.h"
 #include "BattleGround.h"
 #include "WaypointMovementGenerator.h"
+#include "ConfusedMovementGenerator.h"
 #include "MapPersistentStateMgr.h"
 #include "World.h"
 #include "Anticheat.h"
@@ -266,6 +267,13 @@ void Player::ExecuteTeleportNear()
     m_movementInfo.UpdateTime(WorldTimer::getMSTime());
     TeleportPositionRelocation(dest);
     MovementPacketSender::SendTeleportToObservers(this, dest.x, dest.y, dest.z, dest.o);
+
+    // if player is sheeped make him wander around new position
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() == CONFUSED_MOTION_TYPE)
+    {
+        ConfusedMovementGenerator<Player>* confuse = (ConfusedMovementGenerator<Player>*)(GetMotionMaster()->top());
+        confuse->SetStartPosition(dest.x, dest.y, dest.z);
+    }
 
     // resummon pet, if the destination is in another continent instance, let Player::SwitchInstance do it
     // because the client will request the name for the old pet guid and receive no answer
