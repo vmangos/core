@@ -112,7 +112,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
             //Individual event checks
             switch (temp.event_type)
             {
-                case EVENT_T_TIMER:
+                case EVENT_T_TIMER_IN_COMBAT:
                 case EVENT_T_TIMER_OOC:
                     if (temp.timer.initialMax < temp.timer.initialMin)
                         sLog.outErrorDb("CreatureEventAI:  Creature %u is using timed event(%u) with param2 < param1 (InitialMax < InitialMin). Event will never repeat.", temp.creature_id, i);
