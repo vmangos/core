@@ -29,9 +29,6 @@ go_resonite_cask
 go_tablet_of_madness
 go_silithyste
 go_restes_sha_ni
-go_Hive_Regal_Glyphed_Crystal
-go_Hive_Ashi_Glyphed_Crystal
-go_Hive_Zora_Glyphed_Crystal
 go_bells
 go_darkmoon_faire_music
 EndContentData */
@@ -177,51 +174,6 @@ bool GOHello_go_restes_sha_ni(Player* pPlayer, GameObject* pGo)
             return true;
         }
     }
-    return true;
-}
-
-/*######
-## go_Hive_Regal_Glyphed_Crystal
-## go_Hive_Ashi_Glyphed_Crystal
-## go_Hive_Zora_Glyphed_Crystal
-######*/
-
-enum
-{
-    QUEST_GLYPH_CHASING                 = 8309,
-    ITEM_GEOLOGIST_TRANSCRIPTION_KIT    = 20453,
-    ITEM_HIVE_ZORA_RUBBING              = 20454,
-    ITEM_HIVE_ASHI_RUBBING              = 20455,
-    ITEM_HIVE_REGAL_RUBBING             = 20456,
-};
-
-// gossip menu 20000 : Le cristal est couvert de glyphes et de runes compliqués. Vous n'y comprenez rien.
-template <int REWARD_ITEM>
-bool GOHello_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo)
-{
-    pPlayer->PlayerTalkClass->CloseGossip();
-    pPlayer->PlayerTalkClass->ClearMenus();
-
-    if (pPlayer->GetQuestStatus(QUEST_GLYPH_CHASING) == QUEST_STATUS_INCOMPLETE &&
-        pPlayer->HasItemCount(ITEM_GEOLOGIST_TRANSCRIPTION_KIT, 1) &&
-        !pPlayer->HasItemCount(REWARD_ITEM, 1))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<Use the transcription device to gather a rubbing.>", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(7770, pGo->GetGUID());
-    return true;
-}
-
-template <int REWARD_ITEM>
-bool GOSelect_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
-{
-    pPlayer->PlayerTalkClass->CloseGossip();
-    pPlayer->PlayerTalkClass->ClearMenus();
-
-    if (pPlayer->GetQuestStatus(QUEST_GLYPH_CHASING) == QUEST_STATUS_INCOMPLETE &&
-        pPlayer->HasItemCount(ITEM_GEOLOGIST_TRANSCRIPTION_KIT, 1) &&
-        !pPlayer->HasItemCount(REWARD_ITEM, 1))
-        pPlayer->AddItem(REWARD_ITEM, 1);
-
     return true;
 }
 
@@ -558,24 +510,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_restes_sha_ni";
     newscript->pGOHello = &GOHello_go_restes_sha_ni;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_Hive_Regal_Glyphed_Crystal";
-    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_REGAL_RUBBING>);
-    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_REGAL_RUBBING>);
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_Hive_Ashi_Glyphed_Crystal";
-    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ASHI_RUBBING>);
-    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ASHI_RUBBING>);
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_Hive_Zora_Glyphed_Crystal";
-    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
-    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
     newscript->RegisterSelf();
 
     newscript = new Script;
