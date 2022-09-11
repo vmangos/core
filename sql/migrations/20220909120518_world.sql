@@ -40,11 +40,11 @@ SET @POOL11 := 20060;
 
 --  Missing spawns at Dun Morgoth
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(@CHEST1,106318,0,-5906.34,-1873.73,404.95,5.91667,0,0,-0.182235,0.983255,300,900,100,1,0,0,0,10),   -- Helm\s Bed Lake 
+(@CHEST1,106318,0,-5906.34,-1873.73,404.95,5.91667,0,0,-0.182235,0.983255,300,900,100,1,0,0,0,10),   -- Helm\'s Bed Lake
 (@CHEST2,106318,0,-5867.88,-1521.54,379.035,4.32842,0,0,-0.829037,0.559194,300,900,100,1,0,0,0,10),  -- Gol\'Bolar Quarry (Outside Cave)
 (@CHEST3,106318,0,-5825.66,-1594.93,361.824,3.17653,0,0,-0.999847,0.0174693,300,900,100,1,0,0,0,10), -- Gol\'Bolar Quarry (Outside Cave)
-(@CHEST4,106318,0,-5786.93,-1941.07,402.297,4.7473,0,0,-0.694658,0.71934,300,900,100,1,0,0,0,10),    -- Helm\s Bed Lake
-(@CHEST5,106318,0,-5671.38,-2125.01,400.913,2.40855,0,0,0.93358,0.358368,300,900,100,1,0,0,0,10),    -- Helm\s Bed Lake
+(@CHEST4,106318,0,-5786.93,-1941.07,402.297,4.7473,0,0,-0.694658,0.71934,300,900,100,1,0,0,0,10),    -- Helm\'s Bed Lake
+(@CHEST5,106318,0,-5671.38,-2125.01,400.913,2.40855,0,0,0.93358,0.358368,300,900,100,1,0,0,0,10),    -- Helm\'s Bed Lake
 (@CHEST6,106318,0,-5658.51,657.265,383.448,2.63544,0,0,0.968147,0.250381,300,900,100,1,0,0,0,10),    -- Frostmane Hold
 (@CHEST7,106318,0,-5632.21,-1793.37,358.769,1.309,0,0,0.608761,0.793354,300,900,100,1,0,0,0,10),     -- Gol\'Bolar Quarry Mine(Inside Cave)
 (@CHEST8,106318,0,-5576.89,-1727.13,353.111,1.37881,0,0,0.636078,0.771625,300,900,100,1,0,0,0,10),   -- Gol\'Bolar Quarry Mine(Inside Cave)
@@ -64,7 +64,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `inst
 (@POOL1,1,'Battered Chests (106318) - Dun Morgoth - Gnomeregan',0,0,0,10),
 (@POOL2,1,'Battered Chests (106318) - Dun Morgoth - Frostmane Hold',0,0,0,10),
 (@POOL3,1,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den',0,0,0,10),
-(@POOL4,1,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine(Inside Cave)',0,0,0,10),
+(@POOL4,1,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave)',0,0,0,10),
 (@POOL5,1,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry (Outside Cave)',0,0,0,10),
 (@POOL6,1,'Battered Chests (106318) - Dun Morgoth - Helm\'s Bed Lake',0,0,0,10),
 (@POOL7,1,'Battered Chests (106318) - Dun Morgoth - Iceflow Lake',0,0,0,10),
@@ -82,11 +82,11 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `f
 (@CHEST10,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #4',0,0,10),
 (@CHEST11,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #5',0,0,10),
 (@CHEST12,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #6',0,0,10),
-(10856,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine(Inside Cave) #1',0,0,10),
-(29343,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine(Inside Cave) #2',0,0,10),
-(@CHEST7,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine(Inside Cave) #3',0,0,10),
-(@CHEST8,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine(Inside Cave) #4',0,0,10),
-(@CHEST9,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine(Inside Cave) #5',0,0,10),
+(10856,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #1',0,0,10),
+(29343,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #2',0,0,10),
+(@CHEST7,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #3',0,0,10),
+(@CHEST8,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #4',0,0,10),
+(@CHEST9,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #5',0,0,10),
 (10850,@POOL5,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry (Outside Cave) #1',0,0,10),
 (@CHEST2,@POOL5,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry (Outside Cave) #2',0,0,10),
 (@CHEST3,@POOL5,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry (Outside Cave) #3',0,0,10),
