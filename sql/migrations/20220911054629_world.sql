@@ -258,14 +258,14 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=12381;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1238101, 12381, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1238101, 0, 0, 'Ley Sprite - Cast Detonate on Death');
 DELETE FROM `creature_ai_scripts` WHERE `id`=1238101;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1238101, 0, 0, 15, 21027, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ley Sprite - Cast Spell Detonate');
+(1238101, 0, 0, 15, 20789, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ley Sprite - Cast Spell Detonate');
 
 -- Events list for Mana Sprite
 DELETE FROM `creature_ai_events` WHERE `creature_id`=12382;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1238201, 12382, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1238201, 0, 0, 'Mana Sprite - Cast Detonate on Death');
 DELETE FROM `creature_ai_scripts` WHERE `id`=1238201;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1238201, 0, 0, 15, 21027, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mana Sprite - Cast Spell Detonate');
+(1238201, 0, 0, 15, 20789, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mana Sprite - Cast Spell Detonate');
 
 
 -- End of migration.
