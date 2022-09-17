@@ -187,6 +187,11 @@ DELETE FROM `skinning_loot_template` WHERE `entry` IN (10151, 14750);
 -- Objects Used in Quest Bingles' Missing Supplies Should Respawn Faster (credit cmangos)
 UPDATE `gameobject` SET `spawntimesecsmin` = 5, `spawntimesecsmax` = 5 WHERE `guid` IN (12871, 12863, 12872, 12864);
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Keeper Remulos 11832
+UPDATE `creature` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 11832;
+
 
 -- End of migration.
 END IF;
