@@ -193,6 +193,11 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 5, `spawntimesecsmax` = 5 WHERE `gu
 -- Keeper Remulos 11832
 UPDATE `creature` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 11832;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Correct Orientation
+UPDATE `creature` SET `orientation` = 4.79274 WHERE `guid` = 26902;
+
 
 -- End of migration.
 END IF;
