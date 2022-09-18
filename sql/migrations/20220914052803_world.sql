@@ -8,9 +8,9 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20220914052803');
 -- Add your query below.
 
--- Training in a new weapon can be done at level 1 (execpt polearms) 
+-- Remove level requirement for training a new weapon (execpt for polearms)
 UPDATE `npc_trainer` SET `reqlevel`= 0 WHERE `spell` IN (
-1847,  -- One-Handed Swords
+1847,   -- One-Handed Swords
 15983,  -- Two-Handed Swords
 15988,  -- Daggers
 15995,  -- Crossbows
