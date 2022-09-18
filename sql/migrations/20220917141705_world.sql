@@ -208,7 +208,7 @@ DELETE FROM `pool_gameobject_template` WHERE `id` IN (331, 333, 334, 35252);
 SET @OGUID = ;
 SET @PTEMPLATE = ;
 
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`)
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 331, 0, -3563.83, -1767.35, 79.1001, 4.26498, 0, 0, 0.846354, -0.53262, 30, 60, 100, 1, 0, 0, 0, 10),
 (@OGUID+2, 331, 0, -3485.88, -1727.12, 34.5372, 0.0349063, 0, 0, 0.0174522, 0.999848, 30, 60, 100, 1, 0, 0, 0, 10),
 (@OGUID+3, 331, 0, -3308.06, -1899.06, 31.7356, -2.11185, 0, 0, 0.870356, -0.492423, 30, 60, 100, 1, 0, 0, 0, 10),
