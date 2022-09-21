@@ -148,7 +148,7 @@ if(WIN32)
   set(LIBS_DIR ${CMAKE_INSTALL_PREFIX})
 else()
   set(BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
-  set(CONF_DIR ${CMAKE_INSTALL_PREFIX}/etc)
+  set(CONF_DIR ${CMAKE_INSTALL_PREFIX}/etc CACHE PATH "Set custom configuration directory")
   set(LIBS_DIR ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
 
