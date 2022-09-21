@@ -252,6 +252,16 @@ INSERT INTO `quest_greeting` (`entry`, `type`, `emote_id`, `emote_delay`, `conte
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- Update Scourgestone Quests
+UPDATE `creature_involvedrelation` SET `id`= 10839 WHERE `id`=10840 AND `quest`=5407;
+UPDATE `creature_involvedrelation` SET `id`= 10839 WHERE `id`=10840 AND `quest`=5408;
+UPDATE `creature_involvedrelation` SET `id`= 10840 WHERE `id`=10839 AND `quest`=5403;
+UPDATE `creature_involvedrelation` SET `id`= 10840 WHERE `id`=10839 AND `quest`=5402;
+UPDATE `quest_template` SET `RequiredRaces` = 0 WHERE `entry` IN (5401, 5402, 5403, 5404);
+UPDATE `quest_template` SET `RequiredRaces` = 0 WHERE `entry` IN (5405, 5406, 5407, 5408);
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 -- CMANGOS DATA (NEED TO SEE WHAT DATA IS RELEVANT)
 
 DELETE FROM `questgiver_greeting` WHERE `Entry` in (1217, 1284, 1377, 3936, 4048, 4080, 5393, 5637, 5694, 5892, 5906, 6019, 7877, 11036, 15297, 16281, 16494, 27337);
