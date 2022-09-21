@@ -198,6 +198,178 @@ UPDATE `creature` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `
 -- Correct Orientation
 UPDATE `creature` SET `orientation` = 4.79274 WHERE `guid` = 26902;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Update Objects Used For Quest 2933
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(443, 142708, 0, -15.0868, -2789.53, 123.974, 0.916285, 0.705321, 0.172728, -0.672002, 0.145263, 7200, 7200, 100, 1, 0, 0, 0, 10),
+(444, 142710, 0, -14.1372, -2789.71, 123.862, 3.14159, 0, 0, -1, 0, 7200, 7200, 100, 1, 0, 0, 0, 10),
+(445, 142711, 0, -15.0243, -2789.39, 123.862, 3.14159, 0, 0, -1, 0, 7200, 7200, 100, 1, 0, 0, 0, 10);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 1800, `spawntimesecsmax` = 3600 WHERE `id` IN (142702, 142703, 142704, 142705, 142706, 142707, 142708, 142710, 142711, 142712, 142713, 142714);
+
+INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(142703, 2933, 0, 10),
+(142704, 2933, 0, 10),
+(142705, 2933, 0, 10),
+(142706, 2933, 0, 10),
+(142707, 2933, 0, 10),
+(142708, 2933, 0, 10),
+(142710, 2933, 0, 10),
+(142711, 2933, 0, 10),
+(142712, 2933, 0, 10),
+(142713, 2933, 0, 10),
+(142714, 2933, 0, 10);
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Add Missing Greetings
+INSERT INTO `quest_greeting` (`entry`, `type`, `emote_id`, `emote_delay`, `content_default`) VALUES
+(661, 0, 0, 0, 'Greetings. What business have you with the Carevin family? Do you seek to assist the Carevins in their battle against the undead?'),
+(1377, 0, 0, 0, 'Driving a Steam Tank isn\'t for everyone.  It takes an iron grip and nerves of steel...lucky I have both!  How about you?  How\'s your mettle?  Want to prove it to me?'),
+(1738, 1, 0, 0, 'This collection of scrolls contains various logistic and strategic information, as well as coded correspondences.'),
+(2487, 0, 0, 0, 'Ah, smell the fine salt air!  \'Tis always nice to return to our home port of Booty Bay.'),
+(3050, 0, 0, 0, 'The tauren are sons and daughters of the Earthmother, and we show respect to all her children.  Even the beasts we slay are cherished, as their bodies give nourishment and their skins provide warmth.'),
+(4047, 0, 0, 0, 'The spirits of nature are powers to respect.  They offer great aid to the worthy, and mete out swift death to the foolish.'),
+(5393, 0, 1, 0, 'Nethergarde keep always needs more supplies - supplies to help our mages in their research, and supplies to keep our defenders in top fighting shape.'),
+(5637, 0, 2, 0, 'Pleased to meetcha, $c. Me name\'s Roetten. I lead Reclaimers Incorporated.$B$BMe guild and I specialize in aquiring lost goods. We usually hire brave adventurers and send them off to finish tasks for those who aren\'t able, or don\'t have the time.'),
+(6868, 0, 6, 0, 'Whatcha need, $c?  I trust that you\'ve come out to this wasteland for a reason other than idle chit chat.'),
+(7740, 0, 0, 0, ''),
+(7825, 0, 0, 0, ''),
+(7884, 0, 0, 0, ''),
+(8256, 0, 1, 0, 'Greetings, $N.'),
+(8379, 0, 0, 0, 'If you are here to beg for the privilege of working for me, then your company is quite welcome. Otherwise, there is little chance you are of any use to me.'),
+(8582, 0, 0, 0, ''),
+(10306, 0, 0, 0, ''),
+(10428, 0, 1, 0, 'Whitereach Post started off as a small hunting camp... Now, everyone wants to set up shop and call this home.$B$B<Motega shrugs his shoulder>'),
+(11857, 0, 0, 0, ''),
+(11862, 0, 0, 0, ''),
+(11864, 0, 0, 0, ''),
+(12126, 0, 0, 0, ''),
+(138492, 1, 0, 0, 'These shards glint with an unnatural sheen.  It is clear that they hide a deep power within.'),
+(150075, 1, 0, 0, ''),
+(179827, 1, 0, 0, '');
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- CMANGOS DATA (NEED TO SEE WHAT DATA IS RELEVANT)
+
+DELETE FROM `questgiver_greeting` WHERE `Entry` in (1217, 1284, 1377, 3936, 4048, 4080, 5393, 5637, 5694, 5892, 5906, 6019, 7877, 11036, 15297, 16281, 16494, 27337);
+DELETE FROM `questgiver_greeting` WHERE `Entry` in (1740,1938,1952,2055,2229,2277,2500,2934,3050,3428,4454,4630,5598,5636,5675,5878,6868,7802,10428,11259,11596,14567,19936);
+
+-- Glorin Steelbrow
+INSERT INTO `questgiver_greeting` VALUES (1217, 0, 'Harumph!  As if I don''t have enough to do out here in the muck, without all these distractions!', 0, 0);
+
+-- Archbishop Benedictus
+INSERT INTO `questgiver_greeting` VALUES (1284, 0, 'My blessings go to you, $c, and I pray they may guide and protect you during these times of trouble.  Be vigilant, but remain hopeful for peace, for hope is our greatest weapon against the darkness.', 0, 0);
+
+-- Pilot Stonegear
+INSERT INTO `questgiver_greeting` VALUES (1377, 0, 'Driving a Steam Tank isn''t for everyone.  It takes an iron grip and nerves of steel...lucky I have both!  How about you?  How''s your mettle?  Want to prove it to me?', 0, 0);
+
+-- Shandris Feathermoon
+INSERT INTO `questgiver_greeting` VALUES (3936, 0, 'In the name of Elune, the Sentinels keep vigilant watch over all our lands, from the cobbled streets of Darnassus to the edge of Ashenvale Forest.', 2, 0);
+
+-- Falfindel Waywarder
+INSERT INTO `questgiver_greeting` VALUES (4048, 0, 'You look as though you have traveled from afar, $r.', 2, 0);
+
+-- Kaela Shadowspear
+INSERT INTO `questgiver_greeting` VALUES (4080, 0, 'Gaxim is so focused on trying to convince the night elves that his methods are superior that I had no choice but to focus his energies on something--so I unleashed him on the Venture Co.$B$BI remain focused on helping the Charred Vale to the northwest.', 0, 0);
+
+-- Quartermaster Lungertz
+INSERT INTO `questgiver_greeting` VALUES (5393, 0, 'Nethergarde keep always needs more supplies - supplies to help our mages in their research, and supplies to keep our defenders in top fighting shape.', 1, 0);
+
+-- Roetten Stonehammer
+INSERT INTO `questgiver_greeting` VALUES (5637, 0, 'Pleased to meetcha, $c. Me name''s Roetten. I lead Reclaimers Incorporated.$B$BMe guild and I specialize in aquiring lost goods. We usually hire brave adventurers and send them off to finish tasks for those who aren''t able, or don''t have the time.', 2, 0);
+
+-- High Sorcerer Andromath
+INSERT INTO `questgiver_greeting` VALUES (5694, 0, ' ', 0, 0);
+
+-- Searn Firewarder
+INSERT INTO `questgiver_greeting` VALUES (5892, 0, ' ', 0, 0);
+
+-- Xanis Flameweaver
+INSERT INTO `questgiver_greeting` VALUES (5906, 0, 'Hello, shaman. It is good to see one of my $gbrothers:sisters; here. May I aid you somehow?', 1, 0);
+
+-- Hornizz Brimbuzzle
+INSERT INTO `questgiver_greeting` VALUES (6019, 0, ' ', 0, 0);
+
+-- Latronicus Moonspear
+INSERT INTO `questgiver_greeting` VALUES (7877, 0, ' ', 0, 0);
+
+-- Rok Orhan
+UPDATE `questgiver_greeting` SET `Text` = 'The Gordunni Ogres encroach upon our lands.  We send as many as are willing to face them in the desecrated ruins of Feralas. ' WHERE `Entry` = 7777 AND `Type` = 0;
+
+-- Syndicate Documents
+INSERT INTO `questgiver_greeting` VALUES (1740, 1, 'This collection of scrolls contains various logistic and strategic information, as well as coded correspondences.', 0, 0);
+
+-- Dalar Dawnweaver
+INSERT INTO `questgiver_greeting` VALUES (1938, 0, 'The Kirin Tor did not heed my warnings!  The Alliance is a sham.  Arugal is a wreckless fool.', 0, 0);
+
+-- High Executor Hadrec
+INSERT INTO `questgiver_greeting` VALUES (1952, 0, 'Hello, $c.  If you''re here, then you must know that Silverpine is saturated with our enemies.  To survive, the Forsaken must drive them back!', 0, 0);
+
+-- Master Apothecary Faranell
+INSERT INTO `questgiver_greeting` VALUES (2055, 0, 'The Royal Apothecary Society shall heed The Dark Lady''s call to uncover the New Plague and drive Arthas and his heathen Scourge Army from the world once and for all.', 0, 0);
+
+-- Krusk
+INSERT INTO `questgiver_greeting` VALUES (2229, 0, 'To think, the place the Warchief was born and raised lies so close.', 0, 0);
+
+-- Loremaster Dibbs
+INSERT INTO `questgiver_greeting` VALUES (2277, 0, 'I have a great deal of work to do.  Are you here to aid me with my research?', 0, 0);
+
+-- Captain Hecklebury Smotts
+INSERT INTO `questgiver_greeting` VALUES (2500, 0, 'They''re out there!  I can hear them at night, laughing.  Oh, they''ll pay!  They...will...pay!!', 0, 0);
+
+-- Keeper Bel'dugur
+INSERT INTO `questgiver_greeting` VALUES (2934, 0, 'Knowledge is both tool and weapon to those with the will to use it.', 0, 0);
+
+-- Veren Tallstrider
+INSERT INTO `questgiver_greeting` VALUES (3050, 0, 'The tauren are sons and daughters of the Earthmother, and we show respect to all her children.  Even the beasts we slay are cherished, as their bodies give nourishment and their skins provide warmth.', 0, 0);
+
+-- Korran
+INSERT INTO `questgiver_greeting` VALUES (3428, 0, 'The dust of the Barrens parches my throat more and more every day, $N. But it is worth the sacrifice to remain here if it helps the Horde and the warchief.', 0, 0);
+
+-- Fizzle Brassbolts
+INSERT INTO `questgiver_greeting` VALUES (4454, 0, 'Aha!  Did you see that!  I think this new auto-spanner is going to do just the trick for my new influx manifold design.', 0, 0);
+
+-- Pozzik
+INSERT INTO `questgiver_greeting` VALUES (4630, 0, 'What a great day for racing! Oh, who am I kidding? Every day''s a great day for racing!', 0, 0);
+
+-- Atal'ai Exile
+INSERT INTO `questgiver_greeting` VALUES (5598, 0, 'What do you ask of me?', 0, 0);
+
+-- Gryphon Master Talonaxe
+INSERT INTO `questgiver_greeting` VALUES (5636, 0, 'What do you want? I''d be a whole lot happier up in the skies than grounded and yapping with a $r right now.$b$bGuess we can''t all get what we want.', 0, 0);
+
+-- Carendin Halgar
+INSERT INTO `questgiver_greeting` VALUES (5675, 0, 'The summoning of beings from the chaos that lies beyond our world is essential to the mastery of the warlock arts, $N. I am glad to see the progress you have made.', 0, 0);
+
+-- Thun'grim Firegaze
+INSERT INTO `questgiver_greeting` VALUES (5878, 0, 'My vision has darkened, but there are many kinds of sight...', 0, 0);
+
+-- Jarkal Mossmeld
+INSERT INTO `questgiver_greeting` VALUES (6868, 0, 'Whatcha need, $c?  I trust that you''ve come out to this wasteland for a reason other than idle chit chat.', 0, 0);
+
+-- Galvan the Ancient
+INSERT INTO `questgiver_greeting` VALUES (7802, 0, 'So few make it this far, even fewer make it past. Do not become a statistic, $N.', 0, 0);
+
+-- Motega Firemane
+INSERT INTO `questgiver_greeting` VALUES (10428, 0, 'Whitereach Post started off as a small hunting camp... Now, everyone wants to set up shop and call this home.$b$b<Motega shrugs his shoulder>', 0, 0);
+
+-- Nataka Longhorn
+INSERT INTO `questgiver_greeting` VALUES (11259, 0, 'Desolace is not such a bad place, if you don''t mind the constant harassments from the centaurs.', 0, 0);
+
+-- Smeed Scrabblescrew
+INSERT INTO `questgiver_greeting` VALUES (11596, 0, 'My business plan never accounted for housing giant kodos... maybe I should have gone into the underwater basket weaving business instead.', 0, 0);
+
+-- Derotain Mudsipper
+INSERT INTO `questgiver_greeting` VALUES (14567, 0, 'These Mithril Order guys are sissies.', 0, 0);
+
+-- Arazmodu
+INSERT INTO `questgiver_greeting` VALUES (19936, 0, ' ', 0, 0);
+
+UPDATE `questgiver_greeting` SET `Text` = ' ' WHERE `Text` = '';
+
 
 -- End of migration.
 END IF;
