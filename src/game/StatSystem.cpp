@@ -974,7 +974,7 @@ void Pet::UpdateResistances(uint32 school)
 
 void Pet::UpdateArmor()
 {
-    float amount = (GetStat(STAT_AGILITY) * 2.0f);
+    float amount = (GetStat(STAT_AGILITY) * (getPetType() == HUNTER_PET ? 2.0f : 1.0f));
 
     m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] += amount;
     int32 value = GetTotalResistanceValue(SPELL_SCHOOL_NORMAL);
