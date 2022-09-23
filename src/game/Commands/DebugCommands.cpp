@@ -1894,7 +1894,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     {
         if (itr.first == checkItem || !checkItem)
         {
-            ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(itr.first);
+            ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itr.first);
             if (!proto)
                 continue;
 
@@ -1916,7 +1916,7 @@ bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, uint32 simCount)
     uint32 const MAX_TIME = 30;
     auto startTime = time(nullptr);
 
-    ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(lootid);
+    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(lootid);
     if (!proto)
     {
         PSendSysMessage("Error: invalid item id %u", lootid);
@@ -1985,17 +1985,19 @@ bool IsSimilarItem(ItemPrototype const* proto1, ItemPrototype const* proto2)
 
 bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 {
-    for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* proto1 = sItemStorage.LookupEntry<ItemPrototype>(id);
-        if (!proto1)
-            continue;
+        uint32 id = itr.first;
+        ItemPrototype const* proto1 = &itr.second;
+
         Races currMountRace;
         uint8 currRaceNum = 0;
         if (sObjectMgr.GetMountDataByEntry(id, currMountRace, currRaceNum))
             continue;
+
         if (proto1->Quality <= 1)
             continue;
+
         bool inDb = false;
         for (std::map<uint32, uint32>::const_iterator it2 = sObjectMgr.factionchange_items.begin(); it2 != sObjectMgr.factionchange_items.end(); ++it2)
         {
@@ -2018,18 +2020,20 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
         if (!canEquip)
         {
             ItemPrototype const* similar = nullptr;
-            for (uint32 id2 = 0; id2 < sItemStorage.GetMaxEntry(); id2++)
-                if (ItemPrototype const* proto2 = sItemStorage.LookupEntry<ItemPrototype>(id2))
-                    if (proto1 != proto2 && IsSimilarItem(proto1, proto2))
+            for (auto const& itr2 : sObjectMgr.GetItemPrototypeMap())
+            {
+                ItemPrototype const* proto2 = &itr2.second;
+                if (proto1 != proto2 && IsSimilarItem(proto1, proto2))
+                {
+                    if (similar)
                     {
-                        if (similar)
-                        {
-                            // Ambiguity. Other similar items.
-                            similar = nullptr;
-                            break;
-                        }
-                        similar = proto2;
+                        // Ambiguity. Other similar items.
+                        similar = nullptr;
+                        break;
                     }
+                    similar = proto2;
+                }
+            }
 
 
             PSendSysMessage("Item %u not handled ! Similar item : %u", proto1->ItemId, similar ? similar->ItemId : 0);

@@ -172,7 +172,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
 
 void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target /*=nullptr*/)
 {
-    ItemPrototype const* itemProto = sItemStorage.LookupEntry<ItemPrototype >(itemId);
+    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(itemId);
     if (!itemProto)
         return;
 
@@ -222,11 +222,9 @@ bool ChatHandler::HandleLookupItemCommand(char* args)
     uint32 counter = 0;
 
     // Search in `item_template`
-    for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
-        if (!pProto)
-            continue;
+        ItemPrototype const* pProto = &itr.second;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)

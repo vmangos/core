@@ -891,7 +891,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                 // Static item flags are part of that field prior to patch 1.7.
                 if (index == ITEM_FIELD_FLAGS)
                 {
-                    if (ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(GetEntry()))
+                    if (ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(GetEntry()))
                         *data << uint16(pProto->Flags);
                     else
                         *data << uint16(0);

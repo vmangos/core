@@ -303,8 +303,8 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
 
     DETAIL_LOG("STORAGE: Item Query = %u", item);
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(item);
-    if (pProto && (pProto->m_bDiscovered || (GetSecurity() > SEC_PLAYER)))
+    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(item);
+    if (pProto && (pProto->Discovered || (GetSecurity() > SEC_PLAYER)))
     {
         std::string Name        = pProto->Name1;
         std::string Description = pProto->Description;
@@ -445,7 +445,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
     }
     else
     {
-        if (pProto && !pProto->m_bDiscovered)
+        if (pProto && !pProto->Discovered)
         {
             std::stringstream oss;
             oss << "Requested info for undiscovered item " << pProto->ItemId;
@@ -816,7 +816,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 
         if (crItem)
         {
-            if (ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(crItem->item))
+            if (ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(crItem->item))
             {
                 if (!_player->IsGameMaster())
                 {
@@ -1118,7 +1118,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recv_data)
     recv_data.read_skip<uint64>();                          // guid
 
     DEBUG_LOG("WORLD: CMSG_ITEM_NAME_QUERY %u", itemid);
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);
+    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itemid);
     if (pProto)
     {
         std::string Name;

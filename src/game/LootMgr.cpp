@@ -270,7 +270,7 @@ bool LootStoreItem::Roll(bool rate) const
     if (mincountOrRef < 0)                                  // reference case
         return roll_chance_f(chance * (rate ? sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_ITEM_REFERENCED) : 1.0f));
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);
+    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itemid);
 
     float qualityModifier = pProto && rate ? sWorld.getConfig(qualityToRate[pProto->Quality]) : 1.0f;
 
@@ -294,7 +294,7 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 
     if (mincountOrRef > 0)                                  // item (quest or non-quest) entry, maybe grouped
     {
-        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
+        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemid);
         if (!proto)
         {
             sLog.outErrorDb("Table '%s' entry %d item %d: item entry not listed in `item_template` - skipped", store.GetName(), entry, itemid);
@@ -344,7 +344,7 @@ LootItem::LootItem(LootStoreItem const& li)
     itemid      = li.itemid;
     conditionId = li.conditionId;
 
-    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
+    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemid);
     freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
 
     needs_quest = li.needs_quest;
@@ -362,7 +362,7 @@ LootItem::LootItem(uint32 itemid_, uint32 count_, int32 randomPropertyId_)
     itemid      = itemid_;
     conditionId = 0;
 
-    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
+    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemid);
     freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
 
     needs_quest = false;
@@ -382,7 +382,7 @@ bool LootItem::AllowedForPlayer(Player const* player, WorldObject const* lootTar
     if (conditionId && !IsConditionSatisfied(conditionId, player, player->GetMap(), lootTarget, CONDITION_FROM_LOOT))
         return false;
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);
+    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itemid);
     if (!pProto)
         return false;
 
@@ -457,9 +457,9 @@ LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Play
 // Inserts the item into the loot (called by LootTemplate processors)
 void Loot::AddItem(LootStoreItem const& item)
 {
-    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item.itemid);
-    if (proto && !proto->m_bDiscovered)
-        proto->m_bDiscovered = true;
+    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item.itemid);
+    if (proto && !proto->Discovered)
+        proto->Discovered = true;
 
     if (item.needs_quest && proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT))
         m_hasFFAQuestItems = true;
@@ -811,7 +811,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
 {
     b << uint32(li.itemid);
     b << uint32(li.count);                                  // nr of items of this type
-    b << uint32(ObjectMgr::GetItemPrototype(li.itemid)->DisplayInfoID);
+    b << uint32(sObjectMgr.GetItemPrototype(li.itemid)->DisplayInfoID);
     b << uint32(0);
     b << uint32(li.randomPropertyId);
     //b << uint8(0);                                        // slot type - will send after this function call
@@ -1383,17 +1383,14 @@ void LoadLootTemplates_Disenchant()
     LootTemplates_Disenchant.LoadAndCollectLootIds(ids_set);
 
     // remove real entries and check existence loot
-    for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        if (ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype>(i))
+        if (uint32 lootid = itr.second.DisenchantID)
         {
-            if (uint32 lootid = proto->DisenchantID)
-            {
-                if (ids_set.find(lootid) == ids_set.end())
-                    LootTemplates_Disenchant.ReportNotExistedId(lootid);
-                else
-                    ids_setUsed.insert(lootid);
-            }
+            if (ids_set.find(lootid) == ids_set.end())
+                LootTemplates_Disenchant.ReportNotExistedId(lootid);
+            else
+                ids_setUsed.insert(lootid);
         }
     }
     for (const auto itr : ids_setUsed)
@@ -1447,19 +1444,16 @@ void LoadLootTemplates_Item()
     LootTemplates_Item.LoadAndCollectLootIds(ids_set);
 
     // remove real entries and check existence loot
-    for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        if (ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype>(i))
-        {
-            if (!(proto->Flags & ITEM_FLAG_LOOTABLE))
-                continue;
+        if (!(itr.second.Flags & ITEM_FLAG_LOOTABLE))
+            continue;
 
-            if (ids_set.find(proto->ItemId) != ids_set.end() || proto->MaxMoneyLoot > 0)
-                ids_set.erase(proto->ItemId);
-            // wdb have wrong data cases, so skip by default
-            else if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
-                LootTemplates_Item.ReportNotExistedId(proto->ItemId);
-        }
+        if (ids_set.find(itr.second.ItemId) != ids_set.end() || itr.second.MaxMoneyLoot > 0)
+            ids_set.erase(itr.second.ItemId);
+        // wdb have wrong data cases, so skip by default
+        else if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
+            LootTemplates_Item.ReportNotExistedId(itr.second.ItemId);
     }
 
     // output error for any still listed (not referenced from appropriate table) ids

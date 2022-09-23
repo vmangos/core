@@ -207,7 +207,7 @@ bool Item::Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid)
     SetGuidValue(ITEM_FIELD_OWNER, ownerGuid);
     SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
 
-    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(itemid);
+    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(itemid);
     if (!itemProto)
         return false;
 
@@ -220,7 +220,7 @@ bool Item::Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid)
 
     SetUInt32Value(ITEM_FIELD_DURATION, itemProto->Duration);
 
-    itemProto->m_bDiscovered = true;
+    itemProto->Discovered = true;
 
     return true;
 }
@@ -521,7 +521,7 @@ void Item::LoadLootFromDB(Field* fields)
     }
 
     // normal item case
-    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id);
+    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item_id);
 
     if (!proto)
     {
@@ -554,7 +554,7 @@ void Item::DeleteFromInventoryDB()
 
 ItemPrototype const* Item::GetProto() const
 {
-    return ObjectMgr::GetItemPrototype(GetEntry());
+    return sObjectMgr.GetItemPrototype(GetEntry());
 }
 
 Player* Item::GetOwner()const
@@ -779,7 +779,7 @@ uint32 ItemPrototype::GetProficiencySpell() const
 
 int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
 {
-    ItemPrototype const* itemProto = sItemStorage.LookupEntry<ItemPrototype>(item_id);
+    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(item_id);
 
     if (!itemProto)
         return 0;
@@ -1094,7 +1094,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, ObjectGuid playerGuid)
     if (count < 1)
         return nullptr;                                        //don't create item at zero count
 
-    if (ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(item))
+    if (ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(item))
     {
         if (count > pProto->GetMaxStackSize())
             count = pProto->GetMaxStackSize();

@@ -920,7 +920,7 @@ bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
             return false;
         }
 
-        ItemPrototype const* item_proto = ObjectMgr::GetItemPrototype(itemId);
+        ItemPrototype const* item_proto = sObjectMgr.GetItemPrototype(itemId);
         if (!item_proto)
         {
             PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);

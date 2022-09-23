@@ -802,7 +802,7 @@ void Group::GroupLoot(Creature* creature, Loot *loot)
         if (lootItem.freeforall)
             continue;
 
-        ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(lootItem.itemid);
+        ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(lootItem.itemid);
         if (!itemProto)
         {
             DEBUG_LOG("Group::GroupLoot: missing item prototype for item with id: %d", lootItem.itemid);
@@ -825,7 +825,7 @@ void Group::NeedBeforeGreed(Creature* creature, Loot *loot)
         if (lootItem.freeforall)
             continue;
 
-        ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(lootItem.itemid);
+        ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(lootItem.itemid);
         if (!itemProto)
         {
             DEBUG_LOG("Group::NeedBeforeGreed: missing item prototype for item with id: %d", lootItem.itemid);
@@ -844,7 +844,7 @@ void Group::MasterLoot(Creature* creature, Loot* loot)
 {
     for (auto& i : loot->items)
     {
-        ItemPrototype const* item = ObjectMgr::GetItemPrototype(i.itemid);
+        ItemPrototype const* item = sObjectMgr.GetItemPrototype(i.itemid);
         if (!item)
             continue;
         if (item->Quality < uint32(m_lootThreshold))
@@ -953,7 +953,7 @@ void Group::StartLootRoll(Creature* lootTarget, LootMethod method, Loot* loot, u
 
     LootItem const& lootItem =  loot->items[itemSlot];
 
-    ItemPrototype const* item = ObjectMgr::GetItemPrototype(lootItem.itemid);
+    ItemPrototype const* item = sObjectMgr.GetItemPrototype(lootItem.itemid);
 
     Roll* r = new Roll(lootTarget->GetObjectGuid(), lootItem);
 

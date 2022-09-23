@@ -957,7 +957,7 @@ bool ChatHandler::HandleNpcAddWeaponCommand(char* args)
     if (!ExtractUInt32(&args, uiSlotId))
         return false;
 
-    ItemPrototype const* pItemProto = ObjectMgr::GetItemPrototype(uiItemId);
+    ItemPrototype const* pItemProto = sObjectMgr.GetItemPrototype(uiItemId);
 
     if (!pItemProto)
     {
@@ -1011,7 +1011,7 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
 
     sObjectMgr.AddVendorItem(vendor_entry, itemId, maxcount, incrtime, itemflags);
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
+    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itemId);
 
     PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, itemId, pProto->Name1, maxcount, incrtime);
     return true;
@@ -1045,7 +1045,7 @@ bool ChatHandler::HandleNpcDelVendorItemCommand(char* args)
         return false;
     }
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
+    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itemId);
 
     PSendSysMessage(LANG_ITEM_DELETED_FROM_LIST, itemId, pProto->Name1);
     return true;

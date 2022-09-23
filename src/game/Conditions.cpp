@@ -790,7 +790,7 @@ bool ConditionEntry::IsValid()
         case CONDITION_ITEM:
         case CONDITION_ITEM_WITH_BANK:
         {
-            ItemPrototype const* proto = ObjectMgr::GetItemPrototype(m_value1);
+            ItemPrototype const* proto = sObjectMgr.GetItemPrototype(m_value1);
             if (!proto)
             {
                 if (!sObjectMgr.IsExistingItemId(m_value1))
@@ -814,7 +814,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_ITEM_EQUIPPED:
         {
-            ItemPrototype const* proto = ObjectMgr::GetItemPrototype(m_value1);
+            ItemPrototype const* proto = sObjectMgr.GetItemPrototype(m_value1);
             if (!proto)
             {
                 if (!sObjectMgr.IsExistingItemId(m_value1))

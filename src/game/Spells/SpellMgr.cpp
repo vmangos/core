@@ -2273,7 +2273,7 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
             // craft spell for crafting nonexistent item (break client recipes list show)
             case SPELL_EFFECT_CREATE_ITEM:
             {
-                if (!ObjectMgr::GetItemPrototype(spellInfo->EffectItemType[i]))
+                if (!sObjectMgr.GetItemPrototype(spellInfo->EffectItemType[i]))
                 {
                     if (msg)
                     {
@@ -2311,7 +2311,7 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
     {
         for (int j : spellInfo->Reagent)
         {
-            if (j > 0 && !ObjectMgr::GetItemPrototype(j))
+            if (j > 0 && !sObjectMgr.GetItemPrototype(j))
             {
                 if (msg)
                 {

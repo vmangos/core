@@ -829,7 +829,7 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
 }
 
 #define JUMP_FLAG_THRESHOLD 5
-#define FAR_FALL_FLAG_TIME 3000
+#define FAR_FALL_FLAG_TIME 3000u
 #define HEIGHT_LEEWAY 5.0f
 
 bool ShouldResetNoFallTimeCheck(MovementInfo const& movementInfo, uint16 opcode)

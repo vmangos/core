@@ -369,7 +369,7 @@ void AuctionHouseMgr::LoadAuctionItems()
         uint32 itemGuid = fields[10].GetUInt32();
         uint32 itemId = fields[11].GetUInt32();
 
-        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId);
+        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
 
         if (!proto)
         {
