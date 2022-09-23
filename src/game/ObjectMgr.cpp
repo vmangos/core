@@ -6961,12 +6961,6 @@ void ObjectMgr::LoadGraveyardZones()
             continue;
         }
 
-        if (!areaEntry->IsZone())
-        {
-            sLog.outErrorDb("Table `game_graveyard_zone` has record subzone id (%u) instead of zone, skipped.", zoneId);
-            continue;
-        }
-
         if (team != TEAM_NONE && team != HORDE && team != ALLIANCE)
         {
             sLog.outErrorDb("Table `game_graveyard_zone` has record for non player faction (%u), skipped.", team);
@@ -6982,11 +6976,23 @@ void ObjectMgr::LoadGraveyardZones()
     sLog.outString(">> Loaded %u graveyard-zone links", count);
 }
 
-WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team)
+WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 mapId, Team team)
 {
     // search for zone associated closest graveyard
-    uint32 zoneId = sTerrainMgr.GetZoneId(MapId, x, y, z);
+    uint32 zoneId, areaId;
+    sTerrainMgr.GetZoneAndAreaId(zoneId, areaId, mapId, x, y, z);
 
+    if (WorldSafeLocsEntry const* pGY = GetClosestGraveYardForArea(areaId, x, y, z, mapId, team))
+        return pGY;
+
+    if (areaId == zoneId)
+        return nullptr;
+
+    return GetClosestGraveYardForArea(zoneId, x, y, z, mapId, team);
+}
+
+WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYardForArea(uint32 areaOrZoneId, float x, float y, float z, uint32 mapId, Team team)
+{
     // Simulate std. algorithm:
     //   found some graveyard associated to (ghost_zone,ghost_map)
     //
@@ -6994,7 +7000,7 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
     //     then check faction
     //   if mapId != graveyard.mapId (ghost in instance) and search any graveyard associated
     //     then check faction
-    GraveYardMapBounds bounds = m_GraveYardMap.equal_range(zoneId);
+    GraveYardMapBounds bounds = m_GraveYardMap.equal_range(areaOrZoneId);
 
     if (bounds.first == bounds.second)
         return nullptr;
@@ -7012,7 +7018,7 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
     // some where other
     WorldSafeLocsEntry const* entryFar = nullptr;
 
-    MapEntry const* tempEntry = sMapStorage.LookupEntry<MapEntry>(MapId);
+    MapEntry const* tempEntry = sMapStorage.LookupEntry<MapEntry>(mapId);
 
     for (GraveYardMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
     {
@@ -7031,7 +7037,7 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
             continue;
 
         // find now nearest graveyard at other (continent) map
-        if (MapId != entry->map_id)
+        if (mapId != entry->map_id)
         {
             // if find graveyard at different map from where entrance placed (or no entrance data), use any first
             if (!tempEntry ||
