@@ -9,22 +9,34 @@ INSERT INTO `migrations` VALUES ('20220922195507');
 -- Add your query below.
 
 -- Red Cloud Mesa Graveyard can only be accessed while in Red Cloud Mesa
-UPDATE `game_graveyard_zone` SET `ghost_zone`=220 WHERE `id`=34;
+UPDATE `game_graveyard_zone` SET `ghost_zone`=220 WHERE `id`=34 AND `ghost_zone`=215;
 
 -- Coldridge Valley Graveyard can only be accessed while in Coldridge Valley
-UPDATE `game_graveyard_zone` SET `ghost_zone`=132 WHERE `id`=100;
+UPDATE `game_graveyard_zone` SET `ghost_zone`=132 WHERE `id`=100 AND `ghost_zone`=1;
 
 -- Shadowglen Graveyard can only be accessed while in Shadowglen
-UPDATE `game_graveyard_zone` SET `ghost_zone`=188 WHERE `id`=93;
+UPDATE `game_graveyard_zone` SET `ghost_zone`=188 WHERE `id`=93 AND `ghost_zone`=141;
 
 -- Northshire Valley Graveyard can only be accessed while in Northshire Valley
-UPDATE `game_graveyard_zone` SET `ghost_zone`=9 WHERE `id`=105;
+UPDATE `game_graveyard_zone` SET `ghost_zone`=9 WHERE `id`=105 AND `ghost_zone`=12;
 
 -- Valley of Trials Graveyard can only be accessed while in Valley of Trials
-UPDATE `game_graveyard_zone` SET `ghost_zone`=363 WHERE `id`=709;
+UPDATE `game_graveyard_zone` SET `ghost_zone`=363 WHERE `id`=709 AND `ghost_zone`=14;
 
 -- Deathknell Graveyard can only be accessed while in Deathknell
-UPDATE `game_graveyard_zone` SET `ghost_zone`=154 WHERE `id`=94;
+UPDATE `game_graveyard_zone` SET `ghost_zone`=154 WHERE `id`=94 AND `ghost_zone`=85;
+
+-- Gates of Ironforge Graveyard can only be accessed while in Gates of Ironforge
+UPDATE `game_graveyard_zone` SET `ghost_zone`=809 WHERE `id`=852 AND `ghost_zone`=1;
+
+-- Caer Darrow Graveyard can be accessed while in Caer Darrow
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES ('911', '2298', '0', '4544');
+
+-- Delete invalid neutral Darnassus Graveyard for Darkshore
+DELETE FROM `game_graveyard_zone` WHERE  `id`=469 AND `ghost_zone`=148;
+
+-- Delete invalid Ratchet Graveyard for Mulgore 
+DELETE FROM `game_graveyard_zone` WHERE  `id`=249 AND `ghost_zone`=215;
 
 -- End of migration.
 END IF;
