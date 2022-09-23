@@ -30,7 +30,7 @@ UPDATE `game_graveyard_zone` SET `ghost_zone`=154 WHERE `id`=94 AND `ghost_zone`
 UPDATE `game_graveyard_zone` SET `ghost_zone`=809 WHERE `id`=852 AND `ghost_zone`=1;
 
 -- Caer Darrow Graveyard can be accessed while in Caer Darrow
-INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES ('911', '2298', '0', '4544');
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES ('911', '2298', '0', '0');
 
 -- Delete invalid neutral Darnassus Graveyard for Darkshore
 DELETE FROM `game_graveyard_zone` WHERE  `id`=469 AND `ghost_zone`=148;
