@@ -29,11 +29,17 @@ UPDATE `game_graveyard_zone` SET `ghost_zone`=154 WHERE `id`=94 AND `ghost_zone`
 -- Gates of Ironforge Graveyard can only be accessed while in Gates of Ironforge
 UPDATE `game_graveyard_zone` SET `ghost_zone`=809 WHERE `id`=852 AND `ghost_zone`=1;
 
--- Caer Darrow Graveyard can be accessed while in Caer Darrow
-INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES ('911', '2298', '0', '0');
+-- Set Dun Morogh, Anvilmar GY for Coldridge Pass
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (100, 800, 469, 0);
 
--- Delete invalid neutral Darnassus Graveyard for Darkshore
-DELETE FROM `game_graveyard_zone` WHERE  `id`=469 AND `ghost_zone`=148;
+-- Set Eastern Plaguelands, Darrowshire GY for The Fungal Vale
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (634, 2258, 0, 0);
+
+-- Caer Darrow Graveyard can be accessed while in Caer Darrow
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES ('869', '2298', '0', '0');
+
+-- Delete invalid neutral Darkshore Graveyard for Stonetalon Mountains
+DELETE FROM `game_graveyard_zone` WHERE  `id`=469 AND `ghost_zone`=406;
 
 -- Delete invalid Ratchet Graveyard for Mulgore 
 DELETE FROM `game_graveyard_zone` WHERE  `id`=249 AND `ghost_zone`=215;
