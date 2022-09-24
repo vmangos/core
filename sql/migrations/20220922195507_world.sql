@@ -36,7 +36,7 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) V
 INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (634, 2258, 0, 0);
 
 -- Caer Darrow Graveyard can be accessed while in Caer Darrow
-INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES ('869', '2298', '0', '0');
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (869, 2298, 0, 0);
 
 -- Delete invalid neutral Darkshore Graveyard for Stonetalon Mountains
 DELETE FROM `game_graveyard_zone` WHERE  `id`=469 AND `ghost_zone`=406;
