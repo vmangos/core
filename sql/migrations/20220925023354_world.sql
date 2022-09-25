@@ -13,7 +13,7 @@ INSERT INTO `migrations` VALUES ('20220925023354');
 ALTER TABLE `game_graveyard_zone` CHANGE COLUMN `build_min` `patch_min` SMALLINT(4) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Minimum content patch to load this entry' AFTER `faction`;
 
 -- Set Silithus, Cenarion Hold GY to patch 1.8
-UPDATE `game_graveyard_zone` SET `build_min`='6' WHERE  `id`=910 AND `ghost_zone`=1377;
+UPDATE `game_graveyard_zone` SET `patch_min`='6' WHERE  `id`=910 AND `ghost_zone`=1377;
 -- Delete incorrect zone Silithus for Silithus, Scarab Wall (AQ Only) GY
 DELETE FROM `game_graveyard_zone` WHERE  `id`=913 AND `ghost_zone`=1377;
 -- Delete incorrect zone Gates of Ahn'Qiraj for Silithus, Scarab Wall (AQ Only) GY
