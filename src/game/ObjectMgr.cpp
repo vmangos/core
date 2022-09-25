@@ -6921,7 +6921,7 @@ void ObjectMgr::LoadGraveyardZones()
 {
     m_GraveYardMap.clear();                                  // need for reload case
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `ghost_zone`, `faction` FROM `game_graveyard_zone` WHERE `patch_min` <= %u", sWorld.GetWowPatch()));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `ghost_zone`, `faction` FROM `game_graveyard_zone` WHERE ((%u >= patch_min) && (%u <= patch_max))", sWorld.GetWowPatch(), sWorld.GetWowPatch()));
 
     uint32 count = 0;
 
