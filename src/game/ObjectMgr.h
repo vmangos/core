@@ -247,12 +247,12 @@ typedef std::pair<QuestRelationsMap::const_iterator, QuestRelationsMap::const_it
 
 struct PetLevelInfo
 {
-    PetLevelInfo() : health(0), mana(0), armor(0) { for (uint16 & stat : stats) stat = 0; }
-
-    uint16 stats[MAX_STATS];
-    uint16 health;
-    uint16 mana;
-    uint16 armor;
+    uint16 stats[MAX_STATS] = {};
+    uint16 health = 0;
+    uint16 mana = 0;
+    uint16 armor = 0;
+    float dmgMin = 0.0f;
+    float dmgMax = 0.0f;
 };
 
 // We assume the rate is in general the same for all three types below, but chose to keep three for scalability and customization
