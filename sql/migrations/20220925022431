@@ -1,0 +1,19 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20220925022431');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20220925022431');
+-- Add your query below.
+
+-- Set Mulgore, Red Cloud Mesa GY for Brambleblade Ravine
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (34, 358, 67, 0);
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
