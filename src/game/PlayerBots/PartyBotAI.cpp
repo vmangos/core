@@ -724,12 +724,6 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 return;
             }
         }
-
-        if (pVictim && !me->HasInArc(pVictim, 2 * M_PI_F / 3) && !me->IsMoving())
-        {
-            me->SetInFront(pVictim);
-            me->SendMovementPacket(MSG_MOVE_SET_FACING, false);
-        }
     }
 
     if (!me->IsInCombat())
