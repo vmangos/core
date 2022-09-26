@@ -804,15 +804,9 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
         return false;
     }
 
-    if (splineId != me->movespline->GetId())
-    {
-        AddMessageToPacketLog("HandleSplineDone: spline id " + std::to_string(splineId) + " != " + std::to_string(me->movespline->GetId()));
-        sLog.outInfo("HandleSplineDone: Player %s from account id %u sent spline done opcode for wrong spline id %u (expected %u)",
-            me->GetName(), m_session->GetAccountId(), splineId, me->movespline->GetId());
-        return false;
-    }
+    m_lastSplineId = splineId;
 
-    float distance = Geometry::GetDistance3D(movementInfo.GetPos(), me->movespline->FinalDestination());
+    float distance = Geometry::GetDistance3D(movementInfo.GetTransportGuid() ? movementInfo.GetTransportPos() : movementInfo.GetPos(), me->movespline->FinalDestination());
     if (distance > 10.0f)
     {
         AddMessageToPacketLog("HandleSplineDone: distance to spline destination is " + std::to_string(distance));
@@ -824,7 +818,6 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
     if (!movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR | MOVEFLAG_JUMPING))
         ResetJumpCounters();
 
-    m_lastSplineId = splineId;
     return true;
 }
 
