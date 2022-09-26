@@ -145,14 +145,14 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 364;
 UPDATE `quest_template` SET `BreadcrumbForQuestId` = 691 WHERE `entry` = 690; -- Malin's Request -> Worth Its Weight in Gold
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 691;
-UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1524, `NextQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 1522; -- Call of Fire -> Call of Fire
-UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1524, `NextQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 1523; -- Call of Fire -> Call of Fire
-UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1524, `NextQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 2983; -- Call of Fire -> Call of Fire
-UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1524, `NextQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 2984; -- Call of Fire -> Call of Fire
-UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1530, `NextQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 1528; -- Call of Water -> Call of Water
-UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1530, `NextQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 1529; -- Call of Water -> Call of Water
-UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1530, `NextQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 2985; -- Call of Water -> Call of Water
-UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1530, `NextQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 2986; -- Call of Water -> Call of Water
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1524, `NextQuestId` = 0 WHERE `entry` = 1522; -- Call of Fire -> Call of Fire
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1524, `NextQuestId` = 0 WHERE `entry` = 1523; -- Call of Fire -> Call of Fire
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1524, `NextQuestId` = 0 WHERE `entry` = 2983; -- Call of Fire -> Call of Fire
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1524, `NextQuestId` = 0 WHERE `entry` = 2984; -- Call of Fire -> Call of Fire
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1530, `NextQuestId` = 0 WHERE `entry` = 1528; -- Call of Water -> Call of Water
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1530, `NextQuestId` = 0 WHERE `entry` = 1529; -- Call of Water -> Call of Water
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1530, `NextQuestId` = 0 WHERE `entry` = 2985; -- Call of Water -> Call of Water
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1530, `NextQuestId` = 0 WHERE `entry` = 2986; -- Call of Water -> Call of Water
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1699;
 UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1705 WHERE `entry` = 1700; -- Grimand Elmore -> Burning Blood
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1705;
