@@ -2824,6 +2824,8 @@ void Unit::SetFacingTo(float ori)
     m_movementInfo.ChangeOrientation(ori);
 
     Movement::MoveSplineInit init(*this, "SetFacingTo");
+    if (GenericTransport* t = GetTransport())
+        init.SetTransport(t->GetGUIDLow());
     init.SetFacing(ori);
     init.Launch();
 }
