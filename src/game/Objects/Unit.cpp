@@ -8687,12 +8687,11 @@ void Unit::StopMoving(bool force)
     if (!IsInWorld())
         return;
 
-    Movement::MoveSplineInit init(*this, "StopMoving");
-    if (GenericTransport* t = GetTransport())
-        init.SetTransport(t->GetGUIDLow());
-
     if (!movespline->Finalized() || force)
     {
+        Movement::MoveSplineInit init(*this, "StopMoving");
+        if (GenericTransport* t = GetTransport())
+            init.SetTransport(t->GetGUIDLow());
         init.SetStop(); // Will trigger CMSG_MOVE_SPLINE_DONE from client.
         init.Launch();
     }

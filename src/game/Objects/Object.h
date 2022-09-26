@@ -755,7 +755,7 @@ class WorldObject : public Object
 
         float GetAngle(WorldObject const* obj) const;
         float GetAngle(float const x, float const y) const;
-        bool HasInArc(WorldObject const* target, float const arcangle = M_PI, float offset = 0.0f) const;
+        bool HasInArc(WorldObject const* target, float const arcangle = M_PI_F, float offset = 0.0f) const;
         bool HasInArc(float const arcangle, float const x, float const y) const;
         bool IsFacingTarget(WorldObject const* target) const;
 
