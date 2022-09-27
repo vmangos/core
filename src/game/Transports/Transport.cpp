@@ -469,6 +469,7 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
             else
                 passenger->Relocate(x, y, z, o);
             creature->m_movementInfo.t_time = GetPathProgress();
+            passenger->m_movementInfo.ctime = 0;
             break;
         }
         case TYPEID_PLAYER:
@@ -481,6 +482,7 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
                 static_cast<Player*>(passenger)->m_movementInfo.t_guid = GetObjectGuid();
             }
             static_cast<Player*>(passenger)->m_movementInfo.t_time = GetPathProgress();
+            passenger->m_movementInfo.ctime = 0;
             break;
         default:
             break;

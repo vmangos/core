@@ -4229,8 +4229,8 @@ void ObjectMgr::LoadItemRequiredTarget()
 void ObjectMgr::LoadPetLevelInfo()
 {
     {
-        //                                                               0                 1        2     3       4      5      6      7       8      9
-        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature_entry`, `level`, `hp`, `mana`, `str`, `agi`, `sta`, `inte`, `spi`, `armor` FROM `pet_levelstats`"));
+        //                                                               0        1        2         3       4        5          6          7           8          9          10           11
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `level`, `health`, `mana`, `armor`, `dmg_min`, `dmg_max`, `strength`, `agility`, `stamina`, `intellect`, `spirit` FROM `pet_levelstats`"));
 
         uint32 count = 0;
 
@@ -4252,46 +4252,48 @@ void ObjectMgr::LoadPetLevelInfo()
             bar.step();
             Field* fields = result->Fetch();
 
-            uint32 creature_id = fields[0].GetUInt32();
-            if (!sCreatureStorage.LookupEntry<CreatureInfo>(creature_id))
+            uint32 creatureId = fields[0].GetUInt32();
+            if (!sCreatureStorage.LookupEntry<CreatureInfo>(creatureId))
             {
-                if (!IsExistingCreatureId(creature_id))
-                    sLog.outErrorDb("Wrong creature id %u in `pet_levelstats` table, ignoring.", creature_id);
+                if (!IsExistingCreatureId(creatureId))
+                    sLog.outErrorDb("Wrong creature id %u in `pet_levelstats` table, ignoring.", creatureId);
                 continue;
             }
 
-            uint32 current_level = fields[1].GetUInt32();
-            if (current_level > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+            uint32 currentLevel = fields[1].GetUInt32();
+            if (currentLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
             {
-                if (current_level > PLAYER_STRONG_MAX_LEVEL) // hardcoded level maximum
-                    sLog.outErrorDb("Wrong (> %u) level %u in `pet_levelstats` table, ignoring.", PLAYER_STRONG_MAX_LEVEL, current_level);
+                if (currentLevel > PLAYER_STRONG_MAX_LEVEL) // hardcoded level maximum
+                    sLog.outErrorDb("Wrong (> %u) level %u in `pet_levelstats` table, ignoring.", PLAYER_STRONG_MAX_LEVEL, currentLevel);
                 else
                 {
-                    DETAIL_LOG("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `pet_levelstats` table, ignoring.", current_level);
+                    DETAIL_LOG("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `pet_levelstats` table, ignoring.", currentLevel);
                     ++count;                                 // make result loading percent "expected" correct in case disabled detail mode for example.
                 }
                 continue;
             }
-            else if (current_level < 1)
+            else if (currentLevel < 1)
             {
-                sLog.outErrorDb("Wrong (<1) level %u in `pet_levelstats` table, ignoring.", current_level);
+                sLog.outErrorDb("Wrong (<1) level %u in `pet_levelstats` table, ignoring.", currentLevel);
                 continue;
             }
 
-            PetLevelInfo*& pInfoMapEntry = m_PetInfoMap[creature_id];
+            PetLevelInfo*& pInfoMapEntry = m_PetInfoMap[creatureId];
 
             if (pInfoMapEntry == nullptr)
                 pInfoMapEntry =  new PetLevelInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)];
 
             // data for level 1 stored in [0] array element, ...
-            PetLevelInfo* pLevelInfo = &pInfoMapEntry[current_level - 1];
+            PetLevelInfo* pLevelInfo = &pInfoMapEntry[currentLevel - 1];
 
             pLevelInfo->health = fields[2].GetUInt16();
             pLevelInfo->mana   = fields[3].GetUInt16();
-            pLevelInfo->armor  = fields[9].GetUInt16();
+            pLevelInfo->armor  = fields[4].GetUInt16();
+            pLevelInfo->dmgMin = fields[5].GetFloat();
+            pLevelInfo->dmgMax = fields[6].GetFloat();
 
             for (int i = 0; i < MAX_STATS; i++)
-                pLevelInfo->stats[i] = fields[i + 4].GetUInt16();
+                pLevelInfo->stats[i] = fields[i + 7].GetUInt16();
 
             ++count;
         }

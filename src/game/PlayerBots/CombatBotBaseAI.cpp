@@ -2289,7 +2289,8 @@ bool CombatBotBaseAI::IsValidHostileTarget(Unit const* pTarget) const
     return me->IsValidAttackTarget(pTarget) &&
            pTarget->IsVisibleForOrDetect(me, me, false) &&
            !pTarget->HasBreakableByDamageCrowdControlAura() &&
-           !pTarget->IsTotalImmune();
+           !pTarget->IsTotalImmune() &&
+           pTarget->GetTransport() == me->GetTransport();
 }
 
 bool CombatBotBaseAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const

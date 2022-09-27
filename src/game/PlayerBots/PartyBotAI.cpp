@@ -323,7 +323,8 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
     if (Pet* pPet = me->GetPet())
     {
         if (Unit* pPetAttacker = pPet->GetAttackerForHelper())
-            return pPetAttacker;
+            if (IsValidHostileTarget(pPetAttacker))
+                return pPetAttacker;
     }
 
     return nullptr;
@@ -709,23 +710,19 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     }
 
     Unit* pVictim = me->GetVictim();
-    bool const isOnTransport = me->GetTransport() != nullptr;
 
-    if (m_role != ROLE_HEALER && !isOnTransport)
+    if (m_role != ROLE_HEALER)
     {
-        if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
+        if (!pVictim || !IsValidHostileTarget(pVictim))
         {
+            if (pVictim)
+                me->AttackStop();
+
             if (Unit* pVictim = SelectAttackTarget(pLeader))
             {
                 AttackStart(pVictim);
                 return;
             }
-        }
-
-        if (pVictim && !me->HasInArc(pVictim, 2 * M_PI_F / 3) && !me->IsMoving())
-        {
-            me->SetInFront(pVictim);
-            me->SendMovementPacket(MSG_MOVE_SET_FACING, false);
         }
     }
 
@@ -763,7 +760,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
                 me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
         }
-        else if (!isOnTransport)
+        else
         {
             if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
                (m_role == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
@@ -781,7 +778,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
     }
 
-    if (me->IsInCombat() && !isOnTransport)
+    if (me->IsInCombat())
         UpdateInCombatAI();
 }
 

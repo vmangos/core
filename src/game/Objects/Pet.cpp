@@ -1340,7 +1340,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         }
     }
 
-    uint32 creature_ID = (getPetType() == HUNTER_PET) ? 1 : cinfo->entry;
+    uint32 creatureId = (getPetType() == HUNTER_PET) ? 1 : cinfo->entry;
 
     switch (getPetType())
     {
@@ -1370,17 +1370,17 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     else
         SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
 
-    SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(petlevel * 50));
-
     // Nostalrius: pre-2.0: normalisation de la vitesse d'attaque des pets.
     SetAttackTime(BASE_ATTACK, cinfo->base_attack_time); //BASE_ATTACK_TIME);
     SetAttackTime(OFF_ATTACK, cinfo->base_attack_time); //BASE_ATTACK_TIME);
     SetAttackTime(RANGED_ATTACK, cinfo->ranged_attack_time); //BASE_ATTACK_TIME);
+
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 #else
     SetInt32Value(UNIT_MOD_CAST_SPEED, 0);
 #endif
+
     CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->pet_family);
     if (cFamily && cFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
     {
@@ -1417,39 +1417,46 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     {
         case SUMMON_PET:
         {
-            // Formulas reviewed by Clank <Nostalrius>, from vanilla hunter pet tab screenshots.
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(damageMod * (petlevel * 1.15 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(damageMod * (petlevel * 1.45 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
+            PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creatureId, petlevel);
+            CreatureClassLevelStats const* pCLS = GetClassLevelStats();
 
-            //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
+            // damage is only set in db for some creatures
+            if (pInfo && pInfo->dmgMin && pInfo->dmgMax)
+            {
+                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, damageMod * pInfo->dmgMin);
+                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, damageMod * pInfo->dmgMax);
+            }
+            else
+            {
+                float const meleeDamageAverage = pCLS->melee_damage * cinfo->damage_multiplier * damageMod;
+                float const meleeDamageVariance = meleeDamageAverage * cinfo->damage_variance;
+                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, meleeDamageAverage - meleeDamageVariance);
+                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, meleeDamageAverage + meleeDamageVariance);
+            }
 
-            PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
+            if (pInfo && pInfo->armor)
+                SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(pInfo->armor));
+            else
+                SetCreateResistance(SPELL_SCHOOL_NORMAL, pCLS->armor * cinfo->armor_multiplier);
+
             if (pInfo)                                      // exist in DB
             {
                 SetCreateHealth(pInfo->health * healthMod);
                 SetCreateMana(pInfo->mana);
 
-                if (pInfo->armor > 0)
-                    SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(pInfo->armor));
-
                 for (int stat = 0; stat < MAX_STATS; ++stat)
                     SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
             }
-            else                                            // not exist in DB, use some default fake data
+            else
             {
-                // Erreur qui se declanche quand un mob invoque un add (squelette par exemple), et qui n'a
-                // donc pas de stats de pet.
-                DEBUG_LOG("Summoned pet (Entry: %u) not have pet stats data in DB", cinfo->entry);
+                SetCreateHealth(pCLS->health * cinfo->health_multiplier * healthMod);
+                SetCreateMana(pCLS->mana * cinfo->mana_multiplier);
 
-                // disregard template multiplier
-                SetCreateHealth(GetClassLevelStats()->health * healthMod);
-                SetCreateMana(GetClassLevelStats()->mana);
-
-                SetCreateStat(STAT_STRENGTH, 22);
-                SetCreateStat(STAT_AGILITY, 22);
-                SetCreateStat(STAT_STAMINA, 25);
-                SetCreateStat(STAT_INTELLECT, 28);
-                SetCreateStat(STAT_SPIRIT, 27);
+                SetCreateStat(STAT_STRENGTH, pCLS->strength);
+                SetCreateStat(STAT_AGILITY, pCLS->agility);
+                SetCreateStat(STAT_STAMINA, pCLS->stamina);
+                SetCreateStat(STAT_INTELLECT, pCLS->intellect);
+                SetCreateStat(STAT_SPIRIT, pCLS->spirit);
             }
             break;
         }
@@ -1461,7 +1468,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(damageMod * (petlevel * 1.45 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
 
             //stored standard pet stats are entry 1 in pet_levelinfo
-            PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
+            PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creatureId, petlevel);
             if (pInfo)                                      // exist in DB
             {
                 SetCreateHealth(pInfo->health * healthMod);
@@ -1474,15 +1481,17 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             else                                            // not exist in DB, use some default fake data
             {
                 sLog.outErrorDb("Hunter pet levelstats missing in DB");
+                CreatureClassLevelStats const* pCLS = GetClassLevelStats();
 
                 // disregard template multiplier
-                SetCreateHealth(GetClassLevelStats()->health * healthMod);
+                SetCreateHealth(pCLS->health * healthMod);
+                SetCreateResistance(SPELL_SCHOOL_NORMAL, pCLS->armor);
 
-                SetCreateStat(STAT_STRENGTH, 22);
-                SetCreateStat(STAT_AGILITY, 22);
-                SetCreateStat(STAT_STAMINA, 25);
-                SetCreateStat(STAT_INTELLECT, 28);
-                SetCreateStat(STAT_SPIRIT, 27);
+                SetCreateStat(STAT_STRENGTH, pCLS->strength);
+                SetCreateStat(STAT_AGILITY, pCLS->agility);
+                SetCreateStat(STAT_STAMINA, pCLS->stamina);
+                SetCreateStat(STAT_INTELLECT, pCLS->intellect);
+                SetCreateStat(STAT_SPIRIT, pCLS->spirit);
             }
             break;
         }
@@ -1494,17 +1503,20 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetUInt32Value(UNIT_FIELD_FLAGS, cinfo->unit_flags);
 
             CreatureClassLevelStats const* pCLS = GetClassLevelStats();
-            SetCreateMana(pCLS->mana * cinfo->mana_multiplier);
             SetCreateHealth(pCLS->health * cinfo->health_multiplier * healthMod);
-
-            SetAttackTime(BASE_ATTACK, cinfo->base_attack_time);
-            SetAttackTime(OFF_ATTACK, cinfo->base_attack_time);
-            SetAttackTime(RANGED_ATTACK, cinfo->ranged_attack_time);
+            SetCreateMana(pCLS->mana * cinfo->mana_multiplier);
+            SetCreateResistance(SPELL_SCHOOL_NORMAL, pCLS->armor * cinfo->armor_multiplier);
 
             float const meleeDamageAverage = pCLS->melee_damage * cinfo->damage_multiplier * damageMod;
             float const meleeDamageVariance = meleeDamageAverage * cinfo->damage_variance;
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, meleeDamageAverage - meleeDamageVariance);
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, meleeDamageAverage + meleeDamageVariance);
+
+            SetCreateStat(STAT_STRENGTH, pCLS->strength);
+            SetCreateStat(STAT_AGILITY, pCLS->agility);
+            SetCreateStat(STAT_STAMINA, pCLS->stamina);
+            SetCreateStat(STAT_INTELLECT, pCLS->intellect);
+            SetCreateStat(STAT_SPIRIT, pCLS->spirit);
             break;
         }
         default:

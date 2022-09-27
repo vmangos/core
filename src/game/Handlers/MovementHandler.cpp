@@ -831,24 +831,28 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     recvData >> splineId;
     recvData >> Unused<float>();
 
+    if (!VerifyMovementInfo(movementInfo))
+        return;
+
     Unit* pMover = _player->GetMover();
 
     if (pMover->GetObjectGuid() != m_clientMoverGuid)
         return;
 
-    Player* pPlayerMover = pMover->ToPlayer();
-
-    // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
-    if (pPlayerMover && pPlayerMover->IsBeingTeleported())
+    if (pMover->movespline->GetId() != splineId)
         return;
 
-    if (!VerifyMovementInfo(movementInfo))
-        return;
-
-    if (pPlayerMover)
+    if (Player* pPlayerMover = pMover->ToPlayer())
     {
-        if (!_player->GetCheatData()->HandleSplineDone(pPlayerMover, movementInfo, splineId) ||
-            !_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, CMSG_MOVE_SPLINE_DONE))
+        // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
+        if (pPlayerMover->IsBeingTeleported())
+            return;
+
+        // no need to reject future packets in this case
+        if (!_player->GetCheatData()->HandleSplineDone(pPlayerMover, movementInfo, splineId))
+            return;
+
+        if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, CMSG_MOVE_SPLINE_DONE))
         {
             m_moveRejectTime = WorldTimer::getMSTime();
             return;

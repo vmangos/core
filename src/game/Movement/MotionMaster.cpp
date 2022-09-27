@@ -837,6 +837,9 @@ void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack
 
 bool MotionMaster::MoveDistance(Unit* pTarget, float distance)
 {
+    if (m_owner->GetTransport())
+        return false;
+
     float x, y, z;
     pTarget->GetNearPoint(m_owner, x, y, z, 0, distance, pTarget->GetAngle(m_owner));
     
