@@ -327,14 +327,6 @@ void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
 
-    GetLastMovementInfo().jump.startClientTime = WorldTimer::getMSTime() - GetLastMovementInfo().stime + GetLastMovementInfo().ctime;
-    GetLastMovementInfo().jump.start.x = me->GetPositionX();
-    GetLastMovementInfo().jump.start.y = me->GetPositionY();
-    GetLastMovementInfo().jump.start.z = me->GetPositionZ();
-    GetLastMovementInfo().jump.cosAngle = cos;
-    GetLastMovementInfo().jump.sinAngle = sin;
-    GetLastMovementInfo().jump.xyspeed = speedxy;
-    GetLastMovementInfo().moveFlags = MOVEFLAG_JUMPING | (GetLastMovementInfo().moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN);
     m_knockBack = true;
 }
 
@@ -1011,6 +1003,7 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 {
     if ((opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
         (opcode == CMSG_MOVE_SPLINE_DONE) ||
+        !GetLastMovementInfo().ctime ||
         me->IsTaxiFlying() || 
         me->IsBeingTeleported())
         return 0;
@@ -1066,7 +1059,7 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
     }
 
     // Client should send heartbeats every 500ms
-    if (clientTimeDiff > 1000 && GetLastMovementInfo().ctime && GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING)
+    if ((clientTimeDiff > 1000) && (GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING))
         APPEND_CHEAT(CHEAT_TYPE_SKIPPED_HEARTBEATS);
 
     return cheatFlags;
