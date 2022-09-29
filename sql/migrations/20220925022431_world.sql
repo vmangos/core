@@ -8,8 +8,12 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20220925022431');
 -- Add your query below.
 
--- Set Mulgore, Red Cloud Mesa GY for Brambleblade Ravine
+-- Set Mulgore, Red Cloud Mesa GY for Brambleblade Ravine, Kodo Rock
 INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (34, 358, 67, 0);
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (34, 637, 67, 0);
+
+-- Set Durotar, Valley of Trials GY for Spirit Rock
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (709, 637, 67, 0);
 
 -- Condition to return false if quest 769 is complete
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (769, 8, 769, 0, 0, 0, 1);
