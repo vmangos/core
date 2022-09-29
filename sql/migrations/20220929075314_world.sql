@@ -8,8 +8,8 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20220929075314');
 -- Add your query below.
 
--- Quest 823 (Report to Orgnil) is a follow-up to Quest 794 (Burning Blade Medallion)
-UPDATE `quest_template` SET `PrevQuestId` = 794 WHERE `entry` = 823;
+-- Quest 823 (Report to Orgnil) is a follow-up to Quest 805 (Report to Sen'jin Village)
+UPDATE `quest_template` SET `PrevQuestId` = 805 WHERE `entry` = 823;
 
 -- End of migration.
 END IF;
