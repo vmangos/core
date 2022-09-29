@@ -3,9 +3,9 @@ delimiter ??
 CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
-SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20220925022431');
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20220929075314');
 IF v=0 THEN
-INSERT INTO `migrations` VALUES ('20220925022431');
+INSERT INTO `migrations` VALUES ('20220929075314');
 -- Add your query below.
 
 -- Quest 823 (Report to Orgnil) is a follow-up to Quest 794 (Burning Blade Medallion)
