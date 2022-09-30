@@ -1221,8 +1221,12 @@ void Map::Remove(Player* player, bool remove)
 
     RemoveFromGrid(player, grid, cell);
 
-    SendRemoveTransports(player);
-    UpdateObjectVisibility(player, cell, p);
+    if (!sWorld.IsStopped())
+    {
+        if (!remove)
+            SendRemoveTransports(player);
+        UpdateObjectVisibility(player, cell, p);
+    }
 
     player->ClearUpdateMask(true);
     RemoveRelocatedUnit(player);
@@ -1268,7 +1272,8 @@ Map::Remove(T* obj, bool remove)
     else
         obj->RemoveFromWorld();
 
-    UpdateObjectVisibility(obj, cell, p);                   // i think will be better to call this function while object still in grid, this changes nothing but logically is better(as for me)
+    if (!sWorld.IsStopped())
+        UpdateObjectVisibility(obj, cell, p); // i think will be better to call this function while object still in grid, this changes nothing but logically is better(as for me)
     RemoveFromGrid(obj, grid, cell);
 
     obj->ResetMap();
