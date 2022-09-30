@@ -225,6 +225,9 @@ INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 
 -- Add Missing Greetings
 INSERT INTO `quest_greeting` (`entry`, `type`, `emote_id`, `emote_delay`, `content_default`) VALUES
+(3936, 0, 2, 0, 'In the name of Elune, the Sentinels keep vigilant watch over all our lands, from the cobbled streets of Darnassus to the edge of Ashenvale Forest.'),
+(4048, 0, 2, 0, 'You look as though you have traveled from afar, $r.'),
+(5906, 0, 1, 0, 'Hello, shaman. It is good to see one of my $gbrothers:sisters; here. May I aid you somehow?'),
 (7740, 0, 0, 0, ''),
 (7825, 0, 0, 0, ''),
 (7884, 0, 0, 0, ''),
@@ -263,66 +266,57 @@ UPDATE quest_template SET ReqItemId1 = 0, ReqItemId2 = 12627, ReqItemCount1 = 0,
 
 -- CMANGOS DATA
 -- Glorin Steelbrow
-INSERT INTO `questgiver_greeting` VALUES (1217, 0, 'Harumph!  As if I don''t have enough to do out here in the muck, without all these distractions!', 0, 0);
+INSERT INTO `quest_greeting` VALUES (1217, 0, 'Harumph!  As if I don''t have enough to do out here in the muck, without all these distractions!');
 
 -- Archbishop Benedictus
-INSERT INTO `questgiver_greeting` VALUES (1284, 0, 'My blessings go to you, $c, and I pray they may guide and protect you during these times of trouble.  Be vigilant, but remain hopeful for peace, for hope is our greatest weapon against the darkness.', 0, 0);
-
--- Shandris Feathermoon
-INSERT INTO `questgiver_greeting` VALUES (3936, 0, 'In the name of Elune, the Sentinels keep vigilant watch over all our lands, from the cobbled streets of Darnassus to the edge of Ashenvale Forest.', 2, 0);
-
--- Falfindel Waywarder
-INSERT INTO `questgiver_greeting` VALUES (4048, 0, 'You look as though you have traveled from afar, $r.', 2, 0);
+INSERT INTO `quest_greeting` VALUES (1284, 0, 'My blessings go to you, $c, and I pray they may guide and protect you during these times of trouble.  Be vigilant, but remain hopeful for peace, for hope is our greatest weapon against the darkness.');
 
 -- Kaela Shadowspear
-INSERT INTO `questgiver_greeting` VALUES (4080, 0, 'Gaxim is so focused on trying to convince the night elves that his methods are superior that I had no choice but to focus his energies on something--so I unleashed him on the Venture Co.$B$BI remain focused on helping the Charred Vale to the northwest.', 0, 0);
+INSERT INTO `quest_greeting` VALUES (4080, 0, 'Gaxim is so focused on trying to convince the night elves that his methods are superior that I had no choice but to focus his energies on something--so I unleashed him on the Venture Co.$B$BI remain focused on helping the Charred Vale to the northwest.');
 
 -- High Sorcerer Andromath
-INSERT INTO `questgiver_greeting` VALUES (5694, 0, ' ', 0, 0);
+INSERT INTO `quest_greeting` VALUES (5694, 0, ' ');
 
 -- Searn Firewarder
-INSERT INTO `questgiver_greeting` VALUES (5892, 0, ' ', 0, 0);
-
--- Xanis Flameweaver
-INSERT INTO `questgiver_greeting` VALUES (5906, 0, 'Hello, shaman. It is good to see one of my $gbrothers:sisters; here. May I aid you somehow?', 1, 0);
+INSERT INTO `quest_greeting` VALUES (5892, 0, ' ');
 
 -- Hornizz Brimbuzzle
-INSERT INTO `questgiver_greeting` VALUES (6019, 0, ' ', 0, 0);
+INSERT INTO `quest_greeting` VALUES (6019, 0, ' ');
 
 -- Latronicus Moonspear
-INSERT INTO `questgiver_greeting` VALUES (7877, 0, ' ', 0, 0);
+INSERT INTO `quest_greeting` VALUES (7877, 0, ' ');
 
 -- Syndicate Documents
-INSERT INTO `questgiver_greeting` VALUES (1740, 1, 'This collection of scrolls contains various logistic and strategic information, as well as coded correspondences.', 0, 0);
+INSERT INTO `quest_greeting` VALUES (1740, 1, 'This collection of scrolls contains various logistic and strategic information, as well as coded correspondences.');
 
 -- Captain Hecklebury Smotts
-INSERT INTO `questgiver_greeting` VALUES (2500, 0, 'They''re out there!  I can hear them at night, laughing.  Oh, they''ll pay!  They...will...pay!!', 0, 0);
+INSERT INTO `quest_greeting` VALUES (2500, 0, 'They''re out there!  I can hear them at night, laughing.  Oh, they''ll pay!  They...will...pay!!');
 
 -- Keeper Bel'dugur
-INSERT INTO `questgiver_greeting` VALUES (2934, 0, 'Knowledge is both tool and weapon to those with the will to use it.', 0, 0);
+INSERT INTO `quest_greeting` VALUES (2934, 0, 'Knowledge is both tool and weapon to those with the will to use it.');
 
 -- Korran
-INSERT INTO `questgiver_greeting` VALUES (3428, 0, 'The dust of the Barrens parches my throat more and more every day, $N. But it is worth the sacrifice to remain here if it helps the Horde and the warchief.', 0, 0);
+INSERT INTO `quest_greeting` VALUES (3428, 0, 'The dust of the Barrens parches my throat more and more every day, $N. But it is worth the sacrifice to remain here if it helps the Horde and the warchief.');
 
 -- Pozzik
-INSERT INTO `questgiver_greeting` VALUES (4630, 0, 'What a great day for racing! Oh, who am I kidding? Every day''s a great day for racing!', 0, 0);
+INSERT INTO `quest_greeting` VALUES (4630, 0, 'What a great day for racing! Oh, who am I kidding? Every day''s a great day for racing!');
 
 -- Gryphon Master Talonaxe
-INSERT INTO `questgiver_greeting` VALUES (5636, 0, 'What do you want? I''d be a whole lot happier up in the skies than grounded and yapping with a $r right now.$b$bGuess we can''t all get what we want.', 0, 0);
+INSERT INTO `quest_greeting` VALUES (5636, 0, 'What do you want? I''d be a whole lot happier up in the skies than grounded and yapping with a $r right now.$b$bGuess we can''t all get what we want.');
 
 -- Carendin Halgar
-INSERT INTO `questgiver_greeting` VALUES (5675, 0, 'The summoning of beings from the chaos that lies beyond our world is essential to the mastery of the warlock arts, $N. I am glad to see the progress you have made.', 0, 0);
+INSERT INTO `quest_greeting` VALUES (5675, 0, 'The summoning of beings from the chaos that lies beyond our world is essential to the mastery of the warlock arts, $N. I am glad to see the progress you have made.');
 
 -- Thun'grim Firegaze
-INSERT INTO `questgiver_greeting` VALUES (5878, 0, 'My vision has darkened, but there are many kinds of sight...', 0, 0);
+INSERT INTO `quest_greeting` VALUES (5878, 0, 'My vision has darkened, but there are many kinds of sight...');
 
 -- Derotain Mudsipper
-INSERT INTO `questgiver_greeting` VALUES (14567, 0, 'These Mithril Order guys are sissies.', 0, 0);
+INSERT INTO `quest_greeting` VALUES (14567, 0, 'These Mithril Order guys are sissies.');
 
 -- Arazmodu
-INSERT INTO `questgiver_greeting` VALUES (19936, 0, ' ', 0, 0);
+INSERT INTO `quest_greeting` VALUES (19936, 0, ' ', 0, 0);
 
-UPDATE `questgiver_greeting` SET `Text` = ' ' WHERE `Text` = '';
+UPDATE `quest_greeting` SET `Text` = ' ' WHERE `Text` = '';
 
 
 -- End of migration.
