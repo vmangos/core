@@ -225,28 +225,15 @@ INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 
 -- Add Missing Greetings
 INSERT INTO `quest_greeting` (`entry`, `type`, `emote_id`, `emote_delay`, `content_default`) VALUES
-(661, 0, 0, 0, 'Greetings. What business have you with the Carevin family? Do you seek to assist the Carevins in their battle against the undead?'),
-(1377, 0, 0, 0, 'Driving a Steam Tank isn\'t for everyone.  It takes an iron grip and nerves of steel...lucky I have both!  How about you?  How\'s your mettle?  Want to prove it to me?'),
-(1738, 1, 0, 0, 'This collection of scrolls contains various logistic and strategic information, as well as coded correspondences.'),
-(2487, 0, 0, 0, 'Ah, smell the fine salt air!  \'Tis always nice to return to our home port of Booty Bay.'),
-(3050, 0, 0, 0, 'The tauren are sons and daughters of the Earthmother, and we show respect to all her children.  Even the beasts we slay are cherished, as their bodies give nourishment and their skins provide warmth.'),
-(4047, 0, 0, 0, 'The spirits of nature are powers to respect.  They offer great aid to the worthy, and mete out swift death to the foolish.'),
-(5393, 0, 1, 0, 'Nethergarde keep always needs more supplies - supplies to help our mages in their research, and supplies to keep our defenders in top fighting shape.'),
-(5637, 0, 2, 0, 'Pleased to meetcha, $c. Me name\'s Roetten. I lead Reclaimers Incorporated.$B$BMe guild and I specialize in aquiring lost goods. We usually hire brave adventurers and send them off to finish tasks for those who aren\'t able, or don\'t have the time.'),
-(6868, 0, 6, 0, 'Whatcha need, $c?  I trust that you\'ve come out to this wasteland for a reason other than idle chit chat.'),
 (7740, 0, 0, 0, ''),
 (7825, 0, 0, 0, ''),
 (7884, 0, 0, 0, ''),
-(8256, 0, 1, 0, 'Greetings, $N.'),
-(8379, 0, 0, 0, 'If you are here to beg for the privilege of working for me, then your company is quite welcome. Otherwise, there is little chance you are of any use to me.'),
 (8582, 0, 0, 0, ''),
 (10306, 0, 0, 0, ''),
-(10428, 0, 1, 0, 'Whitereach Post started off as a small hunting camp... Now, everyone wants to set up shop and call this home.$B$B<Motega shrugs his shoulder>'),
 (11857, 0, 0, 0, ''),
 (11862, 0, 0, 0, ''),
 (11864, 0, 0, 0, ''),
 (12126, 0, 0, 0, ''),
-(138492, 1, 0, 0, 'These shards glint with an unnatural sheen.  It is clear that they hide a deep power within.'),
 (150075, 1, 0, 0, ''),
 (179827, 1, 0, 0, '');
 
