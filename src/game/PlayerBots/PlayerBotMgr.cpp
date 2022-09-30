@@ -1570,6 +1570,46 @@ bool ChatHandler::HandlePartyBotUnpauseCommand(char* args)
     return HandlePartyBotPauseHelper(args, false);
 }
 
+bool ChatHandler::HandlePartyBotUnequipCommand(char* args)
+{
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    char* cId = ExtractKeyFromLink(&args, "Hitem");
+    if (!cId)
+        return false;
+
+    uint32 itemId = 0;
+    if (!ExtractUInt32(&cId, itemId))
+        return false;
+
+    uint32 count = pTarget->GetItemCount(itemId, false);
+    if (!count)
+    {
+        SendSysMessage("Target does not have that item.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            pTarget->DestroyItemCount(itemId, count, true);
+            return true;
+        }
+    }
+
+    SendSysMessage("Target is not a party bot.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
 bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
 {
     Player* pTarget = GetSelectedPlayer();
