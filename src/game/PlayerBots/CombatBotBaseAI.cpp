@@ -2655,6 +2655,12 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if (pProto->InventoryType == INVTYPE_TABARD || pProto->InventoryType == INVTYPE_BODY)
             continue;
 
+        if (pProto->SourceQuestRaces && !(pProto->SourceQuestRaces & me->GetRaceMask()))
+            continue;
+
+        if (pProto->SourceQuestClasses && !(pProto->SourceQuestClasses & me->GetClassMask()))
+            continue;
+
         if (pProto->SourceQuestLevel < 0)
         {
             // Avoid higher level items with no level requirement

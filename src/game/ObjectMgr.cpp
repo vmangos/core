@@ -5392,6 +5392,8 @@ void ObjectMgr::LoadQuests()
             if (ItemPrototype const* pItemProto = GetItemPrototype(qinfo->SrcItemId))
             {
                 pItemProto->Discovered = true; // all quest items count as discovered
+                pItemProto->SourceQuestRaces |= qinfo->RequiredRaces;
+                pItemProto->SourceQuestClasses |= qinfo->RequiredClasses;
 
                 if (pItemProto->SourceQuestLevel < 0 || uint32(pItemProto->SourceQuestLevel) > qinfo->MinLevel)
                     pItemProto->SourceQuestLevel = int32(std::min<uint32>(qinfo->MinLevel, INT32_MAX));
@@ -5580,6 +5582,8 @@ void ObjectMgr::LoadQuests()
                 {
                     choice_found = true;
                     pItemProto->Discovered = true;
+                    pItemProto->SourceQuestRaces |= qinfo->RequiredRaces;
+                    pItemProto->SourceQuestClasses |= qinfo->RequiredClasses;
 
                     if (pItemProto->SourceQuestLevel < 0 || uint32(pItemProto->SourceQuestLevel) > qinfo->MinLevel)
                         pItemProto->SourceQuestLevel = int32(std::min<uint32>(qinfo->MinLevel, INT32_MAX));
@@ -5621,6 +5625,8 @@ void ObjectMgr::LoadQuests()
                 if (ItemPrototype const* pItemProto = GetItemPrototype(id))
                 {
                     pItemProto->Discovered = true;
+                    pItemProto->SourceQuestRaces |= qinfo->RequiredRaces;
+                    pItemProto->SourceQuestClasses |= qinfo->RequiredClasses;
 
                     if (pItemProto->SourceQuestLevel < 0 || uint32(pItemProto->SourceQuestLevel) > qinfo->MinLevel)
                         pItemProto->SourceQuestLevel = int32(std::min<uint32>(qinfo->MinLevel, INT32_MAX));
