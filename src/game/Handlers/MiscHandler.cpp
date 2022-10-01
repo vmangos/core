@@ -910,15 +910,80 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
 {
-    DETAIL_LOG("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
-    recv_data.rpos(recv_data.wpos());                       // prevent spam at unimplemented packet
-    //recv_data.hexlike();
+    DETAIL_LOG("WORLD: Received opcode CMSG_UPDATE_ACCOUNT_DATA");
+
+    uint32 type, decompressedSize;
+    recv_data >> type >> decompressedSize;
+
+    DEBUG_LOG("UAD: type %u, decompressedSize %u", type, decompressedSize);
+
+    if (type > NUM_ACCOUNT_DATA_TYPES)
+        return;
+
+    if (decompressedSize == 0)                              // erase
+    {
+        SetAccountData(AccountDataType(type), "");
+        return;
+    }
+
+    if (decompressedSize > 0xFFFF)
+    {
+        recv_data.rpos(recv_data.wpos());                   // unnneded warning spam in this case
+        sLog.outError("UAD: Account data packet too big, size %u", decompressedSize);
+        return;
+    }
+
+    ByteBuffer dest;
+    dest.resize(decompressedSize);
+
+    uint32 currentPosition = recv_data.rpos();
+    uLongf realSize = decompressedSize;
+    uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + currentPosition), recv_data.size() - currentPosition);
+
+    recv_data.rpos(recv_data.wpos());                       // uncompress read (recv_data.size() - recv_data.rpos())
+
+    std::string adata;
+    dest >> adata;
+
+    SetAccountData(AccountDataType(type), adata);
 }
 
-void WorldSession::HandleRequestAccountData(WorldPacket& /*recv_data*/)
+void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 {
-    DETAIL_LOG("WORLD: Received CMSG_REQUEST_ACCOUNT_DATA");
-    //recv_data.hexlike();
+    DETAIL_LOG("WORLD: Received opcode CMSG_REQUEST_ACCOUNT_DATA");
+
+    uint32 type;
+    recv_data >> type;
+
+    DEBUG_LOG("RAD: type %u", type);
+
+    if (type > NUM_ACCOUNT_DATA_TYPES)
+        return;
+
+    AccountData* adata = GetAccountData(AccountDataType(type));
+
+    uint32 size = adata->data.size();
+    if (!size)
+    {
+        WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 4 + 4);
+        data << uint32(type);                                // type (0-7)
+        data << uint32(0);                                   // decompressed length
+        SendPacket(&data);
+    }
+    else
+    {
+        uLongf destSize = compressBound(size);
+
+        ByteBuffer dest;
+        dest.resize(destSize);
+        compress(const_cast<uint8*>(dest.contents()), &destSize, (uint8*)adata->data.c_str(), size);
+
+        WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 4 + 4 + destSize + 1);
+        data << uint32(type);                                   // type (0-7)
+        data << uint32(size);                                   // decompressed length
+        data.append(dest);                                      // compressed data
+        SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
