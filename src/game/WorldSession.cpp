@@ -867,7 +867,7 @@ void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
     m_accountData[type].data = data;
 }
 
-void WorldSession::SendAccountDataTimes(uint32 /*mask*/)
+void WorldSession::SendAccountDataTimes()
 {
     WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 128);
     for (int i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)

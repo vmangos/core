@@ -552,7 +552,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     // load player specific part before send times
     LoadAccountData(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA), PER_CHARACTER_CACHE_MASK);
-    SendAccountDataTimes(PER_CHARACTER_CACHE_MASK);
+    SendAccountDataTimes();
 
     // Send MOTD (1.12.1 not have SMSG_MOTD, so do it in another way)
     {
