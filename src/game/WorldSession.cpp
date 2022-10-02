@@ -47,6 +47,8 @@
 #include "Chat.h"
 #include "MasterPlayer.h"
 
+#include <openssl/md5.h>
+
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
 {
@@ -869,13 +871,24 @@ void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
 
 void WorldSession::SendAccountDataTimes()
 {
-    WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 128);
-    for (int i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
+    WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, NUM_ACCOUNT_DATA_TYPES * MD5_DIGEST_LENGTH);
+    for (AccountData const& itr : m_accountData)
     {
-        data << uint32(m_accountData[i].timestamp);
-        data << uint32(m_accountData[i].timestamp);
-        data << uint32(m_accountData[i].timestamp);
-        data << uint32(m_accountData[i].timestamp);
+        if (itr.data.empty())
+        {
+            for (int i = 0; i < MD5_DIGEST_LENGTH; i++)
+                data << uint8(0);
+        }
+        else
+        {
+            MD5_CTX md5;
+            MD5_Init(&md5);
+            MD5_Update(&md5, itr.data.c_str(), itr.data.size());
+
+            uint8 fileHash[MD5_DIGEST_LENGTH];
+            MD5_Final(fileHash, &md5);
+            data.append(fileHash, MD5_DIGEST_LENGTH);
+        }
     }
     SendPacket(&data);
 }
