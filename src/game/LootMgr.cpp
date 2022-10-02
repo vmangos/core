@@ -27,6 +27,7 @@
 #include "Util.h"
 #include "Conditions.h"
 #include "Group.h"
+#include "BattleGroundMgr.h"
 
 static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] =
 {
@@ -807,6 +808,18 @@ uint32 Loot::GetMaxSlotInLootFor(uint32 playerGuid) const
     return items.size() + (itr != m_playerQuestItems.end() ?  itr->second->size() : 0);
 }
 
+WorldObject const* Loot::GetLootTarget() const
+{
+    if (m_lootTarget)
+    {
+        if (Corpse const* pCorpse = m_lootTarget->ToCorpse())
+            if (Player const* pPlayer = sObjectAccessor.FindPlayer(pCorpse->GetOwnerGuid()))
+                return pPlayer;
+    }
+    
+    return m_lootTarget;
+}
+
 ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
 {
     b << uint32(li.itemid);
@@ -1526,11 +1539,13 @@ void LoadLootTemplates_Skinning()
     LootTemplates_Skinning.ReportUnusedIds(ids_set);
 }
 
-void LoadLootTemplates_Reference()
+void LoadLootTemplates_Reference(LootIdSet& ids_set)
 {
-    LootIdSet ids_set;
     LootTemplates_Reference.LoadAndCollectLootIds(ids_set);
+}
 
+void CheckLootTemplates_Reference(LootIdSet& ids_set)
+{
     // check references and remove used
     LootTemplates_Creature.CheckLootRefs(&ids_set);
     LootTemplates_Fishing.CheckLootRefs(&ids_set);
@@ -1541,7 +1556,15 @@ void LoadLootTemplates_Reference()
     LootTemplates_Disenchant.CheckLootRefs(&ids_set);
     LootTemplates_Mail.CheckLootRefs(&ids_set);
     LootTemplates_Reference.CheckLootRefs(&ids_set);
+    auto& usedIds = sBattleGroundMgr.GetUsedRefLootIds();
+    for (uint32 refLootId : usedIds)
+        ids_set.erase(refLootId);
 
     // output error for any still listed ids (not referenced from any loot table)
     LootTemplates_Reference.ReportUnusedIds(ids_set);
+}
+
+bool ExistsRefLootTemplate(uint32 refLootId)
+{
+    return LootTemplates_Reference.HaveLootFor(refLootId);
 }

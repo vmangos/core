@@ -181,6 +181,7 @@ BattleGround::BattleGround()
     m_levelMin          = 0;
     m_levelMax          = 0;
     m_inBGFreeSlotQueue = false;
+    m_playerSkinReflootId = 0;
 
     m_maxPlayersPerTeam = 0;
     m_maxPlayers        = 0;

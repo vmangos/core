@@ -28,7 +28,7 @@
 #include "World.h"
 #include "ObjectMgr.h"
 
-Corpse::Corpse(CorpseType type) : WorldObject(), loot(nullptr), lootRecipient(nullptr), m_faction(nullptr)
+Corpse::Corpse(CorpseType type) : WorldObject(), loot(this), lootRecipient(nullptr), m_faction(nullptr)
 {
     m_objectType |= TYPEMASK_CORPSE;
     m_objectTypeId = TYPEID_CORPSE;

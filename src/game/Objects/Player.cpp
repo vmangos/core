@@ -8000,85 +8000,10 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                     uint32 level = pVictim->GetLevel();
                     bones->loot.gold = (uint32)(urand(50, 150) * 0.016f * pow(((float)level) / 5.76f, 2.5f) * sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_MONEY));
                     bones->loot.m_personal = true; // Everyone can loot the corpse
-                    if (BattleGround* bg = GetBattleGround())
-                    {
-                        if (bg->GetTypeID() == BATTLEGROUND_AV)
-                        {
-                            uint8 race = pVictim->GetRace();
-                            uint32 rank = pVictim->GetHonorMgr().GetHighestRank().visualRank;
-                            uint32 raceItem = 0;
-                            uint32 rankItem = 0;
-                            uint32 questItem = 0;
-                            switch (race)
-                            {
-                            case RACE_HUMAN:
-                                raceItem = 18144;
-                                questItem = 17306;
-                                break;
-                            case RACE_DWARF:
-                                raceItem = 18206;
-                                questItem = 17306;
-                                break;
-                            case RACE_NIGHTELF:
-                                raceItem = 18142;
-                                questItem = 17306;
-                                break;
-                            case RACE_GNOME:
-                                raceItem = 18143;
-                                questItem = 17306;
-                                break;
-                            case RACE_ORC:
-                                raceItem = 18207;
-                                questItem = 17423;
-                                break;
-                            case RACE_UNDEAD:
-                                raceItem = 18147;
-                                questItem = 17423;
-                                break;
-                            case RACE_TAUREN:
-                                raceItem = 18145;
-                                questItem = 17423;
-                                break;
-                            case RACE_TROLL:
-                                raceItem = 18146;
-                                questItem = 17423;
-                                break;
-                            }
-                            if (rank < 6)
-                                if (pVictim->GetTeam() == ALLIANCE)
-                                    rankItem = 17326;
-                                else
-                                    rankItem = 17502;
-                            else if (rank < 10)
-                                if (pVictim->GetTeam() == ALLIANCE)
-                                    rankItem = 17327;
-                                else
-                                    rankItem = 17503;
-                            else if (pVictim->GetTeam() == ALLIANCE)
-                                rankItem = 17328;
-                            else
-                                rankItem = 17504;
 
-                            if (raceItem > 0)
-                            {
-                                LootStoreItem storeitem = LootStoreItem(raceItem, 100, 0, 0, 1, 1);
-                                bones->loot.AddItem(storeitem);
-                            }
-                            if (questItem > 0)
-                            {
-                                LootStoreItem storeitem = LootStoreItem(questItem, 100, 0, 0, 1, 1);
-                                bones->loot.AddItem(storeitem);
-                            }
-                            if (rankItem > 0)
-                            {
-                                LootStoreItem storeitem = LootStoreItem(rankItem, 75, 0, 0, 0, 1);
-                                bones->loot.AddItem(storeitem);
-                            }
-
-                            LootStoreItem storeitem = LootStoreItem(17422, 75, 0, 0, 0, 20);
-                            bones->loot.AddItem(storeitem);
-                        }
-                    }
+                    if (BattleGround* pBG = pVictim->GetBattleGround())
+                        if (uint32 refLootId = pBG->GetPlayerSkinRefLootId())
+                            loot->FillLoot(refLootId, LootTemplates_Reference, this, true);
                 }
             }
 
