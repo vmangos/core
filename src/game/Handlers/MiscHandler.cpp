@@ -1160,20 +1160,11 @@ void WorldSession::HandleWorldTeleport (WorldPacket& msg) {
   msg >> position.z;
   msg >> position.o;
 
-  DEBUG_LOG("Received worldport command from player %s (0x%x):\n" \
-            "timeMs: %u\n"                                        \
-            "coordinates: %u, %f, %f, %f, %f\n",
-            player->GetName(),
-            player->GetGUID(),
-            timeMs,
-            mapId,
-            position.x,
-            position.y,
-            position.z,
-            position.o);
-
-  if (GetSecurity() < SEC_GAMEMASTER)
-    return SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+  // Validate the user's security credentials
+  if (GetSecurity() < SEC_GAMEMASTER) {
+    SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+    return;
+  }
 
   player->TeleportTo(mapId,
                     position.x,
