@@ -264,6 +264,86 @@ UPDATE quest_template SET ReqItemId1 = 0, ReqItemId2 = 12627, ReqItemCount1 = 0,
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- Respawn Wintterfall Villiage (credit cmangos)
+UPDATE `creature` SET `position_x` = 6865.51, `position_y` = -5099.49, `position_z` = 692.725, `orientation` = 0.695391, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41030;
+UPDATE `creature` SET `position_x` = 6845.32, `position_y` = -5115.65, `position_z` = 694.404, `orientation` = 0.135005, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41034;
+UPDATE `creature` SET `position_x` = 6833.81, `position_y` = -5108.76, `position_z` = 693.604, `orientation` = 5.84685, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41048;
+UPDATE `creature` SET `position_x` = 6833.14, `position_y` = -5041.56, `position_z` = 690.784, `orientation` = 5.78156, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41049;
+UPDATE `creature` SET `position_x` = 6818.08, `position_y` = -5083.12, `position_z` = 693.565, `orientation` = 5.67232, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41047;
+UPDATE `creature` SET `position_x` = 6788.7, `position_y` = -5150.96, `position_z` = 731.929, `orientation` = 2.45244, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41026;
+UPDATE `creature` SET `position_x` = 6786.41, `position_y` = -5161.69, `position_z` = 732.942, `orientation` = 0.578115, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41032;
+UPDATE `creature` SET `position_x` = 6780.28, `position_y` = -5049.57, `position_z` = 722.916, `orientation` = 2.09397, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41024;
+UPDATE `creature` SET `position_x` = 6779.97, `position_y` = -5061.67, `position_z` = 722.918, `orientation` = 5.45228, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41025;
+UPDATE `creature` SET `position_x` = 6742.48, `position_y` = -5201.8, `position_z` = 761.62, `orientation` = 0.978138, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41027;
+UPDATE `creature` SET `position_x` = 6731.89, `position_y` = -5134.97, `position_z` = 733.104, `orientation` = 3.80482, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41031;
+
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1823, 7439, 7440, 0, 0, 1, 6740.71, -5139.57, 729.938, 5.84685, 333, 333, 2, 100, 100, 1, 0, 0, 0, 10);
+
+UPDATE `creature` SET `spawntimesecsmin` = 240, `spawntimesecsmax` = 360 WHERE `id` IN (7438, 7439, 7440);
+
+DELETE FROM `creature` WHERE `guid` IN (41018, 41021, 41019, 41022, 41023, 41017, 41020);
+INSERT INTO `creature` (`guid`, `id`, `id2`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `wander_distance`, `movement_type`, `spawntimesecsmin`, `spawntimesecsmax`) VALUES
+(41018, 7438, 7439, 1, 6667.84, -5122.11, 780.42, 0, 10, 1, 240, 360),
+(41021, 7438, 7439, 1, 6646.41, -5083.27, 791.9520, 0, 10, 1, 240, 360),
+(41019, 7438, 7439, 1, 6690.06, -5044.10, 780.40997, 0, 10, 1, 240, 360),
+(41022, 7438, 7439, 1, 6719.06, -5010.87, 766.1040, 0, 10, 1, 240, 360),
+(41023, 7438, 7439, 1, 6750.95, -4982.43, 774.3099, 0, 10, 1, 240, 360),
+(41017, 7438, 7439, 1, 6747.06, -4953.18, 771.3369, 0, 10, 1, 240, 360),
+(41020, 7438, 7439, 1, 6775.89, -4953.06, 763.7109, 0, 10, 1, 240, 360);
+
+DELETE FROM `creature` WHERE `guid` IN (41045, 41046, 41035, 41043, 41041, 41042, 41037);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `wander_distance`, `movement_type`, `spawntimesecsmin`, `spawntimesecsmax`) VALUES
+(41045, 7440, 1, 6847.62, -5148.45, 704.5919, 0, 8, 1, 240, 360),
+(41046, 7440, 1, 6879.10, -5192.58, 728.8530, 0, 8, 1, 240, 360),
+(41035, 7440, 1, 6912.93, -5142.75, 695.0289, 0, 20, 1, 240, 360),
+(41043, 7440, 1, 6922.14, -5080.25, 695.5139, 0, 20, 1, 240, 360),
+(41041, 7440, 1, 6905.95, -5011.29, 693.1820, 0, 20, 1, 240, 360),
+(41042, 7440, 1, 6856.73, -5014.25, 694.9570, 0, 20, 1, 240, 360),
+(41037, 7440, 1, 6883.64, -4985.54, 696.64, 0, 20, 1, 240, 360);
+
+UPDATE `creature` SET `movement_type` = 2, `id2` = 7440 WHERE `guid` = 41029;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
+(41029, 1, 6672.991, -5123.819, 776.6279, 100, 0, 0),
+(41029, 2, 6638.452, -5102.194, 785.6561, 100, 0, 0),
+(41029, 3, 6650.196, -5078.844, 791.2263, 100, 0, 0),
+(41029, 4, 6677.679, -5060.239, 780.3429, 100, 0, 0),
+(41029, 5, 6687.422, -5044.838, 780.5929, 100, 0, 0),
+(41029, 6, 6697.113, -5037.76, 775.5929, 100, 0, 0),
+(41029, 7, 6707.379, -5024.815, 766.2048, 100, 0, 0),
+(41029, 8, 6724.477, -5014.26, 765.8298, 100, 0, 0),
+(41029, 9, 6740.117, -4984.761, 773.6328, 100, 0, 0),
+(41029, 10, 6733.8867, -4965.7383, 772.15936, 100, 0, 0),
+(41029, 11, 6764.60, -4958.81, 768.484, 100, 0, 0),
+(41029, 12, 6733.8867, -4965.7383, 772.15936, 100, 0, 0),
+(41029, 13, 6740.117, -4984.761, 773.6328, 100, 0, 0),
+(41029, 14, 6724.477, -5014.26, 765.8298, 100, 0, 0),
+(41029, 15, 6707.379, -5024.815, 766.2048, 100, 0, 0),
+(41029, 16, 6697.113, -5037.76, 775.5929, 100, 0, 0),
+(41029, 17, 6687.422, -5044.838, 780.5929, 100, 0, 0),
+(41029, 18, 6677.679, -5060.239, 780.3429, 100, 0, 0),
+(41029, 19, 6650.196, -5078.844, 791.2263, 100, 0, 0),
+(41029, 20, 6638.452, -5102.194, 785.6561, 100, 0, 0);
+
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 41044;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
+(41044, 1, 6896.047, -5145.929, 698.4564, 100, 0, 0),
+(41044, 2, 6912.23, -5154.356, 699.7226, 100, 0, 0),
+(41044, 3, 6917.795, -5157.371, 698.9726, 100, 0, 0),
+(41044, 4, 6924.244, -5140.042, 694.5976, 100, 0, 0),
+(41044, 5, 6926.439, -5140.172, 694.2226, 100, 0, 0),
+(41044, 6, 6912.631, -5155.736, 699.8476, 100, 0, 0),
+(41044, 7, 6898.35, -5155.16, 698.56, 100, 0, 0),
+(41044, 8, 6893.58, -5100.58, 695.29, 100, 0, 0),
+(41044, 9, 6904.77, -5064.33, 691.32, 100, 0, 0),
+(41044, 10, 6875.16, -5014.68, 694.93, 100, 0, 0),
+(41044, 11, 6865.56, -4995.85, 695.94, 100, 0, 0),
+(41044, 12, 6884.68, -4974.75, 699.25, 100, 0, 0),
+(41044, 13, 6893.75, -4981.16, 697.89, 100, 0, 0),
+(41044, 14, 6905.25, -5032.75, 693.83, 100, 0, 0),
+(41044, 15, 6904.77, -5064.33, 691.32, 100, 0, 0),
+(41044, 16, 6893.58, -5100.58, 695.29, 100, 0, 0);
+
 
 -- End of migration.
 END IF;
