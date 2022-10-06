@@ -795,7 +795,7 @@ void BattleGroundAV::UpdateScore(BattleGroundTeamIndex teamIdx, int32 points)
 
 void BattleGroundAV::ResetTamedEvent(uint32 teamIdx)
 {
-sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: TeamIdx %i ", teamIdx);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: TeamIdx %i", teamIdx);
     SpawnEvent(AV_05_TAMED+teamIdx, 2, true, false);
     SpawnEvent(AV_10_TAMED+teamIdx, 2, true, false);
     SpawnEvent(AV_15_TAMED+teamIdx, 2, true, false);
