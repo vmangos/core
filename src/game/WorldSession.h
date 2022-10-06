@@ -514,7 +514,7 @@ class WorldSession
         void HandleMovementFlagChangeToggleAck(WorldPacket& recvData);
         void HandleMoveSplineDoneOpcode(WorldPacket& recvPacket);
         void HandleMoveSetRawPosition(WorldPacket& recv_data);
-        void HandleWorldTeleportOpcode(WorldPacket& recv_data);
+        void HandleWorldTeleport (WorldPacket& msg);
         void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
 
         void HandleInspectOpcode(WorldPacket& recvPacket);
