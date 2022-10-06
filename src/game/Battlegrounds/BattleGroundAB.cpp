@@ -203,7 +203,7 @@ void BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
         case 4021:                                          // Unk2
         //break;
         default:
-            //sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
             //source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
@@ -453,7 +453,7 @@ bool BattleGroundAB::SetupBattleGround()
                 || !AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 1, g_buffEntries[1], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
                 || !AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 2, g_buffEntries[2], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
            )
-            sLog.outErrorDb("BatteGroundAB: Failed to spawn buff object!");
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "BatteGroundAB: Failed to spawn buff object!");
     }
 
     return true;

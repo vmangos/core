@@ -1560,7 +1560,7 @@ inline void UnsummonVisualWaypoints(Player const* player, ObjectGuid ownerGuid)
  */
 bool ChatHandler::HandleWpAddCommand(char* args)
 {
-    DEBUG_LOG("DEBUG: HandleWpAddCommand");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DEBUG: HandleWpAddCommand");
 
     CreatureInfo const* waypointInfo = ObjectMgr::GetCreatureTemplate(VISUAL_WAYPOINT);
     if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
@@ -1736,7 +1736,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
  */
 bool ChatHandler::HandleWpModifyCommand(char* args)
 {
-    DEBUG_LOG("DEBUG: HandleWpModifyCommand");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DEBUG: HandleWpModifyCommand");
 
     if (!*args)
         { return false; }
@@ -1771,7 +1771,7 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
 
     if (targetCreature)
     {
-        DEBUG_LOG("DEBUG: HandleWpModifyCommand - User did select an NPC");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DEBUG: HandleWpModifyCommand - User did select an NPC");
 
         // Check if the user did specify a visual waypoint
         if (targetCreature->GetEntry() != VISUAL_WAYPOINT || targetCreature->GetSubtype() != CREATURE_SUBTYPE_TEMPORARY_SUMMON)
@@ -1956,7 +1956,7 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
  */
 bool ChatHandler::HandleWpShowCommand(char* args)
 {
-    DEBUG_LOG("DEBUG: HandleWpShowCommand");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DEBUG: HandleWpShowCommand");
 
     if (!*args)
         { return false; }
@@ -2310,7 +2310,7 @@ bool ChatHandler::HandleWpExportCommand(char* args)
 
 bool ChatHandler::HandleEscortShowWpCommand(char *args)
 {
-    DEBUG_LOG("DEBUG: HandleEscortShowWpCommand");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DEBUG: HandleEscortShowWpCommand");
 
     auto waypointInfo = ObjectMgr::GetCreatureTemplate(VISUAL_WAYPOINT);
     if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
@@ -2373,7 +2373,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
 
 bool ChatHandler::HandleEscortHideWpCommand(char* /*args*/)
 {
-    DEBUG_LOG("DEBUG: HandleEscortHideWpCommand");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DEBUG: HandleEscortHideWpCommand");
 
     auto map = m_session->GetPlayer()->GetMap();
 

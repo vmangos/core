@@ -46,7 +46,7 @@ void WaypointMovementGenerator<Creature>::LoadPath(uint32 guid, uint32 entry, Wa
     // No movement found for entry nor guid
     if (!i_path)
     {
-        sLog.outErrorDb("WaypointMovementGenerator::LoadPath: GUID %u Entry %u doesn't have waypoint path", guid, entry);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "WaypointMovementGenerator::LoadPath: GUID %u Entry %u doesn't have waypoint path", guid, entry);
         return;
     }
 
@@ -84,7 +84,7 @@ void WaypointMovementGenerator<Creature>::InitializeWaypointPath(Creature& creat
             m_lastReachedWaypoint = startPoint - 1;
         }
         else
-            sLog.outError("WaypointMovementGenerator::InitializeWaypointPath: %s tries to start movement from invalid point id %u", creature.GetGuidStr().c_str(), startPoint);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WaypointMovementGenerator::InitializeWaypointPath: %s tries to start movement from invalid point id %u", creature.GetGuidStr().c_str(), startPoint);
     }
 
     i_nextMoveTime.Reset(initialDelay);
@@ -444,13 +444,13 @@ bool PatrolMovementGenerator::InitPatrol(Creature& creature)
     CreatureGroup* group = creature.GetCreatureGroup();
     if (!group || !group->IsFormation() || group->GetLeaderGuid() == creature.GetObjectGuid())
     {
-        sLog.outError("[PatrolMovementGenerator] %s is not allowed for this generator.", creature.GetObjectGuid().GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PatrolMovementGenerator] %s is not allowed for this generator.", creature.GetObjectGuid().GetString().c_str());
         return false;
     }
     std::map<ObjectGuid, CreatureGroupMember*>::const_iterator it = group->GetMembers().find(creature.GetObjectGuid());
     if (it == group->GetMembers().end())
     {
-        sLog.outError("[PatrolMovementGenerator] %s not found in patrol members.", creature.GetObjectGuid().GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PatrolMovementGenerator] %s not found in patrol members.", creature.GetObjectGuid().GetString().c_str());
         return false;
     }
     _leaderGuid = group->GetLeaderGuid();

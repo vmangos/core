@@ -330,7 +330,6 @@ enum eConfigUInt32Values
     CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY,
     CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY,
     CONFIG_UINT32_AC_WARDEN_CLIENT_BAN_DURATION,
-    CONFIG_UINT32_AC_WARDEN_DB_LOGLEVEL,
     CONFIG_UINT32_AUTOBROADCAST_INTERVAL,
     CONFIG_UINT32_PARTY_BOT_MAX_BOTS,
     CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP,
@@ -881,8 +880,6 @@ class World
          * Database logs system
          */
         void LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, char const* type, uint32 dataInt);
-        void LogCharacter(Player* character, char const* action);
-        void LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, char const* action);
         void LogChat(WorldSession* sess, char const* type, std::string const& msg, PlayerPointer target = nullptr, uint32 chanId = 0, char const* chanStr = nullptr);
         void LogTransaction(PlayerTransactionData const& data);
         void Shutdown();

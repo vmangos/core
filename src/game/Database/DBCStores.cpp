@@ -138,7 +138,7 @@ std::string AcceptableClientBuildsListStr()
 
 static bool LoadDBC_assert_print(uint32 fsize, uint32 rsize, std::string const& filename)
 {
-    sLog.outError("Size of '%s' setted by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Size of '%s' setted by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
 
     // ASSERT must fail after function call
     return false;
@@ -421,7 +421,7 @@ void LoadDBCStores(std::string const& dataPath)
     // error checks
     if (bad_dbc_files.size() >= DBCFilesCount)
     {
-        sLog.outError("\nIncorrect DataDir value in mangosd.conf or ALL required *.dbc files (%d) not found by path: %sdbc", DBCFilesCount, dataPath.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "\nIncorrect DataDir value in mangosd.conf or ALL required *.dbc files (%d) not found by path: %sdbc", DBCFilesCount, dataPath.c_str());
         Log::WaitBeforeContinueIfNeed();
         exit(1);
     }
@@ -431,13 +431,13 @@ void LoadDBCStores(std::string const& dataPath)
         for (const auto& bad_dbc_file : bad_dbc_files)
             str += bad_dbc_file + "\n";
 
-        sLog.outError("\nSome required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFilesCount, str.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "\nSome required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFilesCount, str.c_str());
         Log::WaitBeforeContinueIfNeed();
         exit(1);
     }
 
-    sLog.outString();
-    sLog.outString(">> Initialized %d data stores", DBCFilesCount);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Initialized %d data stores", DBCFilesCount);
 }
 
 char const* GetPetName(uint32 petfamily, uint32 dbclang)

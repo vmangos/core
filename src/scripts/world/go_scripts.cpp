@@ -135,7 +135,7 @@ bool GOHello_go_silithyste(Player* pPlayer, GameObject* pGo)
 
     pPlayer->CastSpell(pPlayer, 29519, true);
 
-    sLog.out(LOG_BG, "%s [%u:%u:'%s'] reprend une Silithyst d'un monticule",
+    sLog.Out(LOG_BG, LOG_LVL_DETAIL, "%s [%u:%u:'%s'] reprend une Silithyst d'un monticule",
              pPlayer->GetName(),
              pPlayer->GetGUIDLow(), pPlayer->GetSession()->GetAccountId(), pPlayer->GetSession()->GetRemoteAddress().c_str());
 
@@ -262,7 +262,7 @@ struct go_bells : public GameObjectAI
             break;
             }
         default:
-            sLog.outError("go_bells() called with invalid object, ID: %u", me->GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "go_bells() called with invalid object, ID: %u", me->GetEntry());
         }
     }
 

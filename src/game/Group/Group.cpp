@@ -89,13 +89,13 @@ Group::~Group()
 {
     if (m_bgGroup)
     {
-        DEBUG_LOG("Group::~Group: battleground group being deleted.");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Group::~Group: battleground group being deleted.");
         if (m_bgGroup->GetBgRaid(ALLIANCE) == this)
             m_bgGroup->SetBgRaid(ALLIANCE, nullptr);
         else if (m_bgGroup->GetBgRaid(HORDE) == this)
             m_bgGroup->SetBgRaid(HORDE, nullptr);
         else
-            sLog.outError("Group::~Group: battleground group is not linked to the correct battleground.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Group::~Group: battleground group is not linked to the correct battleground.");
     }
     RemoveAllInvites();
     Rolls::iterator itr;
@@ -805,7 +805,7 @@ void Group::GroupLoot(Creature* creature, Loot *loot)
         ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(lootItem.itemid);
         if (!itemProto)
         {
-            DEBUG_LOG("Group::GroupLoot: missing item prototype for item with id: %d", lootItem.itemid);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Group::GroupLoot: missing item prototype for item with id: %d", lootItem.itemid);
             continue;
         }
 
@@ -828,7 +828,7 @@ void Group::NeedBeforeGreed(Creature* creature, Loot *loot)
         ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(lootItem.itemid);
         if (!itemProto)
         {
-            DEBUG_LOG("Group::NeedBeforeGreed: missing item prototype for item with id: %d", lootItem.itemid);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Group::NeedBeforeGreed: missing item prototype for item with id: %d", lootItem.itemid);
             continue;
         }
 
@@ -1063,7 +1063,7 @@ void Group::CountSingleLooterRoll(Roll* roll)
             item->is_looted = true;
             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
             --roll->getLoot()->unlootedCount;
-            sLog.out(LOG_LOOTS, "%s wins need roll for %ux%u [loot from %s]",
+            sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins need roll for %ux%u [loot from %s]",
                 player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
             if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                 player->OnReceivedItem(newItem);
@@ -1124,7 +1124,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                     item->is_looted = true;
                     roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                     --roll->getLoot()->unlootedCount;
-                    sLog.out(LOG_LOOTS, "%s wins need roll for %ux%u [loot from %s]",
+                    sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins need roll for %ux%u [loot from %s]",
                              player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
                     if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                         player->OnReceivedItem(newItem);
@@ -1175,7 +1175,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                     item->is_looted = true;
                     roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                     --roll->getLoot()->unlootedCount;
-                    sLog.out(LOG_LOOTS, "%s wins greed roll for %ux%u [loot from %s]",
+                    sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins greed roll for %ux%u [loot from %s]",
                              player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
                     if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                         player->OnReceivedItem(newItem);
@@ -2119,7 +2119,7 @@ InstanceGroupBind* Group::BindToInstance(DungeonPersistentState* state, bool per
         bind.state = state;
         bind.perm = permanent;
         if (!load)
-            DEBUG_LOG("Group::BindToInstance: Group (Id: %d) is now bound to map %d, instance %d",
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Group::BindToInstance: Group (Id: %d) is now bound to map %d, instance %d",
                       GetId(), state->GetMapId(), state->GetInstanceId());
         return &bind;
     }

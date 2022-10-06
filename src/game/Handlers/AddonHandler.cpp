@@ -56,7 +56,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
     if (TempValue > 0xFFFFF)
     {
-        sLog.outError("WorldSession::ReadAddonsInfo addon info too big, size %u", TempValue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::ReadAddonsInfo addon info too big, size %u", TempValue);
         return false;
     }
 
@@ -101,7 +101,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
             AddOnPacked >> crc >> unk7 >> unk6;
 
-            //DEBUG_LOG("ADDON: Name:%s CRC:%x Unknown1 :%x Unknown2 :%x", AddonNames.c_str(), crc, unk7, unk6);
+            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ADDON: Name:%s CRC:%x Unknown1 :%x Unknown2 :%x", AddonNames.c_str(), crc, unk7, unk6);
 
             *Target << (uint8)2;
 
@@ -140,7 +140,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
             AddOnPacked >> crc >> unk6;
 
-            //DEBUG_LOG("ADDON: Name:%s CRC:%llx Unknown1 :%x", AddonNames.c_str(), crc, unk6);
+            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ADDON: Name:%s CRC:%llx Unknown1 :%x", AddonNames.c_str(), crc, unk6);
 
             if (crc == 0x4C1C776D01LL)  // standard addon CRC
             {
@@ -159,7 +159,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
     }
     else
     {
-        sLog.outError("Addon packet uncompress error :(");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Addon packet uncompress error :(");
         return false;
     }
     return true;

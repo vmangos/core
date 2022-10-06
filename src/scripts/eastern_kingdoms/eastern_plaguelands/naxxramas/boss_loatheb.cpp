@@ -301,7 +301,7 @@ struct boss_loathebAI : public ScriptedAI
                     {
                         if (availableEyeLocs.empty())
                         {
-                            sLog.outError("boss_loatheb.cpp - availableEyeLocs size 0, should not happen!");
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_loatheb.cpp - availableEyeLocs size 0, should not happen!");
                             return;
                         }
                         uint8 availableIndex = urand(0, availableEyeLocs.size() - 1);
@@ -314,7 +314,7 @@ struct boss_loathebAI : public ScriptedAI
                         Creature* pStalk = m_creature->SummonCreature(NPC_EyeStalk, pos[0], pos[1], pos[2], pos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                         if (!pStalk)
                         {
-                            sLog.outError("Heigans WhackAStalk failed to summon eye stalk");
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Heigans WhackAStalk failed to summon eye stalk");
                             return;
                         }
                         eyeStalk.guid = pStalk->GetObjectGuid();

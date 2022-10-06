@@ -80,13 +80,13 @@ void LoadRandomEnchantmentsTable()
 
         delete result;
 
-        sLog.outString();
-        sLog.outString(">> Loaded %u Item Enchantment definitions", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u Item Enchantment definitions", count);
     }
     else
     {
-        sLog.outString();
-        sLog.outErrorDb(">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
     }
 }
 
@@ -98,7 +98,7 @@ uint32 GetItemEnchantMod(uint32 entry)
 
     if (tab == RandomItemEnch.end())
     {
-        sLog.outErrorDb("Item RandomProperty id #%u used in `item_template` but it doesn't have records in `item_enchantment_template` table.", entry);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Item RandomProperty id #%u used in `item_template` but it doesn't have records in `item_enchantment_template` table.", entry);
         return 0;
     }
 

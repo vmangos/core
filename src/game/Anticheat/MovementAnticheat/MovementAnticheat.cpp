@@ -132,11 +132,8 @@ uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
     // Log data
     if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_DATA) && pPlayer && pPlayer->IsInWorld())
     {
-        LogsDatabase.PExecute("INSERT INTO logs_movement "
-            "(account, guid, posx, posy, posz, map, desyncMs, desyncDist, cheats) VALUES "
-            "(%u,      %u,   %f,   %f,   %f,   %u,  %i,       %f,         '%s');",
-            m_session->GetAccountId(), pPlayer->GetGUIDLow(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(),
-            pPlayer->GetMapId(), m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_BASIC, "DesyncMs %d DesyncDist %f Cheats %s",
+            m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
     }
 
     if ((result & (CHEAT_ACTION_KICK | CHEAT_ACTION_BAN_ACCOUNT | CHEAT_ACTION_BAN_IP_ACCOUNT)) && !m_packetLog.empty())
@@ -791,8 +788,8 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
     if (splineId == m_lastSplineId)
     {
         AddMessageToPacketLog("HandleSplineDone: spline id == last spline id == " + std::to_string(splineId));
-        sLog.outInfo("HandleSplineDone: Player %s from account id %u sent spline done opcode for spline id %u twice",
-            me->GetName(), m_session->GetAccountId(), splineId);
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_MINIMAL, "HandleSplineDone: Player sent spline done opcode for spline id %u twice",
+            splineId);
         return false;
     }
 
@@ -802,8 +799,8 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
     if (distance > 10.0f)
     {
         AddMessageToPacketLog("HandleSplineDone: distance to spline destination is " + std::to_string(distance));
-        sLog.outInfo("HandleSplineDone: Player %s from account id %u sent spline done opcode with position that is %g yards away from destination",
-            me->GetName(), m_session->GetAccountId(), distance);
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_MINIMAL, "HandleSplineDone: Player sent spline done opcode with position that is %g yards away from destination",
+            distance);
         return false;
     }
 

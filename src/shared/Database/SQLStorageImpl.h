@@ -193,7 +193,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
     QueryResult* result  = WorldDatabase.PQuery("SELECT MAX(%s) FROM %s", store.EntryFieldName(), store.GetTableName());
     if (!result)
     {
-        sLog.outError("Error loading %s table (not exist?)\n", store.GetTableName());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error loading %s table (not exist?)\n", store.GetTableName());
         Log::WaitBeforeContinueIfNeed();
         exit(1);                                            // Stop server at loading non exited table or not accessable table
     }
@@ -216,9 +216,9 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
     if (!result)
     {
         if (error_at_empty)
-            sLog.outError("%s table is empty!\n", store.GetTableName());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s table is empty!\n", store.GetTableName());
         else
-            sLog.outString("%s table is empty!\n", store.GetTableName());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s table is empty!\n", store.GetTableName());
 
         recordCount = 0;
         return;
@@ -227,7 +227,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
     if (store.GetSrcFieldCount() != result->GetFieldCount())
     {
         recordCount = 0;
-        sLog.outError("Error in %s table, probably sql file format was updated (there should be %d fields in sql).\n", store.GetTableName(), store.GetSrcFieldCount());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in %s table, probably sql file format was updated (there should be %d fields in sql).\n", store.GetTableName(), store.GetSrcFieldCount());
         delete result;
         Log::WaitBeforeContinueIfNeed();
         exit(1);                                            // Stop server at loading broken or non-compatible table.
@@ -339,7 +339,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
     QueryResult* result = WorldDatabase.PQuery("SELECT MAX(%s) FROM %s t1 WHERE %s=(SELECT max(%s) FROM %s t2 WHERE t1.%s=t2.%s && %s <= %u)", store.EntryFieldName(), store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
     if (!result)
     {
-        sLog.outError("Error loading %s table (not exist?)\n", store.GetTableName());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error loading %s table (not exist?)\n", store.GetTableName());
         Log::WaitBeforeContinueIfNeed();
         exit(1);                                            // Stop server at loading non exited table or not accessable table
     }
@@ -362,9 +362,9 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
     if (!result)
     {
         if (error_at_empty)
-            sLog.outError("%s table is empty!\n", store.GetTableName());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s table is empty!\n", store.GetTableName());
         else
-            sLog.outString("%s table is empty!\n", store.GetTableName());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s table is empty!\n", store.GetTableName());
 
         recordCount = 0;
         return;
@@ -373,7 +373,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
     if (store.GetSrcFieldCount() != result->GetFieldCount() - 1) // patch column is not loaded
     {
         recordCount = 0;
-        sLog.outError("Error in %s table, probably sql file format was updated (there should be %d fields in sql).\n", store.GetTableName(), store.GetSrcFieldCount());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in %s table, probably sql file format was updated (there should be %d fields in sql).\n", store.GetTableName(), store.GetSrcFieldCount());
         delete result;
         Log::WaitBeforeContinueIfNeed();
         exit(1);                                            // Stop server at loading broken or non-compatible table.

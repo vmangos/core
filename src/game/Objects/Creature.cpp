@@ -184,7 +184,7 @@ bool CreatureCreatePos::Relocate(Creature* cr) const
 
     if (!cr->IsPositionValid())
     {
-        sLog.outError("%s not created. Suggested coordinates isn't valid (X: %f Y: %f)", cr->GetGuidStr().c_str(), cr->GetPositionX(), cr->GetPositionY());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s not created. Suggested coordinates isn't valid (X: %f Y: %f)", cr->GetGuidStr().c_str(), cr->GetPositionX(), cr->GetPositionY());
         return false;
     }
 
@@ -306,7 +306,7 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
     CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(Entry);
     if (!normalInfo)
     {
-        sLog.outErrorDb("Creature::UpdateEntry creature entry %u does not exist.", Entry);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature::UpdateEntry creature entry %u does not exist.", Entry);
         return false;
     }
 
@@ -325,14 +325,14 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
     uint32 displayId = ChooseDisplayId(GetCreatureInfo(), data, addon, eventData, &scale);
     if (!displayId)                                         // Cancel load if no display id
     {
-        sLog.outErrorDb("Creature (Entry: %u) has no display id defined in table `creature_template`, can't load.", Entry);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has no display id defined in table `creature_template`, can't load.", Entry);
         return false;
     }
 
     CreatureDisplayInfoAddon const* minfo = sObjectMgr.GetCreatureDisplayInfoRandomGender(displayId);
     if (!minfo)                                             // Cancel load if no display info addon defined
     {
-        sLog.outErrorDb("Creature (Entry: %u) has no display id data defined in table `creature_display_info_addon`, can't load.", Entry);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has no display id data defined in table `creature_display_info_addon`, can't load.", Entry);
         return false;
     }
 
@@ -613,7 +613,7 @@ uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* 
     // Fail safe, use first display id present in dbc, shouldn't happen
     if (displayIndex < 0)
     {
-        sLog.outErrorDb("Creature::ChooseDisplayId can not select native display id for creature entry %u, placeholder model will be used.", cinfo->entry);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature::ChooseDisplayId can not select native display id for creature entry %u, placeholder model will be used.", cinfo->entry);
         if (scale)
             *scale = DEFAULT_OBJECT_SCALE;
         return UNIT_DISPLAY_ID_BOX;
@@ -636,11 +636,11 @@ void Creature::Update(uint32 update_diff, uint32 diff)
     {
         case JUST_ALIVED:
             // Don't must be called, see Creature::SetDeathState JUST_ALIVED -> ALIVE promoting.
-            sLog.outError("Creature (GUIDLow: %u Entry: %u ) in wrong state: JUST_ALIVED (4)", GetGUIDLow(), GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature (GUIDLow: %u Entry: %u ) in wrong state: JUST_ALIVED (4)", GetGUIDLow(), GetEntry());
             break;
         case JUST_DIED:
             // Don't must be called, see Creature::SetDeathState JUST_DIED -> CORPSE promoting.
-            sLog.outError("Creature (GUIDLow: %u Entry: %u ) in wrong state: JUST_DEAD (1)", GetGUIDLow(), GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature (GUIDLow: %u Entry: %u ) in wrong state: JUST_DEAD (1)", GetGUIDLow(), GetEntry());
             break;
         case DEAD:
         {
@@ -871,8 +871,8 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 }
                 catch (std::runtime_error& e)
                 {
-                    sLog.outInfo("[Unit/AI] Crash mob %u map %u", GetEntry(), GetMapId());
-                    sLog.outInfo("%s", e.what());
+                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Unit/AI] Crash mob %u map %u", GetEntry(), GetMapId());
+                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", e.what());
                 }
                 m_AI_locked = false;
             }
@@ -1185,7 +1185,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
     // for not pet trainer expected not empty trainer list always
     if ((!cSpells || cSpells->spellList.empty()) && (!tSpells || tSpells->spellList.empty()))
     {
-        sLog.outErrorDb("Creature %u (Entry: %u) have UNIT_NPC_FLAG_TRAINER but have empty trainer spell list.",
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) have UNIT_NPC_FLAG_TRAINER but have empty trainer spell list.",
                         GetGUIDLow(), GetEntry());
         return false;
     }
@@ -1457,7 +1457,7 @@ void Creature::SaveToDB()
     CreatureData const* data = sObjectMgr.GetCreatureData(GetGUIDLow());
     if (!data)
     {
-        sLog.outError("Creature::SaveToDB failed, cannot get creature data!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature::SaveToDB failed, cannot get creature data!");
         return;
     }
 
@@ -1720,7 +1720,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
 
     if (!data)
     {
-        sLog.outErrorDb("Creature (GUID: %u) not found in table `creature`, can't load. ", guidlow);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUID: %u) not found in table `creature`, can't load. ", guidlow);
         return false;
     }
 
@@ -1731,7 +1731,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
     CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(creatureId);
     if (!cinfo)
     {
-        sLog.outErrorDb("Creature (Entry: %u) not found in table `creature_template`, can't load. ", creatureId);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) not found in table `creature_template`, can't load. ", creatureId);
         return false;
     }
 
@@ -1885,7 +1885,7 @@ void Creature::DeleteFromDB()
     CreatureData const* data = sObjectMgr.GetCreatureData(GetGUIDLow());
     if (!data)
     {
-        DEBUG_LOG("Trying to delete not saved creature!");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Trying to delete not saved creature!");
         return;
     }
 
@@ -2045,7 +2045,7 @@ bool Creature::FallGround()
 
     if (tz <= INVALID_HEIGHT)
     {
-        DEBUG_LOG("FallGround: creature %u at map %u (x: %f, y: %f, z: %f), not able to retrive a proper GetHeight (z: %f).",
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FallGround: creature %u at map %u (x: %f, y: %f, z: %f), not able to retrive a proper GetHeight (z: %f).",
                   GetEntry(), GetMap()->GetId(), GetPositionX(), GetPositionX(), GetPositionZ(), tz);
         return false;
     }
@@ -2078,7 +2078,7 @@ void Creature::CastSpawnSpell()
         if (result != SPELL_CAST_OK)
         {
             RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-            sLog.outError("%s failed to cast spawn spell %u due to reason %u.", GetGuidStr().c_str(), GetCreatureInfo()->spawn_spell_id, result);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s failed to cast spawn spell %u due to reason %u.", GetGuidStr().c_str(), GetCreatureInfo()->spawn_spell_id, result);
         }
     }
 }
@@ -2595,7 +2595,7 @@ void Creature::LoadDefaultAuras(uint32 const* auras, bool reload)
         SpellEntry const* AdditionalSpellInfo = sSpellMgr.GetSpellEntry(*cAura);
         if (!AdditionalSpellInfo)
         {
-            sLog.outErrorDb("Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *cAura);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *cAura);
             continue;
         }
 
@@ -2665,7 +2665,7 @@ void Creature::SetInCombatWithZone(bool initialPulse)
 {
     if (!CanHaveThreatList())
     {
-        sLog.outError("Creature entry %u call SetInCombatWithZone but creature cannot have threat list.", GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature entry %u call SetInCombatWithZone but creature cannot have threat list.", GetEntry());
         return;
     }
 
@@ -2673,7 +2673,7 @@ void Creature::SetInCombatWithZone(bool initialPulse)
 
     if (!pMap->IsDungeon())
     {
-        sLog.outError("Creature entry %u call SetInCombatWithZone for map (id: %u) that isn't an instance.", GetEntry(), pMap->GetId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature entry %u call SetInCombatWithZone for map (id: %u) that isn't an instance.", GetEntry(), pMap->GetId());
         return;
     }
 
@@ -2753,18 +2753,8 @@ void Creature::LogDeath(Unit* pKiller) const
         return;
 
     // by default we log bosses only
-    if (!IsWorldBoss())
-    {
-        if (sLog.m_smartlogExtraEntries.empty() && sLog.m_smartlogExtraGuids.empty())
-            return;
-
-        // if entry or guid matches one of extra values from config we log too
-        bool extraEntry = std::find(sLog.m_smartlogExtraEntries.begin(), sLog.m_smartlogExtraEntries.end(), GetEntry()) != sLog.m_smartlogExtraEntries.end();
-        bool extraGuid = std::find(sLog.m_smartlogExtraGuids.begin(), sLog.m_smartlogExtraGuids.end(), GetGUIDLow()) != sLog.m_smartlogExtraGuids.end();
-
-        if (!extraEntry && !extraGuid)
-            return;
-    }
+    if (!IsWorldBoss() && !sLog.IsSmartLog(GetEntry(), GetGUIDLow()))
+        return;
 
     static SqlStatementID insLogDeath;
     SqlStatement logStmt = LogsDatabase.CreateStatement(insLogDeath, "INSERT INTO smartlog_creature SET type=?, entry=?, guid=?, specifier=?, combatTime=?, content=?");
@@ -3316,7 +3306,7 @@ void Creature::DisappearAndDie()
 {
     if (!IsInWorld())
     {
-        sLog.outInfo("[CRASH][%s]DisappearAndDie: le mob n'est pas InWorld.", GetName());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH][%s]DisappearAndDie: le mob n'est pas InWorld.", GetName());
         return;
     }
 
@@ -3648,7 +3638,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
     Unit* target = nullptr;
 
     if (dist > ATTACK_DISTANCE)
-        sLog.outError("Creature (GUID: %u Entry: %u) SelectNearestTargetInAttackDistance called with dist > ATTACK_DISTANCE. Extra distance ignored.", GetGUIDLow(), GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature (GUID: %u Entry: %u) SelectNearestTargetInAttackDistance called with dist > ATTACK_DISTANCE. Extra distance ignored.", GetGUIDLow(), GetEntry());
 
     MaNGOS::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
     MaNGOS::UnitLastSearcher<MaNGOS::NearestHostileUnitInAttackDistanceCheck> searcher(target, u_check);
@@ -3712,7 +3702,7 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, uint32 uiSpell, uint32 uiCast
 
     if (!pSpellInfo)
     {
-        sLog.outError("TryToCast: attempt to cast unknown spell %u by creature with entry: %u", uiSpell, GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "TryToCast: attempt to cast unknown spell %u by creature with entry: %u", uiSpell, GetEntry());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
@@ -3975,7 +3965,7 @@ struct SpawnCreatureInMapsWorker
         if (map->IsLoaded(i_data->position.x, i_data->position.y))
         {
             Creature* pCreature = new Creature;
-            //DEBUG_LOG("Spawning creature %u",*itr);
+            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Spawning creature %u",*itr);
             if (!pCreature->LoadFromDB(i_guid, map))
                 delete pCreature;
             else
@@ -4018,7 +4008,7 @@ void Creature::SetVirtualItem(VirtualItemSlot slot, uint32 item_id)
     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item_id);
     if (!proto)
     {
-        sLog.outError("Not listed in 'item_template' item (ID:%u) used as virtual item for %s", item_id, GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Not listed in 'item_template' item (ID:%u) used as virtual item for %s", item_id, GetGuidStr().c_str());
         return;
     }
 
@@ -4035,7 +4025,7 @@ void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint
 {
     if (CreatureGroup* myGroup = GetCreatureGroup())
     {
-        sLog.outError("%s attempts to join group, but is already in one.", GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempts to join group, but is already in one.", GetGuidStr().c_str());
         return;
     }
 

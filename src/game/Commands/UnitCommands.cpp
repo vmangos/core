@@ -138,7 +138,7 @@ bool ChatHandler::HandleGPSCommand(char* args)
         PSendSysMessage("Transport coords: %f %f %f %f", pos.x, pos.y, pos.z, pos.o);
     }
 
-    DEBUG_LOG("Player %s GPS call for %s '%s' (%s: %u):",
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %s GPS call for %s '%s' (%s: %u):",
               m_session ? GetNameLink().c_str() : GetMangosString(LANG_CONSOLE_COMMAND),
               (obj->GetTypeId() == TYPEID_PLAYER ? "player" : "creature"), obj->GetName(),
               (obj->GetTypeId() == TYPEID_PLAYER ? "GUID" : "Entry"), (obj->GetTypeId() == TYPEID_PLAYER ? obj->GetGUIDLow() : obj->GetEntry()));
@@ -149,7 +149,7 @@ bool ChatHandler::HandleGPSCommand(char* args)
     if (areaEntry)
         sObjectMgr.GetAreaLocaleString(areaEntry->Id, sWorld.GetDefaultDbcLocale(), &areaName);
 
-    DEBUG_LOG(GetMangosString(LANG_MAP_POSITION),
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_MAP_POSITION),
               obj->GetMapId(), (mapEntry ? mapEntry->name : "<unknown>"),
               zone_id, zoneName.c_str(), area_id, areaName.c_str(),
               obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation(),

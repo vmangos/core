@@ -161,7 +161,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
     Creature* unit = _player->GetMap()->GetAnyTypeCreature(guid);
 
     //if (unit == nullptr)
-    //    sLog.outDebug("WORLD: HandleCreatureQueryOpcode - (%u) NO SUCH UNIT! (GUID: %u, ENTRY: %u)", uint32(GUID_LOPART(guid)), guid, entry);
+    //    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleCreatureQueryOpcode - (%u) NO SUCH UNIT! (GUID: %u, ENTRY: %u)", uint32(GUID_LOPART(guid)), guid, entry);
 
     CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(entry);
     if (ci)
@@ -183,7 +183,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
                     SubName = cl->SubName[loc_idx];
             }
         }
-        DETAIL_LOG("WORLD: CMSG_CREATURE_QUERY '%s' - Entry: %u.", ci->name, entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WORLD: CMSG_CREATURE_QUERY '%s' - Entry: %u.", ci->name, entry);
         // guess size
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
         data << uint32(entry);                              // creature entry
@@ -211,16 +211,16 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
         data << uint8(ci->civilian);                       //wdbFeild14
         data << uint8(ci->racial_leader);
         SendPacket(&data);
-        DEBUG_LOG("WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
     }
     else
     {
-        DEBUG_LOG("WORLD: CMSG_CREATURE_QUERY - Guid: %s Entry: %u NO CREATURE INFO!",
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_CREATURE_QUERY - Guid: %s Entry: %u NO CREATURE INFO!",
                   guid.GetString().c_str(), entry);
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
         data << uint32(entry | 0x80000000);
         SendPacket(&data);
-        DEBUG_LOG("WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
     }
 }
 
@@ -247,7 +247,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recv_data)
                     Name = gl->Name[loc_idx];
             }
         }
-        DETAIL_LOG("WORLD: CMSG_GAMEOBJECT_QUERY '%s' - Entry: %u. ", info->name, entryID);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WORLD: CMSG_GAMEOBJECT_QUERY '%s' - Entry: %u. ", info->name, entryID);
         WorldPacket data(SMSG_GAMEOBJECT_QUERY_RESPONSE, 150);
         data << uint32(entryID);
         data << uint32(info->type);
@@ -262,22 +262,22 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recv_data)
 #endif    
         //data << float(info->size);                // [-ZERO] go size: not in Zero
         SendPacket(&data);
-        DEBUG_LOG("WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
     }
     else
     {
-        DEBUG_LOG("WORLD: CMSG_GAMEOBJECT_QUERY - Guid: %s Entry: %u Missing gameobject info!",
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_GAMEOBJECT_QUERY - Guid: %s Entry: %u Missing gameobject info!",
                   guid.GetString().c_str(), entryID);
         WorldPacket data(SMSG_GAMEOBJECT_QUERY_RESPONSE, 4);
         data << uint32(entryID | 0x80000000);
         SendPacket(&data);
-        DEBUG_LOG("WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
     }
 }
 
 void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recv_data*/)
 {
-    DETAIL_LOG("WORLD: Received MSG_CORPSE_QUERY");
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WORLD: Received MSG_CORPSE_QUERY");
 
     Corpse* corpse = GetPlayer()->GetCorpse();
 
@@ -333,7 +333,7 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recv_data)
     recv_data >> textID;
     recv_data >> guid;
 
-    DETAIL_LOG("WORLD: CMSG_NPC_TEXT_QUERY ID '%u'", textID);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WORLD: CMSG_NPC_TEXT_QUERY ID '%u'", textID);
 
     _player->SetTargetGuid(guid);
 
@@ -409,7 +409,7 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recv_data)
 
     SendPacket(&data);
 
-    DEBUG_LOG("WORLD: Sent SMSG_NPC_TEXT_UPDATE");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_NPC_TEXT_UPDATE");
 }
 
 void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recv_data)
@@ -417,7 +417,7 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recv_data)
     uint32 pageID;
 
     recv_data >> pageID;
-    DETAIL_LOG("WORLD: Received CMSG_PAGE_TEXT_QUERY for pageID '%u'", pageID);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WORLD: Received CMSG_PAGE_TEXT_QUERY for pageID '%u'", pageID);
 
     while (pageID)
     {
@@ -453,7 +453,7 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recv_data)
         }
         SendPacket(&data);
 
-        DEBUG_LOG("WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE");
     }
 }
 
