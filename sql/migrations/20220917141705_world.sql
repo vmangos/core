@@ -302,7 +302,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 (41042, 7440, 1, 6856.73, -5014.25, 694.9570, 0, 20, 1, 240, 360),
 (41037, 7440, 1, 6883.64, -4985.54, 696.64, 0, 20, 1, 240, 360);
 
-UPDATE `creature` SET `movement_type` = 2, `id2` = 7440 WHERE `guid` = 41029;
+UPDATE `creature` SET `movement_type` = 2, `id2` = 7438 WHERE `guid` = 41029;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (41029, 1, 6672.991, -5123.819, 776.6279, 100, 0, 0),
 (41029, 2, 6638.452, -5102.194, 785.6561, 100, 0, 0),
