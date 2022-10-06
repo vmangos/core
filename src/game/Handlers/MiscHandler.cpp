@@ -1148,38 +1148,38 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
 
 //===========================================================================
 void WorldSession::HandleWorldTeleport (WorldPacket& msg) {
-    Player* player = GetPlayer();
-    Position position = {};
-    uint32 timeMs = 0;
-    uint32 mapId = 0;
+  Player* player = GetPlayer();
+  Position position = {};
+  uint32 timeMs = 0;
+  uint32 mapId = 0;
 
-    msg >> timeMs;
-    msg >> mapId;
-    msg >> position.x;
-    msg >> position.y;
-    msg >> position.z;
-    msg >> position.o;
+  msg >> timeMs;
+  msg >> mapId;
+  msg >> position.x;
+  msg >> position.y;
+  msg >> position.z;
+  msg >> position.o;
 
-    DEBUG_LOG("Received worldport command from player %s (0x%x):\n" \
-             "timeMs: %u\n"                                         \
-             "coordinates: %u, %f, %f, %f, %f\n",
-             player->GetName(),
-             player->GetGUID(),
-             timeMs,
-             mapId,
-             position.x,
-             position.y,
-             position.z,
-             position.o);
+  DEBUG_LOG("Received worldport command from player %s (0x%x):\n" \
+            "timeMs: %u\n"                                        \
+            "coordinates: %u, %f, %f, %f, %f\n",
+            player->GetName(),
+            player->GetGUID(),
+            timeMs,
+            mapId,
+            position.x,
+            position.y,
+            position.z,
+            position.o);
 
-    if (GetSecurity() < SEC_GAMEMASTER)
-        return SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+  if (GetSecurity() < SEC_GAMEMASTER)
+    return SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
 
-    player->TeleportTo(mapId,
-                      position.x,
-                      position.y,
-                      position.z,
-                      position.o);
+  player->TeleportTo(mapId,
+                    position.x,
+                    position.y,
+                    position.z,
+                    position.o);
 }
 
 void WorldSession::HandleMoveSetRawPosition(WorldPacket& recv_data)
