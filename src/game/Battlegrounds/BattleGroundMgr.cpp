@@ -1316,7 +1316,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         if (playerSkinReflootId && !ExistsRefLootTemplate(playerSkinReflootId))
         {
             playerSkinReflootId = 0;
-            sLog.outErrorDb("Table `battleground_template` for id %u associated with nonexistent refloot id %u. Setting to 0.", bgTypeID, playerSkinReflootId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `battleground_template` for id %u associated with nonexistent refloot id %u. Setting to 0.", bgTypeID, playerSkinReflootId);
         }
 
         if (playerSkinReflootId)
