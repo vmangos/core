@@ -1147,8 +1147,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
 }
 
 //===========================================================================
-void WorldSession::HandleWorldTeleport (WorldPacket& msg)
-{
+void WorldSession::HandleWorldTeleport (WorldPacket& msg) {
     Player* player = GetPlayer();
     Position position = {};
     uint32 timeMs = 0;
