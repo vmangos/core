@@ -116,7 +116,7 @@ Log::Log() :
     logFiles[LOG_HONOR] = openLogFile("LogFile.Honor", "", log_file_timestamp);
     logFiles[LOG_RA] = openLogFile("LogFile.Ra", "Ra.log", log_file_timestamp);
     logFiles[LOG_DBERROR] = openLogFile("LogFile.DBError", "DBErrors.log", log_file_timestamp);
-    logFiles[LOG_DBERRFIX] = openLogFile("LogFile.DBErrorFix", "", log_file_timestamp);
+    logFiles[LOG_DBERRFIX] = openLogFile("LogFile.DBErrorFix", "DBErrorFixes.sql", log_file_timestamp);
     logFiles[LOG_LOOTS] = openLogFile("LootsLogFile", "Loot.log", log_file_timestamp);
     logFiles[LOG_LEVELUP] = openLogFile("LevelupLogFile", "LevelUp.log", log_file_timestamp);
     logFiles[LOG_PERFORMANCE] = openLogFile("LogFile.Performance", "Perf.log", log_file_timestamp);
@@ -420,10 +420,12 @@ void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
     {
         // LOG_DBERRFIX should not get timestamp, but all others should
         if (logType != LOG_DBERRFIX)
+        {
             outTimestamp(logFiles[logType]);
 
-        if (logLevel == LOG_LVL_ERROR)
-            fputs("ERROR: ", logFiles[logType]);
+            if (logLevel == LOG_LVL_ERROR)
+                fputs("ERROR: ", logFiles[logType]);
+        }
 
         fputs(buff, logFiles[logType]);
         fputs("\n", logFiles[logType]);

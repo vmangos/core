@@ -1058,6 +1058,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
         if (!found)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_gossip_menu_option` has data for nonexistent gossip menu %u item %u, skipped.", menuId, id);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM `locales_gossip_menu_option` WHERE `menu_id`=%u && `id`=%u;", menuId, id);
             continue;
         }
 
@@ -1308,7 +1309,7 @@ void ObjectMgr::CheckCreatureTemplates()
                 if (!displayEntry)
                 {
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has nonexistent display_id%d (%u), can crash client", cInfo->entry, i + 1, cInfo->display_id[i]);
-                    sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `display_id%d`=0 WHERE `entry`=%u;", i + 1, cInfo->entry);
+                    sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `display_id%d`=0 WHERE `entry`=%u;", i + 1, cInfo->entry);
                     const_cast<CreatureInfo*>(cInfo)->display_id[i] = 0;
                     continue;
                 }
@@ -1322,7 +1323,7 @@ void ObjectMgr::CheckCreatureTemplates()
         if (cInfo->mount_display_id && !sCreatureDisplayInfoStore.LookupEntry(cInfo->mount_display_id))
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has nonexistent mount_display_id (%u), can crash client", cInfo->entry, cInfo->mount_display_id);
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `mount_display_id`=0 WHERE `entry`=%u;", cInfo->entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `mount_display_id`=0 WHERE `entry`=%u;", cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->mount_display_id = 0;
         }
 
@@ -1338,19 +1339,19 @@ void ObjectMgr::CheckCreatureTemplates()
         if (cInfo->damage_school >= MAX_SPELL_SCHOOL)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has invalid spell school value (%u) in `damage_school`", cInfo->entry, cInfo->damage_school);
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `dmg_school`=%u WHERE entry=%u;", SPELL_SCHOOL_NORMAL, cInfo->entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `dmg_school`=%u WHERE `entry`=%u;", SPELL_SCHOOL_NORMAL, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->damage_school = SPELL_SCHOOL_NORMAL;
         }
 
         if (cInfo->base_attack_time == 0)
         {
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `base_attack_time`=%u WHERE entry=%u;", BASE_ATTACK_TIME, cInfo->entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `base_attack_time`=%u WHERE `entry`=%u;", BASE_ATTACK_TIME, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->base_attack_time  = BASE_ATTACK_TIME;
         }
 
         if (cInfo->ranged_attack_time == 0)
         {
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `ranged_attack_time`=%u WHERE entry=%u;", BASE_ATTACK_TIME, cInfo->entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `ranged_attack_time`=%u WHERE `entry`=%u;", BASE_ATTACK_TIME, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->ranged_attack_time = BASE_ATTACK_TIME;
         }
 
@@ -1360,7 +1361,7 @@ void ObjectMgr::CheckCreatureTemplates()
         if (cInfo->type && !sCreatureTypeStore.LookupEntry(cInfo->type))
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has invalid creature type (%u) in `type`", cInfo->entry, cInfo->type);
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `type`=%u WHERE entry=%u;", CREATURE_TYPE_HUMANOID, cInfo->entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `type`=%u WHERE `entry`=%u;", CREATURE_TYPE_HUMANOID, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->type = CREATURE_TYPE_HUMANOID;
         }
 
@@ -1368,14 +1369,14 @@ void ObjectMgr::CheckCreatureTemplates()
         if (cInfo->pet_family && !sCreatureFamilyStore.LookupEntry(cInfo->pet_family) && cInfo->pet_family != CREATURE_FAMILY_HORSE_CUSTOM)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has invalid creature family (%u) in `pet_family`", cInfo->entry, cInfo->pet_family);
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `pet_family`=%u WHERE entry=%u;", 0, cInfo->entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `pet_family`=%u WHERE `entry`=%u;", 0, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->pet_family = 0;
         }
 
         if (cInfo->inhabit_type <= 0 || cInfo->inhabit_type > INHABIT_ANYWHERE)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has wrong value (%u) in `inhabit_type`, creature will not correctly walk/swim", cInfo->entry, cInfo->inhabit_type);
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `inhabit_type`=%u WHERE entry=%u;", INHABIT_ANYWHERE, cInfo->entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `inhabit_type`=%u WHERE `entry`=%u;", INHABIT_ANYWHERE, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->inhabit_type = INHABIT_ANYWHERE;
         }
 
@@ -1402,7 +1403,7 @@ void ObjectMgr::CheckCreatureTemplates()
             if (!pSpellEntry || !pSpellEntry->HasEffect(SPELL_EFFECT_SPAWN))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has invalid spawn_spell_id (%u), set to 0", cInfo->entry, cInfo->spawn_spell_id);
-                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `spawn_spell_id`=0 WHERE `entry`=%u;",  cInfo->entry);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `spawn_spell_id`=0 WHERE `entry`=%u;",  cInfo->entry);
                 const_cast<CreatureInfo*>(cInfo)->spawn_spell_id = 0;
             }
         }
@@ -1413,7 +1414,7 @@ void ObjectMgr::CheckCreatureTemplates()
             if (cInfo->spells[j] && !sSpellMgr.GetSpellEntry(cInfo->spells[j]))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has nonexistent spell_id%d (%u), set to 0", cInfo->entry, j + 1, cInfo->spells[j]);
-                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `spell_id%u`=0 WHERE entry=%u;", j + 1, cInfo->entry);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `spell_id%u`=0 WHERE `entry`=%u;", j + 1, cInfo->entry);
                 const_cast<CreatureInfo*>(cInfo)->spells[j] = 0;
             }
         }
@@ -1421,7 +1422,7 @@ void ObjectMgr::CheckCreatureTemplates()
         if (cInfo->movement_type >= MAX_DB_MOTION_TYPE)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has wrong movement generator type (%u), ignored and set to IDLE.", cInfo->entry, cInfo->movement_type);
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `movement_type`=%u WHERE entry=%u;", IDLE_MOTION_TYPE, cInfo->entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `movement_type`=%u WHERE `entry`=%u;", IDLE_MOTION_TYPE, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->movement_type = IDLE_MOTION_TYPE;
         }
 
@@ -1430,7 +1431,7 @@ void ObjectMgr::CheckCreatureTemplates()
             if (!GetEquipmentInfo(cInfo->equipment_id))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `creature_template` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", cInfo->entry, cInfo->equipment_id);
-                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `equipment_id`=0 WHERE entry=%u;", cInfo->entry);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `equipment_id`=0 WHERE `entry`=%u;", cInfo->entry);
                 const_cast<CreatureInfo*>(cInfo)->equipment_id = 0;
             }
         }
@@ -4083,7 +4084,11 @@ void ObjectMgr::LoadItemLocales()
 
         if (!GetItemPrototype(entry))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_item` has data for nonexistent item entry %u, skipped.", entry);
+            if (!IsExistingItemId(entry))
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_item` has data for nonexistent item entry %u, skipped.", entry);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM `locales_item` WHERE `entry`=%u;", entry);
+            }
             continue;
         }
 
@@ -5915,7 +5920,11 @@ void ObjectMgr::LoadQuestLocales()
 
         if (!GetQuestTemplate(entry))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_quest` has data for nonexistent quest entry %u, skipped.", entry);
+            if (!IsExistingQuestId(entry))
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_quest` has data for nonexistent quest entry %u, skipped.", entry);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM `locales_quest` WHERE `entry`=%u;", entry);
+            }
             continue;
         }
 
@@ -6262,6 +6271,7 @@ void ObjectMgr::LoadPageTextLocales()
         if (!sPageTextStore.LookupEntry<PageText>(entry))
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_page_text` has data for nonexistent page text entry %u, skipped.", entry);
+            sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM `locales_page_text` WHERE `entry`=%u;", entry);
             continue;
         }
 
@@ -7464,8 +7474,11 @@ void ObjectMgr::LoadGameObjectLocales()
 
         if (!GetGameObjectInfo(entry))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_gameobject` has data for nonexistent gameobject entry %u, skipped.", entry);
-            sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM `locales_gameobject` WHERE entry = %u;", entry);
+            if (!IsExistingGameObjectId(entry))
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_gameobject` has data for nonexistent gameobject entry %u, skipped.", entry);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM `locales_gameobject` WHERE `entry` = %u;", entry);
+            }
             continue;
         }
 
@@ -8567,8 +8580,8 @@ void ObjectMgr::LoadCreatureQuestRelations()
         CreatureInfo const* cInfo = GetCreatureTemplate(itr.first);
         if (!cInfo)
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `creature_questrelation` have data for nonexistent creature entry (%u) and existing quest %u", itr.first, itr.second);
-        else if (!(cInfo->npc_flags & UNIT_NPC_FLAG_QUESTGIVER))
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table `creature_questrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", itr.first, itr.second);
+        //else if (!(cInfo->npc_flags & UNIT_NPC_FLAG_QUESTGIVER))
+        //    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table `creature_questrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", itr.first, itr.second);
     }
 }
 
@@ -8581,8 +8594,8 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
         CreatureInfo const* cInfo = GetCreatureTemplate(itr.first);
         if (!cInfo)
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `creature_involvedrelation` have data for nonexistent creature entry (%u) and existing quest %u", itr.first, itr.second);
-        else if (!(cInfo->npc_flags & UNIT_NPC_FLAG_QUESTGIVER))
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", itr.first, itr.second);
+        //else if (!(cInfo->npc_flags & UNIT_NPC_FLAG_QUESTGIVER))
+        //    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", itr.first, itr.second);
     }
 }
 
@@ -10466,8 +10479,8 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
                     menu_ids.erase(gMenuItem.menu_id);
             }
 
-            if (found_menu_uses && !found_flags_uses)
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding `npc_flags`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
+            //if (found_menu_uses && !found_flags_uses)
+            //    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding `npc_flags`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
         }
 
         if (gMenuItem.action_poi_id && !GetPointOfInterest(gMenuItem.action_poi_id))
