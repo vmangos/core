@@ -508,47 +508,189 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 600 WHERE
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 140971;
 UPDATE `gameobject` SET `animprogress` = 100, `state` = 1, `spawn_flags` = 0 WHERE `id` IN ( 140971, 37099, 375, 175334, 2087, 176753, 175566, 2743, 2910, 3240, 3290, 20920, 22246, 153123, 157936, 164662, 164958, 171938, 175324, 175384, 175708, 176630, 178186, 179922, 181287, 181098, 2554, 153556, 17282, 143980, 1673, 3640, 3685, 175928, 2724, 13360, 12654, 13872, 28604, 86492, 89634, 89635, 148516, 148513, 148514, 148515, 152094, 152631, 152622, 152620, 176213, 176150, 2560);
 
--- Remove Custom Objects
-DELETE FROM `gameobject` WHERE `guid` IN (25689, 25690, 25691, 25692, 25693, 25694, 25695, 25696, 25697);
-
-
--- MISSING OBJECTS THAT NEED POOLING
 -- Deepmoss Eggs
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 19541, 1, 1163.37, -414.925, 17.3143, 3.61284, 0, 0, -0.972369, 0.233448, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 19541, 1, 1469.62, 896.44, 135.356, 0.95993, 0, 0, 0.461748, 0.887011, 300, 300, 100, 1, 0, 0, 0, 10);
+SET @DEEPMOS_EGGS_OGUID = ;
+SET @DEEPMOS_EGGS_POOL_TEMPLATE = ;
 
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@DEEPMOS_EGGS_OGUID, 19541, 1, 1163.37, -414.925, 17.3143, 3.61284, 0, 0, -0.972369, 0.233448, 300, 300, 100, 1, 0, 0, 0, 10),
+(@DEEPMOS_EGGS_OGUID+1, 19541, 1, 1469.62, 896.44, 135.356, 0.95993, 0, 0, 0.461748, 0.887011, 300, 300, 100, 1, 0, 0, 0, 10),
+(@DEEPMOS_EGGS_OGUID+2, 19542, 1, 1163.37, -414.925, 17.3143, 3.61284, 0, 0, -0.972369, 0.233448, 300, 300, 100, 1, 0, 0, 0, 10),
+(@DEEPMOS_EGGS_OGUID+3, 19542, 1, 1469.62, 896.44, 135.356, 0.95993, 0, 0, 0.461748, 0.887011, 300, 300, 100, 1, 0, 0, 0, 10),
+(@DEEPMOS_EGGS_OGUID+4, 19543, 1, 1163.37, -414.925, 17.3143, 3.61284, 0, 0, -0.972369, 0.233448, 300, 300, 100, 1, 0, 0, 0, 10),
+(@DEEPMOS_EGGS_OGUID+5, 19543, 1, 1469.62, 896.44, 135.356, 0.95993, 0, 0, 0.461748, 0.887011, 300, 300, 100, 1, 0, 0, 0, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 360 WHERE `id` IN (19541, 19542, 19543);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@DEEPMOS_EGGS_POOL_TEMPLATE, 1, 'Stonetalon Mountains - Deepmoss Eggs', 10),
+(@DEEPMOS_EGGS_POOL_TEMPLATE+1, 1, 'Stonetalon Mountains - Deepmoss Eggs', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@DEEPMOS_EGGS_OGUID, @DEEPMOS_EGGS_POOL_TEMPLATE, 'Stonetalon Mountains - Deepmoss Eggs', 10),
+(@DEEPMOS_EGGS_OGUID+1, @DEEPMOS_EGGS_POOL_TEMPLATE+1, 'Stonetalon Mountains - Deepmoss Eggs', 10),
+(@DEEPMOS_EGGS_OGUID+2, @DEEPMOS_EGGS_POOL_TEMPLATE, 'Stonetalon Mountains - Deepmoss Eggs', 10),
+(@DEEPMOS_EGGS_OGUID+3, @DEEPMOS_EGGS_POOL_TEMPLATE+1, 'Stonetalon Mountains - Deepmoss Eggs', 10),
+(@DEEPMOS_EGGS_OGUID+4, @DEEPMOS_EGGS_POOL_TEMPLATE, 'Stonetalon Mountains - Deepmoss Eggs', 10),
+(@DEEPMOS_EGGS_OGUID+5, @DEEPMOS_EGGS_POOL_TEMPLATE+1, 'Stonetalon Mountains - Deepmoss Eggs', 10);
 
 -- Atal'ai Artifact
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 30854, 0, -10528.7, -3820.75, -18.8854, 5.41052, 0, 0, -0.422618, 0.906308, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 30854, 0, -10505.5, -3780.27, -20.4266, 1.25664, 0, 0, 0.587785, 0.809017, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 30854, 0, -10376.8, -3699.82, 12.7557, 6.02139, 0, 0, -0.130526, 0.991445, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 30854, 0, -10343.7, -3804.86, -18.4887, 2.33874, 0, 0, 0.920505, 0.390732, 300, 300, 100, 1, 0, 0, 0, 10);
+SET @ATAL_ARTIFACT_OGUID = ;
+SET @ATAL_ARTIFACT_POOL_TEMPLATE = ;
 
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@ATAL_ARTIFACT_OGUID+1, 30854, 0, -10528.7, -3820.75, -18.8854, 5.41052, 0, 0, -0.422618, 0.906308, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+2, 30854, 0, -10505.5, -3780.27, -20.4266, 1.25664, 0, 0, 0.587785, 0.809017, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+3, 30854, 0, -10376.8, -3699.82, 12.7557, 6.02139, 0, 0, -0.130526, 0.991445, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+4, 30854, 0, -10343.7, -3804.86, -18.4887, 2.33874, 0, 0, 0.920505, 0.390732, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+5, 30855, 0, -10528.7, -3820.75, -18.8854, 5.41052, 0, 0, -0.422618, 0.906308, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+6, 30855, 0, -10505.5, -3780.27, -20.4266, 1.25664, 0, 0, 0.587785, 0.809017, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+7, 30855, 0, -10376.8, -3699.82, 12.7557, 6.02139, 0, 0, -0.130526, 0.991445, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+8, 30855, 0, -10343.7, -3804.86, -18.4887, 2.33874, 0, 0, 0.920505, 0.390732, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+9, 30856, 0, -10528.7, -3820.75, -18.8854, 5.41052, 0, 0, -0.422618, 0.906308, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+10, 30856, 0, -10505.5, -3780.27, -20.4266, 1.25664, 0, 0, 0.587785, 0.809017, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+11, 30856, 0, -10376.8, -3699.82, 12.7557, 6.02139, 0, 0, -0.130526, 0.991445, 300, 300, 100, 1, 0, 0, 0, 10),
+(@ATAL_ARTIFACT_OGUID+12, 30856, 0, -10343.7, -3804.86, -18.4887, 2.33874, 0, 0, 0.920505, 0.390732, 300, 300, 100, 1, 0, 0, 0, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 600, `spawn_flags` = 0 WHERE `id` IN (30854, 30855, 30856);
 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@ATAL_ARTIFACT_POOL_TEMPLATE+1, 1, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_POOL_TEMPLATE+2, 1, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_POOL_TEMPLATE+3, 1, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_POOL_TEMPLATE+4, 1, 'Swamp of Sorrows - Atal\'ai Artifact', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@ATAL_ARTIFACT_OGUID+1, @ATAL_ARTIFACT_POOL_TEMPLATE+1, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+2, @ATAL_ARTIFACT_POOL_TEMPLATE+2, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+3, @ATAL_ARTIFACT_POOL_TEMPLATE+3, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+4, @ATAL_ARTIFACT_POOL_TEMPLATE+4, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+5, @ATAL_ARTIFACT_POOL_TEMPLATE+1, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+6, @ATAL_ARTIFACT_POOL_TEMPLATE+2, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+7, @ATAL_ARTIFACT_POOL_TEMPLATE+3, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+8, @ATAL_ARTIFACT_POOL_TEMPLATE+4, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+9, @ATAL_ARTIFACT_POOL_TEMPLATE+1, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+10, @ATAL_ARTIFACT_POOL_TEMPLATE+2, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+11, @ATAL_ARTIFACT_POOL_TEMPLATE+3, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
+(@ATAL_ARTIFACT_OGUID+12, @ATAL_ARTIFACT_POOL_TEMPLATE+4, 'Swamp of Sorrows - Atal\'ai Artifact', 10);
 
 -- Twilight Tablet Fragments
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 180501, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 180436, 1, -6446.85, 1861.94, 5.63745, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 180436, 1, -6355.86, 1727.92, 15.1053, 5.84685, 0, 0, -0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10);
+SET @TWILIGHT_TABLET_OGUID = ;
+SET @TWILIGHT_TABLET_POOL_TEMPLATE = ;
 
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@TWILIGHT_TABLET_OGUID+1, 180501, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+2, 180501, 1, -6446.85, 1861.94, 5.63745, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+3, 180501, 1, -6355.86, 1727.92, 15.1053, 5.84685, 0, 0, -0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+4, 180501, 1, -6446.85, 1861.94, 5.63745, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+5, 180501, 1, -6355.86, 1727.92, 15.1053, 5.84685, 0, 0, -0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+6, 180501, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+7, 180436, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+8, 180436, 1, -6446.85, 1861.94, 5.63745, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+9, 180436, 1, -6355.86, 1727.92, 15.1053, 5.84685, 0, 0, -0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+10, 180436, 1, -6446.85, 1861.94, 5.63745, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+11, 180436, 1, -6355.86, 1727.92, 15.1053, 5.84685, 0, 0, -0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+12, 180436, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+13, 180583, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+14, 180583, 1, -6446.85, 1861.94, 5.63745, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+15, 180583, 1, -6355.86, 1727.92, 15.1053, 5.84685, 0, 0, -0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+16, 180583, 1, -6446.85, 1861.94, 5.63745, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+17, 180583, 1, -6355.86, 1727.92, 15.1053, 5.84685, 0, 0, -0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10),
+(@TWILIGHT_TABLET_OGUID+18, 180583, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 300 , `patch_min` = 6 WHERE `id` IN (180501, 180436, 180583);
 
--- Supply Crate Spawns
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176224, 329, 3454.34, -3363.78, 141.026, 6.07375, 0, 0, -0.104528, 0.994522, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176224, 329, 3524.34, -3296.48, 132.186, 6.05629, 0, 0, -0.113203, 0.993572, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176304, 329, 3528.21, -3351.28, 132.597, 5.91667, 0, 0, -0.182235, 0.983255, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176304, 329, 3569.1, -3357.61, 131.154, 2.26893, 0, 0, 0.906307, 0.422619, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176304, 329, 3640.21, -3496.79, 136.441, 1.97222, 0, 0, 0.833885, 0.551938, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176304, 329, 3678.94, -3478.72, 136.502, 4.57276, 0, 0, -0.754709, 0.656059, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176224, 329, 3696.97, -3298.02, 128.992, 2.79252, 0, 0, 0.984807, 0.173652, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176304, 329, 3734.02, -3251.49, 129.542, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176304, 329, 3830.18, -3577.71, 144.922, 5.63741, 0, 0, -0.317305, 0.948324, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 176304, 329, 3981.9, -3359.74, 119.357, 0.890117, 0, 0, 0.430511, 0.902586, 300, 300, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(@TWILIGHT_TABLET_POOL_TEMPLATE+1, 1, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+2, 1, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+3, 1, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+4, 1, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+5, 1, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+6, 1, 'Silithus - Twilight Tablet Fragment', 6, 10);
 
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(@TWILIGHT_TABLET_OGUID+1, @TWILIGHT_TABLET_POOL_TEMPLATE+1, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+2, @TWILIGHT_TABLET_POOL_TEMPLATE+2, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+3, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+4, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+5, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+6, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+7, @TWILIGHT_TABLET_POOL_TEMPLATE+1, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+8, @TWILIGHT_TABLET_POOL_TEMPLATE+2, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+9, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+10, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+11, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+12, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+13, @TWILIGHT_TABLET_POOL_TEMPLATE+1, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+14, @TWILIGHT_TABLET_POOL_TEMPLATE+2, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+15, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+16, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+17, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Silithus - Twilight Tablet Fragment', 6, 10),
+(@TWILIGHT_TABLET_OGUID+18, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Silithus - Twilight Tablet Fragment', 6, 10);
 
--- Twilight Tablet
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 180583, 1, -6446.85, 1861.94, 5.63745, 2.32129, 0, 0, 0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 180583, 1, -6355.86, 1727.92, 15.1053, 5.84685, 0, 0, -0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (1, 180501, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10);
+-- Supply Crate
+SET @SUPPLY_CRATE_OGUID = ;
+SET @SUPPLY_CRATE_POOL_TEMPLATE = ;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@SUPPLY_CRATE_OGUID+1, 176224, 329, 3454.34, -3363.78, 141.026, 6.07375, 0, 0, -0.104528, 0.994522, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+2, 176224, 329, 3524.34, -3296.48, 132.186, 6.05629, 0, 0, -0.113203, 0.993572, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+3, 176224, 329, 3528.21, -3351.28, 132.597, 5.91667, 0, 0, -0.182235, 0.983255, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+4, 176224, 329, 3569.1, -3357.61, 131.154, 2.26893, 0, 0, 0.906307, 0.422619, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+5, 176224, 329, 3640.21, -3496.79, 136.441, 1.97222, 0, 0, 0.833885, 0.551938, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+6, 176224, 329, 3678.94, -3478.72, 136.502, 4.57276, 0, 0, -0.754709, 0.656059, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+7, 176224, 329, 3696.97, -3298.02, 128.992, 2.79252, 0, 0, 0.984807, 0.173652, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+8, 176224, 329, 3734.02, -3251.49, 129.542, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+9, 176224, 329, 3830.18, -3577.71, 144.922, 5.63741, 0, 0, -0.317305, 0.948324, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+10, 176224, 329, 3981.9, -3359.74, 119.357, 0.890117, 0, 0, 0.430511, 0.902586, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+11, 176304, 329, 3454.34, -3363.78, 141.026, 6.07375, 0, 0, -0.104528, 0.994522, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+12, 176304, 329, 3524.34, -3296.48, 132.186, 6.05629, 0, 0, -0.113203, 0.993572, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+13, 176304, 329, 3528.21, -3351.28, 132.597, 5.91667, 0, 0, -0.182235, 0.983255, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+14, 176304, 329, 3569.1, -3357.61, 131.154, 2.26893, 0, 0, 0.906307, 0.422619, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+15, 176304, 329, 3640.21, -3496.79, 136.441, 1.97222, 0, 0, 0.833885, 0.551938, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+16, 176304, 329, 3678.94, -3478.72, 136.502, 4.57276, 0, 0, -0.754709, 0.656059, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+17, 176304, 329, 3696.97, -3298.02, 128.992, 2.79252, 0, 0, 0.984807, 0.173652, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+18, 176304, 329, 3734.02, -3251.49, 129.542, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+19, 176304, 329, 3830.18, -3577.71, 144.922, 5.63741, 0, 0, -0.317305, 0.948324, 300, 300, 100, 1, 0, 0, 0, 10),
+(@SUPPLY_CRATE_OGUID+20, 176304, 329, 3981.9, -3359.74, 119.357, 0.890117, 0, 0, 0.430511, 0.902586, 300, 300, 100, 1, 0, 0, 0, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 10800, `spawntimesecsmax` = 10800 WHERE `id` IN  (176224, 176304);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(@TWILIGHT_TABLET_POOL_TEMPLATE+1, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+2, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+3, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+4, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+5, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+6, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+7, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+8, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+9, 1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_POOL_TEMPLATE+10, 1, 'Stratholme - Supply Crate', 0, 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(@TWILIGHT_TABLET_OGUID+1, @TWILIGHT_TABLET_POOL_TEMPLATE+1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+2, @TWILIGHT_TABLET_POOL_TEMPLATE+2, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+3, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+4, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+5, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+6, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+7, @TWILIGHT_TABLET_POOL_TEMPLATE+7, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+8, @TWILIGHT_TABLET_POOL_TEMPLATE+8, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+9, @TWILIGHT_TABLET_POOL_TEMPLATE+9, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+10, @TWILIGHT_TABLET_POOL_TEMPLATE+10, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+11, @TWILIGHT_TABLET_POOL_TEMPLATE+1, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+12, @TWILIGHT_TABLET_POOL_TEMPLATE+2, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+13, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+14, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+15, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+16, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+17, @TWILIGHT_TABLET_POOL_TEMPLATE+7, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+18, @TWILIGHT_TABLET_POOL_TEMPLATE+8, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+19, @TWILIGHT_TABLET_POOL_TEMPLATE+9, 'Stratholme - Supply Crate', 0, 10),
+(@TWILIGHT_TABLET_OGUID+20, @TWILIGHT_TABLET_POOL_TEMPLATE+10, 'Stratholme - Supply Crate', 0, 10);
+
+UPDATE `pool_template` SET `description` = 'Stratholme - Supply Crate' WHERE `description` LIKE 'Strat : Supply Crate';
+UPDATE `pool_gameobject` SET `description` = 'Stratholme - Supply Crate' WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (176224, 176304));
+
+-- Remove Custom Objects
+DELETE FROM `gameobject` WHERE `guid` IN (25689, 25690, 25691, 25692, 25693, 25694, 25695, 25696, 25697);
 
 
 -- End of migration.
