@@ -149,7 +149,7 @@ void WorldSession::HandleCharEnum(QueryResult* result)
         do
         {
             uint32 guidlow = (*result)[0].GetUInt32();
-            uint32 level   = (*result)[7].GetUInt32();
+            uint32 level   = (*result)[10].GetUInt32();
             if (m_characterMaxLevel < level)
                 m_characterMaxLevel = level;
 
