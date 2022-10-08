@@ -523,13 +523,18 @@ void Aura::Update(uint32 diff)
 {
     if (m_isPeriodic)
     {
-        m_periodicTimer -= diff;
+        m_periodicTimer -= (int32)(diff & 0x7FFFFFFF);
 
         if (m_periodicTimer <= 0) // tick also at m_periodicTimer==0 to prevent lost last tick in case max m_duration == (max m_periodicTimer)*N
         {
             // update before applying (aura can be removed in TriggerSpell or PeriodicTick calls)
-            m_periodicTimer += m_modifier.periodictime;
-            ++m_periodicTick;                               // for some infinity auras in some cases can overflow and reset
+            // dont allow timer to drift off to huge negative value over time for permanent periodic auras on mobs
+            if (m_periodicTimer < -m_modifier.periodictime)
+                m_periodicTimer = 0;
+            else
+                m_periodicTimer += m_modifier.periodictime;
+
+            ++m_periodicTick; // for some infinity auras in some cases can overflow and reset
             PeriodicTick();
         }
     }

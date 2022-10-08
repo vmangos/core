@@ -679,7 +679,7 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
                 ss_name << "|cffffffff|Hspell:" << aura.second->GetId() << "|h[" << name << "]|h|r";
 
                 PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
-                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(), aur->GetStackAmount(),
+                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(), aur->GetAuraPeriodicTimer(), aur->GetStackAmount(),
                     ss_name.str().c_str(),
                     (holder->IsPassive() ? passiveStr : ""), (talent ? talentStr : ""),
                     holder->GetCasterGuid().GetString().c_str());
@@ -687,7 +687,7 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
             else
             {
                 PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
-                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(), aur->GetStackAmount(),
+                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(), aur->GetAuraPeriodicTimer(), aur->GetStackAmount(),
                     name,
                     (holder->IsPassive() ? passiveStr : ""), (talent ? talentStr : ""),
                     holder->GetCasterGuid().GetString().c_str());
