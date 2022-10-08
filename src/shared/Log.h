@@ -194,7 +194,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         static void outTime(FILE* where);
         static void outTimestamp(FILE* file);
 
-        FILE* openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile) const;
+        FILE* openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile, bool overwriteOnOpen) const;
         FILE* openGmlogPerAccount(uint32 account) const;
 
         FILE* logFiles[LOG_TYPE_MAX];

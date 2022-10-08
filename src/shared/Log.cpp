@@ -108,23 +108,23 @@ Log::Log() :
         m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
     }
 
-    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", "Server.log", log_file_timestamp);
-    logFiles[LOG_WORLDPACKET] = openLogFile("LogFile.World", "world_packets.log", log_file_timestamp);
-    logFiles[LOG_CHAT] = openLogFile("LogFile.Chat", "Chat.log", log_file_timestamp);
-    logFiles[LOG_BG] = openLogFile("BgLogFile", "Bg.log", log_file_timestamp);
-    logFiles[LOG_CHAR] = openLogFile("LogFile.Char", "Char.log", log_file_timestamp);
-    logFiles[LOG_HONOR] = openLogFile("LogFile.Honor", "", log_file_timestamp);
-    logFiles[LOG_RA] = openLogFile("LogFile.Ra", "Ra.log", log_file_timestamp);
-    logFiles[LOG_DBERROR] = openLogFile("LogFile.DBError", "DBErrors.log", log_file_timestamp);
-    logFiles[LOG_DBERRFIX] = openLogFile("LogFile.DBErrorFix", "DBErrorFixes.sql", log_file_timestamp);
-    logFiles[LOG_LOOTS] = openLogFile("LootsLogFile", "Loot.log", log_file_timestamp);
-    logFiles[LOG_LEVELUP] = openLogFile("LevelupLogFile", "LevelUp.log", log_file_timestamp);
-    logFiles[LOG_PERFORMANCE] = openLogFile("LogFile.Performance", "Perf.log", log_file_timestamp);
+    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", "Server.log", log_file_timestamp, true);
+    logFiles[LOG_WORLDPACKET] = openLogFile("LogFile.World", "world_packets.log", log_file_timestamp, true);
+    logFiles[LOG_CHAT] = openLogFile("LogFile.Chat", "Chat.log", log_file_timestamp, false);
+    logFiles[LOG_BG] = openLogFile("BgLogFile", "Bg.log", log_file_timestamp, false);
+    logFiles[LOG_CHAR] = openLogFile("LogFile.Char", "Char.log", log_file_timestamp, false);
+    logFiles[LOG_HONOR] = openLogFile("LogFile.Honor", "", log_file_timestamp, false);
+    logFiles[LOG_RA] = openLogFile("LogFile.Ra", "Ra.log", log_file_timestamp, false);
+    logFiles[LOG_DBERROR] = openLogFile("LogFile.DBError", "DBErrors.log", log_file_timestamp, true);
+    logFiles[LOG_DBERRFIX] = openLogFile("LogFile.DBErrorFix", "DBErrorFixes.sql", log_file_timestamp, true);
+    logFiles[LOG_LOOTS] = openLogFile("LootsLogFile", "Loot.log", log_file_timestamp, false);
+    logFiles[LOG_LEVELUP] = openLogFile("LevelupLogFile", "LevelUp.log", log_file_timestamp, false);
+    logFiles[LOG_PERFORMANCE] = openLogFile("LogFile.Performance", "Perf.log", log_file_timestamp, false);
     logFiles[LOG_GM] = sConfig.GetBoolDefault("GmLogPerAccount", false) ?
-        openLogFile("LogFile.Gm", "", log_file_timestamp) : nullptr;
-    logFiles[LOG_MONEY_TRADES] = openLogFile("LogFile.Trades", "", log_file_timestamp);
-    logFiles[LOG_GM_CRITICAL] = openLogFile("LogFile.CriticalCommands", "gm_critical.log", log_file_timestamp);
-    logFiles[LOG_ANTICHEAT] = openLogFile("LogFile.Anticheat", "Anticheat.log", log_file_timestamp);
+        openLogFile("LogFile.Gm", "", log_file_timestamp, false) : nullptr;
+    logFiles[LOG_MONEY_TRADES] = openLogFile("LogFile.Trades", "", log_file_timestamp, false);
+    logFiles[LOG_GM_CRITICAL] = openLogFile("LogFile.CriticalCommands", "gm_critical.log", log_file_timestamp, false);
+    logFiles[LOG_ANTICHEAT] = openLogFile("LogFile.Anticheat", "Anticheat.log", log_file_timestamp, false);
 
     // Main log file settings
     m_includeTime = sConfig.GetBoolDefault("LogTime", false);
@@ -303,7 +303,7 @@ void Log::SetFileLevel(LogLevel level)
     printf("File log level set to %u\n", m_fileLevel);
 }
 
-FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile) const
+FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile, bool overwriteOnOpen) const
 {
     std::string logfn = sConfig.GetStringDefault(configFileName, defaultFileName);
     if (logfn.empty())
@@ -319,6 +319,8 @@ FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, 
         else
             logfn += m_logsTimestamp;
     }
+    else if (overwriteOnOpen)
+        mode = "w";
     else
         mode = "a";
 
