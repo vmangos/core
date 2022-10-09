@@ -378,7 +378,6 @@ std::string Log::GetTimestampStr()
     return std::string(buf);
 }
 
-// the actual logging function.  nothing else should write log messages, except this
 void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
 {
     ASSERT(logType >= 0 && logType < LOG_TYPE_MAX&& logLevel >= 0 && logLevel <= LOG_LVL_DEBUG);
@@ -392,47 +391,63 @@ void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
 
     // make buffer
     char buff[4096];
+    memset(buff, 0, sizeof(buff));
+
     va_list ap;
     va_start(ap, str);
-    vsnprintf(buff, sizeof(buff), str, ap);
+    vsnprintf(buff, sizeof(buff)-1, str, ap);
     va_end(ap);
 
+    std::string const log(buff);
+
+    OutConsole(logType, logLevel, log);
+    OutFile(logType, logLevel, log);
+}
+
+void Log::OutConsole(LogType logType, LogLevel logLevel, std::string const& log) const
+{
     // LOG_PERFORMANCE and LOG_DBERRFIX should never be logged to the console
-    if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= logLevel)
+    if (logType == LOG_PERFORMANCE || logType == LOG_DBERRFIX)
+        return;
+
+    if (m_consoleLevel < logLevel)
+        return;
+
+    auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;
+
+    SetColor(where, logColors[logLevel]);
+
+    if (m_includeTime)
+        outTime(where);
+
+    if (logLevel == LOG_LVL_ERROR)
+        fprintf(where, "ERROR: ");
+
+    utf8printf(stdout, log.c_str());
+
+    ResetColor(where);
+
+    fprintf(where, "\n");
+    fflush(where);
+}
+
+void Log::OutFile(LogType logType, LogLevel logLevel, std::string const& str) const
+{
+    if (!logFiles[logType] || m_fileLevel < logLevel)
+        return;
+
+    // LOG_DBERRFIX should not get timestamp, but all others should
+    if (logType != LOG_DBERRFIX)
     {
-        auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;
-
-        SetColor(where, logColors[logLevel]);
-
-        if (m_includeTime)
-            outTime(where);
+        outTimestamp(logFiles[logType]);
 
         if (logLevel == LOG_LVL_ERROR)
-            fprintf(where, "ERROR: ");
-
-        utf8printf(stdout, buff);
-
-        ResetColor(where);
-
-        fprintf(where, "\n");
-        fflush(where);
+            fputs("ERROR: ", logFiles[logType]);
     }
 
-    if (logFiles[logType] && m_fileLevel >= logLevel)
-    {
-        // LOG_DBERRFIX should not get timestamp, but all others should
-        if (logType != LOG_DBERRFIX)
-        {
-            outTimestamp(logFiles[logType]);
-
-            if (logLevel == LOG_LVL_ERROR)
-                fputs("ERROR: ", logFiles[logType]);
-        }
-
-        fputs(buff, logFiles[logType]);
-        fputs("\n", logFiles[logType]);
-        fflush(logFiles[logType]);
-    }
+    fputs(str.c_str(), logFiles[logType]);
+    fputs("\n", logFiles[logType]);
+    fflush(logFiles[logType]);
 }
 
 void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
