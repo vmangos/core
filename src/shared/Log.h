@@ -188,6 +188,9 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
 
     private:
+        void OutConsole(LogType logType, LogLevel logLevel, std::string const& str) const;
+        void OutFile(LogType logType, LogLevel logLevel, std::string const& str) const;
+
         void SetColor(FILE* where, Color color) const;
         void ResetColor(FILE* where) const;
 
