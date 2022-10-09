@@ -309,8 +309,10 @@ FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, 
     if (logfn.empty())
         return nullptr;
 
+    char const* mode;
     if (timestampFile)
     {
+        mode = "w";
         size_t dot_pos = logfn.find_last_of('.');
         if (dot_pos != logfn.npos)
             logfn.insert(dot_pos, m_logsTimestamp);
@@ -322,7 +324,7 @@ FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, 
     else
         mode = "a";
 
-    return fopen((m_logsDir + logfn).c_str(), "w");
+    return fopen((m_logsDir + logfn).c_str(), mode);
 }
 
 FILE* Log::openGmlogPerAccount(uint32 account) const
