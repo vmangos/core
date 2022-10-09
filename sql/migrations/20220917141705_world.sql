@@ -344,6 +344,20 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (41044, 15, 6904.77, -5064.33, 691.32, 100, 0, 0),
 (41044, 16, 6893.58, -5100.58, 695.29, 100, 0, 0);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Fix Vile Familiars Quest Chains (Warlock is required to do quests 1485 and 1499 to unlock 792)
+UPDATE `quest_template` SET `RequiredRaces` = 18 WHERE `entry` IN (1485, 1470);
+UPDATE `quest_template` SET `NextQuestId` = 0, `NextQuestInChain` = 0, `RequiredRaces` = 18 WHERE `entry`=1499;
+UPDATE `quest_template` SET `RequiredCondition` = 500 WHERE `entry` = 792;
+
+-- 500: (499: Target Has Done Quest 1499) Or (498: Not (67: Target Is Class (Warlock)))
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (500, -2, 499, 498, 0, 0, 0);
+-- 499: Target Has Done Quest 1499
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (499, 8, 1499, 0, 0, 0, 0);
+-- 498: Not (67: Target Is Class (Warlock))
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (498, -3, 67, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
