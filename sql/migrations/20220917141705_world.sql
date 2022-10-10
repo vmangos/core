@@ -350,6 +350,25 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 UPDATE `quest_template` SET `RequiredRaces` = 18 WHERE `entry` IN (1485, 1470, 1499);
 UPDATE `quest_template` SET `RequiredClasses` = 1245 WHERE `entry` = 792;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Remove Duplicate Gameobjects
+DELETE FROM `gameobject` WHERE `guid` IN (
+31901,
+31900,
+31684,
+31907,
+31896,
+31897,
+31902,
+31899,
+31905,
+31906,
+31903,
+49216,
+49217,
+21128);
+
 
 -- End of migration.
 END IF;
