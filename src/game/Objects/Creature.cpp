@@ -2345,6 +2345,10 @@ bool Creature::CanRespondToCallForHelpAgainst(Unit const* pEnemy) const
     if (!HasFactionTemplateFlag(FACTION_TEMPLATE_RESPOND_TO_CALL_FOR_HELP))
         return false;
 
+    // can only attack if it doesn't flee (example Burly Rockjaw Trogg)
+    if (HasFactionTemplateFlag(FACTION_TEMPLATE_FLEE_FROM_CALL_FOR_HELP))
+        return false;
+
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_ASSIST))
         return false;
 
