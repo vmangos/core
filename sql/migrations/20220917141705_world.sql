@@ -369,6 +369,11 @@ DELETE FROM `gameobject` WHERE `guid` IN (
 49217,
 21128);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Remove hard coded name in text
+UPDATE `quest_template` SET `RequestItemsText` = 'You made it. I\'m so glad.$b$bMuch has happened over the last few years, $n: the creation of Teldrassil, the corruption of many of the forest creatures here and abroad, discovery of lands we thought lost to us like Feralas... so much, in so little time. But those are just some of the reasons we are here, the most important being to protect our kind from further evil.' WHERE `entry`=3116;
+
 
 -- End of migration.
 END IF;
