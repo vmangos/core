@@ -374,6 +374,17 @@ DELETE FROM `gameobject` WHERE `guid` IN (
 -- Remove hard coded name in text
 UPDATE `quest_template` SET `RequestItemsText` = 'You made it. I\'m so glad.$b$bMuch has happened over the last few years, $n: the creation of Teldrassil, the corruption of many of the forest creatures here and abroad, discovery of lands we thought lost to us like Feralas... so much, in so little time. But those are just some of the reasons we are here, the most important being to protect our kind from further evil.' WHERE `entry`=3116;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Convert To Creature Groups
+UPDATE `creature` SET `movement_type` = 0 WHERE `guid` IN (3560, 3477, 3571);
+DELETE FROM `creature_movement` WHERE `id` IN (3560, 3477, 3571);
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(3476, 3476, 0, 6.25244, 11),
+(3476, 3477, 5, 3.14, 11),
+(3476, 3571, 8, 3, 11),
+(3476, 3560, 8, 3.5, 11);
+
 
 -- End of migration.
 END IF;
