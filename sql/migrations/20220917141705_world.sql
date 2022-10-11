@@ -385,6 +385,12 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (3476, 3571, 8, 3, 11),
 (3476, 3560, 8, 3.5, 11);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- q.872 The Disruption Ends'
+-- Fix issue with 2 requirements placed in same shared place
+UPDATE `quest_template` SET `ReqItemId1` = 0, `ReqItemId3` = 5063, `ReqItemCount1` = 0, `ReqItemCount3` = 1 WHERE `entry` = 872;
+
 
 -- End of migration.
 END IF;
