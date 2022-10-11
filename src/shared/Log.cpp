@@ -429,6 +429,12 @@ void Log::OutConsole(LogType logType, LogLevel logLevel, std::string const& log)
 
     fprintf(where, "\n");
     fflush(where);
+
+    // If we are writing to the console for a log other than the basic console log,
+    // also write it to the basic logfile (Server.log).  This will help the basic
+    // logfile more closely resemble the console output.
+    if (logType != LOG_BASIC)
+        OutFile(LOG_BASIC, logLevel, log);
 }
 
 void Log::OutFile(LogType logType, LogLevel logLevel, std::string const& str) const
