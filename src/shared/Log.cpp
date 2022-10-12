@@ -423,7 +423,7 @@ void Log::OutConsole(LogType logType, LogLevel logLevel, std::string const& log)
     if (logLevel == LOG_LVL_ERROR)
         fprintf(where, "ERROR: ");
 
-    utf8printf(stdout, log.c_str());
+    utf8printf(where, log.c_str());
 
     ResetColor(where);
 
