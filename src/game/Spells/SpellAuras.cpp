@@ -2191,12 +2191,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 ((Player*)target)->UpdateAttackPowerAndDamage();
                 return;
             }
-            // Enrage
-            if ((target->GetTypeId() == TYPEID_PLAYER) && (GetId() == 5229))
-            {
-                ((Player*)target)->UpdateArmor(); // Spell managed in UpdateArmor()
-                return;
-            }
             break;
         }
         case SPELLFAMILY_ROGUE:

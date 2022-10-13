@@ -1856,11 +1856,20 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         case SPELLFAMILY_DRUID:
             switch (m_spellInfo->Id)
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 case 5229:                                  // Enrage
                 {
+                    if (!unitTarget)
+                        return;
+
                     // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
+                    int32 reductionMod = -27;
+                    if (unitTarget->HasAura(9634)) // If in Dire Bear form only 16%
+                        reductionMod = -16;
+                    unitTarget->CastCustomSpell(unitTarget, 25503, reductionMod, {}, {}, true);
                     break;
                 }
+#endif
                 case 29201: // Loatheb Corrupted Mind triggered sub spells
                 {
                     uint32 spellid = 0;
