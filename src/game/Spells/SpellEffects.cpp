@@ -1863,9 +1863,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         return;
 
                     // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
-                    int32 reductionMod = -27;
-                    if (unitTarget->HasAura(9634)) // If in Dire Bear form only 16%
-                        reductionMod = -16;
+                    int32 reductionMod = unitTarget->HasAura(9634) ? -16 : -27;
                     unitTarget->CastCustomSpell(unitTarget, 25503, reductionMod, {}, {}, true);
                     break;
                 }
