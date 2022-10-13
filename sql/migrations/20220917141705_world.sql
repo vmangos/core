@@ -391,6 +391,16 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 -- Fix issue with 2 requirements placed in same shared place
 UPDATE `quest_template` SET `ReqItemId1` = 0, `ReqItemId3` = 5063, `ReqItemCount1` = 0, `ReqItemCount3` = 1 WHERE `entry` = 872;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Undead Mages had int and spi Mixed Up
+UPDATE `player_levelstats` SET `inte` = 21, `spi` = 27 WHERE `race` = 5 AND `class` = 8 AND `level` = 1;
+
+-- Correct Gnome Mage Player Stats 1-10
+UPDATE `player_levelstats` SET `inte` = 27 WHERE `race` =7 AND `class` = 8 AND `level` =2;
+UPDATE `player_levelstats` SET `inte` = 28 WHERE `race` =7 AND `class` = 8 AND `level` =3;
+UPDATE `player_levelstats` SET `inte` = 30 WHERE `race` =7 AND `class` = 8 AND `level` =4;
+
 
 -- End of migration.
 END IF;
