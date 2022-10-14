@@ -36,7 +36,7 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) V
 INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) VALUES (105, 59, 469, 0);
 
 -- Remove invalid Camp Taurajo graveyard for Stonetalon Mountains
-DELETE FROM `game_graveyard_zone` WHERE  `id`=229 AND `ghost_zone`=406;
+DELETE FROM `game_graveyard_zone` WHERE `id`=229 AND `ghost_zone`=406;
 
 -- Condition to return false if quest 769 is complete
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (769, 8, 769, 0, 0, 0, 1);
