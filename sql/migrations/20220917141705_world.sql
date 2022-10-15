@@ -396,10 +396,17 @@ UPDATE `quest_template` SET `ReqItemId1` = 0, `ReqItemId3` = 5063, `ReqItemCount
 -- Undead Mages had int and spi Mixed Up
 UPDATE `player_levelstats` SET `inte` = 21, `spi` = 27 WHERE `race` = 5 AND `class` = 8 AND `level` = 1;
 
--- Correct Gnome Mage Player Stats 1-10
-UPDATE `player_levelstats` SET `inte` = 27 WHERE `race` =7 AND `class` = 8 AND `level` =2;
-UPDATE `player_levelstats` SET `inte` = 28 WHERE `race` =7 AND `class` = 8 AND `level` =3;
-UPDATE `player_levelstats` SET `inte` = 30 WHERE `race` =7 AND `class` = 8 AND `level` =4;
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Events list for Shadowy Assassin
+DELETE FROM `creature_ai_events` WHERE `creature_id`=2434;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (243401, 2434, 0, 4, 0, 100, 0, 0, 0, 0, 0, 243401, 0, 0, 'Shadowy Assassin - Set Faction On Aggro');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=243401;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(243401, 0, 0, 22, 97, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Set Faction');
+
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 2434;
 
 
 -- End of migration.
