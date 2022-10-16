@@ -4989,6 +4989,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
                     {
                         unitTarget->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP); // Add gossip flag for NPC missing it
+                        if (unitTarget->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_INNKEEPER))
+                            unitTarget->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
                         unitTarget->CastSpell(unitTarget, m_spellInfo->Id == 26870 ? 26869 : 27741, true); // Apply aura instantly
                     }
                     return;
