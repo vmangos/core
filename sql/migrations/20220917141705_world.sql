@@ -408,6 +408,11 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 2434;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Correct Scale For Huntress Leafrunner
+UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 14380;
+
 
 -- End of migration.
 END IF;
