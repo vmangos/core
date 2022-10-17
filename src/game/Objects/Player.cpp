@@ -1645,6 +1645,9 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     // Played time
     if (now > m_lastTick)
     {
+        if (IsInWorld() && IsInCombat() && !GetMap()->IsDungeon())
+            LeaveCombatWithFarAwayCreatures();
+
         uint32 elapsed = uint32(now - m_lastTick);
         m_playedTime[PLAYED_TIME_TOTAL] += elapsed;        // Total played time
         m_playedTime[PLAYED_TIME_LEVEL] += elapsed;        // Level played time
@@ -18841,13 +18844,6 @@ void RemoveBroadcastListener(Player* target, Player* me)
         target->m_broadcaster->RemoveListener(me);
 }
 
-// Only called if player is in combat and not in dungeon.
-void Player::BeforeVisibilityDestroy(Creature* creature)
-{
-    if (creature->IsInCombat() && IsInCombatWithCreature(creature))
-        GetHostileRefManager().deleteReference(creature);
-}
-
 template<class T>
 void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow)
 {
@@ -18857,10 +18853,6 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         if (!target->FindMap() || !target->isWithinVisibilityDistanceOf(this, viewPoint, inVisibleList) || !target->IsVisibleForInState(this, viewPoint, true))
         {
             ObjectGuid t_guid = target->GetObjectGuid();
-
-            // Make sure mobs who become out of range leave combat before grid unload.
-            if (target->IsCreature() && target->FindMap() && IsInCombat() && !GetMap()->IsDungeon())
-                BeforeVisibilityDestroy((Creature*)target);
 
             target->BuildOutOfRangeUpdateBlock(data);
             std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
@@ -18893,6 +18885,35 @@ template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Corpse*  
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, GameObject*    target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, DynamicObject* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject*   target, UpdateData& data, std::set<WorldObject*>& visibleNow);
+
+void Player::LeaveCombatWithFarAwayCreatures()
+{
+    HostileReference* pReference = GetHostileRefManager().getFirst();
+
+    while (pReference)
+    {
+        if (pReference->isValid())
+        {
+            if (Creature* pCreature = ::ToCreature(pReference->getSourceUnit()))
+            {
+                if (!pCreature->GetCharmerOrOwnerGuid().IsPlayer() &&
+                    !pCreature->isWithinVisibilityDistanceOf(this, this, IsInVisibleList_Unsafe(pCreature)))
+                {
+                    pReference = pReference->next();
+
+                    if (pCreature->CanHaveThreatList())
+                        pCreature->GetThreatManager().modifyThreatPercent(this, -101);
+                    else
+                        GetHostileRefManager().deleteReference(pCreature);
+
+                    continue;
+                }
+            }
+        }
+
+        pReference = pReference->next();
+    }
+}
 
 void Player::SetLongSight(Aura const* aura)
 {
@@ -22105,21 +22126,6 @@ void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32
 
         SendClearCooldown(spellEntry->Id, this);
     }
-}
-
-bool Player::IsInCombatWithCreature(Creature const* pCreature)
-{
-    HostileReference* pReference = GetHostileRefManager().getFirst();
-
-    while (pReference)
-    {
-        if (pReference->isValid() && pCreature == pReference->getSourceUnit())
-            return true;
-
-        pReference = pReference->next();
-    }
-
-    return false;
 }
 
 void Player::CastHighestStealthRank()
