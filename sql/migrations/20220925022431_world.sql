@@ -38,6 +38,9 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `build_min`) V
 -- Remove invalid Camp Taurajo graveyard for Stonetalon Mountains
 DELETE FROM `game_graveyard_zone` WHERE `id`=229 AND `ghost_zone`=406;
 
+-- Remove invalid Horde-only Wetlands graveyard in Loch Modan
+DELETE FROM `game_graveyard_zone` WHERE `id`=7 AND `faction`=67 AND `ghost_zone`=38;
+
 -- Condition to return false if quest 769 is complete
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (769, 8, 769, 0, 0, 0, 1);
 
