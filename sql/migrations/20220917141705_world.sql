@@ -419,6 +419,11 @@ UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 14380;
 UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` = 3897;
 DELETE FROM `creature_loot_template` WHERE `entry` = 3897;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Increase Dropchance of Shadow Hunter Knife
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -23.30 WHERE `item` = 5040;
+
 
 -- End of migration.
 END IF;
