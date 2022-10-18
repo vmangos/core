@@ -413,6 +413,12 @@ UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 2434;
 -- Correct Scale For Huntress Leafrunner
 UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 14380;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Krolg Does Not Drop Loot
+UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` = 3897;
+DELETE FROM `creature_loot_template` WHERE `entry` = 3897;
+
 
 -- End of migration.
 END IF;
