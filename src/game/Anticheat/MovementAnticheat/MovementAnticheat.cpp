@@ -410,6 +410,22 @@ bool IsFlagAckOpcode(uint16 opcode)
     return false;
 }
 
+bool IsSpeedAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+            return true;
+    }
+
+    return false;
+}
+
 bool IsStopOpcode(uint16 opcode)
 {
     switch (opcode)
@@ -518,6 +534,9 @@ bool ShouldAcceptCorpseMovement(Player* pPlayer, MovementInfo& movementInfo, uin
             return true;
 
         if (IsFlagAckOpcode(opcode))
+            return true;
+
+        if (IsSpeedAckOpcode(opcode))
             return true;
 
         if ((opcode == MSG_MOVE_HEARTBEAT) &&
