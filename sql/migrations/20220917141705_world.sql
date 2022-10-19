@@ -424,6 +424,12 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 3897;
 -- Increase Dropchance of Shadow Hunter Knife
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -23.30 WHERE `item` = 5040;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Update Creatures Under Map
+UPDATE `creature` SET `position_z` = -0.5432 WHERE `guid` = 9492;
+UPDATE `creature` SET `position_x` = -3643.21, `position_y` = -951.42, `position_z` = -6.4994 WHERE `guid` = 9681;
+
 
 -- End of migration.
 END IF;
