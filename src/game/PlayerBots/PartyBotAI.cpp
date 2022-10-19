@@ -364,7 +364,13 @@ Player* PartyBotAI::SelectResurrectionTarget() const
             if (pMember == me)
                 continue;
 
-            if (pMember->GetDeathState() == CORPSE)
+            if (pMember->GetDeathState() != CORPSE)
+                continue;
+
+            if (!me->IsWithinLOSInMap(pMember))
+                continue;
+
+            if (m_resurrectionSpell->IsTargetInRange(me, pMember))
                 return pMember;
         }
     }
