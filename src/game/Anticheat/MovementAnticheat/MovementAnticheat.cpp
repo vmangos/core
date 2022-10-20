@@ -655,11 +655,10 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
 
     AddCheats(cheatFlags);
 
-    bool shouldReject = ShouldRejectMovement(cheatFlags);
-    bool sendHeartbeat = shouldReject;
+    bool sendHeartbeat = ShouldRejectMovement(cheatFlags);
 
     // Do not accept position changes if player is dead and has not released spirit.
-    if (!shouldReject && me->GetDeathState() == CORPSE &&
+    if (!sendHeartbeat && me->GetDeathState() == CORPSE &&
         !ShouldAcceptCorpseMovement(movementInfo, opcode))
     {
         ResetJumpCounters();
@@ -672,11 +671,10 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
             return 1;
         }
 
-        shouldReject = true;
         sendHeartbeat = true;
     }
 
-    if (shouldReject)
+    if (sendHeartbeat)
     {
         //if (!me->movespline->Finalized())
         //    sendHeartbeat = false;
@@ -696,26 +694,23 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
             MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
         }
 
-        if (sendHeartbeat)
+        if (HAS_CHEAT(CHEAT_TYPE_NO_FALL_TIME) &&
+            sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
         {
-            if (HAS_CHEAT(CHEAT_TYPE_NO_FALL_TIME) &&
-                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
-            {
-                // Teleport to ground height in this case.
-                float const x = GetLastMovementInfo().pos.x;
-                float const y = GetLastMovementInfo().pos.y;
-                float const z = me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + 5;
-                GetLastMovementInfo().RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
-                GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses extrapolation.
-                me->TeleportPositionRelocation(x, y, z, 0);
-            }
-
-            me->ResolvePendingMovementChanges(true, true);
-            me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
-            if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
-                ResetJumpCounters();
-            me->SendHeartBeat(true);
+            // Teleport to ground height in this case.
+            float const x = GetLastMovementInfo().pos.x;
+            float const y = GetLastMovementInfo().pos.y;
+            float const z = me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + 5;
+            GetLastMovementInfo().RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
+            GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses extrapolation.
+            me->TeleportPositionRelocation(x, y, z, 0);
         }
+
+        me->ResolvePendingMovementChanges(true, true);
+        me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
+        if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+            ResetJumpCounters();
+        me->SendHeartBeat(true);
 
         if (HAS_CHEAT(CHEAT_TYPE_FAKE_TRANSPORT) &&
             sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_REJECT))
