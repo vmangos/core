@@ -329,10 +329,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (pPlayerMover)
     {
-        if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) || 
-            !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
+        if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode)) ||
+            (m_moveRejectTime = _player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode)))
         {
-            m_moveRejectTime = WorldTimer::getMSTime();
             return;
         }
     }
@@ -500,12 +499,15 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
     Player* const pPlayerMover = pMover->ToPlayer();
 
     // Check if position and movement flags are fine before speed update.
-    bool const canRelocate = 
-        recvData.GetPacketTime() > m_moveRejectTime &&
-        VerifyMovementInfo(movementInfo) &&
-        (!pPlayerMover || 
-        (_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) &&
-         _player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode)));
+    bool canRelocate = recvData.GetPacketTime() > m_moveRejectTime && VerifyMovementInfo(movementInfo);
+    if (canRelocate && pPlayerMover)
+    {
+        if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode)) ||
+            (m_moveRejectTime = _player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode)))
+        {
+            canRelocate = false;
+        }
+    }
 
     // the speed has to be applied before relocation
     // otherwise if the speed update was from an outdoors only aura
@@ -621,10 +623,9 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
 
         if (pPlayerMover)
         {
-            if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) || 
-                !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
+            if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode)) ||
+                (m_moveRejectTime = _player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode)))
             {
-                m_moveRejectTime = WorldTimer::getMSTime();
                 break;
             }
         }
@@ -725,10 +726,9 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 
         if (pPlayerMover)
         {
-            if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) ||
-                !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
+            if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode)) ||
+                (m_moveRejectTime = _player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode)))
             {
-                m_moveRejectTime = WorldTimer::getMSTime();
                 break;
             }
         }
@@ -805,10 +805,9 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 
     if (Player* pPlayerMover = pMover->ToPlayer())
     {
-        if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, recvData.GetOpcode()) ||
-            !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, recvData.GetOpcode()))
+        if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, recvData.GetOpcode())) ||
+            (m_moveRejectTime = _player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, recvData.GetOpcode())))
         {
-            m_moveRejectTime = WorldTimer::getMSTime();
             return;
         }
     }
@@ -852,9 +851,8 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
         if (!_player->GetCheatData()->HandleSplineDone(pPlayerMover, movementInfo, splineId))
             return;
 
-        if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, CMSG_MOVE_SPLINE_DONE))
+        if (m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, CMSG_MOVE_SPLINE_DONE))
         {
-            m_moveRejectTime = WorldTimer::getMSTime();
             return;
         }
     }
@@ -950,6 +948,10 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
     m_clientMoverGuid = ObjectGuid();
 #endif
 
+    // Do not accept packets sent before this time.
+    if (recvData.GetPacketTime() <= m_moveRejectTime)
+        return;
+
     if (!VerifyMovementInfo(movementInfo))
         return;
 
@@ -969,10 +971,9 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
     
     if (pPlayerMover)
     {
-        if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, recvData.GetOpcode()) ||
-            !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, recvData.GetOpcode()))
+        if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, recvData.GetOpcode())) ||
+            (m_moveRejectTime = _player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, recvData.GetOpcode())))
         {
-            m_moveRejectTime = WorldTimer::getMSTime();
             return;
         }
     }

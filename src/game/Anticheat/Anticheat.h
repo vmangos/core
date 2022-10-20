@@ -109,14 +109,15 @@ public:
     void OnExplore(AreaEntry const* pArea) {}
     void OnWrongAckData() {};
     void OnFailedToAckChange() {};
+    void OnDeath() {};
 
     /*
     pPlayer - player who is being moved (not necessarily same as this session's player)
     movementInfo - new movement info that was just received
     opcode - the packet we are checking
     */
-    bool HandlePositionTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return true; }
-    bool HandleFlagTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return true; }
+    uint32 HandlePositionTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return 0; }
+    uint32 HandleFlagTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return 0; }
     bool HandleSplineDone(Player* /*pPlayer*/, MovementInfo const& /*movementInfo*/, uint32 /*splineId*/) { return true; }
     void LogMovementPacket(bool /*isClientPacket*/, WorldPacket& /*packet*/) {}
 };

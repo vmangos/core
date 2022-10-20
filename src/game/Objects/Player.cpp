@@ -4967,6 +4967,7 @@ void Player::KillPlayer()
 
     // 6 minutes until repop at graveyard
     m_deathTimer = CORPSE_REPOP_TIME;
+    GetCheatData()->OnDeath();
 
     UpdateCorpseReclaimDelay();                             // dependent at use SetDeathPvP() call before kill
 

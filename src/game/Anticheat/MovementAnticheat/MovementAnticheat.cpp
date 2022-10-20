@@ -395,6 +395,33 @@ UnitMoveType MovementAnticheat::GetMoveTypeForMovementInfo(MovementInfo const& m
     return type;
 }
 
+
+bool IsAnyMoveAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case MSG_MOVE_TELEPORT_ACK:
+        case MSG_MOVE_WORLDPORT_ACK:
+        case MSG_MOVE_SET_RAW_POSITION_ACK:
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_MOVE_ROOT_ACK:
+        case CMSG_FORCE_MOVE_UNROOT_ACK:
+        case CMSG_MOVE_KNOCK_BACK_ACK:
+        case CMSG_MOVE_HOVER_ACK:
+        case CMSG_MOVE_FEATHER_FALL_ACK:
+        case CMSG_MOVE_WATER_WALK_ACK:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+        case CMSG_MOVE_FLIGHT_ACK:
+            return true;
+    }
+
+    return false;
+}
+
 bool IsFlagAckOpcode(uint16 opcode)
 {
     switch (opcode)
@@ -518,67 +545,55 @@ bool ShouldRejectMovement(uint32 cheatFlags)
     return false;
 }
 
-bool ShouldAcceptCorpseMovement(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
+bool MovementAnticheat::ShouldAcceptCorpseMovement(MovementInfo& movementInfo, uint16 opcode)
 {
-    // Server controlled movement.
-    if (!pPlayer->movespline->Finalized())
+    if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_XZ))
+        return false;
+
+    switch (opcode)
+    {
+        case CMSG_MOVE_SPLINE_DONE:
+        case CMSG_MOVE_NOT_ACTIVE_MOVER:
+            return true;
+    }
+
+    if (IsAnyMoveAckOpcode(opcode))
         return true;
 
-    // A few opcodes can happen soon after death.
-    if (pPlayer->GetDeathTimer() > (CORPSE_REPOP_TIME - (10 * IN_MILLISECONDS)))
+    if (GetLastMovementInfo().HasMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN))
     {
         if (IsStopOpcode(opcode))
             return true;
 
         if (IsFallEndOpcode(opcode))
             return true;
-
-        if (IsFlagAckOpcode(opcode))
-            return true;
-
-        if (IsSpeedAckOpcode(opcode))
-            return true;
-
-        if ((opcode == MSG_MOVE_HEARTBEAT) &&
-            movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
-            return true;
     }
+
+    if ((opcode == MSG_MOVE_HEARTBEAT) &&
+        movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+        return true;
 
     return false;
 }
 
-bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
+void MovementAnticheat::OnDeath()
+{
+    m_deathTime = WorldTimer::getMSTime();
+}
+
+uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)) ||
         !pPlayer->movespline->Finalized())
-        return true;
+        return 0;
     
     if (pPlayer != me)
         InitNewPlayer(pPlayer);
 
     if (opcode == CMSG_MOVE_FEATHER_FALL_ACK)
         GetLastMovementInfo().jump.startClientTime = movementInfo.jump.startClientTime = movementInfo.ctime;
-    
-    // Do not accept position changes if player is dead and has not released spirit.
-    if (me->GetDeathState() == CORPSE)
-    {
-        ResetJumpCounters();
-        m_knockBack = false;
 
-        if (ShouldAcceptCorpseMovement(pPlayer, movementInfo, opcode))
-            return true;
-        
-        if (IsFlagAckOpcode(opcode))
-        {
-            me->m_movementInfo.moveFlags = movementInfo.moveFlags;
-            me->m_movementInfo.CorrectData(me);
-        }
-        me->RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
-        me->SendHeartBeat(true);
-        return false;
-    }
-    
     uint32 cheatFlags = 0x0;
 #define APPEND_CHEAT(t) cheatFlags |= (1 << t)
 #define HAS_CHEAT(t) (cheatFlags & (1 << t))
@@ -640,10 +655,32 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
 
     AddCheats(cheatFlags);
 
-    bool const sendHeartbeat = ShouldRejectMovement(cheatFlags);
+    bool shouldReject = ShouldRejectMovement(cheatFlags);
+    bool sendHeartbeat = shouldReject;
 
-    if (sendHeartbeat)
+    // Do not accept position changes if player is dead and has not released spirit.
+    if (!shouldReject && me->GetDeathState() == CORPSE &&
+        !ShouldAcceptCorpseMovement(movementInfo, opcode))
     {
+        ResetJumpCounters();
+        m_knockBack = false;
+
+        // just skip opcode if we died recently, probably sent before death
+        if ((m_deathTime + 1000 + m_session->GetLatency() * 2) > movementInfo.stime)
+        {
+            GetLastMovementInfo().ctime = 0;
+            return 1;
+        }
+
+        shouldReject = true;
+        sendHeartbeat = true;
+    }
+
+    if (shouldReject)
+    {
+        //if (!me->movespline->Finalized())
+        //    sendHeartbeat = false;
+
         // Movement flags get verified first. Don't undo them if they passed.
         if (IsFlagAckOpcode(opcode))
         {
@@ -651,16 +688,16 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
             me->m_movementInfo.CorrectData(me);
         }     
         
+        if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&
+            sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
+        {
+            UnitMoveType moveType = GetMoveTypeForMovementInfo(GetLastMovementInfo());
+            float speedRate = me->GetSpeed(moveType) / baseMoveSpeed[moveType];
+            MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
+        }
+
         if (sendHeartbeat)
         {
-            if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&
-                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
-            {
-                UnitMoveType moveType = GetMoveTypeForMovementInfo(GetLastMovementInfo());
-                float speedRate = me->GetSpeed(moveType) / baseMoveSpeed[moveType];
-                MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
-            }
-
             if (HAS_CHEAT(CHEAT_TYPE_NO_FALL_TIME) &&
                 sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
             {
@@ -673,30 +710,33 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
                 me->TeleportPositionRelocation(x, y, z, 0);
             }
 
+            me->ResolvePendingMovementChanges(true, true);
             me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
+            if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+                ResetJumpCounters();
             me->SendHeartBeat(true);
+        }
 
-            if (HAS_CHEAT(CHEAT_TYPE_FAKE_TRANSPORT) &&
-                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_REJECT))
-            {
-                // Force logout player to sync transport positions.
-                m_session->LogoutRequest(time(nullptr) - 20);
-            }
-        } 
+        if (HAS_CHEAT(CHEAT_TYPE_FAKE_TRANSPORT) &&
+            sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_REJECT))
+        {
+            // Force logout player to sync transport positions.
+            m_session->LogoutRequest(time(nullptr) - 20);
+        }
 
-        return false;
+        return WorldTimer::getMSTime() + 100 + std::min(1000u, sWorld.GetCurrentDiff() + m_session->GetLatency());
     }
 
-    return true;
+    return 0;
 #undef APPEND_CHEAT
 #undef HAS_CHEAT
 }
 
-bool MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
+uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
-        return true;
+        return 0;
     
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
@@ -787,16 +827,19 @@ bool MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
 
     AddCheats(cheatFlags);
 
-    if (ShouldRejectMovement(cheatFlags))
+    if (ShouldRejectMovement(cheatFlags) &&
+        me->movespline->Finalized() &&
+       !me->IsBeingTeleported())
     {
         me->RemoveUnitMovementFlag(removeMoveFlags);
+        me->ResolvePendingMovementChanges(true, true);
         me->SendHeartBeat(true);
-        return false;
+        return WorldTimer::getMSTime() + 100 + std::min(1000u, sWorld.GetCurrentDiff() + m_session->GetLatency());
     }
     else if (removeMoveFlags)
         movementInfo.RemoveMovementFlag(removeMoveFlags);
 
-    return true;
+    return 0;
 }
 
 bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId)
