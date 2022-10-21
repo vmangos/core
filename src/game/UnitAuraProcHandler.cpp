@@ -883,6 +883,10 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                 // Combustion
                 case 11129:
                 {
+                    // does not proc if no target is affected (aoe like flamestrike)
+                    if (!pVictim)
+                        return SPELL_AURA_PROC_FAILED;
+
                     // combustion counter was dispelled or clicked off
                     if (!HasAura(28682))
                     {
