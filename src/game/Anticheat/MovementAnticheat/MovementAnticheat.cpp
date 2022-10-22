@@ -415,7 +415,6 @@ bool IsAnyMoveAckOpcode(uint16 opcode)
         case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
         case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
         case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
-        case CMSG_MOVE_FLIGHT_ACK:
             return true;
     }
 

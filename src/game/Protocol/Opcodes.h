@@ -202,11 +202,6 @@ inline bool IsMovementOpcode(uint16 id)
         case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         case MSG_MOVE_TIME_SKIPPED:
-        case SMSG_MOVE_SET_FLIGHT:
-        case SMSG_MOVE_UNSET_FLIGHT:
-        case CMSG_MOVE_FLIGHT_ACK:
-        case MSG_MOVE_START_SWIM_CHEAT:
-        case MSG_MOVE_STOP_SWIM_CHEAT:
 #endif
             return true;
     }
