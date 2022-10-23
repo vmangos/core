@@ -516,6 +516,7 @@ class WorldSession
         void HandleMoveSetRawPosition(WorldPacket& recv_data);
         void HandleWorldTeleportOpcode(WorldPacket& recv_data);
         void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
+        void HandleTeleportToUnitOpcode(WorldPacket& recvdata);
 
         void HandleInspectOpcode(WorldPacket& recvPacket);
         void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);

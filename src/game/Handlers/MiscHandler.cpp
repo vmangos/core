@@ -1146,6 +1146,14 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
+void WorldSession::HandleTeleportToUnitOpcode(WorldPacket& recv_data)
+{
+    std::string playerName;
+    recv_data >> playerName;
+    playerName = ".goname " + playerName;
+    ProcessChatMessageAfterSecurityCheck(playerName, LANG_UNIVERSAL, CHAT_MSG_SYSTEM);
+}
+
 void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
 {
     // write in client console: worldport 469 452 6454 2536 180 or /console worldport 469 452 6454 2536 180
