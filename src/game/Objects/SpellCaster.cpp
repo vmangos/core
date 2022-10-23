@@ -616,7 +616,7 @@ float SpellCaster::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
     return resistModHitChance;
 }
 
-void SpellCaster::SendSpellMiss(Unit* target, uint32 spellId, SpellMissInfo missInfo)
+void SpellCaster::SendSpellMiss(Unit* target, uint32 spellId, SpellMissInfo missInfo) const
 {
     WorldPacket data(SMSG_SPELLLOGMISS, (4 + 8 + 1 + 4 + 8 + 1));
     data << uint32(spellId);
@@ -629,6 +629,16 @@ void SpellCaster::SendSpellMiss(Unit* target, uint32 spellId, SpellMissInfo miss
     // Nostalrius: + 2 * float if unk8=1
     // end loop
     SendObjectMessageToSet(&data, true);
+}
+
+void SpellCaster::SendSpellDamageResist(Unit* target, uint32 spellId) const
+{
+    WorldPacket data(SMSG_PROCRESIST, 8 + 8 + 4 + 1);
+    data << GetObjectGuid();
+    data << target->GetObjectGuid();
+    data << uint32(spellId);
+    data << uint8(0); // bool - log format: 0-default, 1-debug
+    SendMessageToSet(&data, true);
 }
 
 void SpellCaster::SendSpellOrDamageImmune(Unit* target, uint32 spellId) const
@@ -765,7 +775,7 @@ void SpellCaster::SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint
 #endif
 }
 
-void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log)
+void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log) const
 {
     WorldPacket data(SMSG_SPELLNONMELEEDAMAGELOG, (16 + 4 + 4 + 1 + 4 + 4 + 1 + 1 + 4 + 4 + 1)); // we guess size
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

@@ -1650,6 +1650,13 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit* pVictim, uint32 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "ProcDamageAndSpell: doing %u damage from spell id %u (triggered by auratype %u of spell %u)",
                      triggeredByAura->GetModifier()->m_amount, spellInfo->Id, triggeredByAura->GetModifier()->m_auraname, triggeredByAura->GetId());
     
+    // Trigger damage can be resisted...
+    if (SpellMissInfo missInfo = SpellHitResult(pVictim, spellInfo, triggeredByAura->GetEffIndex(), false))
+    {
+        SendSpellDamageResist(pVictim, spellInfo->Id);
+        return SPELL_AURA_PROC_OK;
+    }
+
     // World of Warcraft Client Patch 1.9.0 (2006-01-03)
     // - Seal of Righteousness - Now does holy damage on every swing.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
