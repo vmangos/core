@@ -492,6 +492,17 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 (1473701, 4, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Smith Slagtree - Stand Up'),
 (1473701, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9959, 0, 0, 0, 0, 0, 0, 0, 0, 'Smith Slagtree - Talk');
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Conver Caliph Scorpidsting Patrol To Groups
+UPDATE `creature` SET `id2` = 0, `id3` = 0, `movement_type` = 0 WHERE `guid` IN (23466, 23467);
+DELETE FROM `creature_movement` WHERE `id` IN (23466, 23467);
+
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(23286, 23286, 0, 6.25244, 11),
+(23286, 23466, 3, 2.35619, 11),
+(23286, 23467, 3, 3.92699, 11);
+
 
 -- End of migration.
 END IF;
