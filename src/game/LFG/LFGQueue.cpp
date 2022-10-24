@@ -64,11 +64,11 @@ LfgRolePriority LFGPlayerQueueInfo::GetRolePriority(LfgRoles role)
 
 void LFGQueue::Update()
 {
-	TimePoint previously = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
+    TimePoint previously = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
     while (!World::IsStopped())
     {
-		TimePoint const now = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
-		uint32 const diff = (now - previously).count();
+        TimePoint const now = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
+        uint32 const diff = (now - previously).count();
 
         GetMessager().Execute(this);
 
@@ -151,7 +151,7 @@ void LFGQueue::Update()
                     sWorld.GetMessager().AddMessage([groupId = qGroup->first](World* world)
                     {
                         Group* group = sObjectMgr.GetGroupById(groupId);
-						
+                        
                         WorldPacket data;
                         LFGMgr::BuildInProgressPacket(data);
 
@@ -217,9 +217,9 @@ void LFGQueue::Update()
             }
         }
 
-	NEXT_ITERATION:
-		previously = now;
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+    NEXT_ITERATION:
+        previously = now;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 

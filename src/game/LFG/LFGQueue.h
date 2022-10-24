@@ -33,7 +33,7 @@ struct LFGPlayerQueueInfo
     uint32 team = 0;
     uint32 areaId = 0;
     uint32 timeInLFG = 0;
-	bool hasQueuePriority = false;
+    bool hasQueuePriority = false;
     std::string name;
     uint8 playerClass = 0;
     std::list<std::pair<LfgRoles, LfgRolePriority>> rolePriority;

@@ -414,13 +414,13 @@ bool Group::AddMember(ObjectGuid guid, char const* name, uint8 joinMethod)
             }
         }
 
-		if (IsInLFG())
-		{
-			if (joinMethod != GROUP_LFG)
-			{
-				sLFGMgr.UpdateGroup(this, true, guid);
-			}
-		}
+        if (IsInLFG())
+        {
+            if (joinMethod != GROUP_LFG)
+            {
+                sLFGMgr.UpdateGroup(this, true, guid);
+            }
+        }
     }
 
     return true;
@@ -474,12 +474,12 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
             {
                 player->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
 
-				if (!leaderChanged)
-				{
-					data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
-					data << m_LFGAreaId << uint8(MEETINGSTONE_STATUS_PARTY_MEMBER_LEFT_LFG);
-					BroadcastPacket(&data, true);
-				}
+                if (!leaderChanged)
+                {
+                    data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
+                    data << m_LFGAreaId << uint8(MEETINGSTONE_STATUS_PARTY_MEMBER_LEFT_LFG);
+                    BroadcastPacket(&data, true);
+                }
             }
 
             //we already removed player from group and in player->GetGroup() is his original group!
@@ -586,20 +586,20 @@ void Group::Disband(bool hideDestroy)
             data << uint64(0) << uint64(0) << uint64(0);
             player->GetSession()->SendPacket(&data);
 
-			if (IsInLFG())
-				player->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
+            if (IsInLFG())
+                player->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
         }
 
         _homebindIfInstance(player);
     }
 
-	if (IsInLFG())
-	{
-		sWorld.GetLFGQueue().GetMessager().AddMessage([groupId = GetId()](LFGQueue* queue)
-		{
-			queue->RemoveGroupFromQueue(groupId);
-		});
-	}
+    if (IsInLFG())
+    {
+        sWorld.GetLFGQueue().GetMessager().AddMessage([groupId = GetId()](LFGQueue* queue)
+        {
+            queue->RemoveGroupFromQueue(groupId);
+        });
+    }
 
     RollId.clear();
     m_memberSlots.clear();

@@ -174,8 +174,8 @@ World::~World()
         m_charDbWorkerThread.reset(nullptr);
     }
 
-	if (m_lfgQueueThread.joinable())
-		m_lfgQueueThread.join();
+    if (m_lfgQueueThread.joinable())
+        m_lfgQueueThread.join();
 
     //TODO free addSessQueue
 }
@@ -189,8 +189,8 @@ void World::Shutdown()
     if (m_charDbWorkerThread && m_charDbWorkerThread->joinable())
         m_charDbWorkerThread->join();
 
-	if (m_lfgQueueThread.joinable())
-		m_lfgQueueThread.join();
+    if (m_lfgQueueThread.joinable())
+        m_lfgQueueThread.join();
 }
 
 /// Find a session by its id
@@ -1871,7 +1871,7 @@ void World::Update(uint32 diff)
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
 
-	GetMessager().Execute(this);
+    GetMessager().Execute(this);
 
     ///-Update mass mailer tasks if any
     sMassMailMgr.Update();
