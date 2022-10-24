@@ -1,8 +1,5 @@
-/**
- * MaNGOS is a full featured server for World of Warcraft, supporting
- * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
- *
- * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
+/*
+ * This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * World of Warcraft, and all World of Warcraft or Warcraft art, images,
- * and lore are copyrighted by Blizzard Entertainment, Inc.
  */
 
+#ifndef _LFG_DEFINES_H
+#define _LFG_DEFINES_H
 
-#ifndef MANGOSSERVER_LFGHANDLER_H
-#define MANGOSSERVER_LFGHANDLER_H
+enum LfgRoles
+{
+    PLAYER_ROLE_NONE = 0x00,
+    PLAYER_ROLE_TANK = 0x01,
+    PLAYER_ROLE_HEALER = 0x02,
+    PLAYER_ROLE_DAMAGE = 0x04
+};
+
+enum LfgRolePriority
+{
+    LFG_PRIORITY_NONE = 0,
+    LFG_PRIORITY_LOW = 1,
+    LFG_PRIORITY_NORMAL = 2,
+    LFG_PRIORITY_HIGH = 3
+};
+
+enum PlayerLeaveMethod
+{
+    PLAYER_CLIENT_LEAVE = 0,
+    PLAYER_SYSTEM_LEAVE = 1
+};
+
+enum GroupLeaveMethod
+{
+    GROUP_CLIENT_LEAVE = 0,
+    GROUP_SYSTEM_LEAVE = 1
+};
 
 enum MeetingstoneQueueStatus
 {

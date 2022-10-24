@@ -173,16 +173,24 @@ World::~World()
             m_charDbWorkerThread->join();
         m_charDbWorkerThread.reset(nullptr);
     }
+
+	if (m_lfgQueueThread.joinable())
+		m_lfgQueueThread.join();
+
     //TODO free addSessQueue
 }
 
 void World::Shutdown()
 {
     sPlayerBotMgr.DeleteAll();
-    sWorld.KickAll();                                       // save and kick all players
-    sWorld.UpdateSessions(1);                             // real players unload required UpdateSessions call
+    KickAll();                                     // save and kick all players
+    UpdateSessions(1);                             // real players unload required UpdateSessions call
+
     if (m_charDbWorkerThread && m_charDbWorkerThread->joinable())
         m_charDbWorkerThread->join();
+
+	if (m_lfgQueueThread.joinable())
+		m_lfgQueueThread.join();
 }
 
 /// Find a session by its id
@@ -746,6 +754,9 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION,       "Antiflood.Sanction", CHEAT_ACTION_KICK);
 
+    setConfig(CONFIG_BOOL_LFG_MATCHMAKING, "LFG.Matchmaking", false);
+    setConfig(CONFIG_UINT32_LFG_MATCHMAKING_TIMER, "LFG.MatchmakingTimer", 600);
+
     setConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS, "Visibility.ForceActiveObjects", true);
     m_relocation_ai_notify_delay = sConfig.GetIntDefault("Visibility.AIRelocationNotifyDelay", 1000u);
     m_relocation_lower_limit_sq  = pow(sConfig.GetFloatDefault("Visibility.RelocationLowerLimit", 10), 2);
@@ -791,7 +802,7 @@ void World::LoadConfigSettings(bool reload)
 
     //visibility in BG
     m_MaxVisibleDistanceInBG        = sConfig.GetFloatDefault("Visibility.Distance.BG",       DEFAULT_VISIBILITY_BG);
-    if (m_MaxVisibleDistanceInBG < 45 * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
+    if (m_MaxVisibleDistanceInBG < 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.BG can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
         m_MaxVisibleDistanceInBG = 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
@@ -998,9 +1009,10 @@ void World::LoadConfigSettings(bool reload)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "* Pathfinding : [%s]", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "ON" : "OFF");
 
     // Update packet broadcaster config
-    if (reload) {
-        sWorld.m_broadcaster->UpdateConfiguration(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
-            std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
+    if (reload)
+    {
+        m_broadcaster->UpdateConfiguration(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
+        std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
     }
 
     // PvP options
@@ -1775,9 +1787,11 @@ void World::SetInitialWorldSettings()
         sObjectMgr.RestoreDeletedItems();
     }
 
+    StartLFGQueueThread();
+
     m_broadcaster =
-        std::make_unique<MovementBroadcaster>(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
-                                              std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
+        std::make_unique<MovementBroadcaster>(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
+                                              std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
 
     m_charDbWorkerThread.reset(new std::thread(&CharactersDatabaseWorkerThread));
 
@@ -1857,6 +1871,8 @@ void World::Update(uint32 diff)
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
 
+	GetMessager().Execute(this);
+
     ///-Update mass mailer tasks if any
     sMassMailMgr.Update();
 
@@ -1908,7 +1924,6 @@ void World::Update(uint32 diff)
     
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
-    sLFGMgr.Update(diff);
     sGuardMgr.Update(diff);
     sZoneScriptMgr.Update(diff);
 
@@ -2422,6 +2437,14 @@ bool World::RemoveBanAccount(BanMode mode, std::string const& source, std::strin
     return true;
 }
 
+void World::StartLFGQueueThread()
+{
+    m_lfgQueueThread = std::thread([&]()
+    {
+        m_lfgQueue.Update();
+    });
+}
+
 /// Update the game time
 void World::_UpdateGameTime()
 {
@@ -2869,7 +2892,7 @@ void World::AddAsyncTask(std::function<void()> task) {
 
 void World::LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, const char* type, uint32 dataInt)
 {
-    if (!LogsDatabase || !sWorld.getConfig(CONFIG_BOOL_LOGSDB_TRADES))
+    if (!LogsDatabase || !getConfig(CONFIG_BOOL_LOGSDB_TRADES))
         return;
     static SqlStatementID insLogMoney;
     SqlStatement logStmt = LogsDatabase.CreateStatement(insLogMoney, "INSERT INTO `logs_trade` SET `sender`=?, `senderType`=?, `senderEntry`=?, `receiver`=?, `amount`=?, `type`=?, `data`=?");
@@ -2901,7 +2924,7 @@ void World::LogChat(WorldSession* sess, char const* type, std::string const& msg
 
 void World::LogTransaction(PlayerTransactionData const& data)
 {
-    if (!LogsDatabase || !sWorld.getConfig(CONFIG_BOOL_LOGSDB_TRANSACTIONS))
+    if (!LogsDatabase || !getConfig(CONFIG_BOOL_LOGSDB_TRANSACTIONS))
         return;
 
     static SqlStatementID insLogTransaction;

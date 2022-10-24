@@ -522,6 +522,13 @@ void WorldSession::LogoutPlayer(bool Save)
             _player->BuildPlayerRepop();
             _player->RepopAtGraveyard();
         }
+
+        if (_player->IsInLFG())
+            sWorld.GetLFGQueue().GetMessager().AddMessage([playerGuid = _player->GetObjectGuid()](LFGQueue* queue)
+        {
+            queue->RemovePlayerFromQueue(playerGuid, PLAYER_SYSTEM_LEAVE);
+        });
+
         //drop a flag if player is carrying it
         if (BattleGround *bg = _player->GetBattleGround())
             _player->LeaveBattleground(true);
