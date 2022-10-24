@@ -41,12 +41,6 @@ DELETE FROM `game_graveyard_zone` WHERE `id`=229 AND `ghost_zone`=406;
 -- Remove invalid Horde-only Wetlands graveyard in Loch Modan
 DELETE FROM `game_graveyard_zone` WHERE `id`=7 AND `faction`=67 AND `ghost_zone`=38;
 
--- Condition to return false if quest 769 is complete
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (769, 8, 769, 0, 0, 0, 1);
-
--- Quest 769 (Kodo Hide Bag) requires a Leatherworking skill of 10 instead of 1, should not be available if it has already been completed.
-UPDATE `quest_template` SET `RequiredSkillValue` = 10, `RequiredCondition` = 769 WHERE `entry` = 769;
-
 -- End of migration.
 END IF;
 END??
