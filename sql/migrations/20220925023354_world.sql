@@ -102,7 +102,7 @@ UPDATE `creature` SET `patch_min`='4' WHERE  `guid`=40561;
 -- Use Feralas, Camp Mojache for Dire Maul GY pre patch 1.6
 INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`) VALUES ('310', '2557');
 
--- Set The Hinterlands, The Overlook Cliffs GY to patch 1.6
+-- Set The Hinterlands, The Overlook Cliffs GY to patch 1.5
 UPDATE `game_graveyard_zone` SET `patch_min`='3' WHERE  `id`=789 AND `ghost_zone`=47;
 
 -- Set Elwynn Forest, Eastvale Logging Camp GY to patch 1.6
