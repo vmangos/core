@@ -6972,8 +6972,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_casterUnit->IsInWater() && (!m_casterUnit->IsPlayer() || static_cast<Player*>(m_casterUnit)->IsInHighLiquid()))
                     return SPELL_FAILED_ONLY_ABOVEWATER;
 
-                if (m_casterUnit->IsPlayer() && static_cast<Player*>(m_casterUnit)->GetTransport())
-                    return SPELL_FAILED_NO_MOUNTS_ALLOWED;
+                if (m_casterUnit->IsPlayer() && (static_cast<Player*>(m_casterUnit)->GetTransport() && static_cast<Player*>(m_casterUnit)->GetTransport()->IsMoTransport()))
+                        return SPELL_FAILED_NO_MOUNTS_ALLOWED;
 
                 /// Specific case for Temple of Ahn'Qiraj mounts as they are usable only in AQ40 and are the only mounts allowed here
                 /// TBC and above handle this by using m_spellInfo->AreaId
