@@ -43,6 +43,7 @@
 #include "MapPersistentStateMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "Geometry.h"
 #include "CellImpl.h"
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
@@ -6326,10 +6327,11 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
     float const old_y = GetPositionY();
     float const old_z = GetPositionZ();
     float const old_r = GetOrientation();
+	bool const positionChanged = teleport || old_x != x || old_y != y || old_z != z;
 
-    if (teleport || old_x != x || old_y != y || old_z != z || old_r != orientation)
+    if (positionChanged || old_r != orientation)
     {
-        if (teleport || old_x != x || old_y != y || old_z != z)
+        if (positionChanged)
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
         else
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_TURNING_CANCELS);
@@ -6351,15 +6353,21 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
 
         if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
             GetSession()->SendCancelTrade();   // will close both side trade windows
-    }
 
-    if (!m_areaCheckTimer && sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
-        m_areaCheckTimer = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER);
-    else
-    {
-        UpdateTerainEnvironmentFlags();
-        CheckAreaExploreAndOutdoor();
-        LoadMapCellsAround(GetMap()->GetGridActivationDistance());
+		if (positionChanged)
+		{
+			if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
+			{
+				if (!m_areaCheckTimer)
+					m_areaCheckTimer = timerMax;
+			}
+			else
+			{
+				UpdateTerainEnvironmentFlags();
+				CheckAreaExploreAndOutdoor();
+				LoadMapCellsAround(GetMap()->GetGridActivationDistance());
+			}
+		}
     }
 
     return true;
@@ -6417,6 +6425,37 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId)
     CinematicStart(CinematicSequenceId);
 }
 
+bool Player::IsOutdoorOnTransport() const
+{
+	if (!GetTransport()->IsMoTransport())
+		return true;
+
+	// According to original vanilla screenshots, it was only possible to mount on specific spots.
+	// There should probably be some kind of check using the model of the transport, but I dunno
+	// how that should work, so just hardcoding positions on which its known to be possible to mount.
+	switch (GetTransport()->GetDisplayId())
+	{
+		// Ship
+		case 3015:
+		{
+			if (Geometry::GetDistance3D(m_movementInfo.t_pos.x, m_movementInfo.t_pos.y, m_movementInfo.t_pos.z, 6.21f, 0.12f, 14.05f) < 1.1f ||
+				Geometry::GetDistance3D(m_movementInfo.t_pos.x, m_movementInfo.t_pos.y, m_movementInfo.t_pos.z, -10.46f, 6.62f, 17.77f) < 1.0f ||
+				Geometry::GetDistance3D(m_movementInfo.t_pos.x, m_movementInfo.t_pos.y, m_movementInfo.t_pos.z, 1.55f, -4.51f, 11.30f) < 0.5f)
+				return true;
+			break;
+		}
+		// Zeppelin
+		case 3031:
+		{
+			if (Geometry::GetDistance3D(m_movementInfo.t_pos.x, m_movementInfo.t_pos.y, m_movementInfo.t_pos.z, -21.77f, -7.90f, -13.27f) < 1.1f)
+				return true;
+			break;
+		}
+	}
+
+	return false;
+}
+
 void Player::CheckAreaExploreAndOutdoor()
 {
     if (!IsAlive())
@@ -6431,6 +6470,9 @@ void Player::CheckAreaExploreAndOutdoor()
 
     bool isOutdoor;
     uint16 areaFlag = GetTerrain()->GetAreaFlag(GetPositionX(), GetPositionY(), GetPositionZ(), &isOutdoor);
+
+	if (GetTransport())
+		isOutdoor = IsOutdoorOnTransport();
 
     if (isOutdoor)
     {
@@ -6877,6 +6919,7 @@ void Player::DismountCheck()
             {
                 RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
                 Unmount(true);
+				return;
             }
         }
     }
