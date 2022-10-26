@@ -4697,22 +4697,25 @@ void Aura::HandleAuraModStat(bool apply, bool /*Real*/)
     {
         if (apply)
         {
-            int32 staminaToRemove = 0;
-            Unit::AuraList const& auraClassScripts = GetCaster()->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-            for (const auto& aura : auraClassScripts)
+            if (Unit* pCaster = GetCaster())
             {
-                bool exitLoop = false;
-                switch (aura->GetModifier()->m_miscvalue)
+                int32 staminaToRemove = 0;
+                Unit::AuraList const& auraClassScripts = pCaster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                for (const auto& aura : auraClassScripts)
                 {
-                    case 2388: staminaToRemove = m_modifier.m_amount * 10 / 100; exitLoop = true; break; // Rank 1
-                    case 2389: staminaToRemove = m_modifier.m_amount * 20 / 100; exitLoop = true; break; // Rank 2
-                    case 2390: staminaToRemove = m_modifier.m_amount * 30 / 100; exitLoop = true; break; // Rank 3
+                    bool exitLoop = false;
+                    switch (aura->GetModifier()->m_miscvalue)
+                    {
+                        case 2388: staminaToRemove = m_modifier.m_amount * 10 / 100; exitLoop = true; break; // Rank 1
+                        case 2389: staminaToRemove = m_modifier.m_amount * 20 / 100; exitLoop = true; break; // Rank 2
+                        case 2390: staminaToRemove = m_modifier.m_amount * 30 / 100; exitLoop = true; break; // Rank 3
+                    }
+                    if (exitLoop)
+                        break;
                 }
-                if (exitLoop)
-                    break;
+                if (staminaToRemove)
+                    pCaster->CastCustomSpell(target, 19486, staminaToRemove, {}, {}, true);
             }
-            if (staminaToRemove)
-                GetCaster()->CastCustomSpell(target, 19486, staminaToRemove, {}, {}, true);
         }
         else
             target->RemoveAurasDueToSpell(19486, this->GetHolder());
