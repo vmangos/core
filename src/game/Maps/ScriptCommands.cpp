@@ -409,7 +409,7 @@ bool Map::ScriptCommand_SummonCreature(ScriptInfo const& script, WorldObject* so
     float z = script.z;
     float o = script.o;
 
-    if (script.summonCreature.flags & SF_SUMMONCREATURE_UNIQUE || script.summonCreature.flags & SF_SUMMONCREATURE_UNIQUE_TEMP)
+    if (script.summonCreature.flags & (SF_SUMMONCREATURE_UNIQUE | SF_SUMMONCREATURE_UNIQUE_TEMP))
     {
         float dist = script.summonCreature.uniqueDistance ? script.summonCreature.uniqueDistance : (pSummoner->GetDistance(x, y, z) + 50.0f) * 2;
         std::list<Creature*> foundCreatures;
@@ -421,10 +421,12 @@ bool Map::ScriptCommand_SummonCreature(ScriptInfo const& script, WorldObject* so
             uint32 exAmount = 0;
             uint32 reqAmount = script.summonCreature.uniqueLimit ? script.summonCreature.uniqueLimit : 1;
 
+            bool const countDead = IsRespawnableTempSummonType(TempSummonType(script.summonCreature.despawnType));
+
             if (script.summonCreature.flags & SF_SUMMONCREATURE_UNIQUE)
-                exAmount = foundCreatures.size();
+                exAmount = countDead ? foundCreatures.size() : count_if(foundCreatures.begin(), foundCreatures.end(), [](Creature* c) { return c->IsAlive(); });
             else
-                exAmount = count_if(foundCreatures.begin(), foundCreatures.end(), [&](Creature* c) { return c->IsTemporarySummon(); });
+                exAmount = count_if(foundCreatures.begin(), foundCreatures.end(), [countDead](Creature* c) { return c->IsTemporarySummon() && (countDead || c->IsAlive()); });
 
             if (exAmount >= reqAmount)
                 return ShouldAbortScript(script);
