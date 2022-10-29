@@ -512,6 +512,12 @@ REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `
 UPDATE `creature_template` SET `spell_list_id` = 14890 WHERE `entry` = 1489;
 UPDATE `creature_template` SET `spell_list_id` = 14900 WHERE `entry` = 1490;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Correct Devilsaw Template (credit cmangos)
+UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `entry` IN (6498, 6499, 6500);
+
+
 -- End of migration.
 END IF;
 END??
