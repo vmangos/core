@@ -413,12 +413,12 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             damage = 0;
                         break;
                     }
-                    case 24933:                             // Cannon (Darkmoon Steam Tonk)
+                    case 24933: // Cannon (Darkmoon Steam Tonk)
                     {
                         m_caster->CastSpell(unitTarget, 27766, true);
                         break;
                     }
-                    case 28056:                             // [Event: Scourge Invasion] Zap Crystal Corpse
+                    case 28056: // [Event: Scourge Invasion] Zap Crystal Corpse
                     {
                         if (unitTarget->GetEntry() == 16172) // Damaged Necrotic Shard
                         {
@@ -430,7 +430,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         }
                         break;
                     }
-                    case 28386:                             // [Event: Scourge Invasion] Zap Necropolis
+                    case 28386: // [Event: Scourge Invasion] Zap Necropolis
                     {
                         if (unitTarget->GetEntry() == 16421) // Necropolis health
                         {
@@ -5089,6 +5089,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 case 28201:                                 // [Event: Scourge Invasion] Choose Camp Type
                 {
                     unitTarget->CastSpell(unitTarget, PickRandomValue(28199, 28198, 28197), true);
+                    return;
+                }
+                case 28314:                                 // [Event: Scourge Invasion] Flameshocker's Touch
+                {
+                    m_casterUnit->CastSpell(unitTarget, 28329, true);
                     return;
                 }
                 case 28374:                                 // Decimate (Naxxramas: Gluth)

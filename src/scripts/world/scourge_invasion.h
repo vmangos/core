@@ -91,10 +91,10 @@ enum ScourgeInvasionSpells
     SPELL_SUMMON_SCOURGE_CONTROLLER                 = 28092, // Summons 16214 (NPC_NECROPOLIS_CONTROLLER).
 
     // Minion Abilities
-    SPELL_SCOURGE_STRIKE                            = 28265, // Pink Lightning (Instakill).
+    SPELL_SCOURGE_STRIKE                            = 28265, // Pink Lightning (Instakill), only used on Creatures of course.
     SPELL_ENRAGE                                    = 8599,  // Used by 16141 (Ghoul Berserker).
     SPELL_BONE_SHARDS                               = 17014, // [shortest sniff CD: 16,583 seconds] Used by 16299 (Skeletal Shocktrooper).
-    SPELL_INFECTED_BITE                             = 7367,  // [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker).
+    SPELL_INFECTED_BITE                             = 7367,  // Only when not have the debuff already! [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker).
     SPELL_DEMORALIZING_SHOUT                        = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier).
     SPELL_SUNDER_ARMOR                              = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier).
     SPELL_SHADOW_WORD_PAIN                          = 589,   // Used by 16438 (Skeletal Trooper).
@@ -137,6 +137,7 @@ enum ScourgeInvasionSpells
     // Shadow of Doom
     SPELL_SPAWN_SMOKE                               = 10389, // Spawning Visual.
     SPELL_ZAP_CRYSTAL_CORPSE                        = 28056, // Casted on Shard if Shadow of Doom dies.
+    SPELL_ZAP_CRYSTAL_CORPSE_CLASSIC                = 348571,// Casted on Shard if Shadow of Doom dies (only in 1.13.3.40347 Classic).
     SPELL_MINDFLAY                                  = 16568,
     SPELL_FEAR                                      = 12542,
     
@@ -148,12 +149,12 @@ enum ScourgeInvasionSpells
     // Pallid Horror - Patchwerk Terror (also uses: 28315)
     SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL           = 28424, // Alliance.
     SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL             = 28699, // Horde.
-    SPELL_DAMAGE_VS_GUARDS                          = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard).
+    SPELL_DAMAGE_VS_GUARDS                          = 28364, // Hits entries 13839, 16396, 16432.
 
-    // Flameshocker (also uses: 28234, 17680)
-    SPELL_FLAMESHOCKERS_TOUCH                       = 28314, // [shortest sniff CD: 30 seconds]
-    SPELL_FLAMESHOCKERS_REVENGE                     = 28323, // On death. 
+    // Flameshocker
+    SPELL_FLAMESHOCKERS_TOUCH                       = 28314, //
     SPELL_FLAMESHOCKERS_TOUCH2                      = 28329, // [shortest sniff CD: 30 seconds]
+    SPELL_FLAMESHOCKERS_REVENGE                     = 28323, // On death. 
     SPELL_FLAMESHOCKER_IMMOLATE_VISUAL              = 28330
 
     /*
@@ -234,8 +235,8 @@ enum ScourgeInvasionNPC
     NPC_SPECTRAL_APPARITATION                           = 16423,
 
     // Stormwind - Undercity Attacks https://www.youtube.com/watch?v=c0QjLqHVPRU&t=17s
-    NPC_PALLID_HORROR                                   = 16394,
-    NPC_PATCHWORK_TERROR                                = 16382,
+    NPC_PALLID_HORROR                                   = 16394, // Leader NPC for City Attacks. Appears for both routes in undercity.
+    NPC_PATCHWORK_TERROR                                = 16382, // Leader NPC for City Attacks. I believe, since i never saw a Stormwind Castle route in Classic (Yes its bugged somehow, i was waiting for it for hours and days), the Patchwork Terror is only meant to do this route and do not appear in Undercity.
     NPC_CRACKED_NECROTIC_CRYSTAL                        = 16431,
     NPC_FAINT_NECROTIC_CRYSTAL                          = 16531,
     NPC_FLAMESHOCKER                                    = 16383,
@@ -411,8 +412,8 @@ enum ScourgeInvasionGossipScripts
 enum ScourgeInvasionQuests
 {
     QUEST_UNDER_THE_SHADOW                      = 9153,
-    QUEST_CRACKED_NECROTIC_CRYSTAL              = 9292,
-    QUEST_FAINT_NECROTIC_CRYSTAL                = 9310
+    QUEST_CRACKED_NECROTIC_CRYSTAL              = 9292, // Alliance Quest: This Quest was not repeatable in Classic SoM for me.
+    QUEST_FAINT_NECROTIC_CRYSTAL                = 9310  // Horde Quest: This Quest was not repeatable in Classic SoM for me.
 };
 
 enum ScourgeInvasionLang

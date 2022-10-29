@@ -232,11 +232,11 @@ bool UncommonMinionspawner(Creature* pSummoner) // Rare Minion Spawner.
 
     /*
     The chance or timer for a Rare minion spawn is unknown and i don't see an exact pattern for a spawn sequence.
-    I have sniffed 17000 Minion spawns and 30 Rare spawns.
+    I have sniffed 33000 Minion spawns and 56 Rare spawns.
     */
-    uint32 chance = urand(1, 17030);
-    if (chance > 30)
-        return false; // Above 32 = Minion, else Rare.
+    uint32 chance = urand(1, 33000);
+    if (chance > 56)
+        return false; // Above 56 = Minion, else Rare.
 
     return true;
 }
@@ -829,19 +829,7 @@ struct ScourgeMinion : public ScriptedAI
                 m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
                 m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
                 break;
-            case NPC_FLAMESHOCKER:
-                m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000);
-                break;
         }
-    }
-
-    void OnScriptEventHappened(uint32 uiEvent, uint32 /*uiData*/, WorldObject* pInvoker) override
-    {
-        if (!pInvoker)
-            return;
-
-        if (uiEvent == NPC_FLAMESHOCKER)
-            m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
     }
 
     void JustDied(Unit* pKiller) override
@@ -850,19 +838,6 @@ struct ScourgeMinion : public ScriptedAI
         {
             case NPC_SHADOW_OF_DOOM:
                 m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL_CORPSE, true);
-                break;
-            case NPC_FLAMESHOCKER:
-                m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKERS_REVENGE, true);
-                break;
-        }
-    }
-
-    void SpellHit(SpellCaster*, SpellEntry const* spell) override
-    {
-        switch (spell->Id)
-        {
-            case SPELL_SPIRIT_SPAWN_OUT:
-                m_creature->DespawnOrUnsummon(3000);
                 break;
         }
     }
@@ -914,19 +889,6 @@ struct ScourgeMinion : public ScriptedAI
                 {
                     DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR);
                     m_events.ScheduleEvent(EVENT_DOOM_FEAR, 14500);
-                    break;
-                }
-                case EVENT_MINION_FLAMESHOCKERS_TOUCH:
-                {
-                    DoCastSpellIfCan(m_creature->GetVictim(), PickRandomValue(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), CF_TRIGGERED);
-                    m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, urand(30000, 45000));
-                    break;
-                }
-                case EVENT_MINION_FLAMESHOCKERS_DESPAWN:
-                {
-                    if (!m_creature->IsInCombat())
-                        m_creature->CastSpell(m_creature, SPELL_DESPAWNER_SELF, true);
-                    m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
                     break;
                 }
             }
@@ -1123,6 +1085,7 @@ struct PallidHorrorAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_PALLID_RANDOM_YELL, 5000);
         m_events.ScheduleEvent(EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS, 5000);
         m_events.ScheduleEvent(EVENT_PALLID_SUMMON_FLAMESHOCKER, 5000);
+        me->SetWalk(false);
     }
 
     void Reset() override

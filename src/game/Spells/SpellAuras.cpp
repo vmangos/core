@@ -1756,6 +1756,15 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         m_modifier.periodictime = 5 * IN_MILLISECONDS; // expected to tick with 5 sec period
                         return;
                     }
+                    case 17680: // [Event: Scourge Invasion] Spirit Spawn-out
+                    {
+                        Creature* pCaster = GetCaster()->ToCreature();
+                        if (!pCaster)
+                            return;
+
+                        pCaster->DespawnOrUnsummon(1500);
+                        return;
+                    }
                     case 27852: // [Event: Scourge Invasion] [PH] Kill Summoner Buff
                     {
                         Unit* pCaster = GetCaster();
@@ -1770,11 +1779,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     case 31316: // [Event: Scourge Invasion] Summon Boss Buff
                     {
-                        Unit* caster = GetCaster();
-                        if (!caster)
+                        Unit* pCaster = GetCaster();
+                        if (!pCaster)
                             return;
 
-                        caster->CastSpell(caster, 31315, true); // Summon Boss
+                        pCaster->CastSpell(pCaster, 31315, true); // Summon Boss
                         return;
                     }
                     case 21827: // Frostwolf Aura DND
