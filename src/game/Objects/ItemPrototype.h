@@ -409,25 +409,25 @@ enum ItemExtraFlags
 
 struct _ItemDamage
 {
-    float   DamageMin;
-    float   DamageMax;
-    uint32  DamageType;                                     // id from Resistances.dbc
+    float   DamageMin = 0.0f;
+    float   DamageMax = 0.0f;
+    uint32  DamageType = 0;                                 // id from Resistances.dbc
 };
 
 struct _ItemStat
 {
-    uint32  ItemStatType;
-    int32   ItemStatValue;
+    uint32  ItemStatType = 0;
+    int32   ItemStatValue = 0;
 };
 struct _ItemSpell
 {
-    uint32 SpellId;                                         // id from Spell.dbc
-    uint32 SpellTrigger;
-    int32  SpellCharges;
-    float  SpellPPMRate;
-    int32  SpellCooldown;
-    uint32 SpellCategory;                                   // id from SpellCategory.dbc
-    int32  SpellCategoryCooldown;
+    uint32 SpellId = 0;                                     // id from Spell.dbc
+    uint32 SpellTrigger = 0;
+    int32  SpellCharges = 0;
+    float  SpellPPMRate = 0.0f;
+    int32  SpellCooldown = 0;
+    uint32 SpellCategory = 0;                               // id from SpellCategory.dbc
+    int32  SpellCategoryCooldown = 0;
 };
 
 #define MAX_ITEM_PROTO_DAMAGES 5
@@ -436,70 +436,74 @@ struct _ItemSpell
 
 struct ItemPrototype
 {
-    uint32 ItemId;
-    uint32 Class;                                           // id from ItemClass.dbc
-    uint32 SubClass;                                        // id from ItemSubClass.dbc
-    char*  Name1;
-    char*  Description;
-    uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
-    uint32 Quality;
-    uint32 Flags;
-    uint32 BuyCount;
-    uint32 BuyPrice;
-    uint32 SellPrice;
-    uint32 InventoryType;
-    uint32 AllowableClass;
-    uint32 AllowableRace;
-    uint32 ItemLevel;
-    uint32 RequiredLevel;
-    uint32 RequiredSkill;                                   // id from SkillLine.dbc
-    uint32 RequiredSkillRank;
-    uint32 RequiredSpell;                                   // id from Spell.dbc
-    uint32 RequiredHonorRank;
-    uint32 RequiredCityRank;
-    uint32 RequiredReputationFaction;                       // id from Faction.dbc
-    uint32 RequiredReputationRank;
-    uint32 MaxCount;
-    uint32 Stackable;
-    uint32 ContainerSlots;
-    _ItemStat ItemStat[MAX_ITEM_PROTO_STATS];
-    uint32 Delay;
-    float  RangedModRange;
-    uint32 AmmoType;
-    _ItemDamage Damage[MAX_ITEM_PROTO_DAMAGES];
-    uint32 Block;
-    int32 Armor;
-    int32 HolyRes;
-    int32 FireRes;
-    int32 NatureRes;
-    int32 FrostRes;
-    int32 ShadowRes;
-    int32 ArcaneRes;
-    _ItemSpell Spells[MAX_ITEM_PROTO_SPELLS];
-    uint32 Bonding;
-    uint32 PageText;
-    uint32 LanguageID;
-    uint32 PageMaterial;
-    uint32 StartQuest;                                      // id from QuestCache.wdb
-    uint32 LockID;
-    uint32 Material;                                        // id from Material.dbc
-    uint32 Sheath;
-    uint32 RandomProperty;                                  // id from ItemRandomProperties.dbc
-    uint32 ItemSet;                                         // id from ItemSet.dbc
-    uint32 MaxDurability;
-    uint32 Area;                                            // id from AreaTable.dbc
-    uint32 Map;                                             // id from Map.dbc
-    uint32 Duration;
-    uint32 BagFamily;
-    uint32 DisenchantID;
-    uint32 FoodType;
-    uint32 MinMoneyLoot;
-    uint32 MaxMoneyLoot;
-    uint32 WrappedGift;
-    uint32 ExtraFlags;                                      // see ItemExtraFlags
-    uint32 OtherTeamEntry;
+    uint32 ItemId = 0;
+    uint32 Class = 0;                                       // id from ItemClass.dbc
+    uint32 SubClass = 0;                                    // id from ItemSubClass.dbc
+    char*  Name1 = nullptr;
+    char*  Description = nullptr;
+    uint32 DisplayInfoID = 0;                               // id from ItemDisplayInfo.dbc
+    uint32 Quality = 0;
+    uint32 Flags = 0;
+    uint32 BuyCount = 0;
+    uint32 BuyPrice = 0;
+    uint32 SellPrice = 0;
+    uint32 InventoryType = 0;
+    uint32 AllowableClass = 0;
+    uint32 AllowableRace = 0;
+    uint32 ItemLevel = 0;
+    uint32 RequiredLevel = 0;
+    uint32 RequiredSkill = 0;                               // id from SkillLine.dbc
+    uint32 RequiredSkillRank = 0;
+    uint32 RequiredSpell = 0;                               // id from Spell.dbc
+    uint32 RequiredHonorRank = 0;
+    uint32 RequiredCityRank = 0;
+    uint32 RequiredReputationFaction = 0;                   // id from Faction.dbc
+    uint32 RequiredReputationRank = 0;
+    uint32 MaxCount = 0;
+    uint32 Stackable = 0;
+    uint32 ContainerSlots = 0;
+    _ItemStat ItemStat[MAX_ITEM_PROTO_STATS] = {};
+    uint32 Delay = 0;
+    float  RangedModRange = 0.0f;
+    uint32 AmmoType = 0;
+    _ItemDamage Damage[MAX_ITEM_PROTO_DAMAGES] = {};
+    uint32 Block = 0;
+    int32 Armor = 0;
+    int32 HolyRes = 0;
+    int32 FireRes = 0;
+    int32 NatureRes = 0;
+    int32 FrostRes = 0;
+    int32 ShadowRes = 0;
+    int32 ArcaneRes = 0;
+    _ItemSpell Spells[MAX_ITEM_PROTO_SPELLS] = {};
+    uint32 Bonding = 0;
+    uint32 PageText = 0;
+    uint32 LanguageID = 0;
+    uint32 PageMaterial = 0;
+    uint32 StartQuest = 0;                                  // id from QuestCache.wdb
+    uint32 LockID = 0;
+    uint32 Material = 0;                                    // id from Material.dbc
+    uint32 Sheath = 0;
+    uint32 RandomProperty = 0;                              // id from ItemRandomProperties.dbc
+    uint32 ItemSet = 0;                                     // id from ItemSet.dbc
+    uint32 MaxDurability = 0;
+    uint32 Area = 0;                                        // id from AreaTable.dbc
+    uint32 Map = 0;                                         // id from Map.dbc
+    uint32 Duration = 0;
+    uint32 BagFamily = 0;
+    uint32 DisenchantID = 0;
+    uint32 FoodType = 0;
+    uint32 MinMoneyLoot = 0;
+    uint32 MaxMoneyLoot = 0;
+    uint32 WrappedGift = 0;
+    uint32 ExtraFlags = 0;                                  // see ItemExtraFlags
+    uint32 OtherTeamEntry = 0;
 
-    mutable bool m_bDiscovered = false;                     // has item been discovered by players
+    // values assigned by core
+    mutable int32 SourceQuestLevel = -1;                    // minimum level of quest that rewards this item
+    mutable uint32 SourceQuestRaces = 0;                    // allowed races of quest that rewards this item
+    mutable uint32 SourceQuestClasses = 0;                  // allowed classes of quest that rewards this item
+    mutable bool Discovered = false;                        // has item been discovered by players
 
     // helpers
     bool CanChangeEquipStateInCombat() const

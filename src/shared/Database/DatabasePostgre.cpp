@@ -37,7 +37,7 @@ DatabasePostgre::DatabasePostgre()
     {
         if (!PQisthreadsafe())
         {
-            sLog.outError("FATAL ERROR: PostgreSQL libpq isn't thread-safe.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FATAL ERROR: PostgreSQL libpq isn't thread-safe.");
             exit(1);
         }
     }
@@ -68,15 +68,15 @@ bool PostgreSQLConnection::OpenConnection(bool reconnect)
     /* check to see that the backend connection was successfully made */
     if (PQstatus(mPGconn) != CONNECTION_OK)
     {
-        sLog.outError("Could not connect to Postgre database at %s: %s",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not connect to Postgre database at %s: %s",
             m_host.c_str(), PQerrorMessage(mPGconn));
         PQfinish(mPGconn);
         mPGconn = nullptr;
         return false;
     }
 
-    DETAIL_LOG("Connected to Postgre database at %s", m_host.c_str());
-    sLog.outString("PostgreSQL server ver: %d", PQserverVersion(mPGconn));
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Connected to Postgre database at %s", m_host.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "PostgreSQL server ver: %d", PQserverVersion(mPGconn));
     return true;
 }
 
@@ -93,8 +93,8 @@ bool PostgreSQLConnection::_Query(char const* sql, PGresult** pResult, uint64* p
 
     if (PQresultStatus(*pResult) != PGRES_TUPLES_OK)
     {
-        sLog.outErrorDb("SQL : %s", sql);
-        sLog.outErrorDb("SQL %s", PQerrorMessage(mPGconn));
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL : %s", sql);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL %s", PQerrorMessage(mPGconn));
         PQclear(*pResult);
         return false;
     }
@@ -166,8 +166,8 @@ bool PostgreSQLConnection::Execute(char const* sql)
     PGresult* res = PQexec(mPGconn, sql);
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
-        sLog.outErrorDb("SQL: %s", sql);
-        sLog.outErrorDb("SQL %s", PQerrorMessage(mPGconn));
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL %s", PQerrorMessage(mPGconn));
         return false;
     }
     else
@@ -187,13 +187,13 @@ bool PostgreSQLConnection::_TransactionCmd(char const* sql)
     PGresult* res = PQexec(mPGconn, sql);
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
-        sLog.outError("SQL: %s", sql);
-        sLog.outError("SQL ERROR: %s", PQerrorMessage(mPGconn));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: %s", sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", PQerrorMessage(mPGconn));
         return false;
     }
     else
     {
-        DEBUG_LOG("SQL: %s", sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SQL: %s", sql);
     }
     return true;
 }

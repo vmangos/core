@@ -227,6 +227,14 @@ bool ChatHandler::HandleAccountCharactersCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleAccountClearDataCommand(char* args)
+{
+    CharacterDatabase.PExecute("DELETE FROM `account_data` WHERE `account`=%u", GetAccountId());
+    CharacterDatabase.PExecute("DELETE FROM `character_account_data` WHERE `guid` IN (SELECT `guid` FROM `characters` WHERE `account`=%u)", GetAccountId());
+    SendSysMessage("Saved account data cleared.");
+    return true;
+}
+
 /// Create an account
 bool ChatHandler::HandleAccountCreateCommand(char* args)
 {

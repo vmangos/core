@@ -93,7 +93,7 @@ uint16 const* UpdateFields::GetUpdateFieldFlagsArray(uint8 objectTypeId)
             return g_corpseUpdateFieldFlags.data();
         }
     }
-    sLog.outError("Unhandled object type id (%hhu) in GetUpdateFieldFlagsArray!", objectTypeId);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unhandled object type id (%hhu) in GetUpdateFieldFlagsArray!", objectTypeId);
     return 0;
 }
 

@@ -2289,7 +2289,8 @@ bool CombatBotBaseAI::IsValidHostileTarget(Unit const* pTarget) const
     return me->IsValidAttackTarget(pTarget) &&
            pTarget->IsVisibleForOrDetect(me, me, false) &&
            !pTarget->HasBreakableByDamageCrowdControlAura() &&
-           !pTarget->IsTotalImmune();
+           !pTarget->IsTotalImmune() &&
+           pTarget->GetTransport() == me->GetTransport();
 }
 
 bool CombatBotBaseAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const
@@ -2634,14 +2635,12 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
     LearnArmorProficiencies();
 
     std::map<uint32 /*slot*/, std::vector<ItemPrototype const*>> itemsPerSlot;
-    for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(i);
-        if (!pProto)
-            continue;
+        ItemPrototype const* pProto = &itr.second;
 
         // Only items that have already been discovered by someone
-        if (!pProto->m_bDiscovered)
+        if (!pProto->Discovered)
             continue;
 
         // Skip unobtainable items
@@ -2652,17 +2651,32 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if (pProto->Class != ITEM_CLASS_WEAPON && pProto->Class != ITEM_CLASS_ARMOR)
             continue;
 
-        // No item level check for tabards and shirts
-        if (pProto->InventoryType != INVTYPE_TABARD && pProto->InventoryType != INVTYPE_BODY)
+        // No tabards and shirts
+        if (pProto->InventoryType == INVTYPE_TABARD || pProto->InventoryType == INVTYPE_BODY)
+            continue;
+
+        if (pProto->SourceQuestRaces && !(pProto->SourceQuestRaces & me->GetRaceMask()))
+            continue;
+
+        if (pProto->SourceQuestClasses && !(pProto->SourceQuestClasses & me->GetClassMask()))
+            continue;
+
+        if (pProto->SourceQuestLevel < 0)
         {
             // Avoid higher level items with no level requirement
             if (!pProto->RequiredLevel && pProto->ItemLevel > me->GetLevel())
                 continue;
-
-            // Avoid low level items
-            if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        }
+        else
+        {
+            // Item is from a high level quest
+            if (uint32(pProto->SourceQuestLevel) > me->GetLevel())
                 continue;
         }
+
+        // Avoid low level items
+        if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+            continue;
 
         if (me->CanUseItem(pProto) != EQUIP_ERR_OK)
             continue;
@@ -2708,7 +2722,6 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                         m_role != ROLE_HEALER && m_role != ROLE_RANGE_DPS)
                         continue;
                 }
-
 
                 itemsPerSlot[slot].push_back(pProto);
 
@@ -2915,11 +2928,9 @@ void CombatBotBaseAI::AddHunterAmmo()
                 }
 
                 ItemPrototype const* pAmmoProto = nullptr;
-                for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
+                for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
                 {
-                    ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(i);
-                    if (!pProto)
-                        continue;
+                    ItemPrototype const* pProto = &itr.second;
 
                     if (pProto->Class == ITEM_CLASS_PROJECTILE &&
                         pProto->SubClass == ammoType &&

@@ -214,7 +214,7 @@ int32 MoveSplineInit::Launch()
             unit.SendMovementMessageToSet(std::move(data2), true);
         }
         else {
-            sLog.outError("[MoveSplineInit] Unable to compress move packet, move spline not sent");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MoveSplineInit] Unable to compress move packet, move spline not sent");
         }
     }
 #endif

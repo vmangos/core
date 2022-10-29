@@ -39,11 +39,11 @@ int PetAI::Permissible(Creature const* creature)
     return PERMIT_BASE_NO;
 }
 
-PetAI::PetAI(Creature* c) : CreatureAI(c)
+PetAI::PetAI(Creature* c) : CreatureAI(c), m_updateAlliesTimer(0)
 {
     UpdateAllies();
     // Warlock imp has no melee attack
-    hasMelee = (c->GetEntry() != 416);
+    m_bMeleeAttack = (c->GetEntry() != 416);
 }
 
 bool PetAI::_needToStop() const
@@ -132,7 +132,7 @@ void PetAI::UpdateAI(uint32 const diff)
             return;
         }
 
-        if (hasMelee)
+        if (m_bMeleeAttack)
         {
             // Check before attacking to prevent pets from leaving stay position
             bool attacked = false;
@@ -148,9 +148,16 @@ void PetAI::UpdateAI(uint32 const diff)
             else
                 attacked = DoMeleeAttackIfReady();
 
-            if (attacked && owner)
-                if (Unit* v = m_creature->GetVictim()) // Victim may have died between
-                    owner->SetInCombatWith(v);
+            if (attacked && owner && owner->IsAlive())
+            {
+                if (Unit* pVictim = m_creature->GetVictim()) // Victim may have died between
+                {
+                    if (owner->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+                        owner->SetInCombatWithVictim(pVictim, false, 6000);
+                    else
+                        owner->SetInCombatWith(pVictim);
+                }
+            }
         }
     }
     else if (!playerControlled)
@@ -617,7 +624,7 @@ void PetAI::DoAttack(Unit* target, bool chase)
 {
     // Handles attack with or without chase and also resets flags
     // for next update / creature kill
-    if (m_creature->Attack(target, hasMelee))
+    if (m_creature->Attack(target, m_bMeleeAttack))
     {
         // Play sound to let the player know the pet is attacking something it picked on its own
         if (m_creature->HasReactState(REACT_AGGRESSIVE) && !m_creature->GetCharmInfo()->IsCommandAttack())
@@ -633,7 +640,7 @@ void PetAI::DoAttack(Unit* target, bool chase)
             ClearCharmInfoFlags();
             m_creature->GetCharmInfo()->SetIsCommandAttack(oldCmdAttack); // For passive pets commanded to attack so they will use spells
             m_creature->GetMotionMaster()->Clear();
-            if (!hasMelee)
+            if (!m_bMeleeAttack)
                 m_creature->SetCasterChaseDistance(25.0f);
             m_creature->GetMotionMaster()->MoveChase(target);
         }

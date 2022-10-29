@@ -469,7 +469,7 @@ bool ValidateEndSceneHook(const std::vector<uint8> &code)
             str << " ";
     }
 
-    sLog.outWardenDebug("Deobfuscate debug.  Original code size: %u deobfuscated size: %u Code:\n%s",
+    sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Deobfuscate debug.  Original code size: %u deobfuscated size: %u Code:\n%s",
         code.size(), copy.size(), str.str().c_str());
 
     // wrobot's deobfuscated endscene hook begins with pushfd, pushad.  if thats what this starts with,
@@ -510,8 +510,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read SYSTEM_INFO from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read SYSTEM_INFO");
 
             return true;
         }
@@ -521,9 +520,8 @@ void WardenWin::LoadScriptedScans()
         // for classic, tbc, and wotlk, the architecute should never be anything other than x86 (0)
         if (!!wardenWin->_sysInfo.wProcessorArchitecture)
         {
-            sLog.outWarden("Incorrect architecture reported (%u) for account %u ip %s",
-                wardenWin->_sysInfo.wProcessorArchitecture, wardenWin->_session->GetAccountId(),
-                wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Incorrect architecture reported (%u)",
+                wardenWin->_sysInfo.wProcessorArchitecture);
 
             return true;
         }
@@ -533,9 +531,8 @@ void WardenWin::LoadScriptedScans()
             wardenWin->_sysInfo.dwProcessorType != 486 &&
             wardenWin->_sysInfo.dwProcessorType != 586)
         {
-            sLog.outWarden("Incorrect processor type: %u for account %u ip %s",
-                wardenWin->_sysInfo.dwProcessorType, wardenWin->_session->GetAccountId(),
-                wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Incorrect processor type: %u",
+                wardenWin->_sysInfo.dwProcessorType);
 
             return true;
         }
@@ -569,8 +566,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read warden->SysInfo from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read warden->SysInfo");
 
             return true;
         }
@@ -610,8 +606,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read s_moduleInterface from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read s_moduleInterface");
 
             return true;
         }
@@ -648,8 +643,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read CWorld::enables from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read CWorld::enables");
 
             return true;
         }
@@ -659,7 +653,7 @@ void WardenWin::LoadScriptedScans()
         // if any required flags are missing, or prohibited flags are present
         if ((val & Required) != Required || !!(val & Prohibited))
         {
-            sLog.outWarden("CWorld::enables expected 0x%lx prohibited 0x%lx received 0x%lx",
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "CWorld::enables expected 0x%lx prohibited 0x%lx received 0x%lx",
                 Required, Prohibited, val);
 
             return true;
@@ -701,8 +695,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!buff.read<uint8>())
         {
-            sLog.outWardenDebug("Account %u timing check failed to read CSimpleTop::m_eventTime",
-                session->GetLatency());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Timing check failed to read CSimpleTop::m_eventTime");
             return true;
         }
 
@@ -717,15 +710,15 @@ void WardenWin::LoadScriptedScans()
             // or in XP compatibility mode.  there are probably other causes too.  therefore let us ignore this
             // failure, since the clock desync check will catch this same case if the clock is moving at an
             // unfair speed.
-            sLog.outWardenDebug("Account %u timing check failed", session->GetAccountId());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Timing check failed");
             return false;
         }
 
         // last hardware action cannot legitimately be past the current time
         if (lastHardwareAction > currentTime)
         {
-            sLog.outWarden("Account: %u Current time: %u Last hardware action: %u (last hardware action in the future)",
-                session->GetAccountId(), currentTime, lastHardwareAction);
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Current time: %u Last hardware action: %u (last hardware action in the future)",
+                currentTime, lastHardwareAction);
             return true;
         }
 
@@ -855,8 +848,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read EndScene (hook check stage 1) from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (hook check stage 1)");
 
             return true;
         }
@@ -897,8 +889,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read EndScene (stage 4) from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (stage 4)");
 
             return true;
         }
@@ -938,8 +929,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read EndScene (stage 3) from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (stage 3)");
 
             return true;
         }
@@ -978,8 +968,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read EndScene (stage 2) from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Failed to read EndScene (stage 2)");
 
             return true;
         }
@@ -1017,8 +1006,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.outWarden("Failed to read g_theGxDevicePtr from account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read g_theGxDevicePtr");
 
             return true;
         }
@@ -1028,8 +1016,7 @@ void WardenWin::LoadScriptedScans()
         // if for some reason we get nullptr, abort
         if (!wardenWin->_endSceneAddress)
         {
-            sLog.outWarden("g_theGxDevicePtr is nullptr for account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "g_theGxDevicePtr is nullptr");
             return true;
         }
 
@@ -1051,8 +1038,7 @@ void WardenWin::LoadScriptedScans()
             auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
             wardenWin->_proxifierFound = true;
 
-            sLog.outWarden("Proxifier found on account %u ip %s",
-                wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Proxifier found");
         }
 
         return false;
@@ -1163,8 +1149,8 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
     // int3 breakpoint
     if (*p == 0xCC)
     {
-        sLog.outWarden("Detected INT3 EndScene hook for account %u IP %s (NOP count = %d)",
-            _session->GetAccountId(), _session->GetRemoteAddress().c_str(), nopCount);
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Detected INT3 EndScene hook.  NOP count = %d.",
+            nopCount);
     }
     // JMP hook
     else if (*p == 0xE9)
@@ -1172,8 +1158,8 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
         auto const dest = *reinterpret_cast<const uint32 *>(p + 1);
 
         auto const absoluteDest = _endSceneAddress + nopCount + dest + 5;
-        sLog.outWarden("Detected JMP EndScene hook for account %u IP %s (NOP count = %d)",
-            _session->GetAccountId(), _session->GetRemoteAddress().c_str(), nopCount);
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Detected JMP EndScene hook.  NOP count = %d.",
+            nopCount);
 
         // request a custom scan just to check the JMP destination
         EnqueueScans({ std::make_shared<WindowsMemoryScan>(absoluteDest, codeRequestLength,
@@ -1186,9 +1172,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
 
             if (!!result)
             {
-                sLog.outWarden("Failed to read EndScene hook code from account %u ip %s",
-                    wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
-
+                sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene hook code");
                 return true;
             }
 
@@ -1197,8 +1181,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
             buff.read(&code[0], code.size());
 
             if (ValidateEndSceneHook(code))
-                sLog.outWarden("Suspicious EndScene from account %u ip %s.  Probable bot.",
-                    wardenWin->_session->GetAccountId(), wardenWin->_session->GetRemoteAddress().c_str());
+                sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Suspicious EndScene.  Probable bot.");
 
             return false;
         }, "EndScene hook validate scan", None) });
@@ -1225,7 +1208,7 @@ uint32 WardenWin::GetScanFlags() const
 
     if (!found)
     {
-        sLog.outWarden("Invalid client build %u for account %u", _session->GetGameBuild(), _session->GetAccountId());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Invalid client build %u.  Kicking.", _session->GetGameBuild());
         _session->KickPlayer();
         return ScanFlags::None;
     }

@@ -1,5 +1,13 @@
 {
 	"0": {
+		"3652": {
+			"quick": 1,
+			"_Info": "fixes terrain beneath a bridge at deadwind pass"
+		},
+		"3328": {
+			"quick": 1,
+			"_Info": "fixes terrain beneath a barricade at the bulwark"
+		},
 		"3147": {
 			"maxSimplificationError": 1.0,
 			"detailSampleDist": 0.5,

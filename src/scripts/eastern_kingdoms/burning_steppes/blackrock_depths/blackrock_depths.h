@@ -65,6 +65,7 @@ enum
     FACTION_DARK_IRON          = 54,
     FACTION_ARENA_NEUTRAL      = 15,
 
+    NPC_MAGMUS                 = 9938,
     NPC_EMPEROR                = 9019,
     NPC_PRINCESS               = 8929,
     NPC_HIGH_PRIESTESS         = 10076,

@@ -198,7 +198,7 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
             }
             default:
                 UnSummon();
-                sLog.outError("Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
                 break;
         }
     }
@@ -211,6 +211,9 @@ void TemporarySummon::Summon(TempSummonType type, uint32 lifetime, CreatureAiSet
     m_type = type;
     m_timer = lifetime;
     m_lifetime = lifetime;
+
+    if (lifetime && IsRespawnableTempSummonType(type))
+        m_respawnDelay = lifetime / IN_MILLISECONDS;
 
     if (pFuncAiSetter)
         pFuncAiSetter(this);
@@ -266,7 +269,7 @@ TemporarySummon::~TemporarySummon()
     // By this stage it is too late to correctly unsummon the unit, since
     // we have already been removed from the map.
     if (!m_unSummonInformed)
-        sLog.outError("TemporarySummon %s deleted before being unsummed - summoner will retain incorrect count", GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "TemporarySummon %s deleted before being unsummed - summoner will retain incorrect count", GetGuidStr().c_str());
 }
 
 void TemporarySummon::SaveToDB()

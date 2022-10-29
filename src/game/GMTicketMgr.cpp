@@ -346,7 +346,7 @@ void TicketMgr::LoadTickets()
     QueryResult* result = CharacterDatabase.Query("SELECT " TICKET_TABLE_FIELDS " FROM `gm_tickets`");
     if (!result)
     {
-        sLog.outString(">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
         return;
     }
 
@@ -373,7 +373,7 @@ void TicketMgr::LoadTickets()
     } while (result->NextRow());
     delete result;
 
-    sLog.outString(">> Loaded %u GM tickets in %u ms", count, WorldTimer::getMSTimeDiffToNow(oldMSTime));
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u GM tickets in %u ms", count, WorldTimer::getMSTimeDiffToNow(oldMSTime));
 }
 
 void TicketMgr::LoadSurveys()
@@ -388,7 +388,7 @@ void TicketMgr::LoadSurveys()
         delete result;
     }
 
-    sLog.outString(">> Loaded GM Survey count from database in %u ms", WorldTimer::getMSTimeDiffToNow(oldMSTime));
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded GM Survey count from database in %u ms", WorldTimer::getMSTimeDiffToNow(oldMSTime));
 }
 
 void TicketMgr::AddTicket(GmTicket* ticket)

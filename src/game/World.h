@@ -33,6 +33,8 @@
 #include "ObjectGuid.h"
 #include "Chat/AbstractPlayer.h"
 #include "WorldPacket.h"
+#include "Multithreading/Messager.h"
+#include "LFGQueue.h"
 
 #include <map>
 #include <set>
@@ -330,13 +332,13 @@ enum eConfigUInt32Values
     CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY,
     CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY,
     CONFIG_UINT32_AC_WARDEN_CLIENT_BAN_DURATION,
-    CONFIG_UINT32_AC_WARDEN_DB_LOGLEVEL,
     CONFIG_UINT32_AUTOBROADCAST_INTERVAL,
     CONFIG_UINT32_PARTY_BOT_MAX_BOTS,
     CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP,
     CONFIG_UINT32_BATTLE_BOT_AUTO_EQUIP,
     CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE,
     CONFIG_UINT32_PVP_POOL_SIZE_PER_FACTION,
+    CONFIG_UINT32_LFG_MATCHMAKING_TIMER,
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -588,6 +590,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS,
     CONFIG_BOOL_WORLD_AVAILABLE,
     CONFIG_BOOL_GM_CHEAT_GOD,
+    CONFIG_BOOL_LFG_MATCHMAKING,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -881,8 +884,6 @@ class World
          * Database logs system
          */
         void LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, char const* type, uint32 dataInt);
-        void LogCharacter(Player* character, char const* action);
-        void LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, char const* action);
         void LogChat(WorldSession* sess, char const* type, std::string const& msg, PlayerPointer target = nullptr, uint32 chanId = 0, char const* chanStr = nullptr);
         void LogTransaction(PlayerTransactionData const& data);
         void Shutdown();
@@ -917,6 +918,10 @@ class World
         time_t GetWorldUpdateTimer(WorldTimers timer);
         time_t GetWorldUpdateTimerInterval(WorldTimers timer);
 
+        Messager<World>& GetMessager() { return m_messager; }
+
+        LFGQueue& GetLFGQueue() { return m_lfgQueue; }
+        void StartLFGQueueThread();
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -978,6 +983,10 @@ class World
         std::string m_honorPath;
         std::string m_wardenModuleDirectory;
 
+        // Housing this here but logically it is completely asynchronous - TODO: Separate this and unify with BG queue
+        LFGQueue m_lfgQueue;
+        std::thread m_lfgQueueThread;
+
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;
         static float m_MaxVisibleDistanceInInstances;
@@ -1015,6 +1024,8 @@ class World
         static uint32 m_currentMSTime;
         static TimePoint m_currentTime;
         static uint32 m_currentDiff;
+
+        Messager<World> m_messager;
 };
 
 extern uint32 realmID;

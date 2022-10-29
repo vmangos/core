@@ -1489,7 +1489,7 @@ namespace MaNGOS
     class NearestFriendlyUnitCheck
     {
         public:
-            explicit NearestFriendlyUnitCheck(Unit const* source, float dist = 0) : me(source)
+            explicit NearestFriendlyUnitCheck(WorldObject const* source, float dist = 0) : me(source)
             {
                 m_range = (dist == 0 ? 9999 : dist);
             }
@@ -1509,7 +1509,7 @@ namespace MaNGOS
             }
 
         private:
-            Unit const* me;
+            WorldObject const* me;
             float m_range;
             NearestFriendlyUnitCheck(NearestFriendlyUnitCheck const&);
     };
@@ -1518,7 +1518,7 @@ namespace MaNGOS
     class NearestHostileUnitCheck
     {
         public:
-            explicit NearestHostileUnitCheck(Unit const* source, float dist = 0) : me(source)
+            explicit NearestHostileUnitCheck(WorldObject const* source, float dist = 0) : me(source)
             {
                 m_range = (dist == 0 ? 9999 : dist);
             }
@@ -1530,7 +1530,10 @@ namespace MaNGOS
                 if (!me->IsWithinDistInMap(u, m_range))
                     return false;
 
-                if (!me->CanAttack(u))
+                if (!me->IsHostileTo(u))
+                    return false;
+
+                if (!me->IsValidAttackTarget(u))
                     return false;
 
                 m_range = me->GetDistance(u);   // use found unit range as new range limit for next check
@@ -1538,7 +1541,7 @@ namespace MaNGOS
             }
 
         private:
-            Unit const* me;
+            WorldObject const* me;
             float m_range;
             NearestHostileUnitCheck(NearestHostileUnitCheck const&);
     };

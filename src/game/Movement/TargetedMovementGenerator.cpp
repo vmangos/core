@@ -141,8 +141,22 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     PathType pathType = path.getPathType();
     m_bReachable = pathType & (PATHFIND_NORMAL | PATHFIND_DEST_FORCED);
     
-    if (!petFollowing && pathType == PATHFIND_NOPATH)
-        return;    
+    if (!petFollowing)
+    {
+        if (pathType == PATHFIND_NOPATH)
+            return;
+
+        if (isPet)
+        {
+            // prevent pets from going through closed doors
+            path.CutPathWithDynamicLoS();
+            if (path.getPath().size() == 2 && path.Length() < 0.1f)
+            {
+                m_bReachable = false;
+                return;
+            }
+        }
+    }
 
     if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH))
         m_bReachable = true;
@@ -378,7 +392,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 
     if (owner.movespline->Finalized())
     {
-        if (!owner.HasInArc(i_target.getTarget(), 0.01f))
+        if (owner.IsCreature() && !owner.HasInArc(i_target.getTarget(), 0.01f))
             owner.SetInFront(i_target.getTarget());
 
         if (m_bIsSpreading)
@@ -398,6 +412,9 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 
         if (interrupted)
             owner.StopMoving();
+
+        if (interrupted || owner.IsPlayer() && !owner.HasInArc(i_target.getTarget(), M_PI_F / 2.0f))
+            owner.SetFacingTo(owner.GetAngle(i_target.getTarget()));
 
         m_spreadTimer.Update(time_diff);
         if (m_spreadTimer.Passed())
@@ -685,7 +702,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             _reachTarget(owner);
         }
         if (interrupted)
-            owner.StopMoving();
+            owner.StopMoving(true);
     }
     else if (m_bRecalculateTravel)
         owner.GetMotionMaster()->SetNeedAsyncUpdate();

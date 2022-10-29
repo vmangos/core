@@ -755,7 +755,7 @@ class WorldObject : public Object
 
         float GetAngle(WorldObject const* obj) const;
         float GetAngle(float const x, float const y) const;
-        bool HasInArc(WorldObject const* target, float const arcangle = M_PI, float offset = 0.0f) const;
+        bool HasInArc(WorldObject const* target, float const arcangle = M_PI_F, float offset = 0.0f) const;
         bool HasInArc(float const arcangle, float const x, float const y) const;
         bool IsFacingTarget(WorldObject const* target) const;
 
@@ -892,6 +892,8 @@ class WorldObject : public Object
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
         GameObject* FindRandomGameObject(uint32 entry, float range) const;
         Player* FindNearestPlayer(float range) const;
+        Player* FindNearestHostilePlayer(float range) const;
+        Player* FindNearestFriendlyPlayer(float range) const;
         void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
         void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
         void GetAlivePlayerListInRange(WorldObject const* pSource, std::list<Player*>& lList, float fMaxSearchRange) const;

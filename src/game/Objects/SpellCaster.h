@@ -349,9 +349,10 @@ public:
     virtual uint32 DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell = nullptr);
     void DealDamageMods(Unit* pVictim, uint32& damage, uint32* absorb);
     void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
-    void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log);
+    void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log) const;
     void SendSpellNonMeleeDamageLog(Unit* target, uint32 spellId, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
-    void SendSpellMiss(Unit* target, uint32 spellId, SpellMissInfo missInfo);
+    void SendSpellMiss(Unit* target, uint32 spellId, SpellMissInfo missInfo) const;
+    void SendSpellDamageResist(Unit* target, uint32 spellId) const;
     void SendSpellOrDamageImmune(Unit* target, uint32 spellId) const;
     int32 DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* spellProto, bool critical = false);
     void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;

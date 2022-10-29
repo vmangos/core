@@ -70,6 +70,18 @@ enum TempSummonType
     TEMPSUMMON_TIMED_COMBAT_OR_CORPSE_DESPAWN = 10,            // despawns after a specified time (in or out of combat) OR when the creature dies
 };
 
+inline bool IsRespawnableTempSummonType(TempSummonType type)
+{
+    switch (type)
+    {
+        case TEMPSUMMON_TIMED_DESPAWN:
+        case TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT:
+        case TEMPSUMMON_MANUAL_DESPAWN:
+            return true;
+    }
+    return false;
+}
+
 enum ObjectSpawnFlags
 {
     SPAWN_FLAG_ACTIVE               = 0x01,

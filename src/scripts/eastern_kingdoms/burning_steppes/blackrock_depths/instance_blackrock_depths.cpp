@@ -76,7 +76,7 @@ struct instance_blackrock_depths : ScriptedInstance
     uint64 m_uiDwarfRuneF01GUID;
     uint64 m_uiDwarfRuneG01GUID;
 
-    uint64 m_uiGoMagnusGUID;
+    uint64 m_uiMagmusGUID;
 
     uint64 m_uiRocknotGUID;
     uint64 m_uiNagmaraGUID;
@@ -143,7 +143,7 @@ struct instance_blackrock_depths : ScriptedInstance
         m_uiDoomrelGUID = 0;
         m_uiDoperelGUID = 0;
 
-        m_uiGoMagnusGUID = 0;
+        m_uiMagmusGUID = 0;
 
         // Ring of Law Challenge
         m_uiTheldrenGUID = 0;
@@ -257,8 +257,8 @@ struct instance_blackrock_depths : ScriptedInstance
             case NPC_RIBBLY_S_CRONY:
                 m_lRibblySCronyMobGUIDList.push_back(pCreature->GetGUID());
                 break;
-            case 9938:
-                m_uiGoMagnusGUID = pCreature->GetGUID();
+            case NPC_MAGMUS:
+                m_uiMagmusGUID = pCreature->GetGUID();
                 break;
 			// Arena Crowd
             case NPC_ARENA_SPECTATOR:
@@ -640,7 +640,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void CustomSpellCasted(uint32 spellId, Unit* caster, Unit* target) override
     {
-        sLog.outString("Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
         switch (spellId)
         {
             // BRD : Invocation de Theldren
@@ -728,7 +728,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void SetData(uint32 uiType, uint32 uiData) override
     {
-        sLog.outDebug("Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
 
         switch (uiType)
         {
@@ -784,11 +784,11 @@ struct instance_blackrock_depths : ScriptedInstance
                 {
                     DoOpenDoor(m_uiGoGolemNGUID);
                     DoOpenDoor(m_uiGoGolemSGUID);
-                    if (Creature* magnus = instance->GetCreature(m_uiGoMagnusGUID))
+                    if (Creature* magmus = instance->GetCreature(m_uiMagmusGUID))
                     {
-                        DoScriptText(YELL_MAGMUS, magnus);
+                        DoScriptText(YELL_MAGMUS, magmus);
                         std::list<Creature*> AnvilrageList;
-                        GetCreatureListWithEntryInGrid(AnvilrageList, magnus, 8901, 400.0f);
+                        GetCreatureListWithEntryInGrid(AnvilrageList, magmus, 8901, 400.0f);
 
                         for (const auto& it : AnvilrageList)
                             it->SetRespawnDelay(345600);
