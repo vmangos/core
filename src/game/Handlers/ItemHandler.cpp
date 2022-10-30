@@ -640,7 +640,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recv_data)
             }
 
             uint32 dmultiplier = dcost->multiplier[ItemSubClassToDurabilityMultiplierId(pProto->Class, pProto->SubClass)];
-            uint32 repaircost = uint32(LostDurability * dmultiplier * double(dQualitymodEntry->quality_mod));
+            uint32 repaircost = uint32(LostDurability * dmultiplier * dQualitymodEntry->quality_mod);
 
             if (repaircost == 0)
                 repaircost = 1;
