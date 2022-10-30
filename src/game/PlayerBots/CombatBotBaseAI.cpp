@@ -2151,7 +2151,6 @@ SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* p
                 }
             }
 
-            pSpellEntry->GetMaxDuration();
             int32 const diff = basePoints - missingHealth;
             if (std::abs(diff) < healthDiff)
             {
