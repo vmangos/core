@@ -614,6 +614,45 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recv_data)
         }
     }
 
+    uint32 maxDurability = pItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
+    if (maxDurability)
+    {
+        uint32 curDurability = pItem->GetUInt32Value(ITEM_FIELD_DURABILITY);
+        uint32 LostDurability = maxDurability - curDurability;
+
+        if (LostDurability > 0)
+        {
+            DurabilityCostsEntry const* dcost = sDurabilityCostsStore.LookupEntry(pProto->ItemLevel);
+            if (!dcost)
+            {
+                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RepairDurability: Wrong item lvl %u", pProto->ItemLevel);
+                return;
+            }
+
+            uint32 dQualitymodEntryId = (pProto->Quality + 1) * 2;
+            DurabilityQualityEntry const* dQualitymodEntry = sDurabilityQualityStore.LookupEntry(dQualitymodEntryId);
+            if (!dQualitymodEntry)
+            {
+                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RepairDurability: Wrong dQualityModEntry %u", dQualitymodEntryId);
+                return;
+            }
+
+            uint32 dmultiplier = dcost->multiplier[ItemSubClassToDurabilityMultiplierId(pProto->Class, pProto->SubClass)];
+            uint32 repaircost = uint32(LostDurability * dmultiplier * dQualitymodEntry->quality_mod);
+
+            if (repaircost == 0)
+                repaircost = 1;
+
+            //starter items can cost more to repair than vendorprice
+            if (repaircost > money)
+                money = 1;
+            else
+                money -= repaircost;
+        }
+    }
+
     if (count < pItem->GetCount())              // need split items
     {
         Item *pNewItem = pItem->CloneItem(count, _player);
