@@ -14,7 +14,7 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `
 INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `patch_max`) VALUES (34, 221, 67, 0, 10);
 
 -- Set Durotar, Valley of Trials for Spirit Rock, The Den, Hidden Path, Burning Blade Coven until patch 1.6
-UPDATE `game_graveyard_zone` SET `patch_max`=3 WHERE `id`=709 AND `ghost_zone`=363
+UPDATE `game_graveyard_zone` SET `patch_max`=3 WHERE `id`=709 AND `ghost_zone`=363;
 INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `patch_max`) VALUES (709, 637, 67, 0, 3);
 INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `patch_max`) VALUES (709, 364, 67, 0, 3);
 INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `patch_max`) VALUES (709, 638, 67, 0, 3);
