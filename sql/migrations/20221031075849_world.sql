@@ -24,6 +24,10 @@ UPDATE `item_loot_template` SET `ChanceOrQuestChance`=21, `groupid`=1 WHERE `ent
 UPDATE `item_loot_template` SET `ChanceOrQuestChance`=21, `groupid`=1 WHERE `entry`=9276 AND `item`=9355; -- Hoop Earring
 UPDATE `item_loot_template` SET `ChanceOrQuestChance`=1.1, `groupid`=1 WHERE `entry`=9276 AND `item`=9359; -- Southsea Lamp
 
+-- Drop chance of Pirate's Footlocker
+-- source: https://www.wowhead.com/classic/item=9276/pirates-footlocker
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=8 WHERE `entry` IN (7855,7856,7857,7858,15685) AND `item`= 9276;
+
 -- End of migration.
 END IF;
 END??
