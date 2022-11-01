@@ -26,6 +26,19 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `build_min`) 
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `build_min`) VALUES (28364, 1, 16396, 5464);
 DELETE FROM `spell_script_target` WHERE `entry`=28364 AND `type`=1 AND `targetEntry`=7980;
 
+UPDATE `spell_script_target` SET `type`=0, `targetEntry`=181142 WHERE `entry`=31315 AND `type`=1 AND `targetEntry`=16230;
+DELETE FROM `spell_script_target` WHERE `entry`=16172 AND `type`=1 AND `targetEntry`=16136;
+
+-- Move GameObject Necropolis to DB.
+UPDATE `gameobject` SET `spawn_flags`=1, `visibility_mod`=5000 WHERE `id` IN (181154,181373,181374,181215,181223,181172);
+UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` IN (181154,181373,181374,181215,181223,181172);
+
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16401,16386,16398,16172,16230);
+UPDATE `creature` SET `spawn_flags`=1, `visibility_mod`=5000 WHERE `id` IN (16401,16386,16398,16172);
+
+DELETE FROM `creature_ai_scripts` WHERE `dataint`=12366 AND `dataint2`=12367 AND `dataint3`=12368 AND `dataint4`=12369;
+DELETE FROM `creature_ai_scripts` WHERE `dataint`=12370 AND `dataint2`=12371 AND `dataint3`=12372 AND `dataint4`=12373;
+
 -- Pallid Horror Spells
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (163940, 'Pallid Horror', 28364, 100, 1, 0, 0, 2, 5, 30, 10, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -35,7 +48,7 @@ REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `
 -- Shadow of Doom Spells
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (161430, 'Shadow of Doom', 12542, 100, 1, 0, 0, 0, 4, 38, 16, 38, 0, 16568, 100, 1, 0, 0, 136, 3, 38, 4, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
--- 601: Source's Guid Is 66917 (Pallid Horror in Stormwind City: Cathedral of Light)
+-- 601: Source's Guid Is 66917 (Pallid Horror in Stormwind City Cathedral of Light)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (601, 52, 66917, 0, 0, 0, 0);
 
 -- 602: Source's Guid Is 66931 (Pallid Horror in Undercity Canals)
@@ -43,6 +56,54 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 
 -- 603: Source's Guid Is 66945 (Pallid Horror in Undercity Sewers)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (603, 52, 66945, 0, 0, 0, 0);
+
+-- 604: Source's Guid Is 66945 (Patchwork Terror in Stormwind City)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (604, 52, 66961, 0, 0, 0, 0);
+
+-- 605: Source's Guid Is 66901 Or 66903 Or 66902 (Flameshockers in Stormwind City Mage Quarter)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (605, 52, 66901, 66903, 66902, 0, 0); 
+
+-- 606: Source's Guid Is 66904 Or 66905 Or 66906 Or 66907 (Flameshockers in Stormwind City Trade District)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (606, 52, 66904, 66905, 66906, 66907, 0); 
+
+-- 607: Source's Guid Is 66908 Or 66909 Or 66910 (Flameshockers in Stormwind City The Park)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (607, 52, 66908, 66909, 66910, 0, 0); 
+
+-- 608: Source's Guid Is 66911 Or 66912 Or 66913 (Flameshockers in Stormwind City Old Town)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (608, 52, 66911, 66912, 66913, 0, 0); 
+
+-- 609: Source's Guid Is 66920 Or 66920 Or 66922 (Flameshockers in Stormwind City Dwarven District)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (609, 52, 66920, 66921, 66922, 0, 0); 
+
+-- 610: Source's Guid Is 66923 Or 66924 Or 66925 Or 66926 (Flameshockers in Undercity Rogues Quarter)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (610, 52, 66923, 66924, 66925, 66926, 0); 
+
+-- 611: Source's Guid Is 66927 Or 66930 Or 66935 (Flameshockers in Undercity Rogues Quarter)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (611, 52, 66927, 66930, 66935, 0, 0); 
+
+-- 612: (610: Source's Guid Is 66923 Or 66924 Or 66925 Or 66926) Or (611: Source's Guid Is 66927 Or 66930 Or 66935)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (612, -2, 610, 611, 0, 0, 0);
+
+-- 613: Source's Guid Is 66936 Or 66937 Or 66938 Or 66939 (Flameshockers in Undercity Trade Quarter)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (613, 52, 66936, 66937, 66938, 66939, 0); 
+
+-- 614: Source's Guid Is 66940 (Flameshockers in Undercity Trade Quarter)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (614, 52, 66940, 0, 0, 0, 0); 
+
+-- 615: (613: Source's Guid Is 66936 Or 66937 Or 66938 Or 66939) Or (614: Source's Guid Is 66940)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (615, -2, 613, 614, 0, 0, 0);
+
+-- 616: Source's Guid Is 66951 Or 66953 Or 66955 Or 66956 (Flameshockers in Undercity Magic Quarter)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (616, 52, 66951, 66953, 66955, 66956, 0); 
+
+-- 617: Source's Guid Is 66958 Or 66960 (Flameshockers in Undercity Magic Quarter)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (617, 52, 66958, 66960, 0, 0, 0); 
+
+-- 618: (616: Source's Guid Is 66951 Or 66953 Or 66955 Or 66956) Or (617: Source's Guid Is 66958 Or 66960)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (618, -2, 616, 617, 0, 0, 0);
+
+-- 619: Source's Guid Is 66952 Or 66954 Or 66957 Or 66959 (Flameshockers in Undercity War Quarter)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (619, 52, 66952, 66954, 66957, 66959, 0); 
 
 -- Events list for Pallid Horror
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16394;
@@ -53,6 +114,8 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639406, 16394, 0, 30, 0, 100, 1, 0, 0, 0, 0, 1639406, 0, 0, 'Pallid Horror - Leave Combat');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639407, 16394, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1639407, 0, 0, 'Pallid Horror - Just Spawned');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639408, 16394, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1639408, 0, 0, 'Pallid Horror - Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639409, 16394, 603, 6, 0, 100, 0, 0, 0, 0, 0, 1639409, 0, 0, 'Pallid Horror - Death from Undercity Sewers');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639409, 16394, 604, 6, 0, 100, 0, 0, 0, 0, 0, 1639409, 0, 0, 'Pallid Horror - Death from Stormwind');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1639401;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -101,15 +164,19 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1639407;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1639407, 0, 0, 59, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Set React State Defensive');
 
-DELETE FROM `generic_scripts` WHERE `id`=1638301;
-INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1638301, 0, 0, 78, 1, 0, 0, 0, 16394, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Join Creature Group');
-
 DELETE FROM `creature_ai_scripts` WHERE `id`=1639408;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1639408, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Leave Creature Group'),
 (1639408, 0, 0, 15, 28699, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Summon Faint Necrotic Crystal'),
 (1639408, 0, 0, 18, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Despawn 10 seconds after Death');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1639409;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1639409, 0, 0, 0, 6, 0, 0, 0, 32039, 0, 9, 0, 12331, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Undercity Sewers: Lady Sylvanas Windrunner Zone Yell');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1639410;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1639410, 0, 0, 0, 6, 0, 0, 0, 10495, 0, 9, 0, 12318, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Terror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
 
 -- Events list for Shadow of Doom
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16143;
@@ -129,25 +196,46 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16383;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638301, 16383, 0, 1, 0, 100, 0, 8600, 335448, 0, 0, 1638301, 0, 0, 'Flameshocker - Cast Spell: Spirit Spawn-out OOC');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638302, 16383, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1638302, 0, 0, 'Flameshocker - Cast Spell: Flameshocker\'s Revenge On Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638303, 16383, 605, 11, 0, 100, 0, 0, 0, 0, 0, 1638303, 0, 0, 'Flameshocker - Just Spawned in Stormwind City Mage Quarter');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1638301;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1638301, 0, 0, 15, 17680, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Cast Spell: Spirit Spawn-out OOC');
+(1638301, 0, 0, 15, 17680, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Cast Spell: Spirit Spawn-out OOC');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1638302;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1638302, 0, 0, 15, 28323, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Cast Spell: Flameshocker\'s Revenge On Death'),
 (1638302, 0, 0, 18, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Despawn 10 seconds after Death');
 
-UPDATE `spell_script_target` SET `type`=0, `targetEntry`=181142 WHERE `entry`=31315 AND `type`=1 AND `targetEntry`=16230;
-DELETE FROM `spell_script_target` WHERE `entry`=16172 AND `type`=1 AND `targetEntry`=16136;
+-- Stormwind City Mage Quarter - Collin Mauren
+DELETE FROM `creature_ai_scripts` WHERE `id`=1638303;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1638303, 0, 0, 20, 10, 0, 2000, 0, 79820, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Collin Mauren'),
+(1638303, 0, 0, 39, 1638302, 1638303, 0, 0, 79820, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Collin Mauren');
 
--- Move GameObject Necropolis to DB.
-UPDATE `gameobject` SET `spawn_flags`=1, `visibility_mod`=5000 WHERE `id` IN (181154,181373,181374,181215,181223,181172);
-UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` IN (181154,181373,181374,181215,181223,181172);
+-- Stormwind City Mage Quarter - Archmage Malin
+DELETE FROM `creature_ai_scripts` WHERE `id`=1638304;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1638304, 0, 0, 20, 10, 0, 2000, 0, 90442, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Archmage Malin'),
+(1638304, 0, 0, 39, 1638302, 1638303, 0, 0, 90442, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Archmage Malin');
 
-UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16401,16386,16398,16172,16230);
-UPDATE `creature` SET `spawn_flags`=1, `visibility_mod`=5000 WHERE `id` IN (16401,16386,16398,16172);
+-- Stormwind City Mage Quarter - Erich Lohan
+DELETE FROM `creature_ai_scripts` WHERE `id`=1638305;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1638305, 0, 0, 20, 10, 0, 2000, 0, 90445, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Erich Lohan'),
+(1638305, 0, 0, 39, 1638302, 1638303, 0, 0, 90445, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Erich Lohan');
+
+DELETE FROM `generic_scripts` WHERE `id`=1638301;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1638301, 0, 0, 78, 1, 0, 0, 0, 16394, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Join Creature Group');
+
+DELETE FROM `generic_scripts` WHERE `id`=1638302;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1638302, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 2, 12366, 12367, 12368, 12369, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say'),
+
+DELETE FROM `generic_scripts` WHERE `id`=1638303;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1638303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 2, 12370, 12371, 12372, 12373, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say'),
 
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
     (28078, 1, 16172, 0, 0, 5464, 5875),
@@ -276,28 +364,28 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 -- Pallid and Flameshockers respawn.
 SET @FLAMESHOCKER_GUID = 66900;
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-    (@FLAMESHOCKER_GUID+1, 16383, 0, 0, 0, 0, -9001.15, 891.015, 105.505, 2.29504, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Mage Quarter.
-    (@FLAMESHOCKER_GUID+2, 16383, 0, 0, 0, 0, -8997.9, 834.881, 105.855, 1.91986, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Mage Quarter.
-    (@FLAMESHOCKER_GUID+3, 16383, 0, 0, 0, 0, -8931.39, 960.914, 117.416, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Mage Quarter.
-    (@FLAMESHOCKER_GUID+4, 16383, 0, 0, 0, 0, -8879.42, 579.776, 93.0791, 4.62512, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Trade District.
-    (@FLAMESHOCKER_GUID+5, 16383, 0, 0, 0, 0, -8850.97, 653.117, 96.6387, 2.61799, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Trade District.
-    (@FLAMESHOCKER_GUID+6, 16383, 0, 0, 0, 0, -8833.34, 622.748, 93.7479, 1.91986, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Trade District.
-    (@FLAMESHOCKER_GUID+7, 16383, 0, 0, 0, 0, -8810.19, 580.752, 95.9053, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Trade District.
-    (@FLAMESHOCKER_GUID+8, 16383, 0, 0, 0, 0, -8780.81, 1068.88, 90.8636, 2.61799, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: The Park.
-    (@FLAMESHOCKER_GUID+9, 16383, 0, 0, 0, 0, -8733.97, 1106.75, 92.6246, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: The Park.
-    (@FLAMESHOCKER_GUID+10, 16383, 0, 0, 0, 0, -8731.61, 1003.63, 95.8085, 1.91986, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: The Park.
-    (@FLAMESHOCKER_GUID+11, 16383, 0, 0, 0, 0, -8722.22, 441.27, 97.3523, 1.91986, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Old Town.
-    (@FLAMESHOCKER_GUID+12, 16383, 0, 0, 0, 0, -8698.38, 401.52, 101.099, 2.61799, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Old Town.
-    (@FLAMESHOCKER_GUID+13, 16383, 0, 0, 0, 0, -8634.71, 444.417, 102.237, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Old Town.
-    -- (@FLAMESHOCKER_GUID+14, 16383, 0, 0, 0, 0, -8585.14, 903.542, 81.7025, 4.72984, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Cathedral of Light.
-    -- (@FLAMESHOCKER_GUID+15, 16383, 0, 0, 0, 0, -8583.97, 906.899, 81.7026, 3.83972, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Cathedral of Light.
-    -- (@FLAMESHOCKER_GUID+16, 16383, 0, 0, 0, 0, -8583.51, 901.15, 81.7033, 4.08407, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Cathedral of Light.
-    (@FLAMESHOCKER_GUID+17, 16394, 0, 0, 0, 0, -8581.79, 904.538, 81.7021, 3.82227, 2700, 2700, 5, 100, 100, 2, 0, 0, 0, 10), -- Pallid Horror in Stormwind City: Cathedral of Light.
-    -- (@FLAMESHOCKER_GUID+18, 16383, 0, 0, 0, 0, -8580.33, 901.258, 81.7028, 3.92699, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Cathedral of Light.
-    -- (@FLAMESHOCKER_GUID+19, 16383, 0, 0, 0, 0, -8579.29, 907.101, 81.702, 3.92699, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Cathedral of Light.
-    (@FLAMESHOCKER_GUID+20, 16383, 0, 0, 0, 0, -8450.78, 587.494, 94.1273, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Dwarven District.
-    (@FLAMESHOCKER_GUID+21, 16383, 0, 0, 0, 0, -8394.75, 575.578, 91.3721, 2.93627, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Dwarven District.
-    (@FLAMESHOCKER_GUID+22, 16383, 0, 0, 0, 0, -8367.51, 637.011, 94.9871, 4.1433, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City: Dwarven District.
+    (@FLAMESHOCKER_GUID+1, 16383, 0, 0, 0, 0, -9001.15, 891.015, 105.505, 2.29504, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Mage Quarter.
+    (@FLAMESHOCKER_GUID+2, 16383, 0, 0, 0, 0, -8997.9, 834.881, 105.855, 1.91986, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Mage Quarter.
+    (@FLAMESHOCKER_GUID+3, 16383, 0, 0, 0, 0, -8931.39, 960.914, 117.416, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Mage Quarter.
+    (@FLAMESHOCKER_GUID+4, 16383, 0, 0, 0, 0, -8879.42, 579.776, 93.0791, 4.62512, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Trade District.
+    (@FLAMESHOCKER_GUID+5, 16383, 0, 0, 0, 0, -8850.97, 653.117, 96.6387, 2.61799, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Trade District.
+    (@FLAMESHOCKER_GUID+6, 16383, 0, 0, 0, 0, -8833.34, 622.748, 93.7479, 1.91986, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Trade District.
+    (@FLAMESHOCKER_GUID+7, 16383, 0, 0, 0, 0, -8810.19, 580.752, 95.9053, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Trade District.
+    (@FLAMESHOCKER_GUID+8, 16383, 0, 0, 0, 0, -8780.81, 1068.88, 90.8636, 2.61799, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City The Park.
+    (@FLAMESHOCKER_GUID+9, 16383, 0, 0, 0, 0, -8733.97, 1106.75, 92.6246, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City The Park.
+    (@FLAMESHOCKER_GUID+10, 16383, 0, 0, 0, 0, -8731.61, 1003.63, 95.8085, 1.91986, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City The Park.
+    (@FLAMESHOCKER_GUID+11, 16383, 0, 0, 0, 0, -8722.22, 441.27, 97.3523, 1.91986, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Old Town.
+    (@FLAMESHOCKER_GUID+12, 16383, 0, 0, 0, 0, -8698.38, 401.52, 101.099, 2.61799, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Old Town.
+    (@FLAMESHOCKER_GUID+13, 16383, 0, 0, 0, 0, -8634.71, 444.417, 102.237, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Old Town.
+    -- (@FLAMESHOCKER_GUID+14, 16383, 0, 0, 0, 0, -8585.14, 903.542, 81.7025, 4.72984, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Cathedral of Light.
+    -- (@FLAMESHOCKER_GUID+15, 16383, 0, 0, 0, 0, -8583.97, 906.899, 81.7026, 3.83972, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Cathedral of Light.
+    -- (@FLAMESHOCKER_GUID+16, 16383, 0, 0, 0, 0, -8583.51, 901.15, 81.7033, 4.08407, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Cathedral of Light.
+    (@FLAMESHOCKER_GUID+17, 16394, 0, 0, 0, 0, -8581.79, 904.538, 81.7021, 3.82227, 2700, 2700, 5, 100, 100, 2, 1, 0, 0, 10), -- Pallid Horror in Stormwind City Cathedral of Light.
+    -- (@FLAMESHOCKER_GUID+18, 16383, 0, 0, 0, 0, -8580.33, 901.258, 81.7028, 3.92699, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Cathedral of Light.
+    -- (@FLAMESHOCKER_GUID+19, 16383, 0, 0, 0, 0, -8579.29, 907.101, 81.702, 3.92699, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Cathedral of Light.
+    (@FLAMESHOCKER_GUID+20, 16383, 0, 0, 0, 0, -8450.78, 587.494, 94.1273, 0.663225, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Dwarven District.
+    (@FLAMESHOCKER_GUID+21, 16383, 0, 0, 0, 0, -8394.75, 575.578, 91.3721, 2.93627, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Dwarven District.
+    (@FLAMESHOCKER_GUID+22, 16383, 0, 0, 0, 0, -8367.51, 637.011, 94.9871, 4.1433, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Stormwind City Dwarven District.
     (@FLAMESHOCKER_GUID+23, 16383, 0, 0, 0, 0, 1420.04, 119.324, -62.2049, 1.32645, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Rogues Quarter.
     (@FLAMESHOCKER_GUID+24, 16383, 0, 0, 0, 0, 1445.72, 91.438, -62.2014, 0.802851, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Rogues Quarter.
     (@FLAMESHOCKER_GUID+25, 16383, 0, 0, 0, 0, 1489.15, 67.53, -62.2138, 2.37365, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Rogues Quarter.
@@ -306,7 +394,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
     -- (@FLAMESHOCKER_GUID+28, 16383, 0, 0, 0, 0, 1532.72, 273.599, -62.0943, 1.25664, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Canals.
     -- (@FLAMESHOCKER_GUID+29, 16383, 0, 0, 0, 0, 1532.99, 278.193, -62.0943, 1.53589, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Canals.
     (@FLAMESHOCKER_GUID+30, 16383, 0, 0, 0, 0, 1534.92, 138.913, -62.0883, 4.34587, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Rogues Quarter.
-    (@FLAMESHOCKER_GUID+31, 16394, 0, 0, 0, 0, 1535.76, 274.897, -62.0943, 1.0821, 2700, 2700, 5, 100, 100, 2, 0, 0, 0, 10), -- Pallid Horror in Undercity Canals.
+    (@FLAMESHOCKER_GUID+31, 16394, 0, 0, 0, 0, 1535.76, 274.897, -62.0943, 1.0821, 2700, 2700, 5, 100, 100, 2, 1, 0, 0, 10), -- Pallid Horror in Undercity Canals.
     -- (@FLAMESHOCKER_GUID+32, 16383, 0, 0, 0, 0, 1536.4, 271.839, -62.0943, 1.23918, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Canals.
     -- (@FLAMESHOCKER_GUID+33, 16383, 0, 0, 0, 0, 1537.21, 278.743, -62.0943, 1.20428, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Canals.
     -- (@FLAMESHOCKER_GUID+34, 16383, 0, 0, 0, 0, 1539.85, 274.237, -62.0943, 1.20428, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Canals.
@@ -320,7 +408,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
     -- (@FLAMESHOCKER_GUID+42, 16383, 0, 0, 0, 0, 1627.48, 477.444, -22.7847, 4.71239, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Sewers.
     -- (@FLAMESHOCKER_GUID+43, 16383, 0, 0, 0, 0, 1627.97, 484.273, -22.7855, 6.21337, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Sewers.
     -- (@FLAMESHOCKER_GUID+44, 16383, 0, 0, 0, 0, 1629.02, 477.154, -22.7847, 1.88496, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Sewers.
-    (@FLAMESHOCKER_GUID+45, 16394, 0, 0, 0, 0, 1629.41, 480.468, -22.7851, 4.69494, 2700, 2700, 5, 100, 100, 2, 0, 0, 0, 10), -- Pallid Horror in Undercity Sewers.
+    (@FLAMESHOCKER_GUID+45, 16394, 0, 0, 0, 0, 1629.41, 480.468, -22.7851, 4.69494, 2700, 2700, 5, 100, 100, 2, 1, 0, 0, 10), -- Pallid Horror in Undercity Sewers.
     -- (@FLAMESHOCKER_GUID+46, 16383, 0, 0, 0, 0, 1630.92, 484.171, -22.7855, 3.26377, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Sewers.
     -- (@FLAMESHOCKER_GUID+47, 16383, 0, 0, 0, 0, 1631.27, 477.82, -22.785, 5.27089, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Sewers.
     -- (@FLAMESHOCKER_GUID+48, 16383, 0, 0, 0, 0, 1632.22, 481.066, -22.7855, 5.41052, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10), -- Flameshocker in Undercity Sewers.
@@ -338,28 +426,28 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
     (@FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 100, 1, 0, 0, 0, 10); -- Flameshocker in Undercity Magic Quarter.
 
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
-    (@FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City: Mage Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+2, 1431, 0, 'Flameshocker in Stormwind City: Mage Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+3, 1431, 0, 'Flameshocker in Stormwind City: Mage Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+4, 1432, 0, 'Flameshocker in Stormwind City: Trade District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+5, 1432, 0, 'Flameshocker in Stormwind City: Trade District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+6, 1432, 0, 'Flameshocker in Stormwind City: Trade District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+7, 1432, 0, 'Flameshocker in Stormwind City: Trade District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+8, 1433, 0, 'Flameshocker in Stormwind City: The Park', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+9, 1433, 0, 'Flameshocker in Stormwind City: The Park', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+10, 1433, 0, 'Flameshocker in Stormwind City: The Park', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+11, 1434, 0, 'Flameshocker in Stormwind City: Old Town', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+12, 1434, 0, 'Flameshocker in Stormwind City: Old Town', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+13, 1434, 0, 'Flameshocker in Stormwind City: Old Town', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+14, 1441, 0, 'Flameshocker in Stormwind City: Cathedral of Light', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+15, 1441, 0, 'Flameshocker in Stormwind City: Cathedral of Light', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+16, 1441, 0, 'Flameshocker in Stormwind City: Cathedral of Light', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+17, 1441, 0, 'Pallid Horror in Stormwind City: Cathedral of Light', 0, 0, 10), 
-    -- (@FLAMESHOCKER_GUID+18, 1441, 0, 'Flameshocker in Stormwind City: Cathedral of Light', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+19, 1441, 0, 'Flameshocker in Stormwind City: Cathedral of Light', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+20, 1435, 0, 'Flameshocker in Stormwind City: Dwarven District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+21, 1435, 0, 'Flameshocker in Stormwind City: Dwarven District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+22, 1435, 0, 'Flameshocker in Stormwind City: Dwarven District', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+2, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+3, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+4, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+5, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+6, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+7, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+8, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+9, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+10, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+11, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+12, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+13, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
+    -- (@FLAMESHOCKER_GUID+14, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+    -- (@FLAMESHOCKER_GUID+15, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+    -- (@FLAMESHOCKER_GUID+16, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+17, 1441, 0, 'Pallid Horror in Stormwind City Cathedral of Light', 0, 0, 10), 
+    -- (@FLAMESHOCKER_GUID+18, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+    -- (@FLAMESHOCKER_GUID+19, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+20, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+21, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
+    (@FLAMESHOCKER_GUID+22, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
     (@FLAMESHOCKER_GUID+23, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
     (@FLAMESHOCKER_GUID+24, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
     (@FLAMESHOCKER_GUID+25, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
@@ -400,11 +488,11 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`, `fla
     (@FLAMESHOCKER_GUID+60, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-    (1431, 1, 'Flameshockers in Stormwind City: Mage Quarter', 0, 0, 0, 10),
-    (1432, 1, 'Flameshockers in Stormwind City: Trade District', 0, 0, 0, 10),
-    (1433, 1, 'Flameshockers in Stormwind City: The Park', 0, 0, 0, 10),
-    (1434, 1, 'Flameshockers in Stormwind City: Old Town', 0, 0, 0, 10),
-    (1435, 1, 'Flameshockers in Stormwind City: Dwarven District', 0, 0, 0, 10),
+    (1431, 1, 'Flameshockers in Stormwind City Mage Quarter', 0, 0, 0, 10),
+    (1432, 1, 'Flameshockers in Stormwind City Trade District', 0, 0, 0, 10),
+    (1433, 1, 'Flameshockers in Stormwind City The Park', 0, 0, 0, 10),
+    (1434, 1, 'Flameshockers in Stormwind City Old Town', 0, 0, 0, 10),
+    (1435, 1, 'Flameshockers in Stormwind City Dwarven District', 0, 0, 0, 10),
     (1436, 1, 'Flameshockers in Undercity Rogues Quarter', 0, 0, 0, 10),
     (1437, 1, 'Flameshockers in Undercity Trade Quarter', 0, 0, 0, 10),
     (1438, 1, 'Flameshockers in Undercity Magic Quarter', 0, 0, 0, 10),
@@ -413,11 +501,11 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `inst
     (1442, 1, 'Pallids in Undercity', 0, 0, 0, 10);
 
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+14, 5, 0, 8), -- Flameshocker in Stormwind City: Cathedral of Light
-    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+15, 5, 0, 8), -- Flameshocker in Stormwind City: Cathedral of Light
-    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+16, 5, 0, 8), -- Flameshocker in Stormwind City: Cathedral of Light
-    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+18, 5, 0, 8), -- Flameshocker in Stormwind City: Cathedral of Light
-    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+19, 5, 0, 8), -- Flameshocker in Stormwind City: Cathedral of Light
+    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+14, 5, 0, 8), -- Flameshocker in Stormwind City Cathedral of Light
+    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+15, 5, 0, 8), -- Flameshocker in Stormwind City Cathedral of Light
+    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+16, 5, 0, 8), -- Flameshocker in Stormwind City Cathedral of Light
+    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+18, 5, 0, 8), -- Flameshocker in Stormwind City Cathedral of Light
+    (@FLAMESHOCKER_GUID+17, @FLAMESHOCKER_GUID+19, 5, 0, 8), -- Flameshocker in Stormwind City Cathedral of Light
     (@FLAMESHOCKER_GUID+31, @FLAMESHOCKER_GUID+28, 5, 0, 8), -- Flameshocker in Undercity Canals
     (@FLAMESHOCKER_GUID+31, @FLAMESHOCKER_GUID+29, 5, 0, 8), -- Flameshocker in Undercity Canals
     (@FLAMESHOCKER_GUID+31, @FLAMESHOCKER_GUID+32, 5, 0, 8), -- Flameshocker in Undercity Canals
