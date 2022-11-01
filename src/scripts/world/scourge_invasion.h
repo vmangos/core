@@ -317,42 +317,10 @@ enum ScourgeInvasionNPCEvents
     EVENT_SHARD_MINION_SPAWNER_BUTTRESS     = 2,
     EVENT_SPAWNER_SUMMON_MINION             = 3,
     EVENT_SHARD_FIND_DAMAGED_SHARD          = 4,
-    EVENT_CULTIST_CHANNELING                = 5,
     EVENT_MOUTH_OF_KELTHUZAD_YELL           = 6,
     EVENT_MOUTH_OF_KELTHUZAD_ZONE_START     = 7,
     EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP      = 8,
     EVENT_MOUTH_OF_KELTHUZAD_UPDATE         = 9,
-
-    // Shadow of Doom Events
-    EVENT_DOOM_MINDFLAY                     = 20,
-    EVENT_DOOM_FEAR                         = 21,
-    EVENT_DOOM_START_ATTACK                 = 22,
-
-    // Rare Events 
-    EVENT_RARE_KNOCKDOWN                    = 31,
-    EVENT_RARE_TRAMPLE                      = 32,
-    EVENT_RARE_RIBBON_OF_SOULS              = 33,
-
-    // Minion Events
-    EVENT_MINION_ENRAGE                     = 40,
-    EVENT_MINION_BONE_SHARDS                = 41,
-    EVENT_MINION_INFECTED_BITE              = 42,
-    EVENT_MINION_DAZED                      = 43,
-    EVENT_MINION_DEMORALIZING_SHOUT         = 44,
-    EVENT_MINION_SUNDER_ARMOR               = 45,
-    EVENT_MINION_ARCANE_BOLT                = 46,
-    EVENT_MINION_PSYCHIC_SCREAM             = 47,
-    EVENT_MINION_SCOURGE_STRIKE             = 48,
-    EVENT_MINION_SHADOW_WORD_PAIN           = 49,
-    EVENT_MINION_FLAMESHOCKERS_TOUCH        = 50,
-    EVENT_MINION_FLAMESHOCKERS_DESPAWN      = 51,
-
-    // Pallid Horror Events 
-    EVENT_PALLID_RANDOM_YELL                = 52,
-    EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS     = 53,
-    EVENT_SYLVANAS_ANSWER_YELL              = 54,
-    EVENT_PALLID_RANDOM_SAY                 = 55,
-    EVENT_PALLID_SUMMON_FLAMESHOCKER        = 56
 };
 
 enum ScourgeInvasionWorldStatesVariables
