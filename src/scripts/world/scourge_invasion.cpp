@@ -21,48 +21,6 @@
 
 inline uint32 GetCampType(Creature* pUnit) { return pUnit->HasAura(SPELL_CAMP_TYPE_GHOST_SKELETON) || pUnit->HasAura(SPELL_CAMP_TYPE_GHOST_GHOUL) || pUnit->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON); };
 
-inline bool IsGuardOrBoss(Unit* pUnit) {
-    return pUnit->GetEntry() == NPC_ROYAL_DREADGUARD || pUnit->GetEntry() == NPC_STORMWIND_ROYAL_GUARD || pUnit->GetEntry() == NPC_UNDERCITY_ELITE_GUARDIAN || pUnit->GetEntry() == NPC_UNDERCITY_GUARDIAN || pUnit->GetEntry() == NPC_DEATHGUARD_ELITE ||
-        pUnit->GetEntry() == NPC_STORMWIND_CITY_GUARD || pUnit->GetEntry() == NPC_HIGHLORD_BOLVAR_FORDRAGON || pUnit->GetEntry() == NPC_LADY_SYLVANAS_WINDRUNNER || pUnit->GetEntry() == NPC_VARIMATHRAS;
-}
-
-Unit* SelectRandomFlameshockerSpawnTarget(Creature* pUnit, Unit* except, float radius)
-{
-    std::list<Unit*> targets;
-
-    MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(pUnit, pUnit, radius);
-    MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
-    Cell::VisitAllObjects(pUnit, searcher, radius);
-
-    // remove current target
-    if (except)
-        targets.remove(except);
-
-    for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
-    {
-        if (!(*tIter)->IsCreature() || !(*tIter)->ToCreature()->CanSummonGuards() || (*tIter)->GetZoneId() != pUnit->GetZoneId() || !pUnit->IsValidAttackTarget((*tIter)) || (*tIter)->FindNearestCreature(NPC_FLAMESHOCKER, VISIBILITY_DISTANCE_TINY))
-        {
-            std::list<Unit*>::iterator tIter2 = tIter;
-            ++tIter;
-            targets.erase(tIter2);
-        }
-        else
-            ++tIter;
-    }
-
-    // no appropriate targets
-    if (targets.empty())
-        return nullptr;
-
-    // select random
-    uint32 rIdx = urand(0, targets.size() - 1);
-    std::list<Unit*>::const_iterator tcIter = targets.begin();
-    for (uint32 i = 0; i < rIdx; ++i)
-        ++tcIter;
-
-    return *tcIter;
-}
-
 void ChangeZoneEventStatus(Creature* pMouth, bool on)
 {
     if (!pMouth)
@@ -133,7 +91,7 @@ void DespawnEventDoodads(Creature* pShard)
         return;
 
     std::list<GameObject*> doodadList;
-    GetGameObjectListWithEntryInGrid(doodadList, pShard, { GOBJ_SUMMON_CIRCLE, GOBJ_UNDEAD_FIRE, GOBJ_UNDEAD_FIRE_AURA, GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04, GOBJ_SUMMONER_SHIELD }, 60.0f);
+    GetGameObjectListWithEntryInGrid(doodadList, pShard, { GOBJ_CIRCLE, GOBJ_UNDEAD_FIRE, GOBJ_UNDEAD_FIRE_AURA, GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04, GOBJ_SUMMONER_SHIELD }, 60.0f);
     for (const auto pDoodad : doodadList)
         pDoodad->RemoveFromWorld();
 
@@ -165,7 +123,7 @@ void SummonCultists(Unit* pShard)
         pSummonerShield->Despawn();
 
     // We don't have all positions sniffed from the Cultists, so why not using this code which placing them almost perfectly into the circle while blizzards positions are some times way off?
-    if (GameObject* pGameObject = pShard->FindNearestGameObject(GOBJ_SUMMON_CIRCLE, CONTACT_DISTANCE))
+    if (GameObject* pGameObject = pShard->FindNearestGameObject(GOBJ_CIRCLE, CONTACT_DISTANCE))
     {
         for (int i = 0; i < 4; ++i)
         {
@@ -842,16 +800,6 @@ struct ScourgeMinion : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-        if (m_creature->GetEntry() == NPC_FLAMESHOCKER)
-            if (pWho->IsCreature() && m_creature->IsWithinDistInMap(pWho, VISIBILITY_DISTANCE_TINY) && m_creature->IsWithinLOSInMap(pWho) && !pWho->GetVictim())
-                if (IsGuardOrBoss(pWho) && pWho->AI())
-                    pWho->AI()->AttackStart(m_creature);
-
-        ScriptedAI::MoveInLineOfSight(pWho);
-    }
-
     void UpdateAI(uint32 const diff) override
     {
         m_events.Update(diff);
@@ -1093,15 +1041,6 @@ struct PallidHorrorAI : public ScriptedAI
         m_creature->AddAura(SPELL_AURA_OF_FEAR);
     }
 
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-        if (pWho->IsCreature() && m_creature->IsWithinDistInMap(pWho, VISIBILITY_DISTANCE_TINY) && m_creature->IsWithinLOSInMap(pWho) && !pWho->GetVictim())
-            if (IsGuardOrBoss(pWho) && pWho->AI())
-                pWho->AI()->AttackStart(m_creature);
-
-        ScriptedAI::MoveInLineOfSight(pWho);
-    }
-
     void JustDied(Unit* pUnit) override
     {
         if (Creature* pCreature = m_creature->FindNearestCreature(NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_NORMAL))
@@ -1170,24 +1109,6 @@ struct PallidHorrorAI : public ScriptedAI
                 {
                     DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DAMAGE_VS_GUARDS,  CF_TRIGGERED);
                     m_events.ScheduleEvent(EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS, urand(11000, 81000));
-                    break;
-                }
-                case EVENT_PALLID_SUMMON_FLAMESHOCKER:
-                {
-                    if (m_flameshockers.size() < 30)
-                    {
-                        if (Unit* pTarget = SelectRandomFlameshockerSpawnTarget(m_creature, (Unit*) nullptr, DEFAULT_VISIBILITY_BG))
-                        {
-                            float x, y, z;
-                            pTarget->GetNearPoint(pTarget, x, y, z, 5.0f, 5.0f, 0.0f);
-                            if (Creature* pFlameshocker = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 3000))
-                            {
-                                m_flameshockers.insert(pFlameshocker->GetObjectGuid());
-                                pFlameshocker->AI()->OnScriptEventHappened(NPC_FLAMESHOCKER, 0, pFlameshocker);
-                            }
-                        }
-                    }
-                    m_events.ScheduleEvent(EVENT_PALLID_SUMMON_FLAMESHOCKER, 2000);
                     break;
                 }
             }

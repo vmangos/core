@@ -418,6 +418,15 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         m_caster->CastSpell(unitTarget, 27766, true);
                         break;
                     }
+                    case 28041: // [Event: Scourge Invasion] Damage Crystal
+                    {
+                        if (unitTarget->GetEntry() == 16172) // Damaged Necrotic Shard
+                        {
+                            unitTarget->SetArmor(0);
+                            damage = 100;
+                        }
+                        break;
+                    }
                     case 28056: // [Event: Scourge Invasion] Zap Crystal Corpse
                     {
                         if (unitTarget->GetEntry() == 16172) // Damaged Necrotic Shard

@@ -81,7 +81,6 @@ enum ScourgeInvasionSpells
     SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON      = 28187,
 
     // Minions Spells
-    SPELL_ZAP_CRYSTAL_SUMMON_ZAPPER                 = 28031, // Summons 16182 (Crystal Zapper).
     SPELL_ZAP_CRYSTAL                               = 28032, // 15 damage to a Necrotic Shard on death.
     SPELL_MINION_SPAWN_IN                           = 28234, // Pink Lightning.
     SPELL_SPIRIT_SPAWN_OUT                          = 17680, // Makes invisible.
@@ -123,8 +122,6 @@ enum ScourgeInvasionSpells
     SPELL_CREATE_SUMMONER_SHIELD                    = 28132, // Summon Object - Temporary (181142),
                                                              // Casted exactly the same time with 28234 (Minion Spawn-in) on spawn.
     SPELL_BUTTRESS_CHANNEL                          = 28078, // Channeled by Cultist Engineer on Damaged Necrotic Shard shortly after spawning.
-    SPELL_BUTTRESS_TRAP                             = 28054, // Unknown.
-    SPELL_KILL_SUMMONER_SUMMON_BOSS                 = 28250, // Reagents, 1 Necrotic Rune
     SPELL_SELF_STUN_DND                             = 29826,
                                                          
     // Probably used to spawn Shadow of Doom.       Casting sequence (All these [x] spells are being casted the following order within 1-2 seconds):
@@ -136,8 +133,7 @@ enum ScourgeInvasionSpells
 
     // Shadow of Doom
     SPELL_SPAWN_SMOKE                               = 10389, // Spawning Visual.
-    SPELL_ZAP_CRYSTAL_CORPSE                        = 28056, // Casted on Shard if Shadow of Doom dies.
-    SPELL_ZAP_CRYSTAL_CORPSE_CLASSIC                = 348571,// Casted on Shard if Shadow of Doom dies (only in 1.13.3.40347 Classic).
+    SPELL_ZAP_CRYSTAL_CORPSE                        = 28056, // Casted by Damaged Necrotic Shard on himself if Shadow of Doom dies or, every 5 seconds if no Cultists and Shadows are alive.
     SPELL_MINDFLAY                                  = 16568,
     SPELL_FEAR                                      = 12542,
     
@@ -158,14 +154,18 @@ enum ScourgeInvasionSpells
     SPELL_FLAMESHOCKER_IMMOLATE_VISUAL              = 28330
 
     /*
-    These spells are not used by any NPCs or GameObjects.
+    These spells are not used in Classic.
     The [PH] in the name means it's a placeholder. Blizzard often adds that to the names of things they add to the game but haven't finalized.
     The fact that the [PH] is still there means the quest was never finished. (Google)
-        SPELL_OPEN_CIRCLE                                   = 28278, // Probably activates 181136 (Circle) to summon the Necrotic Shard, Caster unknown.
-        SPELL_PH_GET_TOKEN                                  = 27922, // Create Item "Necrotic Rune".
+        SPELL_ZAP_CRYSTAL_CORPSE_CLASSIC                    = 348571,   // Casted on Shard if Shadow of Doom dies (only in 1.13.3.40347 Classic).
+        SPELL_ZAP_CRYSTAL_SUMMON_ZAPPER                     = 28031,    // Summons 16182 (Crystal Zapper).
+        SPELL_BUTTRESS_TRAP                                 = 28054,    // Unknown.
+        SPELL_KILL_SUMMONER_SUMMON_BOSS                     = 28250,    // Reagents, 1 Necrotic Rune
+        SPELL_OPEN_CIRCLE                                   = 28278,    // Probably activates 181136 (Circle) to summon the Necrotic Shard, Caster unknown.
+        SPELL_PH_GET_TOKEN                                  = 27922,    // Create Item "Necrotic Rune".
         SPELL_PH_BUTTRESS_ACTIVATOR                         = 28086,
         SPELL_PH_CRYSTAL_CORPSE_DESPAWN                     = 28020,
-        SPELL_PH_CRYSTAL_CORPSE_TIMER                       = 28018, // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
+        SPELL_PH_CRYSTAL_CORPSE_TIMER                       = 28018,    // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
         SPELL_PH_CYSTAL_BAZOOKA                             = 27849,
         SPELL_DND_SUMMON_CRYSTAL_MINION_FINDER              = 28227,
         SPELL_CREATE_MINION_TRAP_GHOUL_SKELETON             = 28194,
@@ -239,7 +239,7 @@ enum ScourgeInvasionNPC
     NPC_PATCHWORK_TERROR                                = 16382, // Leader NPC for City Attacks. I believe, since i never saw a Stormwind Castle route in Classic (Yes its bugged somehow, i was waiting for it for hours and days), the Patchwork Terror is only meant to do this route and do not appear in Undercity.
     NPC_CRACKED_NECROTIC_CRYSTAL                        = 16431,
     NPC_FAINT_NECROTIC_CRYSTAL                          = 16531,
-    NPC_FLAMESHOCKER                                    = 16383,
+    NPC_FLAMESHOCKER                                    = 16383, // Pooled, One Flameshocker is spawned every 15 minutes per City-Quarter.
     NPC_HIGHLORD_BOLVAR_FORDRAGON                       = 1748,
     NPC_LADY_SYLVANAS_WINDRUNNER                        = 10181,
     NPC_VARIMATHRAS                                     = 2425,
@@ -249,17 +249,7 @@ enum ScourgeInvasionNPC
     NPC_UNDERCITY_GUARDIAN                              = 5624,
     NPC_DEATHGUARD_ELITE                                = 7980,
     NPC_STORMWIND_CITY_GUARD                            = 68,
-    NPC_STORMWIND_ELITE_GUARD                           = 16396,
-
-    // Citizens
-    NPC_RENATO_GALLINA                                  = 1432,
-    NPC_MICHAEL_GARRETT                                 = 4551,
-    NPC_HANNAH_AKELEY                                   = 4575,
-    NPC_INNKEEPER_NORMAN                                = 6741,
-    NPC_OFFICER_MALOOF                                  = 15766,
-    NPC_STEPHANIE_TURNER                                = 6174,
-    NPC_THOMAS_MILLER                                   = 3518,
-    NPC_WILLIAM_MONTAGUE                                = 4549
+    NPC_STORMWIND_ELITE_GUARD                           = 16396
 };
 
 enum ScourgeInvasionMisc
@@ -268,16 +258,15 @@ enum ScourgeInvasionMisc
 
     // [From TrinityCore's Bruteforce DB] Invisible Objects: Those objects can't be sniffed.
     GOBJ_BUTTRESS_SPAWNER                               = 181112, // Casts 28024 ([PH] Summon Buttress) on use.
-
     GOBJ_MINION_SPAWNER_GHOST_GHOUL                     = 181111, // Casts 27883 ([PH] Summon Minion (trap: ghost/ghoul))) on use.
     GOBJ_MINION_SPAWNER_GHOST_SKELETON                  = 181155, // Casts 28186 ([PH] Summon Minion (trap: ghost/skeleton))) on use.
     GOBJ_MINION_SPAWNER_GHOUL_SKELETON                  = 181156, // Casts 28187 ([PH] Summon Minion (trap: ghoul/skeleton))) on use.
-
     GOBJ_MINION_SPAWNER_FINDER                          = 181163, // Casts 28227 ((DND) Summon Crystal Minion, finder) on use.
     GOBJ_NECROPOLIS_CRITTER_SPAWNER                     = 181214, // Casts 27866 (Summon Necropolis critters) on use.
 
     // Visible Objects
-    GOBJ_SUMMON_CIRCLE                                  = 181136,
+    GOBJ_CIRCLE_CITY                                    = 181227, // Circle outside Cities.
+    GOBJ_CIRCLE                                         = 181136, // Circle from World Invasions.
     GOBJ_SUMMONER_SHIELD                                = 181142,
 
     GOBJ_UNDEAD_FIRE                                    = 181173,
@@ -449,23 +438,21 @@ enum ScourgeInvasionLang
 
     // Citizens
     BCT_UNDERCITY_RANDOM_1                             = 12355, // Scourge spotted nearby!
-    BCT_STORMWIND_RANDOM_1                             = 12366, // Scourge spotted nearby! Renato Gallina
+    BCT_STORMWIND_RANDOM_1                             = 12366, // Scourge spotted nearby!
     BCT_UNDERCITY_RANDOM_2                             = 12356, // I just saw a Scourge!  Kill it!
-    BCT_STORMWIND_RANDOM_2                             = 12367, // I just saw a Scourge!  Kill it! Thomas Miller
-    BCT_UNDERCITY_RANDOM_3                             = 12357, // Did you see that?  There's a Scourge over there! Michael Garrett, Hannah Akeley
-    BCT_STORMWIND_RANDOM_3                             = 12368, // Did you see that?  There's a Scourge over there! Thomas Miller
-    BCT_UNDERCITY_RANDOM_4                             = 12359, // There's one of the Scourge, right over there! Innkeeper Norman, Michael Garrett
+    BCT_STORMWIND_RANDOM_2                             = 12367, // I just saw a Scourge!  Kill it!
+    BCT_UNDERCITY_RANDOM_3                             = 12357, // Did you see that?  There's a Scourge over there!
+    BCT_STORMWIND_RANDOM_3                             = 12368, // Did you see that?  There's a Scourge over there!
+    BCT_UNDERCITY_RANDOM_4                             = 12359, // There's one of the Scourge, right over there!
     BCT_STORMWIND_RANDOM_4                             = 12370, // There's one of the Scourge, right over there!
-    BCT_UNDERCITY_RANDOM_5                             = 12357, // Did you see that?  There's a Scourge over there! Michael Garrett, Hannah Akeley
-    BCT_STORMWIND_RANDOM_5                             = 12368, // Did you see that?  There's a Scourge over there! Thomas Miller
-    BCT_UNDERCITY_RANDOM_6                             = 12361, // Will these unrelenting Scourge attacks never end? Innkeeper Norman, William Montague
-    BCT_STORMWIND_RANDOM_6                             = 12372, // Will these unrelenting Scourge attacks never end?
-    BCT_UNDERCITY_RANDOM_7                             = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come! Innkeeper Norman
-    BCT_STORMWIND_RANDOM_7                             = 12371, // This has gone too far.  How dare the Scourge attack Stormwind!  Destroy it before more come! Stephanie Turner
-    BCT_UNDERCITY_RANDOM_8                             = 12362, // Destroy the Scourge invader now, before it's too late! Michael Garrett
-    BCT_STORMWIND_RANDOM_8                             = 12373, // Destroy the Scourge invader now, before it's too late! Officer Maloof
-    BCT_UNDERCITY_RANDOM_9                             = 12358, // How can I get anything done with the Scourge running amok in here?! Innkeeper Norman
-    BCT_STORMWIND_RANDOM_9                             = 12369, // How can I get anything done with the Scourge running amok around here?! Stephanie Turner
+    BCT_UNDERCITY_RANDOM_5                             = 12361, // Will these unrelenting Scourge attacks never end?
+    BCT_STORMWIND_RANDOM_5                             = 12372, // Will these unrelenting Scourge attacks never end?
+    BCT_UNDERCITY_RANDOM_6                             = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come!
+    BCT_STORMWIND_RANDOM_6                             = 12371, // This has gone too far.  How dare the Scourge attack Stormwind!  Destroy it before more come!
+    BCT_UNDERCITY_RANDOM_7                             = 12362, // Destroy the Scourge invader now, before it's too late!
+    BCT_STORMWIND_RANDOM_7                             = 12373, // Destroy the Scourge invader now, before it's too late!
+    BCT_UNDERCITY_RANDOM_8                             = 12358, // How can I get anything done with the Scourge running amok in here?!
+    BCT_STORMWIND_RANDOM_8                             = 12369, // How can I get anything done with the Scourge running amok around here?!
 
     // Stormwind City Guard
     BCT_STORMWIND_CITY_GUARD_1                         = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
