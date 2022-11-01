@@ -1764,11 +1764,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     case 17680: // [Event: Scourge Invasion] Spirit Spawn-out
                     {
-                        Creature* pCaster = GetCaster()->ToCreature();
-                        if (!pCaster)
-                            return;
-
-                        pCaster->DespawnOrUnsummon(1500);
+                        if (Creature* pCreature = ToCreature(GetCaster()))
+                        {
+                            if (pCreature->IsAlive() && !pCreature->HasCreatureState(CSTATE_DESPAWNING))
+                                pCreature->DespawnOrUnsummon(2000);
+                        }
                         return;
                     }
                     case 27852: // [Event: Scourge Invasion] [PH] Kill Summoner Buff
