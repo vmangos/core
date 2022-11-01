@@ -115,7 +115,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639407, 16394, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1639407, 0, 0, 'Pallid Horror - Just Spawned');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639408, 16394, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1639408, 0, 0, 'Pallid Horror - Death');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639409, 16394, 603, 6, 0, 100, 0, 0, 0, 0, 0, 1639409, 0, 0, 'Pallid Horror - Death from Undercity Sewers');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639409, 16394, 604, 6, 0, 100, 0, 0, 0, 0, 0, 1639409, 0, 0, 'Pallid Horror - Death from Stormwind');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639410, 16394, 604, 6, 0, 100, 0, 0, 0, 0, 0, 1639410, 0, 0, 'Pallid Horror - Death from Stormwind');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1639401;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -196,7 +196,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16383;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638301, 16383, 0, 1, 0, 100, 0, 8600, 335448, 0, 0, 1638301, 0, 0, 'Flameshocker - Cast Spell: Spirit Spawn-out OOC');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638302, 16383, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1638302, 0, 0, 'Flameshocker - Cast Spell: Flameshocker\'s Revenge On Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638303, 16383, 605, 11, 0, 100, 0, 0, 0, 0, 0, 1638303, 0, 0, 'Flameshocker - Just Spawned in Stormwind City Mage Quarter');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638303, 16383, 605, 11, 0, 100, 0, 0, 0, 0, 0, 1638303, 1638304, 1638305, 'Flameshocker - Just Spawned in Stormwind City Mage Quarter');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1638301;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -231,11 +231,11 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 
 DELETE FROM `generic_scripts` WHERE `id`=1638302;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1638302, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 2, 12366, 12367, 12368, 12369, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say'),
+(1638302, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 2, 12366, 12367, 12368, 12369, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
 
 DELETE FROM `generic_scripts` WHERE `id`=1638303;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1638303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 2, 12370, 12371, 12372, 12373, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say'),
+(1638303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 2, 12370, 12371, 12372, 12373, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
 
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
     (28078, 1, 16172, 0, 0, 5464, 5875),

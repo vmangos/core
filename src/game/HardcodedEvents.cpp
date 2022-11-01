@@ -508,8 +508,6 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     sObjectMgr.InitSavedVariable(VARIABLE_BURNING_STEPPES_ATTACK_TIME, time(nullptr));
     sObjectMgr.InitSavedVariable(VARIABLE_WINTERSPRING_ATTACK_TIME, time(nullptr));
     sObjectMgr.InitSavedVariable(VARIABLE_AZSHARA_ATTACK_TIME, time(nullptr));
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_UNDERCITY_TIME, time(nullptr));
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_STORMWIND_TIME, time(nullptr));
 
     sObjectMgr.InitSavedVariable(VARIABLE_SI_ATTACK_COUNT, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_LAST_ATTACK_ZONE, 0);
@@ -581,25 +579,6 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     invasionPoints.push_back(blasted_lands);
     invasionPoints.push_back(eastern_plaguelands);
     invasionPoints.push_back(burning_steppes);
-
-    CityAttack undercity;
-    {
-        undercity.map = 0;
-        undercity.zoneId = ZONEID_UNDERCITY;
-        undercity.pallid.push_back(Position(1595.87f, 440.539f, -46.3349f, 2.28207f)); // Royal Quarter
-        undercity.pallid.push_back(Position(1659.2f, 265.988f, -62.1788f, 3.64283f)); // Trade Quarter
-    }
-
-    CityAttack stormwind;
-    {
-        stormwind.map = 0;
-        stormwind.zoneId = ZONEID_STORMWIND;
-        stormwind.pallid.push_back(Position(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Stormwind Keep
-        stormwind.pallid.push_back(Position(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Trade District
-    }
-
-    attackPoints.push_back(undercity);
-    attackPoints.push_back(stormwind);
 }
 
 void ScourgeInvasionEvent::LogNextZoneTime()

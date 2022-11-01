@@ -286,8 +286,6 @@ enum ScourgeInvasionMisc
     // These timers may fail if you set it under 1 minute.
     ZONE_ATTACK_TIMER_MIN                               = MINUTE * 45, // 45 min.
     ZONE_ATTACK_TIMER_MAX                               = MINUTE * 60, // 60 min.
-    CITY_ATTACK_TIMER_MIN                               = MINUTE * 45, // 45 min.
-    CITY_ATTACK_TIMER_MAX                               = MINUTE * 60, // 60 min.
 
     ZONEID_WINTERSPRING                                 = 618,
     ZONEID_AZSHARA                                      = 16,
@@ -295,8 +293,6 @@ enum ScourgeInvasionMisc
     ZONEID_BLASTED_LANDS                                = 4,
     ZONEID_BURNING_STEPPES                              = 46,
     ZONEID_TANARIS                                      = 440,
-    ZONEID_UNDERCITY                                    = 1497,
-    ZONEID_STORMWIND                                    = 1519,
 
     GAME_EVENT_SCOURGE_INVASION                         = 17,
     GAME_EVENT_SCOURGE_INVASION_WINTERSPRING            = 90,
@@ -350,8 +346,6 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_AZSHARA_ATTACK_TIME                = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_AZSHARA,
     VARIABLE_SI_ATTACK_COUNT                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 0,
     VARIABLE_SI_LAST_ATTACK_ZONE                = (GAME_EVENT_SCOURGE_INVASION * 1000) + 1,
-    VARIABLE_SI_UNDERCITY_TIME                  = (GAME_EVENT_SCOURGE_INVASION * 10000) + ZONEID_UNDERCITY,
-    VARIABLE_SI_STORMWIND_TIME                  = (GAME_EVENT_SCOURGE_INVASION * 10000) + ZONEID_STORMWIND,
 
     VARIABLE_SI_WINTERSPRING_REMAINING          = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_WINTERSPRING,
     VARIABLE_SI_AZSHARA_REMAINING               = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_AZSHARA,
