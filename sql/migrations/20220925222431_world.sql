@@ -42,7 +42,7 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `
 -- Remove invalid Camp Taurajo graveyard for Stonetalon Mountains
 DELETE FROM `game_graveyard_zone` WHERE `id`=229 AND `ghost_zone`=406;
 
--- Remove invalid Horde-only Wetlands graveyard in Loch Modan
+-- Remove invalid Horde-only Wetlands graveyard for Loch Modan
 DELETE FROM `game_graveyard_zone` WHERE `id`=7 AND `faction`=67 AND `ghost_zone`=38;
 
 -- End of migration.
