@@ -2144,15 +2144,15 @@ SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* p
             {
                 switch (pSpellEntry->Effect[i])
                 {
-                case SPELL_EFFECT_HEAL:
-                    basePoints += pSpellEntry->EffectBasePoints[i];
-                    break;
-                case SPELL_EFFECT_APPLY_AURA:
-                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-                    if (pSpellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
-                        basePoints += ((pSpellEntry->GetDuration() / pSpellEntry->EffectAmplitude[i]) * pSpellEntry->EffectBasePoints[i]);
-                    break;
+                    case SPELL_EFFECT_HEAL:
+                        basePoints += pSpellEntry->EffectBasePoints[i];
+                        break;
+                    case SPELL_EFFECT_APPLY_AURA:
+                    case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                    case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                        if (pSpellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                            basePoints += ((pSpellEntry->GetDuration() / pSpellEntry->EffectAmplitude[i]) * pSpellEntry->EffectBasePoints[i]);
+                        break;
                 }
             }
 
