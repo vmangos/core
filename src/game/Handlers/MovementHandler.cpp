@@ -248,6 +248,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
             _player->GetName(), _player->GetSession()->GetAccountId(), movementCounter, pMover->GetMovementCounter());
     }
 
+    pPlayerMover->SetSplineDonePending(false);
     pPlayerMover->ExecuteTeleportNear();
 }
 
@@ -306,6 +307,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     Unit* pMover = _player->GetMover();
 
     if (pMover->GetObjectGuid() != m_clientMoverGuid)
+        return;
+
+    if (pMover->HasPendingSplineDone())
         return;
 
     // currently being moved by server
@@ -499,7 +503,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
     Player* const pPlayerMover = pMover->ToPlayer();
 
     // Check if position and movement flags are fine before speed update.
-    bool canRelocate = recvData.GetPacketTime() > m_moveRejectTime && VerifyMovementInfo(movementInfo);
+    bool canRelocate = recvData.GetPacketTime() > m_moveRejectTime && !pMover->HasPendingSplineDone() && VerifyMovementInfo(movementInfo);
     if (canRelocate && pPlayerMover)
     {
         if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode)) ||
@@ -612,6 +616,9 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
     // Use fake loop here to handle movement position checks separately from change ACK.
     do
     {
+        if (pMover->HasPendingSplineDone())
+            break;
+
         // Do not accept packets sent before this time.
         if (recvData.GetPacketTime() <= m_moveRejectTime)
             break;
@@ -715,6 +722,9 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     // Use fake loop here to handle movement position checks separately from change ACK.
     do
     {
+        if (pMover->HasPendingSplineDone())
+            break;
+
         // Do not accept packets sent before this time.
         if (recvData.GetPacketTime() <= m_moveRejectTime)
             break;
@@ -777,9 +787,6 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     if (!pMover)
         return;
 
-    if (!VerifyMovementInfo(movementInfo))
-        return;
-
     // verify that indeed the client is replying with the changes that were send to him
     if (!pMover->HasPendingMovementChange())
     {
@@ -798,6 +805,12 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
             _player->GetCheatData()->OnWrongAckData();
         return;
     }
+
+    if (pMover->HasPendingSplineDone())
+        return;
+
+    if (!VerifyMovementInfo(movementInfo))
+        return;
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (pMover->IsPlayer() && static_cast<Player*>(pMover)->IsBeingTeleported())
@@ -840,6 +853,15 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 
     if (pMover->movespline->GetId() != splineId)
         return;
+
+    // must be after checking this is the newest spline id
+    if (pMover->HasPendingSplineDone())
+        pMover->SetSplineDonePending(false);
+    else
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleMoveSplineDoneOpcode: client sent unexpected spline done for %s", pMover->GetGuidStr().c_str());
+        return;
+    }
 
     if (Player* pPlayerMover = pMover->ToPlayer())
     {
@@ -958,6 +980,9 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
     Unit* pMover = _player->GetMap()->GetUnit(oldMoverGuid);
 
     if (!pMover)
+        return;
+
+    if (pMover->HasPendingSplineDone())
         return;
 
     if (!pMover->movespline->Finalized())

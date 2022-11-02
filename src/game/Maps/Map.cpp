@@ -427,6 +427,7 @@ bool Map::Add(Player* player)
     // Remove any buffs defined in instance_aura_removal for the new map
     sAuraRemovalMgr.PlayerEnterMap(i_id, player);
 
+    player->SetSplineDonePending(false);
     player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);
     player->m_broadcaster->SetInstanceId(GetInstanceId());
     return true;

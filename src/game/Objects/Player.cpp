@@ -1745,6 +1745,7 @@ void Player::OnDisconnected()
     if (cheatAction)
         GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
 
+    SetSplineDonePending(false);
     if (IsInWorld() && FindMap())
     {
         if (!HasUnitState(UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED | UNIT_STAT_TAXI_FLIGHT))
@@ -2411,6 +2412,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LEAVE_WORLD_CANCELS | AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
         RemoveCharmAuras();
         ResolvePendingMovementChanges(false, false);
+        SetSplineDonePending(false);
 
         if (!GetSession()->PlayerLogout())
         {
