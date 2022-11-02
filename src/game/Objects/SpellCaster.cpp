@@ -594,8 +594,10 @@ float SpellCaster::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
         // Victim's level based skill, penalize when calculating for low levels (< 20):
         float const skill = std::max(GetSkillMaxForLevel(victim), uint16(100));
         // Convert resistance value to vulnerability percentage through comparision with skill
-        resistModHitChance = (float(resistModHitChance) / skill) * 100;
-        return (resistModHitChance * 0.01f);
+        resistModHitChance = (float(resistModHitChance) / skill);
+        if (resistModHitChance < -0.75f)
+            resistModHitChance = -0.75f;
+        return resistModHitChance;
     }
 
     uint32 const uiLevel = GetLevel();
