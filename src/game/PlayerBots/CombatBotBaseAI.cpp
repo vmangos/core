@@ -2125,9 +2125,14 @@ bool CombatBotBaseAI::FindAndHealInjuredAlly(float selfHealPercent, float groupH
 template <class T>
 SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* pTarget, std::set<SpellEntry const*, T>& spellList) const
 {
+    return SelectMostEfficientHealingSpell(pTarget, pTarget->GetMaxHealth() - pTarget->GetHealth(), spellList);
+}
+
+template <class T>
+SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* pTarget, int32 missingHealth, std::set<SpellEntry const*, T>& spellList) const
+{
     SpellEntry const* pHealSpell = nullptr;
     int32 healthDiff = INT32_MAX;
-    int32 const missingHealth = pTarget->GetMaxHealth() - pTarget->GetHealth();
 
     // Find most efficient healing spell.
     for (const auto pSpellEntry : spellList)
@@ -2139,15 +2144,15 @@ SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* p
             {
                 switch (pSpellEntry->Effect[i])
                 {
-                    case SPELL_EFFECT_HEAL:
-                        basePoints += pSpellEntry->EffectBasePoints[i];
-                        break;
-                    case SPELL_EFFECT_APPLY_AURA:
-                    case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-                    case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-                        if (pSpellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
-                            basePoints += ((pSpellEntry->GetDuration() / pSpellEntry->EffectAmplitude[i]) * pSpellEntry->EffectBasePoints[i]);
-                        break;
+                case SPELL_EFFECT_HEAL:
+                    basePoints += pSpellEntry->EffectBasePoints[i];
+                    break;
+                case SPELL_EFFECT_APPLY_AURA:
+                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                    if (pSpellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                        basePoints += ((pSpellEntry->GetDuration() / pSpellEntry->EffectAmplitude[i]) * pSpellEntry->EffectBasePoints[i]);
+                    break;
                 }
             }
 
@@ -2165,6 +2170,15 @@ SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* p
     }
 
     return pHealSpell;
+}
+
+int32 CombatBotBaseAI::GetIncomingdamage(Unit const* pTarget) const
+{
+    int32 damage = 0;
+    for (auto const& pAttacker : pTarget->GetAttackers())
+        if (pAttacker->CanReachWithMeleeAutoAttack(pTarget))
+            damage += int32((pAttacker->GetFloatValue(UNIT_FIELD_MINDAMAGE) + pAttacker->GetFloatValue(UNIT_FIELD_MAXDAMAGE)) / 2);
+    return damage;
 }
 
 bool CombatBotBaseAI::HealInjuredTarget(Unit* pTarget)
@@ -2281,6 +2295,60 @@ Unit* CombatBotBaseAI::SelectPeriodicHealTarget(float selfHealPercent, float gro
     }
 
     return nullptr;
+}
+
+bool CombatBotBaseAI::FindAndPreHealTarget()
+{
+    Unit* pTarget = me;
+    int32 maxIncomingDamage = GetIncomingdamage(me);
+
+    if (Group* pGroup = me->GetGroup())
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Unit* pMember = itr->getSource())
+            {
+                // We already checked self.
+                if (pMember == me)
+                    continue;
+
+                // Avoid all healers picking same target.
+                if (pTarget && !IsTankClass(pMember->GetClass()) && AreOthersOnSameTarget(pMember->GetObjectGuid(), false, true))
+                    continue;
+
+                int32 incomingDamage = GetIncomingdamage(pMember);
+                if (!incomingDamage)
+                    continue;
+
+                // Check if we should heal party member.
+                if (incomingDamage > maxIncomingDamage &&
+                    IsValidHealTarget(pMember))
+                {
+                    maxIncomingDamage = incomingDamage;
+                    pTarget = pMember;
+                }
+            }
+        }
+    }
+
+    if (!maxIncomingDamage)
+        return false;
+
+    // Add currently missing health too.
+    maxIncomingDamage += int32(pTarget->GetMaxHealth() - pTarget->GetHealth());
+    if (maxIncomingDamage < int32(pTarget->GetMaxHealth() / 2))
+        return false;
+
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, maxIncomingDamage, spellListDirectHeal))
+    {
+        if (pHealSpell->GetCastTime(me) > 1000 && CanTryToCastSpell(pTarget, pHealSpell))
+        {
+            if (DoCastSpell(pTarget, pHealSpell) == SPELL_CAST_OK)
+                return true;
+        }
+    }
+
+    return pTarget;
 }
 
 bool CombatBotBaseAI::IsValidHostileTarget(Unit const* pTarget) const

@@ -672,6 +672,22 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
+    if (Spell* pCurrentSpell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+    {
+        // Interrupt pre casted heals if target is not injured.
+        if (pCurrentSpell->getState() == SPELL_STATE_PREPARING &&
+            pCurrentSpell->m_spellInfo->IsHealSpell())
+        {
+            if (Unit* pTarget = pCurrentSpell->m_targets.getUnitTarget())
+            {
+                if (pTarget->GetHealth() == pTarget->GetMaxHealth())
+                {
+                    me->InterruptSpell(CURRENT_GENERIC_SPELL, true);
+                }
+            }
+        }
+    }
+
     if (me->IsNonMeleeSpellCasted(false, false, true))
         return;
 
@@ -1031,6 +1047,9 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
 
         if (FindAndHealInjuredAlly(80.0f, 90.0f))
             return;
+
+        if (FindAndPreHealTarget())
+            return;
     }
     else
     {
@@ -1267,7 +1286,13 @@ void PartyBotAI::UpdateInCombatAI_Shaman()
     }
 
     if (m_role == ROLE_HEALER)
-        FindAndHealInjuredAlly(50.0f, 90.0f);
+    {
+        if (FindAndHealInjuredAlly(50.0f, 90.0f))
+            return;
+
+        if (FindAndPreHealTarget())
+            return;
+    }
     else if (me->GetHealthPercent() < 20.0f)
         HealInjuredTarget(me);
 }
@@ -1859,7 +1884,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         DoCastSpell(me, m_spells.priest.pInnerFocus);
     }
 
-    if (m_role == ROLE_HEALER)
+    if (m_role == ROLE_HEALER || (!me->GetVictim() && me->GetShapeshiftForm() == FORM_NONE))
     {
         // Shield allies being attacked.
         if (m_spells.priest.pPowerWordShield)
@@ -1907,6 +1932,9 @@ void PartyBotAI::UpdateInCombatAI_Priest()
                 }
             }
         }
+
+        if (m_role == ROLE_HEALER && FindAndPreHealTarget())
+            return;
     }
     else if (Unit* pVictim = me->GetVictim())
     {
@@ -2962,6 +2990,9 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (DoCastSpell(me, m_spells.druid.pInnervate) == SPELL_CAST_OK)
                 return;
         }
+
+        if (m_role == ROLE_HEALER && FindAndPreHealTarget())
+            return;
 
         if (EnterCombatDruidForm())
             return;
