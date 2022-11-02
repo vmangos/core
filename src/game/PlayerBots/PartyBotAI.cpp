@@ -698,7 +698,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     {
         if (DrinkAndEat())
         {
-            if (me->IsMounted())
+            if (!me->IsWithinDistInMap(pLeader, 100.0f))
+            {
+                me->SetHealth(me->GetMaxHealth());
+                if (me->GetPowerType() == POWER_MANA)
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+            }
+            else if (me->IsMounted())
                 me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
             return;
         }
