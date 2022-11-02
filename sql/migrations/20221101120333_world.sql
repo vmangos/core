@@ -35,6 +35,10 @@ UPDATE `quest_template` SET `RequiredSkillValue` = 200, `PrevQuestId` = 0, `Next
 -- Set quest requirement for 2859 (Wild Leather Leggings (horde side)) to previous condition
 UPDATE `quest_template` SET `RequiredSkillValue` = 200, `PrevQuestId` = 0, `NextQuestId` = 0, `RequiredCondition` = 20003 WHERE `entry` = 2859;
 
+-- INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
+-- (1964, 2855, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Shoulders again?', 0, 0, );
+
+
 -- End of migration.
 END IF;
 END??
