@@ -17,6 +17,23 @@ UPDATE `quest_template` SET `RequiredSkillValue` = 40 WHERE `entry` = 866;
 -- 1618 (Gearing Redridge) should require a Blacksmithing skill of 60 (currently requires 70)
 UPDATE `quest_template` SET `RequiredSkillValue` = 60 WHERE `entry` = 1618;
 
+
+-- All Wild Leather Armor quests should require a Leatherworking skill of 200 (currently requires 225)
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2847;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2848;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2849;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2850;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2851;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2852;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2853;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2854;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2855;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2856;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2857;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2858;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2859;
+UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2860;
+
 -- Condition to return true if 2855 (Wild Leather Shoulders (horde side)) is complete
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20000, 8, 2855, 0, 0, 0, 0);
 
@@ -36,8 +53,9 @@ UPDATE `quest_template` SET `RequiredSkillValue` = 200, `PrevQuestId` = 0, `Next
 UPDATE `quest_template` SET `RequiredSkillValue` = 200, `PrevQuestId` = 0, `NextQuestId` = 0, `RequiredCondition` = 20003 WHERE `entry` = 2859;
 
 -- INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
--- (1964, 2855, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Shoulders again?', 0, 0, );
-
+-- (1964, 2855, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Shoulders again?', 0, 0, 7, -1, 0, 2855, 0, 0, 0, 0, 20000);
+-- INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+-- (2855, 0, 0, 15, 10530, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jangdor Swiftrider - Teach Wild Leather Shoulders');
 
 -- End of migration.
 END IF;
