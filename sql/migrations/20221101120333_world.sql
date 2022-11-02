@@ -8,15 +8,32 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20221101120333');
 -- Add your query below.
 
+-- 90 (Seasoned Wolf Kabobs) should require a Cooking skill of 50 (currently requires 0)
+UPDATE `quest_template` SET `RequiredSkill` = 185, `RequiredSkillValue` = 50 WHERE `entry` = 769;
+
 -- 769 (Kodo Hide Bag) should require a Leatherworking skill of 10 (currently requires 1)
 UPDATE `quest_template` SET `RequiredSkillValue` = 10 WHERE `entry` = 769;
+
+-- 862 (Dig Rat Stew) should require a Cooking skill of 15 (currently requires 1)
+UPDATE `quest_template` SET `RequiredSkillValue` = 15 WHERE `entry` = 862;
 
 -- 866 (Root Samples) should require a Herbalism skill of 40 (currently requires 1)
 UPDATE `quest_template` SET `RequiredSkillValue` = 40 WHERE `entry` = 866;
 
+-- 1579 (Gaffer Jacks) should require a Fishing skill of 40 (currently requires 30)
+UPDATE `quest_template` SET `RequiredSkillValue` = 40 WHERE `entry` = 1579;
+
+-- 1582 (Moonglow Vest) should require a Leatherworking skill of 70 (currently requires 90)
+UPDATE `quest_template` SET `RequiredSkillValue` = 70 WHERE `entry` = 1582;
+
 -- 1618 (Gearing Redridge) should require a Blacksmithing skill of 60 (currently requires 70)
 UPDATE `quest_template` SET `RequiredSkillValue` = 60 WHERE `entry` = 1618;
 
+-- 5143 (Tribal Leatherworking (alliance side)) requires completing 2853 (Master of the Wild Leather (alliance side))
+UPDATE `quest_template` SET `PrevQuestId` = 2853 WHERE `entry` = 5143;
+
+-- 5148 (Tribal Leatherworking (horde side)) requires completing 2860 (Master of the Wild Leather (horde side))
+UPDATE `quest_template` SET `PrevQuestId` = 2860 WHERE `entry` = 5148;
 
 -- All Wild Leather Armor quests should require a Leatherworking skill of 200 (currently requires 225)
 UPDATE `quest_template` SET `RequiredSkillValue` = 200 WHERE `entry` = 2847;
