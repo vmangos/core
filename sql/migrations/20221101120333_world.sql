@@ -106,6 +106,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Condition to return true if Pattern: Wild Leather Leggings is NOT learnt
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20012, 17, 10572, 1, 0, 0, 0);
 
+-- Condition to return true if Pattern: Wild Leather Cloak is NOT learnt
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20027, 17, 10574, 1, 0, 0, 0);
+
 
 -- Condition to return true if 2858 (Wild Leather Boots (horde side)) is complete
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20013, 8, 2858, 0, 0, 0, 0);
@@ -118,6 +121,12 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 
 -- Condition to return true if 2852 (Wild Leather Leggings (alliance side)) is complete
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20016, 8, 2852, 0, 0, 0, 0);
+
+-- Condition to return true if 2860 (Master of the Wild Leather (horde side)) is complete
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20028, 8, 2860, 0, 0, 0, 0);
+
+-- Condition to return true if 2853 (Master of the Wild Leather (alliance side)) is complete
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20029, 8, 2853, 0, 0, 0, 0);
 
 
 -- Note: Condition 379 is a condition requiring 200 Leatherworking Skill
@@ -137,6 +146,10 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Condition for gossip option Wild Leather Leggings (horde)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20021, -1, 379, 20014, 20012, 0, 0);
 
+-- Condition for gossip option Wild Leather Cloak (horde)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20030, -1, 379, 20028, 20027, 0, 0);
+
+
 -- Condition for gossip option Wild Leather Shoulders (alliance)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20022, -1, 379, 20004, 20008, 0, 0);
 
@@ -152,19 +165,37 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Condition for gossip option Wild Leather Leggings (alliance)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20026, -1, 379, 20016, 20012, 0, 0);
 
--- Condition for gossip option Wild Leather Cloak (horde)
+-- Condition for gossip option Wild Leather Cloak (alliance)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20032, -1, 379, 20029, 20027, 0, 0);
 
--- Broadcast text for all gossip options already exists, but wasn't put in `npc_text` or implemented
-/*INSERT INTO `npc_text` () VALUES (9839); -- Jangdor, Wild Leather Shoulders
-INSERT INTO `npc_text` () VALUES (9840); -- Jangdor, Wild Leather Vest
-INSERT INTO `npc_text` () VALUES (9837); -- Jangdor, Wild Leather Helmet
-INSERT INTO `npc_text` () VALUES (9835); -- Jangdor, Wild Leather Boots
-INSERT INTO `npc_text` () VALUES (9838); -- Jangdor, Wild Leather Leggings
-INSERT INTO `npc_text` () VALUES (9832); -- Pratt, Wild Leather Shoulders
-INSERT INTO `npc_text` () VALUES (9831); -- Pratt, Wild Leather Vest
-INSERT INTO `npc_text` () VALUES (9834); -- Pratt, Wild Leather Helmet
-INSERT INTO `npc_text` () VALUES (9829); -- Pratt, Wild Leather Boots
-INSERT INTO `npc_text` () VALUES (9833); -- Pratt, Wild Leather Leggings*/
+
+-- Broadcast text for all gossip options already exists, but wasn't implemented, and is missing in `npc_text`
+
+-- Jangdor, Wild Leather Shoulders
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21000, 9839, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Jangdor, Wild Leather Vest
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21001, 9840, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Jangdor, Wild Leather Helmet
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21002, 9837, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Jangdor, Wild Leather Boots
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21003, 9835, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Jangdor, Wild Leather Leggings
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21004, 9838, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Jangdor, Wild Leather Cloak
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21005, 9836, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+-- Pratt, Wild Leather Shoulders
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21006, 9832, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Pratt, Wild Leather Vest
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21007, 9831, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Pratt, Wild Leather Helmet
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21008, 9834, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Pratt, Wild Leather Boots
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (21009, 9829, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- Pratt, Wild Leather Leggings
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (210010, 9833, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); 
+-- Pratt, Wild Leather Cloak
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (210011, 9830, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Gossip options for Jangdor Swiftrider
 -- INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES (1964, 4957, 0, 0);
