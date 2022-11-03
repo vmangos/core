@@ -136,10 +136,10 @@ INSERT INTO `item_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `group
 -- loot and grouping https://www.wowhead.com/classic/item=9265/cuergos-hidden-treasure#contains, https://youtu.be/3UuPh5nqjCA?t=328
 -- money https://www.wowhead.com/classic/item=9265/cuergos-hidden-treasure#comments
 UPDATE `item_template` SET `min_money_loot`=300, `max_money_loot`=500 WHERE `entry`=9265;
-UPDATE `item_loot_template` SET `ChanceOrQuestChance`=41, `groupid`=1 WHERE `entry`=9265 AND `item`=9355; -- Hoop Earring
-UPDATE `item_loot_template` SET `ChanceOrQuestChance`=40, `groupid`=1 WHERE `entry`=9265 AND `item`=9358; -- A Head Rag
-UPDATE `item_loot_template` SET `ChanceOrQuestChance`=39, `groupid`=1 WHERE `entry`=9265 AND `item`=9357; -- A Parrot Skeleton
-UPDATE `item_loot_template` SET `ChanceOrQuestChance`=39, `groupid`=1 WHERE `entry`=9265 AND `item`=9356; -- A Wooden Leg
+UPDATE `item_loot_template` SET `ChanceOrQuestChance`=24.5, `groupid`=1 WHERE `entry`=9265 AND `item`=9355; -- Hoop Earring
+UPDATE `item_loot_template` SET `ChanceOrQuestChance`=24.5, `groupid`=1 WHERE `entry`=9265 AND `item`=9358; -- A Head Rag
+UPDATE `item_loot_template` SET `ChanceOrQuestChance`=24.5, `groupid`=1 WHERE `entry`=9265 AND `item`=9357; -- A Parrot Skeleton
+UPDATE `item_loot_template` SET `ChanceOrQuestChance`=24.5, `groupid`=1 WHERE `entry`=9265 AND `item`=9356; -- A Wooden Leg
 UPDATE `item_loot_template` SET `ChanceOrQuestChance`=2, `groupid`=1 WHERE `entry`=9265 AND `item`=9359;  -- Southsea Lamp
 
 UPDATE `item_loot_template` SET `ChanceOrQuestChance`=3, `groupid`=2 WHERE `entry`=9265 AND `item`=7909;  -- Aquamarine
