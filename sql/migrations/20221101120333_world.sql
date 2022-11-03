@@ -152,7 +152,20 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Condition for gossip option Wild Leather Leggings (alliance)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (20026, -1, 379, 20016, 20012, 0, 0);
 
--- Broadcast text for all gossip options already exists, but wasn't implemented
+-- Condition for gossip option Wild Leather Cloak (horde)
+
+-- Broadcast text for all gossip options already exists, but wasn't put in `npc_text` or implemented
+/*INSERT INTO `npc_text` () VALUES (9839); -- Jangdor, Wild Leather Shoulders
+INSERT INTO `npc_text` () VALUES (9840); -- Jangdor, Wild Leather Vest
+INSERT INTO `npc_text` () VALUES (9837); -- Jangdor, Wild Leather Helmet
+INSERT INTO `npc_text` () VALUES (9835); -- Jangdor, Wild Leather Boots
+INSERT INTO `npc_text` () VALUES (9838); -- Jangdor, Wild Leather Leggings
+INSERT INTO `npc_text` () VALUES (9832); -- Pratt, Wild Leather Shoulders
+INSERT INTO `npc_text` () VALUES (9831); -- Pratt, Wild Leather Vest
+INSERT INTO `npc_text` () VALUES (9834); -- Pratt, Wild Leather Helmet
+INSERT INTO `npc_text` () VALUES (9829); -- Pratt, Wild Leather Boots
+INSERT INTO `npc_text` () VALUES (9833); -- Pratt, Wild Leather Leggings*/
+
 -- Gossip options for Jangdor Swiftrider
 -- INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES (1964, 4957, 0, 0);
 -- INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
