@@ -11759,7 +11759,6 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
 
 void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint32 itemid /*= 0*/) const
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_INVENTORY_CHANGE_FAILURE (%u)", msg);
     WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I ? 22 : (msg == EQUIP_ERR_OK ? 1 : 18)));
     data << uint8(msg);
 
@@ -11779,7 +11778,6 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
 
 void Player::SendOpenContainer() const
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_OPEN_CONTAINER");
     WorldPacket data(SMSG_OPEN_CONTAINER, 8);   // opens the main bag in the UI
     data << GetObjectGuid();
     GetSession()->SendPacket(&data);
@@ -11787,7 +11785,6 @@ void Player::SendOpenContainer() const
 
 void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint32 /*param*/) const
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_BUY_FAILED");
     WorldPacket data(SMSG_BUY_FAILED, (8 + 4 + 1));
     data << (pCreature ? pCreature->GetObjectGuid() : ObjectGuid());
     data << uint32(item);
@@ -11799,7 +11796,6 @@ void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint3
 
 void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 /*param*/) const
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_SELL_ITEM");
     WorldPacket data(SMSG_SELL_ITEM, (8 + 8 + /*(param ? 4 : 0) +*/ 1)); // last check [ZERO]
     data << (pCreature ? pCreature->GetObjectGuid() : ObjectGuid());
     data << ObjectGuid(itemGuid);
@@ -13553,7 +13549,6 @@ bool Player::SatisfyQuestLog(bool msg) const
     {
         WorldPacket data(SMSG_QUESTLOG_FULL, 0);
         GetSession()->SendPacket(&data);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTLOG_FULL");
     }
     return false;
 }
@@ -14538,14 +14533,12 @@ void Player::SendQuestCompleteEvent(uint32 quest_id) const
         WorldPacket data(SMSG_QUESTUPDATE_COMPLETE, 4);
         data << uint32(quest_id);
         GetSession()->SendPacket(&data);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = %u", quest_id);
     }
 }
 
 void Player::SendQuestReward(Quest const* pQuest, uint32 XP) const
 {
     uint32 questid = pQuest->GetQuestId();
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = %u", questid);
     WorldPacket data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4 + 4 + 4 + 4 + 4 + pQuest->GetRewItemsCount() * 8));
     data << questid;
     data << uint32(0x03);
@@ -14583,7 +14576,6 @@ void Player::SendQuestFailedAtTaker(uint32 quest_id, uint32 reason) const
         data << uint32(quest_id);
         data << uint32(reason);
         GetSession()->SendPacket(&data);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
     }
 }
 
@@ -14594,7 +14586,6 @@ void Player::SendQuestFailed(uint32 quest_id) const
         WorldPacket data(SMSG_QUESTUPDATE_FAILED, 4);
         data << quest_id;
         GetSession()->SendPacket(&data);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTUPDATE_FAILED");
     }
 }
 
@@ -14605,7 +14596,6 @@ void Player::SendQuestTimerFailed(uint32 quest_id) const
         WorldPacket data(SMSG_QUESTUPDATE_FAILEDTIMER, 4);
         data << uint32(quest_id);
         GetSession()->SendPacket(&data);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTUPDATE_FAILEDTIMER");
     }
 }
 
@@ -14614,7 +14604,6 @@ void Player::SendCanTakeQuestResponse(uint32 msg) const
     WorldPacket data(SMSG_QUESTGIVER_QUEST_INVALID, 4);
     data << uint32(msg);
     GetSession()->SendPacket(&data);
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
 }
 
 void Player::SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver) const
@@ -14639,8 +14628,6 @@ void Player::SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver) cons
         data << strTitle;
         data << GetObjectGuid();
         pReceiver->GetSession()->SendPacket(&data);
-
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUEST_CONFIRM_ACCEPT");
     }
 }
 
@@ -14652,7 +14639,6 @@ void Player::SendPushToPartyResponse(Player* pPlayer, uint8 msg) const
         data << pPlayer->GetObjectGuid();
         data << uint8(msg);                                 // enum QuestShareMessages
         GetSession()->SendPacket(&data);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent MSG_QUEST_PUSH_RESULT");
     }
 }
 
@@ -14661,7 +14647,6 @@ void Player::SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32
     MANGOS_ASSERT(count < 64 && "Quest slot count store is limited to 6 bits 2^6 = 64 (0..63)");
 
     // Update quest watcher and fire QUEST_WATCH_UPDATE
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTUPDATE_ADD_ITEM");
     WorldPacket data(SMSG_QUESTUPDATE_ADD_ITEM, (4 + 4));
     data << pQuest->ReqItemId[item_idx];
     data << count;
@@ -14684,7 +14669,6 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* pQuest, ObjectGuid guid
 
     // Update quest watcher and fire QUEST_WATCH_UPDATE
     WorldPacket data(SMSG_QUESTUPDATE_ADD_KILL, (4 * 4 + 8));
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_QUESTUPDATE_ADD_KILL");
     data << uint32(pQuest->GetQuestId());
     data << uint32(entry);
     data << uint32(count);
@@ -18174,8 +18158,6 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
     data << uint32(ERR_TAXIOK);
     GetSession()->SendPacket(&data);
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_ACTIVATETAXIREPLY");
 
     GetSession()->SendDoFlight(mount_display_id, sourcepath);
 

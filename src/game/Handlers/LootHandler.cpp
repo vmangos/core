@@ -40,7 +40,6 @@
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
     Player  *player =   GetPlayer();
     ObjectGuid lguid = player->GetLootGuid();
     Loot    *loot;
@@ -194,8 +193,6 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_LOOT_MONEY");
-
     Player* player = GetPlayer();
     if (!player || !player->IsInWorld())
         return;
@@ -297,8 +294,6 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleLootOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_LOOT");
-
     ObjectGuid guid;
     recv_data >> guid;
 
@@ -323,8 +318,6 @@ void WorldSession::HandleLootOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleLootReleaseOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_LOOT_RELEASE");
-
     // cheaters can modify lguid to prevent correct apply loot release code and re-loot
     // use internal stored guid
     recv_data.read_skip<uint64>();                          // guid;

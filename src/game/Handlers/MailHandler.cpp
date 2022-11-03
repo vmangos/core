@@ -845,8 +845,6 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recv_data)
 
     ///TODO: some check needed, if player has item with guid mailId, or has mail with id mailId
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "CMSG_ITEM_TEXT_QUERY itemguid: %u, mailId: %u, unk: %u", itemTextId, mailId, unk);
-
     WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4 + 10)); // guess size
     data << itemTextId;
     data << sObjectMgr.GetItemText(itemTextId);
@@ -897,8 +895,6 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recv_data)
 
     bodyItem->SetUInt32Value(ITEM_FIELD_ITEM_TEXT_ID, itemTextId);
     bodyItem->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HIGHGUID_PLAYER, m->sender));
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "HandleMailCreateTextItem mailid=%u", mailId);
 
     ItemPosCountVec dest;
     uint8 msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, bodyItem, false);

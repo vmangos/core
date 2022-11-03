@@ -404,8 +404,6 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
         return;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd Player Logon Message");
-
     LoginQueryHolder *holder = new LoginQueryHolder(GetAccountId(), playerGuid);
     if (!holder->Initialize())
     {
@@ -571,8 +569,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             ChatHandler(pCurrChar).PSendSysMessage(str_motd.substr(pos).c_str());
             ++linecount;
         }
-
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent motd (SMSG_MOTD)");
     }
 
     if (Guild* guild = sGuildMgr.GetGuildById(pCurrChar->GetGuildId()))
@@ -582,7 +578,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         data << uint8(1);
         data << guild->GetMOTD();
         SendPacket(&data);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent guild-motd (SMSG_GUILD_EVENT)");
 
         guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetObjectGuid(), pCurrChar->GetName());
     }
@@ -744,8 +739,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
 void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_SET_FACTION_ATWAR");
-
     uint32 repListId;
     uint8  flag;
 
@@ -767,17 +760,13 @@ void WorldSession::HandleTutorialFlagOpcode(WorldPacket& recv_data)
 
     uint32 wInt = (iFlag / 32);
     if (wInt >= 8)
-    {
-        //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHEATER? Account:[%d] Guid[%u] tried to send wrong CMSG_TUTORIAL_FLAG", GetAccountId(),GetGUID());
         return;
-    }
+
     uint32 rInt = (iFlag % 32);
 
     uint32 tutflag = GetTutorialInt(wInt);
     tutflag |= (1 << rInt);
     SetTutorialInt(wInt, tutflag);
-
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received Tutorial Flag Set {%u}.", iFlag);
 }
 
 void WorldSession::HandleTutorialClearOpcode(WorldPacket& /*recv_data*/)
@@ -795,7 +784,6 @@ void WorldSession::HandleTutorialResetOpcode(WorldPacket& /*recv_data*/)
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_SET_WATCHED_FACTION");
     int32 repId;
     recv_data >> repId;
     GetPlayer()->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, repId);
@@ -804,7 +792,6 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_SET_FACTION_INACTIVE");
     uint32 replistid;
     uint8 inactive;
     recv_data >> replistid >> inactive;
@@ -814,13 +801,11 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleShowingHelmOpcode(WorldPacket& /*recv_data*/)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "CMSG_SHOWING_HELM for %s", _player->GetName());
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
 }
 
 void WorldSession::HandleShowingCloakOpcode(WorldPacket& /*recv_data*/)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "CMSG_SHOWING_CLOAK for %s", _player->GetName());
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
 }
 

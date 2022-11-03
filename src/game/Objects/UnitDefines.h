@@ -566,7 +566,6 @@ enum UnitDebugFlags
     DEBUG_DR                    = 0x10,
     DEBUG_CHEAT                 = 0x20,
     DEBUG_PROCS                 = 0x40,
-    DEBUG_SPELLS_DAMAGE         = 0x80,
 };
 
 

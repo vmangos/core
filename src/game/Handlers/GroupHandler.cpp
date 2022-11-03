@@ -383,8 +383,6 @@ void WorldSession::HandleLootRoll(WorldPacket& recv_data)
     recv_data >> itemSlot;
     recv_data >> rollType;
 
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, rollType:%u", (uint32)Guid, NumberOfPlayers, rollType);
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
@@ -530,7 +528,6 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
 {
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_GROUP_CHANGE_SUB_GROUP Message");
     std::string name;
     std::string nameSwapWith;
 
@@ -798,7 +795,6 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
 void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_REQUEST_PARTY_MEMBER_STATS");
     ObjectGuid guid;
     recv_data >> guid;
 

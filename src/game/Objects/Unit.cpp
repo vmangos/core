@@ -2356,7 +2356,6 @@ void Unit::SendMeleeAttackStart(Unit* pVictim) const
     data << pVictim->GetObjectGuid();
 
     SendObjectMessageToSet(&data, true);
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent SMSG_ATTACKSTART");
 }
 
 void Unit::SendMeleeAttackStop(Unit* pVictim) const
@@ -3460,10 +3459,10 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
             // passive non-stackable spells not stackable only with another rank of same spell
             if (sSpellMgr.IsRankSpellDueToSpell(spellProto, i_spellId))
             {
-                if (Spells::CompareAuraRanks(spellId, i_spellId) < 0) // Le sort actuel est plus puissant.
+                if (Spells::CompareAuraRanks(spellId, i_spellId) < 0) // The current spell is more powerful.
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK] [%u/%u] Le sort actuel est plus puissant.", spellId, i_spellId);
-                    // On empeche la pose de l'aura.
+                    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK] [%u/%u] The current spell is more powerful.", spellId, i_spellId);
+                    // Prevent aura application.
                     return false;
                 }
             }
