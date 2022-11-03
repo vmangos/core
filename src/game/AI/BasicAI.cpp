@@ -70,7 +70,7 @@ void BasicAI::MoveInLineOfSight(Unit* pWho)
 
     float const maxDistance = canInitiateAttack ? m_creature->GetAttackDistance(pWho) : m_creature->GetDetectionRange();
 
-    if (m_creature->IsWithinDistInMap(pWho, maxDistance, true, false) &&
+    if (m_creature->IsWithinDistInMap(pWho, maxDistance, true, SizeFactor::None) &&
         pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho) &&
         m_creature->IsWithinLOSInMap(pWho) && pWho->IsInAccessablePlaceFor(m_creature))
     {

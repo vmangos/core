@@ -82,6 +82,15 @@ inline bool IsRespawnableTempSummonType(TempSummonType type)
     return false;
 }
 
+// for distance calculations
+enum class SizeFactor
+{
+    None,
+    BoundingRadius,
+    CombatReach,
+    CombatReachWithMelee,
+};
+
 enum ObjectSpawnFlags
 {
     SPAWN_FLAG_ACTIVE               = 0x01,
