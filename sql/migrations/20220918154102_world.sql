@@ -653,38 +653,38 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 UPDATE `gameobject` SET `spawntimesecsmin` = 10800, `spawntimesecsmax` = 10800 WHERE `id` IN  (176224, 176304);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(@TWILIGHT_TABLET_POOL_TEMPLATE+1, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+2, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+3, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+4, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+5, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+6, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+7, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+8, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+9, 1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_POOL_TEMPLATE+10, 1, 'Stratholme - Supply Crate', 0, 10);
+(@SUPPLY_CRATE_POOL_TEMPLATE+1, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+2, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+3, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+4, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+5, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+6, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+7, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+8, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+9, 1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_POOL_TEMPLATE+10, 1, 'Stratholme - Supply Crate', 0, 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
-(@TWILIGHT_TABLET_OGUID+1, @TWILIGHT_TABLET_POOL_TEMPLATE+1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+2, @TWILIGHT_TABLET_POOL_TEMPLATE+2, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+3, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+4, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+5, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+6, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+7, @TWILIGHT_TABLET_POOL_TEMPLATE+7, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+8, @TWILIGHT_TABLET_POOL_TEMPLATE+8, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+9, @TWILIGHT_TABLET_POOL_TEMPLATE+9, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+10, @TWILIGHT_TABLET_POOL_TEMPLATE+10, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+11, @TWILIGHT_TABLET_POOL_TEMPLATE+1, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+12, @TWILIGHT_TABLET_POOL_TEMPLATE+2, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+13, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+14, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+15, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+16, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+17, @TWILIGHT_TABLET_POOL_TEMPLATE+7, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+18, @TWILIGHT_TABLET_POOL_TEMPLATE+8, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+19, @TWILIGHT_TABLET_POOL_TEMPLATE+9, 'Stratholme - Supply Crate', 0, 10),
-(@TWILIGHT_TABLET_OGUID+20, @TWILIGHT_TABLET_POOL_TEMPLATE+10, 'Stratholme - Supply Crate', 0, 10);
+(@SUPPLY_CRATE_OGUID+1, @SUPPLY_CRATE_POOL_TEMPLATE+1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+2, @SUPPLY_CRATE_POOL_TEMPLATE+2, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+3, @SUPPLY_CRATE_POOL_TEMPLATE+3, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+4, @SUPPLY_CRATE_POOL_TEMPLATE+4, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+5, @SUPPLY_CRATE_POOL_TEMPLATE+5, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+6, @SUPPLY_CRATE_POOL_TEMPLATE+6, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+7, @SUPPLY_CRATE_POOL_TEMPLATE+7, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+8, @SUPPLY_CRATE_POOL_TEMPLATE+8, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+9, @@SUPPLY_CRATE_POOL_TEMPLATE+9, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+10, @SUPPLY_CRATE_POOL_TEMPLATE+10, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+11, @SUPPLY_CRATE_POOL_TEMPLATE+1, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+12, @SUPPLY_CRATE_POOL_TEMPLATE+2, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+13, @SUPPLY_CRATE_POOL_TEMPLATE+3, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+14, @SUPPLY_CRATE_POOL_TEMPLATE+4, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+15, @SUPPLY_CRATE_POOL_TEMPLATE+5, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+16, @SUPPLY_CRATE_POOL_TEMPLATE+6, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+17, @SUPPLY_CRATE_POOL_TEMPLATE+7, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+18, @SUPPLY_CRATE_POOL_TEMPLATE+8, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+19, @SUPPLY_CRATE_POOL_TEMPLATE+9, 'Stratholme - Supply Crate', 0, 10),
+(@SUPPLY_CRATE_OGUID+20, @SUPPLY_CRATE_POOL_TEMPLATE+10, 'Stratholme - Supply Crate', 0, 10);
 
 UPDATE `pool_template` SET `description` = 'Stratholme - Supply Crate' WHERE `description` LIKE 'Strat : Supply Crate';
 UPDATE `pool_gameobject` SET `description` = 'Stratholme - Supply Crate' WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (176224, 176304));
