@@ -57,8 +57,6 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, spellSlot: %u , Item: %u, data length = %i", bagIndex, slot, spellSlot, pItem->GetEntry(), (uint32)recvPacket.size());
-
     ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
     {
@@ -162,13 +160,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WORLD: CMSG_OPEN_ITEM packet, data length = %i", (uint32)recvPacket.size());
-
     uint8 bagIndex, slot;
-
     recvPacket >> bagIndex >> slot;
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "bagIndex: %u, slot: %u", bagIndex, slot);
 
     Player* pUser = _player;
 
@@ -260,10 +253,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
-
     recv_data >> guid;
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_GAMEOBJ_USE Message guid: %s", guid.GetString().c_str());
 
     // ignore for remote control state
     if (!_player->IsSelfMover())
@@ -299,9 +289,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
     uint32 spellId;
     recvPacket >> spellId;
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: got cast spell packet, spellId - %u, data length = %i",
-              spellId, (uint32)recvPacket.size());
 
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
@@ -538,8 +525,6 @@ void WorldSession::HandleCancelChanneling(WorldPacket& recv_data)
 
 void WorldSession::HandleSelfResOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: CMSG_SELF_RES");                  // empty opcode
-
     if (_player->GetUInt32Value(PLAYER_SELF_RES_SPELL))
     {
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL));

@@ -731,6 +731,10 @@ bool PetAI::CanAttack(Unit* target)
     if (m_creature->IsPet() && !((Pet*)m_creature)->IsEnabled())
         return false;
 
+    // This can happen somehow, even though pet should always have charminfo.
+    if (!m_creature->GetCharmInfo())
+        return false;
+
     // Passive - passive pets can attack if told to
     if (m_creature->HasReactState(REACT_PASSIVE))
         return m_creature->GetCharmInfo()->IsCommandAttack();

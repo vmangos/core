@@ -40,7 +40,6 @@
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd MSG_MOVE_WORLDPORT_ACK.");
     HandleMoveWorldportAckOpcode();
 }
 
@@ -220,8 +219,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd MSG_MOVE_TELEPORT_ACK");
-
     ObjectGuid guid;
     recvData >> guid;
     uint32 movementCounter = 0;
@@ -230,8 +227,6 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
 #endif
     uint32 time = 0;
     recvData >> time;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Guid: %s", guid.GetString().c_str());
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Counter %u, time %u", movementCounter, time / IN_MILLISECONDS);
 
     Unit* pMover = _player->GetMover();
     Player* pPlayerMover = pMover->ToPlayer();
@@ -248,6 +243,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
             _player->GetName(), _player->GetSession()->GetAccountId(), movementCounter, pMover->GetMovementCounter());
     }
 
+    pPlayerMover->SetSplineDonePending(false);
     pPlayerMover->ExecuteTeleportNear();
 }
 
@@ -297,7 +293,6 @@ void Player::ExecuteTeleportNear()
 void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 {
     uint32 const opcode = recvData.GetOpcode();
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     // Do not accept packets sent before this time.
     if (recvData.GetPacketTime() <= m_moveRejectTime)
@@ -306,6 +301,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     Unit* pMover = _player->GetMover();
 
     if (pMover->GetObjectGuid() != m_clientMoverGuid)
+        return;
+
+    if (pMover->HasPendingSplineDone())
         return;
 
     // currently being moved by server
@@ -426,7 +424,6 @@ CMSG_FORCE_TURN_RATE_CHANGE_ACK
 void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
 {
     uint32 const opcode = recvData.GetOpcode();
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     /* extract packet */
     ObjectGuid guid;
@@ -499,7 +496,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
     Player* const pPlayerMover = pMover->ToPlayer();
 
     // Check if position and movement flags are fine before speed update.
-    bool canRelocate = recvData.GetPacketTime() > m_moveRejectTime && VerifyMovementInfo(movementInfo);
+    bool canRelocate = recvData.GetPacketTime() > m_moveRejectTime && !pMover->HasPendingSplineDone() && VerifyMovementInfo(movementInfo);
     if (canRelocate && pPlayerMover)
     {
         if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode)) ||
@@ -548,7 +545,6 @@ CMSG_MOVE_FEATHER_FALL_ACK
 void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
 {
     uint32 const opcode = recvData.GetOpcode();
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     /* extract packet */
     ObjectGuid guid;
@@ -612,6 +608,9 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
     // Use fake loop here to handle movement position checks separately from change ACK.
     do
     {
+        if (pMover->HasPendingSplineDone())
+            break;
+
         // Do not accept packets sent before this time.
         if (recvData.GetPacketTime() <= m_moveRejectTime)
             break;
@@ -668,8 +667,7 @@ CMSG_FORCE_MOVE_UNROOT_ACK
 void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 {
     uint32 const opcode = recvData.GetOpcode();
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
-    
+
     /* extract packet */
     ObjectGuid guid;
     recvData >> guid;
@@ -715,6 +713,9 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     // Use fake loop here to handle movement position checks separately from change ACK.
     do
     {
+        if (pMover->HasPendingSplineDone())
+            break;
+
         // Do not accept packets sent before this time.
         if (recvData.GetPacketTime() <= m_moveRejectTime)
             break;
@@ -755,8 +756,6 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 
 void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_MOVE_KNOCK_BACK_ACK");
-
     /* extract packet */
     ObjectGuid guid;
     recvData >> guid;
@@ -775,9 +774,6 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     Unit* pMover = _player->GetMap()->GetUnit(guid);
 
     if (!pMover)
-        return;
-
-    if (!VerifyMovementInfo(movementInfo))
         return;
 
     // verify that indeed the client is replying with the changes that were send to him
@@ -799,6 +795,12 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
         return;
     }
 
+    if (pMover->HasPendingSplineDone())
+        return;
+
+    if (!VerifyMovementInfo(movementInfo))
+        return;
+
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (pMover->IsPlayer() && static_cast<Player*>(pMover)->IsBeingTeleported())
         return;
@@ -819,8 +821,6 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_MOVE_SPLINE_DONE");
-
     MovementInfo movementInfo;
     uint32 splineId;
 
@@ -840,6 +840,15 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 
     if (pMover->movespline->GetId() != splineId)
         return;
+
+    // must be after checking this is the newest spline id
+    if (pMover->HasPendingSplineDone())
+        pMover->SetSplineDonePending(false);
+    else
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleMoveSplineDoneOpcode: client sent unexpected spline done for %s", pMover->GetGuidStr().c_str());
+        return;
+    }
 
     if (Player* pPlayerMover = pMover->ToPlayer())
     {
@@ -873,8 +882,6 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
-
     ObjectGuid guid;
     recvData >> guid;
 
@@ -921,8 +928,6 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
-
     ObjectGuid oldMoverGuid;
     MovementInfo movementInfo;
 
@@ -960,6 +965,9 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
     if (!pMover)
         return;
 
+    if (pMover->HasPendingSplineDone())
+        return;
+
     if (!pMover->movespline->Finalized())
         return;
 
@@ -994,8 +1002,6 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
 {
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_MOUNTSPECIAL_ANIM");
-
     WorldPacket data(SMSG_MOUNTSPECIAL_ANIM, 8);
     data << GetPlayer()->GetObjectGuid();
 
@@ -1015,8 +1021,6 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Time Lag/Synchronization Resent/Update");
-
     ObjectGuid guid;
     recvData >> guid;
     uint32 lag;

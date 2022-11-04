@@ -24,9 +24,13 @@
 
 #include "Policies/Singleton.h"
 #include "Common.h"
+#include "SharedDefines.h"
 #include "LFGDefines.h"
+#include "ObjectGuid.h"
 
 class Group;
+class Player;
+class WorldPacket;
 
 class LFGMgr
 {

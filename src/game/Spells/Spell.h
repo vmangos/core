@@ -224,6 +224,7 @@ class Spell
     friend struct MaNGOS::SpellNotifierPlayer;
     friend struct MaNGOS::SpellNotifierCreatureAndPlayer;
     friend void SpellCaster::SetCurrentCastedSpell(Spell* pSpell);
+    friend void SpellCaster::MoveChannelledSpellWithCastTime(Spell* pSpell);
     public:
 
         void EffectEmpty(SpellEffectIndex effIdx);

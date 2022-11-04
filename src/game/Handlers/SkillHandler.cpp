@@ -39,7 +39,6 @@ void WorldSession::HandleLearnTalentOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MSG_TALENT_WIPE_CONFIRM");
     ObjectGuid guid;
     recv_data >> guid;
 

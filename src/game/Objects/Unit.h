@@ -1284,6 +1284,7 @@ class Unit : public SpellCaster
         uint32 m_movementCounter = 0;
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
         std::map<MovementChangeType, uint32> m_lastMovementChangeCounterPerType;
+        bool m_hasPendingSplineDone = false;
         float m_casterChaseDistance;
         float m_speed_rate[MAX_MOVE_TYPE];
         float m_jumpInitialSpeed = 0;
@@ -1340,6 +1341,8 @@ class Unit : public SpellCaster
         bool FindPendingMovementKnockbackChange(MovementInfo& movementInfo, uint32 movementCounter);
         bool FindPendingMovementSpeedChange(float speedReceived, uint32 movementCounter, UnitMoveType moveType);
         void CheckPendingMovementChanges();
+        bool HasPendingSplineDone() const { return m_hasPendingSplineDone; }
+        void SetSplineDonePending(bool state) { m_hasPendingSplineDone = state; }
 
         void SetWalk(bool enable, bool asDefault = true);
         void SetSpeedRate(UnitMoveType mtype, float rate);

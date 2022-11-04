@@ -241,8 +241,6 @@ AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(Objec
 // this void creates new auction and adds auction to some auctionhouse
 void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleAuctionSellItem");
-
     ObjectGuid auctioneerGuid;
     ObjectGuid itemGuid;
     uint32 etime, bid, buyout;
@@ -417,8 +415,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 // this function is called when client bids or buys out auction
 void WorldSession::HandleAuctionPlaceBid(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleAuctionPlaceBid");
-
     ObjectGuid auctioneerGuid;
     uint32 auctionId;
     uint32 price;
@@ -565,8 +561,6 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recv_data)
 // this void is called when auction_owner cancels his auction
 void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleAuctionRemoveItem");
-
     ObjectGuid auctioneerGuid;
     uint32 auctionId;
     recv_data >> auctioneerGuid;
@@ -714,7 +708,6 @@ public:
 // called when player lists his bids
 void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleAuctionListBidderItems");
     if (ReceivedAHListRequest())
         return;
 
@@ -758,7 +751,6 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
 // this void sends player info about his auctions
 void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleAuctionListOwnerItems");
     if (ReceivedAHListRequest())
         return;
 
@@ -786,7 +778,6 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recv_data)
 
 void WorldSession::HandleAuctionListItems(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleAuctionListItems");
     if (ReceivedAHListRequest())
         return;
 

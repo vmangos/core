@@ -300,6 +300,7 @@ public:
     SpellCastResult CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
 
     void SetCurrentCastedSpell(Spell* pSpell);
+    void MoveChannelledSpellWithCastTime(Spell* pSpell);
     Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
     Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
     bool CheckAndIncreaseCastCounter();

@@ -69,14 +69,10 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Ignore Trade %u", _player->GetGUIDLow());
-    // recvPacket.print_storage();
 }
 
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Busy Trade %u", _player->GetGUIDLow());
-    // recvPacket.print_storage();
 }
 
 void WorldSession::SendUpdateTrade(bool trader_state /*= true*/)
@@ -664,7 +660,6 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)
 {
     uint32 gold;
-
     recvPacket >> gold;
 
     TradeData* my_trade = _player->GetTradeData();

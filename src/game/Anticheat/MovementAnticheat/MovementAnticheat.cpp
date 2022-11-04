@@ -544,37 +544,6 @@ bool ShouldRejectMovement(uint32 cheatFlags)
     return false;
 }
 
-bool MovementAnticheat::ShouldAcceptCorpseMovement(MovementInfo& movementInfo, uint16 opcode)
-{
-    if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_XZ))
-        return false;
-
-    switch (opcode)
-    {
-        case CMSG_MOVE_SPLINE_DONE:
-        case CMSG_MOVE_NOT_ACTIVE_MOVER:
-            return true;
-    }
-
-    if (IsAnyMoveAckOpcode(opcode))
-        return true;
-
-    if (GetLastMovementInfo().HasMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN))
-    {
-        if (IsStopOpcode(opcode))
-            return true;
-
-        if (IsFallEndOpcode(opcode))
-            return true;
-    }
-
-    if ((opcode == MSG_MOVE_HEARTBEAT) &&
-        movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
-        return true;
-
-    return false;
-}
-
 void MovementAnticheat::OnDeath()
 {
     m_deathTime = WorldTimer::getMSTime();
@@ -610,7 +579,7 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
         APPEND_CHEAT(CHEAT_TYPE_JUMP_SPEED_CHANGE);
 #endif
 
-    if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (me->GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
+    if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (me->GetSpeed(GetMoveTypeForMovementInfo(GetLastMovementInfo())) + 0.0001f))
         APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP);
 
     if (CheckMultiJump(opcode))
@@ -654,30 +623,8 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
 
     AddCheats(cheatFlags);
 
-    bool sendHeartbeat = ShouldRejectMovement(cheatFlags);
-
-    // Do not accept position changes if player is dead and has not released spirit.
-    if (!sendHeartbeat && me->GetDeathState() == CORPSE &&
-        !ShouldAcceptCorpseMovement(movementInfo, opcode))
+    if (ShouldRejectMovement(cheatFlags))
     {
-        ResetJumpCounters();
-        m_knockBack = false;
-
-        // just skip opcode if we died recently, probably sent before death
-        if ((m_deathTime + 1000 + m_session->GetLatency() * 2) > movementInfo.stime)
-        {
-            GetLastMovementInfo().ctime = 0;
-            return 1;
-        }
-
-        sendHeartbeat = true;
-    }
-
-    if (sendHeartbeat)
-    {
-        //if (!me->movespline->Finalized())
-        //    sendHeartbeat = false;
-
         // Movement flags get verified first. Don't undo them if they passed.
         if (IsFlagAckOpcode(opcode))
         {
@@ -974,7 +921,7 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
        (GetLastMovementInfo().moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (movementInfo.moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (me->HasFlag(UNIT_FIELD_FLAGS, NO_WALL_CLIMB_CHECK_UNIT_FLAGS)) ||
-        IsInKnockBack() || me->IsTaxiFlying())
+        IsInKnockBack() || me->IsTaxiFlying() || !GetLastMovementInfo().ctime)
         return false;
     
     float const deltaXY = GetDistance2D(GetLastMovementInfo().pos, movementInfo.pos);
