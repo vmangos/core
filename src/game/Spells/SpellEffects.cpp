@@ -3525,17 +3525,15 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
                 level = resultLevel;
         }
     }
-    // level of pet summoned using engineering item based at engineering skill level
+    // level of pet summoned using engineering trinket scales with engineering skill level
     else if (m_CastItem)
     {
         ItemPrototype const* proto = m_CastItem->GetProto();
-        if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
+        if (proto && proto->RequiredSkill == SKILL_ENGINEERING && proto->InventoryType == INVTYPE_TRINKET)
         {
             uint16 engiLevel = ((Player*)m_casterUnit)->GetSkillValue(SKILL_ENGINEERING);
             if (engiLevel)
-            {
                 level = engiLevel / 5;
-            }
         }
     }
 
