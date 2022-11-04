@@ -1589,6 +1589,23 @@ bool SpellCaster::CheckAndIncreaseCastCounter()
     return true;
 }
 
+void SpellCaster::MoveChannelledSpellWithCastTime(Spell* pSpell)
+{
+    MANGOS_ASSERT(pSpell);
+    MANGOS_ASSERT(pSpell->m_channeled && pSpell->m_casttime && !pSpell->m_IsTriggeredSpell && pSpell->getState() == SPELL_STATE_CASTING);
+    MANGOS_ASSERT(m_currentSpells[CURRENT_GENERIC_SPELL] == pSpell);
+
+    if (Spell* pChannelled = m_currentSpells[CURRENT_CHANNELED_SPELL])
+    {
+        MANGOS_ASSERT(pChannelled->m_spellInfo->Id == pSpell->m_spellInfo->Id);
+        InterruptSpell(CURRENT_CHANNELED_SPELL, true);
+    }
+
+    m_currentSpells[CURRENT_GENERIC_SPELL] = nullptr;
+    m_currentSpells[CURRENT_CHANNELED_SPELL] = pSpell;
+    pSpell->m_selfContainer = &(m_currentSpells[CURRENT_CHANNELED_SPELL]);
+}
+
 void SpellCaster::SetCurrentCastedSpell(Spell* pSpell)
 {
     MANGOS_ASSERT(pSpell);                                  // nullptr may be never passed here, use InterruptSpell or InterruptNonMeleeSpells
@@ -1604,8 +1621,10 @@ void SpellCaster::SetCurrentCastedSpell(Spell* pSpell)
     {
         case CURRENT_GENERIC_SPELL:
         {
-            // generic spells always break channeled not delayed spells
-            InterruptSpell(CURRENT_CHANNELED_SPELL, false);
+            // a channelled spell with a cast time is considered generic before channeling starts,
+            // but it does not break itself if you start to recast it, only once channeling starts
+            if (!pSpell->m_channeled || (m_currentSpells[CURRENT_CHANNELED_SPELL] && m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->Id != pSpell->m_spellInfo->Id))
+                InterruptSpell(CURRENT_CHANNELED_SPELL, false);
 
             // autorepeat breaking
             if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL])
