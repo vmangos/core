@@ -49,6 +49,7 @@
 #include "InstanceData.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
+#include "TemporarySummon.h"
 
 using namespace Spells;
 
@@ -629,6 +630,27 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 {
                     // Make sure m_casterUnit gets removed from the map to avoid getting hit by Purple bolt again after respawn.
                     m_casterUnit->RemoveFromWorld();
+                    return;
+                }
+                case 10389: // [Event: Scourge Invasion] Spawn Smoke
+                {
+
+                    if (Creature* pCreature = ToCreature(m_casterUnit))
+                    {
+                        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+
+                        pCreature->m_Events.AddLambdaEventAtOffset([pCreature]
+                        {
+                            if (pCreature->IsTemporarySummon())
+                            {
+                                if (Player* player = pCreature->GetMap()->GetPlayer(((TemporarySummon*)pCreature)->GetSummonerGuid()))
+                                {
+                                    pCreature->GetThreatManager().addThreat(player, 1000.0f);
+                                }
+                            }
+                        }, 1);
+                    }
                     return;
                 }
                 case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?

@@ -12,15 +12,14 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 UPDATE `creature_template` SET `regeneration`=0 WHERE `entry`=16136;
 UPDATE `creature_template` SET `regeneration`=0 WHERE `entry`=16172;
 UPDATE `creature_template` SET `auras`=NULL, `flags_extra`=0 WHERE `entry`=16230;
-UPDATE `creature_template` SET `spawn_spell_id`=10389 WHERE `entry`=16143;
 UPDATE `creature_template` SET `spawn_spell_id`=28234 WHERE  `entry` IN (16230,16299,16141,16298,14697,16380,16379,16438,16437,16422,16423,16394,16382,16383);
 UPDATE `creature_template` SET `auras`='28346 27887' WHERE  `entry` IN (16136,16172);
 UPDATE `creature_template` SET `auras`='28395' WHERE `entry`=16401;
-UPDATE `creature_template` SET `spell_list_id`=163830, `spawn_spell_id`=0, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16383;
-UPDATE `creature_template` SET `spell_list_id`=161430, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
+UPDATE `creature_template` SET `spell_list_id`=163830, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16383;
+UPDATE `creature_template` SET `unit_flags`=64, `spell_list_id`=161430, `spawn_spell_id`=10389, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
 UPDATE `gameobject_template` SET `script_name`='' WHERE `entry`=181136;
-UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432, `spawn_spell_id`=0 WHERE `entry`=16394;
-UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432, `spawn_spell_id`=0 WHERE `entry`=16382;
+UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16394;
+UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16382;
 
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `build_min`) VALUES (28364, 1, 16432, 5464);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `build_min`) VALUES (28364, 1, 16396, 5464);
@@ -231,7 +230,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 
 DELETE FROM `generic_scripts` WHERE `id`=1639402;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1639402, 2, 0, 0, 6, 0, 0, 0, 0, 0, 0, 17, 12318, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
+(1639402, 2, 0, 0, 6, 0, 0, 0, 0, 0, 0, 16, 12318, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
 
 DELETE FROM `generic_scripts` WHERE `id`=1639403;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -271,12 +270,19 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1614301;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1614301, 0, 0, 44, 1, 1, 0, 0, 16172, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Set Phase for Damaged Necrotic Shard'),
-(1614301, 0, 0, 78, 70, 0, 0, 0, 16172, 10, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Join Creature Group');
+(1614301, 0, 0, 39, 1614301, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Start Script');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1614302;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1614302, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Leave Creature Group');
+(1614302, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Leave Creature Group'),
+(1614302, 0, 0, 15, 28056, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Cast Zap Crystal Corpse');
+
+DELETE FROM `generic_scripts` WHERE `id`=1614301;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1614301, 0, 0, 78, 64, 0, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Join Creature Group'),
+(1614301, 0, 0, 44, 1, 1, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Set Phase for Damaged Necrotic Shard'),
+(1614301, 1, 0, 0, 0, 0, 0, 0, 2, 0, 4, 16, 12420, 12421, 12422, 12243, 0, 0, 0, 0, 0, 'Shadow of Doom - Talk'),
+(1614301, 5, 0, 4, 46, 768, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Unit Flags');
 
 -- Events list for Flameshocker
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16383;
@@ -418,9 +424,8 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=16172;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617201, 16172, 0, 8, 0, 100, 1, 28326, 1, 0, 0, 1617201, 0, 0, 'Damaged Necrotic Shard - Hit by Communique, Relay-to-Camp');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617202, 16172, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1617202, 0, 0, 'Damaged Necrotic Shard - Just spawned');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617203, 16172, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1617203, 0, 0, 'Damaged Necrotic Shard - Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617204, 16172, 0, 1, 0, 100, 1, 5000, 5000, 5000, 5000, 1617204, 0, 0, 'Damaged Necrotic Shard - Timmer OOC,  if not in Group');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617205, 16172, 0, 32, 0, 100, 1, 16230, 0, 0, 0, 1617205, 0, 0, 'Damaged Necrotic Shard - Group Member Died: Cultist');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617206, 16172, 0, 32, 0, 100, 1, 16143, 0, 0, 0, 1617205, 0, 0, 'Damaged Necrotic Shard - Group Member Died: Shadow of Doom');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617204, 16172, 0, 1, 2044, 100, 1, 5000, 5000, 5000, 5000, 1617204, 0, 0, 'Damaged Necrotic Shard - Timmer OOC,  if not in Group');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617206, 16172, 0, 32, 0, 100, 1, 16230, 0, 0, 0, 1617205, 0, 0, 'Damaged Necrotic Shard - Group Member Died: Shadow of Doom');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1617201;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -428,12 +433,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1617202;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1617202, 0, 1, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Set Phase 1'),
-(1617202, 0, 2, 15, 27887, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Cast Minion Spawner, small'),
-(1617202, 0, 2, 15, 28201, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Cast Choose Camp Type'),
-(1617202, 0, 2, 15, 27888, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Cast Minion Spawner, Buttress'),
-(1617202, 0, 2, 15, 27886, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Cast Disturb Minion Trap, Buttress'),
-(1617202, 0, 3, 18, 4000, 0, 0, 0, 16136, 5, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Despawn Necrotic Shard');
+(1617202, 0, 1, 39, 1617202, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Start Script');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1617203;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -449,6 +449,15 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1617205;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1617205, 0, 0, 44, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Set Phase');
 
+DELETE FROM `generic_scripts` WHERE `id`=1617202;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1617202, 0, 1, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Set Phase 1'),
+(1617202, 0, 2, 15, 27887, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Cast Minion Spawner, small'),
+(1617202, 0, 2, 15, 28201, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Cast Choose Camp Type'),
+(1617202, 0, 2, 15, 27888, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Cast Minion Spawner, Buttress'),
+(1617202, 0, 2, 15, 27886, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Cast Disturb Minion Trap, Buttress'),
+(1617202, 0, 3, 18, 4000, 0, 0, 0, 16136, 5, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard -  Despawn Necrotic Shard');
+
 -- Events list for Cultist Engineer
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16230;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
@@ -457,21 +466,21 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1623001;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1623001, 0, 0, 44, 1, 1, 0, 0, 16172, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Set Phase for Damaged Necrotic Shard'),
-(1623001, 0, 0, 78, 64, 0, 0, 0, 16172, 10, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Join Creature Group'),
-(1623001, 0, 0, 39, 1623001, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Start Script');
+	(1623001, 0, 0, 39, 1623001, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Start Script');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1623002;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1623002, 0, 0, 15, 28041, 2, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Damage Crystal'),
-(1623002, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Leave Creature Group');
+	(1623002, 0, 0, 15, 28041, 2, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Damage Crystal'),
+	(1623002, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Leave Creature Group');
 
 DELETE FROM `generic_scripts` WHERE `id`=1623001;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1623001, 0, 1, 35, 0, 0, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Face Damaged Necrotic Shard'),
-(1623001, 0, 2, 15, 28132, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Create Summoner Shield'),
-(1623001, 1, 3, 15, 29826, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Self Stun (DND)'),
-(1623001, 2, 4, 15, 28078, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel');
+(1623001, 0, 1, 78, 64, 0, 0, 0, 16172, 10, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Join Creature Group'),
+(1623001, 0, 2, 35, 0, 0, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Face Damaged Necrotic Shard'),
+(1623001, 0, 3, 15, 28132, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Create Summoner Shield'),
+(1623001, 0, 4, 44, 1, 1, 0, 0, 16172, 10, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Set Phase for Damaged Necrotic Shard'),
+(1623001, 1, 5, 15, 29826, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Self Stun (DND)'),
+(1623001, 2, 6, 15, 28078, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel');
 
 DELETE FROM `gossip_scripts` WHERE `id`=7166;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
