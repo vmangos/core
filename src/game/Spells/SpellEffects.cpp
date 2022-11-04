@@ -424,7 +424,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         if (unitTarget->GetEntry() == 16172) // Damaged Necrotic Shard
                         {
                             unitTarget->SetArmor(0);
-                            damage = 100;
+                            //damage = 100;
                         }
                         break;
                     }
@@ -434,9 +434,9 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         {
                             unitTarget->SetArmor(0);
                             if (m_caster->GetEntry() == 16143) // Casted by Shadow of Doom.
-                                damage = unitTarget->GetMaxHealth() / 4.0f;
+                                damage = float(unitTarget->GetMaxHealth() / 4);
                             else // Casted by Damaged Necrotic Shard. https://classic.wowhead.com/spell=348571/zap-crystal-corpse
-                                damage = unitTarget->GetMaxHealth() / 100.0f * 6.0f;
+                                damage = float(unitTarget->GetMaxHealth() / 100 * 6);
                         }
                         break;
                     }
@@ -450,7 +450,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             This is just a workaround to get it always working properly if someone messing up health or armor from the npc.
                             */
                             unitTarget->SetArmor(0);
-                            damage = unitTarget->GetMaxHealth() / 3.0f;
+                            damage = float(unitTarget->GetMaxHealth() / 3);
                         }
                         break;
                     }
@@ -623,7 +623,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     pCaster->m_Events.AddLambdaEventAtOffset([pCaster, spellId]
                     {
                         pCaster->CastSpell(pCaster, spellId, false);
-                    }, 1);
+                    }, 500);
                     return;
                 }
                 case 28351: // [Event: Scourge Invasion] Communique, Camp-to-Relay, Death
@@ -640,6 +640,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
+                        // This is the only way to get it Blizzlike... (And who knows? maybe it is!)
                         pCreature->m_Events.AddLambdaEventAtOffset([pCreature]
                         {
                             if (pCreature->IsTemporarySummon())
@@ -647,6 +648,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                                 if (Player* player = pCreature->GetMap()->GetPlayer(((TemporarySummon*)pCreature)->GetSummonerGuid()))
                                 {
                                     pCreature->GetThreatManager().addThreat(player, 1000.0f);
+                                    // DoScriptText(PickRandomValue(12420, 12421, 12422, 12243), pCreature, player, CHAT_TYPE_SAY);
                                 }
                             }
                         }, 1);
