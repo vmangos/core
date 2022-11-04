@@ -176,12 +176,12 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2855, 0, 0, 15, 23626, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jangdor Swiftrider - Teach Wild Leather Shoulders');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1964, 2, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Shoulders again?', 9839, 1, 7, -1, 0, 2855, 0, 0, '', 0, 20017);
+(1964, 6, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Shoulders again?', 9839, 1, 7, -1, 0, 2855, 0, 0, '', 0, 20017);
 -- Wild Leather Vest
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2856, 0, 0, 15, 23627, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jangdor Swiftrider - Teach Wild Leather Vest');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1964, 3, 0, 'Hey Jangdor - can you teach me again how to make a Wild Leather Vest again?', 9840, 1, 7, -1, 0, 2856, 0, 0, '', 0, 20018);
+(1964, 7, 0, 'Hey Jangdor - can you teach me again how to make a Wild Leather Vest again?', 9840, 1, 7, -1, 0, 2856, 0, 0, '', 0, 20018);
 -- Wild Leather Helmet
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2857, 0, 0, 15, 23623, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jangdor Swiftrider - Teach Wild Leather Helmet');
@@ -191,39 +191,39 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2858, 0, 0, 15, 23621, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jangdor Swiftrider - Teach Wild Leather Boots');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1964, 5, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Boots again?', 9835, 1, 7, -1, 0, 2858, 0, 0, '', 0, 20020);
+(1964, 2, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Boots again?', 9835, 1, 7, -1, 0, 2858, 0, 0, '', 0, 20020);
 -- Wild Leather Leggings
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2859, 0, 0, 15, 23625, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jangdor Swiftrider - Teach Wild Leather Leggings');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1964, 6, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Leggings again?', 9838, 1, 7, -1, 0, 2859, 0, 0, '', 0, 20021);
+(1964, 5, 0, 'Hey Jangdor - can you teach me again how to make Wild Leather Leggings again?', 9838, 1, 7, -1, 0, 2859, 0, 0, '', 0, 20021);
 -- Wild Leather Cloak
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2860, 0, 0, 15, 23622, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jangdor Swiftrider - Teach Wild Leather Cloak');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1964, 7, 0, 'Hey Jangdor - can you teach me again how to make a Wild Leather Cloak again?', 9836, 1, 7, -1, 0, 2860, 0, 0, '', 0, 20030);
+(1964, 3, 0, 'Hey Jangdor - can you teach me again how to make a Wild Leather Cloak again?', 9836, 1, 7, -1, 0, 2860, 0, 0, '', 0, 20030);
 
 -- Gossip options for Pratt McGrubben
 -- Wild Leather Shoulders
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2847, 0, 0, 15, 23626, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pratt McGrubben - Teach Wild Leather Shoulders');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1965, 2, 0, 'Hey Pratt - can you teach me again how to make Wild Leather Shoulders again?', 9832, 1, 7, -1, 0, 2847, 0, 0, '', 0, 20022);
+(1965, 5, 0, 'Hey Pratt - can you teach me again how to make Wild Leather Shoulders again?', 9832, 1, 7, -1, 0, 2847, 0, 0, '', 0, 20022);
 -- Wild Leather Vest
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2848, 0, 0, 15, 23627, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pratt McGrubben - Teach Wild Leather Vest');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1965, 3, 0, 'Hey Pratt - can you teach me again how to make a Wild Leather Vest again?', 9831, 1, 7, -1, 0, 2848, 0, 0, '', 0, 20023);
+(1965, 4, 0, 'Hey Pratt - can you teach me again how to make a Wild Leather Vest again?', 9831, 1, 7, -1, 0, 2848, 0, 0, '', 0, 20023);
 -- Wild Leather Helmet
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2849, 0, 0, 15, 23623, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pratt McGrubben - Teach Wild Leather Helmet');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1965, 4, 0, 'Hey Pratt - can you teach me how to make a Wild Leather Helmet again?', 9834, 1, 7, -1, 0, 2849, 0, 0, '', 0, 20024);
+(1965, 7, 0, 'Hey Pratt - can you teach me how to make a Wild Leather Helmet again?', 9834, 1, 7, -1, 0, 2849, 0, 0, '', 0, 20024);
 -- Wild Leather Boots
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2850, 0, 0, 15, 23621, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pratt McGrubben - Teach Wild Leather Boots');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1965, 5, 0, 'Hey Pratt - can you teach me how to make Wild Leather Boots again?', 9829, 1, 7, -1, 0, 2850, 0, 0, '', 0, 20025);
+(1965, 2, 0, 'Hey Pratt - can you teach me how to make Wild Leather Boots again?', 9829, 1, 7, -1, 0, 2850, 0, 0, '', 0, 20025);
 -- Wild Leather Leggings
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2851, 0, 0, 15, 23625, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pratt McGrubben - Teach Wild Leather Leggings');
@@ -233,7 +233,7 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2852, 0, 0, 15, 23622, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pratt McGrubben - Teach Wild Leather Cloak');
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(1965, 7, 0, 'Hey Pratt - can you teach me how to make a Wild Leather Cloak again?', 9830, 1, 7, -1, 0, 2852, 0, 0, '', 0, 20031);
+(1965, 3, 0, 'Hey Pratt - can you teach me how to make a Wild Leather Cloak again?', 9830, 1, 7, -1, 0, 2852, 0, 0, '', 0, 20031);
 
 -- End of migration.
 END IF;
