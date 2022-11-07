@@ -517,6 +517,16 @@ UPDATE `creature_template` SET `spell_list_id` = 14900 WHERE `entry` = 1490;
 -- Correct Devilsaw Template (credit cmangos)
 UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `entry` IN (6498, 6499, 6500);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Correct Creature Immunities (credit cmangos)
+UPDATE `creature_template` SET `mechanic_immune_mask` = 8388624 WHERE `entry` = 12237;
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Young Crocolisk Skins Does Not Require Pre Quest
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 484;
+
 
 -- End of migration.
 END IF;
