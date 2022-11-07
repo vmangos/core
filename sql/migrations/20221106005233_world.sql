@@ -67,6 +67,9 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 (528701, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 'Longtooth Howler - Call for Help');
 
 
+-- Remove references to event_ai for creatures that no longer have events
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` IN (69, 299, 834, 1508, 1509, 1922, 2729, 2959); 
+
 -- End of migration.
 END IF;
 END??
