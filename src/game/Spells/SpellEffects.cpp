@@ -50,6 +50,8 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "TemporarySummon.h"
+#include "scriptPCH.h"
+
 
 using namespace Spells;
 
@@ -626,12 +628,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }, 500);
                     return;
                 }
-                case 28351: // [Event: Scourge Invasion] Communique, Camp-to-Relay, Death
-                {
-                    // Make sure m_casterUnit gets removed from the map to avoid getting hit by Purple bolt again after respawn.
-                    m_casterUnit->RemoveFromWorld();
-                    return;
-                }
                 case 10389: // [Event: Scourge Invasion] Spawn Smoke
                 {
 
@@ -655,23 +651,21 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }
                     return;
                 }
+                case 27894: // [Event: Scourge Invasion] Kill Summoner, who will Summon Boss
+                {
+                    Player* pPlayer = ToPlayer(m_casterUnit);
+                    {
+                        if (Creature* pCreature = ToCreature(unitTarget)) // Target is Cultist Engineer
+                        {
+                            pCreature->CastSpell(pPlayer, 31316, true); // Summon Boss Buff
+                            pCreature->CastSpell(pCreature, 3617, true);  // Quiet Suicide
+                        }
+                    }
+                    return;
+                }
                 case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
                     m_casterUnit->CastSpell(m_casterUnit, 17680, false);
-                    return;
-                }
-                case 28345: // [Event: Scourge Invasion] (Communique Trigger) triggers (Communique, Camp-to-Relay)?
-                {
-                    unitTarget->CastSpell(unitTarget, 28281, true);
-                    return;
-                }
-                case 27894: // [Event: Scourge Invasion] Kill Summoner, who will Summon Boss
-                {
-                    if (Player* pPlayer = ToPlayer(m_casterUnit))
-                    {
-                        pPlayer->CastSpell(pPlayer, 31316, true); // Summon Boss Buff
-                        unitTarget->CastSpell(unitTarget, 3617, true);  // Quiet Suicide
-                    }
                     return;
                 }
                 case 28203: // [Event: Scourge Invasion] Find Camp Type
@@ -684,6 +678,17 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     else if (unitTarget->HasAura(28199))
                         m_casterUnit->CastSpell(m_casterUnit, 28187, true);
 
+                    return;
+                }
+                case 28345: // [Event: Scourge Invasion] (Communique Trigger) triggers (Communique, Camp-to-Relay)?
+                {
+                    unitTarget->CastSpell(unitTarget, 28281, true);
+                    return;
+                }
+                case 28351: // [Event: Scourge Invasion] Communique, Camp-to-Relay, Death
+                {
+                    // Make sure m_casterUnit gets removed from the map to avoid getting hit by Purple bolt again after respawn.
+                    m_casterUnit->RemoveFromWorld();
                     return;
                 }
                 case 23383: // Alliance Flag Click
@@ -5110,6 +5115,75 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 case 28314:                                 // [Event: Scourge Invasion] Flameshocker's Touch
                 {
                     m_casterUnit->CastSpell(unitTarget, 28329, true);
+                    return;
+                }
+                case 28183:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghost/ghoul)
+                {
+                    // 0.2% Chance of a Rare Spawn.
+                    uint32 roll = urand(1, 500);
+
+                    bool UncommonMinionspawner = false;
+
+                    if (roll == 1)
+                        UncommonMinionspawner = true;
+
+                    uint32 Entry = 16141; // just in case.
+
+                    Entry = UncommonMinionspawner ? PickRandomValue(16379, 14697) : PickRandomValue(16298, 16141);
+
+                    std::list<Creature*> minions;
+                    GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
+
+                    if (minions.empty())
+                        if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
+                            pMinion->SetWanderDistance(1.0f); // Seems to be very low.
+
+                    return;
+                }
+                case 28184:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghost/skeleton)
+                {
+                    // 0.2% Chance of a Rare Spawn.
+                    uint32 roll = urand(1, 500);
+
+                    bool UncommonMinionspawner = false;
+
+                    if (roll == 1)
+                        UncommonMinionspawner = true;
+
+                    uint32 Entry = 16298; // just in case.
+
+                    Entry = UncommonMinionspawner ? PickRandomValue(16379, 16380) : PickRandomValue(16298, 16299);
+
+                    std::list<Creature*> minions;
+                    GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
+
+                    if (minions.empty())
+                        if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
+                            pMinion->SetWanderDistance(1.0f); // Seems to be very low.
+
+                    return;
+                }
+                case 28185:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghoul/skeleton)
+                {
+                    // 0.2% Chance of a Rare Spawn.
+                    uint32 roll = urand(1, 500);
+
+                    bool UncommonMinionspawner = false;
+
+                    if (roll == 1)
+                        UncommonMinionspawner = true;
+
+                    uint32 Entry = 16141; // just in case.
+
+                    Entry = UncommonMinionspawner ? PickRandomValue(14697, 16380) : PickRandomValue(16141, 16299);
+
+                    std::list<Creature*> minions;
+                    GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
+
+                    if (minions.empty())
+                        if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
+                            pMinion->SetWanderDistance(1.0f); // Seems to be very low.
+
                     return;
                 }
                 case 28374:                                 // Decimate (Naxxramas: Gluth)

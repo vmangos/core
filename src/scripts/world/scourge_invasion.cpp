@@ -347,7 +347,7 @@ struct MinionspawnerAI : public ScriptedAI
     {
         Reset();
         m_events.Reset();
-        m_events.ScheduleEvent(EVENT_SPAWNER_SUMMON_MINION, 2000);
+        m_events.ScheduleEvent(EVENT_SPAWNER_SUMMON_MINION, 1000);
     }
 
     EventMap m_events;
@@ -364,25 +364,53 @@ struct MinionspawnerAI : public ScriptedAI
             {
                 case EVENT_SPAWNER_SUMMON_MINION:
                 {
-                    uint32 Entry = NPC_GHOUL_BERSERKER; // just in case.
+                    GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(181163);
 
-                    switch (m_creature->GetEntry())
+                    if (!gInfo)
                     {
-                        case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL:
-                            Entry = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_LUMBERING_HORROR) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_GHOUL_BERSERKER);
-                            break;
-                        case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON:
-                            Entry = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_BONE_WITCH) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_SKELETAL_SHOCKTROOPER);
-                            break;
-                        case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON:
-                            Entry = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_LUMBERING_HORROR, NPC_BONE_WITCH) : PickRandomValue(NPC_GHOUL_BERSERKER, NPC_SKELETAL_SHOCKTROOPER);
-                            break;
+                        return;
                     }
-                    if (Creature* pMinion = m_creature->SummonCreature(Entry, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
+
+                    float x = me->GetPositionX();
+                    float y = me->GetPositionY();
+                    float z = me->GetPositionZ();
+                    float ang = me->GetOrientation();
+                    Map* map = me->GetMap();
+
+                    GameObject* pGameObj = GameObject::CreateGameObject(gInfo->id);
+
+                    // used guids from specially reserved range (can be 0 if no free values)
+                    uint32 db_lowGUID = sObjectMgr.GenerateStaticGameObjectLowGuid();
+                    if (!db_lowGUID)
                     {
-                        pMinion->SetWanderDistance(1.0f); // Seems to be very low.
+                        delete pGameObj;
+                        return;
                     }
-                    break;
+
+                    if (!pGameObj->Create(db_lowGUID, gInfo->id, map, x, y, z, ang, 0.0f, 0.0f, 0.0f, 0.0f, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
+                    {
+                        delete pGameObj;
+                        return;
+                    }
+
+                        pGameObj->SetRespawnTime(300);
+
+                    // fill the gameobject data and save to the db
+                    pGameObj->SaveToDB(map->GetId());
+
+                    // this will generate a new guid if the object is in an instance
+                    if (!pGameObj->LoadFromDB(db_lowGUID, map))
+                    {
+                        delete pGameObj;
+                        return;
+                    }
+
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "GameObject %u (%u) added to: %u %u %u %u", gInfo->name, db_lowGUID, x, y, z, ang);
+
+                    map->Add(pGameObj);
+
+                    sObjectMgr.AddGameobjectToGrid(db_lowGUID, sObjectMgr.GetGOData(db_lowGUID));
+                break;
                 }
             }
         }

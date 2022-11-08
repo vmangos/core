@@ -1773,23 +1773,24 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     case 27852: // [Event: Scourge Invasion] [PH] Kill Summoner Buff
                     {
-                        Unit* pCaster = GetCaster();
-                        if (!pCaster)
-                            return;
-
-                        if (Player* pPlayer = ToPlayer(target))
+                        if (Creature* pCreature = ToCreature(GetCaster())) // Casted by Cultist Engineer
                         {
-                            pPlayer->CastSpell(pCaster, 27894, true); // Kill Summoner, who will Summon Boss
+                            if (Player* pPlayer = ToPlayer(target)) // Target is Player
+                            {
+                                pPlayer->CastSpell(pCreature, 27894, true); // Kill Summoner, who will Summon Boss
+                            }
                         }
                         return;
                     }
                     case 31316: // [Event: Scourge Invasion] Summon Boss Buff
                     {
-                        Unit* pCaster = GetCaster();
-                        if (!pCaster)
-                            return;
-
-                        pCaster->CastSpell(pCaster, 31315, true); // Summon Boss
+                        if (Creature* pCreature = ToCreature(GetCaster())) // Casted by Cultist Engineer
+                        {
+                            if (Player* pPlayer = ToPlayer(target)) // Target is Player
+                            {
+                                pPlayer->CastSpell(pPlayer, 31315, true); // Summon Boss
+                            }
+                        }
                         return;
                     }
                     case 21827: // Frostwolf Aura DND

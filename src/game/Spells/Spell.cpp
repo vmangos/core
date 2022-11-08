@@ -1125,13 +1125,15 @@ void Spell::AddGOTarget(GameObject* pTarget, SpellEffectIndex effIndex)
         targetInfo.timeDelay = uint64(0);
 
     // Add target to list
-    m_UniqueGOTargetInfo.push_back(targetInfo);
+    if (pTarget->isSpawned())
+        m_UniqueGOTargetInfo.push_back(targetInfo);
 }
 
 void Spell::AddGOTarget(ObjectGuid goGuid, SpellEffectIndex effIndex)
 {
     if (GameObject* go = m_caster->GetMap()->GetGameObject(goGuid))
-        AddGOTarget(go, effIndex);
+        if (go->isSpawned())
+            AddGOTarget(go, effIndex);
 }
 
 void Spell::AddItemTarget(Item* pitem, SpellEffectIndex effIndex)

@@ -32,7 +32,7 @@ DELETE FROM `spell_script_target` WHERE `entry`=16172 AND `type`=1 AND `targetEn
 UPDATE `gameobject` SET `spawn_flags`=1, `visibility_mod`=5000 WHERE `id` IN(181154, 181373, 181374, 181215, 181223, 181172);
 UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` IN(181154, 181373, 181374, 181215, 181223, 181172);
 
-UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN(16401, 16386, 16398, 16172, 16230, 16136);
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN(16401, 16386, 16398, 16172, 16230, 16136, 16356, 16306, 16336, 16338);
 UPDATE `creature` SET `spawn_flags`=1, `visibility_mod`=5000 WHERE `id` IN(16401, 16386, 16398, 16172, 16136);
 UPDATE `creature_template` SET `flags_extra`=252162 WHERE `entry` IN(16172, 16136);
 
@@ -185,6 +185,55 @@ INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`
 
 -- 619: Source's Guid Is 66952 Or 66954 Or 66957 Or 66959(Flameshockers in Undercity War Quarter)
 INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (619, 52, 66952, 66954, 66957, 66959, 0); 
+
+-- Events list for Scourge Invasion Minion, finder
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16356;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1635601, 16356, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1635601, 0, 0, 'Finder - Just Spawned');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1635601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1635601, 0, 0, 39, 1635601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Start Script');
+
+DELETE FROM `generic_scripts` WHERE `id`=1635601;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1635601, 0, 0, 15, 28203, 2, 0, 0, 16136, 60, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Cast Spell On Necrotic Shard'),
+(1635601, 0, 0, 15, 28203, 2, 0, 0, 16172, 60, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Cast Spell On Damaged Necrotic Shrard');
+
+-- Events list for Scourge Invasion Minion, spawner, Ghost/Ghoul
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16306;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1630601, 16306, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1630601, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Just Spawned');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1630601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1630601, 0, 0, 39, 1630601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Start Script');
+
+DELETE FROM `generic_scripts` WHERE `id`=1630601;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1630601, 0, 0, 15, 28183, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Cast Spell');
+
+-- Events list for Scourge Invasion Minion, spawner, Ghost/Skeleton
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16336;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1633601, 16336, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1633601, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Just Spawned');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1633601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1633601, 0, 0, 39, 1633601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Start Script');
+
+DELETE FROM `generic_scripts` WHERE `id`=1633601;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1633601, 0, 0, 15, 28184, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Cast Spell');
+
+-- Events list for Scourge Invasion Minion, spawner, Ghoul/Skeleton
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16338;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1633801, 16338, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1633801, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Just Spawned');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1633801;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1633801, 0, 0, 39, 1633801, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Start Script');
+
+DELETE FROM `generic_scripts` WHERE `id`=1633801;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1633801, 0, 0, 15, 28185, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Cast Spell');
 
 -- Events list for Pallid Horror
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16394;
@@ -436,16 +485,26 @@ INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalon
 -- Events list for Necrotic Shard
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16136;
 INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1613601, 16136, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1613601, 0, 0, 'Necrotic Shard - Death');
+INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1613602, 16136, 0, 8, 0, 100, 1, 28326, 1, 0, 0, 1613602, 0, 0, 'Necrotic Shard - Hit by Communique, Relay-to-Camp');
+INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1613603, 16136, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1613603, 0, 0, 'Necrotic Shard - Just spawned');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1613601;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1613601, 0, 1, 15, 27895, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Spell'),
 (1613601, 0, 2, 18, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Despawn Creature');
 
+DELETE FROM `creature_ai_scripts` WHERE `id`=1613602;
+INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1613602, 0, 0, 15, 28449, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Camp Receives Communique');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1613603;
+INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1613603, 0, 1, 39, 1613601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Start Script');
+
 DELETE FROM `generic_scripts` WHERE `id`=1613601;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1613601, 0, 2, 15, 27887, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Minion Spawner, small'),
-(1613601, 0, 2, 15, 28201, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Choose Camp Type'),
+(1613601, 0, 2, 15, 28201, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Choose Camp Type');
 
 -- Events list for Damaged Necrotic Shard
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16172;
@@ -725,6 +784,9 @@ INSERT INTO `game_event_creature`(`guid`, `event`) VALUES
 (@FLAMESHOCKER_GUID+59, 17),
 (@FLAMESHOCKER_GUID+60, 17),
 (@FLAMESHOCKER_GUID+61, 17);
+
+-- temp fix
+UPDATE `creature_template` SET `spawn_spell_id`=0 WHERE `spawn_spell_id`=28234;
 
  
 -- End of migration.
