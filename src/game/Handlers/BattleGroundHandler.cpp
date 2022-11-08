@@ -42,8 +42,6 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from %s", guid.GetString().c_str());
-
     Creature* pCreature = GetPlayer()->GetMap()->GetCreature(guid);
 
     if (!pCreature)
@@ -84,7 +82,6 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket& recv_data)
 {
     uint32 mapId;
     recv_data >> mapId;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WorldSession::HandleBattlefieldJoinOpcode : mapId=%u", mapId);
 
     WorldPacket data(CMSG_BATTLEMASTER_JOIN);
     data << uint64(0);
@@ -97,8 +94,6 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_BATTLEMASTER_JOIN");
-
     ObjectGuid guid;
     uint32 instanceId;
     uint32 mapId;
@@ -290,8 +285,6 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
 void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_data*/)
 {
     // empty opcode
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd MSG_BATTLEGROUND_PLAYER_POSITIONS Message");
-
     BattleGround *bg = _player->GetBattleGround();
     if (!bg)                                                // can't be received if player not in battleground
         return;
@@ -351,8 +344,6 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_d
 
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recv_data*/)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd MSG_PVP_LOG_DATA Message");
-
     BattleGround *bg = _player->GetBattleGround();
     if (!bg)
         return;
@@ -360,14 +351,10 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recv_data*/)
     WorldPacket data;
     sBattleGroundMgr.BuildPvpLogDataPacket(&data, bg);
     SendPacket(&data);
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Sent MSG_PVP_LOG_DATA Message");
 }
 
 void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint32 mapId;
     recv_data >> mapId;
@@ -390,8 +377,6 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_BATTLEFIELD_PORT Message");
-
     uint8 action = 0; // enter battle 0x1, leave queue 0x0
     uint32 mapId = 0;
 
@@ -536,8 +521,6 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleLeaveBattlefieldOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_LEAVE_BATTLEFIELD Message");
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint32 mapId;
     recv_data >> mapId;
@@ -557,8 +540,6 @@ void WorldSession::HandleLeaveBattlefieldOpcode(WorldPacket& recv_data)
 void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recv_data*/)
 {
     // empty opcode
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Battleground status");
-
     WorldPacket data;
     // we must update all queues here
     BattleGround *bg = nullptr;
@@ -613,8 +594,6 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_AREA_SPIRIT_HEALER_QUERY");
-
     BattleGround *bg = _player->GetBattleGround();
     if (!bg)
         return;
@@ -634,8 +613,6 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_AREA_SPIRIT_HEALER_QUEUE");
-
     BattleGround *bg = _player->GetBattleGround();
     if (!bg)
         return;

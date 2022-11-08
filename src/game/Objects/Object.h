@@ -700,45 +700,45 @@ class WorldObject : public Object
 
         virtual uint32 GetDefaultGossipMenuId() const { return 0; }
 
-        float GetCombatDistance(WorldObject const* target) const;
-        float GetDistance2dToCenter(WorldObject const* target) const;
-        float GetDistance2dToCenter(float x, float y) const;
-        float GetDistance2dToCenter(WorldLocation const& position) const { return GetDistance2dToCenter(position.x, position.y); }
-        float GetDistance2dToCenter(Position const& position) const { return GetDistance2dToCenter(position.x, position.y); }
-        float GetDistance3dToCenter(WorldObject const* target) const;
-        float GetDistance3dToCenter(float x, float y, float z) const;
-        float GetDistance3dToCenter(WorldLocation const& position) const { return GetDistance3dToCenter(position.x, position.y, position.z); }
-        float GetDistance3dToCenter(Position const& position) const { return GetDistance3dToCenter(position.x, position.y, position.z); }
-        float GetDistance(WorldObject const* obj) const;
-        float GetDistance(float x, float y, float z) const;
-        float GetDistance(WorldLocation const& position) const { return GetDistance(position.x, position.y, position.z); }
-        float GetDistance(Position const& position) const { return GetDistance(position.x, position.y, position.z); }
-        float GetDistance2d(WorldObject const* obj) const;
-        float GetDistance2d(float x, float y) const;
-        float GetDistance2d(WorldLocation const& position) const { return GetDistance2d(position.x, position.y); }
-        float GetDistance2d(Position const& position) const { return GetDistance2d(position.x, position.y); }
-        float GetDistanceZ(WorldObject const* obj) const;
+        float GetSizeFactorForDistance(WorldObject const* obj, SizeFactor distcalc) const;
+        float GetCombatDistance(WorldObject const* target) const { return GetDistance(target, SizeFactor::CombatReach); }
+        float GetDistance2dToCenter(WorldObject const* target) const { return GetDistance2d(target, SizeFactor::None); }
+        float GetDistance2dToCenter(float x, float y) const { return GetDistance2d(x, y, SizeFactor::None); }
+        float GetDistance2dToCenter(WorldLocation const& position) const { return GetDistance2d(position.x, position.y, SizeFactor::None); }
+        float GetDistance2dToCenter(Position const& position) const { return GetDistance2d(position.x, position.y, SizeFactor::None); }
+        float GetDistance3dToCenter(WorldObject const* target) const { return GetDistance(target, SizeFactor::None); }
+        float GetDistance3dToCenter(float x, float y, float z) const { return GetDistance(x, y, z, SizeFactor::None); }
+        float GetDistance3dToCenter(WorldLocation const& position) const { return GetDistance(position.x, position.y, position.z, SizeFactor::None); }
+        float GetDistance3dToCenter(Position const& position) const { return GetDistance(position.x, position.y, position.z, SizeFactor::None); }
+        float GetDistance(WorldObject const* obj, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        float GetDistance(float x, float y, float z, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        float GetDistance(WorldLocation const& position, SizeFactor distcalc = SizeFactor::BoundingRadius) const { return GetDistance(position.x, position.y, position.z, distcalc); }
+        float GetDistance(Position const& position, SizeFactor distcalc = SizeFactor::BoundingRadius) const { return GetDistance(position.x, position.y, position.z, distcalc); }
+        float GetDistance2d(WorldObject const* obj, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        float GetDistance2d(float x, float y, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        float GetDistance2d(WorldLocation const& position, SizeFactor distcalc = SizeFactor::BoundingRadius) const { return GetDistance2d(position.x, position.y, distcalc); }
+        float GetDistance2d(Position const& position, SizeFactor distcalc = SizeFactor::BoundingRadius) const { return GetDistance2d(position.x, position.y, distcalc); }
+        float GetDistanceZ(WorldObject const* obj, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
         float GetDistanceSqr(float x, float y, float z) const;
         bool IsInMap(WorldObject const* obj) const;
         template <class T>
-        bool IsWithinDist3d(T const& position, float dist2compare) const { return IsWithinDist3d(position.x, position.y, position.z, dist2compare); }
-        bool IsWithinDist3d(float x, float y, float z, float dist2compare) const;
+        bool IsWithinDist3d(T const& position, float dist2compare, SizeFactor distcalc = SizeFactor::BoundingRadius) const { return IsWithinDist3d(position.x, position.y, position.z, dist2compare, distcalc); }
+        bool IsWithinDist3d(float x, float y, float z, float dist2compare, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
         template <class T >
-        bool IsWithinDist2d(T const& position, float dist2compare) const { return IsWithinDist2d(position.x, position.y, dist2compare); }
-        bool IsWithinDist2d(float x, float y, float dist2compare) const;
-        bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius = true) const;
+        bool IsWithinDist2d(T const& position, float dist2compare, SizeFactor distcalc = SizeFactor::BoundingRadius) const { return IsWithinDist2d(position.x, position.y, dist2compare, distcalc); }
+        bool IsWithinDist2d(float x, float y, float dist2compare, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        bool _IsWithinDist(WorldObject const* obj, float const dist2compare, const bool is3D, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
 
         // use only if you will sure about placing both object at same map
-        bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const
+        bool IsWithinDist(WorldObject const* obj, float const& dist2compare, const bool is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
         {
-            return obj && _IsWithinDist(obj, dist2compare, is3D, useBoundingRadius);
+            return obj && _IsWithinDist(obj, dist2compare, is3D, distcalc);
         }
-
-        bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const
+        bool IsWithinDistInMap(WorldObject const* obj, float const& dist2compare, const bool is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
         {
-            return obj && IsInMap(obj) && _IsWithinDist(obj,dist2compare,is3D, useBoundingRadius);
+            return obj && IsInMap(obj) && _IsWithinDist(obj, dist2compare, is3D, distcalc);
         }
-        bool IsWithinCombatDistInMap(WorldObject const* obj, float dist2compare) const
+        bool IsWithinCombatDistInMap(WorldObject const* obj, float const& dist2compare) const
         {
             return obj && IsInMap(obj) && (GetCombatDistance(obj) <= dist2compare);
         }
@@ -749,9 +749,9 @@ class WorldObject : public Object
         bool IsWithinLOSAtPosition(float ownX, float ownY, float ownZ, float targetX, float targetY, float targetZ, bool checkDynLos = true, float targetHeight = 2.f) const;
         bool IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos = true) const;
         bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
-        bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
-        bool IsInRange2d(float x, float y, float minRange, float maxRange) const;
-        bool IsInRange3d(float x, float y, float z, float minRange, float maxRange) const;
+        bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        bool IsInRange2d(float x, float y, float minRange, float maxRange, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        bool IsInRange3d(float x, float y, float z, float minRange, float maxRange, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
 
         float GetAngle(WorldObject const* obj) const;
         float GetAngle(float const x, float const y) const;

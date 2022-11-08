@@ -44,8 +44,6 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
     uint32 spellid = UNIT_ACTION_BUTTON_ACTION(data);
     uint8 flag = UNIT_ACTION_BUTTON_TYPE(data);             // delete = 0x07 CastSpell = C1
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "HandlePetAction: %s flag is %u, spellid is %u, target %s.", petGuid.GetString().c_str(), uint32(flag), spellid, targetGuid.GetString().c_str());
-
     // used also for charmed creature/player
     Unit* pCharmedUnit = _player->GetMap()->GetUnit(petGuid);
     if (!pCharmedUnit)
@@ -181,15 +179,13 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
 
 void WorldSession::HandlePetStopAttack(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_PET_STOP_ATTACK");
-
     ObjectGuid petGuid;
     recv_data >> petGuid;
 
     Unit* pet = GetPlayer()->GetMap()->GetUnit(petGuid);    // pet or controlled creature/player
     if (!pet)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s doesn't exist.", petGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetStopAttack: %s doesn't exist.", petGuid.GetString().c_str());
         return;
     }
 
@@ -207,8 +203,6 @@ void WorldSession::HandlePetStopAttack(WorldPacket& recv_data)
 
 void WorldSession::HandlePetNameQueryOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "HandlePetNameQuery. CMSG_PET_NAME_QUERY");
-
     uint32 petNumber;
     ObjectGuid petGuid;
 
@@ -236,8 +230,6 @@ void WorldSession::SendPetNameQuery(ObjectGuid petGuid, uint32 petNumber)
 
 void WorldSession::HandlePetSetAction(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "HandlePetSetAction. CMSG_PET_SET_ACTION");
-
     ObjectGuid petGuid;
     uint8  count;
 
@@ -349,8 +341,6 @@ void WorldSession::HandlePetSetAction(WorldPacket& recv_data)
 
 void WorldSession::HandlePetRename(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "HandlePetRename. CMSG_PET_RENAME");
-
     ObjectGuid petGuid;
     std::string name;
 
@@ -397,8 +387,6 @@ void WorldSession::HandlePetAbandon(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid;                                      // pet guid
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "HandlePetAbandon. CMSG_PET_ABANDON pet guid is %s", guid.GetString().c_str());
-
     if (!_player->IsInWorld())
         return;
 
@@ -429,8 +417,6 @@ void WorldSession::HandlePetAbandon(WorldPacket& recv_data)
 
 void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "CMSG_PET_UNLEARN");
-
     ObjectGuid guid;
     recvPacket >> guid;                 // Pet guid
 
@@ -486,8 +472,6 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "CMSG_PET_SPELL_AUTOCAST");
-
     ObjectGuid guid;
     uint32 spellid;
     uint8  state;                                           // 1 for on, 0 for off
@@ -522,14 +506,9 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WORLD: CMSG_PET_CAST_SPELL");
-
     ObjectGuid guid;
     uint32 spellid;
-
     recvPacket >> guid >> spellid;
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_PET_CAST_SPELL, %s, spellid %u", guid.GetString().c_str(), spellid);
 
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid);
 

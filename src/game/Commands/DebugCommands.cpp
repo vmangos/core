@@ -2219,7 +2219,6 @@ bool ChatHandler::HandleDebugUnitCommand(char* args)
     HANDLE_DEBUG(DEBUG_DR, "Diminishing returns");
     HANDLE_DEBUG(DEBUG_CHEAT, "Anticheat");
     HANDLE_DEBUG(DEBUG_PROCS, "Proc system");
-    HANDLE_DEBUG(DEBUG_SPELLS_DAMAGE, "Spells damage and healing bonus");
 
     return true;
 }

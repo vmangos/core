@@ -146,8 +146,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         return;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "CHAT: packet received. type %u, lang %u", type, lang);
-
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
     if (!langDesc)
@@ -781,8 +779,6 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recv_data)
 void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
 {
     ObjectGuid iguid;
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_CHAT_IGNORED");
-
     recv_data >> iguid;
 
     Player* player = sObjectMgr.GetPlayer(iguid);

@@ -1,3 +1,4 @@
+SET NAMES utf8;
 DROP PROCEDURE IF EXISTS add_migration;
 delimiter ??
 CREATE PROCEDURE `add_migration`()
@@ -8,6 +9,8 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210628233951');
 -- Add your query below.
 
+
+SET NAMES utf8;
 
 INSERT INTO `npc_trainer_greeting` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES
 (1246, "With alchemy you can turn found herbs into healing and other types of potions.", "", "", "", "", "", "", "", "Освоив алхимию, ты сможешь варить зелья из найденных растений."),

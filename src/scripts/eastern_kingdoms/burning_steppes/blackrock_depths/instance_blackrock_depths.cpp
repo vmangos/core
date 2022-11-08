@@ -472,11 +472,6 @@ struct instance_blackrock_depths : ScriptedInstance
                     m_uiDagranTimer = 45000;    // set a timer of 45 sec to avoid Emperor Thaurissan to spam yells in case many senators are killed in a short amount of time
                 }
                 break;
-            case NPC_GRIM_PATRON:
-            case NPC_HAMMERED_PATRON:
-            case NPC_GUZZLING_PATRON:
-               HandleBarPatrons(PATRON_HOSTILE);
-               break;
             /*case NPC_THELDREN:
                 SetData(DATA_THELDREN, DONE);
                 break;*/

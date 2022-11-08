@@ -254,7 +254,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 attackRadius = PULL_RANGE;
 
             // CREATURE_Z_ATTACK_RANGE there are stairs
-            if (m_creature->IsWithinDistInMap(who, attackRadius, true, false) && m_creature->GetDistanceZ(who) <= 7)
+            if (m_creature->IsWithinDistInMap(who, attackRadius, true, SizeFactor::None) && m_creature->GetDistanceZ(who) <= 7)
                 AttackStart(who);
         }
     }

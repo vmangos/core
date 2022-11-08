@@ -1496,10 +1496,11 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                         return SPELL_AURA_PROC_FAILED;
                 }
 
+                // Need to pass victim guid so its not overwritten with aura caster.
                 // Intentionally do not pass triggeredByAura here.
                 // Seal of Light healing is done by the person who attacks,
                 // and does not increase threat of the original caster.
-                pVictim->CastSpell(pVictim, trigger_spell_id, true, castItem);
+                pVictim->CastSpell(pVictim, trigger_spell_id, true, castItem, triggeredByAura, pVictim->GetObjectGuid());
                 return SPELL_AURA_PROC_OK;                        // no hidden cooldown
             }
             // Illumination
@@ -1606,7 +1607,6 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
     {
         // Cast positive spell on enemy target
         case 7099:  // Curse of Mending
-        case 29494: // Temptation
         case 20233: // Improved Lay on Hands (cast on target)
         {
             target = pVictim;

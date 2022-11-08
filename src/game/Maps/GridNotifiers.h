@@ -1064,7 +1064,7 @@ namespace MaNGOS
                 if (!u->CanSeeInWorld(i_funit))
                     return false;
 
-                return u->IsAlive() && u->IsHostileTo(i_funit) && i_funit->IsWithinDistInMap(u, u->GetAttackDistance(i_funit), true, false);
+                return u->IsAlive() && u->IsHostileTo(i_funit) && i_funit->IsWithinDistInMap(u, u->GetAttackDistance(i_funit), true, SizeFactor::None);
             }
         private:
             Unit* const i_funit;
@@ -1561,7 +1561,7 @@ namespace MaNGOS
                 if (!u->IsVisibleForOrDetect(m_me, m_me, false))
                     return false;
 
-                if (!u->IsWithinDistInMap(m_me, std::min(m_me->GetAttackDistance(u), m_dist), true, false))
+                if (!u->IsWithinDistInMap(m_me, std::min(m_me->GetAttackDistance(u), m_dist), true, SizeFactor::None))
                     return false;
 
                 if (!u->IsTargetableBy(m_me))

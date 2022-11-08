@@ -130,6 +130,9 @@ int32 MoveSplineInit::Launch()
     if (Player* pPlayer = unit.ToPlayer())
         pPlayer->GetCheatData()->ResetJumpCounters();
 
+    if (unit.IsPlayer() || unit.GetPossessorGuid().IsPlayer())
+        unit.SetSplineDonePending(true);
+
     unit.m_movementInfo.SetMovementFlags((MovementFlags)moveFlags);
     move_spline.SetMovementOrigin(movementType);
     move_spline.Initialize(args);

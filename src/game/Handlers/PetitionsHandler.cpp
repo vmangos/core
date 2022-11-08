@@ -40,8 +40,6 @@
 
 void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode CMSG_PETITION_BUY");
-
     ObjectGuid guidNPC;
     uint32 unk2;
     std::string name;
@@ -65,8 +63,6 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
 
     recv_data >> unk2;                                      // index
     recv_data.read_skip<uint32>();                          // 0
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Petitioner %s tried sell petition: name %s", guidNPC.GetString().c_str(), name.c_str());
 
     // prevent cheating
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(guidNPC, UNIT_NPC_FLAG_PETITIONER);
@@ -158,10 +154,6 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
 {
-    // ok
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
-    //recv_data.hexlike();
-
     ObjectGuid itemguid;
     recv_data >> itemguid;                                   // item guid
 
@@ -186,8 +178,6 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
 
     uint8 signs = petition->GetSignatureCount();
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "CMSG_PETITION_SHOW_SIGNATURES petition: %u", petitionGuid);
-
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << itemguid;                               // item guid
     data << _player->GetObjectGuid();               // owner guid
@@ -201,14 +191,10 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode CMSG_PETITION_QUERY");
-    //recv_data.hexlike();
-
     uint32 petitionGuid;
     ObjectGuid itemGuid;
     recv_data >> petitionGuid;                          // petition guid
     recv_data >> itemGuid;                              // item guid
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "CMSG_PETITION_QUERY Item %s Petition GUID %u", itemGuid.GetString().c_str(), petitionGuid);
 
     Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
@@ -238,9 +224,6 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode MSG_PETITION_RENAME");   // ok
-    //recv_data.hexlike();
-
     ObjectGuid itemGuid;
     std::string newname;
 
@@ -279,9 +262,6 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode CMSG_PETITION_SIGN");    // ok
-    //recv_data.hexlike();
-
     ObjectGuid itemGuid;
     uint8 unk;
     recv_data >> itemGuid;                              // item guid
@@ -378,9 +358,6 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode MSG_PETITION_DECLINE");  // ok
-    //recv_data.hexlike();
-
     ObjectGuid itemGuid;
     recv_data >> itemGuid;                              // item guid
 
@@ -403,9 +380,6 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode CMSG_OFFER_PETITION");   // ok
-    //recv_data.hexlike();
-
     ObjectGuid itemGuid;
     ObjectGuid playerGuid;
     recv_data >> itemGuid;                              // item guid
@@ -465,9 +439,6 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode CMSG_TURN_IN_PETITION"); // ok
-    //recv_data.hexlike();
-
     ObjectGuid itemGuid;
     recv_data >> itemGuid;
 
@@ -542,9 +513,6 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recv_data)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received CMSG_PETITION_SHOWLIST");
-    //recv_data.hexlike();
-
     ObjectGuid guid;
     recv_data >> guid;
     SendPetitionShowList(guid);
