@@ -421,24 +421,14 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         m_caster->CastSpell(unitTarget, 27766, true);
                         break;
                     }
-                    case 28041: // [Event: Scourge Invasion] Damage Crystal
-                    {
-                        if (unitTarget->GetEntry() == 16172) // Damaged Necrotic Shard
-                        {
-                            unitTarget->SetArmor(0);
-                            //damage = 100;
-                        }
-                        break;
-                    }
                     case 28056: // [Event: Scourge Invasion] Zap Crystal Corpse
                     {
                         if (unitTarget->GetEntry() == 16172) // Damaged Necrotic Shard
                         {
-                            unitTarget->SetArmor(0);
                             if (m_caster->GetEntry() == 16143) // Casted by Shadow of Doom.
-                                damage = float(unitTarget->GetMaxHealth() / 4);
+                                damage = unitTarget->CountPctFromMaxHealth(25);
                             else // Casted by Damaged Necrotic Shard. https://classic.wowhead.com/spell=348571/zap-crystal-corpse
-                                damage = float(unitTarget->GetMaxHealth() / 100 * 6);
+                                damage = unitTarget->CountPctFromMaxHealth(6);
                         }
                         break;
                     }
@@ -447,12 +437,10 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         if (unitTarget->GetEntry() == 16421) // Necropolis health
                         {
                             /*
-                            There are always 3 Necrotic Shards spawns per Necropolis. This Spell is castet on the NPC "Necropolis Health" if a Shard dies and does 40 Physical damage.
-                            NPC "Necropolis Health" has 42 health. 42 health / 3 Shards = 14 damage.
-                            This is just a workaround to get it always working properly if someone messing up health or armor from the npc.
+                            This Spell is castet on the NPC "Necropolis Health" if a Shard dies.
+                            There are always 3 Necrotic Shards spawns per Necropolis.
                             */
-                            unitTarget->SetArmor(0);
-                            damage = float(unitTarget->GetMaxHealth() / 3);
+                            damage = unitTarget->CountPctFromMaxHealth(34);
                         }
                         break;
                     }
@@ -670,6 +658,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 }
                 case 28203: // [Event: Scourge Invasion] Find Camp Type
                 {
+
                     // Lets the finder spawn the associated spawner.
                     if (unitTarget->HasAura(28197))
                         m_casterUnit->CastSpell(m_casterUnit, 28186, true);
@@ -5109,7 +5098,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 }
                 case 28201:                                 // [Event: Scourge Invasion] Choose Camp Type
                 {
-                    unitTarget->CastSpell(unitTarget, PickRandomValue(28199, 28198, 28197), true);
+                    // Casted by Necrotic Shard and Damaged Necrotic Shard on spawn. They should have 0 Armor and a huge visibility.
+                    m_casterUnit->SetArmor(0);
+                    m_casterUnit->SetActiveObjectState(true);
+                    m_casterUnit->SetVisibilityModifier(DEFAULT_VISIBILITY_BG);
+                    m_casterUnit->CastSpell(m_casterUnit, PickRandomValue(28199, 28198, 28197), true);
                     return;
                 }
                 case 28314:                                 // [Event: Scourge Invasion] Flameshocker's Touch
@@ -5135,8 +5128,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
 
                     if (minions.empty())
+                    {
                         if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
-                            pMinion->SetWanderDistance(1.0f); // Seems to be very low.
+                        {
+                            m_casterUnit->SendSpellGo(m_casterUnit, 28234);
+                            UncommonMinionspawner ? pMinion->SetWanderDistance(5.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.
+                        }
+                    }
 
                     return;
                 }
@@ -5158,8 +5156,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
 
                     if (minions.empty())
+                    {
                         if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
-                            pMinion->SetWanderDistance(1.0f); // Seems to be very low.
+                        {
+                            m_casterUnit->SendSpellGo(m_casterUnit, 28234);
+                            UncommonMinionspawner ? pMinion->SetWanderDistance(5.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.
+                        }
+                    }
 
                     return;
                 }
@@ -5181,8 +5184,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
 
                     if (minions.empty())
+                    {
                         if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
-                            pMinion->SetWanderDistance(1.0f); // Seems to be very low.
+                        {
+                            m_casterUnit->SendSpellGo(m_casterUnit, 28234);
+                            UncommonMinionspawner ? pMinion->SetWanderDistance(5.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.
+                        }
+                    }
 
                     return;
                 }

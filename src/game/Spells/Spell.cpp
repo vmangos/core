@@ -44,6 +44,8 @@
 #include "PathFinder.h"
 #include "CharacterDatabaseCache.h"
 #include "ZoneScript.h"
+#include "scriptPCH.h"
+
 
 using namespace Spells;
 
@@ -1125,15 +1127,13 @@ void Spell::AddGOTarget(GameObject* pTarget, SpellEffectIndex effIndex)
         targetInfo.timeDelay = uint64(0);
 
     // Add target to list
-    if (pTarget->isSpawned())
-        m_UniqueGOTargetInfo.push_back(targetInfo);
+    m_UniqueGOTargetInfo.push_back(targetInfo);
 }
 
 void Spell::AddGOTarget(ObjectGuid goGuid, SpellEffectIndex effIndex)
 {
     if (GameObject* go = m_caster->GetMap()->GetGameObject(goGuid))
-        if (go->isSpawned())
-            AddGOTarget(go, effIndex);
+        AddGOTarget(go, effIndex);
 }
 
 void Spell::AddItemTarget(Item* pitem, SpellEffectIndex effIndex)
@@ -2666,16 +2666,16 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
                 {
                     // search all GO's with entry, within range of m_destN
-                    MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, x, y, z, radius);
-                    MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
-                    Cell::VisitGridObjects(m_caster, checker, radius);
+                    GetGameObjectListWithEntryInGrid(tempTargetGOList, m_casterUnit, i_spellST->second.targetEntry, radius);
+                    tempTargetGOList.sort(ObjectDistanceOrder(m_casterUnit));
                 }
             }
 
             if (!tempTargetGOList.empty())
             {
                 for (const auto& iter : tempTargetGOList)
-                    AddGOTarget(iter, effIndex);
+                    if (iter->isSpawned())
+                        AddGOTarget(iter, effIndex);
             }
 
             break;
