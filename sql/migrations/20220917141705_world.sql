@@ -527,6 +527,47 @@ UPDATE `creature_template` SET `mechanic_immune_mask` = 8388624 WHERE `entry` = 
 -- Young Crocolisk Skins Does Not Require Pre Quest
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 484;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Convert Great Bear Spirit To DB Gossips (credit cmangos)
+UPDATE `creature_template` SET `gossip_menu_id` = 3882, `script_name` = '' WHERE `entry` = 11956;
+
+-- 497: Target Has Quest 5929 In Log
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (497, 9, 5929, 0, 0, 0, 0);
+-- 498: Target Has Quest 5930 In Log
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (498, 9, 5930, 0, 0, 0, 0);
+-- 499: (497: Target Has Quest 5929 In Log) Or (498: Target Has Quest 5930 In Log)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (499, -2, 497, 498, 0, 0, 0);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(3882, 4718, 0, 0),
+(3882, 4719, 0, 499);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(3882, 0, 0, 'What do you represent, spirit?', 7439, 1, 1, 3881, 0, 0, 0, 0, '', 0, 499);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(3881, 4721, 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(3881, 0, 0, 'I seek to understand the importance of strength of the body.', 7442, 1, 1, 3883, 0, 0, 0, 0, '', 0, 0);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(3883, 4733, 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(3883, 0, 0, 'I seek to understand the importance of strength of the heart.', 7444, 1, 1, 3884, 0, 0, 0, 0, '', 0, 0);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES (3884, 4734, 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(3884, 0, 0, 'I have heard your words, Great Bear Spirit, and I understand.  I now seek your blessings to fully learn the way of the Claw.', 7446, 1, 1, 3885, 0, 3884, 0, 0, '', 0, 497),
+(3884, 1, 0, 'I have heard your words, Great Bear Spirit, and I understand.  I now seek your blessings to fully learn the way of the Claw.', 7446, 1, 1, 3885, 0, 3885, 0, 0, '', 0, 498);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(3885, 4735, 0, 0);
+
+DELETE FROM `gossip_scripts` WHERE `id`=3884;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(3884, 0, 0, 7, 5929, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Great Bear Spirit - Complete Quest'),
+(3885, 0, 0, 7, 5930, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Great Bear Spirit - Complete Quest');
+
 
 -- End of migration.
 END IF;
