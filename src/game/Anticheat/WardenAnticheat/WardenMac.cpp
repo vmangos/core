@@ -47,8 +47,7 @@ void WardenMac::LoadScriptedScans()
 
         MANGOS_ASSERT(macWarden->_hashString.size() <= 0xFF);
 
-        scan << static_cast<uint8>(WARDEN_SMSG_CHEAT_CHECKS_REQUEST)
-             << static_cast<uint8>(macWarden->_hashString.size());
+        scan << static_cast<uint8>(macWarden->_hashString.size());
 
         // skip null terminator this way
         scan.append(macWarden->_hashString.c_str(), macWarden->_hashString.size());

@@ -57,6 +57,7 @@ void Warden::LoadScriptedScans()
     auto const start = sWardenScanMgr.Count();
 
     WardenWin::LoadScriptedScans();
+    WardenMac::LoadScriptedScans();
 
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, ">> %u scripted Warden scans loaded from anticheat module", sWardenScanMgr.Count() - start);
 }
@@ -250,15 +251,18 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
     // warden opcode
     buff << static_cast<uint8>(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
 
-    // string table for this request
-    for (auto const &s : strings)
+    if (_module->Windows())
     {
-        buff << static_cast<uint8>(s.length());
-        buff.append(s.c_str(), s.length());
-    }
+        // string table for this request
+        for (auto const &s : strings)
+        {
+            buff << static_cast<uint8>(s.length());
+            buff.append(s.c_str(), s.length());
+        }
 
-    // end of string table
-    buff << static_cast<uint8>(0);
+        // end of string table
+        buff << static_cast<uint8>(0);
+    }
 
     // all scan requests
     buff.append(scan);
@@ -455,16 +459,19 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
     case WARDEN_CMSG_CHEAT_CHECKS_RESULT:
     {
-        // verify checksum integrity
-        uint16 length;
-        uint32 checksum;
-        recvData >> length >> checksum;
-
-        if (BuildChecksum(recvData.contents() + recvData.rpos(), length) != checksum)
+        if (_module->Windows())
         {
-            recvData.rpos(recvData.wpos());
-            ApplyPenalty("failed packet checksum", WARDEN_ACTION_KICK);
-            return;
+            // verify checksum integrity
+            uint16 length;
+            uint32 checksum;
+            recvData >> length >> checksum;
+
+            if (BuildChecksum(recvData.contents() + recvData.rpos(), length) != checksum)
+            {
+                recvData.rpos(recvData.wpos());
+                ApplyPenalty("failed packet checksum", WARDEN_ACTION_KICK);
+                return;
+            }
         }
 
         // this function will also act on the results
