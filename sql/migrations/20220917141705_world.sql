@@ -574,6 +574,11 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 INSERT INTO `game_event_creature_data` (`guid`, `patch`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
 (90438, 0, 0, 0, 50001, 0, 0, 27);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Remove Incorrect Stormwind Guard
+DELETE FROM `creature` WHERE `guid` = 2473;
+
 
 -- End of migration.
 END IF;
