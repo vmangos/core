@@ -568,6 +568,12 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (3884, 0, 0, 7, 5929, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Great Bear Spirit - Complete Quest'),
 (3885, 0, 0, 7, 5930, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Great Bear Spirit - Complete Quest');
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Stormwind City Patroller Should Have A Lantern at Night
+INSERT INTO `game_event_creature_data` (`guid`, `patch`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
+(90438, 0, 0, 0, 50001, 0, 0, 27);
+
 
 -- End of migration.
 END IF;
