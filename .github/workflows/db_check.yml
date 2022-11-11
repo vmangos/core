@@ -23,7 +23,7 @@ jobs:
     - name: Start docker mysql
       run: |
         sudo docker pull mysql
-        sudo docker run --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql:5.6
+        sudo docker run --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql:5.6 --max_allowed_packet=128M
         sudo docker start mysqldb
 
     
