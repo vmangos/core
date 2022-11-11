@@ -17,8 +17,10 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (10999, 17, 20219, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Gnomish Engineering
 (11000, 17, 20222, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Goblin Engineering
 (11001, -1, 10999, 11000, 0, 0, 0) -- Condition to return true if the player has NOT learnt Gnomish Engineering AND Goblin Engineering
-(11002, -1, 11001, 10998, 10997, 0, 0) -- Condition to return true if the player doesn't have an Engineering specialisation, completed one of the Engineering specialisation quests, and has a skill of 225 Engineering
+(11002, -1, 11001, 10998, 10997, 0, 0) -- Condition to return true if the player doesn't have an Engineering specialisation, completed one of the Engineering specialisation quests, and has a skill of 200 Engineering
 
+
+-- https://www.wowhead.com/classic/item=11825/pet-bombling#comments:id=2650836
 
 -- End of migration.
 END IF;
