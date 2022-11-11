@@ -66,7 +66,7 @@ Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumbe
     _session(session), _inputCrypto(KeyLength), _outputCrypto(KeyLength), _initialized(false), _module(module), _crk(nullptr),
     _timeoutClock(0), _scanClock(0), _moduleSendPending(false)
 {
-    MANGOS_ASSERT(!!_module);
+    MANGOS_ASSERT(!!_module || session->GetPlatform() != CLIENT_PLATFORM_X86);
 
     auto const kBytes = K.AsByteArray();
 
@@ -87,18 +87,21 @@ Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumbe
     sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "C->S Key: %s", ByteArrayToHexStr(inputKey, 16).c_str());
     sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "S->C Key: %s", ByteArrayToHexStr(outputKey, 16).c_str());
 
-    ByteBuffer pkt(1 + _module->hash.size() + _module->key.size() + 4);
+    if (_module)
+    {
+        ByteBuffer pkt(1 + _module->hash.size() + _module->key.size() + 4);
 
-    pkt << static_cast<uint8>(WARDEN_SMSG_MODULE_USE);
+        pkt << static_cast<uint8>(WARDEN_SMSG_MODULE_USE);
 
-    pkt.append(&_module->hash[0], _module->hash.size());
-    pkt.append(&_module->key[0], _module->key.size());
+        pkt.append(&_module->hash[0], _module->hash.size());
+        pkt.append(&_module->key[0], _module->key.size());
 
-    pkt << static_cast<uint32>(_module->binary.size());
+        pkt << static_cast<uint32>(_module->binary.size());
 
-    SendPacket(pkt);
+        SendPacket(pkt);
 
-    BeginTimeoutClock();
+        BeginTimeoutClock();
+    }
 }
 
 void Warden::RequestChallenge()
@@ -254,7 +257,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
     // warden opcode
     buff << static_cast<uint8>(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
 
-    if (_module->Windows())
+    if (_session->GetOS() == CLIENT_OS_WIN)
     {
         // string table for this request
         for (auto const &s : strings)
@@ -441,6 +444,13 @@ void Warden::HandlePacket(WorldPacket& recvData)
     {
         case WARDEN_CMSG_MODULE_MISSING:
         {
+            if (!_module)
+            {
+                sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Requested module when none was offered.", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
+                _session->KickPlayer();
+                break;
+            }
+
             if (_moduleSendPending)
             {
                 sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Failed to load module.  Kicking.", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
@@ -456,6 +466,13 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
         case WARDEN_CMSG_MODULE_OK:
         {
+            if (!_module)
+            {
+                sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Loaded module without server request.", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
+                _session->KickPlayer();
+                break;
+            }
+
             _moduleSendPending = false;
             sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Module loaded");
             RequestChallenge();
@@ -464,7 +481,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
         case WARDEN_CMSG_CHEAT_CHECKS_RESULT:
         {
-            if (_module->Windows())
+            if (_session->GetOS() == CLIENT_OS_WIN)
             {
                 // verify checksum integrity
                 uint16 length;
