@@ -579,6 +579,8 @@ INSERT INTO `game_event_creature_data` (`guid`, `patch`, `entry_id`, `display_id
 -- Remove Incorrect Stormwind Guard
 DELETE FROM `creature` WHERE `guid` = 2473;
 
+DELETE FROM `gossip_menu` WHERE  `entry` = 9406 AND `text_id` = 5495;
+
 
 -- End of migration.
 END IF;
