@@ -1399,6 +1399,9 @@ bool AuthSocket::GeographicalLockCheck()
 
 bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect)
 {
+    if (!((_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX)))
+        return false;
+
     if (!sConfig.GetBoolDefault("StrictVersionCheck", false))
         return true;
 
@@ -1406,9 +1409,6 @@ bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versi
     std::array<uint8, 20> const* versionHash = nullptr;
     if (!isReconnect)
     {
-        if (!((_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX)))
-            return false;
-
         RealmBuildInfo const* buildInfo = FindBuildInfo(_build);
         if (!buildInfo)
             return false;
