@@ -76,7 +76,7 @@ struct instance_blackrock_depths : ScriptedInstance
     uint64 m_uiDwarfRuneF01GUID;
     uint64 m_uiDwarfRuneG01GUID;
 
-    uint64 m_uiGoMagnusGUID;
+    uint64 m_uiMagmusGUID;
 
     uint64 m_uiRocknotGUID;
     uint64 m_uiNagmaraGUID;
@@ -143,7 +143,7 @@ struct instance_blackrock_depths : ScriptedInstance
         m_uiDoomrelGUID = 0;
         m_uiDoperelGUID = 0;
 
-        m_uiGoMagnusGUID = 0;
+        m_uiMagmusGUID = 0;
 
         // Ring of Law Challenge
         m_uiTheldrenGUID = 0;
@@ -257,11 +257,23 @@ struct instance_blackrock_depths : ScriptedInstance
             case NPC_RIBBLY_S_CRONY:
                 m_lRibblySCronyMobGUIDList.push_back(pCreature->GetGUID());
                 break;
-            case 9938:
-                m_uiGoMagnusGUID = pCreature->GetGUID();
+            case NPC_MAGMUS:
+                m_uiMagmusGUID = pCreature->GetGUID();
                 break;
+			// Arena Crowd
             case NPC_ARENA_SPECTATOR:
+            case NPC_SHADOWFORGE_PEASANT:
+            case NPC_SHADOWFORGE_CITIZEN:
+            case NPC_SHADOWFORGE_SENATOR:
+            case NPC_ANVILRAGE_SOLDIER:
+            case NPC_ANVILRAGE_MEDIC:
+            case NPC_ANVILRAGE_OFFICER:
+                if (pCreature->GetPositionZ() < aArenaCrowdVolume.m_fCenterZ || pCreature->GetPositionZ() > aArenaCrowdVolume.m_fCenterZ + aArenaCrowdVolume.m_uiHeight ||
+                    !pCreature->IsWithinDist2d(aArenaCrowdVolume.m_fCenterX, aArenaCrowdVolume.m_fCenterY, aArenaCrowdVolume.m_uiRadius))
+                    break;
                 m_lArenaSpectatorMobGUIDList.push_back(pCreature->GetGUID());
+                if (m_auiEncounter[TYPE_RING_OF_LAW] == DONE)
+                    pCreature->SetFactionTemporary(FACTION_ARENA_NEUTRAL, TEMPFACTION_RESTORE_RESPAWN);
                 break;
             /*case NPC_PANZOR: m_uiPanzorGUID = pCreature->GetGUID();
                 switch (urand (0,1))
@@ -460,11 +472,6 @@ struct instance_blackrock_depths : ScriptedInstance
                     m_uiDagranTimer = 45000;    // set a timer of 45 sec to avoid Emperor Thaurissan to spam yells in case many senators are killed in a short amount of time
                 }
                 break;
-            case NPC_GRIM_PATRON:
-            case NPC_HAMMERED_PATRON:
-            case NPC_GUZZLING_PATRON:
-               HandleBarPatrons(PATRON_HOSTILE);
-               break;
             /*case NPC_THELDREN:
                 SetData(DATA_THELDREN, DONE);
                 break;*/
@@ -628,7 +635,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void CustomSpellCasted(uint32 spellId, Unit* caster, Unit* target) override
     {
-        sLog.outString("Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
         switch (spellId)
         {
             // BRD : Invocation de Theldren
@@ -716,7 +723,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void SetData(uint32 uiType, uint32 uiData) override
     {
-        sLog.outDebug("Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
 
         switch (uiType)
         {
@@ -728,7 +735,7 @@ struct instance_blackrock_depths : ScriptedInstance
                         if (Creature* pCreature = instance->GetCreature(guid))
                         {
                             if (pCreature->IsAlive())
-                                pCreature->SetFactionTemplateId(674);
+                                pCreature->SetFactionTemporary(FACTION_ARENA_NEUTRAL, TEMPFACTION_RESTORE_RESPAWN);
                         }
                     }
                 }
@@ -772,11 +779,11 @@ struct instance_blackrock_depths : ScriptedInstance
                 {
                     DoOpenDoor(m_uiGoGolemNGUID);
                     DoOpenDoor(m_uiGoGolemSGUID);
-                    if (Creature* magnus = instance->GetCreature(m_uiGoMagnusGUID))
+                    if (Creature* magmus = instance->GetCreature(m_uiMagmusGUID))
                     {
-                        DoScriptText(YELL_MAGMUS, magnus);
+                        DoScriptText(YELL_MAGMUS, magmus);
                         std::list<Creature*> AnvilrageList;
-                        GetCreatureListWithEntryInGrid(AnvilrageList, magnus, 8901, 400.0f);
+                        GetCreatureListWithEntryInGrid(AnvilrageList, magmus, 8901, 400.0f);
 
                         for (const auto& it : AnvilrageList)
                             it->SetRespawnDelay(345600);

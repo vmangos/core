@@ -324,6 +324,8 @@ enum eScriptCommand
     SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON     = 87,           // source = GameObject
     SCRIPT_COMMAND_SET_COMMAND_STATE        = 88,           // source = Creature
                                                             // datalong = command_state (see enum CommandStates)
+    SCRIPT_COMMAND_PLAY_CUSTOM_ANIM         = 89,           // source = GameObject
+                                                            // datalong = anim_id
 
     SCRIPT_COMMAND_MAX,
 
@@ -1043,6 +1045,11 @@ struct ScriptInfo
         {
             uint32 commandState;                            // datalong
         } setCommandState;
+
+        struct                                              // SCRIPT_COMMAND_PLAY_CUSTOM_ANIM (89)
+        {
+            uint32 animId;                                  // datalong
+        } playCustomAnim;
 
         struct
         {

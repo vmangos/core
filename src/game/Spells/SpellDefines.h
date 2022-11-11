@@ -735,7 +735,7 @@ enum SpellAttributes
     SPELL_ATTR_SET_TRACKING_TARGET            = 0x00400000,            // 22 SetTrackingTarget
     SPELL_ATTR_CASTABLE_WHILE_DEAD            = 0x00800000,            // 23 castable while dead?
     SPELL_ATTR_CASTABLE_WHILE_MOUNTED         = 0x01000000,            // 24 castable while mounted
-    SPELL_ATTR_DISABLED_WHILE_ACTIVE          = 0x02000000,            // 25 Activate and start cooldown after aura fade or remove summoned creature or go
+    SPELL_ATTR_COOLDOWN_ON_EVENT              = 0x02000000,            // 25 Activate and start cooldown after aura fade or remove summoned creature or go
     SPELL_ATTR_NEGATIVE                       = 0x04000000,            // 26 Almost all negative spell have it
     SPELL_ATTR_CASTABLE_WHILE_SITTING         = 0x08000000,            // 27 castable while sitting
     SPELL_ATTR_CANT_USED_IN_COMBAT            = 0x10000000,            // 28 Cannot be used in combat
@@ -762,7 +762,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_FARSIGHT                    = 0x00002000,            // 13
     SPELL_ATTR_EX_CHANNEL_TRACK_TARGET        = 0x00004000,            // 14 Client automatically forces player to face target when channeling
     SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY    = 0x00008000,            // 15 remove auras on immunity
-    SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE = 0x00010000,            // 16 unaffected by school immunity
+    SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS = 0x00010000,// 16 aura that provides immunity prevents positive effects too
     SPELL_ATTR_EX_NOT_RESET_AUTO_ACTIONS      = 0x00020000,            // 17 for auras SPELL_AURA_TRACK_CREATURES, SPELL_AURA_TRACK_RESOURCES and SPELL_AURA_TRACK_STEALTHED select non-stacking tracking spells
     SPELL_ATTR_EX_PREVENTS_ANIM               = 0x00040000,            // 18 stun, polymorph, daze, sleep
     SPELL_ATTR_EX_CANT_TARGET_SELF            = 0x00080000,            // 19
@@ -812,7 +812,7 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_UNK27                      = 0x08000000,            // 27
     SPELL_ATTR_EX2_NOT_AN_ACTION              = 0x10000000,            // 28 no breaks stealth if it fails??
     SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Spell can't crit
-    SPELL_ATTR_EX2_TRIGGERED_CAN_TRIGGER_PROC = 0x40000000,            // 30
+    SPELL_ATTR_EX2_ACTIVE_THREAT              = 0x40000000,            // 30 NYI - has some sort of active threat component like fire nova totem
     SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000             // 31 Food or Drink Buff (like Well Fed)
 };
 
@@ -827,7 +827,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK6                       = 0x00000040,            // 6
     SPELL_ATTR_EX3_STACK_FOR_DIFF_CASTERS     = 0x00000080,            // 7 create a separate (de)buff stack for each caster
     SPELL_ATTR_EX3_TARGET_ONLY_PLAYER         = 0x00000100,            // 8 can target only players
-    SPELL_ATTR_EX3_TRIGGERED_CAN_TRIGGER_SPECIAL = 0x00000200,         // 9 Can only proc auras with SPELL_ATTR_EX3_CAN_PROC_FROM_TRIGGERED_SPECIAL
+    SPELL_ATTR_EX3_NOT_A_PROC                 = 0x00000200,            // 9 aura periodic trigger is not evaluated as triggered (official meaning of proc)
     SPELL_ATTR_EX3_MAIN_HAND                  = 0x00000400,            // 10 Main hand weapon required
     SPELL_ATTR_EX3_BATTLEGROUND               = 0x00000800,            // 11 Can casted only on battleground
     SPELL_ATTR_EX3_CAST_ON_DEAD               = 0x00001000,            // 12 target is a dead player (not every spell has this flag)
@@ -844,7 +844,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK23                      = 0x00800000,            // 23
     SPELL_ATTR_EX3_REQ_OFFHAND                = 0x01000000,            // 24 Req offhand weapon
     SPELL_ATTR_EX3_UNK25                      = 0x02000000,            // 25 no cause spell pushback ?
-    SPELL_ATTR_EX3_CAN_PROC_FROM_TRIGGERED_SPECIAL = 0x04000000,       // 26 Auras with this attribute can proc off SPELL_ATTR_EX3_TRIGGERED_CAN_TRIGGER_SPECIAL
+    SPELL_ATTR_EX3_CAN_PROC_FROM_PROCS        = 0x04000000,            // 26 Auras with this attribute can proc off procced spells (periodic triggers etc)
     SPELL_ATTR_EX3_DRAIN_SOUL                 = 0x08000000,            // 27
     SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
     SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
@@ -1020,6 +1020,17 @@ enum ProcFlagsEx
     PROC_EX_PERIODIC_POSITIVE   = 0x0040000,                // For periodic heal
     PROC_EX_CAST_END            = 0x0080000,                // Procs on end of cast only
 };
+
+#define PROX_EX_NO_DAMAGE_MASK (PROC_EX_MISS    | \
+                                PROC_EX_RESIST  | \
+                                PROC_EX_DODGE   | \
+                                PROC_EX_PARRY   | \
+                                PROC_EX_BLOCK   | \
+                                PROC_EX_EVADE   | \
+                                PROC_EX_IMMUNE  | \
+                                PROC_EX_DEFLECT | \
+                                PROC_EX_ABSORB  | \
+                                PROC_EX_REFLECT)
 
 // original names, do not edit
 enum SpellCategories

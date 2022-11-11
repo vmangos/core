@@ -66,7 +66,7 @@ struct boss_moamAI : public ScriptedAI
         m_uiDrainMana_Timer = 5000;
 
         m_bIsInCombat = false;
-        m_uiArmorValue = m_creature->GetCreatureInfo()->armor;
+        m_uiArmorValue = m_creature->GetDefaultArmor();
 
         m_OGvictim.Clear();
 

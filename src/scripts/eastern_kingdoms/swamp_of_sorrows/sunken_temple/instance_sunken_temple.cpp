@@ -56,8 +56,6 @@ struct instance_sunken_temple : public ScriptedInstance
     uint64 m_uiShadeHakkarGUID;
     uint64 m_uiAtalarionGUID;
     uint64 m_uiJammalanBarrierGUID;
-    uint64 m_uiHakkarDoor1GUID;
-    uint64 m_uiHakkarDoor2GUID;
     uint64 m_uiIdolHakkarGUID;
     uint64 m_uiShadeEranikusGUID;
     uint64 m_uiJammalanGUID;
@@ -68,19 +66,15 @@ struct instance_sunken_temple : public ScriptedInstance
 
     uint32 RemoveTimer;
 
-    uint64 m_luiFlameGUIDs[4];
     uint64 m_luiAtalaiStatueGUIDs[6];
     uint64 m_luiBigLightGUIDs[6];
-    uint64 m_luiCircleGUIDs[8];
 
     void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
         memset(&m_luiProtectorGUIDs, 0, sizeof(m_luiProtectorGUIDs));
-        memset(&m_luiFlameGUIDs, 0, sizeof(m_luiFlameGUIDs));
         memset(&m_luiAtalaiStatueGUIDs, 0, sizeof(m_luiAtalaiStatueGUIDs));
         memset(&m_luiBigLightGUIDs, 0, sizeof(m_luiBigLightGUIDs));
-        memset(&m_luiCircleGUIDs, 0, sizeof(m_luiCircleGUIDs));
 
         m_uiStatueCounter = 0;
         m_uiCurrentStatueVar = 0;
@@ -90,8 +84,6 @@ struct instance_sunken_temple : public ScriptedInstance
         m_bIsFirstHakkarWave = false;
         m_uiShadeHakkarGUID = 0;
         m_uiAtalarionGUID = 0;
-        m_uiHakkarDoor1GUID = 0;
-        m_uiHakkarDoor2GUID = 0;
         m_uiJammalanBarrierGUID = 0;
         m_uiIdolHakkarGUID = 0;
         m_uiShadeEranikusGUID = 0;
@@ -164,30 +156,8 @@ struct instance_sunken_temple : public ScriptedInstance
         return true;
     }
 
-    void DoUpdateFlamesFlags(bool bRestore)
-    {
-        for (uint64 guid : m_luiFlameGUIDs)
-        {
-            if (GameObject* pFlame = instance->GetGameObject(guid))
-            {
-                // Remove the flags of the flames for Hakkar event
-                if (!bRestore)
-                {
-                    pFlame->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                    pFlame->SetGoState(GO_STATE_READY);
-                }
-                else
-                {
-                    pFlame->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                    pFlame->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
-        }
-    }
-
     void OnObjectCreate(GameObject* pGo) override
     {
-        int countCircle = 0;
         int countLight = 0;
         switch (pGo->GetEntry())
         {
@@ -198,12 +168,6 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case GO_IDOL_OF_HAKKAR:
                 m_uiIdolHakkarGUID = pGo->GetGUID();
-                break;
-            case GO_HAKKAR_DOOR_1:
-                m_uiHakkarDoor1GUID = pGo->GetGUID();
-                break;
-            case GO_HAKKAR_DOOR_2:
-                m_uiHakkarDoor2GUID = pGo->GetGUID();
                 break;
             case GO_ATALAI_STATUE_1:
                 m_luiAtalaiStatueGUIDs[0] = pGo->GetGUID();
@@ -230,27 +194,6 @@ struct instance_sunken_temple : public ScriptedInstance
                         ++countLight;
                 }
                 m_luiBigLightGUIDs[countLight] = pGo->GetGUID();
-                break;
-            case GO_EVIL_CIRCLE:
-                for (uint64 guid : m_luiCircleGUIDs)
-                {
-                    if (guid != 0 && guid != pGo->GetGUID())
-                        ++countCircle;
-                }
-                m_luiCircleGUIDs[countCircle] = pGo->GetGUID();
-                break;
-
-            case GO_ETERNAL_FLAME_1:
-                m_luiFlameGUIDs[0] = pGo->GetGUID();
-                break;
-            case GO_ETERNAL_FLAME_2:
-                m_luiFlameGUIDs[1] = pGo->GetGUID();
-                break;
-            case GO_ETERNAL_FLAME_3:
-                m_luiFlameGUIDs[2] = pGo->GetGUID();
-                break;
-            case GO_ETERNAL_FLAME_4:
-                m_luiFlameGUIDs[3] = pGo->GetGUID();
                 break;
             default:
                 break;
@@ -348,24 +291,6 @@ struct instance_sunken_temple : public ScriptedInstance
             case NPC_SHADE_OF_ERANIKUS:
                 pCreature->SetStandState(UNIT_STAND_STATE_STAND);
                 break;
-            case NPC_AVATAR_OF_HAKKAR:
-                DoScriptText(SAY_AVATAR_SPAWN, pCreature);
-                break;
-        }
-    }
-
-    void OnCreatureDeath(Creature *pCreature) override
-    {
-        if (m_uiShadeHakkarGUID && (pCreature->GetEntry() == NPC_HAKKARI_MINION || pCreature->GetEntry() == NPC_BLOODKEEPER))
-        {
-            if (Creature *shade = GetMap()->GetCreature(m_uiShadeHakkarGUID))
-            {
-                if (!shade->IsAlive() || !shade->AI())
-                    return;
-
-                if (npc_shade_hakkarAI *ai = dynamic_cast<npc_shade_hakkarAI*>(shade->AI()))
-                    ai->SummonJustDied(pCreature);
-            }
         }
     }
 
@@ -519,62 +444,6 @@ struct instance_sunken_temple : public ScriptedInstance
                 m_auiEncounter[3] = uiData;
                 break;
             case TYPE_AVATAR:
-                if (uiData == IN_PROGRESS)
-                {
-                    // Use combat doors
-                    if (GameObject* pGob = instance->GetGameObject(m_uiHakkarDoor1GUID))
-                        if (pGob->GetGoState() == GO_STATE_ACTIVE) // Ouverte
-                            DoUseDoorOrButton(m_uiHakkarDoor1GUID);
-                    if (GameObject* pGob = instance->GetGameObject(m_uiHakkarDoor2GUID))
-                        if (pGob->GetGoState() == GO_STATE_ACTIVE) // Ouverte
-                            DoUseDoorOrButton(m_uiHakkarDoor2GUID);
-
-                    Creature* pAvatar = instance->GetCreature(GetData64(NPC_AVATAR_OF_HAKKAR));
-                    if (pAvatar)
-                        break;
-
-                    if (m_auiEncounter[4] != IN_PROGRESS)
-                    {
-                        for (uint64 guid : m_luiCircleGUIDs)
-                            DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
-                    }
-                }
-                else if (uiData == FAIL)
-                {
-                    if (GameObject* pGob = instance->GetGameObject(m_uiHakkarDoor1GUID))
-                        if (pGob->GetGoState() != GO_STATE_ACTIVE) // Fermée
-                            DoUseDoorOrButton(m_uiHakkarDoor1GUID);
-                    if (GameObject* pGob = instance->GetGameObject(m_uiHakkarDoor2GUID))
-                        if (pGob->GetGoState() != GO_STATE_ACTIVE) // Fermée
-                            DoUseDoorOrButton(m_uiHakkarDoor2GUID);
-
-                    Creature* pAvatar = instance->GetCreature(GetData64(NPC_AVATAR_OF_HAKKAR));
-                    if (pAvatar)
-                        break;
-
-                    Creature* pShade = instance->GetCreature(GetData64(NPC_SHADE_OF_HAKKAR));
-                    if (!pShade)
-                        break;
-
-                    // We only get one attempt
-                    DoUpdateFlamesFlags(false);
-
-                    for (uint64 guid : m_luiCircleGUIDs)
-                    {
-                        if (GameObject* pGob = instance->GetGameObject(guid))
-                            pGob->Use(pShade);
-                    }
-                    m_uiFlameCounter = 0;
-                }
-                if (uiData == DONE)
-                {
-                    if (GameObject* pGob = instance->GetGameObject(m_uiHakkarDoor1GUID))
-                        if (pGob->GetGoState() != GO_STATE_ACTIVE) // Fermée
-                            DoUseDoorOrButton(m_uiHakkarDoor1GUID);
-                    if (GameObject* pGob = instance->GetGameObject(m_uiHakkarDoor2GUID))
-                        if (pGob->GetGoState() != GO_STATE_ACTIVE) // Fermée
-                            DoUseDoorOrButton(m_uiHakkarDoor2GUID);
-                }
                 m_auiEncounter[4] = uiData;
                 break;
             case TYPE_ERANIKUS:
@@ -610,6 +479,9 @@ struct instance_sunken_temple : public ScriptedInstance
                     }
                     mobsEntries.clear();
                 }
+                break;
+            case TYPE_ETERNAL_FLAME:
+                m_uiFlameCounter = uiData;
                 break;
         }
 
@@ -683,6 +555,8 @@ struct instance_sunken_temple : public ScriptedInstance
                 return m_auiEncounter[4];
             case TYPE_ERANIKUS:
                 return m_auiEncounter[5];
+            case TYPE_ETERNAL_FLAME:
+                return m_uiFlameCounter;
             default:
                 return 0;
         }
@@ -698,14 +572,6 @@ struct instance_sunken_temple : public ScriptedInstance
                 return m_uiAtalarionGUID;
             case NPC_AVATAR_OF_HAKKAR:
                 return m_uiAvatarHakkarGUID;
-            case GO_ETERNAL_FLAME_1:
-                return m_luiFlameGUIDs[0];
-            case GO_ETERNAL_FLAME_2:
-                return m_luiFlameGUIDs[1];
-            case GO_ETERNAL_FLAME_3:
-                return m_luiFlameGUIDs[2];
-            case GO_ETERNAL_FLAME_4:
-                return m_luiFlameGUIDs[3];
         }
         return 0;
     }

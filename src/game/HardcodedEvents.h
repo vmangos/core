@@ -63,50 +63,6 @@ private:
 };
 
 /*
- * Leprithus (rare) & Rotten Ghouls spawn at night
- */
-
-enum LeprithusEventState
-{
-    LEPRITHUS_EVENT_NONE = 0,
-    LEPRITHUS_EVENT_ONGOING = 150
-};
-
-struct Leprithus : WorldEvent
-{
-    Leprithus() : WorldEvent(LEPRITHUS_EVENT_ONGOING) {}
-
-    void Update() override;
-    void Enable() override;
-    void Disable() override;
-
-private:
-    LeprithusEventState GetLeprithusState();
-};
-
-/*
- * Moonbrook graveyard vultures(Fleshrippers) spawn at daylight
- */
-
-enum MoonbrookEventState
-{
-    MOONBROOK_EVENT_NONE = 0,
-    MOONBROOK_EVENT_ONGOING = 151
-};
-
-struct Moonbrook : WorldEvent
-{
-    Moonbrook() : WorldEvent(MOONBROOK_EVENT_ONGOING) {}
-
-    void Update() override;
-    void Enable() override;
-    void Disable() override;
-
-private:
-    MoonbrookEventState GetMoonbrookState();
-};
-
-/*
  * Dragons of Nightmare
  */
 

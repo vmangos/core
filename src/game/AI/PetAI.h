@@ -34,6 +34,7 @@ enum ePetSelectTargetReason : uint8
     PSTR_FAIL_PASSIVE,
     PSTR_FAIL_NO_OWNER,
     PSTR_FAIL_RETURNING,
+    PSTR_SUCCESS_THREAT_LIST,
     PSTR_SUCCESS_OWNER_ATTACKER,
     PSTR_SUCCESS_AGGRO_RANGE,
 };
@@ -63,9 +64,8 @@ class PetAI : public CreatureAI
 
         void UpdateAllies();
 
-        bool hasMelee;
-        std::set<uint64> m_AllySet;
         uint32 m_updateAlliesTimer;
+        std::set<uint64> m_AllySet;
 
         std::pair<Unit*, ePetSelectTargetReason> SelectNextTarget(bool allowAutoSelect) const;
         void HandleReturnMovement();

@@ -32,6 +32,7 @@ class Spell;
 class Unit;
 class WorldObject;
 class SpellEntry;
+class SpellCaster;
 
 namespace Spells
 {
@@ -435,6 +436,19 @@ namespace Spells
             case SPELL_EFFECT_WEAPON_DAMAGE:
             case SPELL_EFFECT_POWER_BURN:
             case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                return true;
+        }
+
+        return false;
+    }
+
+    inline bool IsThreatEffect(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            case SPELL_EFFECT_THREAT:
+            case SPELL_EFFECT_THREAT_ALL:
+            case SPELL_EFFECT_ATTACK_ME:
                 return true;
         }
 
@@ -945,6 +959,16 @@ class SpellEntry
             return false;
         }
 
+        bool HasDirectThreatIncreaseEffect() const
+        {
+            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                if (Spells::IsThreatEffect(Effect[i]) && EffectBasePoints[i] > 0)
+                    return true;
+            }
+            return false;
+        }
+
         bool IsNeedFaceTarget() const
         {
             return ((Custom & SPELL_CUSTOM_FACE_TARGET) || (rangeIndex == SPELL_RANGE_IDX_COMBAT));
@@ -959,6 +983,11 @@ class SpellEntry
             // Feline Swiftness Passive 2a not have 0x1 mask in Stance field in spell data as expected
             return ((Stances & (1 << (form - 1)) || (Id == 24864 && form == FORM_CAT)) &&
                 !HasAttribute(SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
+        }
+
+        inline bool IsNeedCastSpellAtOutdoor() const
+        {
+            return (HasAttribute(SPELL_ATTR_OUTDOORS_ONLY) && HasAttribute(SPELL_ATTR_PASSIVE));
         }
 
         // Spell effects require a specific power type on the target
@@ -1032,7 +1061,7 @@ class SpellEntry
         int32 GetDuration() const;
         int32 GetMaxDuration() const;
         int32 CalculateDuration(WorldObject const* caster = nullptr) const;
-        uint32 GetCastTime(Spell* spell = nullptr) const;
+        uint32 GetCastTime(SpellCaster const* caster, Spell* spell = nullptr) const;
         uint32 GetCastTimeForBonus(DamageEffectType damagetype) const;
         uint16 GetAuraMaxTicks() const;
         WeaponAttackType GetWeaponAttackType() const;

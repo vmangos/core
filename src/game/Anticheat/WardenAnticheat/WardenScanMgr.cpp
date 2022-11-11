@@ -100,7 +100,7 @@ void WardenScanMgr::loadFromDB()
 
         if (scanType >= MAX_SCAN_TYPE)
         {
-            sLog.outError("Unknown Warden scan type %u.  Skipped.", scanType);
+            sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Unknown Warden scan type %u.  Skipped.", scanType);
             continue;
         }
 
@@ -123,7 +123,7 @@ void WardenScanMgr::loadFromDB()
 
                 if (!BuildRawData(fields[6].GetCppString(), expected) || expected.size() != length)
                 {
-                    sLog.outError("Failed to parse expected value in Warden scan id %u", id);
+                    sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to parse expected value in Warden scan id %u", id);
                     continue;
                 }
 
@@ -155,7 +155,7 @@ void WardenScanMgr::loadFromDB()
                 std::vector<uint8> pattern;
                 if (!BuildRawData(fields[3].GetCppString(), pattern))
                 {
-                    sLog.outError("Failed to parse expected value in Warden scan id %u", id);
+                    sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to parse expected value in Warden scan id %u", id);
                     continue;
                 }
 
@@ -170,7 +170,7 @@ void WardenScanMgr::loadFromDB()
                 std::vector<uint8> expected;
                 if (!BuildRawData(fields[6].GetCppString(), expected))
                 {
-                    sLog.outError("Failed to parse expected value in Warden scan id %u", id);
+                    sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to parse expected value in Warden scan id %u", id);
                     continue;
                 }
 
@@ -199,7 +199,7 @@ void WardenScanMgr::loadFromDB()
                 std::vector<uint8> hash;
                 if (!BuildRawData(fields[6].GetCppString(), hash))
                 {
-                    sLog.outError("Failed to parse expected value in Warden scan id %u", id);
+                    sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to parse expected value in Warden scan id %u", id);
                     continue;
                 }
 
@@ -218,14 +218,14 @@ void WardenScanMgr::loadFromDB()
 
             default:
             {
-                sLog.outError("Unhandled Warden scan type %u id %u.  Skipped.", scanType, id);
+                sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Unhandled Warden scan type %u id %u.  Skipped.", scanType, id);
                 continue;
             }
         }
 
         if (!scan)
         {
-            sLog.outError("Failed to allocate Warden scan type %u id %u", scanType, id);
+            sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to allocate Warden scan type %u id %u", scanType, id);
             continue;
         }
         else
@@ -237,7 +237,7 @@ void WardenScanMgr::loadFromDB()
         m_scans.emplace_back(std::shared_ptr<const Scan>(scan));
     } while (result->NextRow());
 
-    sLog.outBasic(">> %u Warden scans loaded from world database", m_scans.size());
+    sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, ">> %u Warden scans loaded from world database", m_scans.size());
 }
 
 void WardenScanMgr::AddMacScan(const MacScan *scan)

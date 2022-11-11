@@ -105,7 +105,7 @@ namespace MaNGOS
                ((pCreature->GetCreatureInfo()->type == CREATURE_TYPE_CRITTER) ||
                 (pCreature->GetCreatureInfo()->type == CREATURE_TYPE_NOT_SPECIFIED) ||
                 (pCreature->GetCreatureInfo()->type == CREATURE_TYPE_TOTEM) ||
-                (pCreature->GetCreatureInfo()->health_min <= 50)))
+                (pCreature->GetCreatureInfo()->health_multiplier <= 0.1f)))
                 return 0;
 
             if (pCreature->HasUnitState(UNIT_STAT_NO_KILL_REWARD))

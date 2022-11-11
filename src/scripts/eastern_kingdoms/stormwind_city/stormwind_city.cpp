@@ -1169,80 +1169,6 @@ bool QuestAccept_npc_tyrion(Player* pPlayer, Creature* pCreature, Quest const* p
     return true;
 }
 
-/*######
-## npc_master_wood
-######*/
-
-enum MasterWoodData
-{
-    SAY_RUDE_1 = 1403,
-    SAY_RUDE_2 = 1404,
-    SAY_RUDE_3 = 1402
-};
-
-struct npc_master_woodAI : public ScriptedAI
-{
-    npc_master_woodAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 m_uiRudeCount;
-
-    void Reset() override
-    {
-        m_uiRudeCount = 0;
-    }
-
-    void ReceiveEmote(Player* pPlayer, uint32 emote) override
-    {
-        if (pPlayer && (pPlayer->GetTeam() == ALLIANCE) && !m_creature->IsInCombat() && m_creature->IsWithinLOSInMap(pPlayer))
-        {
-            switch (emote)
-            {
-                case TEXTEMOTE_RUDE:
-                {
-                    m_uiRudeCount++;
-                    switch (m_uiRudeCount)
-                    {
-                        case 1:
-                            DoScriptText(SAY_RUDE_1, m_creature, pPlayer);
-                            break;
-                        case 2:
-                            DoScriptText(SAY_RUDE_2, m_creature, pPlayer);
-                            break;
-                        case 3:
-                            DoScriptText(SAY_RUDE_3, m_creature, pPlayer);
-                            break;
-                        case 5:
-                            m_creature->GetMotionMaster()->MoveCharge(pPlayer, 1000, true);
-                            m_uiRudeCount = 0;
-                            break;
-                    }
-                    break;
-                }
-                case TEXTEMOTE_WAVE:
-                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
-                    break;
-                case TEXTEMOTE_BOW:
-                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_FLEX);
-                    break;
-                case TEXTEMOTE_SALUTE:
-                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                    break;
-                case TEXTEMOTE_FLEX:
-                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
-                    break;
-            }
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_master_wood(Creature* pCreature)
-{
-    return new npc_master_woodAI(pCreature);
-}
-
 void AddSC_stormwind_city()
 {
     Script* newscript;
@@ -1275,10 +1201,5 @@ void AddSC_stormwind_city()
     newscript->GetAI = &GetAI_npc_tyrion;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_tyrion;
     newscript->pGossipHello = &GossipHello_npc_tyrion;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_master_wood";
-    newscript->GetAI = &GetAI_npc_master_wood;
     newscript->RegisterSelf();
 }

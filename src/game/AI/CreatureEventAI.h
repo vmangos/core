@@ -37,7 +37,7 @@ class WorldObject;
 
 enum EventAI_Type
 {
-    EVENT_T_TIMER                   = 0,                    // InitialMin, InitialMax, RepeatMin, RepeatMax
+    EVENT_T_TIMER_IN_COMBAT         = 0,                    // InitialMin, InitialMax, RepeatMin, RepeatMax
     EVENT_T_TIMER_OOC               = 1,                    // InitialMin, InitialMax, RepeatMin, RepeatMax
     EVENT_T_HP                      = 2,                    // HPMax%, HPMin%, RepeatMin, RepeatMax
     EVENT_T_MANA                    = 3,                    // ManaMax%,ManaMin% RepeatMin, RepeatMax
@@ -114,7 +114,7 @@ struct CreatureEventAI_Event
 
     union
     {
-        // EVENT_T_TIMER                                    = 0
+        // EVENT_T_TIMER_IN_COMBAT                          = 0
         // EVENT_T_TIMER_OOC                                = 1
         struct
         {

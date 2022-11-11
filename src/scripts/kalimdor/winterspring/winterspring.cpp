@@ -17,12 +17,11 @@
 /* ScriptData
 SDName: Winterspring
 SD%Complete: 90
-SDComment: Quest support: 5126 (Loraxs' tale missing proper gossip items text). Vendor Rivern Frostwind. Obtain Cache of Mau'ari
+SDComment: Quest support: Obtain Cache of Mau'ari
 SDCategory: Winterspring
 EndScriptData */
 
 /* ContentData
-npc_lorax
 npc_rivern_frostwind
 npc_witch_doctor_mauari
 EndContentData */
@@ -30,78 +29,12 @@ EndContentData */
 #include "scriptPCH.h"
 
 /*######
-## npc_lorax
+## npc_artorius_the_amiable
 ######*/
-
-bool GossipHello_npc_lorax(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(5126) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Talk to me", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_lorax(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What do you do here?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            pPlayer->SEND_GOSSIP_MENU(3759, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I can help you", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(3760, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What deal?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(3761, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Then what happened?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            pPlayer->SEND_GOSSIP_MENU(3762, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "He is not safe, i'll make sure of that.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(3763, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->AreaExploredOrEventHappens(5126);
-            break;
-    }
-    return true;
-}
 
 /*######
-## npc_rivern_frostwind
+## npc_artorius_the_doombringer
 ######*/
-
-bool GossipHello_npc_rivern_frostwind(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pCreature->IsVendor() && pPlayer->GetReputationRank(589) >= REP_FRIENDLY)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_rivern_frostwind(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_TRADE)
-        pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-
-    return true;
-}
 
 enum
 {
@@ -119,16 +52,6 @@ enum
     
     QUEST_STAVE_OF_THE_ANCIENTS     = 7636
 };
-
-#define GOSSIP_ITEM                 "Show me your real face, demon."
-
-/*######
-## npc_artorius_the_amiable
-######*/
-
-/*######
-## npc_artorius_the_doombringer
-######*/
 
 struct npc_artoriusAI : public ScriptedAI
 {
@@ -330,23 +253,13 @@ struct npc_artoriusAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
+
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
+    {
+        if (pInvoker && pInvoker->IsPlayer())
+            BeginEvent(pInvoker->GetObjectGuid());
+    }
 };
-
-bool GossipHello_npc_artorius(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_ITEM , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-    
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
-    return true;
-}
-
-bool GossipSelect_npc_artorius(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction )
-{
-    pPlayer->CLOSE_GOSSIP_MENU();
-    ((npc_artoriusAI*)pCreature->AI())->BeginEvent(pPlayer->GetObjectGuid());    
-    return true;
-}
 
 CreatureAI* GetAI_npc_artorius(Creature* pCreature)
 {
@@ -401,22 +314,8 @@ void AddSC_winterspring()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "npc_lorax";
-    newscript->pGossipHello =  &GossipHello_npc_lorax;
-    newscript->pGossipSelect = &GossipSelect_npc_lorax;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_rivern_frostwind";
-    newscript->pGossipHello =  &GossipHello_npc_rivern_frostwind;
-    newscript->pGossipSelect = &GossipSelect_npc_rivern_frostwind;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "npc_artorius";
     newscript->GetAI = &GetAI_npc_artorius;
-    newscript->pGossipHello =  &GossipHello_npc_artorius;
-    newscript->pGossipSelect = &GossipSelect_npc_artorius;
     newscript->RegisterSelf();
     
     newscript = new Script;

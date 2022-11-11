@@ -247,6 +247,16 @@ class ScriptMgr
             return itr->second;
         }
 
+        bool IsCreatureGuidReferencedInScripts(uint32 dbGuid) const
+        {
+            return m_referencedCreatureGuids.find(dbGuid) != m_referencedCreatureGuids.end();
+        }
+
+        bool IsGameObjectGuidReferencedInScripts(uint32 dbGuid) const
+        {
+            return m_referencedGameObjectGuids.find(dbGuid) != m_referencedGameObjectGuids.end();
+        }
+
         uint32 IncreaseScheduledScriptsCount() { return (uint32)++m_scheduledScripts; }
         uint32 DecreaseScheduledScriptCount() { return (uint32)--m_scheduledScripts; }
         uint32 DecreaseScheduledScriptCount(size_t count) { return (uint32)(m_scheduledScripts -= count); }
@@ -297,6 +307,8 @@ class ScriptMgr
         TextDataMap     m_mTextDataMap;                     //additional data for text strings
         PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
         EscortDataMap   m_mEscortDataMap;                   // Des donnees pour les quetes d'escorte scriptees via la DB
+        std::set<uint32> m_referencedCreatureGuids;
+        std::set<uint32> m_referencedGameObjectGuids;
 
         //atomic op counter for active scripts amount
         std::atomic<int> m_scheduledScripts;

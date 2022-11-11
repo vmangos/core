@@ -124,6 +124,7 @@ class SqlStmtFieldData
 };
 
 //template specialization
+template<> inline void SqlStmtFieldData::set(nullptr_t) { m_type = FIELD_NONE; }
 template<> inline void SqlStmtFieldData::set(bool val) { m_type = FIELD_BOOL; m_binaryData.boolean = val; }
 template<> inline void SqlStmtFieldData::set(uint8 val) { m_type = FIELD_UI8; m_binaryData.ui8 = val; }
 template<> inline void SqlStmtFieldData::set(int8 val) { m_type = FIELD_I8; m_binaryData.i8 = val; }
@@ -254,6 +255,7 @@ class SqlStatement
         }
 
         //bind parameters with specified type
+        void addNull() { arg(nullptr); }
         void addBool(bool var) { arg(var); }
         void addUInt8(uint8 var) { arg(var); }
         void addInt8(int8 var) { arg(var); }

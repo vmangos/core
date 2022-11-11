@@ -4,8 +4,10 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
+#include "PlayerBotAI.h"
 
 #include <vector>
+#include <memory>
 
 class PlayerBotAI;
 class WorldSession;
@@ -37,9 +39,9 @@ struct PlayerBotEntry
     bool customBot; // Enabled even if PlayerBot system disabled (AutoTesting system for example)
     bool requestRemoval;
     std::vector<uint16> m_pendingResponses;
-    PlayerBotAI* ai;
+    std::unique_ptr<PlayerBotAI> ai;
 
-    PlayerBotEntry(uint64 guid, uint32 account, uint32 _chance): playerGUID(guid), accountId(account), chance(_chance), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)
+    PlayerBotEntry(uint64 guid, uint32 account, uint32 chance_): playerGUID(guid), accountId(account), chance(chance_), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)
     {}
     PlayerBotEntry(): playerGUID(0), accountId(0), chance(100.0f), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)
     {}
@@ -78,8 +80,8 @@ class PlayerBotMgr
         bool AddOrRemoveBot();
 
         bool AddBot(PlayerBotAI* ai);
-        bool AddBot(uint32 playerGuid, bool chatBot=false);
-        bool DeleteBot(std::map<uint32, PlayerBotEntry*>::iterator iter);
+        bool AddBot(uint32 playerGuid, bool chatBot = false, PlayerBotAI* pAI = nullptr);
+        bool DeleteBot(std::map<uint32, std::shared_ptr<PlayerBotEntry>>::iterator iter);
         bool DeleteBot(uint32 playerGuid);
 
         bool AddRandomBot();
@@ -97,10 +99,11 @@ class PlayerBotMgr
         bool ForceAccountConnection(WorldSession* sess);
         bool IsPermanentBot(uint32 playerGuid);
         bool IsChatBot(uint32 playerGuid);
+        bool IsSavingAllowed() { return m_confAllowSaving; }
 
         uint32 GenBotAccountId() { return ++m_maxAccountId; }
         PlayerBotStats& GetStats(){ return m_stats; }
-        void Start() { m_enableRandomBots = true; }
+        void Start() { m_confEnableRandomBots = true; }
     protected:
         // How long since last update?
         uint32 m_elapsedTime;
@@ -109,7 +112,7 @@ class PlayerBotMgr
         uint32 m_totalChance;
         uint32 m_maxAccountId;
 
-        std::map<uint32 /*pl guid*/, PlayerBotEntry*> m_bots;
+        std::map<uint32 /*pl guid*/, std::shared_ptr<PlayerBotEntry>> m_bots;
         std::map<uint32 /*account*/, uint32> m_tempBots;
         PlayerBotStats m_stats;
 
@@ -117,8 +120,9 @@ class PlayerBotMgr
         uint32 m_confMaxRandomBots;
         uint32 m_confRandomBotsRefresh;
         uint32 m_confUpdateDiff;
+        bool m_confAllowSaving;
         bool m_confDebug;
-        bool m_enableRandomBots;
+        bool m_confEnableRandomBots;
 };
 
 #define sPlayerBotMgr MaNGOS::Singleton<PlayerBotMgr>::Instance()

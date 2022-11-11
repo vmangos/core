@@ -37,7 +37,7 @@ void CharacterDatabaseCache::LoadCharacterPet(uint32 singlePetId)
     else if (!singlePetId)
     {
         m_petsByCharacter.clear();
-        sLog.outString("* Loading table `character_pet`");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "* Loading table `character_pet`");
         result.reset(CharacterDatabase.Query(
                      "SELECT `id`, `entry`, `owner_guid`, `display_id`, `level`, `xp`, `react_state`, `loyalty_points`, `loyalty`, `training_points`, "
                      "`slot`, `name`, `renamed`, `current_health`, `current_mana`, `current_happiness`, `action_bar_data`, `teach_spell_data`, `save_time`, `reset_talents_cost`, "
@@ -82,7 +82,7 @@ void CharacterDatabaseCache::LoadCharacterPet(uint32 singlePetId)
     while (result->NextRow());
     
     if (!singlePetId)
-        sLog.outString("-> %u rows loaded.", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "-> %u rows loaded.", count);
 }
 
 void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
@@ -101,7 +101,7 @@ void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
         for (const auto& it : m_petsByGuid)
             it.second->spells.clear();
 
-        sLog.outString("* Loading `pet_spell`");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "* Loading `pet_spell`");
         result.reset(CharacterDatabase.Query(
                      "SELECT `guid`, `spell`, `active` "
                      "FROM `pet_spell` ORDER BY `guid` ASC"
@@ -132,7 +132,7 @@ void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
     while (result->NextRow());
     
     if (!singlePetId)
-        sLog.outString("-> %u rows loaded.", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "-> %u rows loaded.", count);
 }
 
 void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
@@ -151,7 +151,7 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
         for (const auto& it : m_petsByGuid)
             it.second->spellCooldowns.clear();
 
-        sLog.outString("* Loading `pet_spell_cooldown`");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "* Loading `pet_spell_cooldown`");
         result.reset(CharacterDatabase.Query(
                      "SELECT `guid`, `spell`, `time` "
                      "FROM `pet_spell_cooldown` ORDER BY `guid` ASC"
@@ -183,7 +183,7 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
     while (result->NextRow());
 
     if (!singlePetId)
-        sLog.outString("-> %u rows loaded.", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "-> %u rows loaded.", count);
 }
 
 void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
@@ -203,7 +203,7 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
         for (const auto& it : m_petsByGuid)
             it.second->auras.clear();
 
-        sLog.outString("* Loading table `pet_aura`");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "* Loading table `pet_aura`");
         result.reset(CharacterDatabase.Query(
                                   //       0       1              2            3        4         5          6               7           8
                                   "SELECT `guid`, `caster_guid`, `item_guid`, `spell`, `stacks`, `charges`, `max_duration`, `duration`, `effect_index_mask`, "
@@ -254,7 +254,7 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
     while (result->NextRow());
     
     if (!singlePetId)
-        sLog.outString("-> %u rows loaded.", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "-> %u rows loaded.", count);
 }
 
 CharacterPetCache* CharacterDatabaseCache::GetCharacterPetById(uint32 id)

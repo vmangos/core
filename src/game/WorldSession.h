@@ -55,6 +55,30 @@ class MasterPlayer;
 struct OpcodeHandler;
 struct PlayerBotEntry;
 
+enum AccountDataType
+{
+    GLOBAL_CONFIG_CACHE             = 0,                    // 0x01 g
+    PER_CHARACTER_CONFIG_CACHE      = 1,                    // 0x02 p
+    GLOBAL_BINDINGS_CACHE           = 2,                    // 0x04 g
+    PER_CHARACTER_BINDINGS_CACHE    = 3,                    // 0x08 p
+    GLOBAL_MACROS_CACHE             = 4,                    // 0x10 g
+    PER_CHARACTER_MACROS_CACHE      = 5,                    // 0x20 p
+    PER_CHARACTER_LAYOUT_CACHE      = 6,                    // 0x40 p
+    PER_CHARACTER_CHAT_CACHE        = 7,                    // 0x80 p
+    NUM_ACCOUNT_DATA_TYPES          = 8
+};
+
+#define GLOBAL_CACHE_MASK           0x15
+#define PER_CHARACTER_CACHE_MASK    0xEA
+
+struct AccountData
+{
+    AccountData() : timestamp(0), data("") {}
+
+    time_t timestamp;
+    std::string data;
+};
+
 enum ClientOSType
 {
     CLIENT_OS_UNKNOWN,
@@ -325,8 +349,8 @@ class WorldSession
 
         // Bot system
         std::stringstream m_chatBotHistory;
-        PlayerBotEntry* GetBot() { return m_bot; }
-        void SetBot(PlayerBotEntry* b) { m_bot = b; }
+        PlayerBotEntry* GetBot() { return m_bot.get(); }
+        void SetBot(std::shared_ptr<PlayerBotEntry> const& b) { m_bot = b; }
 
         // Warden / Anticheat
         void InitWarden(BigNumber* K);
@@ -336,6 +360,7 @@ class WorldSession
         void ProcessAnticheatAction(char const* detector, char const* reason, uint32 action, uint32 banTime = 0 /* Perm ban */);
         uint32 GetFingerprint() const { return 0; } // TODO
         void CleanupFingerprintHistory() {} // TODO
+        bool HasClientMovementControl() const { return !m_clientMoverGuid.IsEmpty(); }
         
         void SetReceivedWhoRequest(bool v) { m_who_recvd = v; }
         bool ReceivedWhoRequest() const { return m_who_recvd; }
@@ -399,6 +424,13 @@ class WorldSession
         void SendStableResult(uint8 res);
         bool CheckStableMaster(ObjectGuid guid);
 
+        // Account Data
+        AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
+        void SetAccountData(AccountDataType type, const std::string& data);
+        void SendAccountDataTimes();
+        void LoadGlobalAccountData();
+        void LoadAccountData(QueryResult* result, uint32 mask);
+
         void LoadTutorialsData();
         void SendTutorialsData();
         void SaveTutorialsData();
@@ -428,7 +460,6 @@ class WorldSession
         AuctionHouseEntry const* GetCheckedAuctionHouseForAuctioneer(ObjectGuid guid);
 
         // Item Enchantment
-        void SendEnchantmentLog(ObjectGuid targetGuid, ObjectGuid casterGuid, uint32 itemId, uint32 spellId);
         void SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid itemGuid, uint32 slot, uint32 duration);
 
         // Taxi
@@ -485,6 +516,7 @@ class WorldSession
         void HandleMoveSetRawPosition(WorldPacket& recv_data);
         void HandleWorldTeleportOpcode(WorldPacket& recv_data);
         void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
+        void HandleTeleportToUnitOpcode(WorldPacket& recvdata);
 
         void HandleInspectOpcode(WorldPacket& recvPacket);
         void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);
@@ -816,12 +848,13 @@ class WorldSession
         int m_sessionDbLocaleIndex;
         ClientOSType    m_clientOS;
         uint32          m_gameBuild;
-        PlayerBotEntry* m_bot;
+        std::shared_ptr<PlayerBotEntry> m_bot;
 
         Warden* m_warden;
         MovementAnticheat* m_cheatData;
 
         Player* _player;
+        ObjectGuid m_currentPlayerGuid;
         ObjectGuid m_clientMoverGuid;
         uint32 m_moveRejectTime;
         time_t m_logoutTime;
@@ -832,6 +865,7 @@ class WorldSession
         bool m_playerSave;
         uint32 m_charactersCount;
         uint32 m_characterMaxLevel;
+        AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
         uint32 m_tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;
         
