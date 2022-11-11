@@ -42,8 +42,8 @@ jobs:
         echo "#include \"ace/config-win32.h\"" >> $ACE_ROOT/ace/config.h
         #TBB package download
         wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/oneapi-tbb-$TBB_VERSION-win.zip
-        unzip tbb-$TBB_VERSION-win.zip
-        rm tbb-$TBB_VERSION-win.zip
+        unzip oneapi-tbb-$TBB_VERSION-win.zip
+        rm oneapi-tbb-$TBB_VERSION-win.zip
         #openssl
         choco install -y openssl --version=1.1.1.500
       #git bash shell
@@ -59,7 +59,7 @@ jobs:
         cd $GITHUB_WORKSPACE
         mkdir build
         cd build
-        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 17 2022" -A x64 ..
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/oneapi-tbb-$TBB_VERSION -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 17 2022" -A x64 ..
         /c/Program\ Files/Microsoft\ Visual\ Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
       #git bash shell
       shell: bash
@@ -70,14 +70,12 @@ jobs:
       run: |
           #data is in Release folder
           cd ${{github.workspace}}/bin
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb.dll ${{github.workspace}}/bin/Release/tbb.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_debug.dll ${{github.workspace}}/bin/Release/tbb_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_preview.dll ${{github.workspace}}/bin/Release/tbb_preview.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_preview_debug.dll ${{github.workspace}}/bin/Release/tbb_preview_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc.dll ${{github.workspace}}/bin/Release/tbbmalloc.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_proxy.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_proxy_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy_debug.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbb12.dll ${{github.workspace}}/bin/Release/tbb12.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbb12_debug.dll ${{github.workspace}}/bin/Release/tbb12_debug.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbbmalloc.dll ${{github.workspace}}/bin/Release/tbbmalloc.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbbmalloc_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_debug.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbbmalloc_proxy.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbbmalloc_proxy_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy_debug.dll
 
           copy ${{github.workspace}}/ACE_wrappers/lib/ACE.dll ${{github.workspace}}/bin/Release/ACE.dll
           copy c:/mysql/lib/libmysql.dll ${{github.workspace}}/bin/Release/libmysql.dll
@@ -101,7 +99,7 @@ jobs:
         cd $GITHUB_WORKSPACE
         mkdir buildac
         cd buildac
-        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -DUSE_ANTICHEAT=1 -G "Visual Studio 16 2019" -A x64 ..
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/oneapi-tbb-$TBB_VERSION -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -DUSE_ANTICHEAT=1 -G "Visual Studio 16 2019" -A x64 ..
         /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
       #git bash shell
       shell: bash
@@ -112,14 +110,12 @@ jobs:
       run: |
           #data is in Release folder
           cd ${{github.workspace}}/bin
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb.dll ${{github.workspace}}/bin/Release/tbb.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_debug.dll ${{github.workspace}}/bin/Release/tbb_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_preview.dll ${{github.workspace}}/bin/Release/tbb_preview.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_preview_debug.dll ${{github.workspace}}/bin/Release/tbb_preview_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc.dll ${{github.workspace}}/bin/Release/tbbmalloc.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_proxy.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_proxy_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy_debug.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbb12.dll ${{github.workspace}}/bin/Release/tbb12.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbb12_debug.dll ${{github.workspace}}/bin/Release/tbb12_debug.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbbmalloc.dll ${{github.workspace}}/bin/Release/tbbmalloc.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbbmalloc_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_debug.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbbmalloc_proxy.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy.dll
+          copy ${{github.workspace}}/oneapi-tbb-$TBB_VERSION/redist/intel64/vc14/tbbmalloc_proxy_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy_debug.dll
 
           copy ${{github.workspace}}/ACE_wrappers/lib/ACE.dll ${{github.workspace}}/bin/Release/ACE.dll
           copy c:/mysql/lib/libmysql.dll ${{github.workspace}}/bin/Release/libmysql.dll
