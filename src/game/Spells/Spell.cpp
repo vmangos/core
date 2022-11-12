@@ -8742,7 +8742,7 @@ void Spell::SetClientStarted(bool bisClientStarted)
 
 void Spell::OnSpellLaunch()
 {
-    if (!m_caster || !m_caster->IsInWorld())
+    if (!m_casterUnit || !m_caster->IsInWorld())
         return;
 
     // Make sure the player is sending a valid GO target and lock ID. SPELL_EFFECT_OPEN_LOCK
@@ -8754,7 +8754,7 @@ void Spell::OnSpellLaunch()
             LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
             if (lockInfo && lockInfo->Index[1] == LOCKTYPE_SLOW_OPEN)
             {
-                Spell* visual = m_casterUnit ? new Spell(m_casterUnit, sSpellMgr.GetSpellEntry(24390), true) : new Spell(m_casterGo, sSpellMgr.GetSpellEntry(24390), true);
+                Spell* visual = new Spell(m_casterUnit, sSpellMgr.GetSpellEntry(24390), true);
                 visual->prepare();
             }
         }
@@ -8765,14 +8765,17 @@ void Spell::OnSpellLaunch()
     // Charge handled here instead of in effect handler
     if (!unitTarget || !unitTarget->IsInWorld())
         return;
+
+	// Start the PvP combat timer, but clear it if target dies prematurely.
+	if (m_spellInfo->HasAttribute(SPELL_ATTR_EX2_ACTIVE_THREAT))
+		m_casterUnit->SetInCombatWithVictim(unitTarget, false, UNIT_PVP_COMBAT_TIMER);
+
     bool isCharge = false;
     for (uint32 i : m_spellInfo->Effect)
         if (i == SPELL_EFFECT_CHARGE)
             isCharge = true;
-    if (!isCharge)
-        return;
 
-    if (!m_casterUnit)
+    if (!isCharge)
         return;
 
     // Delay attack, otherwise player makes instant attack after cast
@@ -8783,8 +8786,6 @@ void Spell::OnSpellLaunch()
     }
     
     bool triggerAutoAttack = unitTarget != m_casterUnit && !m_spellInfo->IsPositiveSpell() && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET);
-    if (triggerAutoAttack)
-        m_casterUnit->SetInCombatWithVictim(unitTarget, false, UNIT_PVP_COMBAT_TIMER);
     m_casterUnit->GetMotionMaster()->MoveCharge(unitTarget, m_delayed ? GetSpellBatchingEffectDelay(unitTarget) : 0, triggerAutoAttack);
 }
 
