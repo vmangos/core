@@ -94,7 +94,7 @@ WardenMac::WardenMac(WorldSession *session, const BigNumber &K)
     MD5_Final(_hashMD5, &md5);
 
     // PPC no module, begin string hashing requests directly
-    if (session->GetPlatform() != CLIENT_PLATFORM_X86)
+    if (_module)
     {
         // at this point the client has our module loaded.  send whatever packets are necessary to initialize Warden
         InitializeClient();
