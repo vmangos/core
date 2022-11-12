@@ -262,18 +262,15 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
             Pet* myPet = GetPet();
             if (HasUnitState(UNIT_STAT_FEIGN_DEATH) || !myPet || myPet->GetHostileRefManager().isEmpty())
             {
-                if (m_HostileRefManager.isEmpty())
+                // m_CombatTimer set at aura start and it will be freeze until aura removing
+                if (m_CombatTimer <= update_diff)
                 {
-                    // m_CombatTimer set at aura start and it will be freeze until aura removing
-                    if (m_CombatTimer <= update_diff)
-                    {
-                        // Rage berzerker laisse en combat.
-                        if (!HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
-                            ClearInCombat();
-                    }
-                    else
-                        m_CombatTimer -= update_diff;
+                    // Rage berzerker laisse en combat.
+                    if (m_HostileRefManager.isEmpty() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
+                        ClearInCombat();
                 }
+                else
+                    m_CombatTimer -= update_diff;
             }
         }
     }
