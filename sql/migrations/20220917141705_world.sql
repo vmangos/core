@@ -591,7 +591,7 @@ DELETE FROM `gossip_menu` WHERE  `entry` = 9406 AND `text_id` = 5495;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (602, 9, 3781, 0, 0, 0, 0);
 -- 603:  Not (Target Has 1 Points In Skill 182)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (603, 7, 182, 1, 0, 0, 1);
--- 604: (602: Target Has Incomplete Quest 3781 In Log) And (603:  Not (Target Has 1 Points In Skill 182))
+-- 604: (602: Target Has Quest 3781 In Log) And (603:  Not (Target Has 1 Points In Skill 182))
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (604, -1, 602, 603, 0, 0, 0);
 
 
