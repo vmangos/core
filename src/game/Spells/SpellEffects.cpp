@@ -5111,81 +5111,38 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     return;
                 }
                 case 28183:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghost/ghoul)
-                {
-                    // 0.2% Chance of a Rare Spawn.
-                    uint32 roll = urand(1, 500);
-
-                    bool UncommonMinionspawner = false;
-
-                    if (roll == 1)
-                        UncommonMinionspawner = true;
-
-                    uint32 Entry = 16141; // just in case.
-
-                    Entry = UncommonMinionspawner ? PickRandomValue(16379, 14697) : PickRandomValue(16298, 16141);
-
-                    std::list<Creature*> minions;
-                    GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
-
-                    if (minions.empty())
-                    {
-                        if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
-                        {
-                            m_casterUnit->SendSpellGo(m_casterUnit, 28234);
-                            UncommonMinionspawner ? pMinion->SetWanderDistance(5.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.
-                        }
-                    }
-
-                    return;
-                }
                 case 28184:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghost/skeleton)
-                {
-                    // 0.2% Chance of a Rare Spawn.
-                    uint32 roll = urand(1, 500);
-
-                    bool UncommonMinionspawner = false;
-
-                    if (roll == 1)
-                        UncommonMinionspawner = true;
-
-                    uint32 Entry = 16298; // just in case.
-
-                    Entry = UncommonMinionspawner ? PickRandomValue(16379, 16380) : PickRandomValue(16298, 16299);
-
-                    std::list<Creature*> minions;
-                    GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
-
-                    if (minions.empty())
-                    {
-                        if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
-                        {
-                            m_casterUnit->SendSpellGo(m_casterUnit, 28234);
-                            UncommonMinionspawner ? pMinion->SetWanderDistance(5.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.
-                        }
-                    }
-
-                    return;
-                }
                 case 28185:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghoul/skeleton)
                 {
                     // 0.2% Chance of a Rare Spawn.
                     uint32 roll = urand(1, 500);
 
                     bool UncommonMinionspawner = false;
+                    bool CanSummon = true;
 
                     if (roll == 1)
                         UncommonMinionspawner = true;
 
-                    uint32 Entry = 16141; // just in case.
+                    uint32 Entry = PickRandomValue(16298, 16141, 16299); // just in case.
 
-                    Entry = UncommonMinionspawner ? PickRandomValue(14697, 16380) : PickRandomValue(16141, 16299);
+                    switch (m_spellInfo->Id)
+                    {
+                        case 28183: Entry = UncommonMinionspawner ? PickRandomValue(16379, 14697) : PickRandomValue(16298, 16141); break;
+                        case 28184: Entry = UncommonMinionspawner ? PickRandomValue(16379, 16380) : PickRandomValue(16298, 16299); break;
+                        case 28185: Entry = UncommonMinionspawner ? PickRandomValue(14697, 16380) : PickRandomValue(16141, 16299); break;
+                        default:    Entry = PickRandomValue(16298, 16141, 16299); break;
+                    }
 
                     std::list<Creature*> minions;
-                    GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, 5.0f);
+                    GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, INTERACTION_DISTANCE);
 
-                    if (minions.empty())
+                    for (const auto pMinion : minions)
+                        if (pMinion->IsAlive())
+                            CanSummon = false;
+
+                    if (CanSummon)
                     {
-                        if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
+                        if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, IN_MILLISECONDS * 2))
                         {
                             m_casterUnit->SendSpellGo(m_casterUnit, 28234);
                             UncommonMinionspawner ? pMinion->SetWanderDistance(5.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.

@@ -85,8 +85,6 @@ enum ScourgeInvasionSpells
     SPELL_MINION_SPAWN_IN                           = 28234, // Pink Lightning.
     SPELL_SPIRIT_SPAWN_OUT                          = 17680, // Makes invisible.
     SPELL_MINION_DESPAWN_TIMER                      = 28090, // Triggers 28091 (Despawner, self) every 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
-    SPELL_CONTROLLER_TIMER                          = 28095, // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (Unknown who is casting this).
-    SPELL_DESPAWNER_SELF                            = 28091, // Trigger from Spell above.
     SPELL_SUMMON_SCOURGE_CONTROLLER                 = 28092, // Summons 16214 (NPC_NECROPOLIS_CONTROLLER).
 
     // Minion Abilities
@@ -177,6 +175,8 @@ enum ScourgeInvasionSpells
         SPELL_DND_SUMMON_CRYSTAL_MINION_GHOUL_UNCOMMON      = 28289,
         SPELL_DND_SUMMON_CRYSTAL_MINION_GHOST_UNCOMMON      = 28290,
         SPELL_DND_SUMMON_CRYSTAL_MINION_SKELETON_UNCOMMON   = 28291,
+        SPELL_CONTROLLER_TIMER                              = 28095,    // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (Unknown who is casting this).
+        SPELL_DESPAWNER_SELF                                = 28091,    // Trigger from Spell above.
     */
 };
 
@@ -309,10 +309,6 @@ enum ScourgeInvasionMisc
 
 enum ScourgeInvasionNPCEvents
 {
-    EVENT_SHARD_MINION_SPAWNER_SMALL        = 1,
-    EVENT_SHARD_MINION_SPAWNER_BUTTRESS     = 2,
-    EVENT_SPAWNER_SUMMON_MINION             = 3,
-    EVENT_SHARD_FIND_DAMAGED_SHARD          = 4,
     EVENT_MOUTH_OF_KELTHUZAD_YELL           = 6,
     EVENT_MOUTH_OF_KELTHUZAD_ZONE_START     = 7,
     EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP      = 8,

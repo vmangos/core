@@ -43,6 +43,11 @@ INSERT INTO `spell_group`(`group_id`, `group_spell_id`, `spell_id`, `build_min`,
 
 INSERT INTO `spell_group_stack_rules`(`group_id`, `build`, `stack_rule`) VALUES (1009, 0, 1);
 
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (162990, 'Scourge Invasion - Skeletal Shocktrooper', 17014, 100, 0, 0, 0, 34, 1, 28, 16, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (161410, 'Scourge Invasion - Ghoul Berserker', 7367, 50, 1, 0, 0, 32, 6, 47, 11, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (162980, 'Scourge Invasion - Spectral Soldier', 16244, 50, 1, 0, 0, 32, 5, 54, 17, 43, 0, 21081, 50, 1, 0, 0, 96, 0, 27, 6, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146970, 'Scourge Invasion - Lumbering Horror', 16790, 100, 1, 0, 0, 0, 8, 66, 17, 22, 0, 5568, 100, 0, 0, 0, 0, 6, 24, 13, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
 -- Delete my old Scripts
 DELETE FROM `creature_ai_scripts` WHERE `dataint`=12366 AND `dataint2`=12367 AND `dataint3`=12368 AND `dataint4`=12369;
 DELETE FROM `creature_ai_scripts` WHERE `dataint`=12370 AND `dataint2`=12371 AND `dataint3`=12372 AND `dataint4`=12373;
@@ -186,6 +191,90 @@ INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`
 -- 619: Source's Guid Is 66952 Or 66954 Or 66957 Or 66959(Flameshockers in Undercity War Quarter)
 INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (619, 52, 66952, 66954, 66957, 66959, 0); 
 
+-- 620: Source or Target Is In Zone or Area 4 (Blasted Lands)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (620, 4, 4, 0, 0, 0, 0);
+
+-- 621: Source or Target Is In Zone or Area 16 (Azshara)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (621, 4, 16, 0, 0, 0, 0);
+
+-- 622: Source or Target Is In Zone or Area 46 (Burning Steppes)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (622, 4, 46, 0, 0, 0, 0);
+
+-- 623: Source or Target Is In Zone or Area 139 (Eastern Plaguelands)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (623, 4, 139, 0, 0, 0, 0);
+
+-- 624: Source or Target Is In Zone or Area 440 (Tanaris)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (624, 4, 440, 0, 0, 0, 0);
+
+-- 625: Source or Target Is In Zone or Area 618 (Winterspring)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (625, 4, 618, 0, 0, 0, 0);
+
+-- 626: (620: Source or Target Is In Zone or Area 4) Or (621: Source or Target Is In Zone or Area 16) Or (622: Source or Target Is In Zone or Area 46) Or (623: Source or Target Is In Zone or Area 139)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (626, -2, 620, 621, 622, 623, 0);
+
+-- 627: (624: Source or Target Is In Zone or Area 440) Or (625: Source or Target Is In Zone or Area 618)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (627, -2, 624, 625, 0, 0, 0);
+
+-- 628: (626: (620: Source or Target Is In Zone or Area 4) Or (621: Source or Target Is In Zone or Area 16) Or (622: Source or Target Is In Zone or Area 46) Or (623: Source or Target Is In Zone or Area 139)) Or (627: (624: Source or Target Is In Zone or Area 440) Or (625: Source or Target Is In Zone or Area 618))
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (628, -2, 626, 627, 0, 0, 0);
+
+-- 629: Game Event 93 Is Active (Scourge Invasion: Blasted Lands)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (629, 12, 93, 0, 0, 0, 0);
+
+-- 630: Game Event 92 Is Active (Scourge Invasion: Azshara)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (630, 12, 92, 0, 0, 0, 0);
+
+-- 631: Game Event 95 Is Active (Scourge Invasion: Burning Steppes)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (631, 12, 95, 0, 0, 0, 0);
+
+-- 632: Game Event 94 Is Active (Scourge Invasion: Eastern Plaguelands)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (632, 12, 94, 0, 0, 0, 0);
+
+-- 633: Game Event 91 Is Active (Scourge Invasion: Tanaris)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (633, 12, 91, 0, 0, 0, 0);
+
+-- 634: Game Event 90 Is Active (Scourge Invasion: Winterspring)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (634, 12, 90, 0, 0, 0, 0);
+
+-- 1    Dun Morogh
+-- 4    Blasted Lands
+-- 12    Elwynn Forest
+-- 14    Durotar
+-- 16    Azshara
+-- 28    Western Plaguelands
+-- 46    Burning Steppes
+-- 85    Tirisfal Glades
+-- 139    Eastern Plaguelands
+-- 141    Teldrassil
+-- 440    Tanaris
+-- 618    Winterspring
+-- 1497    Undercity
+-- 1519    Stormwind City
+-- 1637    Orgrimmar
+-- 1638    Thunder Bluff
+
+-- Events list for Mouth of Kel'Thuzad
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16995;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1699501, 16995, 0, 1, 0, 100, 1, 0, 2700000, 2700000, 2700000, 1699501, 0, 0, 'Mouth of Kel\'Thuzad - Timer OOC');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1699501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1699501, 0, 1, 39, 1699501, 1699502, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 628, 'Mouth of Kel\'Thuzad - Start Script: Random Yell'),
+(1699501, 0, 2, 39, 1699503, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Start Script: Start Zone');
+
+DELETE FROM `generic_scripts` WHERE `id`=1699501;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1699501, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13121, 13122, 13123, 13124, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk');
+
+DELETE FROM `generic_scripts` WHERE `id`=1699502;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1699502, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13125, 13126, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk');
+
+DELETE FROM `generic_scripts` WHERE `id`=1699503;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1699503, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13121, 13123, 13125, 13126, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk'),
+(1699503, 0, 0, 53, 90, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Start Game Event');
+
 -- Events list for Scourge Invasion Minion, finder
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16356;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1635601, 16356, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1635601, 0, 0, 'Finder - Just Spawned');
@@ -234,6 +323,14 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 DELETE FROM `generic_scripts` WHERE `id`=1633801;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1633801, 2, 0, 15, 28185, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Cast Spell');
+
+-- Events list for Necropolis health
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16421;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642101, 16421, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1642101, 0, 0, 'Necropolis Health - Hit By Spell');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1642101;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1642101, 0, 0, 15, 28386, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Health - Cast Spell');
 
 -- Events list for Pallid Horror
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16394;
@@ -320,6 +417,16 @@ INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, 
 (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1634.67, 479.701, -21.8066, 1.64061, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
 (1639405, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 149702, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Sewers');
 
+-- Events list for Skeletal Shocktrooper
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16299;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629901, 16299, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1629901, 0, 0, 'Skeletal Shocktrooper - Cast Zap Crystal on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629902, 16299, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1629902, 0, 0, 'Skeletal Shocktrooper - Despawn on Hit by Spirit Spawn-out');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629903, 16299, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1629903, 0, 0, 'Skeletal Shocktrooper - Cast Scourge Strike');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1629903;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1629903, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Skeletal Shocktrooper - Cast Spell Scourge Strike');
+
 -- Events list for Ghoul Berserker
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16141;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614101, 16141, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1614101, 0, 0, 'Ghoul Berserker - Cast Zap Crystal on Death');
@@ -327,12 +434,88 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614103, 16141, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1614103, 0, 0, 'Ghoul Berserker - Despawn on Hit by Spirit Spawn-out');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614104, 16141, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1614104, 0, 0, 'Ghoul Berserker - Cast Scourge Strike');
 
+DELETE FROM `creature_ai_scripts` WHERE `id`=1614104;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1614104, 0, 0, 15, 28265, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Ghoul Berserker - Cast Spell Scourge Strike');
+
+-- Events list for Spectral Soldier
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16298;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629801, 16298, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1629801, 0, 0, 'Spectral Soldier - Cast Zap Crystal on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629802, 16298, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1629802, 0, 0, 'Spectral Soldier - Despawn on Hit by Spirit Spawn-out');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629803, 16298, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1629803, 0, 0, 'Spectral Soldier - Cast Scourge Strike');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1629803;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1629803, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Spectral Soldier - Cast Spell Scourge Strike');
+
+-- Events list for Lumbering Horror
+DELETE FROM `creature_ai_events` WHERE `creature_id`=14697;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469701, 14697, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1469701, 0, 0, 'Lumbering Horror - Cast Zap Crystal on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469702, 14697, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1469702, 0, 0, 'Lumbering Horror - Despawn on Hit by Spirit Spawn-out');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469703, 14697, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1469703, 0, 0, 'Lumbering Horror - Cast Scourge Strike');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469704, 14697, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1469704, 0, 0, 'Lumbering Horror - Cast Aura of Fear');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1469703;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1469703, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Lumbering Horror - Cast Spell Scourge Strike');
+
+-- Events list for Bone Witch
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16380;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638001, 16380, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1638001, 0, 0, 'Bone Witch - Cast Zap Crystal on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638002, 16380, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1638002, 0, 0, 'Bone Witch - Despawn on Hit by Spirit Spawn-out');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638003, 16380, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1638003, 0, 0, 'Bone Witch - Cast Scourge Strike');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1638003;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1638003, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Bone Witch - Cast Spell Scourge Strike');
+
+-- Events list for Spirit of the Damned
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16379;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637901, 16379, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1637901, 0, 0, 'Spirit of the Damned - Cast Zap Crystal on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637902, 16379, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1637902, 0, 0, 'Spirit of the Damned - Despawn on Hit by Spirit Spawn-out');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637903, 16379, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1637903, 0, 0, 'Spirit of the Damned - Cast Scourge Strike');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1637903;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1637903, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Spirit of the Damned - Cast Spell Scourge Strike');
+
+-- Events list for Skeletal Trooper
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16438;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643801, 16438, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1643801, 0, 0, 'Skeletal Trooper - Cast Scourge Strike');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1643801;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1643801, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Skeletal Trooper - Cast Spell Scourge Strike');
+
+-- Events list for Spectral Spirit
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16437;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643701, 16437, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1643701, 0, 0, 'Spectral Spirit - Cast Scourge Strike');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1643701;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1643701, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Spectral Spirit - Cast Spell Scourge Strike');
+
+-- Events list for Skeletal Soldier
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16422;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642201, 16422, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1642201, 0, 0, 'Skeletal Soldier - Cast Scourge Strike');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1642201;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1642201, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Skeletal Soldier - Cast Spell Scourge Strike');
+
+-- Events list for Spectral Apparition
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16423;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642301, 16423, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1642301, 0, 0, 'Spectral Apparition - Cast Scourge Strike');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1642301;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1642301, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Spectral Apparition - Cast Spell Scourge Strike');
+
 -- Events list for Shadow of Doom
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16143;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614301, 16143, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1614301, 0, 0, 'Shadow of Doom - Just Spawned');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614302, 16143, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1614302, 0, 0, 'Shadow of Doom - Death');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614303, 16143, 0, 0, 0, 100, 0, 0, 35000, 5000, 30000, 1614303, 0, 0, 'Shadow of Doom - Timer In Combat');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614304, 16143, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1614304, 0, 0, 'Shadow of Doom - Aggro');
 
 -- 16143:  Not (Source Is Player)
 REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16143, 28, 0, 0, 0, 0, 3);
@@ -348,18 +531,15 @@ INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalon
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1614303;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1614303, 0, 0, 15, 28265, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Shadow of Doom - Cast Spell: Scourge Strike on Non Players');
-
-DELETE FROM `creature_ai_scripts` WHERE `id`=1614304;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1614304, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 'Shadow of Doom - Call For Help');
+(1614303, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Shadow of Doom - Cast Spell: Scourge Strike on Non Players');
 
 DELETE FROM `generic_scripts` WHERE `id`=1614301;
-INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1614301, 0, 0, 41, 0, 0, 0, 0, 181142, 2, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Object(Summoner Shield)'),
 (1614301, 0, 0, 44, 1, 1, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Set Phase for Damaged Necrotic Shard'),
 (1614301, 2, 0, 0, 0, 0, 0, 0, 2, 0, 4, 16, 12420, 12421, 12422, 12243, 0, 0, 0, 0, 0, 'Shadow of Doom - Talk'),
-(1614301, 5, 0, 4, 46, 768, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Unit Flags');
+(1614301, 5, 0, 4, 46, 768, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Unit Flags'),
+(1614301, 3599, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Deal Damage');
 
 -- Events list for Flameshocker
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16383;
@@ -592,12 +772,13 @@ INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalon
 (1623002, 0, 0, 15, 28041, 2, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Damage Crystal');
 
 DELETE FROM `generic_scripts` WHERE `id`=1623001;
-INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1623001, 0, 1, 35, 0, 0, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Face Damaged Necrotic Shard'),
 (1623001, 0, 2, 15, 28132, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Create Summoner Shield'),
 (1623001, 0, 3, 44, 1, 1, 0, 0, 16172, 10, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Set Phase for Damaged Necrotic Shard'),
 (1623001, 0, 4, 15, 29826, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Self Stun(DND)'),
-(1623001, 0, 5, 15, 28078, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel');
+(1623001, 1, 5, 15, 28078, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel'),
+(1623001, 3599, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Deal Damage');
 
 DELETE FROM `gossip_scripts` WHERE `id`=7166;
 INSERT INTO `gossip_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -810,10 +991,11 @@ UPDATE `creature_template` SET `spawn_spell_id`=0 WHERE `spawn_spell_id`=28234;
 -- Minion Spawner, finder
 -- Server Side and charges = 1
 UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181163;
--- 45 to 60 sec respawn timer
-UPDATE `gameobject` SET `spawntimesecsmin`=45, `spawntimesecsmax`=60 WHERE `id`=181163;
+-- On spot respawn for minions is between 2,5 and 3 minutes.
+UPDATE `gameobject` SET `spawntimesecsmin`=150, `spawntimesecsmax`=180 WHERE `id`=181163;
 -- Buttress Spawner: Server Side
-UPDATE `gameobject_template` SET `data8`=1 WHERE `entry`=181112;
+UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181112;
+UPDATE `gameobject` SET `spawntimesecsmin`=7200, `spawntimesecsmax`=7200 WHERE `id`=181112;
 
  
 -- End of migration.

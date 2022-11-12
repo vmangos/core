@@ -85,22 +85,6 @@ void ChangeZoneEventStatus(Creature* pMouth, bool on)
     }
 }
 
-void DespawnEventDoodads(Creature* pShard)
-{
-    if (!pShard)
-        return;
-
-    std::list<GameObject*> doodadList;
-    GetGameObjectListWithEntryInGrid(doodadList, pShard, { GOBJ_CIRCLE, GOBJ_UNDEAD_FIRE, GOBJ_UNDEAD_FIRE_AURA, GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04, GOBJ_SUMMONER_SHIELD }, 60.0f);
-    for (const auto pDoodad : doodadList)
-        pDoodad->RemoveFromWorld();
-
-    std::list<Creature*> finderList;
-    GetCreatureListWithEntryInGrid(finderList, pShard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
-    for (const auto pFinder : finderList)
-        pFinder->RemoveFromWorld();
-}
-
 void DespawnNecropolis(Unit* pDespawner)
 {
     if (!pDespawner)
@@ -110,55 +94,6 @@ void DespawnNecropolis(Unit* pDespawner)
     GetGameObjectListWithEntryInGrid(necropolisList, pDespawner, { GOBJ_NECROPOLIS_TINY, GOBJ_NECROPOLIS_SMALL, GOBJ_NECROPOLIS_MEDIUM, GOBJ_NECROPOLIS_BIG, GOBJ_NECROPOLIS_HUGE }, ATTACK_DISTANCE);
     for (const auto pNecropolis : necropolisList)
         pNecropolis->Despawn();
-}
-
-uint32 HasMinion(Creature* pSummoner, float range)
-{
-    if (!pSummoner)
-        return false;
-
-    uint32 minionCounter = 0;
-    std::list<Creature*> minionList;
-    GetCreatureListWithEntryInGrid(minionList, pSummoner, { NPC_SKELETAL_SHOCKTROOPER, NPC_GHOUL_BERSERKER, NPC_SPECTRAL_SOLDIER, NPC_LUMBERING_HORROR, NPC_BONE_WITCH, NPC_SPIRIT_OF_THE_DAMNED }, ATTACK_DISTANCE);
-    for (const auto pMinion : minionList)
-        if (pMinion && pMinion->IsAlive())
-            minionCounter++;
-
-    return minionCounter;
-}
-
-bool UncommonMinionspawner(Creature* pSummoner) // Rare Minion Spawner.
-{
-    if (!pSummoner)
-        return false;
-
-    std::list<Creature*> uncommonMinionList;
-    GetCreatureListWithEntryInGrid(uncommonMinionList, pSummoner, { NPC_LUMBERING_HORROR, NPC_BONE_WITCH, NPC_SPIRIT_OF_THE_DAMNED }, 100.0f);
-    for (const auto pMinion : uncommonMinionList)
-        if (pMinion)
-            return false; // Already a rare found (dead or alive).
-
-    /*
-    The chance or timer for a Rare minion spawn is unknown and i don't see an exact pattern for a spawn sequence.
-    I have sniffed 33000 Minion spawns and 56 Rare spawns.
-    */
-    uint32 chance = urand(1, 33000);
-    if (chance > 56)
-        return false; // Above 56 = Minion, else Rare.
-
-    return true;
-}
-
-uint32 GetFindersAmount(Creature* pShard)
-{
-    uint32 finderCounter = 0;
-    std::list<Creature*> finderList;
-    GetCreatureListWithEntryInGrid(finderList, pShard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
-    for (const auto pFinder : finderList)
-        if (pFinder)
-            finderCounter++;
-
-    return finderCounter;
 }
 
 /*
@@ -339,90 +274,6 @@ CreatureAI* GetAI_NecropolisHealth(Creature* pCreature)
 }
 
 /*
-Minion Spawner
-*/
-struct MinionspawnerAI : public ScriptedAI
-{
-    MinionspawnerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-        m_events.Reset();
-        m_events.ScheduleEvent(EVENT_SPAWNER_SUMMON_MINION, 1000);
-    }
-
-    EventMap m_events;
-
-    void Reset() {}
-
-    void UpdateAI(uint32 const diff) override
-    {
-        m_events.Update(diff);
-
-        while (uint32 Events = m_events.ExecuteEvent())
-        {
-            switch (Events)
-            {
-                case EVENT_SPAWNER_SUMMON_MINION:
-                {
-                    GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(181163);
-
-                    if (!gInfo)
-                    {
-                        return;
-                    }
-
-                    float x = me->GetPositionX();
-                    float y = me->GetPositionY();
-                    float z = me->GetPositionZ();
-                    float ang = me->GetOrientation();
-                    Map* map = me->GetMap();
-
-                    GameObject* pGameObj = GameObject::CreateGameObject(gInfo->id);
-
-                    // used guids from specially reserved range (can be 0 if no free values)
-                    uint32 db_lowGUID = sObjectMgr.GenerateStaticGameObjectLowGuid();
-                    if (!db_lowGUID)
-                    {
-                        delete pGameObj;
-                        return;
-                    }
-
-                    if (!pGameObj->Create(db_lowGUID, gInfo->id, map, x, y, z, ang, 0.0f, 0.0f, 0.0f, 0.0f, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
-                    {
-                        delete pGameObj;
-                        return;
-                    }
-
-                        pGameObj->SetRespawnTime(300);
-
-                    // fill the gameobject data and save to the db
-                    pGameObj->SaveToDB(map->GetId());
-
-                    // this will generate a new guid if the object is in an instance
-                    if (!pGameObj->LoadFromDB(db_lowGUID, map))
-                    {
-                        delete pGameObj;
-                        return;
-                    }
-
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "GameObject %u (%u) added to: %u %u %u %u", gInfo->name, db_lowGUID, x, y, z, ang);
-
-                    map->Add(pGameObj);
-
-                    sObjectMgr.AddGameobjectToGrid(db_lowGUID, sObjectMgr.GetGOData(db_lowGUID));
-                break;
-                }
-            }
-        }
-    }
-};
-
-CreatureAI* GetAI_Minionspawner(Creature* pCreature)
-{
-    return new MinionspawnerAI(pCreature);
-}
-
-/*
 Argent Emissary
 Notes: NPC thats tells what is going on and shows what locations are under attack.
 */
@@ -581,11 +432,6 @@ void AddSC_scourge_invasion()
     newscript = new Script;
     newscript->Name = "scourge_invasion_necropolis_health";
     newscript->GetAI = &GetAI_NecropolisHealth;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_minion_spawner";
-    newscript->GetAI = &GetAI_Minionspawner;
     newscript->RegisterSelf();
 
     newscript = new Script;
