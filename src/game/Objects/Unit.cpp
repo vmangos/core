@@ -265,8 +265,8 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
                 // m_combatTimer set at aura start and it will be freeze until aura removing
                 if (m_combatTimer <= update_diff)
                 {
-					m_combatTimerTarget.Clear();
-					m_combatTimer = BatchifyTimer(WorldTimer::getMSTime() % UNIT_COMBAT_CHECK_TIMER_MAX);
+                    m_combatTimerTarget.Clear();
+                    m_combatTimer = BatchifyTimer(WorldTimer::getMSTime() % UNIT_COMBAT_CHECK_TIMER_MAX);
                     if (m_HostileRefManager.isEmpty() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
                         ClearInCombat();
                 }
@@ -5764,18 +5764,18 @@ void Unit::SetInCombatState(uint32 combatTimer, Unit* pEnemy)
     if (!IsAlive())
         return;
 
-	if (combatTimer)
-	{
-		if (m_combatTimer < combatTimer)
-		{
-			m_combatTimer = BatchifyTimer(combatTimer);
-			m_combatTimerTarget = pEnemy ? pEnemy->GetObjectGuid() : ObjectGuid();
-		}
-	}
-	// combat timer is interrupted early on actually entering combat with victim
-	// example: charge mob and kill it in 1 hit, you leave combat quicker than 5 seconds
-	else if (m_combatTimer > UNIT_COMBAT_CHECK_TIMER_MAX && pEnemy && pEnemy->GetObjectGuid() == m_combatTimerTarget)
-		m_combatTimer = BatchifyTimer(WorldTimer::getMSTime() % UNIT_COMBAT_CHECK_TIMER_MAX);
+    if (combatTimer)
+    {
+        if (m_combatTimer < combatTimer)
+        {
+            m_combatTimer = BatchifyTimer(combatTimer);
+            m_combatTimerTarget = pEnemy ? pEnemy->GetObjectGuid() : ObjectGuid();
+        }
+    }
+    // combat timer is interrupted early on actually entering combat with victim
+    // example: charge mob and kill it in 1 hit, you leave combat quicker than 5 seconds
+    else if (m_combatTimer > UNIT_COMBAT_CHECK_TIMER_MAX && pEnemy && pEnemy->GetObjectGuid() == m_combatTimerTarget)
+        m_combatTimer = BatchifyTimer(WorldTimer::getMSTime() % UNIT_COMBAT_CHECK_TIMER_MAX);
 
     bool wasInCombat = IsInCombat();
     bool creatureNotInCombat = IsCreature() && !wasInCombat;

@@ -8766,9 +8766,9 @@ void Spell::OnSpellLaunch()
     if (!unitTarget || !unitTarget->IsInWorld())
         return;
 
-	// Start the PvP combat timer, but clear it if target dies prematurely.
-	if (m_spellInfo->HasAttribute(SPELL_ATTR_EX2_ACTIVE_THREAT))
-		m_casterUnit->SetInCombatWithVictim(unitTarget, false, UNIT_PVP_COMBAT_TIMER);
+    // Start the PvP combat timer, but clear it if target dies prematurely.
+    if (m_spellInfo->HasAttribute(SPELL_ATTR_EX2_ACTIVE_THREAT))
+        m_casterUnit->SetInCombatWithVictim(unitTarget, false, UNIT_PVP_COMBAT_TIMER);
 
     bool isCharge = false;
     for (uint32 i : m_spellInfo->Effect)
