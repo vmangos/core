@@ -82,7 +82,7 @@ WardenMac::WardenMac(WorldSession *session, const BigNumber &K)
 
     Sha1Hash sha1;
     sha1.UpdateData(_hashString);
-    if (_session->GetPlatform() == CLIENT_PLATFORM_X86) // Not on PPC
+    if (_module) // this constant is only used if there is a module
         sha1.UpdateData(reinterpret_cast<const uint8 *>(&magic), sizeof(magic));
     sha1.Finalize();
 
