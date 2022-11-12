@@ -128,7 +128,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     uint32 BuiltNumberClient;
     uint32 id, security;
     LocaleConstant locale;
-    std::string account, os;
+    std::string account, os, platform;
     BigNumber v, s, g, N, K;
     WorldPacket packet, SendAddonPacked;
 
@@ -163,7 +163,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     LoginDatabase.escape_string(safe_account);
     // No SQL injection, username escaped.
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT a.`id`, aa.`gmLevel`, a.`sessionkey`, a.`last_ip`, a.`locked`, a.`v`, a.`s`, a.`mutetime`, a.`locale`, a.`os`, a.`flags`, "
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.`id`, aa.`gmLevel`, a.`sessionkey`, a.`last_ip`, a.`locked`, a.`v`, a.`s`, a.`mutetime`, a.`locale`, a.`os`, a.`platform`, a.`flags`, "
         "ab.`unbandate` > UNIX_TIMESTAMP() OR ab.`unbandate` = ab.`bandate` FROM `account` a LEFT JOIN `account_access` aa ON a.`id` = aa.`id` AND aa.`RealmID` IN (-1, %u) "
         "LEFT JOIN `account_banned` ab ON a.`id` = ab.`id` AND ab.`active` = 1 WHERE a.`username` = '%s' ORDER BY aa.`RealmID` DESC LIMIT 1", realmID, safe_account.c_str());
 
@@ -230,9 +230,10 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     locale = LocaleConstant(fields[8].GetUInt8());
     if (locale >= MAX_LOCALE)
         locale = LOCALE_enUS;
-    os = fields[9].GetString();
-    uint32 accFlags = fields[10].GetUInt32();
-    bool isBanned = fields[11].GetBool();
+    os = fields[9].GetCppString();
+    platform = fields[10].GetCppString();
+    uint32 accFlags = fields[11].GetUInt32();
+    bool isBanned = fields[12].GetBool();
     delete result;
 
     
@@ -308,6 +309,17 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         return -1;
     }
 
+    ClientPlatformType clientPlatform;
+    if (platform == "68x")
+        clientPlatform = CLIENT_PLATFORM_X86;
+    else if (platform == "CPP" && clientOs == CLIENT_OS_MAC)
+        clientPlatform = CLIENT_PLATFORM_PPC;
+    else
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Unrecognized Platform '%s' for account '%s' from %s", platform.c_str(), account.c_str(), address.c_str());
+        return -1;
+    }
+
     // NOTE ATM the socket is single-threaded, have this in mind ...
     ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), mutetime, locale), -1);
 
@@ -318,6 +330,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     m_Session->SetGameBuild(BuiltNumberClient);
     m_Session->SetAccountFlags(accFlags);
     m_Session->SetOS(clientOs);
+    m_Session->SetPlatform(clientPlatform);
     m_Session->LoadGlobalAccountData();
     m_Session->LoadTutorialsData();
     m_Session->InitWarden(&K);

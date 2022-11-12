@@ -22410,6 +22410,26 @@ void Log::Player(WorldSession const* session, LogType logType, LogLevel logLevel
     }
 }
 
+void Log::OutWardenPlayer(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...)
+{
+    char buff[4096];
+    va_list ap;
+    va_start(ap, format);
+    vsnprintf(buff, sizeof(buff), format, ap);
+    va_end(ap);
+
+    std::string log;
+
+    if (m_wardenDebug && logLevel > LOG_LVL_MINIMAL)
+        logLevel = LOG_LVL_MINIMAL;
+
+    if (PlayerLogFormatted(session->GetAccountId(), session, logType, "Warden", logLevel, buff, log))
+    {
+        OutConsole(logType, logLevel, log);
+        OutFile(logType, logLevel, log);
+    }
+}
+
 void Log::Player(WorldSession const* session, LogType logType, char const* subType, LogLevel logLevel, char const* format, ...)
 {
     char buff[4096];

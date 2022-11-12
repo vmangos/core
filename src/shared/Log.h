@@ -163,6 +163,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         // for player-specific messages
         void Player(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(WorldSession const* session, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
+        void OutWardenPlayer(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(uint32 accountId, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
 
@@ -209,6 +210,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         uint16 const m_defaultColor;
 
         // include timestamp in console output
+        bool m_wardenDebug;
         bool m_includeTime;
         uint32 m_logFilter;
 
