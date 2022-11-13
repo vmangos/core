@@ -621,6 +621,16 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Beached Sea Creature Should Not Despawn On Loot (Note To Self: Maybe Convert Beached Sea Creatures Hardcoded Scripts To DB)
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (48555, 48788);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Tallonkai's Dresser Should Not Despawn When Looted
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0, `spawn_flags` = 0 WHERE `guid` = 49828;
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Objects Used In Quest The Relics of Wakening Should Not Despawn when Looted
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (49807, 49810, 49808, 49809);
+
 
 -- End of migration.
 END IF;
