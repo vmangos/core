@@ -594,6 +594,28 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- 604: (602: Target Has Quest 3781 In Log) And (603:  Not (Target Has 1 Points In Skill 182))
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (604, -1, 602, 603, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Convert Lunaclaw Spirit To DB Gossips (credit cmangos)
+UPDATE `creature_template` SET `gossip_menu_id` = 3862, `script_name` = '' WHERE `entry` = 12144;
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(3862, 4714, 0, 0),
+(3863, 4715, 0, 0);
+
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(3862, 0, 0, 'You have fought well, spirit.  I ask you to grant me the strength of your body and the stength of your heart.', 7405, 1, 1, 3863, 0, 386201, 0, 0, '', 0, 610),
+(3862, 1, 0, 'You have fought well, spirit.  I ask you to grant me the strength of your body and the stength of your heart.', 7405, 1, 1, 3863, 0, 386202, 0, 0, '', 0, 611);
+
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(386201, 0, 0, 7, 6001, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunaclaw Spirit - Complete Quest'),
+(386202, 0, 0, 7, 6002, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunaclaw Spirit - Complete Quest');
+
+-- 610: Target Has Incomplete Quest 6001 In Log
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (610, 9, 6001, 1, 0, 0, 0);
+-- 611: Target Has Incomplete Quest 6002 In Log
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (611, 9, 6002, 1, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
