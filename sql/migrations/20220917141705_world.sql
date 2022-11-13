@@ -616,6 +616,11 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- 611: Target Has Incomplete Quest 6002 In Log
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (611, 9, 6002, 1, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Beached Sea Creature Should Not Despawn On Loot (Note To Self: Maybe Convert Beached Sea Creatures Hardcoded Scripts To DB)
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` = 48555;
+
 
 -- End of migration.
 END IF;
