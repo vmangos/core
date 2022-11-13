@@ -1149,7 +1149,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
     // int3 breakpoint
     if (*p == 0xCC)
     {
-        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Detected INT3 EndScene hook.  NOP count = %d.",
+        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Detected INT3 EndScene hook.  NOP count = %d.",
             nopCount);
     }
     // JMP hook
@@ -1158,7 +1158,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
         auto const dest = *reinterpret_cast<const uint32 *>(p + 1);
 
         auto const absoluteDest = _endSceneAddress + nopCount + dest + 5;
-        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Detected JMP EndScene hook.  NOP count = %d.",
+        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Detected JMP EndScene hook.  NOP count = %d.",
             nopCount);
 
         // request a custom scan just to check the JMP destination
@@ -1208,7 +1208,7 @@ uint32 WardenWin::GetScanFlags() const
 
     if (!found)
     {
-        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Invalid client build %u.  Kicking.", _session->GetGameBuild());
+        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Invalid client build %u.  Kicking.", _session->GetGameBuild());
         _session->KickPlayer();
         return ScanFlags::None;
     }

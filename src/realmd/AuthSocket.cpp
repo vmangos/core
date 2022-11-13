@@ -767,9 +767,10 @@ bool AuthSocket::_HandleLogonProof()
         ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
         const char* K_hex = srp.GetStrongSessionKey().AsHexStr();
-        const char *os = reinterpret_cast<char *>(&_os);    // no injection as there are only two possible values
-        auto result = LoginDatabase.PQuery("UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s' WHERE `username` = '%s'",
-            K_hex, get_remote_address().c_str(), GetLocaleByName(_localizationName), os, _safelogin.c_str() );
+        const char *os = reinterpret_cast<char *>(&_os); // no injection as there are only two possible values
+        const char *platform = reinterpret_cast<char *>(&_platform); // no injection as there are only two possible values
+        auto result = LoginDatabase.PQuery("UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
+            K_hex, get_remote_address().c_str(), GetLocaleByName(_localizationName), os, platform, _safelogin.c_str() );
         delete result;
         OPENSSL_free((void*)K_hex);
 
@@ -1398,6 +1399,9 @@ bool AuthSocket::GeographicalLockCheck()
 
 bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect)
 {
+    if (!((_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX)))
+        return false;
+
     if (!sConfig.GetBoolDefault("StrictVersionCheck", false))
         return true;
 
@@ -1405,9 +1409,6 @@ bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versi
     std::array<uint8, 20> const* versionHash = nullptr;
     if (!isReconnect)
     {
-        if (!((_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX)))
-            return false;
-
         RealmBuildInfo const* buildInfo = FindBuildInfo(_build);
         if (!buildInfo)
             return false;

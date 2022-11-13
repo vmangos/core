@@ -31,6 +31,7 @@
 #include "Group.h"
 #include "LFGMgr.h"
 #include "LFGQueue.h"
+#include "Opcodes.h"
 
 INSTANTIATE_SINGLETON_1(LFGMgr);
 

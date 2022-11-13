@@ -247,6 +247,8 @@ void Creature::RemoveFromWorld()
     ///- Remove the creature from the accessor
     if (IsInWorld())
     {
+        if (GetUInt32Value(UNIT_CREATED_BY_SPELL))
+            StartCooldownForSummoner();
         if (AI())
             AI()->OnRemoveFromWorld();
         if (GetObjectGuid().GetHigh() == HIGHGUID_UNIT)
@@ -1994,6 +1996,9 @@ void Creature::SetDeathState(DeathState s)
             SetNoSearchAssistance(false);
             UpdateSpeed(MOVE_RUN, false);
         }
+
+        if (GetUInt32Value(UNIT_CREATED_BY_SPELL))
+            StartCooldownForSummoner();
 
         // return, since we promote to CORPSE_FALLING. CORPSE_FALLING is promoted to CORPSE at next update.
         if (!HasCreatureState(CSTATE_DESPAWNING) && CanFly() && FallGround())
@@ -4082,4 +4087,22 @@ void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
         static_cast<Pet*>(this)->DelayedUnsummon(msTimeToDespawn, PET_SAVE_AS_DELETED);
     else
         ForcedDespawn(msTimeToDespawn);
+}
+
+void Creature::StartCooldownForSummoner()
+{
+    if (!HasCreatureState(CSTATE_IMPOSED_COOLDOWN))
+    {
+        if (SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
+        {
+            if (pSpellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
+            {
+                if (Unit* pOwner = GetOwner())
+                {
+                    AddCreatureState(CSTATE_IMPOSED_COOLDOWN);
+                    pOwner->AddCooldown(*pSpellInfo); // Remove infinity cooldown
+                }
+            }
+        }
+    }
 }
