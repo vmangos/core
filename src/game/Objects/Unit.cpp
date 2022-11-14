@@ -262,6 +262,8 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
             Pet* myPet = GetPet();
             if (HasUnitState(UNIT_STAT_FEIGN_DEATH) || !myPet || myPet->GetHostileRefManager().isEmpty())
             {
+                if (myPet)
+                    printf("Pet Hostile Refs %u\n", myPet->GetHostileRefManager().isEmpty());
                 if (m_HostileRefManager.isEmpty() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
                     ClearInCombat();
             }
@@ -5913,7 +5915,11 @@ void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint
     {
         if (pVictim->IsCharmerOrOwnerPlayerOrPlayerItself() && (combatTimer < UNIT_PVP_COMBAT_TIMER))
             combatTimer = UNIT_PVP_COMBAT_TIMER;
+
         SetInCombatState(combatTimer, pVictim);
+
+        if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
+            pOwner->SetInCombatWithVictim(pVictim, false, combatTimer >= UNIT_PVP_COMBAT_TIMER ? combatTimer : UNIT_PVP_COMBAT_TIMER);
     }
 }
 

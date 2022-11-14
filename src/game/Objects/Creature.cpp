@@ -3433,9 +3433,20 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
         if (CanSummonGuards())
             sGuardMgr.SummonGuard(this, pWho);
 
-        if (IsPet())
-            if (Creature* pOwner = GetOwnerCreature())
-                SetLastLeashExtensionTimePtr(pOwner->GetLastLeashExtensionTimePtr());
+        if (Unit* pOwner = GetCharmerOrOwner())
+        {
+            if (pOwner->IsPlayer())
+            {
+                if (pWho->IsValidAttackTarget(pOwner))
+                {
+                    pWho->AddThreat(pOwner);
+                    pWho->SetInCombatWithVictim(pOwner);
+                    pOwner->SetInCombatWithAggressor(pWho);
+                }
+            }
+            else
+                SetLastLeashExtensionTimePtr(static_cast<Creature*>(pOwner)->GetLastLeashExtensionTimePtr());
+        }
     }
 }
 
