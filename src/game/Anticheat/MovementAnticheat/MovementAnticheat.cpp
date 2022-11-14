@@ -1003,6 +1003,7 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 {
     if ((opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
         (opcode == CMSG_MOVE_SPLINE_DONE) ||
+        IsInKnockBack() ||
         !GetLastMovementInfo().ctime ||
         me->IsTaxiFlying() || 
         me->IsBeingTeleported())
