@@ -262,8 +262,6 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
             Pet* myPet = GetPet();
             if (HasUnitState(UNIT_STAT_FEIGN_DEATH) || !myPet || myPet->GetHostileRefManager().isEmpty())
             {
-                if (myPet)
-                    printf("Pet Hostile Refs %u\n", myPet->GetHostileRefManager().isEmpty());
                 if (m_HostileRefManager.isEmpty() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
                     ClearInCombat();
             }
