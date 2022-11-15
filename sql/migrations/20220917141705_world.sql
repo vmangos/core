@@ -621,15 +621,36 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Beached Sea Creature Should Not Despawn On Loot (Note To Self: Maybe Convert Beached Sea Creatures Hardcoded Scripts To DB)
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (48555, 48788);
 
--- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 -- Tallonkai's Dresser Should Not Despawn When Looted
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0, `spawn_flags` = 0 WHERE `guid` = 49828;
 
--- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 -- Objects Used In Quest The Relics of Wakening Should Not Despawn when Looted
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (49807, 49810, 49808, 49809);
+
+-- Objects Used In Quest Deep Ocean, Vast Sea Should Not Despawn When Looted
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (48652, 48653);
+
+-- Objects Used In Quest Trial Of The Sea Lion Should Not Despawn When Looted
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (48785, 21141, 21142);
+
+-- Blackwood Nut Stores Should Not Despawn When Looted
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (48671, 48616, 48605);
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Stop Blubber Gump Castin Fishing If Player Already Has It
+-- 810:  Not (Target Has 1 Points In Skill 356)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (810, 7, 356, 1, 0, 0, 1);
+
+DELETE FROM `gossip_scripts` WHERE `id`=256200;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(256200, 0, 0, 15, 7733, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 810, 'Gubber Blump  - Teach Fishing'),
+(256200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5531, 0, 0, 0, 0, 0, 0, 0, 0, 'Gubber Blump  - Say Text');
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Cant Reset Talents At Loganaar  Untill TBC
+DELETE FROM `gossip_menu_option` WHERE `menu_id` = 4687 AND `id`=1;
 
 
 -- End of migration.
