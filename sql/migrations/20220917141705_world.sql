@@ -652,6 +652,14 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 -- Cant Reset Talents At Loganaar  Untill TBC
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 4687 AND `id`=1;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Silithid Protector Should Talk On Spawn
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3503;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (350301, 3503, 0, 11, 0, 100, 0, 0, 0, 0, 0, 350301, 0, 0, 'Silithid Protector - Talk On Spawn');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(350301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1080, 0, 0, 0, 0, 0, 0, 0, 0, 'Silithid Protector - Talk');
+
 
 -- End of migration.
 END IF;
