@@ -3292,7 +3292,7 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid)
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
 uint32 Player::GetWhoListPartyStatus() const
 {
-    if (sLFGMgr.IsPlayerInQueue(GetObjectGuid()))
+    if (IsInLFG())
         return WHO_PARTY_STATUS_LFG;
 
     if (GetGroup())
