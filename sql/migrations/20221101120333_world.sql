@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20221101120333');
 -- Add your query below.
 
 -- 90 (Seasoned Wolf Kabobs) should require a Cooking skill of 50 (currently requires 0)
-UPDATE `quest_template` SET `RequiredSkill` = 185, `RequiredSkillValue` = 50 WHERE `entry` = 769;
+UPDATE `quest_template` SET `RequiredSkill` = 185, `RequiredSkillValue` = 50 WHERE `entry` = 90;
 
 -- 769 (Kodo Hide Bag) should require a Leatherworking skill of 10 (currently requires 1)
 UPDATE `quest_template` SET `RequiredSkillValue` = 10 WHERE `entry` = 769;
