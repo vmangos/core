@@ -9,6 +9,23 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 -- Add your query below.
 
 
+-- 0. SETUP
+
+    SET @NPC_NPC_FLAMESHOCKER_GUID                                  = 66900;
+    SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 21841;
+    SET @GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID               = 24166;
+    SET @GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID                    = 24418;
+    SET @GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID                    = 24670;
+    SET @GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID              = 25119;
+    SET @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID        = 27173;
+    SET @GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID            = 27341;
+    SET @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING              = 90;
+    SET @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS                   = 91;
+    SET @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA                   = 92;
+    SET @EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS             = 93;
+    SET @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS       = 94;
+    SET @EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES           = 95;
+
 -- 1. ADJUSTMENTS
 
     -- creature_template:
@@ -19,7 +36,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_template` SET `auras`='28346 27887' WHERE `entry` IN (16136, 16172);
     UPDATE `creature_template` SET `auras`='28395' WHERE `entry`=16401;
     UPDATE `creature_template` SET `spell_list_id`=163830, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16383;
-    UPDATE `creature_template` SET `unit_flags`=64, `spell_list_id`=161430, `detection_range`=15, `call_for_help_range`=25, `spawn_spell_id`=10389, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
+    UPDATE `creature_template` SET `unit_flags`=832, `spell_list_id`=161430, `detection_range`=15, `call_for_help_range`=25, `spawn_spell_id`=10389, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
     UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16394;
     UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16382;
     UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16401, 16386, 16398, 16172, 16230, 16136, 16356, 16306, 16336, 16338);
@@ -36,7 +53,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (181163, 9, 6, 327, 'Minion Spawner, finder', 0, 0, 1, 0, 0, 0, 28227, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
         -- (181214, 9, 6, 327, 'Necropolis critter spawner', 0, 0, 1, 0, 0, 0, 27866, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
-
     -- spell_script_target:
     UPDATE `spell_script_target` SET `type`=0, `targetEntry`=181142 WHERE `entry`=31315 AND `type`=1 AND `targetEntry`=16230;
     DELETE FROM `spell_script_target` WHERE `entry`=28364 AND `type`=1 AND `targetEntry`=7980;
@@ -51,22 +67,23 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (27886, 0, 181112, 0, 0, 5464, 5875),
         (28364, 1, 16432, 0, 0, 5464, 5875),
         (28364, 1, 16396, 0, 0, 5464, 5875);
-        
+
     -- gameobject:
-    UPDATE `gameobject` SET `spawn_flags`=1, `visibility_mod`=5000 WHERE `id` IN (181154, 181373, 181374, 181215, 181223, 181172);
-    
+    UPDATE `gameobject` SET `spawn_flags`=1, `visibility_mod`=533 WHERE `id` IN (181154, 181373, 181374, 181215, 181223, 181172);
+
     -- creature:
-    UPDATE `creature` SET `spawn_flags`=1, `visibility_mod`=5000 WHERE `id` IN (16401, 16386, 16398, 16172, 16136);
-    
+    UPDATE `creature` SET `spawn_flags`=1, `visibility_mod`=533 WHERE `id` IN (16401, 16386, 16398, 16172, 16136);
+
     -- creature_spells:
     REPLACE INTO `creature_spells`(`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
-        (162990, 'Scourge Invasion - Skeletal Shocktrooper', 17014, 100, 0, 0, 0, 34, 1, 28, 16, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        (161410, 'Scourge Invasion - Ghoul Berserker', 7367, 50, 1, 0, 0, 32, 6, 47, 11, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        (162980, 'Scourge Invasion - Spectral Soldier', 16244, 50, 1, 0, 0, 32, 5, 54, 17, 43, 0, 21081, 50, 1, 0, 0, 96, 0, 27, 6, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        (146970, 'Scourge Invasion - Lumbering Horror', 16790, 100, 1, 0, 0, 0, 8, 66, 17, 22, 0, 5568, 100, 0, 0, 0, 0, 6, 24, 13, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        (163940, 'Scourge Invasion - Pallid Horror', 28364, 100, 1, 0, 0, 2, 5, 30, 10, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        (163830, 'Scourge Invasion - Flameshocker', 28314, 100, 1, 0, 0, 0, 5, 40, 20, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        (161430, 'Scourge Invasion - Shadow of Doom', 12542, 100, 1, 0, 0, 0, 4, 38, 16, 38, 0, 16568, 100, 1, 0, 0, 136, 3, 38, 4, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        (162990, 'Scourge Invasion - Skeletal Shocktrooper', 17014, 100, 0, 0, 0, 34, 1, 28, 16, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (161410, 'Scourge Invasion - Ghoul Berserker', 7367, 50, 1, 0, 0, 32, 6, 47, 11, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (162980, 'Scourge Invasion - Spectral Soldier', 16244, 50, 1, 0, 0, 32, 5, 54, 17, 43, 0, 21081, 50, 1, 0, 0, 96, 0, 27, 6, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (146970, 'Scourge Invasion - Lumbering Horror', 16790, 100, 1, 0, 0, 0, 8, 66, 17, 22, 0, 5568, 100, 0, 0, 0, 0, 6, 24, 13, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (163940, 'Scourge Invasion - Pallid Horror', 28364, 100, 1, 0, 0, 2, 5, 30, 10, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (163830, 'Scourge Invasion - Flameshocker', 28314, 100, 1, 0, 0, 0, 5, 40, 20, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (161430, 'Scourge Invasion - Shadow of Doom', 12542, 100, 1, 0, 0, 0, 4, 38, 16, 38, 0, 16568, 100, 1, 0, 0, 136, 3, 38, 4, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (163800, 'Scourge Invasion - Bone Witch', 17014, 50, 0, 0, 0, 34, 1, 8, 8, 19, 0, 13748, 100, 1, 0, 0, 136, 1, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     -- spell_group:
     -- Only one Camp Type should be applied.
@@ -76,18 +93,33 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1009, 1, 28198, 0, 5875),
     (1009, 2, 28199, 0, 5875);
 
--- 2. OLD CRAP
+
+-- 2. DELETIONS
+
+    -- For GameObject Respawn
+    DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING);
+    DELETE FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING;
+    DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_TANARIS);
+    DELETE FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_TANARIS;
+    DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA);
+    DELETE FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA;
+    DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS);
+    DELETE FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS;
+    DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS);
+    DELETE FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS;
+    DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES);
+    DELETE FROM `game_event_gameobject` WHERE `event`=@EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES;
 
     -- Delete some old Scripts
     DELETE FROM `creature_ai_scripts` WHERE `dataint`=12366 AND `dataint2`=12367 AND `dataint3`=12368 AND `dataint4`=12369;
     DELETE FROM `creature_ai_scripts` WHERE `dataint`=12370 AND `dataint2`=12371 AND `dataint3`=12372 AND `dataint4`=12373;
-    
+
     -- Remove some old conditions
     DELETE FROM `conditions` WHERE `condition_entry`=3319;
     DELETE FROM `conditions` WHERE `condition_entry`=3320;
     DELETE FROM `conditions` WHERE `condition_entry`=3321;
     DELETE FROM `conditions` WHERE `condition_entry`=3322;
-    
+
     -- Delete some old AIEvents
     DELETE FROM `creature_ai_events` WHERE `id`=143202;
     DELETE FROM `creature_ai_events` WHERE `id`=351802;
@@ -99,8 +131,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_events` WHERE `id`=1576601;
 
     -- Delete all NPCs (Scourge Invasion Minion, finder)
-    DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16356))
-    DELETE FROM `creature` WHERE `id` IN (16356)
+    DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16356));
+    DELETE FROM `creature` WHERE `id` IN (16356);
+
 
 -- 3. WAYPOINTS
 
@@ -123,147 +156,151 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     -- Waypoints to Stormwind City Trade District
     DELETE FROM `creature_movement_special` WHERE `id`=151902;
     INSERT INTO `creature_movement_special`(`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-    (151902, 1, -8579.1, 887.148, 87.3929, 100, 0, 0, 0),
-    (151902, 2, -8570.88, 892.36, 91.993, 100, 0, 0, 0),
-    (151902, 3, -8564.6, 897.153, 96.9478, 100, 0, 0, 0),
-    (151902, 4, -8549.92, 877.133, 96.7929, 100, 0, 0, 0),
-    (151902, 5, -8543.22, 868.753, 96.7929, 100, 0, 0, 0),
-    (151902, 6, -8537.07, 875.58, 100.005, 100, 2000, 0, 151910),-- script
-    (151902, 7, -8546.02, 879.632, 106.593, 100, 0, 0, 0),
-    (151902, 8, -8541.49, 866.118, 106.593, 100, 0, 0, 0),
-    (151902, 9, -8533.81, 856.431, 106.593, 100, 0, 0, 0),
-    (151902, 10, -8532.74, 845.93, 106.593, 100, 0, 0, 0),
-    (151902, 11, -8581.39, 807.936, 106.593, 100, 0, 0, 0),
-    (151902, 12, -8590.56, 800, 106.593, 100, 0, 0, 0),
-    (151902, 13, -8604.3, 790.581, 101.868, 100, 0, 0, 0),
-    (151902, 14, -8615.9, 782.065, 97.4223, 100, 0, 0, 0),
-    (151902, 15, -8657.82, 765.941, 96.8583, 100, 0, 0, 0),
-    (151902, 16, -8667.11, 741.506, 97.3129, 100, 0, 0, 0),
-    (151902, 17, -8679.19, 730.865, 97.1929, 100, 0, 0, 0),
-    (151902, 18, -8703.26, 720.906, 97.2426, 100, 0, 0, 0),
-    (151902, 19, -8713.43, 732.562, 98.0932, 100, 0, 0, 0),
-    (151902, 20, -8730.05, 723.179, 101.723, 100, 0, 0, 0),
-    (151902, 21, -8742.55, 713.155, 98.5837, 100, 0, 0, 0),
-    (151902, 22, -8748.63, 715.417, 97.9962, 100, 0, 0, 0),
-    (151902, 23, -8756.88, 729.102, 98.2915, 100, 0, 0, 0),
-    (151902, 24, -8773.3, 739.74, 99.6768, 100, 0, 0, 0),
-    (151902, 25, -8788.64, 745.475, 98.5872, 100, 0, 0, 0),
-    (151902, 26, -8806.15, 742.132, 97.6887, 100, 0, 0, 0),
-    (151902, 27, -8831.88, 727.151, 98.1724, 100, 0, 0, 0),
-    (151902, 28, -8821.21, 733.939, 98.209, 100, 0, 0, 0),
-    (151902, 29, -8841.4, 722.085, 97.4218, 100, 0, 0, 0),
-    (151902, 30, -8841.67, 713.854, 97.6529, 100, 0, 0, 0),
-    (151902, 31, -8825.71, 679.552, 97.4529, 100, 2000, 0, 151920),-- script
-    (151902, 32, -8849.6, 662.838, 97.3679, 100, 0, 0, 0),
-    (151902, 33, -8849.48, 651.768, 96.6965, 100, 0, 0, 0),
-    (151902, 34, -8837.5, 633.082, 94.4883, 100, 0, 0, 0),
-    (151902, 35, -8836.31, 619.164, 93.1596, 100, 0, 0, 0),
-    (151902, 36, -8793.94, 642.32, 94.5643, 100, 0, 0, 0),
-    (151902, 37, -8844.22, 609.65, 92.8836, 100, 0, 0, 0);
+        (151902, 1, -8579.1, 887.148, 87.3929, 100, 0, 0, 0),
+        (151902, 2, -8570.88, 892.36, 91.993, 100, 0, 0, 0),
+        (151902, 3, -8564.6, 897.153, 96.9478, 100, 0, 0, 0),
+        (151902, 4, -8549.92, 877.133, 96.7929, 100, 0, 0, 0),
+        (151902, 5, -8543.22, 868.753, 96.7929, 100, 0, 0, 0),
+        (151902, 6, -8537.07, 875.58, 100.005, 100, 2000, 0, 151910),-- script
+        (151902, 7, -8546.02, 879.632, 106.593, 100, 0, 0, 0),
+        (151902, 8, -8541.49, 866.118, 106.593, 100, 0, 0, 0),
+        (151902, 9, -8533.81, 856.431, 106.593, 100, 0, 0, 0),
+        (151902, 10, -8532.74, 845.93, 106.593, 100, 0, 0, 0),
+        (151902, 11, -8581.39, 807.936, 106.593, 100, 0, 0, 0),
+        (151902, 12, -8590.56, 800, 106.593, 100, 0, 0, 0),
+        (151902, 13, -8604.3, 790.581, 101.868, 100, 0, 0, 0),
+        (151902, 14, -8615.9, 782.065, 97.4223, 100, 0, 0, 0),
+        (151902, 15, -8657.82, 765.941, 96.8583, 100, 0, 0, 0),
+        (151902, 16, -8667.11, 741.506, 97.3129, 100, 0, 0, 0),
+        (151902, 17, -8679.19, 730.865, 97.1929, 100, 0, 0, 0),
+        (151902, 18, -8703.26, 720.906, 97.2426, 100, 0, 0, 0),
+        (151902, 19, -8713.43, 732.562, 98.0932, 100, 0, 0, 0),
+        (151902, 20, -8730.05, 723.179, 101.723, 100, 0, 0, 0),
+        (151902, 21, -8742.55, 713.155, 98.5837, 100, 0, 0, 0),
+        (151902, 22, -8748.63, 715.417, 97.9962, 100, 0, 0, 0),
+        (151902, 23, -8756.88, 729.102, 98.2915, 100, 0, 0, 0),
+        (151902, 24, -8773.3, 739.74, 99.6768, 100, 0, 0, 0),
+        (151902, 25, -8788.64, 745.475, 98.5872, 100, 0, 0, 0),
+        (151902, 26, -8806.15, 742.132, 97.6887, 100, 0, 0, 0),
+        (151902, 27, -8831.88, 727.151, 98.1724, 100, 0, 0, 0),
+        (151902, 28, -8821.21, 733.939, 98.209, 100, 0, 0, 0),
+        (151902, 29, -8841.4, 722.085, 97.4218, 100, 0, 0, 0),
+        (151902, 30, -8841.67, 713.854, 97.6529, 100, 0, 0, 0),
+        (151902, 31, -8825.71, 679.552, 97.4529, 100, 2000, 0, 151920),-- script
+        (151902, 32, -8849.6, 662.838, 97.3679, 100, 0, 0, 0),
+        (151902, 33, -8849.48, 651.768, 96.6965, 100, 0, 0, 0),
+        (151902, 34, -8837.5, 633.082, 94.4883, 100, 0, 0, 0),
+        (151902, 35, -8836.31, 619.164, 93.1596, 100, 0, 0, 0),
+        (151902, 36, -8793.94, 642.32, 94.5643, 100, 0, 0, 0),
+        (151902, 37, -8844.22, 609.65, 92.8836, 100, 0, 0, 0);
+
 
 -- 4. CONDITIONS
 
     -- 601: Source's Guid Is 66917(Pallid Horror in Stormwind City Cathedral of Light)
     INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (601, 52, 66917, 0, 0, 0, 0);
-    
+
     -- 602: Source's Guid Is 66931(Pallid Horror in Undercity Canals)
     INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (602, 52, 66931, 0, 0, 0, 0);
-    
+
     -- 603: Source's Guid Is 66945(Pallid Horror in Undercity Sewers)
     INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (603, 52, 66945, 0, 0, 0, 0);
-    
+
     -- 604: Source's Guid Is 66945(Patchwork Terror in Stormwind City)
     INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (604, 52, 66961, 0, 0, 0, 0);
-    
+
     -- 605: Source's Guid Is 66901 Or 66903 Or 66902(Flameshockers in Stormwind City Mage Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (605, 52, 66901, 66903, 66902, 0, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (605, 52, 66901, 66903, 66902, 0, 0);
+
     -- 606: Source's Guid Is 66904 Or 66905 Or 66906 Or 66907(Flameshockers in Stormwind City Trade District)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (606, 52, 66904, 66905, 66906, 66907, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (606, 52, 66904, 66905, 66906, 66907, 0);
+
     -- 607: Source's Guid Is 66908 Or 66909 Or 66910(Flameshockers in Stormwind City The Park)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (607, 52, 66908, 66909, 66910, 0, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (607, 52, 66908, 66909, 66910, 0, 0);
+
     -- 608: Source's Guid Is 66911 Or 66912 Or 66913(Flameshockers in Stormwind City Old Town)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (608, 52, 66911, 66912, 66913, 0, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (608, 52, 66911, 66912, 66913, 0, 0);
+
     -- 609: Source's Guid Is 66920 Or 66920 Or 66922(Flameshockers in Stormwind City Dwarven District)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (609, 52, 66920, 66921, 66922, 0, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (609, 52, 66920, 66921, 66922, 0, 0);
+
     -- 610: Source's Guid Is 66923 Or 66924 Or 66925 Or 66926(Flameshockers in Undercity Rogues Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (610, 52, 66923, 66924, 66925, 66926, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (610, 52, 66923, 66924, 66925, 66926, 0);
+
     -- 611: Source's Guid Is 66927 Or 66930 Or 66935(Flameshockers in Undercity Rogues Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (611, 52, 66927, 66930, 66935, 0, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (611, 52, 66927, 66930, 66935, 0, 0);
+
     -- 612:(610: Source's Guid Is 66923 Or 66924 Or 66925 Or 66926) Or(611: Source's Guid Is 66927 Or 66930 Or 66935)
     INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (612, -2, 610, 611, 0, 0, 0);
-    
+
     -- 613: Source's Guid Is 66936 Or 66937 Or 66938 Or 66939(Flameshockers in Undercity Trade Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (613, 52, 66936, 66937, 66938, 66939, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (613, 52, 66936, 66937, 66938, 66939, 0);
+
     -- 614: Source's Guid Is 66940(Flameshockers in Undercity Trade Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (614, 52, 66940, 0, 0, 0, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (614, 52, 66940, 0, 0, 0, 0);
+
     -- 615:(613: Source's Guid Is 66936 Or 66937 Or 66938 Or 66939) Or(614: Source's Guid Is 66940)
     INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (615, -2, 613, 614, 0, 0, 0);
-    
+
     -- 616: Source's Guid Is 66951 Or 66953 Or 66955 Or 66956(Flameshockers in Undercity Magic Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (616, 52, 66951, 66953, 66955, 66956, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (616, 52, 66951, 66953, 66955, 66956, 0);
+
     -- 617: Source's Guid Is 66958 Or 66960(Flameshockers in Undercity Magic Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (617, 52, 66958, 66960, 0, 0, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (617, 52, 66958, 66960, 0, 0, 0);
+
     -- 618:(616: Source's Guid Is 66951 Or 66953 Or 66955 Or 66956) Or(617: Source's Guid Is 66958 Or 66960)
     INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (618, -2, 616, 617, 0, 0, 0);
-    
+
     -- 619: Source's Guid Is 66952 Or 66954 Or 66957 Or 66959(Flameshockers in Undercity War Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (619, 52, 66952, 66954, 66957, 66959, 0); 
-    
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (619, 52, 66952, 66954, 66957, 66959, 0);
+
     -- 620: Source or Target Is In Zone or Area 4 (Blasted Lands)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (620, 4, 4, 0, 0, 0, 0);
-    
+
     -- 621: Source or Target Is In Zone or Area 16 (Azshara)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (621, 4, 16, 0, 0, 0, 0);
-    
+
     -- 622: Source or Target Is In Zone or Area 46 (Burning Steppes)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (622, 4, 46, 0, 0, 0, 0);
-    
+
     -- 623: Source or Target Is In Zone or Area 139 (Eastern Plaguelands)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (623, 4, 139, 0, 0, 0, 0);
-    
+
     -- 624: Source or Target Is In Zone or Area 440 (Tanaris)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (624, 4, 440, 0, 0, 0, 0);
-    
+
     -- 625: Source or Target Is In Zone or Area 618 (Winterspring)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (625, 4, 618, 0, 0, 0, 0);
-    
+
     -- 626: (620: Source or Target Is In Zone or Area 4) Or (621: Source or Target Is In Zone or Area 16) Or (622: Source or Target Is In Zone or Area 46) Or (623: Source or Target Is In Zone or Area 139)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (626, -2, 620, 621, 622, 623, 0);
-    
+
     -- 627: (624: Source or Target Is In Zone or Area 440) Or (625: Source or Target Is In Zone or Area 618)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (627, -2, 624, 625, 0, 0, 0);
-    
+
     -- 628: (626: (620: Source or Target Is In Zone or Area 4) Or (621: Source or Target Is In Zone or Area 16) Or (622: Source or Target Is In Zone or Area 46) Or (623: Source or Target Is In Zone or Area 139)) Or (627: (624: Source or Target Is In Zone or Area 440) Or (625: Source or Target Is In Zone or Area 618))
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (628, -2, 626, 627, 0, 0, 0);
-    
+
     -- 629: Game Event 93 Is Active (Scourge Invasion: Blasted Lands)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (629, 12, 93, 0, 0, 0, 0);
-    
+
     -- 630: Game Event 92 Is Active (Scourge Invasion: Azshara)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (630, 12, 92, 0, 0, 0, 0);
-    
+
     -- 631: Game Event 95 Is Active (Scourge Invasion: Burning Steppes)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (631, 12, 95, 0, 0, 0, 0);
-    
+
     -- 632: Game Event 94 Is Active (Scourge Invasion: Eastern Plaguelands)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (632, 12, 94, 0, 0, 0, 0);
-    
+
     -- 633: Game Event 91 Is Active (Scourge Invasion: Tanaris)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (633, 12, 91, 0, 0, 0, 0);
-    
+
     -- 634: Game Event 90 Is Active (Scourge Invasion: Winterspring)
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (634, 12, 90, 0, 0, 0, 0);
+
+    -- 16143:  Not (Source Is Player)
+    REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16143, 28, 0, 0, 0, 0, 1);
 
     -- 1    Dun Morogh
     -- 4    Blasted Lands
@@ -282,87 +319,92 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     -- 1637    Orgrimmar
     -- 1638    Thunder Bluff
 
+
 -- 5. EVENTAI
 
     -- Events list for Mouth of Kel'Thuzad
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16995;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1699501, 16995, 0, 1, 0, 100, 1, 0, 2700000, 2700000, 2700000, 1699501, 0, 0, 'Mouth of Kel\'Thuzad - Timer OOC');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1699501;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1699501, 0, 1, 39, 1699501, 1699502, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 628, 'Mouth of Kel\'Thuzad - Start Script: Random Yell'),
     (1699501, 0, 2, 39, 1699503, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Start Script: Start Zone');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1699501;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1699501, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13121, 13122, 13123, 13124, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1699502;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1699502, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13125, 13126, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1699503;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1699503, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13121, 13123, 13125, 13126, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk'),
     (1699503, 0, 0, 53, 90, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Start Game Event');
-    
+
     -- Events list for Scourge Invasion Minion, finder
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16356;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1635601, 16356, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1635601, 0, 0, 'Finder - Just Spawned');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1635601;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1635601, 0, 0, 39, 1635601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Start Script');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1635601;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1635601, 0, 0, 15, 28203, 2, 0, 0, 16136, 60, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Cast Spell On Necrotic Shard'),
-    (1635601, 0, 0, 15, 28203, 2, 0, 0, 16172, 60, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Cast Spell On Damaged Necrotic Shrard');
-    
+    (1635601, 0, 1, 15, 28203, 2, 0, 0, 16172, 60, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Cast Spell On Damaged Necrotic Shrard'),
+    (1635601, 0, 1, 15, 28203, 2, 0, 0, 16136, 60, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Cast Spell On Necrotic Shard'),
+    (1635601, 2, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Despawn self');
+
     -- Events list for Scourge Invasion Minion, spawner, Ghost/Ghoul
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16306;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1630601, 16306, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1630601, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Just Spawned');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1630601;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1630601, 0, 0, 39, 1630601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Start Script');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1630601;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1630601, 2, 0, 15, 28183, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Cast Spell');
-    
+    (1630601, 2, 1, 15, 28183, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Cast Spell'),
+    (1630601, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Despawn self');
+
     -- Events list for Scourge Invasion Minion, spawner, Ghost/Skeleton
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16336;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1633601, 16336, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1633601, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Just Spawned');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1633601;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1633601, 0, 0, 39, 1633601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Start Script');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1633601;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1633601, 2, 0, 15, 28184, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Cast Spell');
-    
+    (1633601, 2, 0, 15, 28184, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Cast Spell'),
+    (1633601, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Despawn self');
+
     -- Events list for Scourge Invasion Minion, spawner, Ghoul/Skeleton
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16338;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1633801, 16338, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1633801, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Just Spawned');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1633801;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1633801, 0, 0, 39, 1633801, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Start Script');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1633801;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1633801, 2, 0, 15, 28185, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Cast Spell');
-    
+    (1633801, 2, 0, 15, 28185, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Cast Spell'),
+    (1633801, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Despawn self');
+
     -- Events list for Necropolis health
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16421;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642101, 16421, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1642101, 0, 0, 'Necropolis Health - Hit By Spell');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1642101;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1642101, 0, 0, 15, 28386, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Health - Cast Spell');
-    
+
     -- Events list for Pallid Horror
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16394;
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639401, 16394, 0, 1, 0, 100, 3, 0, 0, 60000, 90000, 1639401, 1639402, 0, 'Pallid Horror - Timer OOC');
@@ -372,51 +414,51 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639406, 16394, 0, 27, 0, 100, 0, 28313, 1, 0, 0, 1639406, 0, 0, 'Pallid Horror - Missing Aura');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639407, 16394, 603, 6, 0, 100, 0, 0, 0, 0, 0, 1639407, 0, 0, 'Pallid Horror - Death: Undercity');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639408, 16394, 604, 6, 0, 100, 0, 0, 0, 0, 0, 1639408, 0, 0, 'Pallid Horror - Death: Stormwind');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639401;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639401, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12325, 12326, 12327, 12328, 0, 0, 0, 0, 0, 'Pallid Horror - Random Zone Yell');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639402;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639402, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12329, 12330, 12342, 12343, 0, 0, 0, 0, 0, 'Pallid Horror - Random Zone Yell');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639403;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639403, 0, 0, 59, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Set React State Defensive'),
     (1639403, 0, 0, 39, 1639403, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 601, 'Pallid Horror - Start Script: Stormwind Cathedral'),
     (1639403, 0, 0, 39, 1639404, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 602, 'Pallid Horror - Start Script: Undercity Canals'),
     (1639403, 0, 0, 39, 1639405, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 603, 'Pallid Horror - Start Script: Undercity Sewers');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639404;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639404, 0, 1, 15, 28699, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Summon Faint Necrotic Crystal'),
     (1639404, 0, 2, 18, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Despawn 5 seconds after Death');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639405;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639405, 0, 0, 27, 16382, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Update Entry to Patchwork Terror');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639406;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639406, 0, 0, 74, 28313, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Add Aura of Fear');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639407;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639407, 0, 3, 39, 1639401, 0, 0, 0, 32039, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Undercity Sewers: Lady Sylvanas Windrunner Zone Yell');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639408;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639408, 0, 4, 39, 1639402, 0, 0, 0, 10495, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1639401;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639401, 2, 0, 0, 6, 0, 0, 0, 0, 0, 0, 16, 12331, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Undercity Sewers: Lady Sylvanas Windrunner Zone Yell');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1639402;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639402, 2, 0, 0, 6, 0, 0, 0, 0, 0, 0, 16, 12318, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1639403;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, -8585.14, 903.542, 81.7025, 4.72984, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
@@ -425,7 +467,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, -8580.33, 901.258, 81.7028, 3.92699, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
     (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, -8579.29, 907.101, 81.702, 3.92699, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
     (1639403, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 151902, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Stormwind Cathedral');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1639404;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1532.72, 273.599, -62.0943, 1.25664, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
@@ -434,7 +476,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1537.21, 278.743, -62.0943, 1.20428, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
     (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1539.85, 274.237, -62.0943, 1.20428, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
     (1639404, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 149701, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Canals');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1639405;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1626.6, 481.696, -22.7855, 5.23599, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
@@ -447,123 +489,120 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1634.59, 477.738, -21.8358, 4.4855, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
     (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1634.67, 479.701, -21.8066, 1.64061, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
     (1639405, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 149702, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Sewers');
-    
+
     -- Events list for Skeletal Shocktrooper
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16299;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629901, 16299, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1629901, 0, 0, 'Skeletal Shocktrooper - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629902, 16299, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1629902, 0, 0, 'Skeletal Shocktrooper - Despawn on Hit by Spirit Spawn-out');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629903, 16299, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1629903, 0, 0, 'Skeletal Shocktrooper - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1629903;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1629903, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Skeletal Shocktrooper - Cast Spell Scourge Strike');
-    
+
     -- Events list for Ghoul Berserker
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16141;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614101, 16141, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1614101, 0, 0, 'Ghoul Berserker - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614102, 16141, 0, 2, 0, 100, 1, 20, 1, 5000, 10000, 1614102, 0, 0, 'Ghoul Berserker - Enrage at 20% HP');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614103, 16141, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1614103, 0, 0, 'Ghoul Berserker - Despawn on Hit by Spirit Spawn-out');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614104, 16141, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1614104, 0, 0, 'Ghoul Berserker - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1614104;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1614104, 0, 0, 15, 28265, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Ghoul Berserker - Cast Spell Scourge Strike');
-    
+
     -- Events list for Spectral Soldier
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16298;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629801, 16298, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1629801, 0, 0, 'Spectral Soldier - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629802, 16298, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1629802, 0, 0, 'Spectral Soldier - Despawn on Hit by Spirit Spawn-out');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629803, 16298, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1629803, 0, 0, 'Spectral Soldier - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1629803;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1629803, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Spectral Soldier - Cast Spell Scourge Strike');
-    
+
     -- Events list for Lumbering Horror
     DELETE FROM `creature_ai_events` WHERE `creature_id`=14697;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469701, 14697, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1469701, 0, 0, 'Lumbering Horror - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469702, 14697, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1469702, 0, 0, 'Lumbering Horror - Despawn on Hit by Spirit Spawn-out');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469703, 14697, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1469703, 0, 0, 'Lumbering Horror - Cast Scourge Strike');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469704, 14697, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1469704, 0, 0, 'Lumbering Horror - Cast Aura of Fear');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1469703;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1469703, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Lumbering Horror - Cast Spell Scourge Strike');
-    
+
     -- Events list for Bone Witch
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16380;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638001, 16380, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1638001, 0, 0, 'Bone Witch - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638002, 16380, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1638002, 0, 0, 'Bone Witch - Despawn on Hit by Spirit Spawn-out');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638003, 16380, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1638003, 0, 0, 'Bone Witch - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638003;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638003, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Bone Witch - Cast Spell Scourge Strike');
-    
+
     -- Events list for Spirit of the Damned
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16379;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637901, 16379, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1637901, 0, 0, 'Spirit of the Damned - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637902, 16379, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1637902, 0, 0, 'Spirit of the Damned - Despawn on Hit by Spirit Spawn-out');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637903, 16379, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1637903, 0, 0, 'Spirit of the Damned - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1637903;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1637903, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Spirit of the Damned - Cast Spell Scourge Strike');
-    
+
     -- Events list for Skeletal Trooper
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16438;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643801, 16438, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1643801, 0, 0, 'Skeletal Trooper - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1643801;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1643801, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Skeletal Trooper - Cast Spell Scourge Strike');
-    
+
     -- Events list for Spectral Spirit
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16437;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643701, 16437, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1643701, 0, 0, 'Spectral Spirit - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1643701;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1643701, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Spectral Spirit - Cast Spell Scourge Strike');
-    
+
     -- Events list for Skeletal Soldier
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16422;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642201, 16422, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1642201, 0, 0, 'Skeletal Soldier - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1642201;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1642201, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Skeletal Soldier - Cast Spell Scourge Strike');
-    
+
     -- Events list for Spectral Apparition
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16423;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642301, 16423, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1642301, 0, 0, 'Spectral Apparition - Cast Scourge Strike');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1642301;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1642301, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Spectral Apparition - Cast Spell Scourge Strike');
-    
+
     -- Events list for Shadow of Doom
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16143;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614301, 16143, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1614301, 0, 0, 'Shadow of Doom - Just Spawned');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614302, 16143, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1614302, 0, 0, 'Shadow of Doom - Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614303, 16143, 0, 0, 0, 100, 0, 0, 35000, 5000, 30000, 1614303, 0, 0, 'Shadow of Doom - Timer In Combat');
-    
-    -- 16143:  Not (Source Is Player)
-    REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16143, 28, 0, 0, 0, 0, 3);
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1614301;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1614301, 0, 0, 39, 1614301, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Start Script');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1614302;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1614302, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Leave Creature Group'),
     (1614302, 0, 0, 15, 28056, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Cast Zap Crystal Corpse');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1614303;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1614303, 0, 0, 15, 28265, 6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16143, 'Shadow of Doom - Cast Spell: Scourge Strike on Non Players');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1614301;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1614301, 0, 0, 41, 0, 0, 0, 0, 181142, 2, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Object(Summoner Shield)'),
@@ -571,7 +610,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1614301, 2, 0, 0, 0, 0, 0, 0, 2, 0, 4, 16, 12420, 12421, 12422, 12243, 0, 0, 0, 0, 0, 'Shadow of Doom - Talk'),
     (1614301, 5, 0, 4, 46, 768, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Unit Flags'),
     (1614301, 3599, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Deal Damage');
-    
+
     -- Events list for Flameshocker
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16383;
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638301, 16383, 0, 1, 4, 100, 1, 503, 382828, 503, 382828, 1638301, 0, 0, 'Flameshocker - Timer OOC');
@@ -581,50 +620,50 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638309, 16383, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1638309, 0, 0, 'Flameshocker - Just Spawned');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638310, 16383, 0, 1, 4, 100, 3, 0, 10000, 5000, 10000, 1638310, 1638311, 0, 'Flameshocker - Timer OOC: Random speed');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638312, 16383, 0, 32, 0, 100, 0, 0, 1, 0, 0, 1638312, 0, 0, 'Flameshocker - Leader died');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638301;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638301, 0, 0, 15, 17680, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Cast Spell: Spirit Spawn-out OOC');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638302;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638302, 0, 0, 15, 28323, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Cast Spell: Flameshocker\'s Revenge On Death'),
     (1638302, 0, 0, 18, 10000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Despawn 10 seconds after Death');
-    
+
     -- Stormwind City Mage Quarter - Collin Mauren
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638303;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638303, 0, 0, 20, 10, 0, 2000, 0, 79820, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Collin Mauren'),
     (1638303, 1, 0, 39, 1638302, 1638303, 0, 0, 79820, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Collin Mauren');
-    
+
     -- Stormwind City Mage Quarter - Archmage Malin
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638304;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638304, 0, 0, 20, 10, 0, 2000, 0, 90442, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Archmage Malin'),
     (1638304, 1, 0, 39, 1638302, 1638303, 0, 0, 90442, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Archmage Malin');
-    
+
     -- Stormwind City Mage Quarter - Erich Lohan
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638305;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638305, 0, 0, 20, 10, 0, 2000, 0, 90445, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Erich Lohan'),
     (1638305, 1, 0, 39, 1638302, 1638303, 0, 0, 90445, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Erich Lohan');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638308;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638308, 0, 0, 18, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Despawn after Spirit Spawn-out');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638309;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638309, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 1');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638310;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638310, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Toggle Walking');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638311;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638311, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Toggle Running');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638312;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638312, 0, 1, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Leave Creature Group'),
@@ -632,17 +671,17 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1638312, 0, 3, 67, 1, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Random Movement'),
     (1638312, 0, 4, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 2'),
     (1638312, 0, 5, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Evade');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1638301;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638301, 0, 1, 78, 199, 0, 0, 0, 16382, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Join Creature Group: Patchwork Terror'),
     (1638301, 0, 1, 78, 199, 0, 0, 0, 16394, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Join Creature Group: Pallid Horror'),
     (1638301, 0, 2, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 2');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1638302;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638302, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12366, 12367, 12368, 12369, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1638303;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12370, 12371, 12372, 12373, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
@@ -654,23 +693,23 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1638601, 16386, 0, 8, 0, 100, 1, 28366, 1, 0, 0, 1638601, 0, 0, 'Necropolis Relay - Hit by Communique, Proxy-to-Relay'),
     (1638603, 16386, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1638603, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay, Death'),
     (1638602, 16386, 0, 8, 0, 100, 1, 28281, 1, 0, 0, 1638602, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638601;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638601, 0, 0, 15, 28326, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Cast Communique, Relay-to-Camp');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638602;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638602, 0, 0, 15, 28365, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Cast Communique, Relay-to-Proxy');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638603;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638603, 0, 0, 15, 28351, 2, 0, 0, 16398, 200, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Cast Communique, Camp-to-Relay, Death On Necropolis Proxy');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638604;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638604, 0, 0, 13, 0, 0, 0, 0, 181136, 200, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Activate Circle');
-    
+
     -- Events list for Necropolis Proxy
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16398;
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
@@ -678,47 +717,47 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1639802, 16398, 0, 8, 0, 100, 1, 28365, 1, 0, 0, 1639802, 0, 0, 'Necropolis Proxy - Hit by Communique, Relay-to-Proxy'),
     (1639803, 16398, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1639803, 0, 0, 'Necropolis Proxy - Hit by Communique, Camp-to-Relay, Death'),
     (1639804, 16386, 0, 8, 0, 100, 0, 28373, 1, 0, 0, 1639804, 0, 0, 'Necropolis Relay - Hit by Communique, Proxy-to-Relay Once to activate Circle');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639801;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639801, 0, 0, 15, 28366, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Cast Communique, Proxy-to-Relay');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639802;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639802, 0, 0, 15, 28367, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Cast Communique, Proxy-to-Necropolis');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639803;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639803, 0, 0, 15, 28351, 2, 0, 0, 16421, 200, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Cast Communique, Camp-to-Relay, Death On Necropolis health');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639804;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639804, 0, 0, 13, 0, 0, 0, 0, 181136, 200, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Activate Circle');
-    
+
     -- Events list for Necrotic Shard
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16136;
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1613601, 16136, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1613601, 0, 0, 'Necrotic Shard - Death');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1613602, 16136, 0, 8, 0, 100, 1, 28326, 1, 0, 0, 1613602, 0, 0, 'Necrotic Shard - Hit by Communique, Relay-to-Camp');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1613603, 16136, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1613603, 0, 0, 'Necrotic Shard - Just spawned');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1613601;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1613601, 0, 1, 15, 27895, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Spell'),
     (1613601, 0, 2, 18, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Despawn Creature');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1613602;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1613602, 0, 0, 15, 28449, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Camp Receives Communique');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1613603;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1613603, 0, 1, 39, 1613601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Start Script');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1613601;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1613601, 0, 2, 15, 27887, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Minion Spawner, small'),
     (1613601, 0, 2, 15, 28201, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard - Cast Choose Camp Type');
-    
+
     -- Events list for Damaged Necrotic Shard
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16172;
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617201, 16172, 0, 8, 0, 100, 1, 28326, 1, 0, 0, 1617201, 0, 0, 'Damaged Necrotic Shard - Hit by Communique, Relay-to-Camp');
@@ -727,15 +766,15 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617204, 16172, 0, 1, 2046, 100, 1, 5000, 5000, 5000, 5000, 1617204, 0, 0, 'Damaged Necrotic Shard - Timmer OOC, if not in Group');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617207, 16172, 0, 8, 0, 100, 1, 28041, 1, 0, 0, 1617205, 0, 0, 'Damaged Necrotic Shard - Hit By Spell: Damage Crystal');
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1617208, 16172, 0, 8, 0, 100, 1, 28056, 1, 0, 0, 1617205, 0, 0, 'Damaged Necrotic Shard - Hit By Spell: Zap Crystal Corpse');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1617201;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1617201, 0, 0, 15, 28449, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Camp Receives Communique');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1617202;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1617202, 0, 1, 39, 1617202, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1617203;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1617203, 0, 0, 18, 4000, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Despawn self'),
@@ -748,19 +787,19 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1617203, 0, 0, 68, 1617201, 0, 181194, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile4)'),
     (1617203, 0, 0, 15, 28681, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Soul Revival'),
     (1617203, 0, 0, 15, 28351, 2, 0, 0, 16386, 200, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Communique, Camp-to-Relay, Death');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1617204;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1617204, 0, 0, 15, 28056, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Spell');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1617205;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1617205, 0, 0, 44, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Set Phase');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1617201;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1617201, 5, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Remove Object');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1617202;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1617202, 0, 1, 15, 28201, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Choose Camp Type'),
@@ -768,256 +807,1627 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1617202, 0, 3, 15, 27886, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Disturb Minion Trap, Buttress'),
     (1617202, 0, 3, 18, 4000, 0, 0, 0, 16136, 5, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Despawn Necrotic Shard'),
     (1617202, 0, 5, 15, 27888, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, Buttress');
-    
+
     -- Events list for Cultist Engineer
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16230;
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
     (1623001, 16230, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1623001, 0, 0, 'Cultist Engineer - Just spawned'),
     (1623002, 16230, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1623002, 0, 0, 'Cultist Engineer - Death');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1623001;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1623001, 0, 0, 39, 1623001, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Start Script');
-    
+
     DELETE FROM `creature_ai_scripts` WHERE `id`=1623002;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1623002, 0, 0, 18, 10000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Despawn Creature after 10 Seconds'),
     (1623002, 0, 0, 15, 28041, 2, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Damage Crystal');
-    
+
     DELETE FROM `generic_scripts` WHERE `id`=1623001;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1623001, 0, 1, 35, 0, 0, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Face Damaged Necrotic Shard'),
     (1623001, 0, 2, 15, 28132, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Create Summoner Shield'),
     (1623001, 0, 3, 44, 1, 1, 0, 0, 16172, 10, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Set Phase for Damaged Necrotic Shard'),
     (1623001, 0, 4, 15, 29826, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Self Stun(DND)'),
-    (1623001, 1, 5, 15, 28078, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel'),
-    (1623001, 3599, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Deal Damage');
-    
+    (1623001, 2, 5, 15, 28078, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel'),
+    (1623001, 3598, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Deal Damage');
+
     DELETE FROM `gossip_scripts` WHERE `id`=7166;
     INSERT INTO `gossip_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (7166, 0, 0, 15, 27852, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Summon Shadow of Doom');
 
+
 -- 6. CREATURE RESPAWNS
 
     -- Pallid and Flameshockers respawn.
-    SET @FLAMESHOCKER_GUID = 66900;
     INSERT INTO `creature`(`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-    (@FLAMESHOCKER_GUID+1, 16383, 0, 0, 0, 0, -9001.15, 891.015, 105.505, 2.29504, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
-    (@FLAMESHOCKER_GUID+2, 16383, 0, 0, 0, 0, -8997.9, 834.881, 105.855, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
-    (@FLAMESHOCKER_GUID+3, 16383, 0, 0, 0, 0, -8931.39, 960.914, 117.416, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
-    (@FLAMESHOCKER_GUID+4, 16383, 0, 0, 0, 0, -8879.42, 579.776, 93.0791, 4.62512, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
-    (@FLAMESHOCKER_GUID+5, 16383, 0, 0, 0, 0, -8850.97, 653.117, 96.6387, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
-    (@FLAMESHOCKER_GUID+6, 16383, 0, 0, 0, 0, -8833.34, 622.748, 93.7479, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
-    (@FLAMESHOCKER_GUID+7, 16383, 0, 0, 0, 0, -8810.19, 580.752, 95.9053, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
-    (@FLAMESHOCKER_GUID+8, 16383, 0, 0, 0, 0, -8780.81, 1068.88, 90.8636, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
-    (@FLAMESHOCKER_GUID+9, 16383, 0, 0, 0, 0, -8733.97, 1106.75, 92.6246, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
-    (@FLAMESHOCKER_GUID+10, 16383, 0, 0, 0, 0, -8731.61, 1003.63, 95.8085, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
-    (@FLAMESHOCKER_GUID+11, 16383, 0, 0, 0, 0, -8722.22, 441.27, 97.3523, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
-    (@FLAMESHOCKER_GUID+12, 16383, 0, 0, 0, 0, -8698.38, 401.52, 101.099, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
-    (@FLAMESHOCKER_GUID+13, 16383, 0, 0, 0, 0, -8634.71, 444.417, 102.237, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
-    -- (@FLAMESHOCKER_GUID+14, 16383, 0, 0, 0, 0, -8585.14, 903.542, 81.7025, 4.72984, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-    -- (@FLAMESHOCKER_GUID+15, 16383, 0, 0, 0, 0, -8583.97, 906.899, 81.7026, 3.83972, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-    -- (@FLAMESHOCKER_GUID+16, 16383, 0, 0, 0, 0, -8583.51, 901.15, 81.7033, 4.08407, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-    (@FLAMESHOCKER_GUID+17, 16394, 0, 0, 0, 0, -8581.79, 904.538, 81.7021, 3.82227, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Stormwind City Cathedral of Light.
-    -- (@FLAMESHOCKER_GUID+18, 16383, 0, 0, 0, 0, -8580.33, 901.258, 81.7028, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-    -- (@FLAMESHOCKER_GUID+19, 16383, 0, 0, 0, 0, -8579.29, 907.101, 81.702, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-    (@FLAMESHOCKER_GUID+20, 16383, 0, 0, 0, 0, -8450.78, 587.494, 94.1273, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
-    (@FLAMESHOCKER_GUID+21, 16383, 0, 0, 0, 0, -8394.75, 575.578, 91.3721, 2.93627, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
-    (@FLAMESHOCKER_GUID+22, 16383, 0, 0, 0, 0, -8367.51, 637.011, 94.9871, 4.1433, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
-    (@FLAMESHOCKER_GUID+23, 16383, 0, 0, 0, 0, 1420.04, 119.324, -62.2049, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-    (@FLAMESHOCKER_GUID+24, 16383, 0, 0, 0, 0, 1445.72, 91.438, -62.2014, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-    (@FLAMESHOCKER_GUID+25, 16383, 0, 0, 0, 0, 1489.15, 67.53, -62.2138, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-    (@FLAMESHOCKER_GUID+26, 16383, 0, 0, 0, 0, 1492.07, 180.029, -62.0023, 3.61883, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-    (@FLAMESHOCKER_GUID+27, 16383, 0, 0, 0, 0, 1493.05, 186.522, -62.0734, 4.11898, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-    -- (@FLAMESHOCKER_GUID+28, 16383, 0, 0, 0, 0, 1532.72, 273.599, -62.0943, 1.25664, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-    -- (@FLAMESHOCKER_GUID+29, 16383, 0, 0, 0, 0, 1532.99, 278.193, -62.0943, 1.53589, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-    (@FLAMESHOCKER_GUID+30, 16383, 0, 0, 0, 0, 1534.92, 138.913, -62.0883, 4.34587, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-    (@FLAMESHOCKER_GUID+31, 16394, 0, 0, 0, 0, 1535.76, 274.897, -62.0943, 1.0821, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Undercity Canals.
-    -- (@FLAMESHOCKER_GUID+32, 16383, 0, 0, 0, 0, 1536.4, 271.839, -62.0943, 1.23918, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-    -- (@FLAMESHOCKER_GUID+33, 16383, 0, 0, 0, 0, 1537.21, 278.743, -62.0943, 1.20428, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-    -- (@FLAMESHOCKER_GUID+34, 16383, 0, 0, 0, 0, 1539.85, 274.237, -62.0943, 1.20428, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-    (@FLAMESHOCKER_GUID+35, 16383, 0, 0, 0, 0, 1545.37, 142.682, -62.0049, 0.358143, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-    (@FLAMESHOCKER_GUID+36, 16383, 0, 0, 0, 0, 1582.24, 276.854, -43.0193, 0.174533, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-    (@FLAMESHOCKER_GUID+37, 16383, 0, 0, 0, 0, 1582.34, 252.503, -61.994, 3.57792, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-    (@FLAMESHOCKER_GUID+38, 16383, 0, 0, 0, 0, 1606.54, 239.628, -52.0687, 0.0698132, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-    (@FLAMESHOCKER_GUID+39, 16383, 0, 0, 0, 0, 1609.49, 229.112, -61.994, 5.25344, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-    (@FLAMESHOCKER_GUID+40, 16383, 0, 0, 0, 0, 1609.66, 205.781, -43.0193, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-    -- (@FLAMESHOCKER_GUID+41, 16383, 0, 0, 0, 0, 1626.6, 481.696, -22.7855, 5.23599, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    -- (@FLAMESHOCKER_GUID+42, 16383, 0, 0, 0, 0, 1627.48, 477.444, -22.7847, 4.71239, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    -- (@FLAMESHOCKER_GUID+43, 16383, 0, 0, 0, 0, 1627.97, 484.273, -22.7855, 6.21337, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    -- (@FLAMESHOCKER_GUID+44, 16383, 0, 0, 0, 0, 1629.02, 477.154, -22.7847, 1.88496, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    (@FLAMESHOCKER_GUID+45, 16394, 0, 0, 0, 0, 1629.41, 480.468, -22.7851, 4.69494, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Undercity Sewers.
-    -- (@FLAMESHOCKER_GUID+46, 16383, 0, 0, 0, 0, 1630.92, 484.171, -22.7855, 3.26377, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    -- (@FLAMESHOCKER_GUID+47, 16383, 0, 0, 0, 0, 1631.27, 477.82, -22.785, 5.27089, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    -- (@FLAMESHOCKER_GUID+48, 16383, 0, 0, 0, 0, 1632.22, 481.066, -22.7855, 5.41052, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    -- (@FLAMESHOCKER_GUID+49, 16383, 0, 0, 0, 0, 1634.59, 477.738, -21.8358, 4.4855, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    -- (@FLAMESHOCKER_GUID+50, 16383, 0, 0, 0, 0, 1634.67, 479.701, -21.8066, 1.64061, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-    (@FLAMESHOCKER_GUID+51, 16383, 0, 0, 0, 0, 1654.89, 134.022, -62.0874, 3.57792, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-    (@FLAMESHOCKER_GUID+52, 16383, 0, 0, 0, 0, 1656.79, 341.062, -62.0883, 5.34071, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
-    (@FLAMESHOCKER_GUID+53, 16383, 0, 0, 0, 0, 1666.35, 150.947, -62.0023, 0.443699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-    (@FLAMESHOCKER_GUID+54, 16383, 0, 0, 0, 0, 1693.4, 409.976, -62.2141, 3.94444, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
-    (@FLAMESHOCKER_GUID+55, 16383, 0, 0, 0, 0, 1694.36, 66.5781, -62.2057, 0.174533, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-    (@FLAMESHOCKER_GUID+56, 16383, 0, 0, 0, 0, 1700.87, 181.282, -62.0883, 5.25344, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-    (@FLAMESHOCKER_GUID+57, 16383, 0, 0, 0, 0, 1724.52, 369.016, -60.4011, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
-    (@FLAMESHOCKER_GUID+58, 16383, 0, 0, 0, 0, 1738.85, 95.2721, -62.1996, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-    (@FLAMESHOCKER_GUID+59, 16383, 0, 0, 0, 0, 1767.03, 339.711, -62.205, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
-    (@FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10);-- Flameshocker in Undercity Magic Quarter.
-    
+        (@NPC_FLAMESHOCKER_GUID+1, 16383, 0, 0, 0, 0, -9001.15, 891.015, 105.505, 2.29504, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
+        (@NPC_FLAMESHOCKER_GUID+2, 16383, 0, 0, 0, 0, -8997.9, 834.881, 105.855, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
+        (@NPC_FLAMESHOCKER_GUID+3, 16383, 0, 0, 0, 0, -8931.39, 960.914, 117.416, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
+        (@NPC_FLAMESHOCKER_GUID+4, 16383, 0, 0, 0, 0, -8879.42, 579.776, 93.0791, 4.62512, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
+        (@NPC_FLAMESHOCKER_GUID+5, 16383, 0, 0, 0, 0, -8850.97, 653.117, 96.6387, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
+        (@NPC_FLAMESHOCKER_GUID+6, 16383, 0, 0, 0, 0, -8833.34, 622.748, 93.7479, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
+        (@NPC_FLAMESHOCKER_GUID+7, 16383, 0, 0, 0, 0, -8810.19, 580.752, 95.9053, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
+        (@NPC_FLAMESHOCKER_GUID+8, 16383, 0, 0, 0, 0, -8780.81, 1068.88, 90.8636, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
+        (@NPC_FLAMESHOCKER_GUID+9, 16383, 0, 0, 0, 0, -8733.97, 1106.75, 92.6246, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
+        (@NPC_FLAMESHOCKER_GUID+10, 16383, 0, 0, 0, 0, -8731.61, 1003.63, 95.8085, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
+        (@NPC_FLAMESHOCKER_GUID+11, 16383, 0, 0, 0, 0, -8722.22, 441.27, 97.3523, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
+        (@NPC_FLAMESHOCKER_GUID+12, 16383, 0, 0, 0, 0, -8698.38, 401.52, 101.099, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
+        (@NPC_FLAMESHOCKER_GUID+13, 16383, 0, 0, 0, 0, -8634.71, 444.417, 102.237, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
+        -- (@NPC_FLAMESHOCKER_GUID+14, 16383, 0, 0, 0, 0, -8585.14, 903.542, 81.7025, 4.72984, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
+        -- (@NPC_FLAMESHOCKER_GUID+15, 16383, 0, 0, 0, 0, -8583.97, 906.899, 81.7026, 3.83972, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
+        -- (@NPC_FLAMESHOCKER_GUID+16, 16383, 0, 0, 0, 0, -8583.51, 901.15, 81.7033, 4.08407, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
+        (@NPC_FLAMESHOCKER_GUID+17, 16394, 0, 0, 0, 0, -8581.79, 904.538, 81.7021, 3.82227, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Stormwind City Cathedral of Light.
+        -- (@NPC_FLAMESHOCKER_GUID+18, 16383, 0, 0, 0, 0, -8580.33, 901.258, 81.7028, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
+        -- (@NPC_FLAMESHOCKER_GUID+19, 16383, 0, 0, 0, 0, -8579.29, 907.101, 81.702, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
+        (@NPC_FLAMESHOCKER_GUID+20, 16383, 0, 0, 0, 0, -8450.78, 587.494, 94.1273, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
+        (@NPC_FLAMESHOCKER_GUID+21, 16383, 0, 0, 0, 0, -8394.75, 575.578, 91.3721, 2.93627, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
+        (@NPC_FLAMESHOCKER_GUID+22, 16383, 0, 0, 0, 0, -8367.51, 637.011, 94.9871, 4.1433, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
+        (@NPC_FLAMESHOCKER_GUID+23, 16383, 0, 0, 0, 0, 1420.04, 119.324, -62.2049, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+24, 16383, 0, 0, 0, 0, 1445.72, 91.438, -62.2014, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+25, 16383, 0, 0, 0, 0, 1489.15, 67.53, -62.2138, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+26, 16383, 0, 0, 0, 0, 1492.07, 180.029, -62.0023, 3.61883, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+27, 16383, 0, 0, 0, 0, 1493.05, 186.522, -62.0734, 4.11898, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
+        -- (@NPC_FLAMESHOCKER_GUID+28, 16383, 0, 0, 0, 0, 1532.72, 273.599, -62.0943, 1.25664, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
+        -- (@NPC_FLAMESHOCKER_GUID+29, 16383, 0, 0, 0, 0, 1532.99, 278.193, -62.0943, 1.53589, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
+        (@NPC_FLAMESHOCKER_GUID+30, 16383, 0, 0, 0, 0, 1534.92, 138.913, -62.0883, 4.34587, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+31, 16394, 0, 0, 0, 0, 1535.76, 274.897, -62.0943, 1.0821, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Undercity Canals.
+        -- (@NPC_FLAMESHOCKER_GUID+32, 16383, 0, 0, 0, 0, 1536.4, 271.839, -62.0943, 1.23918, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
+        -- (@NPC_FLAMESHOCKER_GUID+33, 16383, 0, 0, 0, 0, 1537.21, 278.743, -62.0943, 1.20428, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
+        -- (@NPC_FLAMESHOCKER_GUID+34, 16383, 0, 0, 0, 0, 1539.85, 274.237, -62.0943, 1.20428, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
+        (@NPC_FLAMESHOCKER_GUID+35, 16383, 0, 0, 0, 0, 1545.37, 142.682, -62.0049, 0.358143, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+36, 16383, 0, 0, 0, 0, 1582.24, 276.854, -43.0193, 0.174533, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
+        (@NPC_FLAMESHOCKER_GUID+37, 16383, 0, 0, 0, 0, 1582.34, 252.503, -61.994, 3.57792, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
+        (@NPC_FLAMESHOCKER_GUID+38, 16383, 0, 0, 0, 0, 1606.54, 239.628, -52.0687, 0.0698132, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
+        (@NPC_FLAMESHOCKER_GUID+39, 16383, 0, 0, 0, 0, 1609.49, 229.112, -61.994, 5.25344, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
+        (@NPC_FLAMESHOCKER_GUID+40, 16383, 0, 0, 0, 0, 1609.66, 205.781, -43.0193, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
+        -- (@NPC_FLAMESHOCKER_GUID+41, 16383, 0, 0, 0, 0, 1626.6, 481.696, -22.7855, 5.23599, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+42, 16383, 0, 0, 0, 0, 1627.48, 477.444, -22.7847, 4.71239, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+43, 16383, 0, 0, 0, 0, 1627.97, 484.273, -22.7855, 6.21337, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+44, 16383, 0, 0, 0, 0, 1629.02, 477.154, -22.7847, 1.88496, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        (@NPC_FLAMESHOCKER_GUID+45, 16394, 0, 0, 0, 0, 1629.41, 480.468, -22.7851, 4.69494, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+46, 16383, 0, 0, 0, 0, 1630.92, 484.171, -22.7855, 3.26377, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+47, 16383, 0, 0, 0, 0, 1631.27, 477.82, -22.785, 5.27089, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+48, 16383, 0, 0, 0, 0, 1632.22, 481.066, -22.7855, 5.41052, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+49, 16383, 0, 0, 0, 0, 1634.59, 477.738, -21.8358, 4.4855, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+50, 16383, 0, 0, 0, 0, 1634.67, 479.701, -21.8066, 1.64061, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
+        (@NPC_FLAMESHOCKER_GUID+51, 16383, 0, 0, 0, 0, 1654.89, 134.022, -62.0874, 3.57792, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+52, 16383, 0, 0, 0, 0, 1656.79, 341.062, -62.0883, 5.34071, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
+        (@NPC_FLAMESHOCKER_GUID+53, 16383, 0, 0, 0, 0, 1666.35, 150.947, -62.0023, 0.443699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+54, 16383, 0, 0, 0, 0, 1693.4, 409.976, -62.2141, 3.94444, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
+        (@NPC_FLAMESHOCKER_GUID+55, 16383, 0, 0, 0, 0, 1694.36, 66.5781, -62.2057, 0.174533, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+56, 16383, 0, 0, 0, 0, 1700.87, 181.282, -62.0883, 5.25344, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+57, 16383, 0, 0, 0, 0, 1724.52, 369.016, -60.4011, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
+        (@NPC_FLAMESHOCKER_GUID+58, 16383, 0, 0, 0, 0, 1738.85, 95.2721, -62.1996, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+59, 16383, 0, 0, 0, 0, 1767.03, 339.711, -62.205, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
+        (@NPC_FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10);-- Flameshocker in Undercity Magic Quarter.
+
     INSERT INTO `pool_creature`(`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
-    (@FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+2, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+3, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+4, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+5, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+6, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+7, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+8, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+9, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+10, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+11, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+12, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+13, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+14, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+15, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+16, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+17, 1441, 0, 'Pallid Horror in Stormwind City Cathedral of Light', 0, 0, 10), 
-    -- (@FLAMESHOCKER_GUID+18, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+19, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+20, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+21, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+22, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+23, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+24, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+25, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+26, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+27, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+28, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+29, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+30, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+31, 1442, 0, 'Pallid Horror in Undercity Canals', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+32, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+33, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+34, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+35, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+36, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+37, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+38, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+39, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+40, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+41, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+42, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+43, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+44, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+45, 1442, 0, 'Pallid Horror in Undercity Sewers', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+46, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+47, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+48, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+49, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    -- (@FLAMESHOCKER_GUID+50, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+51, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+52, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+53, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+54, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+55, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+56, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+57, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+58, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+59, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
-    (@FLAMESHOCKER_GUID+60, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10);
-    
+        (@NPC_FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+2, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+3, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+4, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+5, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+6, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+7, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+8, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+9, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+10, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+11, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+12, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+13, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+14, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+15, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+16, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+17, 1441, 0, 'Pallid Horror in Stormwind City Cathedral of Light', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+18, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+19, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+20, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+21, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+22, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+23, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+24, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+25, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+26, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+27, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+28, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+29, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+30, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+31, 1442, 0, 'Pallid Horror in Undercity Canals', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+32, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+33, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+34, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+35, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+36, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+37, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+38, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+39, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+40, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+41, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+42, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+43, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+44, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+45, 1442, 0, 'Pallid Horror in Undercity Sewers', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+46, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+47, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+48, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+49, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+50, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+51, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+52, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+53, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+54, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+55, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+56, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+57, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+58, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+59, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
+        (@NPC_FLAMESHOCKER_GUID+60, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10);
+
     INSERT INTO `pool_template`(`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-    (1431, 1, 'Flameshockers in Stormwind City Mage Quarter', 0, 0, 0, 10),
-    (1432, 1, 'Flameshockers in Stormwind City Trade District', 0, 0, 0, 10),
-    (1433, 1, 'Flameshockers in Stormwind City The Park', 0, 0, 0, 10),
-    (1434, 1, 'Flameshockers in Stormwind City Old Town', 0, 0, 0, 10),
-    (1435, 1, 'Flameshockers in Stormwind City Dwarven District', 0, 0, 0, 10),
-    (1436, 1, 'Flameshockers in Undercity Rogues Quarter', 0, 0, 0, 10),
-    (1437, 1, 'Flameshockers in Undercity Trade Quarter', 0, 0, 0, 10),
-    (1438, 1, 'Flameshockers in Undercity Magic Quarter', 0, 0, 0, 10),
-    (1439, 1, 'Flameshockers in Undercity War Quarter', 0, 0, 0, 10),
-    (1441, 1, 'Pallids in Stormwind City', 0, 0, 0, 10),
-    (1442, 1, 'Pallids in Undercity', 0, 0, 0, 10);
-    
+        (1431, 1, 'Flameshockers in Stormwind City Mage Quarter', 0, 0, 0, 10),
+        (1432, 1, 'Flameshockers in Stormwind City Trade District', 0, 0, 0, 10),
+        (1433, 1, 'Flameshockers in Stormwind City The Park', 0, 0, 0, 10),
+        (1434, 1, 'Flameshockers in Stormwind City Old Town', 0, 0, 0, 10),
+        (1435, 1, 'Flameshockers in Stormwind City Dwarven District', 0, 0, 0, 10),
+        (1436, 1, 'Flameshockers in Undercity Rogues Quarter', 0, 0, 0, 10),
+        (1437, 1, 'Flameshockers in Undercity Trade Quarter', 0, 0, 0, 10),
+        (1438, 1, 'Flameshockers in Undercity Magic Quarter', 0, 0, 0, 10),
+        (1439, 1, 'Flameshockers in Undercity War Quarter', 0, 0, 0, 10),
+        (1441, 1, 'Pallids in Stormwind City', 0, 0, 0, 10),
+        (1442, 1, 'Pallids in Undercity', 0, 0, 0, 10);
+
     INSERT INTO `game_event_creature`(`guid`, `event`) VALUES
-    (@FLAMESHOCKER_GUID+1, 17),
-    (@FLAMESHOCKER_GUID+2, 17),
-    (@FLAMESHOCKER_GUID+3, 17),
-    (@FLAMESHOCKER_GUID+4, 17),
-    (@FLAMESHOCKER_GUID+5, 17),
-    (@FLAMESHOCKER_GUID+6, 17),
-    (@FLAMESHOCKER_GUID+7, 17),
-    (@FLAMESHOCKER_GUID+8, 17),
-    (@FLAMESHOCKER_GUID+9, 17),
-    (@FLAMESHOCKER_GUID+10, 17),
-    (@FLAMESHOCKER_GUID+11, 17),
-    (@FLAMESHOCKER_GUID+12, 17),
-    (@FLAMESHOCKER_GUID+13, 17),
-    -- (@FLAMESHOCKER_GUID+14, 17),
-    -- (@FLAMESHOCKER_GUID+15, 17),
-    -- (@FLAMESHOCKER_GUID+16, 17),
-    (@FLAMESHOCKER_GUID+17, 17),
-    -- (@FLAMESHOCKER_GUID+18, 17),
-    -- (@FLAMESHOCKER_GUID+19, 17),
-    (@FLAMESHOCKER_GUID+20, 17),
-    (@FLAMESHOCKER_GUID+21, 17),
-    (@FLAMESHOCKER_GUID+22, 17),
-    (@FLAMESHOCKER_GUID+23, 17),
-    (@FLAMESHOCKER_GUID+24, 17),
-    (@FLAMESHOCKER_GUID+25, 17),
-    (@FLAMESHOCKER_GUID+26, 17),
-    (@FLAMESHOCKER_GUID+27, 17),
-    -- (@FLAMESHOCKER_GUID+28, 17),
-    -- (@FLAMESHOCKER_GUID+29, 17),
-    (@FLAMESHOCKER_GUID+30, 17),
-    (@FLAMESHOCKER_GUID+31, 17),
-    -- (@FLAMESHOCKER_GUID+32, 17),
-    -- (@FLAMESHOCKER_GUID+33, 17),
-    -- (@FLAMESHOCKER_GUID+34, 17),
-    (@FLAMESHOCKER_GUID+35, 17),
-    (@FLAMESHOCKER_GUID+36, 17),
-    (@FLAMESHOCKER_GUID+37, 17),
-    (@FLAMESHOCKER_GUID+38, 17),
-    (@FLAMESHOCKER_GUID+39, 17),
-    (@FLAMESHOCKER_GUID+40, 17),
-    -- (@FLAMESHOCKER_GUID+41, 17),
-    -- (@FLAMESHOCKER_GUID+42, 17),
-    -- (@FLAMESHOCKER_GUID+43, 17),
-    -- (@FLAMESHOCKER_GUID+44, 17),
-    (@FLAMESHOCKER_GUID+45, 17),
-    -- (@FLAMESHOCKER_GUID+46, 17),
-    -- (@FLAMESHOCKER_GUID+47, 17),
-    -- (@FLAMESHOCKER_GUID+48, 17),
-    -- (@FLAMESHOCKER_GUID+49, 17),
-    -- (@FLAMESHOCKER_GUID+50, 17),
-    (@FLAMESHOCKER_GUID+51, 17),
-    (@FLAMESHOCKER_GUID+52, 17),
-    (@FLAMESHOCKER_GUID+53, 17),
-    (@FLAMESHOCKER_GUID+54, 17),
-    (@FLAMESHOCKER_GUID+55, 17),
-    (@FLAMESHOCKER_GUID+56, 17),
-    (@FLAMESHOCKER_GUID+57, 17),
-    (@FLAMESHOCKER_GUID+58, 17),
-    (@FLAMESHOCKER_GUID+59, 17),
-    (@FLAMESHOCKER_GUID+60, 17),
-    (@FLAMESHOCKER_GUID+61, 17);
+    (@NPC_FLAMESHOCKER_GUID+1, 17),
+    (@NPC_FLAMESHOCKER_GUID+2, 17),
+    (@NPC_FLAMESHOCKER_GUID+3, 17),
+    (@NPC_FLAMESHOCKER_GUID+4, 17),
+    (@NPC_FLAMESHOCKER_GUID+5, 17),
+    (@NPC_FLAMESHOCKER_GUID+6, 17),
+    (@NPC_FLAMESHOCKER_GUID+7, 17),
+    (@NPC_FLAMESHOCKER_GUID+8, 17),
+    (@NPC_FLAMESHOCKER_GUID+9, 17),
+    (@NPC_FLAMESHOCKER_GUID+10, 17),
+    (@NPC_FLAMESHOCKER_GUID+11, 17),
+    (@NPC_FLAMESHOCKER_GUID+12, 17),
+    (@NPC_FLAMESHOCKER_GUID+13, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+14, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+15, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+16, 17),
+    (@NPC_FLAMESHOCKER_GUID+17, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+18, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+19, 17),
+    (@NPC_FLAMESHOCKER_GUID+20, 17),
+    (@NPC_FLAMESHOCKER_GUID+21, 17),
+    (@NPC_FLAMESHOCKER_GUID+22, 17),
+    (@NPC_FLAMESHOCKER_GUID+23, 17),
+    (@NPC_FLAMESHOCKER_GUID+24, 17),
+    (@NPC_FLAMESHOCKER_GUID+25, 17),
+    (@NPC_FLAMESHOCKER_GUID+26, 17),
+    (@NPC_FLAMESHOCKER_GUID+27, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+28, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+29, 17),
+    (@NPC_FLAMESHOCKER_GUID+30, 17),
+    (@NPC_FLAMESHOCKER_GUID+31, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+32, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+33, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+34, 17),
+    (@NPC_FLAMESHOCKER_GUID+35, 17),
+    (@NPC_FLAMESHOCKER_GUID+36, 17),
+    (@NPC_FLAMESHOCKER_GUID+37, 17),
+    (@NPC_FLAMESHOCKER_GUID+38, 17),
+    (@NPC_FLAMESHOCKER_GUID+39, 17),
+    (@NPC_FLAMESHOCKER_GUID+40, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+41, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+42, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+43, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+44, 17),
+    (@NPC_FLAMESHOCKER_GUID+45, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+46, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+47, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+48, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+49, 17),
+    -- (@NPC_FLAMESHOCKER_GUID+50, 17),
+    (@NPC_FLAMESHOCKER_GUID+51, 17),
+    (@NPC_FLAMESHOCKER_GUID+52, 17),
+    (@NPC_FLAMESHOCKER_GUID+53, 17),
+    (@NPC_FLAMESHOCKER_GUID+54, 17),
+    (@NPC_FLAMESHOCKER_GUID+55, 17),
+    (@NPC_FLAMESHOCKER_GUID+56, 17),
+    (@NPC_FLAMESHOCKER_GUID+57, 17),
+    (@NPC_FLAMESHOCKER_GUID+58, 17),
+    (@NPC_FLAMESHOCKER_GUID+59, 17),
+    (@NPC_FLAMESHOCKER_GUID+60, 17),
+    (@NPC_FLAMESHOCKER_GUID+61, 17);
 
 
--- 7. TEMPORARY FIXES
+-- 7. GAMEOBJECT RESPAWNS
+
+    -- GameObject "Buttress Spawner"
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+1, 181112, 0, -11013.9, -2789.49, 4.90531, 1.93718, 0, 0, 0.824088, 0.566462, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+2, 181112, 0, -11010.1, -2781.17, 4.53689, 3.4877, 0, 0, -0.985064, 0.172191, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+3, 181112, 0, -11018.4, -2776.93, 4.06231, 5.03269, 0, 0, -0.585298, 0.810819, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+4, 181112, 0, -11022.6, -2785.69, 4.54449, 0.347485, 0, 0, 0.17287, 0.984945, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+5, 181112, 0, -11417.8, -2810.29, 0.166052, 4.396, 0, 0, -0.809673, 0.586881, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+6, 181112, 0, -11413.4, -2818.93, -0.374438, 2.84483, 0, 0, 0.989012, 0.147837, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+7, 181112, 0, -11422.2, -2823.53, -0.252675, 1.24451, 0, 0, 0.582869, 0.812566, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+8, 181112, 0, -11426.6, -2814.82, 0.574567, 5.9759, 0, 0, -0.153037, 0.98822, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+9, 181112, 0, -11354.2, -3149.56, 6.86018, 6.09013, 0, 0, -0.0963802, 0.995345, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+10, 181112, 0, -11341.2, -3152.23, 6.94757, 2.92991, 0, 0, 0.994404, 0.105646, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+11, 181112, 0, -11346.1, -3144.17, 5.92472, 4.47517, 0, 0, -0.785812, 0.618465, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+12, 181112, 0, -11349.3, -3157.45, 7.71357, 1.33072, 0, 0, 0.617343, 0.786694, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+13, 181112, 0, -11180.3, -2978.37, 7.70552, 4.52146, 0, 0, -0.77129, 0.636484, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+14, 181112, 0, -11174.7, -2987.36, 9.12028, 2.86642, 0, 0, 0.99055, 0.137152, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+15, 181112, 0, -11183.1, -2992.34, 8.49926, 1.37856, 0, 0, 0.635982, 0.771704, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+16, 181112, 0, -11188.4, -2983.75, 8.15144, 6.04574, 0, 0, -0.118442, 0.992961, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+17, 181112, 0, -11243.9, -3348.39, 9.62239, 3.49129, 0, 0, -0.984753, 0.17396, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+18, 181112, 0, -11252.7, -3344.21, 9.65939, 5.03742, 0, 0, -0.583379, 0.8122, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+19, 181112, 0, -11248.2, -3357.18, 9.6958, 1.91072, 0, 0, 0.816521, 0.577316, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+20, 181112, 0, -11256.6, -3353.08, 9.9488, 0.356298, 0, 0, 0.177208, 0.984173, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+21, 181112, 0, -11542.1, -3284.83, 8.279, 2.90593, 0, 0, 0.993066, 0.117559, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+22, 181112, 0, -11546.9, -3276.7, 7.46751, 4.46399, 0, 0, -0.789256, 0.614064, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+23, 181112, 0, -11555, -3281.72, 7.43727, 6.04553, 0, 0, -0.118546, 0.992948, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+24, 181112, 0, -11550, -3289.78, 7.54038, 1.35247, 0, 0, 0.62586, 0.779935, 7200, 7200, 100, 1, 0, 0, 9, 10),          -- GameObject "Buttress Spawner" in Blasted Lands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+25, 181112, 1, 3518.06, -4158.56, 106.521, 1.83081, 0, 0, 0.79281, 0.609468, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+26, 181112, 1, 3522.92, -4150.64, 107.653, 3.31697, 0, 0, -0.996158, 0.0875781, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+27, 181112, 1, 3510.11, -4153.44, 105.972, 0.258678, 0, 0, 0.128979, 0.991647, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+28, 181112, 1, 3514.67, -4145.08, 106.819, 4.94512, 0, 0, -0.620226, 0.784423, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+29, 181112, 1, 3366.02, -5558.79, 12.6548, 4.74505, 0, 0, -0.695467, 0.718558, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+30, 181112, 1, 3359.5, -5566.77, 11.1865, 0.0645444, 0, 0, 0.0322666, 0.999479, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+31, 181112, 1, 3373.1, -5565.97, 11.3561, 3.1953, 0, 0, -0.99964, 0.0268488, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+32, 181112, 1, 3366.78, -5572.43, 10.2243, 1.65529, 0, 0, 0.736341, 0.67661, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+33, 181112, 1, 3658.5, -5533.36, 21.6631, 6.27578, 0, 0, -0.00370502, 0.999993, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+34, 181112, 1, 3665.81, -5539.48, 19.7312, 1.46113, 0, 0, 0.667289, 0.744799, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+35, 181112, 1, 3673.43, -5533.4, 19.9191, 3.14436, 0, 0, -0.999999, 0.00138107, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+36, 181112, 1, 3079.47, -4217.4, 96.5195, 0.236918, 0, 0, 0.118182, 0.992992, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+37, 181112, 1, 3084.87, -4209.1, 97.7786, 4.95208, 0, 0, -0.617495, 0.786575, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+38, 181112, 1, 3092.9, -4214.1, 97.4467, 3.3865, 0, 0, -0.992512, 0.122149, 7200, 7200, 100, 1, 0, 0, 9, 10),          -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+39, 181112, 1, 3088.06, -4222.4, 97.2186, 1.80208, 0, 0, 0.783974, 0.620794, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+40, 181112, 1, 3338, -4522.62, 98.0686, 1.65191, 0, 0, 0.735195, 0.677855, 7200, 7200, 100, 1, 0, 0, 9, 10),           -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+41, 181112, 1, 3336.04, -4509.74, 97.3408, 4.92227, 0, 0, -0.629148, 0.777286, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+42, 181112, 1, 3343.22, -4515.29, 97.9444, 3.37163, 0, 0, -0.993393, 0.114763, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+43, 181112, 1, 3331.16, -4518.24, 98.0714, 0.24851, 0, 0, 0.123936, 0.99229, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+44, 181112, 1, 3666.98, -5526.31, 21.8595, 4.64173, 0, 0, -0.731642, 0.681689, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+45, 181112, 1, 3516.62, -5705.72, 4.86755, 4.96068, 0, 0, -0.614106, 0.789223, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+46, 181112, 1, 3520, -5718.63, 4.26591, 1.83479, 0, 0, 0.794021, 0.607891, 7200, 7200, 100, 1, 0, 0, 9, 10),           -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+47, 181112, 1, 3525.26, -5711.76, 5.20241, 3.23535, 0, 0, -0.998901, 0.0468623, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+48, 181112, 1, 3511.71, -5714.21, 4.98457, 0.265377, 0, 0, 0.132299, 0.99121, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Azshara.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+49, 181112, 0, -7735.77, -2238.76, 135.289, 1.11799, 0, 0, 0.530334, 0.847789, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+50, 181112, 0, -7731.44, -2226.06, 134.367, 4.50427, 0, 0, -0.77673, 0.629834, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+51, 181112, 0, -7727.31, -2233.73, 135.941, 2.97412, 0, 0, 0.996496, 0.083638, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+52, 181112, 0, -7739.53, -2231.62, 134.201, 6.10936, 0, 0, -0.0868034, 0.996225, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+53, 181112, 0, -7976.6, -2428.7, 128.119, 3.85626, 0, 0, -0.936832, 0.349779, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+54, 181112, 0, -7977.33, -2438.51, 129.598, 2.28449, 0, 0, 0.909568, 0.415555, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+55, 181112, 0, -7986.28, -2428.22, 129.667, 5.43109, 0, 0, -0.413274, 0.910607, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+56, 181112, 0, -7987.61, -2437.53, 131.247, 0.63768, 0, 0, 0.313465, 0.9496, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+57, 181112, 0, -8392.96, -1247.51, 202.522, 2.92965, 0, 0, 0.99439, 0.105771, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+58, 181112, 0, -8399.95, -1240.92, 199.281, 4.73817, 0, 0, -0.697933, 0.716163, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+59, 181112, 0, -8406.71, -1244.72, 202.682, 6.09456, 0, 0, -0.0941706, 0.995556, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+60, 181112, 0, -8400.54, -1250.62, 205.729, 1.41576, 0, 0, 0.650226, 0.759741, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+61, 181112, 0, -8037.73, -985.029, 122.717, 0.537801, 0, 0, 0.265672, 0.964064, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+62, 181112, 0, -8028.53, -987.591, 122.719, 2.09929, 0, 0, 0.867248, 0.497877, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+63, 181112, 0, -8035.24, -975.765, 122.73, 5.21493, 0, 0, -0.509091, 0.860713, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+64, 181112, 0, -8026.02, -978.236, 122.73, 3.65543, 0, 0, -0.967177, 0.254102, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+65, 181112, 0, -8376.99, -966.79, 190.868, 0.537631, 0, 0, 0.26559, 0.964086, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+66, 181112, 0, -8373.59, -959.376, 192.901, 5.26914, 0, 0, -0.485578, 0.874194, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+67, 181112, 0, -8365.14, -960.146, 191.12, 3.62632, 0, 0, -0.970774, 0.239997, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+68, 181112, 0, -8367.59, -969.403, 188.907, 2.09876, 0, 0, 0.867114, 0.49811, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+69, 181112, 0, -7610.02, -2595.22, 134.121, 6.09497, 0, 0, -0.0939713, 0.995575, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+70, 181112, 0, -7602.5, -2589.76, 135.933, 4.54476, 0, 0, -0.76382, 0.64543, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+71, 181112, 0, -7597.43, -2597.74, 136.835, 2.93495, 0, 0, 0.994667, 0.103138, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+72, 181112, 0, -7604.78, -2603.31, 135.168, 1.40399, 0, 0, 0.645741, 0.763556, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Burning Steppes.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+73, 181112, 0, 1603.34, -3045.25, 78.5547, 2.12798, 0, 0, 0.874298, 0.485389, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+74, 181112, 0, 1952.17, -3106.29, 84.4605, 0.75527, 0, 0, 0.368723, 0.929539, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+75, 181112, 0, 1953.56, -3095.88, 83.5142, 5.25689, 0, 0, -0.490924, 0.871202, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+76, 181112, 0, 1960.6, -3107.06, 83.6143, 2.15214, 0, 0, 0.880099, 0.47479, 7200, 7200, 100, 1, 0, 0, 9, 10),          -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+77, 181112, 0, 1594.45, -3043.14, 80.1013, 0.593819, 0, 0, 0.292566, 0.956245, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+78, 181112, 0, 2312.39, -4928.6, 85.2299, 5.27655, 0, 0, -0.482333, 0.875988, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+79, 181112, 0, 2321.07, -4929.9, 83.3816, 3.63973, 0, 0, -0.969142, 0.246503, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+80, 181112, 0, 2309.16, -4936.3, 82.0618, 0.488903, 0, 0, 0.242024, 0.97027, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+81, 181112, 0, 1941.92, -4766.93, 97.9149, 2.10025, 0, 0, 0.867485, 0.497463, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+82, 181112, 0, 1944.33, -4757.89, 97.3728, 3.6731, 0, 0, -0.964895, 0.262635, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+83, 181112, 0, 1935.28, -4755.23, 96.8524, 5.21688, 0, 0, -0.50825, 0.861209, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+84, 181112, 0, 2318.43, -4938.32, 80.3885, 2.11895, 0, 0, 0.872098, 0.489331, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+85, 181112, 0, 1958.34, -5120.63, 79.0385, 5.55335, 0, 0, -0.356874, 0.934153, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+86, 181112, 0, 1967.09, -5121.02, 81.02, 3.96389, 0, 0, -0.916662, 0.399663, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+87, 181112, 0, 1967.82, -5129.54, 79.2314, 2.3618, 0, 0, 0.924949, 0.380092, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+88, 181112, 0, 1958.65, -5130.02, 76.1395, 0.814107, 0, 0, 0.395905, 0.918291, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+89, 181112, 0, 1605.74, -3036.01, 77.6772, 3.67637, 0, 0, -0.964464, 0.264214, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+90, 181112, 0, 1596.27, -3033.77, 78.7078, 5.25884, 0, 0, -0.490071, 0.871682, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+91, 181112, 0, 1932.52, -4764.53, 97.0531, 0.494284, 0, 0, 0.244634, 0.969616, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+92, 181112, 0, 1962.81, -3098.09, 83.2199, 3.70069, 0, 0, -0.96118, 0.275923, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+93, 181112, 0, 1800.86, -2836.56, 72.3579, 5.25497, 0, 0, -0.491758, 0.870732, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+94, 181112, 0, 1798.57, -2846.25, 72.1208, 0.566801, 0, 0, 0.279622, 0.96011, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+95, 181112, 0, 1809.06, -2849.14, 69.3921, 2.17892, 0, 0, 0.886376, 0.462965, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+96, 181112, 0, 1810.19, -2838.92, 72.5255, 3.69937, 0, 0, -0.961362, 0.275288, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Eastern Plaguelands.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+97, 181112, 1, -7330.05, -3963.48, 10.0899, 4.88824, 0, 0, -0.642283, 0.766467, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+98, 181112, 1, -7335.53, -3971.89, 10.8281, 0.249671, 0, 0, 0.124512, 0.992218, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+99, 181112, 1, -7321.76, -3968.46, 10.5438, 3.3807, 0, 0, -0.992862, 0.119271, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+100, 181112, 1, -7327.75, -3977.19, 12.2037, 1.72779, 0, 0, 0.760377, 0.649482, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+101, 181112, 1, -8172.16, -3797.4, 15.09, 5.06059, 0, 0, -0.573932, 0.818903, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+102, 181112, 1, -8167.94, -3810.2, 15.0286, 1.8623, 0, 0, 0.802307, 0.596911, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+103, 181112, 1, -8163.54, -3801.6, 15.0347, 3.43797, 0, 0, -0.98904, 0.147645, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+104, 181112, 1, -8176.4, -3805.54, 14.538, 0.298431, 0, 0, 0.148663, 0.988888, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+105, 181112, 1, -7625.31, -3729.16, 18.5552, 3.65894, 0, 0, -0.96673, 0.255799, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+106, 181112, 1, -7252.32, -3545.4, 13.2834, 0.276513, 0, 0, 0.137816, 0.990458, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+107, 181112, 1, -7244.36, -3550.27, 13.5147, 1.81505, 0, 0, 0.787982, 0.615698, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+108, 181112, 1, -7247.74, -3536.89, 13.6045, 4.96345, 0, 0, -0.613013, 0.790073, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+109, 181112, 1, -7239.39, -3541.65, 13.6649, 3.42876, 0, 0, -0.98971, 0.143089, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+110, 181112, 1, -7633.83, -3725.47, 20.1457, 4.95148, 0, 0, -0.617729, 0.786391, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+111, 181112, 1, -7630.36, -3739.67, 20.6877, 1.81177, 0, 0, 0.786973, 0.616987, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+112, 181112, 1, -7638.53, -3736.17, 22.6584, 0.456129, 0, 0, 0.226092, 0.974106, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+113, 181112, 1, -8468.66, -3822.99, 13.5224, 3.5205, 0, 0, -0.982107, 0.188323, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+114, 181112, 1, -8482.81, -3827.85, 19.663, 0.273663, 0, 0, 0.136405, 0.990653, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+115, 181112, 1, -8474.18, -3832.61, 16.8047, 1.87174, 0, 0, 0.805117, 0.593116, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+116, 181112, 1, -8478.27, -3819.61, 16.7459, 5.02006, 0, 0, -0.590405, 0.807107, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+117, 181112, 1, -8327.41, -4201.08, 12.003, 3.45237, 0, 0, -0.987951, 0.154765, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+118, 181112, 1, -8331.47, -4209.11, 12.73, 1.95288, 0, 0, 0.828509, 0.559975, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+119, 181112, 1, -8336.15, -4196.6, 12.1524, 5.04786, 0, 0, -0.579133, 0.815233, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+120, 181112, 1, -8340.2, -4204.66, 12.7315, 0.233551, 0, 0, 0.11651, 0.993189, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+121, 181112, 1, -8526.72, -2699.96, 22.2086, 3.10342, 0, 0, 0.999818, 0.0190852, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+122, 181112, 1, -8539.86, -2699.8, 20.5008, 0.015175, 0, 0, 0.00758743, 0.999971, 7200, 7200, 100, 1, 0, 0, 9, 10),    -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+123, 181112, 1, -8533.62, -2693.06, 22.7555, 4.73251, 0, 0, -0.699958, 0.714184, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+124, 181112, 1, -8532.77, -2706.29, 20.2104, 1.67886, 0, 0, 0.744262, 0.667888, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+125, 181112, 1, -8840.51, -2600.58, 21.7024, 0.0288802, 0, 0, 0.0144396, 0.999896, 7200, 7200, 100, 1, 0, 0, 9, 10),   -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+126, 181112, 1, -8833.54, -2606.79, 22.6977, 1.57765, 0, 0, 0.709524, 0.704681, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+127, 181112, 1, -8833.6, -2594.29, 20.834, 4.71624, 0, 0, -0.705745, 0.708466, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+128, 181112, 1, -8826.67, -2600.32, 21.5937, 3.15033, 0, 0, -0.99999, 0.00436732, 7200, 7200, 100, 1, 0, 0, 9, 10),    -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+129, 181112, 1, -8539.3, -2303.56, 28.607, 0.744435, 0, 0, 0.363682, 0.931523, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+130, 181112, 1, -8529.61, -2304.47, 29.8455, 2.25941, 0, 0, 0.904286, 0.426926, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+131, 181112, 1, -8538.59, -2294.59, 27.837, 5.50866, 0, 0, -0.377657, 0.925946, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+132, 181112, 1, -8529.02, -2294.42, 28.7271, 3.85041, 0, 0, -0.937852, 0.347036, 7200, 7200, 100, 1, 0, 0, 9, 10),     -- GameObject "Buttress Spawner" in Tanaris.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+133, 181112, 1, 6548.87, -3489.14, 645.474, 1.78574, 0, 0, 0.778873, 0.627181, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+134, 181112, 1, 7821.43, -4213.28, 675.083, 4.92869, 0, 0, -0.626651, 0.7793, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+135, 181112, 1, 7823.17, -4225.99, 677.018, 1.60891, 0, 0, 0.720453, 0.693503, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+136, 181112, 1, 7829.49, -4218.6, 675.312, 3.37847, 0, 0, -0.992994, 0.118162, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+137, 181112, 1, 7816.18, -4222.44, 676.409, 0.323136, 0, 0, 0.160866, 0.986976, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+138, 181112, 1, 6540.67, -3484.4, 642.273, 0.289597, 0, 0, 0.144293, 0.989535, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+139, 181112, 1, 6546.16, -3475.6, 641.165, 4.89255, 0, 0, -0.640631, 0.767849, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+140, 181112, 1, 6553.39, -3480.42, 645.329, 3.46024, 0, 0, -0.987335, 0.158648, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+141, 181112, 1, 6078.1, -5037.46, 790.121, 3.55922, 0, 0, -0.978277, 0.207301, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+142, 181112, 1, 6065.72, -5042.99, 790.27, 0.422198, 0, 0, 0.209535, 0.977801, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+143, 181112, 1, 6074.64, -5046.08, 792.349, 1.97266, 0, 0, 0.834005, 0.551756, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+144, 181112, 1, 6069.25, -5033.93, 787.502, 5.14478, 0, 0, -0.538961, 0.84233, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+145, 181112, 1, 7941.39, -3877.28, 695.517, 1.83821, 0, 0, 0.795058, 0.606533, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+146, 181112, 1, 7933.18, -3872.76, 695.522, 0.275244, 0, 0, 0.137188, 0.990545, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+147, 181112, 1, 7694.45, -3876.01, 687.335, 3.39796, 0, 0, -0.991796, 0.127834, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+148, 181112, 1, 7689.99, -3883.6, 687.909, 1.91827, 0, 0, 0.818694, 0.57423, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+149, 181112, 1, 7685.95, -3871.65, 686.451, 5.01694, 0, 0, -0.591664, 0.806184, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+150, 181112, 1, 7938.27, -3864.38, 695.525, 4.9203, 0, 0, -0.629912, 0.776666, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+151, 181112, 1, 7946.29, -3869.5, 695.235, 3.35344, 0, 0, -0.994395, 0.105726, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+152, 181112, 1, 6050.68, -4755.56, 788.498, 1.25759, 0, 0, 0.588169, 0.808738, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+153, 181112, 1, 6059, -4751.98, 782.158, 2.78925, 0, 0, 0.984522, 0.175262, 7200, 7200, 100, 1, 0, 0, 9, 10),          -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+154, 181112, 1, 6054.36, -4743.45, 784.78, 4.43529, 0, 0, -0.797986, 0.602676, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+155, 181112, 1, 6045.95, -4747.92, 790.25, 6.03176, 0, 0, -0.125382, 0.992109, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+156, 181112, 1, 6289.69, -4777.6, 757.262, 3.8812, 0, 0, -0.932399, 0.361431, 7200, 7200, 100, 1, 0, 0, 9, 10),        -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+157, 181112, 1, 6279.89, -4777.42, 756.971, 5.50285, 0, 0, -0.380343, 0.924845, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+158, 181112, 1, 6288.89, -4787.29, 758.546, 2.25758, 0, 0, 0.903894, 0.427756, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+159, 181112, 1, 6279.78, -4786.82, 757.329, 0.759063, 0, 0, 0.370485, 0.928838, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+160, 181112, 1, 6749.06, -3351.1, 687.258, 3.32217, 0, 0, -0.995927, 0.0901649, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+161, 181112, 1, 6735.65, -3354.29, 688.133, 0.286997, 0, 0, 0.143006, 0.989722, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+162, 181112, 1, 6740.6, -3345.96, 687.573, 4.96332, 0, 0, -0.613064, 0.790033, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+163, 181112, 1, 6743.94, -3359.71, 687.566, 1.79712, 0, 0, 0.782432, 0.622737, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+164, 181112, 1, 7680.98, -3879.64, 686.913, 0.270057, 0, 0, 0.134619, 0.990897, 7200, 7200, 100, 1, 0, 0, 9, 10),      -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+165, 181112, 1, 6775.35, -3587, 713.148, 0.201509, 0, 0, 0.100584, 0.994929, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+166, 181112, 1, 6780.23, -3577.91, 709.708, 4.9379, 0, 0, -0.623054, 0.782179, 7200, 7200, 100, 1, 0, 0, 9, 10),       -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+167, 181112, 1, 6784.02, -3593.25, 715.376, 1.83091, 0, 0, 0.79284, 0.60943, 7200, 7200, 100, 1, 0, 0, 9, 10),         -- GameObject "Buttress Spawner" in Winterspring.
+        (@GOBJ_BUTTRESS_SPAWNER_GUID+168, 181112, 1, 6788.81, -3583.99, 711.793, 3.37985, 0, 0, -0.992912, 0.118849, 7200, 7200, 100, 1, 0, 0, 9, 10);      -- GameObject "Buttress Spawner" in Winterspring.
+
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_BUTTRESS_SPAWNER_GUID+133 AND @GOBJ_BUTTRESS_SPAWNER_GUID+168;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_BUTTRESS_SPAWNER_GUID+97 AND @GOBJ_BUTTRESS_SPAWNER_GUID+132;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_BUTTRESS_SPAWNER_GUID+25 AND @GOBJ_BUTTRESS_SPAWNER_GUID+48;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_BUTTRESS_SPAWNER_GUID+1 AND @GOBJ_BUTTRESS_SPAWNER_GUID+24;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_BUTTRESS_SPAWNER_GUID+73 AND @GOBJ_BUTTRESS_SPAWNER_GUID+96;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_BUTTRESS_SPAWNER_GUID+49 AND @GOBJ_BUTTRESS_SPAWNER_GUID+72;
+
+    -- GameObject: "Minion Spawner, finder" in Azshara
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+1, 181163, 1, 3052.06, -4218.66, 94.5101, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+2, 181163, 1, 3054.88, -4193.17, 96.3701, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+3, 181163, 1, 3061.03, -4205.14, 95.3405, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+4, 181163, 1, 3064.59, -4231.33, 96.0068, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+5, 181163, 1, 3068.87, -4181.28, 97.6392, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+6, 181163, 1, 3069.67, -4218.87, 95.3934, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+7, 181163, 1, 3070.3, -4194.14, 96.5278, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+8, 181163, 1, 3077.05, -4209.22, 96.0722, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+9, 181163, 1, 3077.45, -4255.77, 97.9742, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+10, 181163, 1, 3078.05, -4241.87, 97.7776, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+11, 181163, 1, 3078.86, -4226.2, 96.4072, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+12, 181163, 1, 3082.93, -4181.02, 98.3096, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+13, 181163, 1, 3084.01, -4199.99, 98.0012, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+14, 181163, 1, 3089.11, -4233.47, 97.1534, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+15, 181163, 1, 3091.23, -4189.78, 98.9192, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+16, 181163, 1, 3091.28, -4249.13, 98.1309, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+17, 181163, 1, 3094.07, -4204.89, 98.4522, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+18, 181163, 1, 3097.55, -4222.91, 97.6538, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+19, 181163, 1, 3101.93, -4236.38, 98.152, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+20, 181163, 1, 3104.51, -4213.21, 99.724, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+21, 181163, 1, 3105.64, -4249.88, 99.2042, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+22, 181163, 1, 3106.46, -4184.55, 102.513, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+23, 181163, 1, 3107.96, -4200.47, 102.344, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+24, 181163, 1, 3111.7, -4224.77, 99.2081, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+25, 181163, 1, 3115.46, -4239.17, 99.894, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+26, 181163, 1, 3117.07, -4212.53, 102.378, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+27, 181163, 1, 3122.37, -4198.01, 106.873, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+28, 181163, 1, 3123.73, -4224.91, 100.597, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+29, 181163, 1, 3297.06, -4492.66, 97.7712, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+30, 181163, 1, 3303.45, -4537.55, 94.6147, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+31, 181163, 1, 3303.64, -4508.5, 96.8414, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+32, 181163, 1, 3311.86, -4483.88, 99.9921, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+33, 181163, 1, 3317.9, -4552.03, 95.2773, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+34, 181163, 1, 3319.64, -4470.73, 102.761, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+35, 181163, 1, 3321.15, -4497.27, 97.3538, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+36, 181163, 1, 3321.4, -4519.14, 98.2024, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+37, 181163, 1, 3322, -4535.2, 97.9475, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+38, 181163, 1, 3331.03, -4484.22, 98.3, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),              -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+39, 181163, 1, 3331.88, -4510.62, 97.4588, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+40, 181163, 1, 3332.78, -5576.57, 14.3716, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+41, 181163, 1, 3333.38, -4523.2, 98.2382, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+42, 181163, 1, 3334.05, -4547.67, 97.5789, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+43, 181163, 1, 3334.31, -5564.92, 15.6421, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+44, 181163, 1, 3335.97, -4498.37, 97.0747, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+45, 181163, 1, 3340.66, -4470.9, 99.1944, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+46, 181163, 1, 3340.95, -4533.95, 98.2443, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+47, 181163, 1, 3341.39, -4562.71, 98.1636, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+48, 181163, 1, 3342.15, -4509.72, 97.5853, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+49, 181163, 1, 3342.43, -5554.33, 16.3574, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+50, 181163, 1, 3343.45, -5586.44, 10.6995, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+51, 181163, 1, 3343.69, -5574.39, 11.6644, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+52, 181163, 1, 3343.84, -4521.73, 98.083, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+53, 181163, 1, 3349.37, -5564.11, 12.6707, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+54, 181163, 1, 3350.16, -4550.55, 99.9108, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+55, 181163, 1, 3351.04, -5543.88, 18.714, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+56, 181163, 1, 3353.38, -5594.22, 9.27417, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+57, 181163, 1, 3354.8, -4496.21, 97.864, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+58, 181163, 1, 3355.19, -5583.63, 9.23584, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+59, 181163, 1, 3355.53, -4514.97, 99.4529, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+60, 181163, 1, 3358.77, -5573.38, 10.0153, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+61, 181163, 1, 3359.02, -4534.84, 100.891, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+62, 181163, 1, 3364, -5533.69, 19.6938, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+63, 181163, 1, 3365.13, -4574.19, 97.0721, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+64, 181163, 1, 3365.3, -5550.28, 14.5021, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+65, 181163, 1, 3366.84, -4551.24, 99.3443, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+66, 181163, 1, 3367.03, -5580.67, 9.14213, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+67, 181163, 1, 3367.16, -5590.04, 8.40419, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+68, 181163, 1, 3367.3, -5602.42, 8.44488, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+69, 181163, 1, 3373.94, -5559.22, 12.58, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+70, 181163, 1, 3374.06, -5540.74, 16.3713, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+71, 181163, 1, 3374.33, -5572.26, 10.2641, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+72, 181163, 1, 3374.54, -4503.57, 99.4529, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+73, 181163, 1, 3375.73, -4517.19, 100.536, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+74, 181163, 1, 3378.03, -5583.71, 8.52229, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+75, 181163, 1, 3378.62, -5593.57, 7.50537, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+76, 181163, 1, 3380.49, -4541.89, 99.703, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+77, 181163, 1, 3383.45, -5565.49, 11.5553, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+78, 181163, 1, 3385.7, -5552.67, 13.7273, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+79, 181163, 1, 3386.67, -5540.08, 16.1174, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+80, 181163, 1, 3388.58, -5574.24, 9.89189, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+81, 181163, 1, 3391.48, -5584, 8.78693, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+82, 181163, 1, 3397.08, -5551.55, 14.2353, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+83, 181163, 1, 3397.78, -5563.62, 12.4127, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+84, 181163, 1, 3401.69, -5572.06, 11.1274, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+85, 181163, 1, 3475.85, -4132.15, 108.939, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+86, 181163, 1, 3482.23, -4172.11, 99.6946, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+87, 181163, 1, 3486.96, -4157.97, 102.621, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+88, 181163, 1, 3488.06, -5710.97, 5.98872, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+89, 181163, 1, 3489.89, -4127.42, 103.581, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+90, 181163, 1, 3490.66, -5733.72, 7.04485, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+91, 181163, 1, 3491.65, -5687.77, 4.77581, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+92, 181163, 1, 3493.7, -5702.2, 4.62473, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+93, 181163, 1, 3494.08, -5724.02, 7.07728, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+94, 181163, 1, 3496.34, -4145.18, 103.741, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+95, 181163, 1, 3497.39, -4183.08, 98.5261, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+96, 181163, 1, 3498.01, -4168.62, 101.474, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+97, 181163, 1, 3498.46, -5715.92, 6.02655, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+98, 181163, 1, 3499.21, -4155.17, 103.601, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+99, 181163, 1, 3501.47, -5732.45, 5.50239, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+100, 181163, 1, 3503.59, -5743.56, 4.9394, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+101, 181163, 1, 3503.97, -5690.9, 4.51797, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+102, 181163, 1, 3504.39, -4133.83, 107.599, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+103, 181163, 1, 3507.8, -5705.52, 4.60514, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+104, 181163, 1, 3507.83, -4123.35, 103.923, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+105, 181163, 1, 3508.2, -5678.11, 5.59947, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+106, 181163, 1, 3508.56, -4145.32, 105.706, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+107, 181163, 1, 3511, -5722.33, 4.77359, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+108, 181163, 1, 3511.29, -4177.76, 101.651, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+109, 181163, 1, 3511.37, -4193.3, 100.419, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+110, 181163, 1, 3511.52, -4160.92, 105.342, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+111, 181163, 1, 3513.05, -5738.57, 4.13426, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+112, 181163, 1, 3514.81, -5692.86, 4.26868, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+113, 181163, 1, 3515.6, -4132.6, 105.999, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+114, 181163, 1, 3518.78, -5750.42, 5.19787, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+115, 181163, 1, 3519.91, -4119.88, 105.367, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+116, 181163, 1, 3521.14, -4171.2, 103.552, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+117, 181163, 1, 3522.71, -5729.77, 2.86675, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+118, 181163, 1, 3522.99, -4142.82, 107.56, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+119, 181163, 1, 3523.98, -5675.84, 4.81455, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+120, 181163, 1, 3524.24, -4185.59, 102.865, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+121, 181163, 1, 3524.68, -4158.03, 107.071, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+122, 181163, 1, 3525.71, -5702.98, 5.7656, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+123, 181163, 1, 3525.95, -5690.33, 5.74886, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+124, 181163, 1, 3526.56, -4130.81, 107.419, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+125, 181163, 1, 3527.92, -5741.46, 2.53033, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+126, 181163, 1, 3533.39, -4172.37, 105.328, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+127, 181163, 1, 3535.63, -4150.14, 107.273, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+128, 181163, 1, 3537, -5709.04, 6.25807, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+129, 181163, 1, 3537.48, -5684.61, 6.55419, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+130, 181163, 1, 3538.73, -5697.86, 7.8636, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+131, 181163, 1, 3538.77, -4126.51, 109.197, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+132, 181163, 1, 3539.37, -4138.37, 107.582, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+133, 181163, 1, 3541.88, -4160.51, 106.205, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+134, 181163, 1, 3542.16, -5733.04, 1.71104, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+135, 181163, 1, 3543.24, -5746.65, 1.89087, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+136, 181163, 1, 3543.48, -4172.77, 106.955, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+137, 181163, 1, 3547.56, -5722, 2.6648, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+138, 181163, 1, 3551.49, -5701.81, 6.66457, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+139, 181163, 1, 3551.9, -4149.52, 105.794, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+140, 181163, 1, 3552.45, -5712.3, 4.66837, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+141, 181163, 1, 3629.52, -5537.6, 21.5078, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+142, 181163, 1, 3632.27, -5525.7, 23.2605, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+143, 181163, 1, 3637.79, -5551.26, 20.5829, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+144, 181163, 1, 3642.21, -5539.7, 22.084, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+145, 181163, 1, 3645.98, -5527.76, 23.378, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+146, 181163, 1, 3646.52, -5513.63, 25.4151, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+147, 181163, 1, 3650.81, -5552.16, 19.3526, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+148, 181163, 1, 3651.64, -5564.29, 17.5879, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+149, 181163, 1, 3654.55, -5541.72, 20.819, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+150, 181163, 1, 3658.43, -5522.9, 23.2322, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+151, 181163, 1, 3660.68, -5508.89, 26.724, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+152, 181163, 1, 3662.81, -5563.04, 16.3745, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+153, 181163, 1, 3664.29, -5550.41, 17.9544, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+154, 181163, 1, 3666.26, -5572.33, 15.0484, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+155, 181163, 1, 3670.6, -5514.95, 24.1455, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+156, 181163, 1, 3672.79, -5499.77, 28.3583, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+157, 181163, 1, 3675.8, -5542.07, 18.1617, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+158, 181163, 1, 3676.29, -5565.21, 14.818, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+159, 181163, 1, 3676.53, -5526.23, 21.2233, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+160, 181163, 1, 3676.9, -5552.87, 16.2495, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+161, 181163, 1, 3682.15, -5513.76, 24.072, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+162, 181163, 1, 3687.04, -5535.02, 18.9696, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+163, 181163, 1, 3689.03, -5544.3, 17.1654, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+164, 181163, 1, 3689.47, -5523.47, 22.0029, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+165, 181163, 1, 3690.1, -5555.26, 15.5335, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+166, 181163, 1, 3693.61, -5512.01, 24.4701, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+167, 181163, 1, 3699.76, -5535.99, 19.664, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Azshara
+        (@GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+168, 181163, 1, 3702.28, -5548.42, 17.2446, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10);       -- GameObject: "Minion Spawner, finder" in Azshara
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+1 AND @GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID+168;
+
+    -- GameObject: "Minion Spawner, finder" in Winterspring
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+1, 181163, 1, 6019.56, -4732.35, 802.346, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+2, 181163, 1, 6019.6, -4757.41, 803.772, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+3, 181163, 1, 6021.62, -4717.61, 795.413, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+4, 181163, 1, 6023.85, -4776.91, 796.595, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+5, 181163, 1, 6026.22, -5049.34, 787.266, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+6, 181163, 1, 6028.84, -5069.67, 798.821, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+7, 181163, 1, 6029.56, -5033.75, 783.063, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+8, 181163, 1, 6030.33, -4747.28, 800.217, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+9, 181163, 1, 6030.76, -4794.53, 783.93, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+10, 181163, 1, 6032.58, -4761.92, 796.403, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+11, 181163, 1, 6033.94, -4731.03, 796.03, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+12, 181163, 1, 6034.1, -5016.35, 781.757, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+13, 181163, 1, 6038.34, -5052.79, 793.367, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+14, 181163, 1, 6042.01, -4749.4, 792.771, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+15, 181163, 1, 6043.09, -4722.28, 788.435, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+16, 181163, 1, 6044.18, -5030.07, 783.474, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+17, 181163, 1, 6046.37, -4736.93, 789.502, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+18, 181163, 1, 6046.45, -4780.51, 789.494, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+19, 181163, 1, 6046.94, -4713.09, 780.627, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+20, 181163, 1, 6047.73, -4760.52, 791.407, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+21, 181163, 1, 6048.68, -5063.7, 803.729, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+22, 181163, 1, 6049.2, -5003.04, 780.38, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+23, 181163, 1, 6051.28, -5047.69, 789.502, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+24, 181163, 1, 6058.75, -5016.88, 782.489, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+25, 181163, 1, 6058.82, -4727.96, 778.763, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+26, 181163, 1, 6060.16, -5034.83, 786.358, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+27, 181163, 1, 6061.17, -4742.39, 780.267, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+28, 181163, 1, 6062.34, -4762.52, 784.416, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+29, 181163, 1, 6063.3, -4997.71, 781.418, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+30, 181163, 1, 6064.33, -4785.45, 776.044, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+31, 181163, 1, 6065.56, -5072.04, 807.075, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+32, 181163, 1, 6066.06, -5051.1, 793.402, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+33, 181163, 1, 6071.35, -4752.91, 774.007, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+34, 181163, 1, 6074.01, -5025.43, 786.359, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+35, 181163, 1, 6074.43, -4722.75, 756.24, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+36, 181163, 1, 6074.85, -4773.89, 773.899, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+37, 181163, 1, 6077.58, -4738.75, 768.914, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+38, 181163, 1, 6077.83, -5007.27, 784.157, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+39, 181163, 1, 6082.63, -5087.32, 826.216, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+40, 181163, 1, 6082.92, -4760.65, 768.08, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+41, 181163, 1, 6084.75, -4788.65, 767.875, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+42, 181163, 1, 6085.1, -5037.21, 790.957, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+43, 181163, 1, 6086.76, -5053.22, 795.569, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+44, 181163, 1, 6088.08, -4715.84, 748.35, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+45, 181163, 1, 6089.73, -5021.6, 788.242, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+46, 181163, 1, 6091.63, -4773.75, 767.684, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+47, 181163, 1, 6094.11, -4743.58, 760.271, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+48, 181163, 1, 6094.19, -5074.18, 802.467, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+49, 181163, 1, 6095.58, -5003.05, 786.695, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+50, 181163, 1, 6097.15, -4760.67, 757.799, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+51, 181163, 1, 6099.65, -5034.8, 791.309, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+52, 181163, 1, 6101.9, -5048.42, 793.883, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+53, 181163, 1, 6107.5, -5018.22, 790.313, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+54, 181163, 1, 6111.27, -5071.46, 809.851, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+55, 181163, 1, 6114.28, -5035.89, 791.659, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+56, 181163, 1, 6115.64, -5055.81, 794.876, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+57, 181163, 1, 6244, -4779.69, 751.781, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+58, 181163, 1, 6244.2, -4822.47, 758.176, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+59, 181163, 1, 6245.98, -4805.58, 757.178, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+60, 181163, 1, 6248.46, -4755.08, 752.083, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+61, 181163, 1, 6260.05, -4793.75, 756.794, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+62, 181163, 1, 6261.85, -4815.35, 756.9, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+63, 181163, 1, 6264.28, -4779.01, 755.461, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+64, 181163, 1, 6266.41, -4760.14, 754.315, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+65, 181163, 1, 6267.61, -4741.21, 752.306, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+66, 181163, 1, 6274.75, -4790.02, 757.197, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+67, 181163, 1, 6275.42, -4772.54, 756.038, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+68, 181163, 1, 6278.3, -4822.49, 753.667, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+69, 181163, 1, 6278.87, -4805.42, 758.658, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+70, 181163, 1, 6285.86, -4739.68, 754.379, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+71, 181163, 1, 6290.29, -4792.8, 758.906, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+72, 181163, 1, 6291.49, -4761.14, 755.795, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+73, 181163, 1, 6293.97, -4810.49, 757.794, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+74, 181163, 1, 6295.38, -4778.72, 757.879, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+75, 181163, 1, 6300.34, -4823.2, 755.121, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+76, 181163, 1, 6300.74, -4746.35, 763.063, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+77, 181163, 1, 6305.05, -4791.18, 757.605, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+78, 181163, 1, 6305.06, -4765.39, 758.555, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+79, 181163, 1, 6308.67, -4809.84, 755.112, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+80, 181163, 1, 6315.74, -4777.7, 756.809, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+81, 181163, 1, 6316.25, -4825.2, 752.389, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+82, 181163, 1, 6320.75, -4749.24, 774.757, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+83, 181163, 1, 6321.46, -4795.62, 751.583, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+84, 181163, 1, 6327.99, -4811.45, 754.255, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+85, 181163, 1, 6502.31, -3474.61, 629.31, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+86, 181163, 1, 6505.72, -3459.59, 621.225, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+87, 181163, 1, 6507.96, -3520.64, 646.056, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+88, 181163, 1, 6518.95, -3487.36, 636.76, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+89, 181163, 1, 6524.56, -3475.16, 631.954, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+90, 181163, 1, 6525.9, -3499.27, 642.475, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+91, 181163, 1, 6530.19, -3521.71, 651.428, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+92, 181163, 1, 6532.16, -3437.84, 620.91, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+93, 181163, 1, 6533.33, -3464.28, 631.243, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+94, 181163, 1, 6536.55, -3488.23, 642.123, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+95, 181163, 1, 6538.32, -3507.86, 647.232, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+96, 181163, 1, 6539.41, -3474.06, 637.828, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+97, 181163, 1, 6544.11, -3447.51, 631.453, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+98, 181163, 1, 6544.26, -3495.53, 645.126, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+99, 181163, 1, 6545.69, -3522.92, 654.758, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+100, 181163, 1, 6550.84, -3458.72, 638.834, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+101, 181163, 1, 6554.11, -3471.91, 643.642, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+102, 181163, 1, 6554.91, -3494.86, 649.53, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+103, 181163, 1, 6555.51, -3507.44, 654.253, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+104, 181163, 1, 6555.9, -3442.93, 639.3, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+105, 181163, 1, 6558.93, -3482.51, 648.34, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+106, 181163, 1, 6566.17, -3515.59, 664.822, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+107, 181163, 1, 6566.26, -3496.04, 657.436, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+108, 181163, 1, 6569.58, -3465.98, 650.354, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+109, 181163, 1, 6571.48, -3482.74, 656.277, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+110, 181163, 1, 6582.48, -3498.92, 668.396, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+111, 181163, 1, 6585.37, -3473.37, 661.758, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+112, 181163, 1, 6592.46, -3487.51, 668.623, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+113, 181163, 1, 6697.96, -3353.05, 678.908, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+114, 181163, 1, 6707.89, -3378.03, 672.704, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+115, 181163, 1, 6710, -3337.31, 680.159, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+116, 181163, 1, 6710.2, -3323.17, 675.236, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+117, 181163, 1, 6714.63, -3360.29, 685.129, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+118, 181163, 1, 6722.37, -3390.24, 670.368, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+119, 181163, 1, 6722.59, -3345.27, 685.512, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+120, 181163, 1, 6724.65, -3332.95, 682.82, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+121, 181163, 1, 6725.51, -3317.41, 676.774, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+122, 181163, 1, 6729.41, -3370.34, 682.625, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+123, 181163, 1, 6732.38, -3355.74, 687.47, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+124, 181163, 1, 6734.2, -3572.91, 704.031, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+125, 181163, 1, 6735.53, -3341.49, 686.324, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+126, 181163, 1, 6738.41, -3327.87, 681.681, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+127, 181163, 1, 6740.54, -3392.55, 681.018, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+128, 181163, 1, 6743.03, -3307.84, 673.46, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+129, 181163, 1, 6743.57, -3622.55, 716.376, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+130, 181163, 1, 6743.76, -3605.07, 718.788, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+131, 181163, 1, 6744.9, -3380.01, 681.274, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+132, 181163, 1, 6744.93, -3365.14, 685.487, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+133, 181163, 1, 6745.98, -3560.78, 700.839, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+134, 181163, 1, 6748.63, -3577.6, 706.911, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+135, 181163, 1, 6750.93, -3596.03, 712.466, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+136, 181163, 1, 6751.61, -3343.63, 685.362, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+137, 181163, 1, 6755.18, -3542.83, 695.273, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+138, 181163, 1, 6755.89, -3355.38, 684.195, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+139, 181163, 1, 6756.24, -3610.65, 717.111, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+140, 181163, 1, 6757.12, -3329.68, 679.008, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+141, 181163, 1, 6757.45, -3625.26, 719.836, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+142, 181163, 1, 6758.04, -3387.27, 681.821, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+143, 181163, 1, 6759.55, -3586.78, 711.38, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+144, 181163, 1, 6761.73, -3369.84, 680.471, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+145, 181163, 1, 6765.78, -3312.03, 670.013, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+146, 181163, 1, 6767.9, -3597.28, 715.526, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+147, 181163, 1, 6768.14, -3343.88, 679.026, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+148, 181163, 1, 6768.48, -3608.16, 718.727, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+149, 181163, 1, 6768.63, -3558.32, 703.155, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+150, 181163, 1, 6768.67, -3576.22, 709.911, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+151, 181163, 1, 6770.59, -3539.92, 696.328, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+152, 181163, 1, 6772.13, -3621.32, 721.641, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+153, 181163, 1, 6773.43, -3359.75, 674.856, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+154, 181163, 1, 6776.84, -3327.48, 675.283, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+155, 181163, 1, 6780.61, -3388.83, 670.426, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+156, 181163, 1, 6781.78, -3572.2, 707.945, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+157, 181163, 1, 6781.79, -3605.28, 718.212, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+158, 181163, 1, 6782.17, -3629.35, 725.447, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+159, 181163, 1, 6783.27, -3549.51, 702.551, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+160, 181163, 1, 6792.82, -3333.73, 672.688, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+161, 181163, 1, 6793.59, -3582.59, 711.24, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+162, 181163, 1, 6795.1, -3623.55, 723.573, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+163, 181163, 1, 6798.46, -3596.05, 715.951, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+164, 181163, 1, 6798.58, -3567.63, 707.992, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+165, 181163, 1, 6803.28, -3609.97, 724.075, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+166, 181163, 1, 6809.51, -3588.19, 715.367, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+167, 181163, 1, 6817.91, -3615.72, 729.914, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+168, 181163, 1, 6819.23, -3570.4, 727.072, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+169, 181163, 1, 7641.33, -3886.13, 685.03, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+170, 181163, 1, 7646.42, -3869.21, 684.829, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+171, 181163, 1, 7649.19, -3855.19, 684.986, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+172, 181163, 1, 7652.64, -3903.16, 686.687, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+173, 181163, 1, 7656.79, -3884.09, 685.725, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+174, 181163, 1, 7662.29, -3869.07, 685.246, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+175, 181163, 1, 7664.56, -3850.75, 685.964, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+176, 181163, 1, 7667.13, -3911.85, 689.31, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+177, 181163, 1, 7669.45, -3886.25, 686.406, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+178, 181163, 1, 7677, -3857.65, 685.728, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+179, 181163, 1, 7677.6, -3841.15, 686.967, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+180, 181163, 1, 7678.66, -3914.82, 692.927, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+181, 181163, 1, 7680.04, -3872.52, 686.097, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+182, 181163, 1, 7682.71, -3885.57, 687.503, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+183, 181163, 1, 7688.04, -3897.73, 694.276, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+184, 181163, 1, 7692.21, -3843.77, 688.606, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+185, 181163, 1, 7692.97, -3869.9, 686.828, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+186, 181163, 1, 7693.95, -3855.77, 687.262, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+187, 181163, 1, 7694.82, -3881.97, 687.965, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+188, 181163, 1, 7696.09, -3920.77, 696.934, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+189, 181163, 1, 7706.35, -3854.83, 690.142, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+190, 181163, 1, 7707.08, -3889.23, 688.648, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+191, 181163, 1, 7708.42, -3907.95, 691.742, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+192, 181163, 1, 7709.28, -3870.56, 688.726, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+193, 181163, 1, 7711.92, -3840.43, 700.265, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+194, 181163, 1, 7720.34, -3881.16, 690.456, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+195, 181163, 1, 7722.49, -3863.91, 692.282, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+196, 181163, 1, 7723.1, -3902.68, 691.566, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+197, 181163, 1, 7788.19, -4196.17, 678.94, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+198, 181163, 1, 7789.24, -4224.77, 678.404, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+199, 181163, 1, 7795.15, -4252.16, 684.127, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+200, 181163, 1, 7795.27, -4208.93, 676.937, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+201, 181163, 1, 7795.84, -4235.55, 680.31, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+202, 181163, 1, 7803.93, -4223.38, 676.976, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+203, 181163, 1, 7806.19, -4247.15, 682.155, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+204, 181163, 1, 7806.81, -4258.37, 684.659, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+205, 181163, 1, 7807.68, -4200.73, 676.645, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+206, 181163, 1, 7808.61, -4236.62, 680.346, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+207, 181163, 1, 7810.57, -4187.36, 679.448, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+208, 181163, 1, 7814.38, -4215.36, 675.235, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+209, 181163, 1, 7819.46, -4228.16, 678.039, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+210, 181163, 1, 7819.69, -4253.9, 683.877, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+211, 181163, 1, 7823.81, -4183.98, 678.287, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+212, 181163, 1, 7823.87, -4236.39, 680.851, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+213, 181163, 1, 7824.58, -4198.73, 676.44, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+214, 181163, 1, 7828.07, -4212.5, 675.284, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+215, 181163, 1, 7830.36, -4226.16, 676.592, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+216, 181163, 1, 7830.58, -4248.46, 683.335, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+217, 181163, 1, 7833.12, -4264.02, 685.045, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+218, 181163, 1, 7834.89, -4191.34, 678.831, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+219, 181163, 1, 7837.27, -4205.74, 676.506, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+220, 181163, 1, 7843.34, -4239.35, 680.186, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+221, 181163, 1, 7845.04, -4220.46, 676.056, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+222, 181163, 1, 7848.99, -4251.67, 682.438, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+223, 181163, 1, 7859.19, -4210.56, 677.92, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+224, 181163, 1, 7862.23, -4231.88, 680.239, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+225, 181163, 1, 7898.49, -3883.67, 695.912, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+226, 181163, 1, 7906.08, -3869.86, 697.101, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+227, 181163, 1, 7911.53, -3892.19, 694.113, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+228, 181163, 1, 7919.69, -3876.01, 695.881, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+229, 181163, 1, 7919.76, -3859.64, 697.67, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+230, 181163, 1, 7927.97, -3839.86, 697.547, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+231, 181163, 1, 7928.04, -3895.8, 693.936, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+232, 181163, 1, 7930.05, -3865.68, 696.047, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+233, 181163, 1, 7933.96, -3880.2, 695.511, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+234, 181163, 1, 7936.22, -3851.07, 695.79, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+235, 181163, 1, 7937.52, -3907.76, 691.837, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+236, 181163, 1, 7939.44, -3824.62, 694.276, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+237, 181163, 1, 7941.26, -3838.65, 695.45, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+238, 181163, 1, 7943.79, -3893.78, 694.071, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+239, 181163, 1, 7945.12, -3861.87, 695.372, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+240, 181163, 1, 7947.64, -3849.3, 695.279, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+241, 181163, 1, 7949.9, -3877.03, 694.952, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+242, 181163, 1, 7951.07, -3833.49, 694.815, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+243, 181163, 1, 7954.25, -3903.53, 692.432, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+244, 181163, 1, 7956.12, -3823.11, 694.151, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+245, 181163, 1, 7956.16, -3890.51, 692.989, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+246, 181163, 1, 7957.6, -3842.41, 695.523, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+247, 181163, 1, 7957.85, -3866.2, 695.307, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+248, 181163, 1, 7959.24, -3852.64, 695.212, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+249, 181163, 1, 7962, -3877.56, 694.392, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+250, 181163, 1, 7963.28, -3831.76, 695.148, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+251, 181163, 1, 7965.36, -3899.19, 690.591, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Winterspring
+        (@GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+252, 181163, 1, 7965.54, -3861.22, 694.937, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10);       -- GameObject: "Minion Spawner, finder" in Winterspring
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+1 AND @GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID+252;
+
+    -- GameObject: "Minion Spawner, finder" in Tanaris
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+1, 181163, 1, -8875.47, -2605.15, 18.6127, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+2, 181163, 1, -8866.94, -2627.48, 20.5245, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+3, 181163, 1, -8866.47, -2614.57, 19.8519, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+4, 181163, 1, -8866.35, -2591.27, 18.9667, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+5, 181163, 1, -8860.52, -2601.38, 19.9517, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+6, 181163, 1, -8858.14, -2576.11, 19.1797, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+7, 181163, 1, -8855.31, -2589.61, 19.9539, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+8, 181163, 1, -8854.67, -2627.79, 21.6025, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+9, 181163, 1, -8852.79, -2614.9, 21.5556, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+10, 181163, 1, -8849.52, -2601.38, 21.1683, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+11, 181163, 1, -8847.34, -2563.92, 17.0464, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+12, 181163, 1, -8844.52, -2638.38, 23.0136, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+13, 181163, 1, -8844.4, -2576.94, 18.7649, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+14, 181163, 1, -8843.74, -2589.91, 20.3794, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+15, 181163, 1, -8843.16, -2624.59, 23.1432, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+16, 181163, 1, -8842.16, -2611.2, 22.6175, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+17, 181163, 1, -8833.58, -2619.84, 24.0012, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+18, 181163, 1, -8833.29, -2633.88, 24.6284, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+19, 181163, 1, -8833.24, -2580.29, 18.1988, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+20, 181163, 1, -8831.92, -2562.77, 14.4384, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+21, 181163, 1, -8822.62, -2624.8, 24.9219, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+22, 181163, 1, -8821.97, -2612.31, 23.3849, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+23, 181163, 1, -8821.94, -2588.89, 18.6781, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+24, 181163, 1, -8817.13, -2574.37, 14.2864, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+25, 181163, 1, -8813.18, -2600.65, 20.0722, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+26, 181163, 1, -8809.92, -2613.55, 22.483, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+27, 181163, 1, -8803.88, -2588.05, 14.9465, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+28, 181163, 1, -8796.55, -2601.58, 16.4604, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+29, 181163, 1, -8570.12, -2280.41, 23.9053, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+30, 181163, 1, -8569.21, -2307.8, 26.149, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+31, 181163, 1, -8568.39, -2710.22, 17.4404, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+32, 181163, 1, -8568.37, -2695.87, 18.6941, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+33, 181163, 1, -8567.95, -2291.9, 24.4589, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+34, 181163, 1, -8567.42, -2321.62, 27.4631, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+35, 181163, 1, -8560.55, -2681.99, 20.8305, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+36, 181163, 1, -8557.07, -2280.72, 25.1838, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+37, 181163, 1, -8556.26, -2309.37, 27.1497, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+38, 181163, 1, -8556.13, -2725.65, 16.8157, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+39, 181163, 1, -8554.92, -2294.24, 26.1406, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+40, 181163, 1, -8554.6, -2711.14, 18.1204, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+41, 181163, 1, -8554.31, -2270.46, 25.5822, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+42, 181163, 1, -8553.1, -2325.86, 28.7335, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+43, 181163, 1, -8551.27, -2696.89, 19.5145, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+44, 181163, 1, -8550.62, -2674.02, 24.4004, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+45, 181163, 1, -8546.71, -2287.25, 26.5024, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+46, 181163, 1, -8546.58, -2300.08, 27.483, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+47, 181163, 1, -8545.69, -2313.16, 28.6384, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+48, 181163, 1, -8544.33, -2259.92, 26.6284, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+49, 181163, 1, -8543.9, -2274.42, 26.0788, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+50, 181163, 1, -8543.75, -2723.52, 17.3032, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+51, 181163, 1, -8543.18, -2688.59, 22.2679, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+52, 181163, 1, -8543.02, -2741.27, 15.7143, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+53, 181163, 1, -8540.64, -2708.69, 19.0619, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+54, 181163, 1, -8538.17, -2323.67, 30.6695, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+55, 181163, 1, -8536.47, -2680.38, 25.2552, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+56, 181163, 1, -8536, -2284.88, 27.1547, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+57, 181163, 1, -8535.79, -2661.39, 29.0533, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+58, 181163, 1, -8533.4, -2311.17, 30.1374, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+59, 181163, 1, -8532.56, -2335.88, 32.7434, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+60, 181163, 1, -8531.11, -2716.61, 19.1148, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+61, 181163, 1, -8530.84, -2267.82, 26.2574, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+62, 181163, 1, -8530.54, -2734.31, 16.4976, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+63, 181163, 1, -8526.18, -2323.52, 32.4688, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+64, 181163, 1, -8524.61, -2690.84, 24.5677, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+65, 181163, 1, -8522.76, -2709.36, 21.0987, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+66, 181163, 1, -8522.25, -2284.88, 28.0509, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+67, 181163, 1, -8521.8, -2675.69, 28.1673, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+68, 181163, 1, -8521.69, -2311.75, 31.5211, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+69, 181163, 1, -8521.43, -2298.91, 29.8686, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+70, 181163, 1, -8516.23, -2736.99, 18.1427, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+71, 181163, 1, -8515.51, -2271.21, 26.7178, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+72, 181163, 1, -8515.25, -2723.55, 20.5058, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+73, 181163, 1, -8514.31, -2701.25, 23.6604, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+74, 181163, 1, -8512.32, -2322.18, 33.4144, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+75, 181163, 1, -8509.89, -2291.45, 29.0953, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+76, 181163, 1, -8509.53, -3832.18, 23.253, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+77, 181163, 1, -8509.53, -2306.43, 31.1962, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+78, 181163, 1, -8509.28, -2670.58, 31.3468, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+79, 181163, 1, -8508.45, -2687.16, 27.8193, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+80, 181163, 1, -8503.3, -2714.46, 22.2704, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+81, 181163, 1, -8502.65, -3817.23, 23.0028, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+82, 181163, 1, -8500.43, -2728.78, 21.0353, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+83, 181163, 1, -8497.73, -3829.68, 23.2553, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+84, 181163, 1, -8497.2, -3843.25, 23.6297, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+85, 181163, 1, -8495.78, -3805.49, 20.6777, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+86, 181163, 1, -8495.53, -2299.1, 28.8357, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+87, 181163, 1, -8492.5, -2702.93, 25.9494, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+88, 181163, 1, -8492.32, -2687.27, 29.2567, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+89, 181163, 1, -8489.18, -3818.92, 20.8645, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+90, 181163, 1, -8487.71, -2715.79, 23.6916, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+91, 181163, 1, -8485.91, -3791.77, 14.1813, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+92, 181163, 1, -8484.35, -3837.43, 21.0824, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+93, 181163, 1, -8482.11, -3848.27, 21.205, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+94, 181163, 1, -8482.06, -3806.28, 16.3868, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+95, 181163, 1, -8478.91, -3859.43, 20.9495, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+96, 181163, 1, -8473.98, -3841.03, 17.8062, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+97, 181163, 1, -8470.19, -3854.1, 17.8575, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+98, 181163, 1, -8468.51, -3799.28, 11.0332, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+99, 181163, 1, -8468.27, -3812.58, 12.6366, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+100, 181163, 1, -8468.25, -3784.74, 10.6056, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+101, 181163, 1, -8463.29, -3871.34, 16.7454, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+102, 181163, 1, -8463.16, -3833.24, 13.3817, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+103, 181163, 1, -8458.14, -3846.84, 14.1027, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+104, 181163, 1, -8455.49, -3821.52, 11.621, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+105, 181163, 1, -8454.86, -3809.41, 10.7524, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+106, 181163, 1, -8453.66, -3796.16, 10.6514, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+107, 181163, 1, -8450.82, -3861.77, 14.0416, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+108, 181163, 1, -8447.66, -3833.82, 12.3459, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+109, 181163, 1, -8440.73, -3850.02, 13.0488, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+110, 181163, 1, -8440.53, -3807.73, 11.7735, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+111, 181163, 1, -8438.92, -3823.27, 12.1672, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+112, 181163, 1, -8431.08, -3834.85, 12.4184, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+113, 181163, 1, -8372.59, -4222.65, 13.8112, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+114, 181163, 1, -8371.76, -4209.64, 12.2172, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+115, 181163, 1, -8365.46, -4179.82, 12.2681, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+116, 181163, 1, -8358.85, -4194.83, 10.88, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+117, 181163, 1, -8357.24, -4220.91, 12.8511, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+118, 181163, 1, -8353, -4208.15, 12.2674, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+119, 181163, 1, -8351.21, -4168.74, 13.3854, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+120, 181163, 1, -8347.74, -4182.63, 12.731, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+121, 181163, 1, -8345.09, -4195.04, 11.8301, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+122, 181163, 1, -8344.86, -4230.74, 13.3013, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+123, 181163, 1, -8342.07, -4215.83, 13.6906, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+124, 181163, 1, -8337.4, -4166.29, 12.8508, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+125, 181163, 1, -8335.46, -4182.44, 13.014, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+126, 181163, 1, -8331.53, -4222.94, 13.4123, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+127, 181163, 1, -8330.82, -4240.35, 12.4493, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+128, 181163, 1, -8326.1, -4190.56, 12.6192, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+129, 181163, 1, -8324.41, -4177.46, 12.9567, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+130, 181163, 1, -8322.67, -4151.78, 10.2642, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+131, 181163, 1, -8321.77, -4211.24, 11.495, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+132, 181163, 1, -8317.97, -4225.9, 11.1311, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+133, 181163, 1, -8313.99, -4199.83, 11.3477, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+134, 181163, 1, -8312.53, -4185.8, 11.8573, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+135, 181163, 1, -8309.51, -4162.99, 10.0566, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+136, 181163, 1, -8306.88, -4210.41, 9.92429, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+137, 181163, 1, -8304.14, -4227.69, 8.9611, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+138, 181163, 1, -8299.23, -4196.12, 9.59805, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+139, 181163, 1, -8294.54, -4177.96, 8.66661, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+140, 181163, 1, -8290.03, -4207.55, 8.68307, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+141, 181163, 1, -8202.46, -3804.13, 10.8938, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+142, 181163, 1, -8195.46, -3781.23, 16.1365, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+143, 181163, 1, -8192.93, -3832.2, 9.10186, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+144, 181163, 1, -8191.13, -3792.8, 14.827, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+145, 181163, 1, -8189.24, -3820.07, 10.7394, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+146, 181163, 1, -8186.83, -3807.78, 12.8409, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+147, 181163, 1, -8183.67, -3783.82, 16.3321, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+148, 181163, 1, -8179.1, -3794.72, 15.3745, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+149, 181163, 1, -8178.19, -3829.83, 11.3705, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+150, 181163, 1, -8176.62, -3816.16, 13.4556, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+151, 181163, 1, -8171.13, -3783.94, 14.9894, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+152, 181163, 1, -8170.4, -3769.46, 14.0081, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+153, 181163, 1, -8165.72, -3823.48, 14.4758, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+154, 181163, 1, -8164.48, -3840.64, 12.4232, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+155, 181163, 1, -8160.06, -3793.21, 14.1458, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+156, 181163, 1, -8157.91, -3812.96, 15.47, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+157, 181163, 1, -8157.87, -3779.69, 12.999, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+158, 181163, 1, -8156.69, -3765.66, 13.2382, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+159, 181163, 1, -8153.07, -3825.89, 15.7912, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+160, 181163, 1, -8150.95, -3838.64, 15.2399, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+161, 181163, 1, -8150.57, -3803.01, 14.1501, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+162, 181163, 1, -8146.28, -3789.86, 12.565, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+163, 181163, 1, -8143.77, -3815.97, 14.8309, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+164, 181163, 1, -8143.17, -3775.31, 12.8539, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+165, 181163, 1, -8138.02, -3827.97, 15.4933, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+166, 181163, 1, -8133.4, -3803.21, 12.2422, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+167, 181163, 1, -8132.48, -3789.38, 12.4753, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+168, 181163, 1, -8123.68, -3817.04, 12.3483, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+169, 181163, 1, -7661.95, -3727.53, 26.8725, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+170, 181163, 1, -7659.07, -3736.71, 25.7794, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+171, 181163, 1, -7655.67, -3714.27, 24.4955, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+172, 181163, 1, -7653.08, -3726.19, 25.1272, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+173, 181163, 1, -7650.74, -3757.33, 21.7677, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+174, 181163, 1, -7649.6, -3746.09, 23.8511, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+175, 181163, 1, -7648.75, -3736.26, 24.7103, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+176, 181163, 1, -7646.51, -3698.16, 21.8852, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+177, 181163, 1, -7645.2, -3712.39, 21.2354, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+178, 181163, 1, -7643.15, -3726.38, 22.7255, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+179, 181163, 1, -7639.91, -3753.53, 21.4733, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+180, 181163, 1, -7639.1, -3743.79, 22.6832, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+181, 181163, 1, -7634.08, -3713.65, 19.3541, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+182, 181163, 1, -7633.44, -3698.23, 20.7083, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+183, 181163, 1, -7628.52, -3751.79, 19.5663, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+184, 181163, 1, -7627.59, -3763.22, 17.7038, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+185, 181163, 1, -7622.82, -3722.15, 18.0316, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+186, 181163, 1, -7620.14, -3708.12, 18.9941, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+187, 181163, 1, -7618.54, -3742.16, 17.8402, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+188, 181163, 1, -7614.92, -3753.19, 16.2557, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+189, 181163, 1, -7613.69, -3766.51, 14.5989, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+190, 181163, 1, -7609.51, -3731.71, 16.5359, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+191, 181163, 1, -7607.49, -3719.28, 17.4744, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+192, 181163, 1, -7606.45, -3707.07, 17.96, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+193, 181163, 1, -7603.88, -3743.44, 14.7937, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+194, 181163, 1, -7599.78, -3755.23, 12.4615, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+195, 181163, 1, -7592.56, -3732.58, 14.9794, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+196, 181163, 1, -7588.72, -3744.07, 12.7845, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+197, 181163, 1, -7356.58, -3978.46, 9.93594, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+198, 181163, 1, -7356.55, -3958.05, 10.2371, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+199, 181163, 1, -7354.07, -3968.47, 9.26089, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+200, 181163, 1, -7349.55, -3989.31, 10.3145, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+201, 181163, 1, -7348.71, -3948.03, 11.5307, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+202, 181163, 1, -7347.73, -3978.61, 9.64909, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+203, 181163, 1, -7346.61, -3957.99, 9.51486, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+204, 181163, 1, -7343.19, -3968.54, 9.55852, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+205, 181163, 1, -7341.13, -3938.26, 12.6796, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+206, 181163, 1, -7339.9, -3949.15, 10.7003, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+207, 181163, 1, -7338.79, -4001.61, 11.0869, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+208, 181163, 1, -7337.82, -3989.84, 10.5515, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+209, 181163, 1, -7337.17, -3960.35, 9.55714, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+210, 181163, 1, -7336.37, -3979.78, 11.1886, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+211, 181163, 1, -7330.96, -3940.37, 12.3137, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+212, 181163, 1, -7328.98, -3952.59, 10.2225, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+213, 181163, 1, -7328.43, -3987.73, 12.0351, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+214, 181163, 1, -7327.48, -3999.14, 11.5049, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+215, 181163, 1, -7319.64, -3977.81, 11.7139, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+216, 181163, 1, -7319.5, -3989.14, 12.536, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+217, 181163, 1, -7319.24, -3938.45, 12.1927, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+218, 181163, 1, -7318.98, -3959.46, 10.0326, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+219, 181163, 1, -7317.51, -3948.85, 11.0682, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+220, 181163, 1, -7311.69, -3968.46, 9.96437, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+221, 181163, 1, -7308.94, -3980.61, 10.3655, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+222, 181163, 1, -7308.7, -3959.18, 10.5048, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+223, 181163, 1, -7306.82, -3949.61, 11.547, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+224, 181163, 1, -7299.76, -3971.29, 10.1424, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+225, 181163, 1, -7277.2, -3552.66, 8.59923, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+226, 181163, 1, -7275.22, -3531.92, 11.8755, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+227, 181163, 1, -7272.66, -3543.49, 10.7438, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+228, 181163, 1, -7268.31, -3567.27, 8.98188, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+229, 181163, 1, -7266.57, -3554.31, 10.0326, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+230, 181163, 1, -7265, -3523.32, 12.9154, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+231, 181163, 1, -7263.98, -3533.87, 12.9191, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+232, 181163, 1, -7260.92, -3543.11, 12.5748, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+233, 181163, 1, -7259.76, -3575.32, 9.33801, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+234, 181163, 1, -7258.43, -3562.49, 10.4937, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+235, 181163, 1, -7256.64, -3513.72, 11.9059, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+236, 181163, 1, -7256.06, -3524.96, 13.0664, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+237, 181163, 1, -7255.17, -3535.15, 13.4109, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+238, 181163, 1, -7254.99, -3551.94, 12.341, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+239, 181163, 1, -7251.03, -3573.52, 10.2201, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+240, 181163, 1, -7248.59, -3560.16, 12.1926, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+241, 181163, 1, -7246.26, -3528.72, 13.1347, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+242, 181163, 1, -7244.28, -3515.06, 11.3882, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+243, 181163, 1, -7239.63, -3575.1, 11.3355, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+244, 181163, 1, -7238.77, -3562.69, 12.8448, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+245, 181163, 1, -7238.6, -3551.89, 13.6019, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+246, 181163, 1, -7236.96, -3534.54, 13.0861, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+247, 181163, 1, -7234.28, -3523.69, 11.7133, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+248, 181163, 1, -7231.06, -3542.7, 13.2445, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+249, 181163, 1, -7227.98, -3553.69, 13.3394, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+250, 181163, 1, -7226.6, -3565.82, 13.0601, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+251, 181163, 1, -7226.05, -3532.65, 11.8293, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Tanaris
+        (@GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+252, 181163, 1, -7218.94, -3544.25, 12.0636, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10);       -- GameObject: "Minion Spawner, finder" in Tanaris
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+1 AND @GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID+252;
+
+    -- GameObject: "Minion Spawner, finder" in Blasted Lands
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+1, 181163, 0, -11591.7, -3294.08, 7.72112, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+2, 181163, 0, -11591.7, -3259.07, 7.44409, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+3, 181163, 0, -11588.4, -3239.93, 7.05529, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+4, 181163, 0, -11585.3, -3275.69, 7.71706, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+5, 181163, 0, -11583.9, -3310.85, 8.08078, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+6, 181163, 0, -11577.8, -3253.41, 6.74885, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+7, 181163, 0, -11576.2, -3288.48, 9.07377, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+8, 181163, 0, -11571.2, -3270.33, 7.40802, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+9, 181163, 0, -11568.8, -3316.34, 9.62002, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+10, 181163, 0, -11568.4, -3238.51, 6.11985, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+11, 181163, 0, -11562, -3254.91, 6.87347, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+12, 181163, 0, -11560.6, -3284.29, 7.74791, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+13, 181163, 0, -11557.2, -3303.17, 9.34602, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+14, 181163, 0, -11554.3, -3269.97, 7.27004, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+15, 181163, 0, -11549.5, -3318.25, 9.25335, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+16, 181163, 0, -11546.3, -3245.86, 6.85342, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+17, 181163, 0, -11540.4, -3260.93, 7.04242, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+18, 181163, 0, -11539.6, -3276.42, 7.99829, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+19, 181163, 0, -11538.9, -3290.09, 8.57665, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+20, 181163, 0, -11538.1, -3304.59, 8.15991, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+21, 181163, 0, -11534.7, -3327.86, 14.1548, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+22, 181163, 0, -11525.7, -3283.26, 8.72746, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+23, 181163, 0, -11525.6, -3316.16, 8.15826, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+24, 181163, 0, -11523.9, -3245.55, 7.11017, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+25, 181163, 0, -11521.3, -3263.87, 7.51119, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+26, 181163, 0, -11521.2, -3300.12, 9.13522, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+27, 181163, 0, -11510.2, -3314.3, 8.31123, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+28, 181163, 0, -11509.8, -3283.77, 8.013, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+29, 181163, 0, -11458.5, -2835.28, -0.501001, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+30, 181163, 0, -11458.5, -2791.27, -1.29338, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+31, 181163, 0, -11452.7, -2810.38, -1.63872, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+32, 181163, 0, -11448.1, -2859.39, 0.904908, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+33, 181163, 0, -11443.4, -2783.43, -0.325569, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+34, 181163, 0, -11443.2, -2825.79, -1.2147, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+35, 181163, 0, -11442.2, -2843.87, -0.296348, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+36, 181163, 0, -11435.1, -2813.19, -1.24098, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+37, 181163, 0, -11428.8, -2827.22, 0.264869, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+38, 181163, 0, -11426.9, -2783.61, 0.789475, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+39, 181163, 0, -11424.5, -2803.79, 0.722889, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+40, 181163, 0, -11424, -2838.84, 0.50487, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+41, 181163, 0, -11419.1, -2860.09, 1.96834, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+42, 181163, 0, -11412.8, -2791.76, 1.57174, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+43, 181163, 0, -11411, -2832.67, -2.81856, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+44, 181163, 0, -11409.4, -2807.62, -2.2806, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+45, 181163, 0, -11409.1, -2774.37, 2.76715, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+46, 181163, 0, -11405.1, -2846.84, -2.72865, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+47, 181163, 0, -11399.7, -2827.16, -2.43278, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+48, 181163, 0, -11393.4, -2789.38, 3.18945, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+49, 181163, 0, -11392.3, -2813.08, -2.27471, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+50, 181163, 0, -11389.1, -2836.06, -2.25091, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+51, 181163, 0, -11388.5, -2857.65, 3.03795, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+52, 181163, 0, -11387.6, -2775.46, 3.7363, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+53, 181163, 0, -11380.6, -2824.51, -2.15952, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+54, 181163, 0, -11378.1, -3184.08, 13.2359, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+55, 181163, 0, -11377.2, -3123.76, 5.38044, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+56, 181163, 0, -11376.8, -3139.34, 7.8165, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+57, 181163, 0, -11375.5, -2787.37, 3.76548, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+58, 181163, 0, -11375.2, -3166.46, 11.8, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+59, 181163, 0, -11374, -2842.94, 4.32663, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+60, 181163, 0, -11373.6, -2804.95, 3.71653, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+61, 181163, 0, -11372.4, -3151.96, 9.45155, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+62, 181163, 0, -11370.2, -3108.52, 3.10605, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+63, 181163, 0, -11364.6, -3129.79, 5.75585, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+64, 181163, 0, -11362.9, -3174.96, 10.6151, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+65, 181163, 0, -11361.3, -3159.3, 8.87013, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+66, 181163, 0, -11361.3, -3143.44, 6.54761, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+67, 181163, 0, -11359.4, -3191, 12.9642, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+68, 181163, 0, -11355.9, -3120.81, 2.03413, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+69, 181163, 0, -11351.4, -3135.15, 2.55729, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+70, 181163, 0, -11346.8, -3169.79, 10.8443, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+71, 181163, 0, -11345.2, -3184.88, 9.96713, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+72, 181163, 0, -11343.4, -3110.82, -1.571, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+73, 181163, 0, -11337.9, -3126.06, -1.45812, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+74, 181163, 0, -11335.9, -3156, 7.16726, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+75, 181163, 0, -11333.7, -3195.45, 9.97451, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+76, 181163, 0, -11331.3, -3174.08, 8.75502, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+77, 181163, 0, -11330.6, -3141.88, 6.51639, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+78, 181163, 0, -11324.3, -3115.12, -1.57099, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+79, 181163, 0, -11320.6, -3127.99, -0.00666066, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+80, 181163, 0, -11319.7, -3163.73, 7.40355, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+81, 181163, 0, -11318.2, -3184.48, 10.1434, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+82, 181163, 0, -11313.1, -3143.47, 5.6345, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+83, 181163, 0, -11306.5, -3119.29, -1.06902, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+84, 181163, 0, -11306.4, -3156.66, 6.39326, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+85, 181163, 0, -11293.2, -3355.24, 9.05811, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+86, 181163, 0, -11288.4, -3389.93, 7.66957, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+87, 181163, 0, -11287.8, -3340.54, 9.04822, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+88, 181163, 0, -11287.3, -3372.26, 7.9216, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+89, 181163, 0, -11276, -3358.51, 6.2773, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+90, 181163, 0, -11274.2, -3317.7, 25.2531, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+91, 181163, 0, -11272.4, -3343.95, 9.96668, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+92, 181163, 0, -11272, -3384.21, 6.37339, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+93, 181163, 0, -11265.1, -3368, 6.34093, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+94, 181163, 0, -11262.1, -3354.55, 8.87, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+95, 181163, 0, -11259.6, -3394.71, 10.1497, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+96, 181163, 0, -11258.9, -3340.28, 10.113, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+97, 181163, 0, -11252.6, -3324.28, 18.7379, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+98, 181163, 0, -11250.9, -3379.86, 7.35147, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+99, 181163, 0, -11249.8, -3363.01, 10.1013, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+100, 181163, 0, -11243.1, -3340.19, 9.38895, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+101, 181163, 0, -11238.7, -3390.98, 10.9117, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+102, 181163, 0, -11238.2, -3306.17, 15.0118, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+103, 181163, 0, -11235.5, -3353.5, 5.08604, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+104, 181163, 0, -11235, -3369.2, 9.52345, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+105, 181163, 0, -11231.3, -3323.45, 9.99582, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+106, 181163, 0, -11227.2, -3338.57, 9.37604, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+107, 181163, 0, -11223.5, -2946.92, 10.2132, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+108, 181163, 0, -11223, -3005.04, 7.03504, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+109, 181163, 0, -11222, -2984.07, 3.90817, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+110, 181163, 0, -11221, -3023.16, 6.41069, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+111, 181163, 0, -11219.5, -3353.26, 5.08604, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+112, 181163, 0, -11218.2, -3391.36, 22.9658, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+113, 181163, 0, -11218.1, -3309.34, 9.15481, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+114, 181163, 0, -11217.4, -3372.26, 9.48901, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+115, 181163, 0, -11216.1, -3325.78, 8.73674, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+116, 181163, 0, -11208.6, -2953.39, 8.99919, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+117, 181163, 0, -11208.1, -3013.59, 5.09382, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+118, 181163, 0, -11207.4, -2992.09, 4.00507, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+119, 181163, 0, -11206.8, -3342.5, 5.20492, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+120, 181163, 0, -11205.6, -2971.31, 8.41278, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+121, 181163, 0, -11194, -3023.39, 7.16518, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+122, 181163, 0, -11193, -3005.14, 6.8718, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),              -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+123, 181163, 0, -11193, -2978.19, 8.73847, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+124, 181163, 0, -11193, -2963.79, 8.5652, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+125, 181163, 0, -11184, -2946.85, 19.4696, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+126, 181163, 0, -11181.1, -2973.18, 7.62003, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+127, 181163, 0, -11178.6, -3011.94, 7.4886, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+128, 181163, 0, -11176.8, -3027.3, 7.47332, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+129, 181163, 0, -11176.3, -2996.02, 9.51162, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+130, 181163, 0, -11169.5, -2980.98, 9.00698, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+131, 181163, 0, -11168.3, -2963.32, 8.0324, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+132, 181163, 0, -11162.9, -3011.74, 7.76302, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+133, 181163, 0, -11160.4, -2940.95, 20.0502, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+134, 181163, 0, -11160.2, -2995.96, 8.56307, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+135, 181163, 0, -11153.4, -2983.33, 8.81915, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+136, 181163, 0, -11151.9, -2962.63, 8.69393, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+137, 181163, 0, -11147.6, -3013.51, 20.7093, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+138, 181163, 0, -11145.5, -2953.04, 9.862, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+139, 181163, 0, -11144.7, -2994.87, 9.82344, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+140, 181163, 0, -11141.8, -2973.75, 8.65759, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+141, 181163, 0, -11061.5, -2784.66, 7.56118, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+142, 181163, 0, -11060.6, -2822.69, 9.96001, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+143, 181163, 0, -11058.8, -2803.73, 10.737, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+144, 181163, 0, -11057.7, -2763.12, 1.95433, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+145, 181163, 0, -11044.8, -2779.02, 5.63407, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+146, 181163, 0, -11042.2, -2816.22, 11.9086, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+147, 181163, 0, -11039.7, -2750.75, 2.0154, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+148, 181163, 0, -11036.4, -2796.51, 5.90141, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+149, 181163, 0, -11033.8, -2767.28, 4.80015, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+150, 181163, 0, -11030.3, -2782.59, 4.53306, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+151, 181163, 0, -11025.9, -2807.95, 7.76655, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+152, 181163, 0, -11023.6, -2822.95, 10.6242, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+153, 181163, 0, -11021.8, -2794.13, 5.22963, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+154, 181163, 0, -11019.7, -2771, 3.74648, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),             -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+155, 181163, 0, -11018.4, -2753.57, 3.71715, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+156, 181163, 0, -11008.3, -2738.67, 5.43277, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+157, 181163, 0, -11008.1, -2817.31, 7.10468, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+158, 181163, 0, -11005, -2763.27, 3.90122, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+159, 181163, 0, -11004.4, -2777.81, 4.51385, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+160, 181163, 0, -11003.4, -2796.45, 5.53892, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+161, 181163, 0, -10995.8, -2829.69, 9.40201, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+162, 181163, 0, -10990.6, -2756.9, 5.03873, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+163, 181163, 0, -10990.4, -2771.41, 4.11055, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+164, 181163, 0, -10990.2, -2793.42, 5.36988, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+165, 181163, 0, -10989.3, -2812.23, 5.92583, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+166, 181163, 0, -10976.6, -2762.51, 4.21193, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+167, 181163, 0, -10974.5, -2782.83, 5.10687, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+        (@GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+168, 181163, 0, -10973.5, -2807.63, 5.38797, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10);         -- GameObject: "Minion Spawner, finder" in Blasted Lands
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+1 AND @GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID+168;
+
+    -- GameObject: "Minion Spawner, finder" in Burning Steppes
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+1, 181163, 0, -8434.59, -1251.75, 212.887, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+2, 181163, 0, -8430.69, -1236.91, 209.005, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+3, 181163, 0, -8422.15, -1230.22, 201.935, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+4, 181163, 0, -8420.82, -1250.92, 208.61, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+5, 181163, 0, -8417.78, -982.665, 193.693, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+6, 181163, 0, -8417.09, -1242.56, 202.798, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+7, 181163, 0, -8416.66, -1268.47, 217.223, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+8, 181163, 0, -8412.83, -1223.1, 192.778, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+9, 181163, 0, -8411.97, -1259.67, 212.583, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+10, 181163, 0, -8411.01, -966.88, 197.595, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+11, 181163, 0, -8410.35, -950.937, 204.729, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+12, 181163, 0, -8410.06, -1236.7, 198.685, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+13, 181163, 0, -8408.37, -1251.06, 206.726, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+14, 181163, 0, -8406.53, -1011.18, 187.62, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+15, 181163, 0, -8405.25, -1270.55, 215.192, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+16, 181163, 0, -8403.62, -990.62, 189.168, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+17, 181163, 0, -8402.34, -1258.13, 210.17, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+18, 181163, 0, -8401.44, -974.976, 192.589, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+19, 181163, 0, -8399.72, -1231.35, 194.753, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+20, 181163, 0, -8398.1, -945.571, 204.354, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+21, 181163, 0, -8398.03, -1215.75, 189.571, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+22, 181163, 0, -8397.75, -960.193, 197.608, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+23, 181163, 0, -8393.84, -1264.77, 210.899, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+24, 181163, 0, -8393.72, -1254.67, 206.65, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+25, 181163, 0, -8389.59, -1238.51, 196.459, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+26, 181163, 0, -8388.02, -984.879, 188.321, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+27, 181163, 0, -8387.81, -1228.66, 190.961, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+28, 181163, 0, -8387.62, -972.728, 190.48, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+29, 181163, 0, -8385.5, -1216.21, 188.255, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+30, 181163, 0, -8385.35, -959.903, 194.977, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+31, 181163, 0, -8384.74, -1274.93, 211.92, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+32, 181163, 0, -8383.68, -1250.24, 200.656, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+33, 181163, 0, -8383.28, -939.714, 203.698, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+34, 181163, 0, -8381.1, -1261.64, 204.694, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+35, 181163, 0, -8379.6, -949.735, 198.216, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+36, 181163, 0, -8376.3, -1242.36, 194.958, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+37, 181163, 0, -8376.08, -989.427, 187.287, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+38, 181163, 0, -8374.31, -974.651, 188.325, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+39, 181163, 0, -8374.22, -1288.5, 214.244, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+40, 181163, 0, -8372.71, -1228.52, 191.559, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+41, 181163, 0, -8371.14, -940.599, 200.466, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+42, 181163, 0, -8371.06, -927.954, 206.34, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+43, 181163, 0, -8369.19, -1256.53, 197.905, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+44, 181163, 0, -8366.68, -950.877, 194.8, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+45, 181163, 0, -8362.64, -977.057, 187.058, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+46, 181163, 0, -8361.33, -1242.17, 191.948, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+47, 181163, 0, -8359.42, -992.785, 185.469, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+48, 181163, 0, -8358.7, -1274.18, 212.731, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+49, 181163, 0, -8357.42, -941.79, 196.903, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+50, 181163, 0, -8356.6, -966.806, 188.383, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+51, 181163, 0, -8354.76, -925.623, 207.732, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+52, 181163, 0, -8350.88, -954.868, 191.154, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+53, 181163, 0, -8349.12, -977.729, 185.528, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+54, 181163, 0, -8347.13, -990.8, 183.778, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+55, 181163, 0, -8340.74, -963.852, 188.287, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+56, 181163, 0, -8333.76, -976.666, 184.352, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+57, 181163, 0, -8078.88, -1017.77, 132.302, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+58, 181163, 0, -8070.64, -997.174, 132.958, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+59, 181163, 0, -8058.14, -994.36, 131.377, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+60, 181163, 0, -8058, -1007.02, 130.824, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),           -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+61, 181163, 0, -8053.54, -977.332, 132.213, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+62, 181163, 0, -8047.03, -1037.13, 122.743, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+63, 181163, 0, -8047.01, -962.325, 133.982, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+64, 181163, 0, -8044.6, -1019.05, 122.717, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+65, 181163, 0, -8044.14, -994.623, 129.837, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+66, 181163, 0, -8035.43, -946.744, 134.689, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+67, 181163, 0, -8033.76, -958.735, 131.688, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+68, 181163, 0, -8032.22, -1009.51, 122.717, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+69, 181163, 0, -8023.47, -996.543, 122.887, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+70, 181163, 0, -8021.97, -2447.23, 128.728, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+71, 181163, 0, -8021.12, -2433.45, 127.165, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+72, 181163, 0, -8020.13, -984.429, 122.73, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+73, 181163, 0, -8019.59, -2417.85, 125.19, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+74, 181163, 0, -8019.44, -1026.2, 130.085, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+75, 181163, 0, -8019.33, -2405.6, 124.062, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+76, 181163, 0, -8018.83, -972.995, 122.73, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+77, 181163, 0, -8016.62, -950.324, 132.549, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+78, 181163, 0, -8011.34, -2452.43, 131.309, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+79, 181163, 0, -8009.85, -2439.8, 129.72, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+80, 181163, 0, -8008.86, -2426.77, 127.948, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+81, 181163, 0, -8008.24, -2411.38, 124.142, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+82, 181163, 0, -8002.21, -959.983, 128.742, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+83, 181163, 0, -8000.76, -985.283, 127.825, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+84, 181163, 0, -7996.63, -1013.41, 131.867, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+85, 181163, 0, -7996.59, -2444.02, 132.116, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+86, 181163, 0, -7995.8, -2432.08, 130.865, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+87, 181163, 0, -7995.75, -2420.87, 127.493, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+88, 181163, 0, -7990.3, -2455.1, 132.799, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+89, 181163, 0, -7989.67, -2411.44, 124.287, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+90, 181163, 0, -7986.28, -996.667, 130.558, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+91, 181163, 0, -7983.3, -2466.48, 133.952, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+92, 181163, 0, -7982.83, -2444.96, 131.372, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+93, 181163, 0, -7982.13, -958.83, 130.196, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+94, 181163, 0, -7981.67, -2421.34, 127.498, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+95, 181163, 0, -7981.53, -2400.69, 123.693, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+96, 181163, 0, -7978.5, -980.081, 130.28, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+97, 181163, 0, -7974.82, -2456.01, 132.592, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+98, 181163, 0, -7974.29, -2411.06, 125.853, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+99, 181163, 0, -7968.86, -2445.95, 129.784, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+100, 181163, 0, -7967, -2421.33, 126.912, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+101, 181163, 0, -7966.7, -2434.54, 126.773, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+102, 181163, 0, -7964.2, -2404.19, 125.886, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+103, 181163, 0, -7958.5, -2455.63, 133.389, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+104, 181163, 0, -7955.28, -2440.49, 129.066, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+105, 181163, 0, -7954.89, -2411.8, 126.7, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+106, 181163, 0, -7953.55, -2426.47, 126.483, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+107, 181163, 0, -7942.9, -2434.35, 130.081, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+108, 181163, 0, -7768.15, -2244.1, 133.522, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+109, 181163, 0, -7764.27, -2231.68, 134.763, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+110, 181163, 0, -7762.09, -2256.11, 133.522, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+111, 181163, 0, -7756.19, -2210.4, 133.608, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+112, 181163, 0, -7754.92, -2243.28, 133.56, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+113, 181163, 0, -7753.03, -2220.56, 133.522, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+114, 181163, 0, -7752.77, -2269.4, 133.522, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+115, 181163, 0, -7749.98, -2230.43, 133.549, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+116, 181163, 0, -7748.55, -2253.08, 133.889, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+117, 181163, 0, -7745.01, -2211.63, 133.522, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+118, 181163, 0, -7744.63, -2199.94, 133.522, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+119, 181163, 0, -7743.51, -2240.18, 134.333, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+120, 181163, 0, -7741.34, -2222.07, 133.522, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+121, 181163, 0, -7739.09, -2263.74, 135.584, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+122, 181163, 0, -7736.6, -2248.45, 135.77, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+123, 181163, 0, -7732.98, -2200.64, 133.522, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+124, 181163, 0, -7732.21, -2213.26, 133.522, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+125, 181163, 0, -7726.86, -2266.76, 139.261, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+126, 181163, 0, -7726.67, -2240.58, 137.086, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+127, 181163, 0, -7724.87, -2251.59, 138.603, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+128, 181163, 0, -7722.57, -2222.69, 134.566, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+129, 181163, 0, -7720.99, -2198.35, 133.522, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+130, 181163, 0, -7720.22, -2210.86, 133.522, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+131, 181163, 0, -7716.08, -2231.63, 136.743, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+132, 181163, 0, -7714.18, -2242.01, 138.918, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+133, 181163, 0, -7713.89, -2254.8, 140.417, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+134, 181163, 0, -7710.2, -2220.98, 135.435, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+135, 181163, 0, -7703.33, -2233.25, 138.695, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+136, 181163, 0, -7640.81, -2611.35, 134.295, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+137, 181163, 0, -7639.9, -2581.16, 133.687, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+138, 181163, 0, -7637.5, -2596.85, 133.659, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+139, 181163, 0, -7628.49, -2566.81, 133.167, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+140, 181163, 0, -7627.43, -2608.98, 132.801, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+141, 181163, 0, -7626.99, -2580.78, 132.126, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+142, 181163, 0, -7623.71, -2594.94, 132.243, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+143, 181163, 0, -7619.34, -2632.74, 132.442, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+144, 181163, 0, -7617.49, -2618.51, 132.388, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+145, 181163, 0, -7614.49, -2605.03, 133.224, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+146, 181163, 0, -7614.09, -2569, 132.293, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),          -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+147, 181163, 0, -7613.49, -2583.94, 132.551, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+148, 181163, 0, -7609.75, -2643.94, 135.102, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+149, 181163, 0, -7607.12, -2613.97, 134.21, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+150, 181163, 0, -7606.8, -2629.2, 134.006, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+151, 181163, 0, -7601.51, -2575.6, 134.627, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+152, 181163, 0, -7599.6, -2557.68, 133.46, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+153, 181163, 0, -7596.23, -2607.85, 136.089, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+154, 181163, 0, -7595.52, -2620.74, 135.202, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+155, 181163, 0, -7593.19, -2637.25, 134.726, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+156, 181163, 0, -7591.38, -2586.37, 137.663, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+157, 181163, 0, -7587.62, -2596.88, 138.436, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+158, 181163, 0, -7586.65, -2571.02, 134.666, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),         -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+159, 181163, 0, -7584.07, -2624.76, 136.432, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+160, 181163, 0, -7583.83, -2611.54, 137.273, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+161, 181163, 0, -7578.33, -2584.39, 137.647, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+162, 181163, 0, -7574.27, -2597.62, 138.662, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Burning Steppes
+        (@GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+163, 181163, 0, -7573.05, -2570.59, 135.373, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10);      -- GameObject: "Minion Spawner, finder" in Burning Steppes
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+1 AND @GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID+163;
+
+    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+1, 181163, 0, 1570.02, -3050.68, 79.0132, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+2, 181163, 0, 1571.33, -3029.47, 81.6105, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+3, 181163, 0, 1573.15, -3015.96, 82.5453, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+4, 181163, 0, 1577.9, -3040.05, 80.2832, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+5, 181163, 0, 1581.49, -3026.61, 80.4581, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+6, 181163, 0, 1585.25, -3014.47, 82.1723, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+7, 181163, 0, 1585.47, -3047.95, 81.0597, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+8, 181163, 0, 1587.5, -3057.86, 80.5577, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+9, 181163, 0, 1588.02, -3035.67, 79.5394, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+10, 181163, 0, 1588.63, -3073.42, 79.3912, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+11, 181163, 0, 1591.62, -3023.66, 79.6951, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+12, 181163, 0, 1596.86, -3051.43, 80.3504, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+13, 181163, 0, 1597.99, -3015.07, 80.8619, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+14, 181163, 0, 1601.55, -3062.51, 79.5382, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+15, 181163, 0, 1603.18, -3026.92, 78.8733, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+16, 181163, 0, 1609.52, -3080.49, 78.5546, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+17, 181163, 0, 1610.03, -3054.43, 77.6714, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+18, 181163, 0, 1612.26, -3020.54, 80.1317, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+19, 181163, 0, 1614, -3067.01, 78.5759, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+20, 181163, 0, 1615.18, -3043.48, 77.9448, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+21, 181163, 0, 1616.92, -3032.24, 77.9181, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+22, 181163, 0, 1620.94, -3053.08, 78.5073, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+23, 181163, 0, 1625.65, -3040.63, 79.4046, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+24, 181163, 0, 1625.89, -3025.52, 78.6135, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+25, 181163, 0, 1627.02, -3068.68, 76.4933, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+26, 181163, 0, 1635.26, -3052.03, 79.2805, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+27, 181163, 0, 1639.01, -3033.52, 80.0769, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+28, 181163, 0, 1754.28, -2822.62, 69.5536, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+29, 181163, 0, 1756.27, -2838.5, 71.8524, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+30, 181163, 0, 1764.52, -2853.84, 71.4485, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+31, 181163, 0, 1764.65, -2870.41, 73.6183, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+32, 181163, 0, 1770.04, -2833.66, 69.1137, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+33, 181163, 0, 1776.73, -2862.17, 69.8869, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+34, 181163, 0, 1776.73, -2847.62, 68.0293, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+35, 181163, 0, 1783.63, -2797.31, 69.6425, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+36, 181163, 0, 1784.81, -2827.16, 68.9084, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+37, 181163, 0, 1788.41, -2854.86, 69.5864, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+38, 181163, 0, 1789.62, -2811.82, 69.1659, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+39, 181163, 0, 1790, -2870, 69.488, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),            -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+40, 181163, 0, 1790.67, -2839.55, 67.9582, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+41, 181163, 0, 1796.8, -2883.29, 69.08, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+42, 181163, 0, 1800.43, -2858.79, 68.4132, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+43, 181163, 0, 1806.58, -2895.59, 71.0175, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+44, 181163, 0, 1807.25, -2871.82, 68.1865, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+45, 181163, 0, 1808.64, -2810.61, 71.4553, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+46, 181163, 0, 1813.97, -2881.81, 70.605, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+47, 181163, 0, 1818.12, -2792.36, 78.1475, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+48, 181163, 0, 1823.68, -2869.15, 72.6406, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+49, 181163, 0, 1824.64, -2815.49, 80.8515, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+50, 181163, 0, 1825.61, -2841.07, 77.8605, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+51, 181163, 0, 1832.86, -2799.42, 89.9933, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+52, 181163, 0, 1834.68, -2826.12, 80.1513, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+53, 181163, 0, 1836.86, -2846.55, 80.2934, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+54, 181163, 0, 1842.08, -2865.71, 83.0356, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+55, 181163, 0, 1846.59, -2836.98, 78.5254, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+56, 181163, 0, 1880.03, -4775.64, 118.908, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+57, 181163, 0, 1900.38, -4771.47, 107.755, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+58, 181163, 0, 1901.73, -4804.16, 117.785, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+59, 181163, 0, 1908.37, -4756.09, 103.381, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+60, 181163, 0, 1914.86, -4768.54, 102.506, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+61, 181163, 0, 1918.46, -5104.82, 78.6254, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+62, 181163, 0, 1919.65, -4726.78, 103.351, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+63, 181163, 0, 1921.88, -4755.47, 98.6358, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+64, 181163, 0, 1922.56, -3092.55, 84.8936, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+65, 181163, 0, 1923.5, -4796.78, 105.184, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),        -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+66, 181163, 0, 1925.22, -5146.31, 73.7998, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+67, 181163, 0, 1927.25, -3115.44, 89.5502, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+68, 181163, 0, 1927.37, -4775.64, 99.1395, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+69, 181163, 0, 1928.41, -4788.16, 100.995, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+70, 181163, 0, 1929.7, -4811.18, 106.314, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+71, 181163, 0, 1930.32, -3128.16, 92.3846, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+72, 181163, 0, 1932.13, -4738.85, 98.4199, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+73, 181163, 0, 1933.82, -3105.16, 87.6127, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+74, 181163, 0, 1934.48, -5106.61, 81.5771, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+75, 181163, 0, 1934.5, -3089.65, 85.2839, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+76, 181163, 0, 1936.21, -3078.9, 81.3924, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+77, 181163, 0, 1936.64, -5122.08, 77.2904, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+78, 181163, 0, 1937.51, -5136.48, 74.0787, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+79, 181163, 0, 1937.79, -5168.97, 73.8352, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+80, 181163, 0, 1937.89, -4727.84, 101.581, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+81, 181163, 0, 1938.22, -5153.89, 73.7006, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+82, 181163, 0, 1939.71, -5093.66, 85.3817, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+83, 181163, 0, 1941.36, -4781.74, 98.7184, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+84, 181163, 0, 1941.83, -3111.62, 88.3198, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+85, 181163, 0, 1942.3, -4798.79, 99.2277, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+86, 181163, 0, 1942.9, -3099.65, 86.0871, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+87, 181163, 0, 1945.33, -4746.02, 96.6191, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+88, 181163, 0, 1945.81, -3120.05, 90.1894, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+89, 181163, 0, 1946.28, -5116.19, 79.0226, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+90, 181163, 0, 1946.92, -3085.17, 82.5324, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+91, 181163, 0, 1947.12, -5129.18, 74.6231, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+92, 181163, 0, 1947.14, -5142.58, 73.7133, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+93, 181163, 0, 1947.81, -3067.52, 78.5057, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+94, 181163, 0, 1948.49, -3130.42, 91.1517, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+95, 181163, 0, 1950.57, -5105.44, 83.4558, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+96, 181163, 0, 1951.62, -5182.88, 75.7269, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+97, 181163, 0, 1952.13, -4767.59, 98.6923, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+98, 181163, 0, 1952.47, -5154.08, 74.4785, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+99, 181163, 0, 1953.1, -3115.71, 86.7831, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+100, 181163, 0, 1954.47, -3079.95, 79.4626, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),  -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+101, 181163, 0, 1957.29, -5095.38, 87.063, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+102, 181163, 0, 1957.71, -5164.12, 78.0503, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+103, 181163, 0, 1957.9, -3125.03, 87.3232, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+104, 181163, 0, 1959.05, -5115.43, 80.9018, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+105, 181163, 0, 1960.3, -4754.93, 97.1058, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+106, 181163, 0, 1960.41, -5144.66, 74.0155, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+107, 181163, 0, 1961.65, -3086.94, 81.2841, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+108, 181163, 0, 1963.06, -4740.15, 96.5762, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+109, 181163, 0, 1965.17, -3119.4, 82.47, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+110, 181163, 0, 1965.33, -5104.58, 84.9795, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),  -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+111, 181163, 0, 1966.54, -4717.01, 98.3666, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+112, 181163, 0, 1967.54, -5156.13, 75.3015, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+113, 181163, 0, 1969.07, -3130.91, 84.8494, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+114, 181163, 0, 1970.84, -5116.75, 83.369, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+115, 181163, 0, 1971.79, -3107.76, 82.1643, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+116, 181163, 0, 1972.56, -5094.81, 87.8344, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+117, 181163, 0, 1972.73, -3093.22, 81.4991, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+118, 181163, 0, 1973.04, -5169.46, 79.5659, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+119, 181163, 0, 1973.19, -5143.4, 77.7543, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+120, 181163, 0, 1973.42, -3082.14, 77.2806, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+121, 181163, 0, 1976.3, -3117.37, 79.6319, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+122, 181163, 0, 1976.63, -4751.14, 95.6187, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+123, 181163, 0, 1978.7, -5104.94, 88.0376, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+124, 181163, 0, 1979.44, -5155.38, 77.7833, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+125, 181163, 0, 1982.26, -3130.7, 82.4981, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+126, 181163, 0, 1983.41, -3107.48, 79.13, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),      -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+127, 181163, 0, 1983.9, -4803.06, 100.701, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+128, 181163, 0, 1985.02, -4733.8, 98.0468, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+129, 181163, 0, 1986.43, -5137.69, 83.5169, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+130, 181163, 0, 1987.22, -3089.93, 78.7242, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+131, 181163, 0, 1987.54, -3073.56, 75.334, 3.14159, 0, 0, 1, 0.00000126759, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+132, 181163, 0, 1993.22, -3117.53, 75.8745, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+133, 181163, 0, 1997.14, -4768.31, 92.909, 3.03684, 0, 0, 0.998629, 0.0523524, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+134, 181163, 0, 1998.26, -3100.47, 76.1631, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+135, 181163, 0, 1999.05, -4747.77, 96.9688, 4.03171, 0, 0, 0.902585, -0.430511, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+136, 181163, 0, 2287.74, -4912.95, 98.9361, 0.226892, 0, 0, 0.113203, 0.993572, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+137, 181163, 0, 2289.91, -4894.23, 105.882, 5.81195, 0, 0, 0.233444, -0.97237, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+138, 181163, 0, 2296.32, -4938.82, 82.8966, 2.23402, 0, 0, 0.898794, 0.438372, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+139, 181163, 0, 2297.14, -4990.14, 73.9808, 5.49779, 0, 0, 0.382682, -0.92388, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+140, 181163, 0, 2300.33, -4909.28, 96.9081, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+141, 181163, 0, 2303.51, -4924.88, 88.2932, 4.04917, 0, 0, 0.898793, -0.438374, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+142, 181163, 0, 2304.92, -4950.09, 77.5079, 2.00713, 0, 0, 0.843392, 0.537299, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+143, 181163, 0, 2308.04, -4891.65, 96.8087, 1.95477, 0, 0, 0.829038, 0.559192, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+144, 181163, 0, 2317.52, -4917.48, 86.1716, 0.715585, 0, 0, 0.350207, 0.936672, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+145, 181163, 0, 2319.81, -4995.46, 73.6679, 4.20625, 0, 0, 0.861627, -0.507541, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+146, 181163, 0, 2322.72, -4955.73, 74.6833, 1.8675, 0, 0, 0.803856, 0.594824, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+147, 181163, 0, 2325.54, -4973.26, 72.0681, 3.26377, 0, 0, 0.998135, -0.0610507, 150, 180, 100, 1, 0, 0, 9, 10),  -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+148, 181163, 0, 2328.11, -4937.05, 78.605, 5.20108, 0, 0, 0.515039, -0.857167, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+149, 181163, 0, 2333.36, -4921.62, 78.8639, 5.63741, 0, 0, 0.317306, -0.948323, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+150, 181163, 0, 2333.59, -4907.31, 79.932, 5.53269, 0, 0, 0.366503, -0.930417, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+151, 181163, 0, 2338.23, -4951.55, 72.1418, 0.506145, 0, 0, 0.25038, 0.968148, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+152, 181163, 0, 2342.1, -4966.07, 70.4122, 1.09956, 0, 0, 0.5225, 0.852639, 150, 180, 100, 1, 0, 0, 9, 10),       -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+153, 181163, 0, 2342.53, -4932.7, 74.7631, 1.88495, 0, 0, 0.809015, 0.587788, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+154, 181163, 0, 2343.07, -4984.65, 71.7298, 4.06662, 0, 0, 0.894934, -0.446199, 150, 180, 100, 1, 0, 0, 9, 10),   -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+155, 181163, 0, 2348.67, -4913.01, 74.6708, 6.24828, 0, 0, 0.0174517, -0.999848, 150, 180, 100, 1, 0, 0, 9, 10),  -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+156, 181163, 0, 2348.91, -4896.29, 78.0656, 1.37881, 0, 0, 0.636078, 0.771625, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+157, 181163, 0, 2353.36, -4948.53, 72.1315, 1.85005, 0, 0, 0.798636, 0.601815, 150, 180, 100, 1, 0, 0, 9, 10),    -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+158, 181163, 0, 2358.82, -4966.1, 70.6148, 2.80998, 0, 0, 0.986286, 0.165048, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+159, 181163, 0, 2362.78, -4922.8, 73.5862, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10),     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+        (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+160, 181163, 0, 2366.46, -4908.5, 76.7359, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10);     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+1 AND @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+160;
+
+
+-- 8. TEMPORARY FIXES
 
     UPDATE `creature_template` SET `spawn_spell_id`=0 WHERE `spawn_spell_id`=28234;
     -- Minion Spawner, finder
     -- Server Side and charges = 1
     UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181163;
-    -- On spot respawn for minions is between 2,5 and 3 minutes.
-    UPDATE `gameobject` SET `spawntimesecsmin`=150, `spawntimesecsmax`=180 WHERE `id`=181163;
     -- Buttress Spawner: Server Side
     UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181112;
-    UPDATE `gameobject` SET `spawntimesecsmin`=7200, `spawntimesecsmax`=7200 WHERE `id`=181112;
 
- 
+
 -- End of migration.
 END IF;
 END??
-delimiter ; 
+delimiter ;
 CALL add_migration();
 DROP PROCEDURE IF EXISTS add_migration;

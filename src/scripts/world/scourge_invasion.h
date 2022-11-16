@@ -90,10 +90,10 @@ enum ScourgeInvasionSpells
     // Minion Abilities
     SPELL_SCOURGE_STRIKE                            = 28265, // Pink Lightning (Instakill), only used on Creatures of course.
     SPELL_ENRAGE                                    = 8599,  // Used by 16141 (Ghoul Berserker).
-    SPELL_BONE_SHARDS                               = 17014, // [shortest sniff CD: 16,583 seconds] Used by 16299 (Skeletal Shocktrooper).
-    SPELL_INFECTED_BITE                             = 7367,  // Only when not have the debuff already! [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker).
-    SPELL_DEMORALIZING_SHOUT                        = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier).
-    SPELL_SUNDER_ARMOR                              = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier).
+    SPELL_BONE_SHARDS                               = 17014, // Used by 16299 (Skeletal Shocktrooper).
+    SPELL_INFECTED_BITE                             = 7367,  // Only when not have the debuff already! Used by 16141 (Ghoul Berserker).
+    SPELL_DEMORALIZING_SHOUT                        = 16244, // Used by 16298 (Spectral Soldier).
+    SPELL_SUNDER_ARMOR                              = 21081, // Used by 16298 (Spectral Soldier).
     SPELL_SHADOW_WORD_PAIN                          = 589,   // Used by 16438 (Skeletal Trooper).
     SPELL_DUAL_WIELD                                = 674,   // Used by Skeletal Soldier and Skeletal Shocktrooper.
 
@@ -106,7 +106,7 @@ enum ScourgeInvasionSpells
     SPELL_KNOCKDOWN                                 = 16790, // Used by 14697 (Lumbering Horror).
     SPELL_TRAMPLE                                   = 5568,  // Used by 14697 (Lumbering Horror).
     SPELL_AURA_OF_FEAR                              = 28313, // Used by 14697 (Lumbering Horror).
-    SPELL_RIBBON_OF_SOULS                           = 16243, // [shortest sniff CD: 1,638 seconds] Used by 16379 (Spirit of the Damned).
+    SPELL_RIBBON_OF_SOULS                           = 16243, // Used by 16379 (Spirit of the Damned).
     SPELL_PSYCHIC_SCREAM                            = 22884, // or 26042, used by 16379 (Spirit of the Damned).
     SPELL_MINION_DESPAWN_TIMER_UNCOMMON             = 28292, // Triggers 28091 (Despawner, self) every 10 minutes. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
     SPELL_ARCANE_BOLT                               = 13748, /* 20720 Used by 16380 (Bone Witch).
@@ -146,8 +146,8 @@ enum ScourgeInvasionSpells
     SPELL_DAMAGE_VS_GUARDS                          = 28364, // Hits entries 13839, 16396, 16432.
 
     // Flameshocker
-    SPELL_FLAMESHOCKERS_TOUCH                       = 28314, //
-    SPELL_FLAMESHOCKERS_TOUCH2                      = 28329, // [shortest sniff CD: 30 seconds]
+    SPELL_FLAMESHOCKERS_TOUCH                       = 28314,
+    SPELL_FLAMESHOCKERS_TOUCH2                      = 28329,
     SPELL_FLAMESHOCKERS_REVENGE                     = 28323, // On death. 
     SPELL_FLAMESHOCKER_IMMOLATE_VISUAL              = 28330
 

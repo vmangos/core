@@ -621,6 +621,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     if (Creature* pCreature = ToCreature(m_casterUnit))
                     {
+                        // This should be already set in creature_template, otherwise the player will quickly enter and leave combat on spawn and thats not Blizzlike.
                         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
@@ -631,7 +632,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                             {
                                 if (Player* player = pCreature->GetMap()->GetPlayer(((TemporarySummon*)pCreature)->GetSummonerGuid()))
                                 {
-                                    pCreature->GetThreatManager().addThreat(player, 1000.0f);
+                                    pCreature->GetThreatManager().addThreat(player, 1.0f);
                                     // DoScriptText(PickRandomValue(12420, 12421, 12422, 12243), pCreature, player, CHAT_TYPE_SAY);
                                 }
                             }
