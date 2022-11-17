@@ -1399,7 +1399,17 @@ bool AuthSocket::GeographicalLockCheck()
 
 bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect)
 {
-    if (!((_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX)))
+    if (_os == Win)
+    {
+        if (_platform != X86)
+            return false;
+    }
+    else if (_os == OSX)
+    {
+        if (_platform != X86 && _platform != PPC)
+            return false;
+    }
+    else
         return false;
 
     if (!sConfig.GetBoolDefault("StrictVersionCheck", false))
