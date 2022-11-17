@@ -31,16 +31,20 @@
 
 struct RealmBuildInfo
 {
-    int build;
-    int major_version;
-    int minor_version;
-    int bugfix_version;
-    int hotfix_version;
-    std::array<uint8, 20> WindowsHash;
-    std::array<uint8, 20> MacHash;
+    uint8 majorVersion = 0;
+    uint8 minorVersion = 0;
+    uint8 bugfixVersion = 0;
+    char hotfixVersion = 0;
+    uint16 build = 0;
+    uint32 os = 0;
+    uint32 platform = 0;
+    std::array<uint8, 20> integrityHash = { };
 };
 
 RealmBuildInfo const* FindBuildInfo(uint16 _build);
+std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, uint32 os, uint32 platform);
+
+extern std::vector<RealmBuildInfo> ExpectedRealmdClientBuilds;
 
 typedef std::set<uint32> RealmBuilds;
 
@@ -79,6 +83,7 @@ class RealmList
     private:
         void UpdateRealms(bool init);
         void UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const std::string& builds);
+        void LoadAllowedClients();
     private:
         RealmMap m_realms;                                  ///< Internal map of realms
         uint32   m_UpdateInterval;

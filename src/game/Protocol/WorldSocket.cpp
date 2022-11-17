@@ -299,9 +299,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     stmt.PExecute(address.c_str(), account.c_str());
 
     ClientOSType clientOs;
-    if (os == "niW")
+    if (os == "Win")
         clientOs = CLIENT_OS_WIN;
-    else if (os == "XSO")
+    else if (os == "OSX")
         clientOs = CLIENT_OS_MAC;
     else
     {
@@ -310,9 +310,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     ClientPlatformType clientPlatform;
-    if (platform == "68x")
+    if (platform == "x86")
         clientPlatform = CLIENT_PLATFORM_X86;
-    else if (platform == "CPP" && clientOs == CLIENT_OS_MAC)
+    else if (platform == "PPC" && clientOs == CLIENT_OS_MAC)
         clientPlatform = CLIENT_PLATFORM_PPC;
     else
     {
