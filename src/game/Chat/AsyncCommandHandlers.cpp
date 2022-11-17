@@ -57,7 +57,7 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
 
         if (auto const warden = target->GetSession()->GetWarden())
             warden->GetPlayerInfo(data->warden_clock, data->warden_fingerprint, data->warden_hypervisors,
-                data->warden_endscene, data->warden_proxifier);
+                data->warden_proxifier);
 
         HandleDataAfterPlayerLookup(data);
     }
@@ -228,8 +228,6 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
         cHandler.SendSysMessage(data->warden_fingerprint.c_str());
     if (!data->warden_hypervisors.empty())
         cHandler.SendSysMessage(data->warden_hypervisors.c_str());
-    if (!data->warden_endscene.empty())
-        cHandler.SendSysMessage(data->warden_endscene.c_str());
     if (!data->warden_proxifier.empty())
         cHandler.SendSysMessage(data->warden_proxifier.c_str());
 

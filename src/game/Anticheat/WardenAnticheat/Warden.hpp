@@ -154,7 +154,7 @@ class Warden
         virtual void SetCharEnumPacket(WorldPacket &&packet) = 0;
 
         virtual void GetPlayerInfo(std::string &clock, std::string &fingerprint, std::string &hypervisors,
-            std::string &endscene, std::string &proxifier) const = 0;
+            std::string &proxifier) const = 0;
 };
 
 #endif /*!__WARDEN_HPP_*/

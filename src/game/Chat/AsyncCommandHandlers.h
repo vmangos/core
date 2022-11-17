@@ -63,7 +63,6 @@ struct PInfoData
     std::string warden_clock;
     std::string warden_fingerprint;
     std::string warden_hypervisors;
-    std::string warden_endscene;
     std::string warden_proxifier;
 };
 

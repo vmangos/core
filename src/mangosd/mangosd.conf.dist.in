@@ -1454,11 +1454,6 @@ Antiflood.Sanction = 8
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 #
-#    Warden.DebugLog
-#        Description: Prints additional information about performed checks.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-#
 #    Warden.ModuleDir
 #        Description: Directory where warden modules are stored.
 #        Default: "warden_modules"
@@ -1473,7 +1468,6 @@ Warden.ClientResponseDelay   = 30
 Warden.ScanFrequency         = 15
 Warden.DefaultPenalty        = 0
 Warden.BanDuration           = 86400
-Warden.DebugLog              = 0
 Warden.ModuleDir             = "warden_modules"
 
 ###################################################################################################

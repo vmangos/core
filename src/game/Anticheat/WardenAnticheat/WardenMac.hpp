@@ -61,7 +61,7 @@ class WardenMac final : public Warden
         virtual void SetCharEnumPacket(WorldPacket &&packet);
 
         virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
-            std::string& endscene, std::string& proxifier) const {}
+            std::string& proxifier) const {}
 };
 
 #endif /*!__WARDENMAC_HPP_*/

@@ -70,12 +70,6 @@ static constexpr struct ClientOffsets
     // LastHardwareAction memory scan (CSimpleTop::m_eventTime)
     uint32 LastHardwareAction;
 
-    // EndScene memory scan
-    uint32 g_theGxDevicePtr;
-    uint32 OfsDevice2;
-    uint32 OfsDevice3;
-    uint32 OfsDevice4;
-
     // Warden memory scan
     uint32 WardenModule;
     uint32 OfsWardenSysInfo;
@@ -88,7 +82,6 @@ static constexpr struct ClientOffsets
         0x2C010,
         0xC7B2A4,
         0xCF0BC8,
-        0xC0ED38, 0x38A8, 0x0, 0xA8,
         0xCE897C, 0x228, 0x08
     }
 };
@@ -450,35 +443,6 @@ void DeobfuscateAsm(std::vector<std::uint8_t> &code)
     } while (true);
 #undef LSTRIP
 }
-
-// returns true when the given hook code is suspicious
-bool ValidateEndSceneHook(const std::vector<uint8> &code)
-{
-    auto copy = code;
-
-    // attempt asm deobfuscation to detect wrobot
-    DeobfuscateAsm(copy);
-
-    std::stringstream str;
-
-    for (auto i = 0u; i < code.size(); ++i)
-    {
-        str << "0x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(code[i]);
-
-        if (i < code.size() - 1)
-            str << " ";
-    }
-
-    sLog.Out(LOG_ANTICHEAT, LOG_LVL_DEBUG, "Deobfuscate debug.  Original code size: %u deobfuscated size: %u Code:\n%s",
-        code.size(), copy.size(), str.str().c_str());
-
-    // wrobot's deobfuscated endscene hook begins with pushfd, pushad.  if thats what this starts with,
-    // assume it is wrobot, regardless of what comes after it.
-    if (copy.size() >= 2 && copy[0] == 0x9C && copy[1] == 0x60)
-        return true;
-
-    return code.size() == 200 && copy.size() < 15;
-}
 }
 
 void WardenWin::LoadScriptedScans()
@@ -822,213 +786,6 @@ void WardenWin::LoadScriptedScans()
     "Warden Memory Read check",
     WinAllBuild));
 
-    // end scene hook check 1
-    static constexpr uint8 endSceneReadSize = 16u;
-    auto const endSceneHookCheck1 = std::make_shared<WindowsScan>(
-    // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
-    {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-
-        // if we have not found EndScene, do nothing
-        if (!wardenWin->_endSceneFound)
-            return;
-
-        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
-             << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress
-             << endSceneReadSize;
-    },
-    // checker
-    [](const Warden *warden, ByteBuffer &buff)
-    {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
-
-        auto const result = buff.read<uint8>();
-
-        if (!!result)
-        {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (hook check stage 1)");
-
-            return true;
-        }
-
-        std::vector<uint8> code(endSceneReadSize);
-        buff.read(&code[0], code.size());
-
-        wardenWin->ValidateEndScene(code);
-
-        return false;
-    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + endSceneReadSize,
-    "EndScene hook check stage 1", WinAllBuild);
-
-    sWardenScanMgr.AddWindowsScan(endSceneHookCheck1);
-
-    // end scene locate phase 4
-    auto const endSceneLocate4 = std::make_shared<WindowsScan>(
-    // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
-    {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
-
-        if (!offsets)
-            return;
-
-        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
-             << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + offsets->OfsDevice4
-             << static_cast<uint8>(sizeof(uint32));
-    },
-    // checker
-    [endSceneHookCheck1](const Warden *warden, ByteBuffer &buff)
-    {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
-
-        auto const result = buff.read<uint8>();
-
-        if (!!result)
-        {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (stage 4)");
-
-            return true;
-        }
-
-        wardenWin->_endSceneAddress = buff.read<uint32>();
-        wardenWin->_endSceneFound = true;
-
-        // immediately request hook check
-        wardenWin->EnqueueScans({ endSceneHookCheck1 });
-
-        return false;
-    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 4", None);
-
-    // end scene locate phase 3
-    auto const endSceneLocate3 = std::make_shared<WindowsScan>(
-    // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
-    {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
-
-        if (!offsets)
-            return;
-
-        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
-             << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + offsets->OfsDevice3
-             << static_cast<uint8>(sizeof(uint32));
-    },
-    // checker
-    [endSceneLocate4](const Warden *warden, ByteBuffer &buff)
-    {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
-
-        auto const result = buff.read<uint8>();
-
-        if (!!result)
-        {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (stage 3)");
-
-            return true;
-        }
-
-        wardenWin->_endSceneAddress = buff.read<uint32>();
-
-        // immediately request fourth stage
-        wardenWin->EnqueueScans({ endSceneLocate4 });
-
-        return false;
-    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 3", None);
-
-    // end scene locate phase 2
-    auto const endSceneLocate2 = std::make_shared<WindowsScan>(
-    // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
-    {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
-
-        if (!offsets)
-            return;
-
-        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
-             << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + offsets->OfsDevice2
-             << static_cast<uint8>(sizeof(uint32));
-    },
-    // checker
-    [endSceneLocate3](const Warden *warden, ByteBuffer &buff)
-    {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
-
-        auto const result = buff.read<uint8>();
-
-        if (!!result)
-        {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Failed to read EndScene (stage 2)");
-
-            return true;
-        }
-
-        wardenWin->_endSceneAddress = buff.read<uint32>();
-
-        // immediately request third stage
-        wardenWin->EnqueueScans({ endSceneLocate3 });
-
-        return false;
-    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 2", None);
-
-    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
-    // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
-    {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
-
-        if (!offsets)
-            return;
-
-        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
-             << static_cast<uint8>(0)
-             << offsets->g_theGxDevicePtr
-             << static_cast<uint8>(sizeof(uint32));
-    },
-    // checker
-    [endSceneLocate2](const Warden *warden, ByteBuffer &buff)
-    {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
-
-        auto const result = buff.read<uint8>();
-
-        if (!!result)
-        {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read g_theGxDevicePtr");
-
-            return true;
-        }
-
-        buff.read(reinterpret_cast<uint8 *>(&wardenWin->_endSceneAddress), sizeof(wardenWin->_endSceneAddress));
-
-        // if for some reason we get nullptr, abort
-        if (!wardenWin->_endSceneAddress)
-        {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "g_theGxDevicePtr is nullptr");
-            return true;
-        }
-
-        // immediately request second stage
-        wardenWin->EnqueueScans({ endSceneLocate2 });
-
-        return false;
-    },
-    sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
-    sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 1", InitialLogin|offset_flags));
-
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsModuleScan>("prxdrvpe.dll",
     // checker
     Scan::CheckT([](const Warden *warden, ByteBuffer &buff)
@@ -1129,63 +886,9 @@ void WardenWin::BuildTimingInit(const std::string &module, uint32 offset, bool s
 WardenWin::WardenWin(WorldSession *session, const BigNumber &K) :
     _wardenAddress(0), Warden(session, sWardenModuleMgr.GetWindowsModule(), K),
     _lastClientTime(0), _lastHardwareActionTime(0), _lastTimeCheckServer(0), _sysInfoSaved(false),
-    _proxifierFound(false), _hypervisors(""), _endSceneFound(false), _endSceneAddress(0)
+    _proxifierFound(false), _hypervisors("")
 {
     memset(&_sysInfo, 0, sizeof(_sysInfo));
-}
-
-// read the dx9 EndScene binary code to look for bad stuff
-void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
-{
-    auto p = &code[0];
-
-    // skip any NOPs
-    while (*p == 0x90) ++p;
-
-    auto const nopCount = static_cast<int>(p - &code[0]);
-
-    static constexpr size_t codeRequestLength = 200u;
-
-    // int3 breakpoint
-    if (*p == 0xCC)
-    {
-        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Detected INT3 EndScene hook.  NOP count = %d.",
-            nopCount);
-    }
-    // JMP hook
-    else if (*p == 0xE9)
-    {
-        auto const dest = *reinterpret_cast<const uint32 *>(p + 1);
-
-        auto const absoluteDest = _endSceneAddress + nopCount + dest + 5;
-        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Detected JMP EndScene hook.  NOP count = %d.",
-            nopCount);
-
-        // request a custom scan just to check the JMP destination
-        EnqueueScans({ std::make_shared<WindowsMemoryScan>(absoluteDest, codeRequestLength,
-        // checker
-        [](const Warden *warden, ByteBuffer &buff)
-        {
-            auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
-
-            auto const result = buff.read<uint8>();
-
-            if (!!result)
-            {
-                sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene hook code");
-                return true;
-            }
-
-            std::vector<uint8> code(codeRequestLength);
-
-            buff.read(&code[0], code.size());
-
-            if (ValidateEndSceneHook(code))
-                sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Suspicious EndScene.  Probable bot.");
-
-            return false;
-        }, "EndScene hook validate scan", None) });
-    }
 }
 
 uint32 WardenWin::GetScanFlags() const
@@ -1208,7 +911,7 @@ uint32 WardenWin::GetScanFlags() const
 
     if (!found)
     {
-        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Invalid client build %u.  Kicking.", _session->GetGameBuild());
+        sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Invalid client build %u.  Kicking.", _session->GetGameBuild());
         _session->KickPlayer();
         return ScanFlags::None;
     }
@@ -1335,7 +1038,7 @@ void WardenWin::SetCharEnumPacket(WorldPacket &&packet)
 }
 
 void WardenWin::GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
-    std::string& endscene, std::string& proxifier) const
+    std::string& proxifier) const
 {
     if (!!_lastTimeCheckServer)
     {
@@ -1370,13 +1073,6 @@ void WardenWin::GetPlayerInfo(std::string& clock, std::string& fingerprint, std:
 
     if (_hypervisors.length() > 0)
         hypervisors = "Hypervisor(s) found: " + _hypervisors;
-
-    if (_endSceneFound)
-    {
-        std::stringstream s;
-        s << "EndScene: 0x" << std::hex << _endSceneAddress;
-        endscene = s.str();
-    }
 
     if (_proxifierFound)
         proxifier = "Proxifier is running";

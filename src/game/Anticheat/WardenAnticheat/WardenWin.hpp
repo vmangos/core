@@ -77,11 +77,6 @@ class WardenWin final : public Warden
         uint32 _lastHardwareActionTime;
         uint32 _lastTimeCheckServer;
 
-        bool _endSceneFound;
-        uint32 _endSceneAddress;
-
-        void ValidateEndScene(const std::vector<uint8> &code);
-
         virtual uint32 GetScanFlags() const;
 
         // send module initialization information (function offsets, etc.)
@@ -148,7 +143,7 @@ class WardenWin final : public Warden
         virtual void SetCharEnumPacket(WorldPacket &&packet);
 
         virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
-            std::string& endscene, std::string& proxifier) const;
+            std::string& proxifier) const;
 };
 
 #endif /*!__WARDENWIN_HPP_*/
