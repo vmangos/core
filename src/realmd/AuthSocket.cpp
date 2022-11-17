@@ -1406,7 +1406,7 @@ bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versi
     }
     else if (_os == OSX)
     {
-        if (_platform != X86 && _platform != PPC)
+        if (_platform != X86 && sConfig.GetBoolDefault("AllowPowerPC", false) && _platform != PPC)
             return false;
     }
     else

@@ -126,6 +126,11 @@ ConfVersion=2020010501
 #        Default: 1 - (Enabled)
 #                 0 - (Disabled)
 #
+#    AllowPowerPC
+#        Description: Allow clients using PowerPC.  This is a security issue as it allows easy bypassing of Warden.
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+#
 #    SendMail
 #        Whether the server is allowed to send emails
 #        The server must have been compiled with USE_SENDGRID
@@ -174,6 +179,7 @@ ReqEmailVerification = 0
 ReqEmailSince = 0
 GeoLocking = 0
 StrictVersionCheck = 1
+AllowPowerPC = 0
 SendMail = 0
 MailFrom = ""
 MailCertChecks = 1
