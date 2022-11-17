@@ -112,7 +112,7 @@ void WardenMac::Update()
 {
     Warden::Update();
 
-    if (_fingerprintSaved)
+    if (!_fingerprintSaved)
     {
         LogsDatabase.BeginTransaction();
 
