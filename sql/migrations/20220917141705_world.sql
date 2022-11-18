@@ -684,6 +684,15 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 (1077801, 0, 0, 16, 2680, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Janice Felstone - Play Sound');
 UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` = 10778;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Add Missing Gossip For Janice Felstone
+INSERT INTO `gossip_menu` (`entry`, `text_id`, condition_id) VALUES
+(2961, 3669, 299);
+
+-- 299: Target Has Done Quest 5051
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (299, 8, 5051, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
