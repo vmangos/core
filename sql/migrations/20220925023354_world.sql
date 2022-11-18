@@ -145,6 +145,10 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `patch_max`) VALUES ('106
 -- Don't use Durotar, Razor Hill GY for Hall of Legends after patch 1.6
 UPDATE `game_graveyard_zone` SET `patch_max`='3' WHERE  `id`=32 AND `ghost_zone`=2917 AND `patch_max`=10;
 
+-- Thousand Needles, Shimmering Flats GY should only be used for area Shimmering Flats
+-- Should be neutral
+UPDATE `game_graveyard_zone` SET `faction`=0, `ghost_zone`=439 WHERE `id`=329 AND `ghost_zone`=400 AND `patch_max`=10;
+
 
 -- End of migration.
 END IF;
