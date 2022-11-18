@@ -693,6 +693,11 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, condition_id) VALUES
 -- 299: Target Has Done Quest 5051
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (299, 8, 5051, 0, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Defias Rioter Should Not Drop Money
+UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry` = 5043;
+
 
 -- End of migration.
 END IF;
