@@ -675,6 +675,15 @@ REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `
 (74410, 'Winterspring - Winterfall Totemic', 15786, 100, 0, 0, 0, 0, 7, 9, 55, 65, 0, 15787, 100, 0, 0, 0, 0, 12, 14, 20, 30, 0, 17205, 100, 0, 0, 0, 32, 0, 10, 120, 121, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 UPDATE `creature_template` SET `spell_list_id` = 74410 WHERE `entry` = 7441;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Events list for Janice Felstone
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(1077801, 10778, 0, 1, 0, 100, 1, 0, 420000, 180000, 420000, 1077801, 0, 0, 'Janice Felstone - Play Sound OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1077801, 0, 0, 16, 2680, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Janice Felstone - Play Sound');
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` = 10778;
+
 
 -- End of migration.
 END IF;
