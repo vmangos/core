@@ -278,6 +278,12 @@ bool Map::ScriptCommand_TeleportTo(ScriptInfo const& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
+    if (!pSource->FindMap())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SCRIPT_COMMAND_TELEPORT_TO (script id %u) call for source unit not in map (%s).", script.id, source->GetGuidStr().c_str());
+        return ShouldAbortScript(script);
+    }
+
     if (pSource->GetTypeId() == TYPEID_PLAYER)
         (static_cast<Player*>(pSource))->TeleportTo(script.teleportTo.mapId, script.x, script.y, script.z, script.o, script.teleportTo.teleportOptions);
     else
