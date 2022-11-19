@@ -698,6 +698,12 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Defias Rioter Should Not Drop Money
 UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry` = 5043;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Unstuck Creature
+UPDATE `creature` SET `position_z` = 52.7279 WHERE `guid`=18622;
+UPDATE `creature` SET `position_z` = 31.6557 WHERE `guid`=7887;
+
 
 -- End of migration.
 END IF;
