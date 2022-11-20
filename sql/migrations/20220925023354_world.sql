@@ -148,6 +148,12 @@ UPDATE `game_graveyard_zone` SET `patch_max`='3' WHERE  `id`=32 AND `ghost_zone`
 -- Thousand Needles, Shimmering Flats GY should only be used for area Shimmering Flats
 -- Should be neutral
 UPDATE `game_graveyard_zone` SET `faction`=0, `ghost_zone`=439 WHERE `id`=329 AND `ghost_zone`=400 AND `patch_max`=10;
+-- Add subareas in Shimmering Flats to Thousand Needles, Shimmering Flats GY 
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `patch_max`) VALUES
+(329, 479, 0, 0, 10),
+(329, 2240, 0, 0, 10),
+(329, 3038, 0, 0, 10),
+(329, 3039, 0, 0, 10);
 
 
 -- End of migration.
