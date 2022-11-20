@@ -14,12 +14,12 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     SET @NPC_NPC_FLAMESHOCKER_GUID                                  = 66900;
     SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 21841;
 
-    SET @GOBJ_SKULLPILE_WINTERSPRING_GUID                           = 52495; -- 648
-    SET @GOBJ_SKULLPILE_TANARIS_GUID                                = 53143; --
-    SET @GOBJ_SKULLPILE_AZSHARA_GUID                                = 52495; --
-    SET @GOBJ_SKULLPILE_BLASTED_LANDS_GUID                          = 52495; --
-    SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 52495; --
-    SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 52495; --
+    SET @GOBJ_SKULLPILE_WINTERSPRING_GUID                           = 52495; -- 648 Entries
+    SET @GOBJ_SKULLPILE_TANARIS_GUID                                = 53143; -- 648 Entries
+    SET @GOBJ_SKULLPILE_AZSHARA_GUID                                = 53791; --
+    SET @GOBJ_SKULLPILE_BLASTED_LANDS_GUID                          = 0; --
+    SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 0; --
+    SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 0; --
 
     SET @GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID               = 24166;
     SET @GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID                    = 24418;
@@ -28,12 +28,12 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     SET @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID        = 27173;
     SET @GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID            = 27341;
 
-    SET @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY                 = 52495;
-    SET @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY                      = 52495;
-    SET @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY                      = 52495;
-    SET @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY                = 52495;
-    SET @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY          = 52495;
-    SET @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY              = 52495;
+    SET @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY                 = 14281; -- 162 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY                      = 14443; -- 162 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY                      = 14605; -- 108 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY                = 14713;
+    SET @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY          = 0;
+    SET @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY              = 0;
 
     SET @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING              = 90;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS                   = 91;
@@ -2433,6 +2433,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+160, 181163, 0, 2366.46, -4908.5, 76.7359, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10);     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
     INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+1 AND @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+160;
 
+    -- GameObject: "Skullpile" in Winterspring
     INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
         (@GOBJ_SKULLPILE_WINTERSPRING_GUID+1, 181191, 1, 6010.73, -5045.85, 787.062, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Winterspring
         (@GOBJ_SKULLPILE_WINTERSPRING_GUID+2, 181192, 1, 6010.73, -5045.85, 787.062, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Winterspring
@@ -3734,6 +3735,1309 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_SKULLPILE_WINTERSPRING_GUID+647, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+162, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
         (@GOBJ_SKULLPILE_WINTERSPRING_GUID+648, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+162, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10);
     INSERT INTO `pool_template` SELECT pool_gameobject.pool_entry, 1, 'Scourge Invasion Winterspring, Skullpile', 0, 0, 9, 10 FROM `pool_gameobject` WHERE pool_gameobject.pool_entry BETWEEN @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+1 AND @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+162 GROUP BY pool_gameobject.pool_entry;
+
+    -- GameObject: "Skullpile" in Tanaris
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_TANARIS_GUID+1, 181191, 1, -8855.68, -2612.3, 20.9845, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+2, 181192, 1, -8855.68, -2612.3, 20.9845, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+3, 181193, 1, -8855.68, -2612.3, 20.9845, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+4, 181194, 1, -8855.68, -2612.3, 20.9845, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+5, 181191, 1, -8855.06, -2613.22, 21.1039, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+6, 181192, 1, -8855.06, -2613.22, 21.1039, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+7, 181193, 1, -8855.06, -2613.22, 21.1039, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+8, 181194, 1, -8855.06, -2613.22, 21.1039, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+9, 181191, 1, -8853.76, -2599.58, 20.5476, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+10, 181192, 1, -8853.76, -2599.58, 20.5476, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+11, 181193, 1, -8853.76, -2599.58, 20.5476, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+12, 181194, 1, -8853.76, -2599.58, 20.5476, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+13, 181191, 1, -8848.14, -2586.65, 19.9328, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+14, 181192, 1, -8848.14, -2586.65, 19.9328, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+15, 181193, 1, -8848.14, -2586.65, 19.9328, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+16, 181194, 1, -8848.14, -2586.65, 19.9328, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+17, 181191, 1, -8848.11, -2587.74, 20.037, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+18, 181192, 1, -8848.11, -2587.74, 20.037, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+19, 181193, 1, -8848.11, -2587.74, 20.037, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+20, 181194, 1, -8848.11, -2587.74, 20.037, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+21, 181191, 1, -8847.73, -2586.65, 19.9377, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+22, 181192, 1, -8847.73, -2586.65, 19.9377, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+23, 181193, 1, -8847.73, -2586.65, 19.9377, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+24, 181194, 1, -8847.73, -2586.65, 19.9377, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+25, 181191, 1, -8841.23, -2614.51, 22.8541, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+26, 181192, 1, -8841.23, -2614.51, 22.8541, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+27, 181193, 1, -8841.23, -2614.51, 22.8541, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+28, 181194, 1, -8841.23, -2614.51, 22.8541, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+29, 181191, 1, -8840.52, -2615.04, 22.9579, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+30, 181192, 1, -8840.52, -2615.04, 22.9579, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+31, 181193, 1, -8840.52, -2615.04, 22.9579, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+32, 181194, 1, -8840.52, -2615.04, 22.9579, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+33, 181191, 1, -8839.9, -2590.59, 20.3447, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+34, 181192, 1, -8839.9, -2590.59, 20.3447, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+35, 181193, 1, -8839.9, -2590.59, 20.3447, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+36, 181194, 1, -8839.9, -2590.59, 20.3447, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+37, 181191, 1, -8835.51, -2579.87, 18.2914, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+38, 181192, 1, -8835.51, -2579.87, 18.2914, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+39, 181193, 1, -8835.51, -2579.87, 18.2914, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+40, 181194, 1, -8835.51, -2579.87, 18.2914, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+41, 181191, 1, -8835.25, -2580.45, 18.3708, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+42, 181192, 1, -8835.25, -2580.45, 18.3708, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+43, 181193, 1, -8835.25, -2580.45, 18.3708, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+44, 181194, 1, -8835.25, -2580.45, 18.3708, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+45, 181191, 1, -8831.08, -2607.68, 22.7675, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+46, 181192, 1, -8831.08, -2607.68, 22.7675, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+47, 181193, 1, -8831.08, -2607.68, 22.7675, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+48, 181194, 1, -8831.08, -2607.68, 22.7675, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+49, 181191, 1, -8825.62, -2584.85, 18.1544, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+50, 181192, 1, -8825.62, -2584.85, 18.1544, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+51, 181193, 1, -8825.62, -2584.85, 18.1544, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+52, 181194, 1, -8825.62, -2584.85, 18.1544, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+53, 181191, 1, -8825.61, -2592.94, 19.9679, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+54, 181192, 1, -8825.61, -2592.94, 19.9679, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+55, 181193, 1, -8825.61, -2592.94, 19.9679, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+56, 181194, 1, -8825.61, -2592.94, 19.9679, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+57, 181191, 1, -8825.25, -2593.34, 20.0255, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+58, 181192, 1, -8825.25, -2593.34, 20.0255, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+59, 181193, 1, -8825.25, -2593.34, 20.0255, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+60, 181194, 1, -8825.25, -2593.34, 20.0255, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+61, 181191, 1, -8821.63, -2613.11, 23.407, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+62, 181192, 1, -8821.63, -2613.11, 23.407, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+63, 181193, 1, -8821.63, -2613.11, 23.407, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+64, 181194, 1, -8821.63, -2613.11, 23.407, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+65, 181191, 1, -8820.26, -2613.15, 23.3564, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+66, 181192, 1, -8820.26, -2613.15, 23.3564, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+67, 181193, 1, -8820.26, -2613.15, 23.3564, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+68, 181194, 1, -8820.26, -2613.15, 23.3564, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+69, 181191, 1, -8815.01, -2593.01, 18.4082, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+70, 181192, 1, -8815.01, -2593.01, 18.4082, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+71, 181193, 1, -8815.01, -2593.01, 18.4082, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+72, 181194, 1, -8815.01, -2593.01, 18.4082, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+73, 181191, 1, -8565.92, -2708.38, 17.7712, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+74, 181192, 1, -8565.92, -2708.38, 17.7712, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+75, 181193, 1, -8565.92, -2708.38, 17.7712, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+76, 181194, 1, -8565.92, -2708.38, 17.7712, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+77, 181191, 1, -8561.86, -2683.07, 20.4009, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+78, 181192, 1, -8561.86, -2683.07, 20.4009, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+79, 181193, 1, -8561.86, -2683.07, 20.4009, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+80, 181194, 1, -8561.86, -2683.07, 20.4009, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+81, 181191, 1, -8559.94, -2295.46, 25.5611, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+82, 181192, 1, -8559.94, -2295.46, 25.5611, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+83, 181193, 1, -8559.94, -2295.46, 25.5611, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+84, 181194, 1, -8559.94, -2295.46, 25.5611, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+85, 181191, 1, -8559.86, -2310.24, 26.8044, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+86, 181192, 1, -8559.86, -2310.24, 26.8044, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+87, 181193, 1, -8559.86, -2310.24, 26.8044, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+88, 181194, 1, -8559.86, -2310.24, 26.8044, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+89, 181191, 1, -8559.66, -2311.28, 26.9071, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+90, 181192, 1, -8559.66, -2311.28, 26.9071, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+91, 181193, 1, -8559.66, -2311.28, 26.9071, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+92, 181194, 1, -8559.66, -2311.28, 26.9071, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+93, 181191, 1, -8559.13, -2310.88, 26.9176, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+94, 181192, 1, -8559.13, -2310.88, 26.9176, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+95, 181193, 1, -8559.13, -2310.88, 26.9176, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+96, 181194, 1, -8559.13, -2310.88, 26.9176, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+97, 181191, 1, -8552.64, -2714.94, 17.81, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+98, 181192, 1, -8552.64, -2714.94, 17.81, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+99, 181193, 1, -8552.64, -2714.94, 17.81, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+100, 181194, 1, -8552.64, -2714.94, 17.81, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+101, 181191, 1, -8552.41, -2283.76, 25.6822, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+102, 181192, 1, -8552.41, -2283.76, 25.6822, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+103, 181193, 1, -8552.41, -2283.76, 25.6822, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+104, 181194, 1, -8552.41, -2283.76, 25.6822, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+105, 181191, 1, -8552.24, -2715.69, 17.7591, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+106, 181192, 1, -8552.24, -2715.69, 17.7591, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+107, 181193, 1, -8552.24, -2715.69, 17.7591, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+108, 181194, 1, -8552.24, -2715.69, 17.7591, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+109, 181191, 1, -8551.15, -2317.67, 28.2411, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+110, 181192, 1, -8551.15, -2317.67, 28.2411, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+111, 181193, 1, -8551.15, -2317.67, 28.2411, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+112, 181194, 1, -8551.15, -2317.67, 28.2411, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+113, 181191, 1, -8548.03, -2675.35, 24.4387, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+114, 181192, 1, -8548.03, -2675.35, 24.4387, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+115, 181193, 1, -8548.03, -2675.35, 24.4387, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+116, 181194, 1, -8548.03, -2675.35, 24.4387, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+117, 181191, 1, -8547.42, -2676.08, 24.3664, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+118, 181192, 1, -8547.42, -2676.08, 24.3664, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+119, 181193, 1, -8547.42, -2676.08, 24.3664, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+120, 181194, 1, -8547.42, -2676.08, 24.3664, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+121, 181191, 1, -8545.43, -2296.88, 27.2682, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+122, 181192, 1, -8545.43, -2296.88, 27.2682, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+123, 181193, 1, -8545.43, -2296.88, 27.2682, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+124, 181194, 1, -8545.43, -2296.88, 27.2682, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+125, 181191, 1, -8544.66, -2297.59, 27.403, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+126, 181192, 1, -8544.66, -2297.59, 27.403, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+127, 181193, 1, -8544.66, -2297.59, 27.403, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+128, 181194, 1, -8544.66, -2297.59, 27.403, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+129, 181191, 1, -8544.29, -2275.54, 25.9922, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+130, 181192, 1, -8544.29, -2275.54, 25.9922, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+131, 181193, 1, -8544.29, -2275.54, 25.9922, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+132, 181194, 1, -8544.29, -2275.54, 25.9922, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+133, 181191, 1, -8543.66, -2275.98, 26.0279, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+134, 181192, 1, -8543.66, -2275.98, 26.0279, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+135, 181193, 1, -8543.66, -2275.98, 26.0279, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+136, 181194, 1, -8543.66, -2275.98, 26.0279, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+137, 181191, 1, -8539.82, -2708.14, 19.1234, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+138, 181192, 1, -8539.82, -2708.14, 19.1234, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+139, 181193, 1, -8539.82, -2708.14, 19.1234, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+140, 181194, 1, -8539.82, -2708.14, 19.1234, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+141, 181191, 1, -8538.38, -2707.68, 19.3151, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+142, 181192, 1, -8538.38, -2707.68, 19.3151, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+143, 181193, 1, -8538.38, -2707.68, 19.3151, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+144, 181194, 1, -8538.38, -2707.68, 19.3151, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+145, 181191, 1, -8537.66, -2314.78, 29.8219, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+146, 181192, 1, -8537.66, -2314.78, 29.8219, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+147, 181193, 1, -8537.66, -2314.78, 29.8219, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+148, 181194, 1, -8537.66, -2314.78, 29.8219, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+149, 181191, 1, -8532.27, -2685.06, 24.7199, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+150, 181192, 1, -8532.27, -2685.06, 24.7199, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+151, 181193, 1, -8532.27, -2685.06, 24.7199, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+152, 181194, 1, -8532.27, -2685.06, 24.7199, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+153, 181191, 1, -8531.49, -2324.18, 31.6934, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+154, 181192, 1, -8531.49, -2324.18, 31.6934, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+155, 181193, 1, -8531.49, -2324.18, 31.6934, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+156, 181194, 1, -8531.49, -2324.18, 31.6934, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+157, 181191, 1, -8530.33, -2324.33, 31.8888, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+158, 181192, 1, -8530.33, -2324.33, 31.8888, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+159, 181193, 1, -8530.33, -2324.33, 31.8888, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+160, 181194, 1, -8530.33, -2324.33, 31.8888, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+161, 181191, 1, -8529.68, -2279.74, 26.9854, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+162, 181192, 1, -8529.68, -2279.74, 26.9854, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+163, 181193, 1, -8529.68, -2279.74, 26.9854, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+164, 181194, 1, -8529.68, -2279.74, 26.9854, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+165, 181191, 1, -8522.8, -2672.39, 28.4981, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+166, 181192, 1, -8522.8, -2672.39, 28.4981, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+167, 181193, 1, -8522.8, -2672.39, 28.4981, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+168, 181194, 1, -8522.8, -2672.39, 28.4981, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+169, 181191, 1, -8521.94, -2719.63, 19.9967, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+170, 181192, 1, -8521.94, -2719.63, 19.9967, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+171, 181193, 1, -8521.94, -2719.63, 19.9967, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+172, 181194, 1, -8521.94, -2719.63, 19.9967, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+173, 181191, 1, -8521.08, -2670.83, 29.0276, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+174, 181192, 1, -8521.08, -2670.83, 29.0276, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+175, 181193, 1, -8521.08, -2670.83, 29.0276, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+176, 181194, 1, -8521.08, -2670.83, 29.0276, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+177, 181191, 1, -8521.03, -2312.31, 31.563, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+178, 181192, 1, -8521.03, -2312.31, 31.563, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+179, 181193, 1, -8521.03, -2312.31, 31.563, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+180, 181194, 1, -8521.03, -2312.31, 31.563, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+181, 181191, 1, -8520.69, -2720.47, 20.086, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+182, 181192, 1, -8520.69, -2720.47, 20.086, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+183, 181193, 1, -8520.69, -2720.47, 20.086, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+184, 181194, 1, -8520.69, -2720.47, 20.086, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+185, 181191, 1, -8518.84, -2733.52, 18.2613, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+186, 181192, 1, -8518.84, -2733.52, 18.2613, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+187, 181193, 1, -8518.84, -2733.52, 18.2613, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+188, 181194, 1, -8518.84, -2733.52, 18.2613, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+189, 181191, 1, -8517.46, -2298.79, 29.9655, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+190, 181192, 1, -8517.46, -2298.79, 29.9655, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+191, 181193, 1, -8517.46, -2298.79, 29.9655, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+192, 181194, 1, -8517.46, -2298.79, 29.9655, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+193, 181191, 1, -8516.76, -2299.98, 30.151, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+194, 181192, 1, -8516.76, -2299.98, 30.151, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+195, 181193, 1, -8516.76, -2299.98, 30.151, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+196, 181194, 1, -8516.76, -2299.98, 30.151, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+197, 181191, 1, -8516.58, -2299.49, 30.091, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+198, 181192, 1, -8516.58, -2299.49, 30.091, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+199, 181193, 1, -8516.58, -2299.49, 30.091, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+200, 181194, 1, -8516.58, -2299.49, 30.091, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+201, 181191, 1, -8515.71, -2708.44, 22.0036, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+202, 181192, 1, -8515.71, -2708.44, 22.0036, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+203, 181193, 1, -8515.71, -2708.44, 22.0036, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+204, 181194, 1, -8515.71, -2708.44, 22.0036, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+205, 181191, 1, -8515, -2693.34, 25.3124, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+206, 181192, 1, -8515, -2693.34, 25.3124, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+207, 181193, 1, -8515, -2693.34, 25.3124, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+208, 181194, 1, -8515, -2693.34, 25.3124, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+209, 181191, 1, -8513.5, -2693.82, 25.418, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+210, 181192, 1, -8513.5, -2693.82, 25.418, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+211, 181193, 1, -8513.5, -2693.82, 25.418, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+212, 181194, 1, -8513.5, -2693.82, 25.418, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+213, 181191, 1, -8498.64, -2699.57, 25.9792, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+214, 181192, 1, -8498.64, -2699.57, 25.9792, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+215, 181193, 1, -8498.64, -2699.57, 25.9792, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+216, 181194, 1, -8498.64, -2699.57, 25.9792, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+217, 181191, 1, -8492.51, -3840.79, 22.9963, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+218, 181192, 1, -8492.51, -3840.79, 22.9963, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+219, 181193, 1, -8492.51, -3840.79, 22.9963, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+220, 181194, 1, -8492.51, -3840.79, 22.9963, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+221, 181191, 1, -8492.48, -3824.91, 22.1804, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+222, 181192, 1, -8492.48, -3824.91, 22.1804, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+223, 181193, 1, -8492.48, -3824.91, 22.1804, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+224, 181194, 1, -8492.48, -3824.91, 22.1804, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+225, 181191, 1, -8491.93, -3823.43, 21.9661, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+226, 181192, 1, -8491.93, -3823.43, 21.9661, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+227, 181193, 1, -8491.93, -3823.43, 21.9661, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+228, 181194, 1, -8491.93, -3823.43, 21.9661, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+229, 181191, 1, -8487.15, -3797.78, 16.1267, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+230, 181192, 1, -8487.15, -3797.78, 16.1267, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+231, 181193, 1, -8487.15, -3797.78, 16.1267, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+232, 181194, 1, -8487.15, -3797.78, 16.1267, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+233, 181191, 1, -8486.24, -3849.88, 22.2001, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+234, 181192, 1, -8486.24, -3849.88, 22.2001, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+235, 181193, 1, -8486.24, -3849.88, 22.2001, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+236, 181194, 1, -8486.24, -3849.88, 22.2001, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+237, 181191, 1, -8477.85, -3845.78, 19.6327, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+238, 181192, 1, -8477.85, -3845.78, 19.6327, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+239, 181193, 1, -8477.85, -3845.78, 19.6327, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+240, 181194, 1, -8477.85, -3845.78, 19.6327, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+241, 181191, 1, -8473.6, -3808.87, 13.5766, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+242, 181192, 1, -8473.6, -3808.87, 13.5766, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+243, 181193, 1, -8473.6, -3808.87, 13.5766, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+244, 181194, 1, -8473.6, -3808.87, 13.5766, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+245, 181191, 1, -8472.53, -3809.85, 13.3288, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+246, 181192, 1, -8472.53, -3809.85, 13.3288, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+247, 181193, 1, -8472.53, -3809.85, 13.3288, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+248, 181194, 1, -8472.53, -3809.85, 13.3288, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+249, 181191, 1, -8472.31, -3808.9, 13.1103, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+250, 181192, 1, -8472.31, -3808.9, 13.1103, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+251, 181193, 1, -8472.31, -3808.9, 13.1103, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+252, 181194, 1, -8472.31, -3808.9, 13.1103, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+253, 181191, 1, -8467.81, -3859.59, 17.4158, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+254, 181192, 1, -8467.81, -3859.59, 17.4158, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+255, 181193, 1, -8467.81, -3859.59, 17.4158, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+256, 181194, 1, -8467.81, -3859.59, 17.4158, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+257, 181191, 1, -8467.4, -3860.53, 17.3443, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+258, 181192, 1, -8467.4, -3860.53, 17.3443, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+259, 181193, 1, -8467.4, -3860.53, 17.3443, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+260, 181194, 1, -8467.4, -3860.53, 17.3443, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+261, 181191, 1, -8459.59, -3835.74, 12.9851, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+262, 181192, 1, -8459.59, -3835.74, 12.9851, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+263, 181193, 1, -8459.59, -3835.74, 12.9851, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+264, 181194, 1, -8459.59, -3835.74, 12.9851, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+265, 181191, 1, -8459.11, -3837.16, 13.0731, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+266, 181192, 1, -8459.11, -3837.16, 13.0731, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+267, 181193, 1, -8459.11, -3837.16, 13.0731, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+268, 181194, 1, -8459.11, -3837.16, 13.0731, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+269, 181191, 1, -8456.02, -3812.77, 10.9128, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+270, 181192, 1, -8456.02, -3812.77, 10.9128, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+271, 181193, 1, -8456.02, -3812.77, 10.9128, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+272, 181194, 1, -8456.02, -3812.77, 10.9128, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+273, 181191, 1, -8449.55, -3851.52, 13.5815, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+274, 181192, 1, -8449.55, -3851.52, 13.5815, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+275, 181193, 1, -8449.55, -3851.52, 13.5815, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+276, 181194, 1, -8449.55, -3851.52, 13.5815, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+277, 181191, 1, -8445.57, -3821.65, 11.7236, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+278, 181192, 1, -8445.57, -3821.65, 11.7236, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+279, 181193, 1, -8445.57, -3821.65, 11.7236, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+280, 181194, 1, -8445.57, -3821.65, 11.7236, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+281, 181191, 1, -8443.05, -3835.11, 12.3717, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+282, 181192, 1, -8443.05, -3835.11, 12.3717, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+283, 181193, 1, -8443.05, -3835.11, 12.3717, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+284, 181194, 1, -8443.05, -3835.11, 12.3717, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+285, 181191, 1, -8442.69, -3833.79, 12.2917, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+286, 181192, 1, -8442.69, -3833.79, 12.2917, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+287, 181193, 1, -8442.69, -3833.79, 12.2917, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+288, 181194, 1, -8442.69, -3833.79, 12.2917, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+289, 181191, 1, -8362.51, -4219.57, 12.9193, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+290, 181192, 1, -8362.51, -4219.57, 12.9193, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+291, 181193, 1, -8362.51, -4219.57, 12.9193, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+292, 181194, 1, -8362.51, -4219.57, 12.9193, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+293, 181191, 1, -8360.75, -4219.06, 12.7648, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+294, 181192, 1, -8360.75, -4219.06, 12.7648, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+295, 181193, 1, -8360.75, -4219.06, 12.7648, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+296, 181194, 1, -8360.75, -4219.06, 12.7648, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+297, 181191, 1, -8353.97, -4180.1, 12.751, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+298, 181192, 1, -8353.97, -4180.1, 12.751, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+299, 181193, 1, -8353.97, -4180.1, 12.751, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+300, 181194, 1, -8353.97, -4180.1, 12.751, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+301, 181191, 1, -8348.64, -4199.97, 11.6817, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+302, 181192, 1, -8348.64, -4199.97, 11.6817, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+303, 181193, 1, -8348.64, -4199.97, 11.6817, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+304, 181194, 1, -8348.64, -4199.97, 11.6817, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+305, 181191, 1, -8347.8, -4198.86, 11.6864, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+306, 181192, 1, -8347.8, -4198.86, 11.6864, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+307, 181193, 1, -8347.8, -4198.86, 11.6864, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+308, 181194, 1, -8347.8, -4198.86, 11.6864, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+309, 181191, 1, -8347.73, -4200.1, 11.7734, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+310, 181192, 1, -8347.73, -4200.1, 11.7734, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+311, 181193, 1, -8347.73, -4200.1, 11.7734, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+312, 181194, 1, -8347.73, -4200.1, 11.7734, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+313, 181191, 1, -8340.27, -4223.53, 13.5409, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+314, 181192, 1, -8340.27, -4223.53, 13.5409, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+315, 181193, 1, -8340.27, -4223.53, 13.5409, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+316, 181194, 1, -8340.27, -4223.53, 13.5409, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+317, 181191, 1, -8330.96, -4231.78, 12.6973, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+318, 181192, 1, -8330.96, -4231.78, 12.6973, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+319, 181193, 1, -8330.96, -4231.78, 12.6973, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+320, 181194, 1, -8330.96, -4231.78, 12.6973, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+321, 181191, 1, -8330.78, -4230.26, 12.7909, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+322, 181192, 1, -8330.78, -4230.26, 12.7909, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+323, 181193, 1, -8330.78, -4230.26, 12.7909, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+324, 181194, 1, -8330.78, -4230.26, 12.7909, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+325, 181191, 1, -8326.34, -4167.36, 12.2286, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+326, 181192, 1, -8326.34, -4167.36, 12.2286, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+327, 181193, 1, -8326.34, -4167.36, 12.2286, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+328, 181194, 1, -8326.34, -4167.36, 12.2286, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+329, 181191, 1, -8326.11, -4168.15, 12.292, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+330, 181192, 1, -8326.11, -4168.15, 12.292, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+331, 181193, 1, -8326.11, -4168.15, 12.292, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+332, 181194, 1, -8326.11, -4168.15, 12.292, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+333, 181191, 1, -8322.27, -4187.97, 12.7111, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+334, 181192, 1, -8322.27, -4187.97, 12.7111, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+335, 181193, 1, -8322.27, -4187.97, 12.7111, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+336, 181194, 1, -8322.27, -4187.97, 12.7111, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+337, 181191, 1, -8315.76, -4222.67, 10.576, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+338, 181192, 1, -8315.76, -4222.67, 10.576, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+339, 181193, 1, -8315.76, -4222.67, 10.576, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+340, 181194, 1, -8315.76, -4222.67, 10.576, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+341, 181191, 1, -8314.28, -4204.59, 10.916, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+342, 181192, 1, -8314.28, -4204.59, 10.916, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+343, 181193, 1, -8314.28, -4204.59, 10.916, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+344, 181194, 1, -8314.28, -4204.59, 10.916, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+345, 181191, 1, -8313.8, -4205.24, 10.8326, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+346, 181192, 1, -8313.8, -4205.24, 10.8326, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+347, 181193, 1, -8313.8, -4205.24, 10.8326, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+348, 181194, 1, -8313.8, -4205.24, 10.8326, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+349, 181191, 1, -8307.8, -4177.41, 10.6385, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+350, 181192, 1, -8307.8, -4177.41, 10.6385, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+351, 181193, 1, -8307.8, -4177.41, 10.6385, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+352, 181194, 1, -8307.8, -4177.41, 10.6385, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+353, 181191, 1, -8295.47, -4194.36, 9.037, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+354, 181192, 1, -8295.47, -4194.36, 9.037, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+355, 181193, 1, -8295.47, -4194.36, 9.037, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+356, 181194, 1, -8295.47, -4194.36, 9.037, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+357, 181191, 1, -8293.62, -4193.97, 8.87366, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+358, 181192, 1, -8293.62, -4193.97, 8.87366, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+359, 181193, 1, -8293.62, -4193.97, 8.87366, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+360, 181194, 1, -8293.62, -4193.97, 8.87366, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+361, 181191, 1, -8190.53, -3791.35, 15.0982, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+362, 181192, 1, -8190.53, -3791.35, 15.0982, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+363, 181193, 1, -8190.53, -3791.35, 15.0982, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+364, 181194, 1, -8190.53, -3791.35, 15.0982, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+365, 181191, 1, -8190.24, -3791.99, 15.0187, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+366, 181192, 1, -8190.24, -3791.99, 15.0187, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+367, 181193, 1, -8190.24, -3791.99, 15.0187, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+368, 181194, 1, -8190.24, -3791.99, 15.0187, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+369, 181191, 1, -8186.86, -3808.95, 12.5813, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+370, 181192, 1, -8186.86, -3808.95, 12.5813, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+371, 181193, 1, -8186.86, -3808.95, 12.5813, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+372, 181194, 1, -8186.86, -3808.95, 12.5813, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+373, 181191, 1, -8186.66, -3823.62, 10.6459, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+374, 181192, 1, -8186.66, -3823.62, 10.6459, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+375, 181193, 1, -8186.66, -3823.62, 10.6459, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+376, 181194, 1, -8186.66, -3823.62, 10.6459, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+377, 181191, 1, -8185.36, -3824.41, 10.7623, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+378, 181192, 1, -8185.36, -3824.41, 10.7623, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+379, 181193, 1, -8185.36, -3824.41, 10.7623, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+380, 181194, 1, -8185.36, -3824.41, 10.7623, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+381, 181191, 1, -8178.06, -3786.61, 15.7069, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+382, 181192, 1, -8178.06, -3786.61, 15.7069, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+383, 181193, 1, -8178.06, -3786.61, 15.7069, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+384, 181194, 1, -8178.06, -3786.61, 15.7069, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+385, 181191, 1, -8168.28, -3828.42, 13.3761, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+386, 181192, 1, -8168.28, -3828.42, 13.3761, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+387, 181193, 1, -8168.28, -3828.42, 13.3761, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+388, 181194, 1, -8168.28, -3828.42, 13.3761, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+389, 181191, 1, -8164.58, -3779.35, 13.619, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+390, 181192, 1, -8164.58, -3779.35, 13.619, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+391, 181193, 1, -8164.58, -3779.35, 13.619, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+392, 181194, 1, -8164.58, -3779.35, 13.619, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+393, 181191, 1, -8164.15, -3795.79, 14.647, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+394, 181192, 1, -8164.15, -3795.79, 14.647, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+395, 181193, 1, -8164.15, -3795.79, 14.647, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+396, 181194, 1, -8164.15, -3795.79, 14.647, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+397, 181191, 1, -8162.89, -3796.32, 14.5938, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+398, 181192, 1, -8162.89, -3796.32, 14.5938, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+399, 181193, 1, -8162.89, -3796.32, 14.5938, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+400, 181194, 1, -8162.89, -3796.32, 14.5938, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+401, 181191, 1, -8157.61, -3811.4, 15.3045, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+402, 181192, 1, -8157.61, -3811.4, 15.3045, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+403, 181193, 1, -8157.61, -3811.4, 15.3045, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+404, 181194, 1, -8157.61, -3811.4, 15.3045, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+405, 181191, 1, -8154.78, -3788.68, 13.1254, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+406, 181192, 1, -8154.78, -3788.68, 13.1254, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+407, 181193, 1, -8154.78, -3788.68, 13.1254, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+408, 181194, 1, -8154.78, -3788.68, 13.1254, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+409, 181191, 1, -8153.53, -3822.95, 15.6909, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+410, 181192, 1, -8153.53, -3822.95, 15.6909, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+411, 181193, 1, -8153.53, -3822.95, 15.6909, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+412, 181194, 1, -8153.53, -3822.95, 15.6909, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+413, 181191, 1, -8152.87, -3822.27, 15.711, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+414, 181192, 1, -8152.87, -3822.27, 15.711, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+415, 181193, 1, -8152.87, -3822.27, 15.711, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+416, 181194, 1, -8152.87, -3822.27, 15.711, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+417, 181191, 1, -8142.92, -3805.71, 13.4032, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+418, 181192, 1, -8142.92, -3805.71, 13.4032, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+419, 181193, 1, -8142.92, -3805.71, 13.4032, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+420, 181194, 1, -8142.92, -3805.71, 13.4032, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+421, 181191, 1, -8142.86, -3805.25, 13.3441, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+422, 181192, 1, -8142.86, -3805.25, 13.3441, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+423, 181193, 1, -8142.86, -3805.25, 13.3441, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+424, 181194, 1, -8142.86, -3805.25, 13.3441, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+425, 181191, 1, -8142.68, -3794.19, 12.3602, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+426, 181192, 1, -8142.68, -3794.19, 12.3602, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+427, 181193, 1, -8142.68, -3794.19, 12.3602, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+428, 181194, 1, -8142.68, -3794.19, 12.3602, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+429, 181191, 1, -8140.04, -3818.99, 14.6955, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+430, 181192, 1, -8140.04, -3818.99, 14.6955, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+431, 181193, 1, -8140.04, -3818.99, 14.6955, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+432, 181194, 1, -8140.04, -3818.99, 14.6955, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+433, 181191, 1, -7647.65, -3736.53, 24.4549, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+434, 181192, 1, -7647.65, -3736.53, 24.4549, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+435, 181193, 1, -7647.65, -3736.53, 24.4549, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+436, 181194, 1, -7647.65, -3736.53, 24.4549, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+437, 181191, 1, -7646.29, -3711.4, 21.3581, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+438, 181192, 1, -7646.29, -3711.4, 21.3581, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+439, 181193, 1, -7646.29, -3711.4, 21.3581, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+440, 181194, 1, -7646.29, -3711.4, 21.3581, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+441, 181191, 1, -7645.66, -3724.43, 22.9962, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+442, 181192, 1, -7645.66, -3724.43, 22.9962, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+443, 181193, 1, -7645.66, -3724.43, 22.9962, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+444, 181194, 1, -7645.66, -3724.43, 22.9962, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+445, 181191, 1, -7645.55, -3725.55, 23.1402, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+446, 181192, 1, -7645.55, -3725.55, 23.1402, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+447, 181193, 1, -7645.55, -3725.55, 23.1402, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+448, 181194, 1, -7645.55, -3725.55, 23.1402, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+449, 181191, 1, -7644.84, -3725.11, 22.8912, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+450, 181192, 1, -7644.84, -3725.11, 22.8912, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+451, 181193, 1, -7644.84, -3725.11, 22.8912, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+452, 181194, 1, -7644.84, -3725.11, 22.8912, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+453, 181191, 1, -7641.05, -3745.16, 22.8822, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+454, 181192, 1, -7641.05, -3745.16, 22.8822, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+455, 181193, 1, -7641.05, -3745.16, 22.8822, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+456, 181194, 1, -7641.05, -3745.16, 22.8822, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+457, 181191, 1, -7640.64, -3744.2, 22.873, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+458, 181192, 1, -7640.64, -3744.2, 22.873, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+459, 181193, 1, -7640.64, -3744.2, 22.873, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+460, 181194, 1, -7640.64, -3744.2, 22.873, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+461, 181191, 1, -7631.79, -3712.03, 19.1096, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+462, 181192, 1, -7631.79, -3712.03, 19.1096, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+463, 181193, 1, -7631.79, -3712.03, 19.1096, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+464, 181194, 1, -7631.79, -3712.03, 19.1096, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+465, 181191, 1, -7631.23, -3748.74, 20.4292, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+466, 181192, 1, -7631.23, -3748.74, 20.4292, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+467, 181193, 1, -7631.23, -3748.74, 20.4292, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+468, 181194, 1, -7631.23, -3748.74, 20.4292, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+469, 181191, 1, -7628.34, -3722.85, 18.6309, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+470, 181192, 1, -7628.34, -3722.85, 18.6309, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+471, 181193, 1, -7628.34, -3722.85, 18.6309, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+472, 181194, 1, -7628.34, -3722.85, 18.6309, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+473, 181191, 1, -7627.38, -3723.27, 18.5083, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+474, 181192, 1, -7627.38, -3723.27, 18.5083, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+475, 181193, 1, -7627.38, -3723.27, 18.5083, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+476, 181194, 1, -7627.38, -3723.27, 18.5083, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+477, 181191, 1, -7623.2, -3732.59, 18.284, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+478, 181192, 1, -7623.2, -3732.59, 18.284, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+479, 181193, 1, -7623.2, -3732.59, 18.284, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+480, 181194, 1, -7623.2, -3732.59, 18.284, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+481, 181191, 1, -7622.35, -3744.29, 18.7068, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+482, 181192, 1, -7622.35, -3744.29, 18.7068, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+483, 181193, 1, -7622.35, -3744.29, 18.7068, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+484, 181194, 1, -7622.35, -3744.29, 18.7068, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+485, 181191, 1, -7621.97, -3745.74, 18.5694, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+486, 181192, 1, -7621.97, -3745.74, 18.5694, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+487, 181193, 1, -7621.97, -3745.74, 18.5694, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+488, 181194, 1, -7621.97, -3745.74, 18.5694, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+489, 181191, 1, -7619.05, -3718.65, 17.9488, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+490, 181192, 1, -7619.05, -3718.65, 17.9488, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+491, 181193, 1, -7619.05, -3718.65, 17.9488, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+492, 181194, 1, -7619.05, -3718.65, 17.9488, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+493, 181191, 1, -7617.77, -3720.17, 17.7926, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+494, 181192, 1, -7617.77, -3720.17, 17.7926, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+495, 181193, 1, -7617.77, -3720.17, 17.7926, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+496, 181194, 1, -7617.77, -3720.17, 17.7926, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+497, 181191, 1, -7611.75, -3734.01, 16.4665, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+498, 181192, 1, -7611.75, -3734.01, 16.4665, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+499, 181193, 1, -7611.75, -3734.01, 16.4665, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+500, 181194, 1, -7611.75, -3734.01, 16.4665, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+501, 181191, 1, -7610.96, -3734.53, 16.3485, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+502, 181192, 1, -7610.96, -3734.53, 16.3485, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+503, 181193, 1, -7610.96, -3734.53, 16.3485, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+504, 181194, 1, -7610.96, -3734.53, 16.3485, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+505, 181191, 1, -7349.37, -3974.53, 9.24155, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+506, 181192, 1, -7349.37, -3974.53, 9.24155, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+507, 181193, 1, -7349.37, -3974.53, 9.24155, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+508, 181194, 1, -7349.37, -3974.53, 9.24155, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+509, 181191, 1, -7344.34, -3960.82, 9.07886, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+510, 181192, 1, -7344.34, -3960.82, 9.07886, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+511, 181193, 1, -7344.34, -3960.82, 9.07886, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+512, 181194, 1, -7344.34, -3960.82, 9.07886, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+513, 181191, 1, -7341.67, -3950.58, 10.3941, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+514, 181192, 1, -7341.67, -3950.58, 10.3941, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+515, 181193, 1, -7341.67, -3950.58, 10.3941, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+516, 181194, 1, -7341.67, -3950.58, 10.3941, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+517, 181191, 1, -7339.83, -3979.17, 10.5015, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+518, 181192, 1, -7339.83, -3979.17, 10.5015, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+519, 181193, 1, -7339.83, -3979.17, 10.5015, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+520, 181194, 1, -7339.83, -3979.17, 10.5015, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+521, 181191, 1, -7339.7, -3980.84, 10.4953, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+522, 181192, 1, -7339.7, -3980.84, 10.4953, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+523, 181193, 1, -7339.7, -3980.84, 10.4953, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+524, 181194, 1, -7339.7, -3980.84, 10.4953, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+525, 181191, 1, -7339.14, -3993.29, 10.3943, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+526, 181192, 1, -7339.14, -3993.29, 10.3943, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+527, 181193, 1, -7339.14, -3993.29, 10.3943, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+528, 181194, 1, -7339.14, -3993.29, 10.3943, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+529, 181191, 1, -7338.49, -3993.56, 10.4255, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+530, 181192, 1, -7338.49, -3993.56, 10.4255, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+531, 181193, 1, -7338.49, -3993.56, 10.4255, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+532, 181194, 1, -7338.49, -3993.56, 10.4255, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+533, 181191, 1, -7328.61, -3983.62, 12.278, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+534, 181192, 1, -7328.61, -3983.62, 12.278, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+535, 181193, 1, -7328.61, -3983.62, 12.278, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+536, 181194, 1, -7328.61, -3983.62, 12.278, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+537, 181191, 1, -7327.71, -3983.62, 12.3456, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+538, 181192, 1, -7327.71, -3983.62, 12.3456, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+539, 181193, 1, -7327.71, -3983.62, 12.3456, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+540, 181194, 1, -7327.71, -3983.62, 12.3456, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+541, 181191, 1, -7327.44, -3954.89, 9.90071, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+542, 181192, 1, -7327.44, -3954.89, 9.90071, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+543, 181193, 1, -7327.44, -3954.89, 9.90071, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+544, 181194, 1, -7327.44, -3954.89, 9.90071, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+545, 181191, 1, -7327.16, -3984.27, 12.3565, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+546, 181192, 1, -7327.16, -3984.27, 12.3565, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+547, 181193, 1, -7327.16, -3984.27, 12.3565, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+548, 181194, 1, -7327.16, -3984.27, 12.3565, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+549, 181191, 1, -7327.03, -3953.43, 10.0576, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+550, 181192, 1, -7327.03, -3953.43, 10.0576, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+551, 181193, 1, -7327.03, -3953.43, 10.0576, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+552, 181194, 1, -7327.03, -3953.43, 10.0576, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+553, 181191, 1, -7326.09, -3954.75, 9.94265, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+554, 181192, 1, -7326.09, -3954.75, 9.94265, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+555, 181193, 1, -7326.09, -3954.75, 9.94265, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+556, 181194, 1, -7326.09, -3954.75, 9.94265, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+557, 181191, 1, -7320.23, -3979.14, 11.9099, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+558, 181192, 1, -7320.23, -3979.14, 11.9099, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+559, 181193, 1, -7320.23, -3979.14, 11.9099, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+560, 181194, 1, -7320.23, -3979.14, 11.9099, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+561, 181191, 1, -7319.34, -3979.53, 11.8133, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+562, 181192, 1, -7319.34, -3979.53, 11.8133, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+563, 181193, 1, -7319.34, -3979.53, 11.8133, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+564, 181194, 1, -7319.34, -3979.53, 11.8133, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+565, 181191, 1, -7313.57, -3968.96, 9.94525, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+566, 181192, 1, -7313.57, -3968.96, 9.94525, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+567, 181193, 1, -7313.57, -3968.96, 9.94525, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+568, 181194, 1, -7313.57, -3968.96, 9.94525, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+569, 181191, 1, -7312.98, -3967.9, 9.9058, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+570, 181192, 1, -7312.98, -3967.9, 9.9058, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+571, 181193, 1, -7312.98, -3967.9, 9.9058, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+572, 181194, 1, -7312.98, -3967.9, 9.9058, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+573, 181191, 1, -7312.35, -3956.01, 10.4644, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+574, 181192, 1, -7312.35, -3956.01, 10.4644, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+575, 181193, 1, -7312.35, -3956.01, 10.4644, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+576, 181194, 1, -7312.35, -3956.01, 10.4644, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+577, 181191, 1, -7276.39, -3541.23, 10.5185, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+578, 181192, 1, -7276.39, -3541.23, 10.5185, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+579, 181193, 1, -7276.39, -3541.23, 10.5185, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+580, 181194, 1, -7276.39, -3541.23, 10.5185, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+581, 181191, 1, -7274.9, -3540.86, 10.76, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+582, 181192, 1, -7274.9, -3540.86, 10.76, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+583, 181193, 1, -7274.9, -3540.86, 10.76, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+584, 181194, 1, -7274.9, -3540.86, 10.76, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+585, 181191, 1, -7267.94, -3558.7, 9.20586, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+586, 181192, 1, -7267.94, -3558.7, 9.20586, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+587, 181193, 1, -7267.94, -3558.7, 9.20586, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+588, 181194, 1, -7267.94, -3558.7, 9.20586, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+589, 181191, 1, -7262.65, -3533.37, 12.9806, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+590, 181192, 1, -7262.65, -3533.37, 12.9806, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+591, 181193, 1, -7262.65, -3533.37, 12.9806, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+592, 181194, 1, -7262.65, -3533.37, 12.9806, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+593, 181191, 1, -7261.54, -3533.83, 13.0357, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+594, 181192, 1, -7261.54, -3533.83, 13.0357, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+595, 181193, 1, -7261.54, -3533.83, 13.0357, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+596, 181194, 1, -7261.54, -3533.83, 13.0357, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+597, 181191, 1, -7258.46, -3566.65, 9.95873, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+598, 181192, 1, -7258.46, -3566.65, 9.95873, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+599, 181193, 1, -7258.46, -3566.65, 9.95873, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+600, 181194, 1, -7258.46, -3566.65, 9.95873, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+601, 181191, 1, -7257.36, -3567.66, 9.99947, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+602, 181192, 1, -7257.36, -3567.66, 9.99947, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+603, 181193, 1, -7257.36, -3567.66, 9.99947, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+604, 181194, 1, -7257.36, -3567.66, 9.99947, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+605, 181191, 1, -7256.97, -3565.91, 10.2495, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+606, 181192, 1, -7256.97, -3565.91, 10.2495, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+607, 181193, 1, -7256.97, -3565.91, 10.2495, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+608, 181194, 1, -7256.97, -3565.91, 10.2495, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+609, 181191, 1, -7251.92, -3518.77, 12.2586, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+610, 181192, 1, -7251.92, -3518.77, 12.2586, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+611, 181193, 1, -7251.92, -3518.77, 12.2586, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+612, 181194, 1, -7251.92, -3518.77, 12.2586, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+613, 181191, 1, -7245.07, -3571.42, 11.1106, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+614, 181192, 1, -7245.07, -3571.42, 11.1106, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+615, 181193, 1, -7245.07, -3571.42, 11.1106, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+616, 181194, 1, -7245.07, -3571.42, 11.1106, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+617, 181191, 1, -7243.45, -3571.51, 11.2861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+618, 181192, 1, -7243.45, -3571.51, 11.2861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+619, 181193, 1, -7243.45, -3571.51, 11.2861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+620, 181194, 1, -7243.45, -3571.51, 11.2861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+621, 181191, 1, -7238.64, -3550.66, 13.5652, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+622, 181192, 1, -7238.64, -3550.66, 13.5652, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+623, 181193, 1, -7238.64, -3550.66, 13.5652, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+624, 181194, 1, -7238.64, -3550.66, 13.5652, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+625, 181191, 1, -7231.64, -3530.56, 12.1301, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+626, 181192, 1, -7231.64, -3530.56, 12.1301, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+627, 181193, 1, -7231.64, -3530.56, 12.1301, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+628, 181194, 1, -7231.64, -3530.56, 12.1301, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+629, 181191, 1, -7231.16, -3531.78, 12.2061, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+630, 181192, 1, -7231.16, -3531.78, 12.2061, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+631, 181193, 1, -7231.16, -3531.78, 12.2061, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+632, 181194, 1, -7231.16, -3531.78, 12.2061, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+633, 181191, 1, -7227.97, -3556.45, 13.2431, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+634, 181192, 1, -7227.97, -3556.45, 13.2431, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+635, 181193, 1, -7227.97, -3556.45, 13.2431, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+636, 181194, 1, -7227.97, -3556.45, 13.2431, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+637, 181191, 1, -7226.8, -3556.18, 13.1967, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+638, 181192, 1, -7226.8, -3556.18, 13.1967, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+639, 181193, 1, -7226.8, -3556.18, 13.1967, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+640, 181194, 1, -7226.8, -3556.18, 13.1967, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+641, 181191, 1, -7221.92, -3543.14, 12.2587, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+642, 181192, 1, -7221.92, -3543.14, 12.2587, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+643, 181193, 1, -7221.92, -3543.14, 12.2587, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+644, 181194, 1, -7221.92, -3543.14, 12.2587, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+645, 181191, 1, -7220.76, -3541.66, 11.9943, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+646, 181192, 1, -7220.76, -3541.66, 11.9943, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+647, 181193, 1, -7220.76, -3541.66, 11.9943, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Tanaris
+        (@GOBJ_SKULLPILE_TANARIS_GUID+648, 181194, 1, -7220.76, -3541.66, 11.9943, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10);       -- GameObject: "Skullpile 04" in Tanaris
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_SKULLPILE_TANARIS_GUID+1 AND @GOBJ_SKULLPILE_TANARIS_GUID+648;
+
+    INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_TANARIS_GUID+1, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+1, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+2, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+1, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+3, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+1, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+4, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+1, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+5, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+2, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+6, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+2, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+7, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+2, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+8, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+2, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+9, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+3, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+10, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+3, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+11, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+3, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+12, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+3, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+13, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+4, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+14, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+4, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+15, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+4, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+16, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+4, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+17, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+5, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+18, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+5, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+19, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+5, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+20, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+5, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+21, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+6, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+22, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+6, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+23, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+6, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+24, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+6, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+25, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+7, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+26, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+7, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+27, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+7, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+28, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+7, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+29, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+8, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+30, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+8, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+31, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+8, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+32, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+8, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+33, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+9, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+34, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+9, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+35, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+9, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+36, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+9, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+37, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+10, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+38, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+10, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+39, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+10, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+40, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+10, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+41, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+11, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+42, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+11, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+43, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+11, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+44, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+11, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+45, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+12, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+46, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+12, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+47, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+12, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+48, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+12, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+49, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+13, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+50, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+13, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+51, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+13, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+52, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+13, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+53, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+14, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+54, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+14, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+55, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+14, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+56, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+14, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+57, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+15, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+58, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+15, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+59, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+15, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+60, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+15, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+61, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+16, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+62, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+16, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+63, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+16, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+64, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+16, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+65, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+17, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+66, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+17, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+67, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+17, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+68, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+17, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+69, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+18, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+70, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+18, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+71, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+18, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+72, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+18, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+73, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+19, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+74, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+19, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+75, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+19, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+76, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+19, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+77, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+20, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+78, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+20, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+79, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+20, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+80, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+20, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+81, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+21, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+82, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+21, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+83, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+21, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+84, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+21, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+85, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+22, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+86, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+22, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+87, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+22, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+88, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+22, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+89, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+23, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+90, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+23, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+91, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+23, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+92, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+23, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+93, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+24, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+94, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+24, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+95, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+24, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+96, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+24, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+97, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+25, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+98, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+25, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+99, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+25, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+100, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+25, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+101, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+26, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+102, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+26, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+103, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+26, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+104, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+26, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+105, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+27, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+106, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+27, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+107, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+27, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+108, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+27, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+109, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+28, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+110, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+28, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+111, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+28, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+112, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+28, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+113, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+29, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+114, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+29, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+115, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+29, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+116, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+29, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+117, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+30, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+118, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+30, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+119, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+30, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+120, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+30, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+121, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+31, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+122, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+31, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+123, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+31, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+124, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+31, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+125, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+32, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+126, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+32, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+127, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+32, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+128, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+32, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+129, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+33, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+130, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+33, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+131, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+33, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+132, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+33, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+133, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+34, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+134, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+34, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+135, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+34, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+136, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+34, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+137, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+35, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+138, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+35, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+139, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+35, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+140, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+35, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+141, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+36, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+142, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+36, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+143, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+36, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+144, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+36, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+145, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+37, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+146, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+37, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+147, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+37, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+148, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+37, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+149, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+38, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+150, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+38, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+151, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+38, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+152, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+38, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+153, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+39, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+154, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+39, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+155, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+39, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+156, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+39, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+157, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+40, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+158, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+40, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+159, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+40, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+160, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+40, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+161, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+41, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+162, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+41, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+163, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+41, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+164, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+41, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+165, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+42, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+166, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+42, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+167, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+42, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+168, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+42, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+169, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+43, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+170, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+43, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+171, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+43, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+172, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+43, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+173, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+44, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+174, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+44, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+175, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+44, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+176, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+44, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+177, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+45, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+178, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+45, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+179, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+45, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+180, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+45, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+181, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+46, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+182, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+46, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+183, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+46, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+184, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+46, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+185, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+47, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+186, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+47, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+187, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+47, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+188, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+47, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+189, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+48, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+190, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+48, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+191, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+48, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+192, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+48, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+193, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+49, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+194, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+49, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+195, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+49, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+196, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+49, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+197, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+50, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+198, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+50, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+199, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+50, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+200, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+50, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+201, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+51, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+202, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+51, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+203, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+51, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+204, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+51, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+205, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+52, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+206, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+52, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+207, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+52, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+208, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+52, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+209, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+53, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+210, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+53, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+211, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+53, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+212, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+53, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+213, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+54, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+214, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+54, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+215, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+54, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+216, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+54, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+217, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+55, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+218, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+55, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+219, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+55, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+220, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+55, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+221, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+56, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+222, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+56, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+223, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+56, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+224, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+56, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+225, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+57, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+226, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+57, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+227, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+57, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+228, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+57, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+229, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+58, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+230, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+58, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+231, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+58, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+232, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+58, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+233, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+59, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+234, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+59, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+235, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+59, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+236, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+59, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+237, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+60, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+238, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+60, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+239, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+60, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+240, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+60, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+241, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+61, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+242, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+61, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+243, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+61, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+244, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+61, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+245, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+62, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+246, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+62, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+247, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+62, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+248, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+62, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+249, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+63, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+250, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+63, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+251, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+63, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+252, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+63, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+253, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+64, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+254, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+64, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+255, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+64, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+256, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+64, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+257, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+65, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+258, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+65, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+259, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+65, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+260, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+65, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+261, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+66, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+262, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+66, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+263, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+66, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+264, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+66, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+265, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+67, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+266, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+67, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+267, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+67, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+268, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+67, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+269, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+68, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+270, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+68, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+271, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+68, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+272, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+68, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+273, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+69, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+274, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+69, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+275, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+69, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+276, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+69, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+277, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+70, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+278, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+70, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+279, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+70, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+280, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+70, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+281, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+71, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+282, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+71, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+283, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+71, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+284, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+71, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+285, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+72, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+286, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+72, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+287, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+72, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+288, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+72, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+289, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+73, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+290, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+73, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+291, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+73, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+292, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+73, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+293, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+74, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+294, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+74, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+295, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+74, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+296, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+74, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+297, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+75, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+298, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+75, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+299, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+75, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+300, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+75, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+301, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+76, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+302, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+76, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+303, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+76, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+304, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+76, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+305, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+77, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+306, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+77, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+307, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+77, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+308, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+77, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+309, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+78, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+310, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+78, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+311, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+78, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+312, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+78, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+313, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+79, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+314, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+79, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+315, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+79, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+316, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+79, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+317, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+80, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+318, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+80, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+319, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+80, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+320, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+80, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+321, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+81, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+322, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+81, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+323, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+81, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+324, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+81, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+325, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+82, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+326, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+82, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+327, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+82, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+328, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+82, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+329, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+83, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+330, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+83, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+331, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+83, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+332, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+83, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+333, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+84, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+334, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+84, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+335, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+84, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+336, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+84, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+337, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+85, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+338, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+85, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+339, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+85, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+340, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+85, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+341, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+86, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+342, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+86, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+343, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+86, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+344, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+86, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+345, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+87, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+346, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+87, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+347, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+87, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+348, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+87, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+349, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+88, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+350, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+88, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+351, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+88, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+352, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+88, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+353, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+89, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+354, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+89, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+355, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+89, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+356, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+89, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+357, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+90, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+358, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+90, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+359, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+90, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+360, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+90, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+361, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+91, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+362, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+91, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+363, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+91, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+364, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+91, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+365, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+92, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+366, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+92, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+367, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+92, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+368, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+92, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+369, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+93, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+370, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+93, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+371, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+93, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+372, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+93, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+373, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+94, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+374, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+94, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+375, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+94, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+376, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+94, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+377, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+95, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+378, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+95, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+379, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+95, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+380, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+95, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+381, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+96, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+382, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+96, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+383, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+96, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+384, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+96, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+385, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+97, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+386, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+97, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+387, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+97, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+388, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+97, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+389, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+98, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+390, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+98, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+391, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+98, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+392, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+98, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+393, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+99, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+394, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+99, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+395, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+99, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+396, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+99, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+397, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+100, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+398, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+100, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+399, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+100, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+400, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+100, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+401, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+101, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+402, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+101, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+403, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+101, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+404, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+101, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+405, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+102, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+406, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+102, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+407, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+102, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+408, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+102, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+409, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+103, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+410, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+103, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+411, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+103, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+412, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+103, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+413, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+104, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+414, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+104, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+415, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+104, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+416, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+104, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+417, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+105, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+418, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+105, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+419, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+105, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+420, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+105, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+421, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+106, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+422, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+106, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+423, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+106, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+424, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+106, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+425, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+107, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+426, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+107, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+427, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+107, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+428, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+107, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+429, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+108, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+430, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+108, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+431, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+108, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+432, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+108, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+433, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+109, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+434, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+109, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+435, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+109, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+436, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+109, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+437, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+110, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+438, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+110, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+439, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+110, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+440, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+110, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+441, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+111, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+442, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+111, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+443, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+111, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+444, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+111, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+445, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+112, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+446, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+112, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+447, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+112, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+448, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+112, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+449, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+113, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+450, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+113, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+451, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+113, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+452, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+113, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+453, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+114, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+454, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+114, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+455, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+114, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+456, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+114, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+457, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+115, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+458, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+115, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+459, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+115, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+460, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+115, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+461, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+116, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+462, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+116, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+463, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+116, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+464, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+116, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+465, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+117, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+466, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+117, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+467, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+117, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+468, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+117, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+469, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+118, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+470, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+118, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+471, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+118, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+472, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+118, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+473, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+119, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+474, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+119, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+475, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+119, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+476, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+119, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+477, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+120, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+478, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+120, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+479, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+120, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+480, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+120, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+481, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+121, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+482, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+121, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+483, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+121, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+484, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+121, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+485, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+122, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+486, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+122, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+487, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+122, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+488, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+122, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+489, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+123, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+490, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+123, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+491, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+123, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+492, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+123, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+493, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+124, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+494, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+124, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+495, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+124, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+496, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+124, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+497, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+125, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+498, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+125, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+499, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+125, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+500, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+125, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+501, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+126, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+502, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+126, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+503, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+126, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+504, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+126, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+505, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+127, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+506, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+127, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+507, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+127, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+508, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+127, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+509, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+128, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+510, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+128, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+511, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+128, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+512, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+128, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+513, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+129, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+514, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+129, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+515, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+129, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+516, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+129, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+517, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+130, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+518, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+130, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+519, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+130, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+520, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+130, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+521, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+131, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+522, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+131, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+523, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+131, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+524, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+131, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+525, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+132, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+526, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+132, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+527, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+132, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+528, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+132, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+529, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+133, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+530, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+133, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+531, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+133, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+532, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+133, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+533, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+134, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+534, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+134, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+535, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+134, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+536, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+134, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+537, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+135, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+538, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+135, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+539, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+135, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+540, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+135, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+541, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+136, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+542, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+136, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+543, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+136, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+544, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+136, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+545, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+137, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+546, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+137, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+547, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+137, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+548, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+137, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+549, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+138, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+550, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+138, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+551, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+138, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+552, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+138, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+553, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+139, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+554, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+139, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+555, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+139, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+556, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+139, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+557, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+140, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+558, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+140, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+559, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+140, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+560, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+140, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+561, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+141, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+562, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+141, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+563, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+141, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+564, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+141, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+565, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+142, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+566, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+142, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+567, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+142, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+568, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+142, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+569, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+143, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+570, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+143, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+571, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+143, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+572, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+143, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+573, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+144, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+574, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+144, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+575, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+144, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+576, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+144, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+577, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+145, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+578, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+145, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+579, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+145, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+580, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+145, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+581, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+146, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+582, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+146, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+583, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+146, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+584, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+146, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+585, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+147, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+586, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+147, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+587, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+147, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+588, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+147, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+589, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+148, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+590, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+148, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+591, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+148, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+592, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+148, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+593, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+149, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+594, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+149, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+595, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+149, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+596, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+149, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+597, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+150, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+598, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+150, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+599, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+150, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+600, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+150, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+601, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+151, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+602, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+151, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+603, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+151, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+604, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+151, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+605, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+152, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+606, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+152, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+607, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+152, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+608, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+152, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+609, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+153, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+610, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+153, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+611, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+153, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+612, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+153, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+613, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+154, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+614, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+154, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+615, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+154, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+616, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+154, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+617, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+155, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+618, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+155, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+619, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+155, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+620, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+155, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+621, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+156, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+622, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+156, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+623, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+156, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+624, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+156, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+625, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+157, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+626, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+157, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+627, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+157, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+628, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+157, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+629, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+158, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+630, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+158, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+631, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+158, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+632, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+158, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+633, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+159, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+634, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+159, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+635, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+159, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+636, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+159, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+637, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+160, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+638, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+160, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+639, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+160, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+640, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+160, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+641, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+161, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+642, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+161, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+643, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+161, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+644, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+161, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+645, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+162, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+646, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+162, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+647, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+162, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_TANARIS_GUID+648, @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+162, 0, 'Scourge Invasion Tanaris, Skullpile', 0, 9, 10);
+    INSERT INTO `pool_template` SELECT pool_gameobject.pool_entry, 1, 'Scourge Invasion Tanaris, Skullpile', 0, 0, 9, 10 FROM `pool_gameobject` WHERE pool_gameobject.pool_entry BETWEEN @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+1 AND @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY+162 GROUP BY pool_gameobject.pool_entry;
 
     -- GameObject: "Skullpile" in Azshara
     INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (@GOBJ_SKULLPILE_AZSHARA_GUID+1, 181191, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
