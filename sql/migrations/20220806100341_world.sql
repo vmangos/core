@@ -14,12 +14,12 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     SET @NPC_NPC_FLAMESHOCKER_GUID                                  = 66900;
     SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 21841;
 
-    SET @GOBJ_SKULLPILE_WINTERSPRING_GUID                           = 52495;
-    SET @GOBJ_SKULLPILE_TANARIS_GUID                                = 52495;
-    SET @GOBJ_SKULLPILE_AZSHARA_GUID                                = 52495;
-    SET @GOBJ_SKULLPILE_BLASTED_LANDS_GUID                          = 52495;
-    SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 52495;
-    SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 52495;
+    SET @GOBJ_SKULLPILE_WINTERSPRING_GUID                           = 52495; -- 648
+    SET @GOBJ_SKULLPILE_TANARIS_GUID                                = 53143; --
+    SET @GOBJ_SKULLPILE_AZSHARA_GUID                                = 52495; --
+    SET @GOBJ_SKULLPILE_BLASTED_LANDS_GUID                          = 52495; --
+    SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 52495; --
+    SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 52495; --
 
     SET @GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID               = 24166;
     SET @GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID                    = 24418;
@@ -2433,874 +2433,2176 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+160, 181163, 0, 2366.46, -4908.5, 76.7359, 4.46804, 0, 0, 0.788012, -0.61566, 150, 180, 100, 1, 0, 0, 9, 10);     -- GameObject: "Minion Spawner, finder" in Eastern Plagueland
     INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+1 AND @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID+160;
 
-    -- GameObject: "Skullpile" in Azshara
-    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+1, 181191, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+2, 181192, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+3, 181193, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+4, 181194, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+5, 181191, 1, 3063.93, -4216.36, 94.9908, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+6, 181192, 1, 3063.93, -4216.36, 94.9908, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+7, 181193, 1, 3063.93, -4216.36, 94.9908, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+8, 181194, 1, 3063.93, -4216.36, 94.9908, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+9, 181191, 1, 3070.7, -4188.19, 96.9667, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+10, 181192, 1, 3070.7, -4188.19, 96.9667, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+11, 181193, 1, 3070.7, -4188.19, 96.9667, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+12, 181194, 1, 3070.7, -4188.19, 96.9667, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+13, 181191, 1, 3070.96, -4189.68, 96.8523, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+14, 181192, 1, 3070.96, -4189.68, 96.8523, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+15, 181193, 1, 3070.96, -4189.68, 96.8523, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+16, 181194, 1, 3070.96, -4189.68, 96.8523, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+17, 181191, 1, 3072.05, -4189.65, 96.9118, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+18, 181192, 1, 3072.05, -4189.65, 96.9118, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+19, 181193, 1, 3072.05, -4189.65, 96.9118, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+20, 181194, 1, 3072.05, -4189.65, 96.9118, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+21, 181191, 1, 3075.36, -4236.97, 97.2334, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+22, 181192, 1, 3075.36, -4236.97, 97.2334, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+23, 181193, 1, 3075.36, -4236.97, 97.2334, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+24, 181194, 1, 3075.36, -4236.97, 97.2334, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+25, 181191, 1, 3075.63, -4235.19, 97.0664, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+26, 181192, 1, 3075.63, -4235.19, 97.0664, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+27, 181193, 1, 3075.63, -4235.19, 97.0664, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+28, 181194, 1, 3075.63, -4235.19, 97.0664, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+29, 181191, 1, 3075.67, -4219.88, 95.7057, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+30, 181192, 1, 3075.67, -4219.88, 95.7057, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+31, 181193, 1, 3075.67, -4219.88, 95.7057, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+32, 181194, 1, 3075.67, -4219.88, 95.7057, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+33, 181191, 1, 3076.89, -4235.82, 97.1714, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+34, 181192, 1, 3076.89, -4235.82, 97.1714, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+35, 181193, 1, 3076.89, -4235.82, 97.1714, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+36, 181194, 1, 3076.89, -4235.82, 97.1714, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+37, 181191, 1, 3081.1, -4205.11, 97.0449, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+38, 181192, 1, 3081.1, -4205.11, 97.0449, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+39, 181193, 1, 3081.1, -4205.11, 97.0449, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+40, 181194, 1, 3081.1, -4205.11, 97.0449, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+41, 181191, 1, 3082.1, -4204.67, 97.3073, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+42, 181192, 1, 3082.1, -4204.67, 97.3073, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+43, 181193, 1, 3082.1, -4204.67, 97.3073, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+44, 181194, 1, 3082.1, -4204.67, 97.3073, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+45, 181191, 1, 3085.64, -4185.1, 97.9973, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+46, 181192, 1, 3085.64, -4185.1, 97.9973, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+47, 181193, 1, 3085.64, -4185.1, 97.9973, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+48, 181194, 1, 3085.64, -4185.1, 97.9973, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+49, 181191, 1, 3086.07, -4226.38, 96.6846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+50, 181192, 1, 3086.07, -4226.38, 96.6846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+51, 181193, 1, 3086.07, -4226.38, 96.6846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+52, 181194, 1, 3086.07, -4226.38, 96.6846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+53, 181191, 1, 3098.37, -4214.79, 98.0724, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+54, 181192, 1, 3098.37, -4214.79, 98.0724, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+55, 181193, 1, 3098.37, -4214.79, 98.0724, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+56, 181194, 1, 3098.37, -4214.79, 98.0724, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+57, 181191, 1, 3101.25, -4243.69, 98.4745, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+58, 181192, 1, 3101.25, -4243.69, 98.4745, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+59, 181193, 1, 3101.25, -4243.69, 98.4745, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+60, 181194, 1, 3101.25, -4243.69, 98.4745, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+61, 181191, 1, 3102.88, -4243.38, 98.5706, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+62, 181192, 1, 3102.88, -4243.38, 98.5706, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+63, 181193, 1, 3102.88, -4243.38, 98.5706, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+64, 181194, 1, 3102.88, -4243.38, 98.5706, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+65, 181191, 1, 3103.59, -4194.91, 101.387, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+66, 181192, 1, 3103.59, -4194.91, 101.387, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+67, 181193, 1, 3103.59, -4194.91, 101.387, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+68, 181194, 1, 3103.59, -4194.91, 101.387, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+69, 181191, 1, 3104.79, -4193.94, 101.773, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+70, 181192, 1, 3104.79, -4193.94, 101.773, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+71, 181193, 1, 3104.79, -4193.94, 101.773, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+72, 181194, 1, 3104.79, -4193.94, 101.773, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+73, 181191, 1, 3322.93, -4535.41, 97.9271, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+74, 181192, 1, 3322.93, -4535.41, 97.9271, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+75, 181193, 1, 3322.93, -4535.41, 97.9271, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+76, 181194, 1, 3322.93, -4535.41, 97.9271, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+77, 181191, 1, 3323.2, -4536.07, 97.8793, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+78, 181192, 1, 3323.2, -4536.07, 97.8793, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+79, 181193, 1, 3323.2, -4536.07, 97.8793, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+80, 181194, 1, 3323.2, -4536.07, 97.8793, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+81, 181191, 1, 3327.3, -4529.78, 98.2545, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+82, 181192, 1, 3327.3, -4529.78, 98.2545, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+83, 181193, 1, 3327.3, -4529.78, 98.2545, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+84, 181194, 1, 3327.3, -4529.78, 98.2545, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+85, 181191, 1, 3327.6, -4530.95, 98.2269, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+86, 181192, 1, 3327.6, -4530.95, 98.2269, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+87, 181193, 1, 3327.6, -4530.95, 98.2269, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+88, 181194, 1, 3327.6, -4530.95, 98.2269, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+89, 181191, 1, 3328.82, -4527.13, 98.2791, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+90, 181192, 1, 3328.82, -4527.13, 98.2791, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+91, 181193, 1, 3328.82, -4527.13, 98.2791, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+92, 181194, 1, 3328.82, -4527.13, 98.2791, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+93, 181191, 1, 3329.38, -4528.78, 98.2727, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+94, 181192, 1, 3329.38, -4528.78, 98.2727, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+95, 181193, 1, 3329.38, -4528.78, 98.2727, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+96, 181194, 1, 3329.38, -4528.78, 98.2727, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+97, 181191, 1, 3330, -4536.22, 97.9976, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+98, 181192, 1, 3330, -4536.22, 97.9976, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+99, 181193, 1, 3330, -4536.22, 97.9976, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+100, 181194, 1, 3330, -4536.22, 97.9976, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+101, 181191, 1, 3332.66, -4503.76, 96.8936, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+102, 181192, 1, 3332.66, -4503.76, 96.8936, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+103, 181193, 1, 3332.66, -4503.76, 96.8936, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+104, 181194, 1, 3332.66, -4503.76, 96.8936, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+105, 181191, 1, 3334.03, -4502.54, 96.8898, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+106, 181192, 1, 3334.03, -4502.54, 96.8898, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+107, 181193, 1, 3334.03, -4502.54, 96.8898, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+108, 181194, 1, 3334.03, -4502.54, 96.8898, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+109, 181191, 1, 3338.62, -4537.07, 98.0098, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+110, 181192, 1, 3338.62, -4537.07, 98.0098, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+111, 181193, 1, 3338.62, -4537.07, 98.0098, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+112, 181194, 1, 3338.62, -4537.07, 98.0098, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+113, 181191, 1, 3341.19, -4531.52, 98.2102, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+114, 181192, 1, 3341.19, -4531.52, 98.2102, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+115, 181193, 1, 3341.19, -4531.52, 98.2102, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+116, 181194, 1, 3341.19, -4531.52, 98.2102, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+117, 181191, 1, 3341.89, -5573.16, 12.1904, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+118, 181192, 1, 3341.89, -5573.16, 12.1904, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+119, 181193, 1, 3341.89, -5573.16, 12.1904, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+120, 181194, 1, 3341.89, -5573.16, 12.1904, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+121, 181191, 1, 3342.89, -4530.83, 98.2008, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+122, 181192, 1, 3342.89, -4530.83, 98.2008, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+123, 181193, 1, 3342.89, -4530.83, 98.2008, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+124, 181194, 1, 3342.89, -4530.83, 98.2008, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+125, 181191, 1, 3342.97, -5574.26, 11.761, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+126, 181192, 1, 3342.97, -5574.26, 11.761, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+127, 181193, 1, 3342.97, -5574.26, 11.761, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+128, 181194, 1, 3342.97, -5574.26, 11.761, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+129, 181191, 1, 3343.07, -5556.61, 15.4991, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+130, 181192, 1, 3343.07, -5556.61, 15.4991, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+131, 181193, 1, 3343.07, -5556.61, 15.4991, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+132, 181194, 1, 3343.07, -5556.61, 15.4991, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+133, 181191, 1, 3343.99, -5558.02, 14.9819, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+134, 181192, 1, 3343.99, -5558.02, 14.9819, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+135, 181193, 1, 3343.99, -5558.02, 14.9819, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+136, 181194, 1, 3343.99, -5558.02, 14.9819, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+137, 181191, 1, 3344.79, -4532.26, 98.1381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+138, 181192, 1, 3344.79, -4532.26, 98.1381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+139, 181193, 1, 3344.79, -4532.26, 98.1381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+140, 181194, 1, 3344.79, -4532.26, 98.1381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+141, 181191, 1, 3345.55, -4507.08, 97.6514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+142, 181192, 1, 3345.55, -4507.08, 97.6514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+143, 181193, 1, 3345.55, -4507.08, 97.6514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+144, 181194, 1, 3345.55, -4507.08, 97.6514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+145, 181191, 1, 3345.72, -4505.13, 97.3897, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+146, 181192, 1, 3345.72, -4505.13, 97.3897, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+147, 181193, 1, 3345.72, -4505.13, 97.3897, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+148, 181194, 1, 3345.72, -4505.13, 97.3897, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+149, 181191, 1, 3353.43, -5588.57, 9.10668, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+150, 181192, 1, 3353.43, -5588.57, 9.10668, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+151, 181193, 1, 3353.43, -5588.57, 9.10668, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+152, 181194, 1, 3353.43, -5588.57, 9.10668, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+153, 181191, 1, 3353.99, -4508.55, 98.3366, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+154, 181192, 1, 3353.99, -4508.55, 98.3366, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+155, 181193, 1, 3353.99, -4508.55, 98.3366, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+156, 181194, 1, 3353.99, -4508.55, 98.3366, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+157, 181191, 1, 3354.31, -4508.55, 98.3604, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+158, 181192, 1, 3354.31, -4508.55, 98.3604, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+159, 181193, 1, 3354.31, -4508.55, 98.3604, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+160, 181194, 1, 3354.31, -4508.55, 98.3604, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+161, 181191, 1, 3355.24, -5588.03, 8.94121, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+162, 181192, 1, 3355.24, -5588.03, 8.94121, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+163, 181193, 1, 3355.24, -5588.03, 8.94121, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+164, 181194, 1, 3355.24, -5588.03, 8.94121, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+165, 181191, 1, 3355.51, -4509.02, 98.5344, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+166, 181192, 1, 3355.51, -4509.02, 98.5344, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+167, 181193, 1, 3355.51, -4509.02, 98.5344, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+168, 181194, 1, 3355.51, -4509.02, 98.5344, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+169, 181191, 1, 3356.03, -5589.63, 8.83571, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+170, 181192, 1, 3356.03, -5589.63, 8.83571, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+171, 181193, 1, 3356.03, -5589.63, 8.83571, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+172, 181194, 1, 3356.03, -5589.63, 8.83571, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+173, 181191, 1, 3364.04, -5548.14, 15.0761, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+174, 181192, 1, 3364.04, -5548.14, 15.0761, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+175, 181193, 1, 3364.04, -5548.14, 15.0761, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+176, 181194, 1, 3364.04, -5548.14, 15.0761, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+177, 181191, 1, 3376.25, -5586.27, 8.15972, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+178, 181192, 1, 3376.25, -5586.27, 8.15972, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+179, 181193, 1, 3376.25, -5586.27, 8.15972, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+180, 181194, 1, 3376.25, -5586.27, 8.15972, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+181, 181191, 1, 3377.61, -5570.81, 10.431, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+182, 181192, 1, 3377.61, -5570.81, 10.431, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+183, 181193, 1, 3377.61, -5570.81, 10.431, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+184, 181194, 1, 3377.61, -5570.81, 10.431, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+185, 181191, 1, 3378.7, -5570.63, 10.4669, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+186, 181192, 1, 3378.7, -5570.63, 10.4669, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+187, 181193, 1, 3378.7, -5570.63, 10.4669, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+188, 181194, 1, 3378.7, -5570.63, 10.4669, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+189, 181191, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+190, 181192, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+191, 181193, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+192, 181194, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+193, 181191, 1, 3388.04, -5552.5, 13.7602, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+194, 181192, 1, 3388.04, -5552.5, 13.7602, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+195, 181193, 1, 3388.04, -5552.5, 13.7602, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+196, 181194, 1, 3388.04, -5552.5, 13.7602, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+197, 181191, 1, 3394.31, -5565.42, 11.8053, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+198, 181192, 1, 3394.31, -5565.42, 11.8053, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+199, 181193, 1, 3394.31, -5565.42, 11.8053, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+200, 181194, 1, 3394.31, -5565.42, 11.8053, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+201, 181191, 1, 3394.7, -5567.41, 11.3836, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+202, 181192, 1, 3394.7, -5567.41, 11.3836, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+203, 181193, 1, 3394.7, -5567.41, 11.3836, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+204, 181194, 1, 3394.7, -5567.41, 11.3836, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+205, 181191, 1, 3395.3, -5587, 8.63123, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+206, 181192, 1, 3395.3, -5587, 8.63123, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+207, 181193, 1, 3395.3, -5587, 8.63123, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+208, 181194, 1, 3395.3, -5587, 8.63123, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+209, 181191, 1, 3395.37, -5566.75, 11.567, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+210, 181192, 1, 3395.37, -5566.75, 11.567, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+211, 181193, 1, 3395.37, -5566.75, 11.567, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+212, 181194, 1, 3395.37, -5566.75, 11.567, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+213, 181191, 1, 3395.81, -5587.91, 8.5719, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+214, 181192, 1, 3395.81, -5587.91, 8.5719, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+215, 181193, 1, 3395.81, -5587.91, 8.5719, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+216, 181194, 1, 3395.81, -5587.91, 8.5719, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+217, 181191, 1, 3487.37, -4150.98, 104.137, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+218, 181192, 1, 3487.37, -4150.98, 104.137, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+219, 181193, 1, 3487.37, -4150.98, 104.137, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+220, 181194, 1, 3487.37, -4150.98, 104.137, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+221, 181191, 1, 3488.67, -4149.57, 104.073, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+222, 181192, 1, 3488.67, -4149.57, 104.073, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+223, 181193, 1, 3488.67, -4149.57, 104.073, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+224, 181194, 1, 3488.67, -4149.57, 104.073, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+225, 181191, 1, 3489.39, -4151.23, 103.572, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+226, 181192, 1, 3489.39, -4151.23, 103.572, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+227, 181193, 1, 3489.39, -4151.23, 103.572, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+228, 181194, 1, 3489.39, -4151.23, 103.572, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+229, 181191, 1, 3494.49, -5692.49, 4.33028, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+230, 181192, 1, 3494.49, -5692.49, 4.33028, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+231, 181193, 1, 3494.49, -5692.49, 4.33028, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+232, 181194, 1, 3494.49, -5692.49, 4.33028, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+233, 181191, 1, 3494.61, -5725.11, 6.93952, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+234, 181192, 1, 3494.61, -5725.11, 6.93952, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+235, 181193, 1, 3494.61, -5725.11, 6.93952, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+236, 181194, 1, 3494.61, -5725.11, 6.93952, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+237, 181191, 1, 3495.12, -5710.59, 5.39667, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+238, 181192, 1, 3495.12, -5710.59, 5.39667, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+239, 181193, 1, 3495.12, -5710.59, 5.39667, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+240, 181194, 1, 3495.12, -5710.59, 5.39667, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+241, 181191, 1, 3495.92, -5708.79, 5.05228, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+242, 181192, 1, 3495.92, -5708.79, 5.05228, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+243, 181193, 1, 3495.92, -5708.79, 5.05228, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+244, 181194, 1, 3495.92, -5708.79, 5.05228, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+245, 181191, 1, 3496.41, -5710.4, 5.28776, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+246, 181192, 1, 3496.41, -5710.4, 5.28776, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+247, 181193, 1, 3496.41, -5710.4, 5.28776, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+248, 181194, 1, 3496.41, -5710.4, 5.28776, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+249, 181191, 1, 3505.94, -4150.03, 105.143, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+250, 181192, 1, 3505.94, -4150.03, 105.143, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+251, 181193, 1, 3505.94, -4150.03, 105.143, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+252, 181194, 1, 3505.94, -4150.03, 105.143, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+253, 181191, 1, 3506.33, -4169.63, 102.766, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+254, 181192, 1, 3506.33, -4169.63, 102.766, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+255, 181193, 1, 3506.33, -4169.63, 102.766, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+256, 181194, 1, 3506.33, -4169.63, 102.766, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+257, 181191, 1, 3507.59, -5734.8, 4.43492, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+258, 181192, 1, 3507.59, -5734.8, 4.43492, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+259, 181193, 1, 3507.59, -5734.8, 4.43492, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+260, 181194, 1, 3507.59, -5734.8, 4.43492, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+261, 181191, 1, 3507.85, -4169.18, 103.104, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+262, 181192, 1, 3507.85, -4169.18, 103.104, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+263, 181193, 1, 3507.85, -4169.18, 103.104, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+264, 181194, 1, 3507.85, -4169.18, 103.104, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+265, 181191, 1, 3508.43, -5691.03, 4.37112, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+266, 181192, 1, 3508.43, -5691.03, 4.37112, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+267, 181193, 1, 3508.43, -5691.03, 4.37112, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+268, 181194, 1, 3508.43, -5691.03, 4.37112, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+269, 181191, 1, 3508.5, -5736.2, 4.35272, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+270, 181192, 1, 3508.5, -5736.2, 4.35272, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+271, 181193, 1, 3508.5, -5736.2, 4.35272, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+272, 181194, 1, 3508.5, -5736.2, 4.35272, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+273, 181191, 1, 3508.76, -5734.47, 4.27758, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+274, 181192, 1, 3508.76, -5734.47, 4.27758, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+275, 181193, 1, 3508.76, -5734.47, 4.27758, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+276, 181194, 1, 3508.76, -5734.47, 4.27758, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+277, 181191, 1, 3510.25, -5691.54, 4.28637, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+278, 181192, 1, 3510.25, -5691.54, 4.28637, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+279, 181193, 1, 3510.25, -5691.54, 4.28637, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+280, 181194, 1, 3510.25, -5691.54, 4.28637, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+281, 181191, 1, 3511.88, -4129.86, 104.967, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+282, 181192, 1, 3511.88, -4129.86, 104.967, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+283, 181193, 1, 3511.88, -4129.86, 104.967, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+284, 181194, 1, 3511.88, -4129.86, 104.967, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+285, 181191, 1, 3512.71, -5719.83, 4.70861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+286, 181192, 1, 3512.71, -5719.83, 4.70861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+287, 181193, 1, 3512.71, -5719.83, 4.70861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+288, 181194, 1, 3512.71, -5719.83, 4.70861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+289, 181191, 1, 3512.79, -4127.95, 104.821, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+290, 181192, 1, 3512.79, -4127.95, 104.821, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+291, 181193, 1, 3512.79, -4127.95, 104.821, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+292, 181194, 1, 3512.79, -4127.95, 104.821, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+293, 181191, 1, 3517.29, -4162.03, 105.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+294, 181192, 1, 3517.29, -4162.03, 105.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+295, 181193, 1, 3517.29, -4162.03, 105.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+296, 181194, 1, 3517.29, -4162.03, 105.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+297, 181191, 1, 3520, -4139.49, 107.101, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+298, 181192, 1, 3520, -4139.49, 107.101, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+299, 181193, 1, 3520, -4139.49, 107.101, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+300, 181194, 1, 3520, -4139.49, 107.101, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+301, 181191, 1, 3527.29, -4152.41, 107.635, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+302, 181192, 1, 3527.29, -4152.41, 107.635, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+303, 181193, 1, 3527.29, -4152.41, 107.635, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+304, 181194, 1, 3527.29, -4152.41, 107.635, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+305, 181191, 1, 3527.55, -4177.87, 103.897, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+306, 181192, 1, 3527.55, -4177.87, 103.897, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+307, 181193, 1, 3527.55, -4177.87, 103.897, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+308, 181194, 1, 3527.55, -4177.87, 103.897, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+309, 181191, 1, 3527.61, -4151.38, 107.674, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+310, 181192, 1, 3527.61, -4151.38, 107.674, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+311, 181193, 1, 3527.61, -4151.38, 107.674, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+312, 181194, 1, 3527.61, -4151.38, 107.674, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+313, 181191, 1, 3529.72, -4177.77, 104.283, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+314, 181192, 1, 3529.72, -4177.77, 104.283, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+315, 181193, 1, 3529.72, -4177.77, 104.283, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+316, 181194, 1, 3529.72, -4177.77, 104.283, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+317, 181191, 1, 3530.56, -5696.26, 6.54382, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+318, 181192, 1, 3530.56, -5696.26, 6.54382, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+319, 181193, 1, 3530.56, -5696.26, 6.54382, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+320, 181194, 1, 3530.56, -5696.26, 6.54382, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+321, 181191, 1, 3532.85, -4143.78, 107.665, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+322, 181192, 1, 3532.85, -4143.78, 107.665, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+323, 181193, 1, 3532.85, -4143.78, 107.665, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+324, 181194, 1, 3532.85, -4143.78, 107.665, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+325, 181191, 1, 3533.26, -4142.38, 107.664, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+326, 181192, 1, 3533.26, -4142.38, 107.664, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+327, 181193, 1, 3533.26, -4142.38, 107.664, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+328, 181194, 1, 3533.26, -4142.38, 107.664, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+329, 181191, 1, 3535.08, -4142.74, 107.557, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+330, 181192, 1, 3535.08, -4142.74, 107.557, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+331, 181193, 1, 3535.08, -4142.74, 107.557, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+332, 181194, 1, 3535.08, -4142.74, 107.557, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+333, 181191, 1, 3537.25, -4167.45, 105.964, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+334, 181192, 1, 3537.25, -4167.45, 105.964, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+335, 181193, 1, 3537.25, -4167.45, 105.964, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+336, 181194, 1, 3537.25, -4167.45, 105.964, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+337, 181191, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+338, 181192, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+339, 181193, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+340, 181194, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+341, 181191, 1, 3539.51, -5722.72, 2.53295, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+342, 181192, 1, 3539.51, -5722.72, 2.53295, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+343, 181193, 1, 3539.51, -5722.72, 2.53295, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+344, 181194, 1, 3539.51, -5722.72, 2.53295, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+345, 181191, 1, 3540.06, -5704.46, 7.14416, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+346, 181192, 1, 3540.06, -5704.46, 7.14416, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+347, 181193, 1, 3540.06, -5704.46, 7.14416, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+348, 181194, 1, 3540.06, -5704.46, 7.14416, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+349, 181191, 1, 3540.89, -5705.92, 6.91671, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+350, 181192, 1, 3540.89, -5705.92, 6.91671, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+351, 181193, 1, 3540.89, -5705.92, 6.91671, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+352, 181194, 1, 3540.89, -5705.92, 6.91671, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+353, 181191, 1, 3541.64, -5705.12, 7.10472, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+354, 181192, 1, 3541.64, -5705.12, 7.10472, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+355, 181193, 1, 3541.64, -5705.12, 7.10472, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+356, 181194, 1, 3541.64, -5705.12, 7.10472, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+357, 181191, 1, 3544.74, -5714.38, 4.59868, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+358, 181192, 1, 3544.74, -5714.38, 4.59868, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+359, 181193, 1, 3544.74, -5714.38, 4.59868, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+360, 181194, 1, 3544.74, -5714.38, 4.59868, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+361, 181191, 1, 3634.7, -5544.98, 20.9806, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+362, 181192, 1, 3634.7, -5544.98, 20.9806, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+363, 181193, 1, 3634.7, -5544.98, 20.9806, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+364, 181194, 1, 3634.7, -5544.98, 20.9806, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+365, 181191, 1, 3634.91, -5522.89, 23.6551, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+366, 181192, 1, 3634.91, -5522.89, 23.6551, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+367, 181193, 1, 3634.91, -5522.89, 23.6551, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+368, 181194, 1, 3634.91, -5522.89, 23.6551, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+369, 181191, 1, 3635.69, -5520.71, 23.9232, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+370, 181192, 1, 3635.69, -5520.71, 23.9232, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+371, 181193, 1, 3635.69, -5520.71, 23.9232, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+372, 181194, 1, 3635.69, -5520.71, 23.9232, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+373, 181191, 1, 3635.89, -5546.44, 20.9121, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+374, 181192, 1, 3635.89, -5546.44, 20.9121, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+375, 181193, 1, 3635.89, -5546.44, 20.9121, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+376, 181194, 1, 3635.89, -5546.44, 20.9121, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+377, 181191, 1, 3636.93, -5522.18, 23.8032, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+378, 181192, 1, 3636.93, -5522.18, 23.8032, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+379, 181193, 1, 3636.93, -5522.18, 23.8032, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+380, 181194, 1, 3636.93, -5522.18, 23.8032, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+381, 181191, 1, 3652.51, -5550.15, 19.4157, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+382, 181192, 1, 3652.51, -5550.15, 19.4157, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+383, 181193, 1, 3652.51, -5550.15, 19.4157, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+384, 181194, 1, 3652.51, -5550.15, 19.4157, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+385, 181191, 1, 3653.23, -5547.9, 19.7454, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+386, 181192, 1, 3653.23, -5547.9, 19.7454, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+387, 181193, 1, 3653.23, -5547.9, 19.7454, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+388, 181194, 1, 3653.23, -5547.9, 19.7454, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+389, 181191, 1, 3666.53, -5560.65, 16.1447, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+390, 181192, 1, 3666.53, -5560.65, 16.1447, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+391, 181193, 1, 3666.53, -5560.65, 16.1447, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+392, 181194, 1, 3666.53, -5560.65, 16.1447, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+393, 181191, 1, 3666.54, -5519.18, 23.2943, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+394, 181192, 1, 3666.54, -5519.18, 23.2943, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+395, 181193, 1, 3666.54, -5519.18, 23.2943, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+396, 181194, 1, 3666.54, -5519.18, 23.2943, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+397, 181191, 1, 3667.36, -5561.11, 15.9933, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+398, 181192, 1, 3667.36, -5561.11, 15.9933, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+399, 181193, 1, 3667.36, -5561.11, 15.9933, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+400, 181194, 1, 3667.36, -5561.11, 15.9933, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+401, 181191, 1, 3674.12, -5540.77, 18.4339, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+402, 181192, 1, 3674.12, -5540.77, 18.4339, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+403, 181193, 1, 3674.12, -5540.77, 18.4339, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+404, 181194, 1, 3674.12, -5540.77, 18.4339, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+405, 181191, 1, 3684.8, -5516.67, 23.3081, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+406, 181192, 1, 3684.8, -5516.67, 23.3081, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+407, 181193, 1, 3684.8, -5516.67, 23.3081, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+408, 181194, 1, 3684.8, -5516.67, 23.3081, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+409, 181191, 1, 3685.18, -5518.93, 22.8104, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+410, 181192, 1, 3685.18, -5518.93, 22.8104, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+411, 181193, 1, 3685.18, -5518.93, 22.8104, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+412, 181194, 1, 3685.18, -5518.93, 22.8104, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+413, 181191, 1, 3686.57, -5517.49, 23.1737, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+414, 181192, 1, 3686.57, -5517.49, 23.1737, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+415, 181193, 1, 3686.57, -5517.49, 23.1737, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+416, 181194, 1, 3686.57, -5517.49, 23.1737, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+417, 181191, 1, 3686.64, -5552.65, 15.6566, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+418, 181192, 1, 3686.64, -5552.65, 15.6566, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+419, 181193, 1, 3686.64, -5552.65, 15.6566, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+420, 181194, 1, 3686.64, -5552.65, 15.6566, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+421, 181191, 1, 3687.64, -5551.49, 15.8381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+422, 181192, 1, 3687.64, -5551.49, 15.8381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+423, 181193, 1, 3687.64, -5551.49, 15.8381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+424, 181194, 1, 3687.64, -5551.49, 15.8381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+425, 181191, 1, 3700.34, -5543.09, 18.0561, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+426, 181192, 1, 3700.34, -5543.09, 18.0561, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+427, 181193, 1, 3700.34, -5543.09, 18.0561, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+428, 181194, 1, 3700.34, -5543.09, 18.0561, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+429, 181191, 1, 3701.38, -5541.03, 18.5767, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+430, 181192, 1, 3701.38, -5541.03, 18.5767, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+431, 181193, 1, 3701.38, -5541.03, 18.5767, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+432, 181194, 1, 3701.38, -5541.03, 18.5767, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10);    -- GameObject: "Skullpile 04" in Azshara
-    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_MINION_SKULLPILE_AZSHARA_GUID+1 AND @GOBJ_MINION_SKULLPILE_AZSHARA_GUID+432;
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+1, 181191, 1, 6010.73, -5045.85, 787.062, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+2, 181192, 1, 6010.73, -5045.85, 787.062, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+3, 181193, 1, 6010.73, -5045.85, 787.062, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+4, 181194, 1, 6010.73, -5045.85, 787.062, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+5, 181191, 1, 6012.84, -4774.02, 799.936, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+6, 181192, 1, 6012.84, -4774.02, 799.936, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+7, 181193, 1, 6012.84, -4774.02, 799.936, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+8, 181194, 1, 6012.84, -4774.02, 799.936, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+9, 181191, 1, 6014.15, -4773.88, 799.724, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+10, 181192, 1, 6014.15, -4773.88, 799.724, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+11, 181193, 1, 6014.15, -4773.88, 799.724, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+12, 181194, 1, 6014.15, -4773.88, 799.724, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+13, 181191, 1, 6018.93, -4736.45, 803.017, 0.0698117, 0, 0, 0.0348988, 0.999391, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+14, 181192, 1, 6018.93, -4736.45, 803.017, 0.0698117, 0, 0, 0.0348988, 0.999391, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+15, 181193, 1, 6018.93, -4736.45, 803.017, 0.0698117, 0, 0, 0.0348988, 0.999391, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+16, 181194, 1, 6018.93, -4736.45, 803.017, 0.0698117, 0, 0, 0.0348988, 0.999391, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+17, 181191, 1, 6022.51, -5022.58, 781.851, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+18, 181192, 1, 6022.51, -5022.58, 781.851, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+19, 181193, 1, 6022.51, -5022.58, 781.851, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+20, 181194, 1, 6022.51, -5022.58, 781.851, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+21, 181191, 1, 6023.64, -4723.44, 799.217, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+22, 181192, 1, 6023.64, -4723.44, 799.217, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+23, 181193, 1, 6023.64, -4723.44, 799.217, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+24, 181194, 1, 6023.64, -4723.44, 799.217, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+25, 181191, 1, 6027.05, -5037.71, 783.62, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+26, 181192, 1, 6027.05, -5037.71, 783.62, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+27, 181193, 1, 6027.05, -5037.71, 783.62, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+28, 181194, 1, 6027.05, -5037.71, 783.62, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+29, 181191, 1, 6036.04, -5017.71, 781.846, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+30, 181192, 1, 6036.04, -5017.71, 781.846, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+31, 181193, 1, 6036.04, -5017.71, 781.846, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+32, 181194, 1, 6036.04, -5017.71, 781.846, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+33, 181191, 1, 6037.22, -4760.02, 794.969, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+34, 181192, 1, 6037.22, -4760.02, 794.969, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+35, 181193, 1, 6037.22, -4760.02, 794.969, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+36, 181194, 1, 6037.22, -4760.02, 794.969, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+37, 181191, 1, 6037.43, -4760.56, 794.89, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+38, 181192, 1, 6037.43, -4760.56, 794.89, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+39, 181193, 1, 6037.43, -4760.56, 794.89, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+40, 181194, 1, 6037.43, -4760.56, 794.89, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+41, 181191, 1, 6038.32, -4735.53, 793.959, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+42, 181192, 1, 6038.32, -4735.53, 793.959, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+43, 181193, 1, 6038.32, -4735.53, 793.959, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+44, 181194, 1, 6038.32, -4735.53, 793.959, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+45, 181191, 1, 6039.19, -5054.72, 795.048, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+46, 181192, 1, 6039.19, -5054.72, 795.048, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+47, 181193, 1, 6039.19, -5054.72, 795.048, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+48, 181194, 1, 6039.19, -5054.72, 795.048, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+49, 181191, 1, 6044.28, -5031.84, 783.655, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+50, 181192, 1, 6044.28, -5031.84, 783.655, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+51, 181193, 1, 6044.28, -5031.84, 783.655, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+52, 181194, 1, 6044.28, -5031.84, 783.655, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+53, 181191, 1, 6049.14, -4723.7, 784.812, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+54, 181192, 1, 6049.14, -4723.7, 784.812, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+55, 181193, 1, 6049.14, -4723.7, 784.812, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+56, 181194, 1, 6049.14, -4723.7, 784.812, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+57, 181191, 1, 6049.41, -4739.42, 787.897, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+58, 181192, 1, 6049.41, -4739.42, 787.897, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+59, 181193, 1, 6049.41, -4739.42, 787.897, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+60, 181194, 1, 6049.41, -4739.42, 787.897, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+61, 181191, 1, 6049.59, -4723.78, 784.482, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+62, 181192, 1, 6049.59, -4723.78, 784.482, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+63, 181193, 1, 6049.59, -4723.78, 784.482, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+64, 181194, 1, 6049.59, -4723.78, 784.482, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+65, 181191, 1, 6050.72, -5008.29, 781.027, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+66, 181192, 1, 6050.72, -5008.29, 781.027, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+67, 181193, 1, 6050.72, -5008.29, 781.027, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+68, 181194, 1, 6050.72, -5008.29, 781.027, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+69, 181191, 1, 6054.86, -5035.81, 785.728, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+70, 181192, 1, 6054.86, -5035.81, 785.728, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+71, 181193, 1, 6054.86, -5035.81, 785.728, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+72, 181194, 1, 6054.86, -5035.81, 785.728, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+73, 181191, 1, 6059.8, -5063.97, 803.037, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+74, 181192, 1, 6059.8, -5063.97, 803.037, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+75, 181193, 1, 6059.8, -5063.97, 803.037, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+76, 181194, 1, 6059.8, -5063.97, 803.037, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+77, 181191, 1, 6060.76, -5063.9, 803.047, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+78, 181192, 1, 6060.76, -5063.9, 803.047, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+79, 181193, 1, 6060.76, -5063.9, 803.047, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+80, 181194, 1, 6060.76, -5063.9, 803.047, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+81, 181191, 1, 6061.17, -4741.01, 780.119, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+82, 181192, 1, 6061.17, -4741.01, 780.119, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+83, 181193, 1, 6061.17, -4741.01, 780.119, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+84, 181194, 1, 6061.17, -4741.01, 780.119, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+85, 181191, 1, 6061.72, -4741.88, 779.778, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+86, 181192, 1, 6061.72, -4741.88, 779.778, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+87, 181193, 1, 6061.72, -4741.88, 779.778, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+88, 181194, 1, 6061.72, -4741.88, 779.778, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+89, 181191, 1, 6062.72, -4765.63, 784.29, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+90, 181192, 1, 6062.72, -4765.63, 784.29, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+91, 181193, 1, 6062.72, -4765.63, 784.29, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+92, 181194, 1, 6062.72, -4765.63, 784.29, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+93, 181191, 1, 6071.98, -4998.29, 782.531, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+94, 181192, 1, 6071.98, -4998.29, 782.531, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+95, 181193, 1, 6071.98, -4998.29, 782.531, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+96, 181194, 1, 6071.98, -4998.29, 782.531, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+97, 181191, 1, 6075.96, -4781.22, 773.205, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+98, 181192, 1, 6075.96, -4781.22, 773.205, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+99, 181193, 1, 6075.96, -4781.22, 773.205, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+100, 181194, 1, 6075.96, -4781.22, 773.205, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+101, 181191, 1, 6079.17, -5018.45, 786.022, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+102, 181192, 1, 6079.17, -5018.45, 786.022, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+103, 181193, 1, 6079.17, -5018.45, 786.022, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+104, 181194, 1, 6079.17, -5018.45, 786.022, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+105, 181191, 1, 6083.31, -4740.33, 766.961, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+106, 181192, 1, 6083.31, -4740.33, 766.961, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+107, 181193, 1, 6083.31, -4740.33, 766.961, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+108, 181194, 1, 6083.31, -4740.33, 766.961, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+109, 181191, 1, 6093.83, -4756.6, 759.822, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+110, 181192, 1, 6093.83, -4756.6, 759.822, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+111, 181193, 1, 6093.83, -4756.6, 759.822, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+112, 181194, 1, 6093.83, -4756.6, 759.822, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+113, 181191, 1, 6094.3, -5053.53, 795.275, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+114, 181192, 1, 6094.3, -5053.53, 795.275, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+115, 181193, 1, 6094.3, -5053.53, 795.275, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+116, 181194, 1, 6094.3, -5053.53, 795.275, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+117, 181191, 1, 6094.68, -4758.38, 759.308, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+118, 181192, 1, 6094.68, -4758.38, 759.308, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+119, 181193, 1, 6094.68, -4758.38, 759.308, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+120, 181194, 1, 6094.68, -4758.38, 759.308, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+121, 181191, 1, 6095.61, -4756.99, 758.707, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+122, 181192, 1, 6095.61, -4756.99, 758.707, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+123, 181193, 1, 6095.61, -4756.99, 758.707, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+124, 181194, 1, 6095.61, -4756.99, 758.707, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+125, 181191, 1, 6104.99, -5004.92, 788.723, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+126, 181192, 1, 6104.99, -5004.92, 788.723, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+127, 181193, 1, 6104.99, -5004.92, 788.723, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+128, 181194, 1, 6104.99, -5004.92, 788.723, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+129, 181191, 1, 6105.01, -5025.15, 790.674, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+130, 181192, 1, 6105.01, -5025.15, 790.674, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+131, 181193, 1, 6105.01, -5025.15, 790.674, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+132, 181194, 1, 6105.01, -5025.15, 790.674, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+133, 181191, 1, 6105.89, -5004.39, 788.874, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+134, 181192, 1, 6105.89, -5004.39, 788.874, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+135, 181193, 1, 6105.89, -5004.39, 788.874, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+136, 181194, 1, 6105.89, -5004.39, 788.874, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+137, 181191, 1, 6117.96, -5039.05, 791.338, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+138, 181192, 1, 6117.96, -5039.05, 791.338, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+139, 181193, 1, 6117.96, -5039.05, 791.338, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+140, 181194, 1, 6117.96, -5039.05, 791.338, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+141, 181191, 1, 6118.95, -5038.24, 791.291, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+142, 181192, 1, 6118.95, -5038.24, 791.291, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+143, 181193, 1, 6118.95, -5038.24, 791.291, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+144, 181194, 1, 6118.95, -5038.24, 791.291, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+145, 181191, 1, 6239.76, -4810.6, 757.662, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+146, 181192, 1, 6239.76, -4810.6, 757.662, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+147, 181193, 1, 6239.76, -4810.6, 757.662, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+148, 181194, 1, 6239.76, -4810.6, 757.662, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+149, 181191, 1, 6240.71, -4811.51, 757.896, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+150, 181192, 1, 6240.71, -4811.51, 757.896, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+151, 181193, 1, 6240.71, -4811.51, 757.896, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+152, 181194, 1, 6240.71, -4811.51, 757.896, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+153, 181191, 1, 6253.66, -4755.55, 753.513, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+154, 181192, 1, 6253.66, -4755.55, 753.513, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+155, 181193, 1, 6253.66, -4755.55, 753.513, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+156, 181194, 1, 6253.66, -4755.55, 753.513, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+157, 181191, 1, 6254.01, -4754.98, 753.513, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+158, 181192, 1, 6254.01, -4754.98, 753.513, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+159, 181193, 1, 6254.01, -4754.98, 753.513, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+160, 181194, 1, 6254.01, -4754.98, 753.513, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+161, 181191, 1, 6257.11, -4778.2, 754.556, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+162, 181192, 1, 6257.11, -4778.2, 754.556, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+163, 181193, 1, 6257.11, -4778.2, 754.556, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+164, 181194, 1, 6257.11, -4778.2, 754.556, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+165, 181191, 1, 6260.07, -4803.59, 758.108, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+166, 181192, 1, 6260.07, -4803.59, 758.108, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+167, 181193, 1, 6260.07, -4803.59, 758.108, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+168, 181194, 1, 6260.07, -4803.59, 758.108, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+169, 181191, 1, 6270.84, -4755.31, 753.638, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+170, 181192, 1, 6270.84, -4755.31, 753.638, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+171, 181193, 1, 6270.84, -4755.31, 753.638, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+172, 181194, 1, 6270.84, -4755.31, 753.638, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+173, 181191, 1, 6275.72, -4772.13, 755.884, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+174, 181192, 1, 6275.72, -4772.13, 755.884, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+175, 181193, 1, 6275.72, -4772.13, 755.884, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+176, 181194, 1, 6275.72, -4772.13, 755.884, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+177, 181191, 1, 6277.27, -4771.49, 755.742, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+178, 181192, 1, 6277.27, -4771.49, 755.742, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+179, 181193, 1, 6277.27, -4771.49, 755.742, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+180, 181194, 1, 6277.27, -4771.49, 755.742, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+181, 181191, 1, 6279.65, -4793.17, 757.857, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+182, 181192, 1, 6279.65, -4793.17, 757.857, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+183, 181193, 1, 6279.65, -4793.17, 757.857, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+184, 181194, 1, 6279.65, -4793.17, 757.857, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+185, 181191, 1, 6279.97, -4792.25, 757.774, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+186, 181192, 1, 6279.97, -4792.25, 757.774, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+187, 181193, 1, 6279.97, -4792.25, 757.774, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+188, 181194, 1, 6279.97, -4792.25, 757.774, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+189, 181191, 1, 6280.72, -4792.69, 757.879, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+190, 181192, 1, 6280.72, -4792.69, 757.879, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+191, 181193, 1, 6280.72, -4792.69, 757.879, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+192, 181194, 1, 6280.72, -4792.69, 757.879, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+193, 181191, 1, 6284.16, -4809.84, 758.301, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+194, 181192, 1, 6284.16, -4809.84, 758.301, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+195, 181193, 1, 6284.16, -4809.84, 758.301, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+196, 181194, 1, 6284.16, -4809.84, 758.301, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+197, 181191, 1, 6285.01, -4810.11, 758.283, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+198, 181192, 1, 6285.01, -4810.11, 758.283, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+199, 181193, 1, 6285.01, -4810.11, 758.283, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+200, 181194, 1, 6285.01, -4810.11, 758.283, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+201, 181191, 1, 6303.22, -4754.17, 762.843, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+202, 181192, 1, 6303.22, -4754.17, 762.843, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+203, 181193, 1, 6303.22, -4754.17, 762.843, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+204, 181194, 1, 6303.22, -4754.17, 762.843, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+205, 181191, 1, 6305.35, -4812.15, 755.291, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+206, 181192, 1, 6305.35, -4812.15, 755.291, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+207, 181193, 1, 6305.35, -4812.15, 755.291, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+208, 181194, 1, 6305.35, -4812.15, 755.291, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+209, 181191, 1, 6310.07, -4811.32, 754.724, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+210, 181192, 1, 6310.07, -4811.32, 754.724, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+211, 181193, 1, 6310.07, -4811.32, 754.724, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+212, 181194, 1, 6310.07, -4811.32, 754.724, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+213, 181191, 1, 6314.06, -4784.79, 755.29, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+214, 181192, 1, 6314.06, -4784.79, 755.29, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+215, 181193, 1, 6314.06, -4784.79, 755.29, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+216, 181194, 1, 6314.06, -4784.79, 755.29, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+217, 181191, 1, 6523.63, -3485.76, 637.073, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+218, 181192, 1, 6523.63, -3485.76, 637.073, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+219, 181193, 1, 6523.63, -3485.76, 637.073, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+220, 181194, 1, 6523.63, -3485.76, 637.073, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+221, 181191, 1, 6524.11, -3485.38, 637.018, 0.0698117, 0, 0, 0.0348988, 0.999391, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+222, 181192, 1, 6524.11, -3485.38, 637.018, 0.0698117, 0, 0, 0.0348988, 0.999391, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+223, 181193, 1, 6524.11, -3485.38, 637.018, 0.0698117, 0, 0, 0.0348988, 0.999391, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+224, 181194, 1, 6524.11, -3485.38, 637.018, 0.0698117, 0, 0, 0.0348988, 0.999391, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+225, 181191, 1, 6525.25, -3457.35, 626.526, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+226, 181192, 1, 6525.25, -3457.35, 626.526, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+227, 181193, 1, 6525.25, -3457.35, 626.526, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+228, 181194, 1, 6525.25, -3457.35, 626.526, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+229, 181191, 1, 6526.48, -3511.82, 645.865, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+230, 181192, 1, 6526.48, -3511.82, 645.865, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+231, 181193, 1, 6526.48, -3511.82, 645.865, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+232, 181194, 1, 6526.48, -3511.82, 645.865, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+233, 181191, 1, 6526.9, -3506.54, 644.309, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+234, 181192, 1, 6526.9, -3506.54, 644.309, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+235, 181193, 1, 6526.9, -3506.54, 644.309, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+236, 181194, 1, 6526.9, -3506.54, 644.309, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+237, 181191, 1, 6534.08, -3467.39, 632.624, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+238, 181192, 1, 6534.08, -3467.39, 632.624, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+239, 181193, 1, 6534.08, -3467.39, 632.624, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+240, 181194, 1, 6534.08, -3467.39, 632.624, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+241, 181191, 1, 6539.98, -3504.23, 646.37, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+242, 181192, 1, 6539.98, -3504.23, 646.37, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+243, 181193, 1, 6539.98, -3504.23, 646.37, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+244, 181194, 1, 6539.98, -3504.23, 646.37, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+245, 181191, 1, 6543.6, -3473.05, 638.964, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+246, 181192, 1, 6543.6, -3473.05, 638.964, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+247, 181193, 1, 6543.6, -3473.05, 638.964, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+248, 181194, 1, 6543.6, -3473.05, 638.964, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+249, 181191, 1, 6548.6, -3457.54, 636.978, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+250, 181192, 1, 6548.6, -3457.54, 636.978, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+251, 181193, 1, 6548.6, -3457.54, 636.978, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+252, 181194, 1, 6548.6, -3457.54, 636.978, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+253, 181191, 1, 6549.6, -3456.65, 637.663, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+254, 181192, 1, 6549.6, -3456.65, 637.663, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+255, 181193, 1, 6549.6, -3456.65, 637.663, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+256, 181194, 1, 6549.6, -3456.65, 637.663, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+257, 181191, 1, 6552.37, -3512.79, 654.12, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+258, 181192, 1, 6552.37, -3512.79, 654.12, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+259, 181193, 1, 6552.37, -3512.79, 654.12, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+260, 181194, 1, 6552.37, -3512.79, 654.12, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+261, 181191, 1, 6553.16, -3511.32, 654.066, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+262, 181192, 1, 6553.16, -3511.32, 654.066, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+263, 181193, 1, 6553.16, -3511.32, 654.066, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+264, 181194, 1, 6553.16, -3511.32, 654.066, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+265, 181191, 1, 6559.08, -3486.38, 649.274, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+266, 181192, 1, 6559.08, -3486.38, 649.274, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+267, 181193, 1, 6559.08, -3486.38, 649.274, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+268, 181194, 1, 6559.08, -3486.38, 649.274, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+269, 181191, 1, 6559.69, -3485.18, 649.252, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+270, 181192, 1, 6559.69, -3485.18, 649.252, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+271, 181193, 1, 6559.69, -3485.18, 649.252, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+272, 181194, 1, 6559.69, -3485.18, 649.252, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+273, 181191, 1, 6560.25, -3486.85, 650.214, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+274, 181192, 1, 6560.25, -3486.85, 650.214, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+275, 181193, 1, 6560.25, -3486.85, 650.214, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+276, 181194, 1, 6560.25, -3486.85, 650.214, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+277, 181191, 1, 6572, -3461.13, 650.298, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+278, 181192, 1, 6572, -3461.13, 650.298, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+279, 181193, 1, 6572, -3461.13, 650.298, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+280, 181194, 1, 6572, -3461.13, 650.298, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+281, 181191, 1, 6572.7, -3480.63, 656.029, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+282, 181192, 1, 6572.7, -3480.63, 656.029, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+283, 181193, 1, 6572.7, -3480.63, 656.029, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+284, 181194, 1, 6572.7, -3480.63, 656.029, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+285, 181191, 1, 6573.9, -3483.82, 658.282, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+286, 181192, 1, 6573.9, -3483.82, 658.282, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+287, 181193, 1, 6573.9, -3483.82, 658.282, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+288, 181194, 1, 6573.9, -3483.82, 658.282, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+289, 181191, 1, 6720.69, -3342.35, 684.403, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+290, 181192, 1, 6720.69, -3342.35, 684.403, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+291, 181193, 1, 6720.69, -3342.35, 684.403, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+292, 181194, 1, 6720.69, -3342.35, 684.403, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+293, 181191, 1, 6723.63, -3357.09, 686.36, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+294, 181192, 1, 6723.63, -3357.09, 686.36, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+295, 181193, 1, 6723.63, -3357.09, 686.36, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+296, 181194, 1, 6723.63, -3357.09, 686.36, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+297, 181191, 1, 6724.2, -3358.49, 686.193, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+298, 181192, 1, 6724.2, -3358.49, 686.193, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+299, 181193, 1, 6724.2, -3358.49, 686.193, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+300, 181194, 1, 6724.2, -3358.49, 686.193, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+301, 181191, 1, 6724.7, -3357.41, 686.361, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+302, 181192, 1, 6724.7, -3357.41, 686.361, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+303, 181193, 1, 6724.7, -3357.41, 686.361, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+304, 181194, 1, 6724.7, -3357.41, 686.361, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+305, 181191, 1, 6727.33, -3325.57, 681.35, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+306, 181192, 1, 6727.33, -3325.57, 681.35, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+307, 181193, 1, 6727.33, -3325.57, 681.35, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+308, 181194, 1, 6727.33, -3325.57, 681.35, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+309, 181191, 1, 6733, -3376.66, 680.377, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+310, 181192, 1, 6733, -3376.66, 680.377, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+311, 181193, 1, 6733, -3376.66, 680.377, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+312, 181194, 1, 6733, -3376.66, 680.377, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+313, 181191, 1, 6735.45, -3344.8, 686.807, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+314, 181192, 1, 6735.45, -3344.8, 686.807, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+315, 181193, 1, 6735.45, -3344.8, 686.807, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+316, 181194, 1, 6735.45, -3344.8, 686.807, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+317, 181191, 1, 6742.03, -3566.77, 701.939, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+318, 181192, 1, 6742.03, -3566.77, 701.939, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+319, 181193, 1, 6742.03, -3566.77, 701.939, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+320, 181194, 1, 6742.03, -3566.77, 701.939, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+321, 181191, 1, 6745.26, -3367.39, 684.424, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+322, 181192, 1, 6745.26, -3367.39, 684.424, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+323, 181193, 1, 6745.26, -3367.39, 684.424, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+324, 181194, 1, 6745.26, -3367.39, 684.424, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+325, 181191, 1, 6746.08, -3380.7, 681.023, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+326, 181192, 1, 6746.08, -3380.7, 681.023, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+327, 181193, 1, 6746.08, -3380.7, 681.023, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+328, 181194, 1, 6746.08, -3380.7, 681.023, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+329, 181191, 1, 6746.21, -3367.38, 684.331, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+330, 181192, 1, 6746.21, -3367.38, 684.331, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+331, 181193, 1, 6746.21, -3367.38, 684.331, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+332, 181194, 1, 6746.21, -3367.38, 684.331, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+333, 181191, 1, 6748.73, -3341.29, 685.584, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+334, 181192, 1, 6748.73, -3341.29, 685.584, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+335, 181193, 1, 6748.73, -3341.29, 685.584, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+336, 181194, 1, 6748.73, -3341.29, 685.584, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+337, 181191, 1, 6749.57, -3342.13, 685.646, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+338, 181192, 1, 6749.57, -3342.13, 685.646, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+339, 181193, 1, 6749.57, -3342.13, 685.646, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+340, 181194, 1, 6749.57, -3342.13, 685.646, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+341, 181191, 1, 6752.2, -3323.48, 677.893, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+342, 181192, 1, 6752.2, -3323.48, 677.893, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+343, 181193, 1, 6752.2, -3323.48, 677.893, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+344, 181194, 1, 6752.2, -3323.48, 677.893, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+345, 181191, 1, 6753.27, -3587.21, 710.209, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+346, 181192, 1, 6753.27, -3587.21, 710.209, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+347, 181193, 1, 6753.27, -3587.21, 710.209, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+348, 181194, 1, 6753.27, -3587.21, 710.209, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+349, 181191, 1, 6759.25, -3559.23, 702.179, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+350, 181192, 1, 6759.25, -3559.23, 702.179, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+351, 181193, 1, 6759.25, -3559.23, 702.179, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+352, 181194, 1, 6759.25, -3559.23, 702.179, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+353, 181191, 1, 6759.39, -3578.55, 709.409, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+354, 181192, 1, 6759.39, -3578.55, 709.409, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+355, 181193, 1, 6759.39, -3578.55, 709.409, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+356, 181194, 1, 6759.39, -3578.55, 709.409, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+357, 181191, 1, 6759.59, -3356.03, 682.107, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+358, 181192, 1, 6759.59, -3356.03, 682.107, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+359, 181193, 1, 6759.59, -3356.03, 682.107, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+360, 181194, 1, 6759.59, -3356.03, 682.107, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+361, 181191, 1, 6760.55, -3606.53, 716.882, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+362, 181192, 1, 6760.55, -3606.53, 716.882, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+363, 181193, 1, 6760.55, -3606.53, 716.882, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+364, 181194, 1, 6760.55, -3606.53, 716.882, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+365, 181191, 1, 6761.1, -3345.33, 681.59, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+366, 181192, 1, 6761.1, -3345.33, 681.59, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+367, 181193, 1, 6761.1, -3345.33, 681.59, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+368, 181194, 1, 6761.1, -3345.33, 681.59, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+369, 181191, 1, 6767.33, -3617.96, 720.119, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+370, 181192, 1, 6767.33, -3617.96, 720.119, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+371, 181193, 1, 6767.33, -3617.96, 720.119, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+372, 181194, 1, 6767.33, -3617.96, 720.119, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+373, 181191, 1, 6770.72, -3588.42, 713.462, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+374, 181192, 1, 6770.72, -3588.42, 713.462, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+375, 181193, 1, 6770.72, -3588.42, 713.462, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+376, 181194, 1, 6770.72, -3588.42, 713.462, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+377, 181191, 1, 6771.26, -3589.5, 713.749, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+378, 181192, 1, 6771.26, -3589.5, 713.749, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+379, 181193, 1, 6771.26, -3589.5, 713.749, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+380, 181194, 1, 6771.26, -3589.5, 713.749, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+381, 181191, 1, 6773.27, -3334.44, 676.92, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+382, 181192, 1, 6773.27, -3334.44, 676.92, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+383, 181193, 1, 6773.27, -3334.44, 676.92, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+384, 181194, 1, 6773.27, -3334.44, 676.92, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+385, 181191, 1, 6773.77, -3573.25, 708.462, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+386, 181192, 1, 6773.77, -3573.25, 708.462, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+387, 181193, 1, 6773.77, -3573.25, 708.462, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+388, 181194, 1, 6773.77, -3573.25, 708.462, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+389, 181191, 1, 6773.92, -3334.25, 676.696, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+390, 181192, 1, 6773.92, -3334.25, 676.696, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+391, 181193, 1, 6773.92, -3334.25, 676.696, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+392, 181194, 1, 6773.92, -3334.25, 676.696, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+393, 181191, 1, 6774.76, -3571.34, 707.807, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+394, 181192, 1, 6774.76, -3571.34, 707.807, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+395, 181193, 1, 6774.76, -3571.34, 707.807, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+396, 181194, 1, 6774.76, -3571.34, 707.807, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+397, 181191, 1, 6779.28, -3365.8, 671.606, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+398, 181192, 1, 6779.28, -3365.8, 671.606, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+399, 181193, 1, 6779.28, -3365.8, 671.606, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+400, 181194, 1, 6779.28, -3365.8, 671.606, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+401, 181191, 1, 6780.09, -3552.03, 702.982, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+402, 181192, 1, 6780.09, -3552.03, 702.982, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+403, 181193, 1, 6780.09, -3552.03, 702.982, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+404, 181194, 1, 6780.09, -3552.03, 702.982, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+405, 181191, 1, 6780.31, -3608.75, 719.072, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+406, 181192, 1, 6780.31, -3608.75, 719.072, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+407, 181193, 1, 6780.31, -3608.75, 719.072, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+408, 181194, 1, 6780.31, -3608.75, 719.072, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+409, 181191, 1, 6781.15, -3551.25, 702.816, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+410, 181192, 1, 6781.15, -3551.25, 702.816, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+411, 181193, 1, 6781.15, -3551.25, 702.816, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+412, 181194, 1, 6781.15, -3551.25, 702.816, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+413, 181191, 1, 6787.05, -3565.61, 706.188, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+414, 181192, 1, 6787.05, -3565.61, 706.188, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+415, 181193, 1, 6787.05, -3565.61, 706.188, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+416, 181194, 1, 6787.05, -3565.61, 706.188, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+417, 181191, 1, 6790.12, -3610.6, 719.965, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+418, 181192, 1, 6790.12, -3610.6, 719.965, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+419, 181193, 1, 6790.12, -3610.6, 719.965, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+420, 181194, 1, 6790.12, -3610.6, 719.965, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+421, 181191, 1, 6793.19, -3594.2, 715.44, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+422, 181192, 1, 6793.19, -3594.2, 715.44, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+423, 181193, 1, 6793.19, -3594.2, 715.44, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+424, 181194, 1, 6793.19, -3594.2, 715.44, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+425, 181191, 1, 6808.92, -3588.39, 715.136, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+426, 181192, 1, 6808.92, -3588.39, 715.136, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+427, 181193, 1, 6808.92, -3588.39, 715.136, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+428, 181194, 1, 6808.92, -3588.39, 715.136, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+429, 181191, 1, 6810.17, -3588.13, 715.462, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+430, 181192, 1, 6810.17, -3588.13, 715.462, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+431, 181193, 1, 6810.17, -3588.13, 715.462, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+432, 181194, 1, 6810.17, -3588.13, 715.462, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+433, 181191, 1, 7650.75, -3870.34, 684.878, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+434, 181192, 1, 7650.75, -3870.34, 684.878, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+435, 181193, 1, 7650.75, -3870.34, 684.878, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+436, 181194, 1, 7650.75, -3870.34, 684.878, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+437, 181191, 1, 7652.7, -3868.06, 684.898, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+438, 181192, 1, 7652.7, -3868.06, 684.898, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+439, 181193, 1, 7652.7, -3868.06, 684.898, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+440, 181194, 1, 7652.7, -3868.06, 684.898, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+441, 181191, 1, 7668.84, -3879.69, 685.915, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+442, 181192, 1, 7668.84, -3879.69, 685.915, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+443, 181193, 1, 7668.84, -3879.69, 685.915, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+444, 181194, 1, 7668.84, -3879.69, 685.915, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+445, 181191, 1, 7670.92, -3881.04, 686.056, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+446, 181192, 1, 7670.92, -3881.04, 686.056, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+447, 181193, 1, 7670.92, -3881.04, 686.056, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+448, 181194, 1, 7670.92, -3881.04, 686.056, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+449, 181191, 1, 7672.77, -3879.24, 686.063, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+450, 181192, 1, 7672.77, -3879.24, 686.063, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+451, 181193, 1, 7672.77, -3879.24, 686.063, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+452, 181194, 1, 7672.77, -3879.24, 686.063, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+453, 181191, 1, 7679.69, -3852.65, 686.282, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+454, 181192, 1, 7679.69, -3852.65, 686.282, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+455, 181193, 1, 7679.69, -3852.65, 686.282, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+456, 181194, 1, 7679.69, -3852.65, 686.282, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+457, 181191, 1, 7680.05, -3869.54, 685.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+458, 181192, 1, 7680.05, -3869.54, 685.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+459, 181193, 1, 7680.05, -3869.54, 685.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+460, 181194, 1, 7680.05, -3869.54, 685.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+461, 181191, 1, 7680.09, -3866.85, 685.594, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+462, 181192, 1, 7680.09, -3866.85, 685.594, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+463, 181193, 1, 7680.09, -3866.85, 685.594, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+464, 181194, 1, 7680.09, -3866.85, 685.594, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+465, 181191, 1, 7681.06, -3866.14, 685.673, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+466, 181192, 1, 7681.06, -3866.14, 685.673, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+467, 181193, 1, 7681.06, -3866.14, 685.673, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+468, 181194, 1, 7681.06, -3866.14, 685.673, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+469, 181191, 1, 7681.38, -3868.22, 685.793, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+470, 181192, 1, 7681.38, -3868.22, 685.793, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+471, 181193, 1, 7681.38, -3868.22, 685.793, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+472, 181194, 1, 7681.38, -3868.22, 685.793, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+473, 181191, 1, 7688.64, -3887.38, 687.983, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+474, 181192, 1, 7688.64, -3887.38, 687.983, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+475, 181193, 1, 7688.64, -3887.38, 687.983, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+476, 181194, 1, 7688.64, -3887.38, 687.983, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+477, 181191, 1, 7697.07, -3866.02, 687.001, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+478, 181192, 1, 7697.07, -3866.02, 687.001, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+479, 181193, 1, 7697.07, -3866.02, 687.001, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+480, 181194, 1, 7697.07, -3866.02, 687.001, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+481, 181191, 1, 7700.63, -3853.92, 688.848, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+482, 181192, 1, 7700.63, -3853.92, 688.848, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+483, 181193, 1, 7700.63, -3853.92, 688.848, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+484, 181194, 1, 7700.63, -3853.92, 688.848, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+485, 181191, 1, 7700.66, -3858.5, 688.053, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+486, 181192, 1, 7700.66, -3858.5, 688.053, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+487, 181193, 1, 7700.66, -3858.5, 688.053, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+488, 181194, 1, 7700.66, -3858.5, 688.053, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+489, 181191, 1, 7701.28, -3857.09, 688.463, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+490, 181192, 1, 7701.28, -3857.09, 688.463, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+491, 181193, 1, 7701.28, -3857.09, 688.463, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+492, 181194, 1, 7701.28, -3857.09, 688.463, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+493, 181191, 1, 7701.83, -3855.88, 688.818, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+494, 181192, 1, 7701.83, -3855.88, 688.818, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+495, 181193, 1, 7701.83, -3855.88, 688.818, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+496, 181194, 1, 7701.83, -3855.88, 688.818, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+497, 181191, 1, 7703.84, -3876.46, 687.837, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+498, 181192, 1, 7703.84, -3876.46, 687.837, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+499, 181193, 1, 7703.84, -3876.46, 687.837, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+500, 181194, 1, 7703.84, -3876.46, 687.837, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+501, 181191, 1, 7704.6, -3875.36, 687.847, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+502, 181192, 1, 7704.6, -3875.36, 687.847, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+503, 181193, 1, 7704.6, -3875.36, 687.847, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+504, 181194, 1, 7704.6, -3875.36, 687.847, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+505, 181191, 1, 7806.42, -4222.62, 676.601, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+506, 181192, 1, 7806.42, -4222.62, 676.601, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+507, 181193, 1, 7806.42, -4222.62, 676.601, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+508, 181194, 1, 7806.42, -4222.62, 676.601, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+509, 181191, 1, 7807.11, -4222.25, 676.505, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+510, 181192, 1, 7807.11, -4222.25, 676.505, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+511, 181193, 1, 7807.11, -4222.25, 676.505, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+512, 181194, 1, 7807.11, -4222.25, 676.505, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+513, 181191, 1, 7812.17, -4236.05, 680.415, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+514, 181192, 1, 7812.17, -4236.05, 680.415, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+515, 181193, 1, 7812.17, -4236.05, 680.415, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+516, 181194, 1, 7812.17, -4236.05, 680.415, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+517, 181191, 1, 7812.46, -4213.05, 675.142, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+518, 181192, 1, 7812.46, -4213.05, 675.142, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+519, 181193, 1, 7812.46, -4213.05, 675.142, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+520, 181194, 1, 7812.46, -4213.05, 675.142, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+521, 181191, 1, 7812.75, -4214.37, 675.185, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+522, 181192, 1, 7812.75, -4214.37, 675.185, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+523, 181193, 1, 7812.75, -4214.37, 675.185, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+524, 181194, 1, 7812.75, -4214.37, 675.185, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+525, 181191, 1, 7813.87, -4234.42, 680.098, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+526, 181192, 1, 7813.87, -4234.42, 680.098, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+527, 181193, 1, 7813.87, -4234.42, 680.098, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+528, 181194, 1, 7813.87, -4234.42, 680.098, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+529, 181191, 1, 7814.2, -4236.19, 680.603, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+530, 181192, 1, 7814.2, -4236.19, 680.603, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+531, 181193, 1, 7814.2, -4236.19, 680.603, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+532, 181194, 1, 7814.2, -4236.19, 680.603, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+533, 181191, 1, 7815.1, -4232.74, 679.616, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+534, 181192, 1, 7815.1, -4232.74, 679.616, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+535, 181193, 1, 7815.1, -4232.74, 679.616, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+536, 181194, 1, 7815.1, -4232.74, 679.616, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+537, 181191, 1, 7824.72, -4201.28, 676.084, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+538, 181192, 1, 7824.72, -4201.28, 676.084, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+539, 181193, 1, 7824.72, -4201.28, 676.084, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+540, 181194, 1, 7824.72, -4201.28, 676.084, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+541, 181191, 1, 7825.49, -4240.33, 681.8, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+542, 181192, 1, 7825.49, -4240.33, 681.8, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+543, 181193, 1, 7825.49, -4240.33, 681.8, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+544, 181194, 1, 7825.49, -4240.33, 681.8, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+545, 181191, 1, 7825.88, -4237.19, 680.884, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+546, 181192, 1, 7825.88, -4237.19, 680.884, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+547, 181193, 1, 7825.88, -4237.19, 680.884, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+548, 181194, 1, 7825.88, -4237.19, 680.884, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+549, 181191, 1, 7827.11, -4238.12, 681.061, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+550, 181192, 1, 7827.11, -4238.12, 681.061, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+551, 181193, 1, 7827.11, -4238.12, 681.061, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+552, 181194, 1, 7827.11, -4238.12, 681.061, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+553, 181191, 1, 7829.87, -4199.46, 676.699, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+554, 181192, 1, 7829.87, -4199.46, 676.699, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+555, 181193, 1, 7829.87, -4199.46, 676.699, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+556, 181194, 1, 7829.87, -4199.46, 676.699, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+557, 181191, 1, 7830.32, -4196.79, 677.141, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+558, 181192, 1, 7830.32, -4196.79, 677.141, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+559, 181193, 1, 7830.32, -4196.79, 677.141, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+560, 181194, 1, 7830.32, -4196.79, 677.141, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+561, 181191, 1, 7831.1, -4197.87, 677.076, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+562, 181192, 1, 7831.1, -4197.87, 677.076, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+563, 181193, 1, 7831.1, -4197.87, 677.076, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+564, 181194, 1, 7831.1, -4197.87, 677.076, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+565, 181191, 1, 7837.79, -4229.47, 677.319, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+566, 181192, 1, 7837.79, -4229.47, 677.319, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+567, 181193, 1, 7837.79, -4229.47, 677.319, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+568, 181194, 1, 7837.79, -4229.47, 677.319, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+569, 181191, 1, 7839.97, -4227.98, 676.906, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+570, 181192, 1, 7839.97, -4227.98, 676.906, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+571, 181193, 1, 7839.97, -4227.98, 676.906, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+572, 181194, 1, 7839.97, -4227.98, 676.906, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+573, 181191, 1, 7841.32, -4210.41, 676.247, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+574, 181192, 1, 7841.32, -4210.41, 676.247, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+575, 181193, 1, 7841.32, -4210.41, 676.247, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+576, 181194, 1, 7841.32, -4210.41, 676.247, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+577, 181191, 1, 7922, -3868.02, 696.827, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+578, 181192, 1, 7922, -3868.02, 696.827, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+579, 181193, 1, 7922, -3868.02, 696.827, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+580, 181194, 1, 7922, -3868.02, 696.827, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+581, 181191, 1, 7922.17, -3870.31, 696.454, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+582, 181192, 1, 7922.17, -3870.31, 696.454, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+583, 181193, 1, 7922.17, -3870.31, 696.454, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+584, 181194, 1, 7922.17, -3870.31, 696.454, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+585, 181191, 1, 7922.56, -3866.16, 696.966, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+586, 181192, 1, 7922.56, -3866.16, 696.966, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+587, 181193, 1, 7922.56, -3866.16, 696.966, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+588, 181194, 1, 7922.56, -3866.16, 696.966, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+589, 181191, 1, 7922.72, -3884.97, 694.782, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+590, 181192, 1, 7922.72, -3884.97, 694.782, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+591, 181193, 1, 7922.72, -3884.97, 694.782, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+592, 181194, 1, 7922.72, -3884.97, 694.782, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+593, 181191, 1, 7923.6, -3885.66, 694.762, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+594, 181192, 1, 7923.6, -3885.66, 694.762, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+595, 181193, 1, 7923.6, -3885.66, 694.762, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+596, 181194, 1, 7923.6, -3885.66, 694.762, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+597, 181191, 1, 7927.77, -3842.22, 697.658, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+598, 181192, 1, 7927.77, -3842.22, 697.658, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+599, 181193, 1, 7927.77, -3842.22, 697.658, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+600, 181194, 1, 7927.77, -3842.22, 697.658, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+601, 181191, 1, 7928.2, -3838.52, 697.282, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+602, 181192, 1, 7928.2, -3838.52, 697.282, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+603, 181193, 1, 7928.2, -3838.52, 697.282, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+604, 181194, 1, 7928.2, -3838.52, 697.282, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+605, 181191, 1, 7929.03, -3839.96, 697.334, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+606, 181192, 1, 7929.03, -3839.96, 697.334, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+607, 181193, 1, 7929.03, -3839.96, 697.334, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+608, 181194, 1, 7929.03, -3839.96, 697.334, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+609, 181191, 1, 7938.94, -3887.58, 695.173, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+610, 181192, 1, 7938.94, -3887.58, 695.173, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+611, 181193, 1, 7938.94, -3887.58, 695.173, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+612, 181194, 1, 7938.94, -3887.58, 695.173, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+613, 181191, 1, 7941.02, -3855.58, 695.078, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+614, 181192, 1, 7941.02, -3855.58, 695.078, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+615, 181193, 1, 7941.02, -3855.58, 695.078, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+616, 181194, 1, 7941.02, -3855.58, 695.078, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+617, 181191, 1, 7941.17, -3886.24, 695.238, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+618, 181192, 1, 7941.17, -3886.24, 695.238, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+619, 181193, 1, 7941.17, -3886.24, 695.238, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+620, 181194, 1, 7941.17, -3886.24, 695.238, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+621, 181191, 1, 7944.12, -3887.76, 694.885, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+622, 181192, 1, 7944.12, -3887.76, 694.885, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+623, 181193, 1, 7944.12, -3887.76, 694.885, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+624, 181194, 1, 7944.12, -3887.76, 694.885, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+625, 181191, 1, 7945.83, -3886.93, 694.836, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+626, 181192, 1, 7945.83, -3886.93, 694.836, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+627, 181193, 1, 7945.83, -3886.93, 694.836, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+628, 181194, 1, 7945.83, -3886.93, 694.836, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+629, 181191, 1, 7947.08, -3858.18, 695.113, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+630, 181192, 1, 7947.08, -3858.18, 695.113, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+631, 181193, 1, 7947.08, -3858.18, 695.113, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+632, 181194, 1, 7947.08, -3858.18, 695.113, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+633, 181191, 1, 7947.38, -3862.14, 695.209, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+634, 181192, 1, 7947.38, -3862.14, 695.209, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+635, 181193, 1, 7947.38, -3862.14, 695.209, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+636, 181194, 1, 7947.38, -3862.14, 695.209, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+637, 181191, 1, 7954.38, -3870.54, 695.227, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+638, 181192, 1, 7954.38, -3870.54, 695.227, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+639, 181193, 1, 7954.38, -3870.54, 695.227, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+640, 181194, 1, 7954.38, -3870.54, 695.227, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+641, 181191, 1, 7954.69, -3871.9, 695.201, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+642, 181192, 1, 7954.69, -3871.9, 695.201, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+643, 181193, 1, 7954.69, -3871.9, 695.201, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+644, 181194, 1, 7954.69, -3871.9, 695.201, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+645, 181191, 1, 7956.02, -3872.67, 695.24, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+646, 181192, 1, 7956.02, -3872.67, 695.24, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+647, 181193, 1, 7956.02, -3872.67, 695.24, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Winterspring
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+648, 181194, 1, 7956.02, -3872.67, 695.24, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10);        -- GameObject: "Skullpile 04" in Winterspring
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_SKULLPILE_WINTERSPRING_GUID+1 AND @GOBJ_SKULLPILE_WINTERSPRING_GUID+648;
 
     INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+1, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+2, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+3, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+4, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+5, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+2, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+6, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+2, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+7, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+2, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+8, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+2, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+9, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+3, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+10, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+3, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+11, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+3, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+12, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+3, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+13, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+4, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+14, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+4, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+15, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+4, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+16, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+4, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+17, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+5, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+18, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+5, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+19, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+5, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+20, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+5, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+21, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+6, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+22, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+6, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+23, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+6, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+24, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+6, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+25, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+7, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+26, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+7, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+27, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+7, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+28, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+7, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+29, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+8, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+30, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+8, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+31, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+8, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+32, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+8, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+33, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+9, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+34, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+9, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+35, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+9, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+36, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+9, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+37, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+10, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+38, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+10, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+39, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+10, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+40, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+10, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+41, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+11, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+42, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+11, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+43, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+11, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+44, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+11, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+45, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+12, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+46, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+12, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+47, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+12, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+48, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+12, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+49, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+13, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+50, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+13, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+51, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+13, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+52, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+13, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+53, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+14, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+54, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+14, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+55, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+14, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+56, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+14, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+57, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+15, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+58, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+15, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+59, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+15, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+60, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+15, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+61, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+16, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+62, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+16, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+63, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+16, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+64, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+16, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+65, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+17, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+66, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+17, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+67, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+17, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+68, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+17, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+69, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+18, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+70, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+18, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+71, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+18, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+72, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+18, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+73, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+19, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+74, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+19, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+75, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+19, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+76, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+19, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+77, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+20, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+78, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+20, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+79, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+20, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+80, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+20, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+81, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+21, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+82, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+21, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+83, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+21, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+84, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+21, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+85, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+22, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+86, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+22, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+87, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+22, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+88, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+22, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+89, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+23, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+90, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+23, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+91, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+23, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+92, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+23, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+93, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+24, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+94, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+24, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+95, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+24, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+96, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+24, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+97, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+25, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+98, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+25, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+99, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+25, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+100, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+25, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+101, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+26, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+102, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+26, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+103, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+26, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+104, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+26, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+105, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+27, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+106, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+27, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+107, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+27, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+108, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+27, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+109, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+28, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+110, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+28, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+111, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+28, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+112, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+28, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+113, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+29, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+114, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+29, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+115, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+29, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+116, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+29, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+117, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+30, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+118, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+30, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+119, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+30, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+120, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+30, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+121, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+31, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+122, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+31, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+123, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+31, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+124, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+31, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+125, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+32, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+126, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+32, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+127, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+32, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+128, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+32, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+129, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+33, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+130, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+33, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+131, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+33, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+132, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+33, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+133, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+34, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+134, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+34, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+135, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+34, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+136, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+34, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+137, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+35, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+138, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+35, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+139, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+35, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+140, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+35, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+141, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+36, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+142, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+36, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+143, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+36, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+144, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+36, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+145, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+37, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+146, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+37, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+147, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+37, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+148, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+37, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+149, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+38, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+150, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+38, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+151, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+38, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+152, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+38, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+153, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+39, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+154, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+39, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+155, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+39, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+156, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+39, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+157, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+40, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+158, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+40, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+159, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+40, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+160, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+40, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+161, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+41, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+162, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+41, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+163, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+41, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+164, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+41, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+165, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+42, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+166, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+42, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+167, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+42, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+168, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+42, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+169, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+43, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+170, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+43, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+171, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+43, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+172, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+43, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+173, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+44, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+174, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+44, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+175, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+44, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+176, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+44, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+177, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+45, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+178, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+45, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+179, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+45, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+180, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+45, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+181, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+46, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+182, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+46, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+183, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+46, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+184, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+46, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+185, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+47, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+186, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+47, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+187, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+47, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+188, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+47, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+189, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+48, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+190, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+48, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+191, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+48, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+192, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+48, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+193, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+49, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+194, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+49, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+195, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+49, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+196, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+49, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+197, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+50, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+198, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+50, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+199, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+50, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+200, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+50, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+201, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+51, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+202, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+51, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+203, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+51, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+204, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+51, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+205, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+52, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+206, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+52, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+207, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+52, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+208, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+52, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+209, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+53, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+210, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+53, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+211, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+53, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+212, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+53, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+213, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+54, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+214, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+54, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+215, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+54, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+216, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+54, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+217, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+55, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+218, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+55, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+219, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+55, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+220, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+55, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+221, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+56, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+222, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+56, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+223, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+56, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+224, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+56, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+225, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+57, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+226, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+57, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+227, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+57, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+228, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+57, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+229, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+58, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+230, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+58, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+231, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+58, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+232, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+58, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+233, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+59, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+234, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+59, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+235, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+59, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+236, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+59, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+237, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+60, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+238, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+60, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+239, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+60, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+240, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+60, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+241, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+61, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+242, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+61, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+243, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+61, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+244, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+61, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+245, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+62, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+246, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+62, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+247, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+62, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+248, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+62, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+249, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+63, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+250, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+63, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+251, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+63, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+252, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+63, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+253, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+64, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+254, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+64, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+255, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+64, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+256, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+64, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+257, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+65, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+258, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+65, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+259, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+65, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+260, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+65, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+261, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+66, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+262, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+66, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+263, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+66, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+264, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+66, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+265, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+67, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+266, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+67, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+267, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+67, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+268, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+67, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+269, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+68, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+270, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+68, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+271, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+68, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+272, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+68, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+273, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+69, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+274, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+69, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+275, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+69, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+276, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+69, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+277, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+70, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+278, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+70, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+279, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+70, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+280, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+70, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+281, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+71, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+282, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+71, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+283, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+71, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+284, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+71, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+285, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+72, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+286, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+72, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+287, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+72, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+288, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+72, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+289, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+73, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+290, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+73, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+291, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+73, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+292, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+73, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+293, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+74, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+294, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+74, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+295, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+74, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+296, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+74, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+297, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+75, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+298, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+75, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+299, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+75, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+300, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+75, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+301, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+76, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+302, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+76, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+303, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+76, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+304, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+76, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+305, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+77, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+306, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+77, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+307, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+77, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+308, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+77, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+309, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+78, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+310, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+78, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+311, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+78, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+312, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+78, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+313, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+79, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+314, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+79, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+315, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+79, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+316, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+79, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+317, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+80, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+318, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+80, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+319, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+80, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+320, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+80, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+321, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+81, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+322, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+81, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+323, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+81, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+324, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+81, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+325, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+82, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+326, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+82, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+327, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+82, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+328, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+82, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+329, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+83, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+330, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+83, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+331, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+83, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+332, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+83, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+333, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+84, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+334, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+84, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+335, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+84, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+336, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+84, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+337, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+85, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+338, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+85, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+339, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+85, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+340, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+85, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+341, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+86, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+342, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+86, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+343, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+86, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+344, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+86, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+345, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+87, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+346, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+87, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+347, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+87, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+348, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+87, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+349, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+88, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+350, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+88, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+351, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+88, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+352, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+88, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+353, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+89, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+354, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+89, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+355, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+89, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+356, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+89, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+357, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+90, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+358, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+90, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+359, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+90, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+360, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+90, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+361, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+91, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+362, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+91, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+363, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+91, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+364, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+91, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+365, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+92, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+366, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+92, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+367, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+92, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+368, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+92, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+369, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+93, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+370, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+93, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+371, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+93, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+372, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+93, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+373, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+94, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+374, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+94, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+375, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+94, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+376, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+94, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+377, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+95, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+378, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+95, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+379, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+95, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+380, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+95, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+381, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+96, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+382, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+96, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+383, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+96, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+384, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+96, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+385, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+97, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+386, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+97, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+387, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+97, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+388, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+97, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+389, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+98, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+390, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+98, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+391, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+98, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+392, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+98, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+393, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+99, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+394, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+99, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+395, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+99, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+396, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+99, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+397, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+100, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+398, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+100, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+399, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+100, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+400, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+100, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+401, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+101, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+402, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+101, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+403, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+101, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+404, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+101, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+405, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+102, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+406, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+102, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+407, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+102, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+408, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+102, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+409, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+103, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+410, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+103, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+411, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+103, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+412, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+103, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+413, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+104, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+414, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+104, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+415, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+104, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+416, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+104, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+417, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+105, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+418, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+105, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+419, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+105, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+420, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+105, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+421, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+106, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+422, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+106, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+423, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+106, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+424, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+106, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+425, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+107, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+426, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+107, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+427, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+107, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+428, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+107, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+429, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+430, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+431, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
-        (@GOBJ_MINION_SKULLPILE_AZSHARA_GUID+432, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10);
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+1, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+1, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+2, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+1, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+3, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+1, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+4, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+1, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+5, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+2, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+6, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+2, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+7, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+2, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+8, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+2, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+9, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+3, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+10, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+3, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+11, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+3, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+12, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+3, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+13, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+4, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+14, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+4, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+15, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+4, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+16, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+4, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+17, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+5, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+18, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+5, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+19, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+5, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+20, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+5, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+21, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+6, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+22, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+6, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+23, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+6, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+24, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+6, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+25, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+7, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+26, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+7, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+27, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+7, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+28, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+7, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+29, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+8, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+30, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+8, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+31, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+8, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+32, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+8, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+33, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+9, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+34, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+9, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+35, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+9, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+36, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+9, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+37, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+10, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+38, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+10, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+39, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+10, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+40, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+10, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+41, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+11, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+42, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+11, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+43, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+11, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+44, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+11, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+45, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+12, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+46, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+12, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+47, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+12, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+48, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+12, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+49, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+13, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+50, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+13, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+51, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+13, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+52, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+13, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+53, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+14, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+54, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+14, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+55, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+14, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+56, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+14, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+57, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+15, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+58, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+15, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+59, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+15, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+60, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+15, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+61, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+16, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+62, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+16, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+63, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+16, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+64, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+16, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+65, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+17, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+66, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+17, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+67, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+17, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+68, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+17, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+69, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+18, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+70, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+18, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+71, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+18, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+72, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+18, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+73, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+19, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+74, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+19, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+75, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+19, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+76, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+19, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+77, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+20, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+78, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+20, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+79, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+20, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+80, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+20, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+81, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+21, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+82, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+21, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+83, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+21, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+84, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+21, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+85, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+22, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+86, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+22, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+87, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+22, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+88, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+22, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+89, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+23, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+90, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+23, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+91, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+23, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+92, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+23, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+93, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+24, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+94, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+24, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+95, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+24, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+96, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+24, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+97, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+25, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+98, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+25, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+99, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+25, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+100, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+25, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+101, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+26, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+102, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+26, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+103, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+26, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+104, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+26, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+105, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+27, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+106, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+27, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+107, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+27, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+108, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+27, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+109, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+28, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+110, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+28, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+111, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+28, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+112, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+28, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+113, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+29, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+114, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+29, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+115, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+29, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+116, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+29, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+117, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+30, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+118, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+30, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+119, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+30, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+120, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+30, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+121, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+31, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+122, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+31, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+123, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+31, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+124, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+31, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+125, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+32, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+126, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+32, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+127, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+32, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+128, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+32, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+129, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+33, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+130, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+33, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+131, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+33, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+132, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+33, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+133, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+34, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+134, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+34, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+135, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+34, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+136, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+34, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+137, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+35, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+138, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+35, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+139, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+35, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+140, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+35, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+141, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+36, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+142, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+36, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+143, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+36, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+144, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+36, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+145, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+37, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+146, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+37, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+147, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+37, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+148, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+37, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+149, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+38, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+150, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+38, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+151, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+38, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+152, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+38, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+153, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+39, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+154, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+39, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+155, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+39, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+156, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+39, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+157, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+40, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+158, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+40, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+159, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+40, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+160, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+40, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+161, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+41, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+162, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+41, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+163, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+41, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+164, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+41, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+165, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+42, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+166, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+42, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+167, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+42, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+168, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+42, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+169, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+43, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+170, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+43, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+171, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+43, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+172, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+43, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+173, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+44, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+174, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+44, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+175, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+44, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+176, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+44, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+177, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+45, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+178, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+45, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+179, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+45, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+180, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+45, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+181, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+46, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+182, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+46, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+183, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+46, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+184, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+46, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+185, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+47, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+186, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+47, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+187, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+47, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+188, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+47, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+189, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+48, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+190, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+48, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+191, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+48, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+192, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+48, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+193, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+49, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+194, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+49, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+195, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+49, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+196, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+49, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+197, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+50, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+198, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+50, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+199, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+50, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+200, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+50, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+201, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+51, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+202, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+51, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+203, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+51, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+204, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+51, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+205, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+52, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+206, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+52, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+207, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+52, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+208, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+52, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+209, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+53, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+210, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+53, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+211, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+53, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+212, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+53, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+213, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+54, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+214, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+54, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+215, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+54, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+216, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+54, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+217, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+55, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+218, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+55, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+219, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+55, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+220, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+55, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+221, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+56, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+222, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+56, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+223, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+56, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+224, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+56, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+225, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+57, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+226, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+57, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+227, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+57, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+228, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+57, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+229, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+58, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+230, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+58, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+231, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+58, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+232, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+58, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+233, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+59, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+234, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+59, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+235, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+59, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+236, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+59, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+237, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+60, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+238, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+60, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+239, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+60, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+240, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+60, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+241, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+61, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+242, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+61, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+243, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+61, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+244, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+61, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+245, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+62, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+246, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+62, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+247, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+62, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+248, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+62, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+249, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+63, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+250, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+63, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+251, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+63, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+252, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+63, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+253, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+64, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+254, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+64, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+255, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+64, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+256, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+64, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+257, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+65, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+258, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+65, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+259, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+65, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+260, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+65, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+261, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+66, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+262, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+66, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+263, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+66, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+264, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+66, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+265, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+67, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+266, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+67, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+267, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+67, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+268, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+67, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+269, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+68, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+270, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+68, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+271, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+68, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+272, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+68, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+273, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+69, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+274, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+69, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+275, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+69, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+276, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+69, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+277, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+70, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+278, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+70, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+279, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+70, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+280, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+70, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+281, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+71, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+282, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+71, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+283, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+71, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+284, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+71, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+285, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+72, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+286, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+72, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+287, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+72, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+288, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+72, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+289, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+73, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+290, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+73, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+291, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+73, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+292, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+73, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+293, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+74, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+294, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+74, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+295, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+74, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+296, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+74, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+297, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+75, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+298, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+75, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+299, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+75, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+300, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+75, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+301, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+76, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+302, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+76, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+303, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+76, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+304, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+76, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+305, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+77, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+306, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+77, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+307, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+77, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+308, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+77, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+309, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+78, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+310, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+78, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+311, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+78, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+312, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+78, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+313, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+79, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+314, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+79, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+315, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+79, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+316, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+79, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+317, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+80, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+318, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+80, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+319, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+80, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+320, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+80, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+321, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+81, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+322, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+81, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+323, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+81, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+324, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+81, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+325, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+82, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+326, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+82, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+327, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+82, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+328, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+82, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+329, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+83, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+330, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+83, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+331, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+83, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+332, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+83, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+333, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+84, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+334, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+84, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+335, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+84, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+336, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+84, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+337, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+85, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+338, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+85, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+339, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+85, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+340, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+85, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+341, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+86, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+342, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+86, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+343, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+86, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+344, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+86, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+345, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+87, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+346, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+87, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+347, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+87, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+348, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+87, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+349, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+88, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+350, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+88, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+351, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+88, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+352, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+88, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+353, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+89, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+354, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+89, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+355, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+89, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+356, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+89, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+357, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+90, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+358, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+90, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+359, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+90, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+360, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+90, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+361, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+91, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+362, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+91, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+363, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+91, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+364, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+91, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+365, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+92, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+366, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+92, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+367, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+92, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+368, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+92, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+369, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+93, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+370, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+93, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+371, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+93, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+372, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+93, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+373, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+94, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+374, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+94, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+375, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+94, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+376, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+94, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+377, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+95, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+378, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+95, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+379, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+95, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+380, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+95, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+381, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+96, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+382, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+96, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+383, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+96, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+384, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+96, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+385, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+97, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+386, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+97, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+387, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+97, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+388, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+97, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+389, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+98, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+390, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+98, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+391, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+98, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+392, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+98, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+393, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+99, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+394, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+99, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+395, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+99, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+396, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+99, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+397, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+100, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+398, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+100, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+399, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+100, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+400, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+100, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+401, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+101, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+402, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+101, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+403, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+101, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+404, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+101, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+405, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+102, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+406, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+102, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+407, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+102, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+408, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+102, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+409, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+103, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+410, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+103, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+411, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+103, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+412, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+103, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+413, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+104, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+414, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+104, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+415, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+104, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+416, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+104, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+417, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+105, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+418, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+105, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+419, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+105, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+420, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+105, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+421, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+106, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+422, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+106, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+423, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+106, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+424, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+106, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+425, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+107, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+426, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+107, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+427, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+107, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+428, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+107, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+429, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+108, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+430, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+108, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+431, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+108, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+432, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+108, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+433, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+109, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+434, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+109, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+435, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+109, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+436, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+109, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+437, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+110, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+438, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+110, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+439, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+110, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+440, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+110, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+441, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+111, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+442, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+111, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+443, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+111, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+444, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+111, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+445, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+112, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+446, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+112, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+447, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+112, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+448, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+112, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+449, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+113, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+450, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+113, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+451, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+113, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+452, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+113, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+453, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+114, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+454, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+114, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+455, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+114, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+456, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+114, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+457, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+115, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+458, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+115, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+459, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+115, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+460, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+115, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+461, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+116, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+462, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+116, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+463, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+116, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+464, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+116, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+465, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+117, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+466, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+117, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+467, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+117, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+468, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+117, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+469, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+118, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+470, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+118, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+471, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+118, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+472, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+118, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+473, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+119, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+474, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+119, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+475, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+119, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+476, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+119, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+477, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+120, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+478, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+120, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+479, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+120, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+480, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+120, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+481, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+121, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+482, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+121, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+483, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+121, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+484, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+121, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+485, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+122, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+486, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+122, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+487, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+122, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+488, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+122, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+489, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+123, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+490, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+123, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+491, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+123, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+492, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+123, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+493, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+124, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+494, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+124, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+495, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+124, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+496, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+124, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+497, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+125, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+498, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+125, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+499, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+125, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+500, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+125, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+501, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+126, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+502, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+126, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+503, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+126, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+504, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+126, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+505, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+127, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+506, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+127, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+507, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+127, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+508, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+127, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+509, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+128, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+510, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+128, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+511, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+128, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+512, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+128, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+513, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+129, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+514, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+129, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+515, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+129, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+516, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+129, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+517, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+130, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+518, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+130, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+519, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+130, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+520, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+130, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+521, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+131, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+522, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+131, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+523, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+131, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+524, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+131, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+525, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+132, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+526, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+132, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+527, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+132, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+528, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+132, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+529, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+133, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+530, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+133, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+531, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+133, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+532, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+133, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+533, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+134, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+534, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+134, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+535, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+134, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+536, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+134, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+537, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+135, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+538, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+135, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+539, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+135, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+540, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+135, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+541, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+136, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+542, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+136, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+543, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+136, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+544, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+136, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+545, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+137, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+546, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+137, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+547, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+137, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+548, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+137, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+549, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+138, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+550, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+138, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+551, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+138, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+552, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+138, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+553, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+139, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+554, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+139, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+555, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+139, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+556, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+139, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+557, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+140, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+558, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+140, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+559, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+140, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+560, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+140, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+561, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+141, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+562, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+141, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+563, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+141, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+564, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+141, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+565, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+142, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+566, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+142, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+567, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+142, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+568, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+142, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+569, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+143, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+570, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+143, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+571, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+143, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+572, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+143, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+573, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+144, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+574, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+144, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+575, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+144, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+576, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+144, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+577, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+145, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+578, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+145, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+579, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+145, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+580, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+145, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+581, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+146, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+582, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+146, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+583, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+146, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+584, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+146, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+585, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+147, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+586, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+147, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+587, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+147, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+588, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+147, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+589, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+148, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+590, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+148, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+591, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+148, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+592, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+148, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+593, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+149, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+594, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+149, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+595, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+149, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+596, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+149, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+597, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+150, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+598, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+150, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+599, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+150, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+600, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+150, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+601, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+151, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+602, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+151, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+603, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+151, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+604, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+151, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+605, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+152, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+606, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+152, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+607, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+152, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+608, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+152, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+609, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+153, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+610, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+153, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+611, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+153, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+612, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+153, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+613, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+154, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+614, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+154, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+615, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+154, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+616, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+154, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+617, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+155, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+618, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+155, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+619, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+155, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+620, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+155, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+621, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+156, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+622, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+156, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+623, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+156, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+624, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+156, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+625, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+157, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+626, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+157, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+627, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+157, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+628, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+157, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+629, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+158, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+630, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+158, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+631, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+158, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+632, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+158, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+633, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+159, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+634, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+159, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+635, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+159, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+636, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+159, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+637, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+160, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+638, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+160, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+639, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+160, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+640, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+160, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+641, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+161, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+642, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+161, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+643, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+161, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+644, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+161, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+645, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+162, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+646, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+162, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+647, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+162, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_WINTERSPRING_GUID+648, @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+162, 0, 'Scourge Invasion Winterspring, Skullpile', 0, 9, 10);
+    INSERT INTO `pool_template` SELECT pool_gameobject.pool_entry, 1, 'Scourge Invasion Winterspring, Skullpile', 0, 0, 9, 10 FROM `pool_gameobject` WHERE pool_gameobject.pool_entry BETWEEN @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+1 AND @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY+162 GROUP BY pool_gameobject.pool_entry;
+
+    -- GameObject: "Skullpile" in Azshara
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (@GOBJ_SKULLPILE_AZSHARA_GUID+1, 181191, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+2, 181192, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+3, 181193, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+4, 181194, 1, 3062.9, -4217.87, 95.0052, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+5, 181191, 1, 3063.93, -4216.36, 94.9908, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+6, 181192, 1, 3063.93, -4216.36, 94.9908, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+7, 181193, 1, 3063.93, -4216.36, 94.9908, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+8, 181194, 1, 3063.93, -4216.36, 94.9908, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+9, 181191, 1, 3070.7, -4188.19, 96.9667, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+10, 181192, 1, 3070.7, -4188.19, 96.9667, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+11, 181193, 1, 3070.7, -4188.19, 96.9667, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+12, 181194, 1, 3070.7, -4188.19, 96.9667, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+13, 181191, 1, 3070.96, -4189.68, 96.8523, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+14, 181192, 1, 3070.96, -4189.68, 96.8523, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+15, 181193, 1, 3070.96, -4189.68, 96.8523, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+16, 181194, 1, 3070.96, -4189.68, 96.8523, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+17, 181191, 1, 3072.05, -4189.65, 96.9118, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+18, 181192, 1, 3072.05, -4189.65, 96.9118, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+19, 181193, 1, 3072.05, -4189.65, 96.9118, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+20, 181194, 1, 3072.05, -4189.65, 96.9118, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+21, 181191, 1, 3075.36, -4236.97, 97.2334, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+22, 181192, 1, 3075.36, -4236.97, 97.2334, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+23, 181193, 1, 3075.36, -4236.97, 97.2334, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+24, 181194, 1, 3075.36, -4236.97, 97.2334, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+25, 181191, 1, 3075.63, -4235.19, 97.0664, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+26, 181192, 1, 3075.63, -4235.19, 97.0664, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+27, 181193, 1, 3075.63, -4235.19, 97.0664, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+28, 181194, 1, 3075.63, -4235.19, 97.0664, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+29, 181191, 1, 3075.67, -4219.88, 95.7057, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+30, 181192, 1, 3075.67, -4219.88, 95.7057, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+31, 181193, 1, 3075.67, -4219.88, 95.7057, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+32, 181194, 1, 3075.67, -4219.88, 95.7057, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+33, 181191, 1, 3076.89, -4235.82, 97.1714, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+34, 181192, 1, 3076.89, -4235.82, 97.1714, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+35, 181193, 1, 3076.89, -4235.82, 97.1714, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+36, 181194, 1, 3076.89, -4235.82, 97.1714, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+37, 181191, 1, 3081.1, -4205.11, 97.0449, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+38, 181192, 1, 3081.1, -4205.11, 97.0449, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+39, 181193, 1, 3081.1, -4205.11, 97.0449, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+40, 181194, 1, 3081.1, -4205.11, 97.0449, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+41, 181191, 1, 3082.1, -4204.67, 97.3073, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+42, 181192, 1, 3082.1, -4204.67, 97.3073, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+43, 181193, 1, 3082.1, -4204.67, 97.3073, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+44, 181194, 1, 3082.1, -4204.67, 97.3073, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+45, 181191, 1, 3085.64, -4185.1, 97.9973, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+46, 181192, 1, 3085.64, -4185.1, 97.9973, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+47, 181193, 1, 3085.64, -4185.1, 97.9973, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+48, 181194, 1, 3085.64, -4185.1, 97.9973, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+49, 181191, 1, 3086.07, -4226.38, 96.6846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+50, 181192, 1, 3086.07, -4226.38, 96.6846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+51, 181193, 1, 3086.07, -4226.38, 96.6846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+52, 181194, 1, 3086.07, -4226.38, 96.6846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+53, 181191, 1, 3098.37, -4214.79, 98.0724, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+54, 181192, 1, 3098.37, -4214.79, 98.0724, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+55, 181193, 1, 3098.37, -4214.79, 98.0724, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+56, 181194, 1, 3098.37, -4214.79, 98.0724, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+57, 181191, 1, 3101.25, -4243.69, 98.4745, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+58, 181192, 1, 3101.25, -4243.69, 98.4745, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+59, 181193, 1, 3101.25, -4243.69, 98.4745, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+60, 181194, 1, 3101.25, -4243.69, 98.4745, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+61, 181191, 1, 3102.88, -4243.38, 98.5706, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+62, 181192, 1, 3102.88, -4243.38, 98.5706, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+63, 181193, 1, 3102.88, -4243.38, 98.5706, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+64, 181194, 1, 3102.88, -4243.38, 98.5706, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+65, 181191, 1, 3103.59, -4194.91, 101.387, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+66, 181192, 1, 3103.59, -4194.91, 101.387, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+67, 181193, 1, 3103.59, -4194.91, 101.387, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+68, 181194, 1, 3103.59, -4194.91, 101.387, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+69, 181191, 1, 3104.79, -4193.94, 101.773, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+70, 181192, 1, 3104.79, -4193.94, 101.773, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+71, 181193, 1, 3104.79, -4193.94, 101.773, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+72, 181194, 1, 3104.79, -4193.94, 101.773, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+73, 181191, 1, 3322.93, -4535.41, 97.9271, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+74, 181192, 1, 3322.93, -4535.41, 97.9271, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+75, 181193, 1, 3322.93, -4535.41, 97.9271, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+76, 181194, 1, 3322.93, -4535.41, 97.9271, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+77, 181191, 1, 3323.2, -4536.07, 97.8793, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+78, 181192, 1, 3323.2, -4536.07, 97.8793, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+79, 181193, 1, 3323.2, -4536.07, 97.8793, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+80, 181194, 1, 3323.2, -4536.07, 97.8793, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+81, 181191, 1, 3327.3, -4529.78, 98.2545, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+82, 181192, 1, 3327.3, -4529.78, 98.2545, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+83, 181193, 1, 3327.3, -4529.78, 98.2545, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+84, 181194, 1, 3327.3, -4529.78, 98.2545, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+85, 181191, 1, 3327.6, -4530.95, 98.2269, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+86, 181192, 1, 3327.6, -4530.95, 98.2269, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+87, 181193, 1, 3327.6, -4530.95, 98.2269, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+88, 181194, 1, 3327.6, -4530.95, 98.2269, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+89, 181191, 1, 3328.82, -4527.13, 98.2791, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+90, 181192, 1, 3328.82, -4527.13, 98.2791, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+91, 181193, 1, 3328.82, -4527.13, 98.2791, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+92, 181194, 1, 3328.82, -4527.13, 98.2791, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+93, 181191, 1, 3329.38, -4528.78, 98.2727, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+94, 181192, 1, 3329.38, -4528.78, 98.2727, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+95, 181193, 1, 3329.38, -4528.78, 98.2727, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+96, 181194, 1, 3329.38, -4528.78, 98.2727, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+97, 181191, 1, 3330, -4536.22, 97.9976, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+98, 181192, 1, 3330, -4536.22, 97.9976, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+99, 181193, 1, 3330, -4536.22, 97.9976, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+100, 181194, 1, 3330, -4536.22, 97.9976, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+101, 181191, 1, 3332.66, -4503.76, 96.8936, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+102, 181192, 1, 3332.66, -4503.76, 96.8936, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+103, 181193, 1, 3332.66, -4503.76, 96.8936, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+104, 181194, 1, 3332.66, -4503.76, 96.8936, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+105, 181191, 1, 3334.03, -4502.54, 96.8898, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+106, 181192, 1, 3334.03, -4502.54, 96.8898, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+107, 181193, 1, 3334.03, -4502.54, 96.8898, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+108, 181194, 1, 3334.03, -4502.54, 96.8898, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+109, 181191, 1, 3338.62, -4537.07, 98.0098, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+110, 181192, 1, 3338.62, -4537.07, 98.0098, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+111, 181193, 1, 3338.62, -4537.07, 98.0098, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+112, 181194, 1, 3338.62, -4537.07, 98.0098, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+113, 181191, 1, 3341.19, -4531.52, 98.2102, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+114, 181192, 1, 3341.19, -4531.52, 98.2102, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+115, 181193, 1, 3341.19, -4531.52, 98.2102, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+116, 181194, 1, 3341.19, -4531.52, 98.2102, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+117, 181191, 1, 3341.89, -5573.16, 12.1904, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+118, 181192, 1, 3341.89, -5573.16, 12.1904, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+119, 181193, 1, 3341.89, -5573.16, 12.1904, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+120, 181194, 1, 3341.89, -5573.16, 12.1904, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+121, 181191, 1, 3342.89, -4530.83, 98.2008, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+122, 181192, 1, 3342.89, -4530.83, 98.2008, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+123, 181193, 1, 3342.89, -4530.83, 98.2008, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+124, 181194, 1, 3342.89, -4530.83, 98.2008, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+125, 181191, 1, 3342.97, -5574.26, 11.761, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+126, 181192, 1, 3342.97, -5574.26, 11.761, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+127, 181193, 1, 3342.97, -5574.26, 11.761, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+128, 181194, 1, 3342.97, -5574.26, 11.761, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+129, 181191, 1, 3343.07, -5556.61, 15.4991, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+130, 181192, 1, 3343.07, -5556.61, 15.4991, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+131, 181193, 1, 3343.07, -5556.61, 15.4991, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+132, 181194, 1, 3343.07, -5556.61, 15.4991, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+133, 181191, 1, 3343.99, -5558.02, 14.9819, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+134, 181192, 1, 3343.99, -5558.02, 14.9819, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+135, 181193, 1, 3343.99, -5558.02, 14.9819, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+136, 181194, 1, 3343.99, -5558.02, 14.9819, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+137, 181191, 1, 3344.79, -4532.26, 98.1381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+138, 181192, 1, 3344.79, -4532.26, 98.1381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+139, 181193, 1, 3344.79, -4532.26, 98.1381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+140, 181194, 1, 3344.79, -4532.26, 98.1381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+141, 181191, 1, 3345.55, -4507.08, 97.6514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+142, 181192, 1, 3345.55, -4507.08, 97.6514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+143, 181193, 1, 3345.55, -4507.08, 97.6514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+144, 181194, 1, 3345.55, -4507.08, 97.6514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+145, 181191, 1, 3345.72, -4505.13, 97.3897, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+146, 181192, 1, 3345.72, -4505.13, 97.3897, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+147, 181193, 1, 3345.72, -4505.13, 97.3897, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+148, 181194, 1, 3345.72, -4505.13, 97.3897, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+149, 181191, 1, 3353.43, -5588.57, 9.10668, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+150, 181192, 1, 3353.43, -5588.57, 9.10668, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+151, 181193, 1, 3353.43, -5588.57, 9.10668, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+152, 181194, 1, 3353.43, -5588.57, 9.10668, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+153, 181191, 1, 3353.99, -4508.55, 98.3366, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+154, 181192, 1, 3353.99, -4508.55, 98.3366, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+155, 181193, 1, 3353.99, -4508.55, 98.3366, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+156, 181194, 1, 3353.99, -4508.55, 98.3366, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+157, 181191, 1, 3354.31, -4508.55, 98.3604, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+158, 181192, 1, 3354.31, -4508.55, 98.3604, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+159, 181193, 1, 3354.31, -4508.55, 98.3604, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+160, 181194, 1, 3354.31, -4508.55, 98.3604, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+161, 181191, 1, 3355.24, -5588.03, 8.94121, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+162, 181192, 1, 3355.24, -5588.03, 8.94121, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+163, 181193, 1, 3355.24, -5588.03, 8.94121, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+164, 181194, 1, 3355.24, -5588.03, 8.94121, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+165, 181191, 1, 3355.51, -4509.02, 98.5344, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+166, 181192, 1, 3355.51, -4509.02, 98.5344, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+167, 181193, 1, 3355.51, -4509.02, 98.5344, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+168, 181194, 1, 3355.51, -4509.02, 98.5344, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+169, 181191, 1, 3356.03, -5589.63, 8.83571, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+170, 181192, 1, 3356.03, -5589.63, 8.83571, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+171, 181193, 1, 3356.03, -5589.63, 8.83571, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+172, 181194, 1, 3356.03, -5589.63, 8.83571, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+173, 181191, 1, 3364.04, -5548.14, 15.0761, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+174, 181192, 1, 3364.04, -5548.14, 15.0761, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+175, 181193, 1, 3364.04, -5548.14, 15.0761, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+176, 181194, 1, 3364.04, -5548.14, 15.0761, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+177, 181191, 1, 3376.25, -5586.27, 8.15972, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+178, 181192, 1, 3376.25, -5586.27, 8.15972, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+179, 181193, 1, 3376.25, -5586.27, 8.15972, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+180, 181194, 1, 3376.25, -5586.27, 8.15972, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+181, 181191, 1, 3377.61, -5570.81, 10.431, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+182, 181192, 1, 3377.61, -5570.81, 10.431, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+183, 181193, 1, 3377.61, -5570.81, 10.431, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+184, 181194, 1, 3377.61, -5570.81, 10.431, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+185, 181191, 1, 3378.7, -5570.63, 10.4669, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+186, 181192, 1, 3378.7, -5570.63, 10.4669, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+187, 181193, 1, 3378.7, -5570.63, 10.4669, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+188, 181194, 1, 3378.7, -5570.63, 10.4669, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+189, 181191, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+190, 181192, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+191, 181193, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+192, 181194, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+193, 181191, 1, 3388.04, -5552.5, 13.7602, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+194, 181192, 1, 3388.04, -5552.5, 13.7602, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+195, 181193, 1, 3388.04, -5552.5, 13.7602, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+196, 181194, 1, 3388.04, -5552.5, 13.7602, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+197, 181191, 1, 3394.31, -5565.42, 11.8053, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+198, 181192, 1, 3394.31, -5565.42, 11.8053, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+199, 181193, 1, 3394.31, -5565.42, 11.8053, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+200, 181194, 1, 3394.31, -5565.42, 11.8053, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+201, 181191, 1, 3394.7, -5567.41, 11.3836, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+202, 181192, 1, 3394.7, -5567.41, 11.3836, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+203, 181193, 1, 3394.7, -5567.41, 11.3836, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+204, 181194, 1, 3394.7, -5567.41, 11.3836, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+205, 181191, 1, 3395.3, -5587, 8.63123, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+206, 181192, 1, 3395.3, -5587, 8.63123, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+207, 181193, 1, 3395.3, -5587, 8.63123, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+208, 181194, 1, 3395.3, -5587, 8.63123, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+209, 181191, 1, 3395.37, -5566.75, 11.567, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+210, 181192, 1, 3395.37, -5566.75, 11.567, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+211, 181193, 1, 3395.37, -5566.75, 11.567, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+212, 181194, 1, 3395.37, -5566.75, 11.567, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+213, 181191, 1, 3395.81, -5587.91, 8.5719, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+214, 181192, 1, 3395.81, -5587.91, 8.5719, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+215, 181193, 1, 3395.81, -5587.91, 8.5719, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+216, 181194, 1, 3395.81, -5587.91, 8.5719, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+217, 181191, 1, 3487.37, -4150.98, 104.137, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+218, 181192, 1, 3487.37, -4150.98, 104.137, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+219, 181193, 1, 3487.37, -4150.98, 104.137, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+220, 181194, 1, 3487.37, -4150.98, 104.137, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+221, 181191, 1, 3488.67, -4149.57, 104.073, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+222, 181192, 1, 3488.67, -4149.57, 104.073, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+223, 181193, 1, 3488.67, -4149.57, 104.073, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+224, 181194, 1, 3488.67, -4149.57, 104.073, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+225, 181191, 1, 3489.39, -4151.23, 103.572, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+226, 181192, 1, 3489.39, -4151.23, 103.572, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+227, 181193, 1, 3489.39, -4151.23, 103.572, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+228, 181194, 1, 3489.39, -4151.23, 103.572, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+229, 181191, 1, 3494.49, -5692.49, 4.33028, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+230, 181192, 1, 3494.49, -5692.49, 4.33028, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+231, 181193, 1, 3494.49, -5692.49, 4.33028, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+232, 181194, 1, 3494.49, -5692.49, 4.33028, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+233, 181191, 1, 3494.61, -5725.11, 6.93952, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+234, 181192, 1, 3494.61, -5725.11, 6.93952, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+235, 181193, 1, 3494.61, -5725.11, 6.93952, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+236, 181194, 1, 3494.61, -5725.11, 6.93952, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+237, 181191, 1, 3495.12, -5710.59, 5.39667, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+238, 181192, 1, 3495.12, -5710.59, 5.39667, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+239, 181193, 1, 3495.12, -5710.59, 5.39667, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+240, 181194, 1, 3495.12, -5710.59, 5.39667, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+241, 181191, 1, 3495.92, -5708.79, 5.05228, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+242, 181192, 1, 3495.92, -5708.79, 5.05228, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+243, 181193, 1, 3495.92, -5708.79, 5.05228, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+244, 181194, 1, 3495.92, -5708.79, 5.05228, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+245, 181191, 1, 3496.41, -5710.4, 5.28776, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+246, 181192, 1, 3496.41, -5710.4, 5.28776, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+247, 181193, 1, 3496.41, -5710.4, 5.28776, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+248, 181194, 1, 3496.41, -5710.4, 5.28776, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+249, 181191, 1, 3505.94, -4150.03, 105.143, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+250, 181192, 1, 3505.94, -4150.03, 105.143, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+251, 181193, 1, 3505.94, -4150.03, 105.143, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+252, 181194, 1, 3505.94, -4150.03, 105.143, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+253, 181191, 1, 3506.33, -4169.63, 102.766, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+254, 181192, 1, 3506.33, -4169.63, 102.766, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+255, 181193, 1, 3506.33, -4169.63, 102.766, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+256, 181194, 1, 3506.33, -4169.63, 102.766, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+257, 181191, 1, 3507.59, -5734.8, 4.43492, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+258, 181192, 1, 3507.59, -5734.8, 4.43492, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+259, 181193, 1, 3507.59, -5734.8, 4.43492, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+260, 181194, 1, 3507.59, -5734.8, 4.43492, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+261, 181191, 1, 3507.85, -4169.18, 103.104, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+262, 181192, 1, 3507.85, -4169.18, 103.104, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+263, 181193, 1, 3507.85, -4169.18, 103.104, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+264, 181194, 1, 3507.85, -4169.18, 103.104, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+265, 181191, 1, 3508.43, -5691.03, 4.37112, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+266, 181192, 1, 3508.43, -5691.03, 4.37112, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+267, 181193, 1, 3508.43, -5691.03, 4.37112, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+268, 181194, 1, 3508.43, -5691.03, 4.37112, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+269, 181191, 1, 3508.5, -5736.2, 4.35272, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+270, 181192, 1, 3508.5, -5736.2, 4.35272, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+271, 181193, 1, 3508.5, -5736.2, 4.35272, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+272, 181194, 1, 3508.5, -5736.2, 4.35272, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+273, 181191, 1, 3508.76, -5734.47, 4.27758, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+274, 181192, 1, 3508.76, -5734.47, 4.27758, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+275, 181193, 1, 3508.76, -5734.47, 4.27758, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+276, 181194, 1, 3508.76, -5734.47, 4.27758, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+277, 181191, 1, 3510.25, -5691.54, 4.28637, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+278, 181192, 1, 3510.25, -5691.54, 4.28637, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+279, 181193, 1, 3510.25, -5691.54, 4.28637, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+280, 181194, 1, 3510.25, -5691.54, 4.28637, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+281, 181191, 1, 3511.88, -4129.86, 104.967, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+282, 181192, 1, 3511.88, -4129.86, 104.967, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+283, 181193, 1, 3511.88, -4129.86, 104.967, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+284, 181194, 1, 3511.88, -4129.86, 104.967, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+285, 181191, 1, 3512.71, -5719.83, 4.70861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+286, 181192, 1, 3512.71, -5719.83, 4.70861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+287, 181193, 1, 3512.71, -5719.83, 4.70861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+288, 181194, 1, 3512.71, -5719.83, 4.70861, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+289, 181191, 1, 3512.79, -4127.95, 104.821, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+290, 181192, 1, 3512.79, -4127.95, 104.821, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+291, 181193, 1, 3512.79, -4127.95, 104.821, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+292, 181194, 1, 3512.79, -4127.95, 104.821, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+293, 181191, 1, 3517.29, -4162.03, 105.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+294, 181192, 1, 3517.29, -4162.03, 105.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+295, 181193, 1, 3517.29, -4162.03, 105.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+296, 181194, 1, 3517.29, -4162.03, 105.765, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+297, 181191, 1, 3520, -4139.49, 107.101, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+298, 181192, 1, 3520, -4139.49, 107.101, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+299, 181193, 1, 3520, -4139.49, 107.101, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+300, 181194, 1, 3520, -4139.49, 107.101, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+301, 181191, 1, 3527.29, -4152.41, 107.635, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+302, 181192, 1, 3527.29, -4152.41, 107.635, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+303, 181193, 1, 3527.29, -4152.41, 107.635, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+304, 181194, 1, 3527.29, -4152.41, 107.635, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+305, 181191, 1, 3527.55, -4177.87, 103.897, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+306, 181192, 1, 3527.55, -4177.87, 103.897, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+307, 181193, 1, 3527.55, -4177.87, 103.897, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+308, 181194, 1, 3527.55, -4177.87, 103.897, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+309, 181191, 1, 3527.61, -4151.38, 107.674, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+310, 181192, 1, 3527.61, -4151.38, 107.674, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+311, 181193, 1, 3527.61, -4151.38, 107.674, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+312, 181194, 1, 3527.61, -4151.38, 107.674, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+313, 181191, 1, 3529.72, -4177.77, 104.283, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+314, 181192, 1, 3529.72, -4177.77, 104.283, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+315, 181193, 1, 3529.72, -4177.77, 104.283, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+316, 181194, 1, 3529.72, -4177.77, 104.283, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+317, 181191, 1, 3530.56, -5696.26, 6.54382, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+318, 181192, 1, 3530.56, -5696.26, 6.54382, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+319, 181193, 1, 3530.56, -5696.26, 6.54382, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+320, 181194, 1, 3530.56, -5696.26, 6.54382, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+321, 181191, 1, 3532.85, -4143.78, 107.665, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+322, 181192, 1, 3532.85, -4143.78, 107.665, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+323, 181193, 1, 3532.85, -4143.78, 107.665, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+324, 181194, 1, 3532.85, -4143.78, 107.665, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+325, 181191, 1, 3533.26, -4142.38, 107.664, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+326, 181192, 1, 3533.26, -4142.38, 107.664, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+327, 181193, 1, 3533.26, -4142.38, 107.664, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+328, 181194, 1, 3533.26, -4142.38, 107.664, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+329, 181191, 1, 3535.08, -4142.74, 107.557, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+330, 181192, 1, 3535.08, -4142.74, 107.557, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+331, 181193, 1, 3535.08, -4142.74, 107.557, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+332, 181194, 1, 3535.08, -4142.74, 107.557, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+333, 181191, 1, 3537.25, -4167.45, 105.964, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+334, 181192, 1, 3537.25, -4167.45, 105.964, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+335, 181193, 1, 3537.25, -4167.45, 105.964, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+336, 181194, 1, 3537.25, -4167.45, 105.964, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+337, 181191, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+338, 181192, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+339, 181193, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+340, 181194, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+341, 181191, 1, 3539.51, -5722.72, 2.53295, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+342, 181192, 1, 3539.51, -5722.72, 2.53295, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+343, 181193, 1, 3539.51, -5722.72, 2.53295, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+344, 181194, 1, 3539.51, -5722.72, 2.53295, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+345, 181191, 1, 3540.06, -5704.46, 7.14416, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+346, 181192, 1, 3540.06, -5704.46, 7.14416, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+347, 181193, 1, 3540.06, -5704.46, 7.14416, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+348, 181194, 1, 3540.06, -5704.46, 7.14416, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+349, 181191, 1, 3540.89, -5705.92, 6.91671, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+350, 181192, 1, 3540.89, -5705.92, 6.91671, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+351, 181193, 1, 3540.89, -5705.92, 6.91671, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+352, 181194, 1, 3540.89, -5705.92, 6.91671, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+353, 181191, 1, 3541.64, -5705.12, 7.10472, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+354, 181192, 1, 3541.64, -5705.12, 7.10472, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+355, 181193, 1, 3541.64, -5705.12, 7.10472, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+356, 181194, 1, 3541.64, -5705.12, 7.10472, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+357, 181191, 1, 3544.74, -5714.38, 4.59868, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+358, 181192, 1, 3544.74, -5714.38, 4.59868, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+359, 181193, 1, 3544.74, -5714.38, 4.59868, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+360, 181194, 1, 3544.74, -5714.38, 4.59868, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+361, 181191, 1, 3634.7, -5544.98, 20.9806, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+362, 181192, 1, 3634.7, -5544.98, 20.9806, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+363, 181193, 1, 3634.7, -5544.98, 20.9806, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+364, 181194, 1, 3634.7, -5544.98, 20.9806, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+365, 181191, 1, 3634.91, -5522.89, 23.6551, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+366, 181192, 1, 3634.91, -5522.89, 23.6551, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+367, 181193, 1, 3634.91, -5522.89, 23.6551, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+368, 181194, 1, 3634.91, -5522.89, 23.6551, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+369, 181191, 1, 3635.69, -5520.71, 23.9232, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+370, 181192, 1, 3635.69, -5520.71, 23.9232, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+371, 181193, 1, 3635.69, -5520.71, 23.9232, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+372, 181194, 1, 3635.69, -5520.71, 23.9232, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+373, 181191, 1, 3635.89, -5546.44, 20.9121, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+374, 181192, 1, 3635.89, -5546.44, 20.9121, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+375, 181193, 1, 3635.89, -5546.44, 20.9121, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+376, 181194, 1, 3635.89, -5546.44, 20.9121, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+377, 181191, 1, 3636.93, -5522.18, 23.8032, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+378, 181192, 1, 3636.93, -5522.18, 23.8032, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+379, 181193, 1, 3636.93, -5522.18, 23.8032, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+380, 181194, 1, 3636.93, -5522.18, 23.8032, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+381, 181191, 1, 3652.51, -5550.15, 19.4157, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+382, 181192, 1, 3652.51, -5550.15, 19.4157, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+383, 181193, 1, 3652.51, -5550.15, 19.4157, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+384, 181194, 1, 3652.51, -5550.15, 19.4157, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+385, 181191, 1, 3653.23, -5547.9, 19.7454, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+386, 181192, 1, 3653.23, -5547.9, 19.7454, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+387, 181193, 1, 3653.23, -5547.9, 19.7454, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+388, 181194, 1, 3653.23, -5547.9, 19.7454, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+389, 181191, 1, 3666.53, -5560.65, 16.1447, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+390, 181192, 1, 3666.53, -5560.65, 16.1447, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+391, 181193, 1, 3666.53, -5560.65, 16.1447, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+392, 181194, 1, 3666.53, -5560.65, 16.1447, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+393, 181191, 1, 3666.54, -5519.18, 23.2943, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+394, 181192, 1, 3666.54, -5519.18, 23.2943, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+395, 181193, 1, 3666.54, -5519.18, 23.2943, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+396, 181194, 1, 3666.54, -5519.18, 23.2943, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+397, 181191, 1, 3667.36, -5561.11, 15.9933, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+398, 181192, 1, 3667.36, -5561.11, 15.9933, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+399, 181193, 1, 3667.36, -5561.11, 15.9933, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+400, 181194, 1, 3667.36, -5561.11, 15.9933, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+401, 181191, 1, 3674.12, -5540.77, 18.4339, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+402, 181192, 1, 3674.12, -5540.77, 18.4339, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+403, 181193, 1, 3674.12, -5540.77, 18.4339, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+404, 181194, 1, 3674.12, -5540.77, 18.4339, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+405, 181191, 1, 3684.8, -5516.67, 23.3081, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+406, 181192, 1, 3684.8, -5516.67, 23.3081, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+407, 181193, 1, 3684.8, -5516.67, 23.3081, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+408, 181194, 1, 3684.8, -5516.67, 23.3081, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+409, 181191, 1, 3685.18, -5518.93, 22.8104, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+410, 181192, 1, 3685.18, -5518.93, 22.8104, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+411, 181193, 1, 3685.18, -5518.93, 22.8104, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+412, 181194, 1, 3685.18, -5518.93, 22.8104, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+413, 181191, 1, 3686.57, -5517.49, 23.1737, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+414, 181192, 1, 3686.57, -5517.49, 23.1737, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+415, 181193, 1, 3686.57, -5517.49, 23.1737, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+416, 181194, 1, 3686.57, -5517.49, 23.1737, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+417, 181191, 1, 3686.64, -5552.65, 15.6566, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+418, 181192, 1, 3686.64, -5552.65, 15.6566, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+419, 181193, 1, 3686.64, -5552.65, 15.6566, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+420, 181194, 1, 3686.64, -5552.65, 15.6566, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+421, 181191, 1, 3687.64, -5551.49, 15.8381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+422, 181192, 1, 3687.64, -5551.49, 15.8381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+423, 181193, 1, 3687.64, -5551.49, 15.8381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+424, 181194, 1, 3687.64, -5551.49, 15.8381, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+425, 181191, 1, 3700.34, -5543.09, 18.0561, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+426, 181192, 1, 3700.34, -5543.09, 18.0561, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+427, 181193, 1, 3700.34, -5543.09, 18.0561, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+428, 181194, 1, 3700.34, -5543.09, 18.0561, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+429, 181191, 1, 3701.38, -5541.03, 18.5767, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+430, 181192, 1, 3701.38, -5541.03, 18.5767, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+431, 181193, 1, 3701.38, -5541.03, 18.5767, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Azshara
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+432, 181194, 1, 3701.38, -5541.03, 18.5767, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10);    -- GameObject: "Skullpile 04" in Azshara
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_SKULLPILE_AZSHARA_GUID+1 AND @GOBJ_SKULLPILE_AZSHARA_GUID+432;
+
+    INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+1, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+2, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+3, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+4, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+5, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+2, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+6, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+2, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+7, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+2, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+8, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+2, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+9, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+3, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+10, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+3, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+11, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+3, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+12, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+3, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+13, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+4, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+14, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+4, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+15, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+4, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+16, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+4, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+17, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+5, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+18, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+5, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+19, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+5, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+20, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+5, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+21, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+6, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+22, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+6, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+23, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+6, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+24, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+6, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+25, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+7, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+26, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+7, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+27, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+7, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+28, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+7, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+29, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+8, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+30, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+8, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+31, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+8, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+32, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+8, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+33, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+9, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+34, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+9, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+35, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+9, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+36, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+9, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+37, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+10, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+38, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+10, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+39, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+10, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+40, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+10, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+41, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+11, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+42, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+11, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+43, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+11, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+44, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+11, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+45, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+12, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+46, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+12, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+47, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+12, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+48, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+12, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+49, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+13, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+50, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+13, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+51, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+13, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+52, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+13, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+53, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+14, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+54, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+14, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+55, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+14, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+56, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+14, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+57, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+15, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+58, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+15, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+59, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+15, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+60, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+15, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+61, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+16, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+62, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+16, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+63, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+16, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+64, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+16, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+65, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+17, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+66, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+17, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+67, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+17, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+68, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+17, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+69, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+18, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+70, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+18, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+71, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+18, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+72, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+18, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+73, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+19, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+74, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+19, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+75, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+19, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+76, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+19, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+77, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+20, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+78, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+20, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+79, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+20, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+80, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+20, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+81, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+21, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+82, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+21, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+83, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+21, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+84, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+21, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+85, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+22, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+86, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+22, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+87, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+22, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+88, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+22, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+89, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+23, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+90, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+23, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+91, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+23, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+92, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+23, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+93, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+24, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+94, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+24, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+95, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+24, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+96, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+24, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+97, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+25, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+98, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+25, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+99, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+25, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+100, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+25, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+101, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+26, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+102, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+26, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+103, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+26, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+104, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+26, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+105, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+27, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+106, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+27, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+107, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+27, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+108, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+27, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+109, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+28, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+110, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+28, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+111, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+28, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+112, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+28, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+113, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+29, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+114, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+29, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+115, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+29, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+116, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+29, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+117, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+30, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+118, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+30, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+119, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+30, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+120, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+30, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+121, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+31, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+122, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+31, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+123, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+31, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+124, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+31, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+125, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+32, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+126, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+32, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+127, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+32, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+128, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+32, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+129, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+33, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+130, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+33, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+131, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+33, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+132, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+33, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+133, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+34, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+134, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+34, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+135, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+34, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+136, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+34, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+137, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+35, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+138, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+35, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+139, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+35, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+140, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+35, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+141, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+36, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+142, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+36, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+143, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+36, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+144, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+36, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+145, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+37, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+146, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+37, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+147, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+37, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+148, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+37, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+149, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+38, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+150, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+38, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+151, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+38, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+152, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+38, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+153, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+39, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+154, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+39, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+155, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+39, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+156, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+39, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+157, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+40, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+158, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+40, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+159, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+40, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+160, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+40, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+161, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+41, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+162, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+41, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+163, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+41, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+164, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+41, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+165, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+42, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+166, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+42, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+167, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+42, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+168, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+42, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+169, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+43, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+170, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+43, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+171, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+43, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+172, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+43, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+173, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+44, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+174, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+44, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+175, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+44, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+176, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+44, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+177, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+45, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+178, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+45, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+179, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+45, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+180, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+45, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+181, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+46, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+182, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+46, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+183, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+46, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+184, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+46, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+185, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+47, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+186, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+47, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+187, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+47, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+188, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+47, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+189, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+48, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+190, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+48, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+191, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+48, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+192, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+48, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+193, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+49, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+194, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+49, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+195, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+49, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+196, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+49, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+197, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+50, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+198, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+50, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+199, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+50, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+200, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+50, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+201, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+51, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+202, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+51, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+203, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+51, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+204, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+51, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+205, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+52, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+206, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+52, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+207, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+52, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+208, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+52, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+209, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+53, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+210, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+53, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+211, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+53, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+212, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+53, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+213, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+54, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+214, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+54, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+215, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+54, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+216, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+54, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+217, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+55, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+218, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+55, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+219, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+55, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+220, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+55, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+221, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+56, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+222, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+56, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+223, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+56, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+224, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+56, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+225, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+57, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+226, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+57, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+227, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+57, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+228, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+57, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+229, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+58, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+230, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+58, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+231, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+58, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+232, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+58, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+233, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+59, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+234, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+59, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+235, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+59, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+236, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+59, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+237, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+60, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+238, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+60, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+239, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+60, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+240, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+60, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+241, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+61, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+242, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+61, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+243, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+61, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+244, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+61, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+245, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+62, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+246, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+62, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+247, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+62, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+248, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+62, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+249, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+63, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+250, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+63, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+251, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+63, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+252, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+63, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+253, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+64, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+254, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+64, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+255, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+64, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+256, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+64, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+257, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+65, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+258, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+65, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+259, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+65, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+260, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+65, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+261, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+66, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+262, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+66, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+263, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+66, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+264, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+66, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+265, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+67, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+266, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+67, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+267, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+67, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+268, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+67, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+269, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+68, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+270, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+68, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+271, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+68, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+272, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+68, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+273, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+69, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+274, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+69, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+275, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+69, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+276, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+69, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+277, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+70, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+278, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+70, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+279, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+70, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+280, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+70, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+281, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+71, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+282, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+71, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+283, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+71, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+284, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+71, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+285, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+72, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+286, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+72, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+287, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+72, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+288, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+72, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+289, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+73, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+290, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+73, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+291, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+73, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+292, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+73, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+293, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+74, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+294, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+74, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+295, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+74, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+296, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+74, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+297, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+75, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+298, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+75, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+299, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+75, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+300, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+75, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+301, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+76, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+302, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+76, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+303, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+76, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+304, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+76, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+305, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+77, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+306, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+77, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+307, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+77, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+308, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+77, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+309, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+78, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+310, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+78, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+311, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+78, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+312, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+78, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+313, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+79, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+314, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+79, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+315, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+79, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+316, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+79, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+317, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+80, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+318, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+80, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+319, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+80, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+320, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+80, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+321, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+81, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+322, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+81, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+323, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+81, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+324, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+81, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+325, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+82, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+326, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+82, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+327, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+82, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+328, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+82, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+329, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+83, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+330, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+83, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+331, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+83, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+332, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+83, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+333, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+84, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+334, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+84, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+335, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+84, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+336, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+84, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+337, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+85, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+338, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+85, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+339, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+85, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+340, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+85, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+341, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+86, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+342, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+86, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+343, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+86, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+344, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+86, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+345, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+87, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+346, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+87, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+347, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+87, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+348, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+87, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+349, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+88, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+350, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+88, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+351, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+88, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+352, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+88, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+353, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+89, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+354, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+89, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+355, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+89, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+356, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+89, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+357, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+90, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+358, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+90, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+359, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+90, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+360, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+90, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+361, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+91, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+362, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+91, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+363, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+91, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+364, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+91, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+365, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+92, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+366, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+92, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+367, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+92, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+368, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+92, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+369, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+93, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+370, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+93, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+371, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+93, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+372, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+93, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+373, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+94, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+374, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+94, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+375, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+94, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+376, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+94, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+377, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+95, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+378, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+95, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+379, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+95, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+380, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+95, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+381, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+96, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+382, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+96, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+383, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+96, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+384, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+96, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+385, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+97, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+386, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+97, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+387, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+97, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+388, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+97, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+389, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+98, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+390, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+98, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+391, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+98, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+392, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+98, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+393, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+99, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+394, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+99, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+395, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+99, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+396, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+99, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+397, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+100, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+398, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+100, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+399, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+100, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+400, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+100, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+401, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+101, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+402, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+101, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+403, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+101, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+404, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+101, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+405, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+102, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+406, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+102, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+407, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+102, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+408, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+102, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+409, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+103, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+410, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+103, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+411, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+103, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+412, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+103, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+413, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+104, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+414, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+104, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+415, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+104, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+416, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+104, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+417, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+105, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+418, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+105, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+419, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+105, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+420, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+105, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+421, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+106, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+422, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+106, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+423, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+106, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+424, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+106, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+425, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+107, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+426, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+107, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+427, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+107, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+428, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+107, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+429, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+430, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+431, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_AZSHARA_GUID+432, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10);
     INSERT INTO `pool_template` SELECT pool_gameobject.pool_entry, 1, 'Scourge Invasion Azshara, Skullpile', 0, 0, 9, 10 FROM `pool_gameobject` WHERE pool_gameobject.pool_entry BETWEEN @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1 AND @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108 GROUP BY pool_gameobject.pool_entry;
 
 
