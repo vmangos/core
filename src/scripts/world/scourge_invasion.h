@@ -210,6 +210,12 @@ enum ScourgeInvasionNPC
     NPC_GHOUL_BERSERKER                                 = 16141,
     NPC_SPECTRAL_SOLDIER                                = 16298,
 
+    // Low level Minions
+    NPC_SKELETAL_TROOPER                                = 16438,
+    NPC_SPECTRAL_SPIRIT                                 = 16437,
+    NPC_SKELETAL_SOLDIER                                = 16422,
+    NPC_SPECTRAL_APPARITATION                           = 16423,
+
     /* Rare Minions
     I sniffed out 17000 minion spawns and 32 rare spawns. That means a rare spawn ratio of 1 to 531.25.
     I have also seen multiple Rare spawns per Camp, but maybe it's also an "WoW Classic issue".
@@ -227,12 +233,6 @@ enum ScourgeInvasionNPC
     // 150 Zones cleared
     NPC_ARGENT_DAWN_CRUSADER                            = 16433,
     NPC_ARGENT_DAWN_CHAMPION                            = 16434,
-
-    // Low level Minions
-    NPC_SKELETAL_TROOPER                                = 16438,
-    NPC_SPECTRAL_SPIRIT                                 = 16437,
-    NPC_SKELETAL_SOLDIER                                = 16422,
-    NPC_SPECTRAL_APPARITATION                           = 16423,
 
     // Stormwind - Undercity Attacks https://www.youtube.com/watch?v=c0QjLqHVPRU&t=17s
     NPC_PALLID_HORROR                                   = 16394, // Leader NPC for City Attacks. Appears for both routes in undercity.

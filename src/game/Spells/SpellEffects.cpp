@@ -618,7 +618,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 }
                 case 10389: // [Event: Scourge Invasion] Spawn Smoke
                 {
-
                     if (Creature* pCreature = ToCreature(m_casterUnit))
                     {
                         // This should be already set in creature_template, otherwise the player will quickly enter and leave combat on spawn and thats not Blizzlike.
@@ -678,7 +677,12 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 case 28351: // [Event: Scourge Invasion] Communique, Camp-to-Relay, Death
                 {
                     // Make sure m_casterUnit gets removed from the map to avoid getting hit by Purple bolt again after respawn.
-                    m_casterUnit->RemoveFromWorld();
+                    if (m_casterUnit->GetEntry() == 16386 || m_casterUnit->GetEntry() == 16398)
+                        return;
+
+                    if (Creature* pCreature = ToCreature(m_casterUnit))
+                        pCreature->m_Events.AddLambdaEventAtOffset([pCreature]{pCreature->RemoveFromWorld();}, 1);
+
                     return;
                 }
                 case 23383: // Alliance Flag Click

@@ -131,7 +131,6 @@ void GameObject::AddToWorld()
 
     // After Object::AddToWorld so that for initial state the GO is added to the world (and hence handled correctly)
     UpdateCollisionState();
-    SummonLinkedTrapIfAny();
 
     if (!i_AI)
         AIM_Initialize();
