@@ -3121,6 +3121,9 @@ void CombatBotBaseAI::UseTrinketEffects()
     if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2))
         if (UseItemEffect(pItem))
             return;
+    if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)) //add use of mainhand weapon effect
+        if (UseItemEffect(pItem))
+            return;
 }
 
 bool CombatBotBaseAI::UseItemEffect(Item* pItem)
