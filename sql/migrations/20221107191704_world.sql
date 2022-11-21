@@ -30,9 +30,12 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (1469, 21000, 0, 11002), -- Gossip for Nixx Sprocketspring
 (1468, 21001, 0, 11002), -- Gossip for Tinkmaster Overspark
 (1467, 21002, 0, 11002), -- Gossip for Oglethorpe Obnoticus
-(7058, 8321, 0, 0), - Gossip for Book "Soothslaying for Dummies" (Engineering)
+(7058, 21003, 0, 11002), - Gossip for Book "Soothslaying for Dummies" (Engineering)
 
--- https://www.wowhead.com/classic/item=11825/pet-bombling#comments:id=2650836
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
+(7058, 1, 0, 'I am 100% confident that I wish to learn in the ways of goblin engineering.', 11876, 1, 1, -1, 0, spellscript, 0, 0, '', 0, 11002),
+(7058, 2, 0, 'I am 100% confident that I wish to learn in the ways of gnomish engineering.', 11878, 1, 1, -1, 0, spellscript, 0, 0, '', 0, 11002),
+
 
 -- End of migration.
 END IF;
