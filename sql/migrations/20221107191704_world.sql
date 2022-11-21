@@ -9,7 +9,6 @@ INSERT INTO `migrations` VALUES ('20221107191704');
 -- Add your query below.
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
-(10997, 7, 202, 200, 0, 0, 0), -- Condition for Engineering skill of 200
 (10994, 8, 3639, 0, 0, 0, 0), -- Condition for completing Show Your Work (goblin engineering)
 (10995, 8, 3641, 0, 0, 0, 0), -- Condition for completing Show Your Work (gnomish engineering - alliance side) 
 (10996, 8, 3643, 0, 0, 0, 0), -- Condition for completing Show Your Work (gnomish engineering - horde side) 
@@ -18,9 +17,10 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11000, 17, 20222, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Goblin Engineering
 (11001, -2, 10999, 11000, 0, 0, 0), -- Condition to return true if the player has NOT learnt Gnomish Engineering OR Goblin Engineering
 -- Note: Condition 4018 corresponds to a condition checking if the current patch is 1.10 or higher
-(11002, -1, 11001, 10998, 10997, 4018, 0), -- Condition to return true if the player doesn't have an Engineering specialisation, completed one of the Engineering specialisation quests, and has a skill of 200 Engineering, and the current patch is 1.10 or later
-(11003, -1, 11001, 10995, 10997, 10994, 0), -- Same as above (missing patch requirement) but requires specifically completing Show Your Work (gnomish engineering - alliance side) or Show Your Work (goblin engineering) for gossip option
-(11004, -1, 11001, 10996, 10997, 10994, 0), -- Same as above (missing patch requirement) but requires specifically completing Show Your Work (gnomish engineering - horde side) or Show Your Work (goblin engineering) for gossip option
+-- Note: Condition 393 corresponds to a condition checking if the player has an Engineering skill of 200
+(11002, -1, 11001, 10998, 393, 4018, 0), -- Condition to return true if the player doesn't have an Engineering specialisation, completed one of the Engineering specialisation quests, and has a skill of 200 Engineering, and the current patch is 1.10 or later
+(11003, -1, 11001, 10995, 393, 10994, 0), -- Same as above (missing patch requirement) but requires specifically completing Show Your Work (gnomish engineering - alliance side) or Show Your Work (goblin engineering) for gossip option
+(11004, -1, 11001, 10996, 393, 10994, 0), -- Same as above (missing patch requirement) but requires specifically completing Show Your Work (gnomish engineering - horde side) or Show Your Work (goblin engineering) for gossip option
 (11005, -1, 11003, 4018, 0, 0, 0), -- Add patch requirement to alliance-side gossip condition
 (11006, -1, 11004, 4018, 0, 0, 0), -- Add patch requirement to horde-side gossip condition
 (11007, -1, 11002, 11023, 0, 0, 1), -- NAND gate for Leatherworking and Engineering requirements for Book "Soothsaying for Dummies" gossip (If the conditions for both Leatherworking and Engineering gossips are met then this condition allows to easily decide what should be displayed)
