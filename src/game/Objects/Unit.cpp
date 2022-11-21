@@ -153,7 +153,7 @@ Unit::Unit()
     m_modSpellHitChance = 0.0f;
     m_baseSpellCritChance = 5;
 
-    m_CombatTimer = 0;
+    m_combatTimer = 0;
     m_lastManaUseTimer = 0;
     m_lastManaUseSpellId = 0;
 
@@ -250,33 +250,25 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
             m_lastManaUseTimer -= update_diff;
     }
 
-    // update combat timer only for players and pets
-    if (IsInCombat() && (IsPlayer() || ((Creature*)this)->IsPet() || ((Creature*)this)->IsCharmed()))
+    if (m_combatTimer <= update_diff)
     {
-        // Check UNIT_STAT_MELEE_ATTACKING or UNIT_STAT_CHASE (without UNIT_STAT_FOLLOW in this case) so pets can reach far away
-        // targets without stopping half way there and running off.
-        // These flags are reset after target dies or another command is given.
-        if (GetCharmerGuid().IsPlayer() || GetOwnerGuid().IsPlayer() || IsPlayer())
+        m_combatTimerTarget.Clear();
+        m_combatTimer = UNIT_COMBAT_CHECK_TIMER_MAX - std::min(update_diff - m_combatTimer, UNIT_COMBAT_CHECK_TIMER_MAX);
+
+        // update combat timer only for players and pets
+        if (IsInCombat() && (IsPlayer() || (IsPet() && GetOwnerGuid().IsPlayer()) || GetCharmerGuid().IsPlayer()))
         {
             // Pet in combat ?
             Pet* myPet = GetPet();
             if (HasUnitState(UNIT_STAT_FEIGN_DEATH) || !myPet || myPet->GetHostileRefManager().isEmpty())
             {
-                if (m_HostileRefManager.isEmpty())
-                {
-                    // m_CombatTimer set at aura start and it will be freeze until aura removing
-                    if (m_CombatTimer <= update_diff)
-                    {
-                        // Rage berzerker laisse en combat.
-                        if (!HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
-                            ClearInCombat();
-                    }
-                    else
-                        m_CombatTimer -= update_diff;
-                }
+                if (m_HostileRefManager.isEmpty() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
+                    ClearInCombat();
             }
         }
     }
+    else
+        m_combatTimer -= update_diff;
 
     // extra attack
     Unit* victim = GetVictim();
@@ -5766,8 +5758,21 @@ void Unit::SetInCombatState(uint32 combatTimer, Unit* pEnemy)
     if (!IsAlive())
         return;
 
-    if (m_CombatTimer < combatTimer)
-        m_CombatTimer = combatTimer;
+    if (combatTimer)
+    {
+        if (m_combatTimer < combatTimer)
+        {
+            m_combatTimer += BatchifyTimer(combatTimer - m_combatTimer, UNIT_COMBAT_CHECK_TIMER_MAX);
+            m_combatTimerTarget = pEnemy ? pEnemy->GetObjectGuid() : ObjectGuid();
+        }
+    }
+    // combat timer is interrupted early on actually entering combat with victim
+    // example: charge mob and kill it in 1 hit, you leave combat quicker than 5 seconds
+    else if (m_combatTimer > UNIT_COMBAT_CHECK_TIMER_MAX && pEnemy && pEnemy->GetObjectGuid() == m_combatTimerTarget)
+    {
+        m_combatTimer = UNIT_COMBAT_CHECK_TIMER_MAX - (WorldTimer::getMSTime() % UNIT_COMBAT_CHECK_TIMER_MAX);
+        m_combatTimerTarget.Clear();
+    }
 
     bool wasInCombat = IsInCombat();
     bool creatureNotInCombat = IsCreature() && !wasInCombat;
@@ -5908,14 +5913,18 @@ void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint
     {
         if (pVictim->IsCharmerOrOwnerPlayerOrPlayerItself() && (combatTimer < UNIT_PVP_COMBAT_TIMER))
             combatTimer = UNIT_PVP_COMBAT_TIMER;
+
         SetInCombatState(combatTimer, pVictim);
+
+        if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
+            pOwner->SetInCombatWithVictim(pVictim, false, combatTimer >= UNIT_PVP_COMBAT_TIMER ? combatTimer : UNIT_PVP_COMBAT_TIMER);
     }
 }
 
 
 void Unit::ClearInCombat()
 {
-    m_CombatTimer = 0;
+    m_combatTimer = 0;
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
 
@@ -7956,6 +7965,7 @@ void Unit::AddToWorld()
 
     if (sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
         m_procsUpdateTimer = sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY));
+    m_combatTimer = UNIT_COMBAT_CHECK_TIMER_MAX - (WorldTimer::getMSTime() % UNIT_COMBAT_CHECK_TIMER_MAX);
 }
 
 void Unit::RemoveFromWorld()

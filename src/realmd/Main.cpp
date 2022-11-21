@@ -273,6 +273,12 @@ extern int main(int argc, char **argv)
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
+    if (ExpectedRealmdClientBuilds.size() == 0)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "No valid client builds specified.");
+        Log::WaitBeforeContinueIfNeed();
+        return 1;
+    }
 
     // cleanup query
     // set expired bans to inactive

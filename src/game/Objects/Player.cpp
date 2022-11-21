@@ -1765,6 +1765,9 @@ void Player::OnDisconnected()
 
         if (ObjectGuid lootGuid = GetLootGuid())
             GetSession()->DoLootRelease(lootGuid);
+
+        if (GetCurrentCinematicEntry() != 0)
+            CinematicEnd();
     }
 
     // Player should be leave from channels
@@ -3292,7 +3295,7 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid)
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
 uint32 Player::GetWhoListPartyStatus() const
 {
-    if (sLFGMgr.IsPlayerInQueue(GetObjectGuid()))
+    if (IsInLFG())
         return WHO_PARTY_STATUS_LFG;
 
     if (GetGroup())
@@ -22406,6 +22409,26 @@ void Log::Player(WorldSession const* session, LogType logType, LogLevel logLevel
     if (PlayerLogFormatted(session->GetAccountId(), session, logType, nullptr, logLevel, buff, log))
     {
         // Player logs should never go to the console
+        OutFile(logType, logLevel, log);
+    }
+}
+
+void Log::OutWardenPlayer(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...)
+{
+    char buff[4096];
+    va_list ap;
+    va_start(ap, format);
+    vsnprintf(buff, sizeof(buff), format, ap);
+    va_end(ap);
+
+    std::string log;
+
+    if (m_wardenDebug && logLevel > LOG_LVL_MINIMAL)
+        logLevel = LOG_LVL_MINIMAL;
+
+    if (PlayerLogFormatted(session->GetAccountId(), session, logType, "Warden", logLevel, buff, log))
+    {
+        OutConsole(logType, logLevel, log);
         OutFile(logType, logLevel, log);
     }
 }

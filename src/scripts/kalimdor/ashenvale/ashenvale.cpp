@@ -600,6 +600,7 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
             if (go_foulweald_totem_moundAI* pMoundAI = dynamic_cast<go_foulweald_totem_moundAI*>(gobj->AI()))
                 pMoundAI->EnragedFoulwealdJustDied(m_creature->GetGUID());
         }
+        m_creature->DespawnOrUnsummon(60000);
     }
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override
