@@ -41,8 +41,8 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11022, -2, 11019, 11021, 0, 0, 0), -- Condition to return true if the player has NOT learnt Tribal, Elemental, OR Dragonscale Leatherworking
 (11023, -1, 11009, 11018, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
 (11024, -1, 11023, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
-(11025, -3, 11007, 0, 0, 0, 0); -- Condition if requirements for both Engineering and Leatherworking gossip is met
-
+(11025, -3, 11007, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
+(11026, -2, 11025, 11008, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies includes if both requirements are met (Uses engineering text for now because I have no idea what is correct)
 -- For some reason there are seperate broadcast texts for male and female characters even though there is no difference in text. I'm just adding the female text option to the one that only had the male text because that is stupid.
 -- I'm not sure if this means if the localisations are messed up too.
 UPDATE `broadcast_text` SET `female_text` = 'I cannot teach you dragonscale leatherworking, $n. You must go to Tanaris and find the home of Narain Soothfancy. Once there, consult the book \"Soothsaying for Dummies.\"' WHERE `entry` = 11894;
@@ -65,9 +65,8 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (1469, 21000, 0, 11002), -- Gossip for Nixx Sprocketspring
 (1468, 21001, 0, 11005), -- Gossip for Tinkmaster Overspark
 (1467, 21002, 0, 11006), -- Gossip for Oglethorpe Obnoticus
-(7058, 21003, 0, 11008), -- Gossip for Book Soothslaying for Dummies (Engineering)
+(7058, 21003, 0, 11026), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
 (7058, 21007, 0, 11024), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
-(7058, 21003, 0, 11025), -- Gossip for Book Soothslaying for Dummies if both requirements are met (Uses engineering text for now because I have no idea what is correct)
 (22000, 21004, 0, 0), -- Gossip sub-menu for Dragonscale Leatherworking
 (22001, 21005, 0, 0), -- Gossip sub-menu for Elemental Leatherworking
 (22002, 21006, 0, 0); -- Gossip sub-menu for Tribal Leatherworking
