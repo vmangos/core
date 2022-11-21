@@ -24,7 +24,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11005, -1, 11003, 4018, 0, 0, 0), -- Add patch requirement to alliance-side gossip condition
 (11006, -1, 11004, 4018, 0, 0, 0), -- Add patch requirement to horde-side gossip condition
 (11007, -1, 11002, 11023, 0, 0, 1), -- NAND gate for Leatherworking and Engineering requirements for Book "Soothsaying for Dummies" gossip (If the conditions for both Leatherworking and Engineering gossips are met then this condition allows to easily decide what should be displayed)
-(11008, -1, 11002, 11007, 0, 0, 0). -- Condition for Book "Soothsaying for Dummies" Engineering gossip
+(11008, -1, 11002, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
 (11009, 7, 165, 225, 0, 0, 0), -- Condition for Leatherworking skill of 225
 (11010, 8, 5141, 0, 0, 0, 0), -- Condition for completing Dragonscale Leatherworking (alliance side)
 (11011, 8, 5143, 0, 0, 0, 0), -- Condition for completing Tribal Leatherworking (alliance side)
