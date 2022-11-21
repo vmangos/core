@@ -13,7 +13,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (10994, 8, 3639, 0, 0, 0, 0), -- Condition for completing Show Your Work (goblin engineering)
 (10995, 8, 3641, 0, 0, 0, 0), -- Condition for completing Show Your Work (gnomish engineering - alliance side) 
 (10996, 8, 3643, 0, 0, 0, 0), -- Condition for completing Show Your Work (gnomish engineering - horde side) 
-(10998, -2, 10994, 10995, 10996, 0, 0) -- Condition to return true if any of the above quests are complete
+(10998, -2, 10994, 10995, 10996, 0, 0), -- Condition to return true if any of the above quests are complete
 (10999, 17, 20219, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Gnomish Engineering
 (11000, 17, 20222, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Goblin Engineering
 (11001, -2, 10999, 11000, 0, 0, 0), -- Condition to return true if the player has NOT learnt Gnomish Engineering OR Goblin Engineering
