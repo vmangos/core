@@ -704,6 +704,34 @@ UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry` = 50
 UPDATE `creature` SET `position_z` = 52.7279 WHERE `guid`=18622;
 UPDATE `creature` SET `position_z` = 31.6557 WHERE `guid`=7887;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Events list for Gordok Spirit (credit cmangos)
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` = 11446;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(1144601, 11446, 0, 4, 0, 10, 0, 0, 0, 0, 0, 1144601, 0, 0, ' Gordok Spirit - Talk on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1144601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1925, 1926, 1927, 0, 0, 0, 0, 0, 0, ' Gordok Spirit - Talk');
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Improve Start script for Quest Cave Mushrooms (credit cmangos)
+DELETE FROM `quest_start_scripts` WHERE `id`=947;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(947, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Barithras Moonshade - Emote'),
+(947, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1211, 0, 0, 0, 0, 0, 0, 0, 0, 'Barithras Moonshade - Talk'),
+(947, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1210, 0, 0, 0, 0, 0, 0, 0, 0, 'Barithras Moonshade - Talk'),
+(947, 3, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Barithras Moonshade - Emote'),
+(947, 3, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.131268, 0, 'Barithras Moonshade - Set Orientation'),
+(947, 10, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.747295, 0, 'Barithras Moonshade - Set Orientation');
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- End script for Quest Onu is meditating (credit cmangos)
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(960, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1219, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu - Talk');
+UPDATE `quest_template` SET `CompleteScript` = 960 WHERE  `entry` IN (960, 961);
+
 
 -- End of migration.
 END IF;
