@@ -29,7 +29,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11010, 8, 5141, 0, 0, 0, 0), -- Condition for completing Dragonscale Leatherworking (alliance side)
 (11011, 8, 5143, 0, 0, 0, 0), -- Condition for completing Tribal Leatherworking (alliance side)
 (11012, 8, 5144, 0, 0, 0, 0), -- Condition for completing Elemental Leatherworking (alliance side)
-(11013, -2, 11012, 11011, 11010, 0, 0) -- Condition to return true if any of the above quests are complete
+(11013, -2, 11012, 11011, 11010, 0, 0), -- Condition to return true if any of the above quests are complete
 (11014, 8, 5145, 0, 0, 0, 0), -- Condition for completing Dragonscale Leatherworking (horde side)
 (11015, 8, 5148, 0, 0, 0, 0), -- Condition for completing Tribal Leatherworking (horde side)
 (11016, 8, 5146, 0, 0, 0, 0), -- Condition for completing Elemental Leatherworking (horde side)
@@ -40,7 +40,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11021, 17, 10656, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Dragonscale Leatherworking
 (11022, -2, 11019, 11021, 0, 0, 0), -- Condition to return true if the player has NOT learnt Tribal, Elemental, OR Dragonscale Leatherworking
 (11023, -1, 11009, 11018, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
-(11024, -1, 11023, 11007, 0, 0, 0). -- Condition for Book "Soothsaying for Dummies" Engineering gossip
+(11024, -1, 11023, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
 (11025, -3, 11007, 0, 0, 0, 0); -- Condition if requirements for both Engineering and Leatherworking gossip is met
 
 -- For some reason there are seperate broadcast texts for male and female characters even though there is no difference in text. I'm just adding the female text option to the one that only had the male text because that is stupid.
