@@ -11,15 +11,23 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 -- 0. SETUP
 
-    SET @NPC_NPC_FLAMESHOCKER_GUID                                  = 66900;
+    SET @NPC_FLAMESHOCKER_GUID                                  	= 66900;
     SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 21841;
+    SET @GOBJ_ZONES_GUID                                            = 82090; -- 474 Entries
 
     SET @GOBJ_SKULLPILE_WINTERSPRING_GUID                           = 52495; -- 648 Entries
     SET @GOBJ_SKULLPILE_TANARIS_GUID                                = 53143; -- 648 Entries
-    SET @GOBJ_SKULLPILE_AZSHARA_GUID                                = 53791; --
-    SET @GOBJ_SKULLPILE_BLASTED_LANDS_GUID                          = 0; --
-    SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 0; --
-    SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 0; --
+    SET @GOBJ_SKULLPILE_AZSHARA_GUID                                = 53791; -- 432 Entries
+    SET @GOBJ_SKULLPILE_BLASTED_LANDS_GUID                          = 54223; -- 428 Entries
+    SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 54949; -- 432 Entries
+    SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 56119; -- 432 Entries
+
+    SET @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY                 = 14281; -- 162 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY                      = 14443; -- 162 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY                      = 14605; -- 108 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY                = 14713; -- 107 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY          = 14820; -- 108 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY              = 14928; -- 108 Entries
 
     SET @GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID               = 24166;
     SET @GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID                    = 24418;
@@ -28,19 +36,13 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     SET @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID        = 27173;
     SET @GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID            = 27341;
 
-    SET @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY                 = 14281; -- 162 Entries
-    SET @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY                      = 14443; -- 162 Entries
-    SET @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY                      = 14605; -- 108 Entries
-    SET @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY                = 14713;
-    SET @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY          = 0;
-    SET @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY              = 0;
-
     SET @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING              = 90;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS                   = 91;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA                   = 92;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS             = 93;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS       = 94;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES           = 95;
+
 
 -- 1. ADJUSTMENTS
 
@@ -860,66 +862,66 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Pallid and Flameshockers respawn.
     INSERT INTO `creature`(`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-        (@NPC_FLAMESHOCKER_GUID+1, 16383, 0, 0, 0, 0, -9001.15, 891.015, 105.505, 2.29504, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
-        (@NPC_FLAMESHOCKER_GUID+2, 16383, 0, 0, 0, 0, -8997.9, 834.881, 105.855, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
-        (@NPC_FLAMESHOCKER_GUID+3, 16383, 0, 0, 0, 0, -8931.39, 960.914, 117.416, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Mage Quarter.
-        (@NPC_FLAMESHOCKER_GUID+4, 16383, 0, 0, 0, 0, -8879.42, 579.776, 93.0791, 4.62512, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
-        (@NPC_FLAMESHOCKER_GUID+5, 16383, 0, 0, 0, 0, -8850.97, 653.117, 96.6387, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
-        (@NPC_FLAMESHOCKER_GUID+6, 16383, 0, 0, 0, 0, -8833.34, 622.748, 93.7479, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
-        (@NPC_FLAMESHOCKER_GUID+7, 16383, 0, 0, 0, 0, -8810.19, 580.752, 95.9053, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Trade District.
-        (@NPC_FLAMESHOCKER_GUID+8, 16383, 0, 0, 0, 0, -8780.81, 1068.88, 90.8636, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
-        (@NPC_FLAMESHOCKER_GUID+9, 16383, 0, 0, 0, 0, -8733.97, 1106.75, 92.6246, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
-        (@NPC_FLAMESHOCKER_GUID+10, 16383, 0, 0, 0, 0, -8731.61, 1003.63, 95.8085, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City The Park.
-        (@NPC_FLAMESHOCKER_GUID+11, 16383, 0, 0, 0, 0, -8722.22, 441.27, 97.3523, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
-        (@NPC_FLAMESHOCKER_GUID+12, 16383, 0, 0, 0, 0, -8698.38, 401.52, 101.099, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
-        (@NPC_FLAMESHOCKER_GUID+13, 16383, 0, 0, 0, 0, -8634.71, 444.417, 102.237, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Old Town.
-        -- (@NPC_FLAMESHOCKER_GUID+14, 16383, 0, 0, 0, 0, -8585.14, 903.542, 81.7025, 4.72984, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-        -- (@NPC_FLAMESHOCKER_GUID+15, 16383, 0, 0, 0, 0, -8583.97, 906.899, 81.7026, 3.83972, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-        -- (@NPC_FLAMESHOCKER_GUID+16, 16383, 0, 0, 0, 0, -8583.51, 901.15, 81.7033, 4.08407, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-        (@NPC_FLAMESHOCKER_GUID+17, 16394, 0, 0, 0, 0, -8581.79, 904.538, 81.7021, 3.82227, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Stormwind City Cathedral of Light.
-        -- (@NPC_FLAMESHOCKER_GUID+18, 16383, 0, 0, 0, 0, -8580.33, 901.258, 81.7028, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-        -- (@NPC_FLAMESHOCKER_GUID+19, 16383, 0, 0, 0, 0, -8579.29, 907.101, 81.702, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Cathedral of Light.
-        (@NPC_FLAMESHOCKER_GUID+20, 16383, 0, 0, 0, 0, -8450.78, 587.494, 94.1273, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
-        (@NPC_FLAMESHOCKER_GUID+21, 16383, 0, 0, 0, 0, -8394.75, 575.578, 91.3721, 2.93627, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
-        (@NPC_FLAMESHOCKER_GUID+22, 16383, 0, 0, 0, 0, -8367.51, 637.011, 94.9871, 4.1433, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Stormwind City Dwarven District.
-        (@NPC_FLAMESHOCKER_GUID+23, 16383, 0, 0, 0, 0, 1420.04, 119.324, -62.2049, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-        (@NPC_FLAMESHOCKER_GUID+24, 16383, 0, 0, 0, 0, 1445.72, 91.438, -62.2014, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-        (@NPC_FLAMESHOCKER_GUID+25, 16383, 0, 0, 0, 0, 1489.15, 67.53, -62.2138, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-        (@NPC_FLAMESHOCKER_GUID+26, 16383, 0, 0, 0, 0, 1492.07, 180.029, -62.0023, 3.61883, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-        (@NPC_FLAMESHOCKER_GUID+27, 16383, 0, 0, 0, 0, 1493.05, 186.522, -62.0734, 4.11898, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-        -- (@NPC_FLAMESHOCKER_GUID+28, 16383, 0, 0, 0, 0, 1532.72, 273.599, -62.0943, 1.25664, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-        -- (@NPC_FLAMESHOCKER_GUID+29, 16383, 0, 0, 0, 0, 1532.99, 278.193, -62.0943, 1.53589, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-        (@NPC_FLAMESHOCKER_GUID+30, 16383, 0, 0, 0, 0, 1534.92, 138.913, -62.0883, 4.34587, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-        (@NPC_FLAMESHOCKER_GUID+31, 16394, 0, 0, 0, 0, 1535.76, 274.897, -62.0943, 1.0821, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Undercity Canals.
-        -- (@NPC_FLAMESHOCKER_GUID+32, 16383, 0, 0, 0, 0, 1536.4, 271.839, -62.0943, 1.23918, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-        -- (@NPC_FLAMESHOCKER_GUID+33, 16383, 0, 0, 0, 0, 1537.21, 278.743, -62.0943, 1.20428, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-        -- (@NPC_FLAMESHOCKER_GUID+34, 16383, 0, 0, 0, 0, 1539.85, 274.237, -62.0943, 1.20428, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Canals.
-        (@NPC_FLAMESHOCKER_GUID+35, 16383, 0, 0, 0, 0, 1545.37, 142.682, -62.0049, 0.358143, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Rogues Quarter.
-        (@NPC_FLAMESHOCKER_GUID+36, 16383, 0, 0, 0, 0, 1582.24, 276.854, -43.0193, 0.174533, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-        (@NPC_FLAMESHOCKER_GUID+37, 16383, 0, 0, 0, 0, 1582.34, 252.503, -61.994, 3.57792, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-        (@NPC_FLAMESHOCKER_GUID+38, 16383, 0, 0, 0, 0, 1606.54, 239.628, -52.0687, 0.0698132, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-        (@NPC_FLAMESHOCKER_GUID+39, 16383, 0, 0, 0, 0, 1609.49, 229.112, -61.994, 5.25344, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-        (@NPC_FLAMESHOCKER_GUID+40, 16383, 0, 0, 0, 0, 1609.66, 205.781, -43.0193, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Trade Quarter.
-        -- (@NPC_FLAMESHOCKER_GUID+41, 16383, 0, 0, 0, 0, 1626.6, 481.696, -22.7855, 5.23599, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        -- (@NPC_FLAMESHOCKER_GUID+42, 16383, 0, 0, 0, 0, 1627.48, 477.444, -22.7847, 4.71239, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        -- (@NPC_FLAMESHOCKER_GUID+43, 16383, 0, 0, 0, 0, 1627.97, 484.273, -22.7855, 6.21337, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        -- (@NPC_FLAMESHOCKER_GUID+44, 16383, 0, 0, 0, 0, 1629.02, 477.154, -22.7847, 1.88496, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        (@NPC_FLAMESHOCKER_GUID+45, 16394, 0, 0, 0, 0, 1629.41, 480.468, -22.7851, 4.69494, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),-- Pallid Horror in Undercity Sewers.
-        -- (@NPC_FLAMESHOCKER_GUID+46, 16383, 0, 0, 0, 0, 1630.92, 484.171, -22.7855, 3.26377, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        -- (@NPC_FLAMESHOCKER_GUID+47, 16383, 0, 0, 0, 0, 1631.27, 477.82, -22.785, 5.27089, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        -- (@NPC_FLAMESHOCKER_GUID+48, 16383, 0, 0, 0, 0, 1632.22, 481.066, -22.7855, 5.41052, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        -- (@NPC_FLAMESHOCKER_GUID+49, 16383, 0, 0, 0, 0, 1634.59, 477.738, -21.8358, 4.4855, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        -- (@NPC_FLAMESHOCKER_GUID+50, 16383, 0, 0, 0, 0, 1634.67, 479.701, -21.8066, 1.64061, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Sewers.
-        (@NPC_FLAMESHOCKER_GUID+51, 16383, 0, 0, 0, 0, 1654.89, 134.022, -62.0874, 3.57792, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-        (@NPC_FLAMESHOCKER_GUID+52, 16383, 0, 0, 0, 0, 1656.79, 341.062, -62.0883, 5.34071, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
-        (@NPC_FLAMESHOCKER_GUID+53, 16383, 0, 0, 0, 0, 1666.35, 150.947, -62.0023, 0.443699, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-        (@NPC_FLAMESHOCKER_GUID+54, 16383, 0, 0, 0, 0, 1693.4, 409.976, -62.2141, 3.94444, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
-        (@NPC_FLAMESHOCKER_GUID+55, 16383, 0, 0, 0, 0, 1694.36, 66.5781, -62.2057, 0.174533, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-        (@NPC_FLAMESHOCKER_GUID+56, 16383, 0, 0, 0, 0, 1700.87, 181.282, -62.0883, 5.25344, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-        (@NPC_FLAMESHOCKER_GUID+57, 16383, 0, 0, 0, 0, 1724.52, 369.016, -60.4011, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
-        (@NPC_FLAMESHOCKER_GUID+58, 16383, 0, 0, 0, 0, 1738.85, 95.2721, -62.1996, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity Magic Quarter.
-        (@NPC_FLAMESHOCKER_GUID+59, 16383, 0, 0, 0, 0, 1767.03, 339.711, -62.205, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10),-- Flameshocker in Undercity War Quarter.
-        (@NPC_FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 0, 10);-- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+1, 16383, 0, 0, 0, 0, -9001.15, 891.015, 105.505, 2.29504, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Stormwind City Mage Quarter.
+        (@NPC_FLAMESHOCKER_GUID+2, 16383, 0, 0, 0, 0, -8997.9, 834.881, 105.855, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),        -- Flameshocker in Stormwind City Mage Quarter.
+        (@NPC_FLAMESHOCKER_GUID+3, 16383, 0, 0, 0, 0, -8931.39, 960.914, 117.416, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Stormwind City Mage Quarter.
+        (@NPC_FLAMESHOCKER_GUID+4, 16383, 0, 0, 0, 0, -8879.42, 579.776, 93.0791, 4.62512, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Stormwind City Trade District.
+        (@NPC_FLAMESHOCKER_GUID+5, 16383, 0, 0, 0, 0, -8850.97, 653.117, 96.6387, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Stormwind City Trade District.
+        (@NPC_FLAMESHOCKER_GUID+6, 16383, 0, 0, 0, 0, -8833.34, 622.748, 93.7479, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Stormwind City Trade District.
+        (@NPC_FLAMESHOCKER_GUID+7, 16383, 0, 0, 0, 0, -8810.19, 580.752, 95.9053, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Stormwind City Trade District.
+        (@NPC_FLAMESHOCKER_GUID+8, 16383, 0, 0, 0, 0, -8780.81, 1068.88, 90.8636, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Stormwind City The Park.
+        (@NPC_FLAMESHOCKER_GUID+9, 16383, 0, 0, 0, 0, -8733.97, 1106.75, 92.6246, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Stormwind City The Park.
+        (@NPC_FLAMESHOCKER_GUID+10, 16383, 0, 0, 0, 0, -8731.61, 1003.63, 95.8085, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Stormwind City The Park.
+        (@NPC_FLAMESHOCKER_GUID+11, 16383, 0, 0, 0, 0, -8722.22, 441.27, 97.3523, 1.91986, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Stormwind City Old Town.
+        (@NPC_FLAMESHOCKER_GUID+12, 16383, 0, 0, 0, 0, -8698.38, 401.52, 101.099, 2.61799, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Stormwind City Old Town.
+        (@NPC_FLAMESHOCKER_GUID+13, 16383, 0, 0, 0, 0, -8634.71, 444.417, 102.237, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Stormwind City Old Town.
+        -- (@NPC_FLAMESHOCKER_GUID+14, 16383, 0, 0, 0, 0, -8585.14, 903.542, 81.7025, 4.72984, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Stormwind City Cathedral of Light.
+        -- (@NPC_FLAMESHOCKER_GUID+15, 16383, 0, 0, 0, 0, -8583.97, 906.899, 81.7026, 3.83972, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Stormwind City Cathedral of Light.
+        -- (@NPC_FLAMESHOCKER_GUID+16, 16383, 0, 0, 0, 0, -8583.51, 901.15, 81.7033, 4.08407, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),    -- Flameshocker in Stormwind City Cathedral of Light.
+        (@NPC_FLAMESHOCKER_GUID+17, 16394, 0, 0, 0, 0, -8581.79, 904.538, 81.7021, 3.82227, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),     -- Pallid Horror in Stormwind City Cathedral of Light.
+        -- (@NPC_FLAMESHOCKER_GUID+18, 16383, 0, 0, 0, 0, -8580.33, 901.258, 81.7028, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Stormwind City Cathedral of Light.
+        -- (@NPC_FLAMESHOCKER_GUID+19, 16383, 0, 0, 0, 0, -8579.29, 907.101, 81.702, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),    -- Flameshocker in Stormwind City Cathedral of Light.
+        (@NPC_FLAMESHOCKER_GUID+20, 16383, 0, 0, 0, 0, -8450.78, 587.494, 94.1273, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Stormwind City Dwarven District.
+        (@NPC_FLAMESHOCKER_GUID+21, 16383, 0, 0, 0, 0, -8394.75, 575.578, 91.3721, 2.93627, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Stormwind City Dwarven District.
+        (@NPC_FLAMESHOCKER_GUID+22, 16383, 0, 0, 0, 0, -8367.51, 637.011, 94.9871, 4.1433, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Stormwind City Dwarven District.
+        (@NPC_FLAMESHOCKER_GUID+23, 16383, 0, 0, 0, 0, 1420.04, 119.324, -62.2049, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+24, 16383, 0, 0, 0, 0, 1445.72, 91.438, -62.2014, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+25, 16383, 0, 0, 0, 0, 1489.15, 67.53, -62.2138, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),        -- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+26, 16383, 0, 0, 0, 0, 1492.07, 180.029, -62.0023, 3.61883, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+27, 16383, 0, 0, 0, 0, 1493.05, 186.522, -62.0734, 4.11898, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Rogues Quarter.
+        -- (@NPC_FLAMESHOCKER_GUID+28, 16383, 0, 0, 0, 0, 1532.72, 273.599, -62.0943, 1.25664, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Canals.
+        -- (@NPC_FLAMESHOCKER_GUID+29, 16383, 0, 0, 0, 0, 1532.99, 278.193, -62.0943, 1.53589, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Canals.
+        (@NPC_FLAMESHOCKER_GUID+30, 16383, 0, 0, 0, 0, 1534.92, 138.913, -62.0883, 4.34587, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+31, 16394, 0, 0, 0, 0, 1535.76, 274.897, -62.0943, 1.0821, 2700, 2700, 5, 100, 0, 1, 1, 0, 9, 10),      -- Pallid Horror in Undercity Canals.
+        -- (@NPC_FLAMESHOCKER_GUID+32, 16383, 0, 0, 0, 0, 1536.4, 271.839, -62.0943, 1.23918, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),    -- Flameshocker in Undercity Canals.
+        -- (@NPC_FLAMESHOCKER_GUID+33, 16383, 0, 0, 0, 0, 1537.21, 278.743, -62.0943, 1.20428, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Canals.
+        -- (@NPC_FLAMESHOCKER_GUID+34, 16383, 0, 0, 0, 0, 1539.85, 274.237, -62.0943, 1.20428, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Canals.
+        (@NPC_FLAMESHOCKER_GUID+35, 16383, 0, 0, 0, 0, 1545.37, 142.682, -62.0049, 0.358143, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Undercity Rogues Quarter.
+        (@NPC_FLAMESHOCKER_GUID+36, 16383, 0, 0, 0, 0, 1582.24, 276.854, -43.0193, 0.174533, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Undercity Trade Quarter.
+        (@NPC_FLAMESHOCKER_GUID+37, 16383, 0, 0, 0, 0, 1582.34, 252.503, -61.994, 3.57792, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Undercity Trade Quarter.
+        (@NPC_FLAMESHOCKER_GUID+38, 16383, 0, 0, 0, 0, 1606.54, 239.628, -52.0687, 0.0698132, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),    -- Flameshocker in Undercity Trade Quarter.
+        (@NPC_FLAMESHOCKER_GUID+39, 16383, 0, 0, 0, 0, 1609.49, 229.112, -61.994, 5.25344, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Undercity Trade Quarter.
+        (@NPC_FLAMESHOCKER_GUID+40, 16383, 0, 0, 0, 0, 1609.66, 205.781, -43.0193, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Trade Quarter.
+        -- (@NPC_FLAMESHOCKER_GUID+41, 16383, 0, 0, 0, 0, 1626.6, 481.696, -22.7855, 5.23599, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),    -- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+42, 16383, 0, 0, 0, 0, 1627.48, 477.444, -22.7847, 4.71239, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+43, 16383, 0, 0, 0, 0, 1627.97, 484.273, -22.7855, 6.21337, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+44, 16383, 0, 0, 0, 0, 1629.02, 477.154, -22.7847, 1.88496, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Sewers.
+        (@NPC_FLAMESHOCKER_GUID+45, 16394, 0, 0, 0, 0, 1629.41, 480.468, -22.7851, 4.69494, 2700, 2700, 5, 100, 0, 1, 1, 0, 9, 10),     -- Pallid Horror in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+46, 16383, 0, 0, 0, 0, 1630.92, 484.171, -22.7855, 3.26377, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+47, 16383, 0, 0, 0, 0, 1631.27, 477.82, -22.785, 5.27089, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+48, 16383, 0, 0, 0, 0, 1632.22, 481.066, -22.7855, 5.41052, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+49, 16383, 0, 0, 0, 0, 1634.59, 477.738, -21.8358, 4.4855, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),    -- Flameshocker in Undercity Sewers.
+        -- (@NPC_FLAMESHOCKER_GUID+50, 16383, 0, 0, 0, 0, 1634.67, 479.701, -21.8066, 1.64061, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Undercity Sewers.
+        (@NPC_FLAMESHOCKER_GUID+51, 16383, 0, 0, 0, 0, 1654.89, 134.022, -62.0874, 3.57792, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+52, 16383, 0, 0, 0, 0, 1656.79, 341.062, -62.0883, 5.34071, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity War Quarter.
+        (@NPC_FLAMESHOCKER_GUID+53, 16383, 0, 0, 0, 0, 1666.35, 150.947, -62.0023, 0.443699, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+54, 16383, 0, 0, 0, 0, 1693.4, 409.976, -62.2141, 3.94444, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Undercity War Quarter.
+        (@NPC_FLAMESHOCKER_GUID+55, 16383, 0, 0, 0, 0, 1694.36, 66.5781, -62.2057, 0.174533, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+56, 16383, 0, 0, 0, 0, 1700.87, 181.282, -62.0883, 5.25344, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+57, 16383, 0, 0, 0, 0, 1724.52, 369.016, -60.4011, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Undercity War Quarter.
+        (@NPC_FLAMESHOCKER_GUID+58, 16383, 0, 0, 0, 0, 1738.85, 95.2721, -62.1996, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+59, 16383, 0, 0, 0, 0, 1767.03, 339.711, -62.205, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Undercity War Quarter.
+        (@NPC_FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10);      -- Flameshocker in Undercity Magic Quarter.
 
     INSERT INTO `pool_creature`(`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
         (@NPC_FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
@@ -1061,6 +1063,495 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 
 -- 7. GAMEOBJECT RESPAWNS
+
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_ZONES_GUID+1, 181136, 0, -11347.7, -3150.83, 6.83877, 1.3439, 0, 0, 0.622514, 0.782609, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+2, 181136, 0, -11420, -2816.92, 0.782562, 2.84488, 0, 0, 0.989016, 0.147811, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+3, 181136, 0, -11016.3, -2783.4, 4.35682, 3.49067, 0, 0, -0.984807, 0.173652, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Circle" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+4, 181136, 0, -11181.7, -2985.37, 8.24824, 4.4855, 0, 0, -0.782608, 0.622515, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Circle" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+5, 181136, 0, -11250.4, -3350.77, 9.86965, 3.49067, 0, 0, -0.984807, 0.173652, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+6, 181136, 0, -11548.5, -3283.3, 7.45651, 4.4855, 0, 0, -0.782608, 0.622515, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+7, 181173, 0, -11348.3, -3137.8, 2.5852, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+8, 181173, 0, -11337.4, -3146.26, 6.20375, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+9, 181173, 0, -11358.2, -3147.44, 6.7121, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+10, 181173, 0, -11340, -3160.64, 7.71811, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+11, 181173, 0, -11354.5, -3159.13, 8.06337, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+12, 181173, 0, -11411.4, -2812.16, -2.36393, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+13, 181173, 0, -11422.6, -2806.9, 0.603001, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+14, 181173, 0, -11414.6, -2826.01, -2.87386, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+15, 181173, 0, -11427.2, -2824.02, 0.048245, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+16, 181173, 0, -11431.3, -2813.51, -0.797982, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+17, 181173, 0, -11025.1, -2788.75, 4.72334, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+18, 181173, 0, -11024.6, -2777.53, 4.05862, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+19, 181173, 0, -11013.1, -2792.5, 5.05269, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+20, 181173, 0, -11006.2, -2783.21, 4.68019, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+21, 181173, 0, -11013.6, -2773.45, 3.91934, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+22, 181173, 0, -11175.4, -2976.16, 7.56094, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+23, 181173, 0, -11170.9, -2988.73, 10.0367, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+24, 181173, 0, -11180.7, -2995.72, 9.00704, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+25, 181173, 0, -11187.3, -2976.43, 8.15536, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+26, 181173, 0, -11193.1, -2987.38, 6.08082, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+27, 181173, 0, -11240.3, -3346.03, 8.90917, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+28, 181173, 0, -11251.9, -3339.84, 9.61862, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+29, 181173, 0, -11256.1, -3360.71, 9.0967, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+30, 181173, 0, -11243.4, -3359.44, 9.5082, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+31, 181173, 0, -11261.8, -3349.11, 10.238, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+32, 181173, 0, -11539.1, -3284.73, 8.61913, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+33, 181173, 0, -11558.9, -3289.16, 7.57173, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+34, 181173, 0, -11542.8, -3272.75, 7.43698, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+35, 181173, 0, -11547.6, -3294.89, 7.6757, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+36, 181173, 0, -11557.1, -3274.81, 7.65565, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+37, 181174, 0, -11348.3, -3137.8, 2.5852, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+38, 181174, 0, -11337.4, -3146.26, 6.20375, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+39, 181174, 0, -11358.2, -3147.44, 6.7121, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+40, 181174, 0, -11340, -3160.64, 7.71811, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+41, 181174, 0, -11354.5, -3159.13, 8.06337, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+42, 181174, 0, -11411.4, -2812.16, -2.36393, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+43, 181174, 0, -11422.6, -2806.9, 0.603001, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+44, 181174, 0, -11414.6, -2826.01, -2.87386, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+45, 181174, 0, -11427.2, -2824.02, 0.048245, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+46, 181174, 0, -11431.3, -2813.51, -0.797982, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+47, 181174, 0, -11025.1, -2788.75, 4.72334, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+48, 181174, 0, -11024.6, -2777.53, 4.05862, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+49, 181174, 0, -11013.1, -2792.5, 5.05269, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+50, 181174, 0, -11006.2, -2783.21, 4.68019, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+51, 181174, 0, -11013.6, -2773.45, 3.91934, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+52, 181174, 0, -11175.4, -2976.16, 7.56094, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+53, 181174, 0, -11170.9, -2988.73, 10.0367, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+54, 181174, 0, -11180.7, -2995.72, 9.00704, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+55, 181174, 0, -11187.3, -2976.43, 8.15536, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+56, 181174, 0, -11193.1, -2987.38, 6.08082, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+57, 181174, 0, -11240.3, -3346.03, 8.90917, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+58, 181174, 0, -11251.9, -3339.84, 9.61862, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+59, 181174, 0, -11256.1, -3360.71, 9.0967, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+60, 181174, 0, -11243.4, -3359.44, 9.5082, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+61, 181174, 0, -11261.8, -3349.11, 10.238, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+62, 181174, 0, -11539.1, -3284.73, 8.61913, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+63, 181174, 0, -11558.9, -3289.16, 7.57173, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+64, 181174, 0, -11542.8, -3272.75, 7.43698, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+65, 181174, 0, -11547.6, -3294.89, 7.6757, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+66, 181174, 0, -11557.1, -3274.81, 7.65565, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+67, 181223, 0, -11402.1, -3316.55, 111.188, 4.46804, 0, 0, -0.788011, 0.615662, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 3.5)" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+68, 181374, 0, -11233.9, -2841.77, 185.603, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 2.0)" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+69, 181136, 1, 3366.27, -5566.33, 11.1423, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Circle" in Azshara.
+        (@GOBJ_ZONES_GUID+70, 181136, 1, 3516.26, -4151.82, 106.875, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Azshara.
+        (@GOBJ_ZONES_GUID+71, 181136, 1, 3086.48, -4215.71, 97.6507, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Azshara.
+        (@GOBJ_ZONES_GUID+72, 181136, 1, 3518.32, -5712.41, 4.82692, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Azshara.
+        (@GOBJ_ZONES_GUID+73, 181136, 1, 3666.47, -5533.42, 20.5987, 4.60767, 0, 0, -0.743144, 0.669131, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Azshara.
+        (@GOBJ_ZONES_GUID+74, 181136, 1, 3337.51, -4516.62, 97.713, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Circle" in Azshara.
+        (@GOBJ_ZONES_GUID+75, 181154, 1, 3299.55, -4301.3, 177.808, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Necropolis" in Azshara.
+        (@GOBJ_ZONES_GUID+76, 181154, 1, 3544.98, -5610.26, 67.1127, 2.82743, 0, 0, 0.987688, 0.156436, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Necropolis" in Azshara.
+        (@GOBJ_ZONES_GUID+77, 181173, 1, 3351.3, -5559, 13.5844, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),             -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+78, 181173, 1, 3380.17, -5556.3, 13.0397, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+79, 181173, 1, 3490.81, -4165.98, 100.503, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+80, 181173, 1, 3494.83, -4134.08, 104.549, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+81, 181173, 1, 3386.65, -5576.33, 9.43248, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+82, 181173, 1, 3366.75, -5584.61, 8.67064, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+83, 181173, 1, 3349.61, -5577.22, 10.1002, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+84, 181173, 1, 3513.6, -4181.8, 101.187, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+85, 181173, 1, 3526.99, -4129.5, 107.352, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+86, 181173, 1, 3539.52, -4163.67, 106.101, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+87, 181173, 1, 3063.43, -4206.71, 95.1969, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+88, 181173, 1, 3063.17, -4228.82, 95.5224, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+89, 181173, 1, 3089.63, -4194.87, 98.314, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+90, 181173, 1, 3089.73, -4242.7, 97.7909, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+91, 181173, 1, 3109.54, -4220.91, 99.2763, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+92, 181173, 1, 3505.47, -5728.37, 5.0291, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+93, 181173, 1, 3522.2, -5691.11, 5.19167, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+94, 181173, 1, 3499.85, -5706.13, 4.64753, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+95, 181173, 1, 3536.1, -5705.18, 6.73484, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+96, 181173, 1, 3532.96, -5729.75, 1.78794, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+97, 181173, 1, 3661.16, -5551.96, 17.9784, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+98, 181173, 1, 3649.75, -5535.95, 22.1447, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+99, 181173, 1, 3663.16, -5517.9, 23.888, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+100, 181173, 1, 3682.33, -5524.87, 21.3495, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+101, 181173, 1, 3680.94, -5543.86, 17.4121, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+102, 181173, 1, 3348.72, -4525.94, 98.1148, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+103, 181173, 1, 3352.04, -4514.34, 98.9571, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+104, 181173, 1, 3333.68, -4529.75, 98.2622, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+105, 181173, 1, 3328.39, -4508.51, 97.6156, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+106, 181173, 1, 3339.81, -4501.66, 96.8962, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
+        (@GOBJ_ZONES_GUID+107, 181174, 1, 3351.3, -5559, 13.5844, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),            -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+108, 181174, 1, 3380.17, -5556.3, 13.0397, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+109, 181174, 1, 3490.81, -4165.98, 100.503, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+110, 181174, 1, 3494.83, -4134.08, 104.549, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+111, 181174, 1, 3386.65, -5576.33, 9.43248, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+112, 181174, 1, 3366.75, -5584.61, 8.67064, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+113, 181174, 1, 3349.61, -5577.22, 10.1002, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+114, 181174, 1, 3513.6, -4181.8, 101.187, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+115, 181174, 1, 3526.99, -4129.5, 107.352, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+116, 181174, 1, 3539.52, -4163.67, 106.101, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+117, 181174, 1, 3063.43, -4206.71, 95.1969, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+118, 181174, 1, 3063.17, -4228.82, 95.5224, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+119, 181174, 1, 3089.63, -4194.87, 98.314, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+120, 181174, 1, 3089.73, -4242.7, 97.7909, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+121, 181174, 1, 3109.54, -4220.91, 99.2763, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+122, 181174, 1, 3505.47, -5728.37, 5.0291, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+123, 181174, 1, 3522.2, -5691.11, 5.19167, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+124, 181174, 1, 3499.85, -5706.13, 4.64753, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+125, 181174, 1, 3536.1, -5705.18, 6.73484, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+126, 181174, 1, 3532.96, -5729.75, 1.78794, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+127, 181174, 1, 3661.16, -5551.96, 17.9784, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+128, 181174, 1, 3649.75, -5535.95, 22.1447, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+129, 181174, 1, 3663.16, -5517.9, 23.888, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+130, 181174, 1, 3682.33, -5524.87, 21.3495, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+131, 181174, 1, 3680.94, -5543.86, 17.4121, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+132, 181174, 1, 3348.72, -4525.94, 98.1148, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+133, 181174, 1, 3352.04, -4514.34, 98.9571, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+134, 181174, 1, 3333.68, -4529.75, 98.2622, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+135, 181174, 1, 3328.39, -4508.51, 97.6156, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+136, 181174, 1, 3339.81, -4501.66, 96.8962, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Azshara.
+        (@GOBJ_ZONES_GUID+137, 181136, 0, -7732.86, -2232.79, 134.965, 1.37881, 0, 0, 0.636078, 0.771625, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+138, 181136, 0, -8399.82, -1246.03, 202.741, 1.37881, 0, 0, 0.636078, 0.771625, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+139, 181136, 0, -8032.02, -981.624, 122.643, 5.23599, 0, 0, -0.5, 0.866025, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Circle" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+140, 181136, 0, -8371.14, -963.306, 191.002, 5.23599, 0, 0, -0.5, 0.866025, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Circle" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+141, 181136, 0, -7603.63, -2596.44, 135.679, 1.37881, 0, 0, 0.636078, 0.771625, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+142, 181136, 0, -7981.86, -2433.27, 129.776, 0.733038, 0, 0, 0.358368, 0.93358, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+143, 181154, 0, -8232.78, -1099.86, 201.488, 5.18363, 0, 0, -0.522498, 0.85264, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+144, 181154, 0, -7733.72, -2432.74, 190.786, 2.67035, 0, 0, 0.972369, 0.233448, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+145, 181173, 0, -7735.35, -2214.41, 133.439, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+146, 181173, 0, -7717.37, -2225.96, 135.464, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+147, 181173, 0, -7722.01, -2243.29, 138.13, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+148, 181173, 0, -7741.55, -2250.78, 134.744, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+149, 181173, 0, -7751.28, -2233.32, 133.5, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+150, 181173, 0, -8391.57, -1236.6, 195.301, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+151, 181173, 0, -8408.04, -1234.03, 197.22, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+152, 181173, 0, -8403.73, -1258.55, 210.502, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+153, 181173, 0, -8412.98, -1248.38, 205.592, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+154, 181173, 0, -8053.09, -988.775, 131.256, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+155, 181173, 0, -8025.57, -1002.61, 122.94, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+156, 181173, 0, -8009.05, -988.576, 128.328, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+157, 181173, 0, -8019.87, -966.035, 122.647, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+158, 181173, 0, -8043.76, -962.956, 132.977, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+159, 181173, 0, -8356.23, -953.66, 191.819, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+160, 181173, 0, -8358.83, -972.333, 187.406, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+161, 181173, 0, -8374.4, -976.698, 187.892, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+162, 181173, 0, -8384.43, -965.495, 192.449, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+163, 181173, 0, -8373.36, -951.099, 196.14, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+164, 181173, 0, -7610.4, -2579.54, 132.97, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+165, 181173, 0, -7622.51, -2594.37, 132.082, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+166, 181173, 0, -7588.65, -2585.35, 137.826, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+167, 181173, 0, -7611.16, -2613.02, 133.458, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+168, 181173, 0, -7588.18, -2604.83, 137.333, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+169, 181173, 0, -7965.11, -2432.87, 126.468, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+170, 181173, 0, -7979.67, -2446.44, 131.103, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+171, 181173, 0, -7977.75, -2418.21, 126.65, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+172, 181173, 0, -7994.7, -2440.14, 131.838, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+173, 181173, 0, -7995.97, -2424.91, 128.912, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+174, 181174, 0, -7735.35, -2214.41, 133.439, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+175, 181174, 0, -7717.37, -2225.96, 135.464, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+176, 181174, 0, -7722.01, -2243.29, 138.13, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+177, 181174, 0, -7741.55, -2250.78, 134.744, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+178, 181174, 0, -7751.28, -2233.32, 133.5, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+179, 181174, 0, -8391.57, -1236.6, 195.301, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+180, 181174, 0, -8408.04, -1234.03, 197.22, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+181, 181174, 0, -8403.73, -1258.55, 210.502, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+182, 181174, 0, -8412.98, -1248.38, 205.592, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+183, 181174, 0, -8053.09, -988.775, 131.256, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+184, 181174, 0, -8025.57, -1002.61, 122.94, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+185, 181174, 0, -8009.05, -988.576, 128.328, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+186, 181174, 0, -8019.87, -966.035, 122.647, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+187, 181174, 0, -8043.76, -962.956, 132.977, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+188, 181174, 0, -8356.23, -953.66, 191.819, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+189, 181174, 0, -8358.83, -972.333, 187.406, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+190, 181174, 0, -8374.4, -976.698, 187.892, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+191, 181174, 0, -8384.43, -965.495, 192.449, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+192, 181174, 0, -8373.36, -951.099, 196.14, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+193, 181174, 0, -7610.4, -2579.54, 132.97, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+194, 181174, 0, -7622.51, -2594.37, 132.082, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+195, 181174, 0, -7588.65, -2585.35, 137.826, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+196, 181174, 0, -7611.16, -2613.02, 133.458, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+197, 181174, 0, -7588.18, -2604.83, 137.333, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+198, 181174, 0, -7965.11, -2432.87, 126.468, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+199, 181174, 0, -7979.67, -2446.44, 131.103, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+200, 181174, 0, -7977.75, -2418.21, 126.65, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+201, 181174, 0, -7994.7, -2440.14, 131.838, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+202, 181174, 0, -7995.97, -2424.91, 128.912, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+203, 181136, 0, 1938.6, -4761.25, 97.0908, 5.21854, 0, 0, -0.507538, 0.861629, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+204, 181136, 0, 1804.44, -2842.51, 72.9479, 2.1293, 0, 0, 0.874619, 0.48481, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+205, 181136, 0, 1599.78, -3039.54, 78.7164, 2.1293, 0, 0, 0.874619, 0.48481, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+206, 181136, 0, 1963.32, -5125.08, 78.7029, 3.9619, 0, 0, -0.91706, 0.39875, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+207, 181136, 0, 2315.23, -4933.08, 83.0351, 5.21854, 0, 0, -0.507538, 0.861629, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+208, 181136, 0, 1957.07, -3101.68, 83.5755, 2.1293, 0, 0, 0.874619, 0.48481, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+209, 181154, 0, 2101.69, -4930.03, 168.281, 1.0472, 0, 0, 0.5, 0.866025, 120, 120, 100, 1, 0, 0, 9, 10),              -- GameObject: "Necropolis" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+210, 181154, 0, 1766.67, -3033.34, 132.804, 5.18363, 0, 0, -0.522498, 0.85264, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Necropolis" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+211, 181173, 0, 1948.52, -4775.06, 99.0672, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+212, 181173, 0, 1930.57, -4741.03, 98.0023, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+213, 181173, 0, 1927.29, -4778.58, 99.4498, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+214, 181173, 0, 1957.52, -4749.19, 96.4972, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+215, 181173, 0, 1772.05, -2864.72, 69.953, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+216, 181173, 0, 1792.11, -2816.19, 68.3669, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+217, 181173, 0, 1614.48, -3030.5, 77.7499, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+218, 181173, 0, 1614.42, -3051.32, 77.6001, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+219, 181173, 0, 1915.6, -4761.28, 101.138, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+220, 181173, 0, 1791.07, -2852.26, 69.2167, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+221, 181173, 0, 1810.87, -2872.05, 68.268, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+222, 181173, 0, 1828.78, -2835.28, 79.0129, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+223, 181173, 0, 1582.5, -3030.12, 79.9779, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+224, 181173, 0, 1590.2, -3049.41, 80.9236, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+225, 181173, 0, 1596.72, -3020.29, 80.0585, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+226, 181173, 0, 1977.92, -5143.16, 79.2317, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+227, 181173, 0, 1967.02, -5116.3, 82.1635, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+228, 181173, 0, 1947.72, -5115.88, 79.1624, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+229, 181173, 0, 1960.57, -5151.77, 74.0361, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+230, 181173, 0, 1943.04, -5142.08, 73.6436, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+231, 181173, 0, 2301.16, -4941.02, 80.8607, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+232, 181173, 0, 2320.43, -4951.71, 76.1494, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+233, 181173, 0, 2306.55, -4919.39, 89.5811, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+234, 181173, 0, 2321.65, -4917.39, 84.3817, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+235, 181173, 0, 2333.07, -4938.58, 76.1625, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+236, 181173, 0, 1972.12, -3110.72, 81.5372, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+237, 181173, 0, 1947.97, -3091.73, 84.0488, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+238, 181173, 0, 1954.03, -3119.84, 87.7657, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+239, 181173, 0, 1966.9, -3090.5, 81.5039, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+240, 181173, 0, 1942.62, -3107.03, 86.7935, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+241, 181174, 0, 1948.52, -4775.06, 99.0672, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+242, 181174, 0, 1930.57, -4741.03, 98.0023, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+243, 181174, 0, 1927.29, -4778.58, 99.4498, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+244, 181174, 0, 1772.05, -2864.72, 69.953, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+245, 181174, 0, 1792.11, -2816.19, 68.3669, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+246, 181174, 0, 1614.42, -3051.32, 77.6001, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+247, 181174, 0, 1614.48, -3030.5, 77.7499, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+248, 181174, 0, 1957.52, -4749.19, 96.4972, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+249, 181174, 0, 1915.6, -4761.28, 101.138, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+250, 181174, 0, 1791.07, -2852.26, 69.2167, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+251, 181174, 0, 1810.87, -2872.05, 68.268, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+252, 181174, 0, 1828.78, -2835.28, 79.0129, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+253, 181174, 0, 1582.5, -3030.12, 79.9779, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+254, 181174, 0, 1590.2, -3049.41, 80.9236, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+255, 181174, 0, 1596.72, -3020.29, 80.0585, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+256, 181174, 0, 1977.92, -5143.16, 79.2317, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+257, 181174, 0, 1967.02, -5116.3, 82.1635, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+258, 181174, 0, 1947.72, -5115.88, 79.1624, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+259, 181174, 0, 1960.57, -5151.77, 74.0361, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+260, 181174, 0, 1943.04, -5142.08, 73.6436, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+261, 181174, 0, 2301.16, -4941.02, 80.8607, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+262, 181174, 0, 2320.43, -4951.71, 76.1494, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+263, 181174, 0, 2306.55, -4919.39, 89.5811, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+264, 181174, 0, 2321.65, -4917.39, 84.3817, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+265, 181174, 0, 2333.07, -4938.58, 76.1625, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+266, 181174, 0, 1972.12, -3110.72, 81.5372, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+267, 181174, 0, 1947.97, -3091.73, 84.0488, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+268, 181174, 0, 1954.03, -3119.84, 87.7657, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+269, 181174, 0, 1966.9, -3090.5, 81.5039, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+270, 181174, 0, 1942.62, -3107.03, 86.7935, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+271, 181136, 1, -8476.23, -3826.01, 16.5777, 5.02655, 0, 0, -0.587785, 0.809017, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+272, 181136, 1, -7328.86, -3970.19, 11.0381, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+273, 181136, 1, -7632.01, -3732.97, 20.6804, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+274, 181136, 1, -7246.02, -3543.61, 13.5918, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+275, 181136, 1, -8333.86, -4203.15, 12.3244, 5.02655, 0, 0, -0.587785, 0.809017, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+276, 181136, 1, -8533.49, -2699.71, 21.2257, 3.17653, 0, 0, -0.999847, 0.0174693, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+277, 181136, 1, -8534.21, -2298.88, 28.635, 2.30383, 0, 0, 0.913545, 0.406738, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+278, 181136, 1, -8169.93, -3803.55, 14.9479, 5.02655, 0, 0, -0.587785, 0.809017, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+279, 181136, 1, -8833.58, -2600.38, 21.7275, 3.17653, 0, 0, -0.999847, 0.0174693, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Circle" in Tanaris.
+        (@GOBJ_ZONES_GUID+280, 181173, 1, -8441.58, -3821.71, 11.9222, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+281, 181173, 1, -8468.24, -3795.84, 10.7968, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+282, 181173, 1, -8454.52, -3852.54, 14.0437, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+283, 181173, 1, -8497.19, -3813.2, 22.0456, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+284, 181173, 1, -8491.68, -3848.15, 23.1257, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+285, 181173, 1, -7315.42, -3965.14, 9.92329, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+286, 181173, 1, -7334.5, -3955.59, 9.67339, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+287, 181173, 1, -7344.87, -3969.87, 9.37224, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+288, 181173, 1, -7334.18, -3985.1, 11.2661, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+289, 181173, 1, -7319.15, -3982.26, 12.0744, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+290, 181173, 1, -7613.95, -3732.19, 16.8296, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+291, 181173, 1, -7622.64, -3714.87, 18.3393, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+292, 181173, 1, -7625.02, -3746.56, 19.273, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+293, 181173, 1, -7647.7, -3742.95, 24.0148, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+294, 181173, 1, -7644.11, -3721.98, 22.1893, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+295, 181173, 1, -8166.92, -3821.8, 14.3705, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+296, 181173, 1, -7229.49, -3562.56, 13.1128, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+297, 181173, 1, -7252.48, -3563.27, 11.2089, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+298, 181173, 1, -7225.1, -3539.17, 12.273, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+299, 181173, 1, -7264.03, -3547.05, 11.4845, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+300, 181173, 1, -7249.38, -3523.43, 12.6714, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+301, 181173, 1, -8351.69, -4199.87, 11.3947, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+302, 181173, 1, -8319.12, -4214.37, 11.0459, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+303, 181173, 1, -8340.59, -4217.98, 13.6852, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+304, 181173, 1, -8338.94, -4184.19, 12.7285, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+305, 181173, 1, -8316.71, -4193.08, 12.0411, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+306, 181173, 1, -8506.62, -2712.38, 22.2848, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+307, 181173, 1, -8507.15, -2679.72, 29.649, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+308, 181173, 1, -8542.56, -2666.96, 27.2642, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+309, 181173, 1, -8558.21, -2700.35, 18.5581, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+310, 181173, 1, -8533.27, -2320.92, 31.0943, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+311, 181173, 1, -8554.67, -2309.78, 27.2581, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+312, 181173, 1, -8513.17, -2304.23, 30.8188, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+313, 181173, 1, -8523.53, -2280.98, 27.4485, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+314, 181173, 1, -8546.62, -2280.9, 26.0423, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+315, 181173, 1, -8185.06, -3803.97, 13.6013, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+316, 181173, 1, -8149.45, -3812.64, 14.9879, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+317, 181173, 1, -8173.21, -3784.46, 15.2138, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+318, 181173, 1, -8149.44, -3786.35, 12.6009, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+319, 181173, 1, -8538.61, -2733.37, 16.2711, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+320, 181173, 1, -8851.98, -2613.53, 21.5255, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+321, 181173, 1, -8851.25, -2594.26, 20.4285, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+322, 181173, 1, -8833.52, -2616.1, 23.621, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+323, 181173, 1, -8833.35, -2582.71, 18.6093, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+324, 181173, 1, -8815.68, -2598.3, 19.8856, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Tanaris.
+        (@GOBJ_ZONES_GUID+325, 181174, 1, -8441.58, -3821.71, 11.9222, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+326, 181174, 1, -8468.24, -3795.84, 10.7968, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+327, 181174, 1, -8454.52, -3852.54, 14.0437, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+328, 181174, 1, -8497.19, -3813.2, 22.0456, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+329, 181174, 1, -8491.68, -3848.15, 23.1257, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+330, 181174, 1, -7315.42, -3965.14, 9.92329, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+331, 181174, 1, -7334.5, -3955.59, 9.67339, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+332, 181174, 1, -7344.87, -3969.87, 9.37224, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+333, 181174, 1, -7334.18, -3985.1, 11.2661, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+334, 181174, 1, -7319.15, -3982.26, 12.0744, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+335, 181174, 1, -7613.95, -3732.19, 16.8296, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+336, 181174, 1, -7622.64, -3714.87, 18.3393, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+337, 181174, 1, -7625.02, -3746.56, 19.273, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+338, 181174, 1, -7647.7, -3742.95, 24.0148, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+339, 181174, 1, -7644.11, -3721.98, 22.1893, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+340, 181174, 1, -8166.92, -3821.8, 14.3705, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+341, 181174, 1, -7229.49, -3562.56, 13.1128, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+342, 181174, 1, -7252.48, -3563.27, 11.2089, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+343, 181174, 1, -7225.1, -3539.17, 12.273, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+344, 181174, 1, -7264.03, -3547.05, 11.4845, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+345, 181174, 1, -7249.38, -3523.43, 12.6714, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+346, 181174, 1, -8351.69, -4199.87, 11.3947, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+347, 181174, 1, -8319.12, -4214.37, 11.0459, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+348, 181174, 1, -8340.59, -4217.98, 13.6852, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+349, 181174, 1, -8338.94, -4184.19, 12.7285, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+350, 181174, 1, -8316.71, -4193.08, 12.0411, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+351, 181174, 1, -8506.62, -2712.38, 22.2848, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+352, 181174, 1, -8507.15, -2679.72, 29.649, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+353, 181174, 1, -8542.56, -2666.96, 27.2642, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+354, 181174, 1, -8558.21, -2700.35, 18.5581, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+355, 181174, 1, -8533.27, -2320.92, 31.0943, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+356, 181174, 1, -8554.67, -2309.78, 27.2581, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+357, 181174, 1, -8513.17, -2304.23, 30.8188, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+358, 181174, 1, -8523.53, -2280.98, 27.4485, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+359, 181174, 1, -8546.62, -2280.9, 26.0423, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+360, 181174, 1, -8185.06, -3803.97, 13.6013, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+361, 181174, 1, -8149.45, -3812.64, 14.9879, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+362, 181174, 1, -8173.21, -3784.46, 15.2138, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+363, 181174, 1, -8149.44, -3786.35, 12.6009, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+364, 181174, 1, -8538.61, -2733.37, 16.2711, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+365, 181174, 1, -8851.98, -2613.53, 21.5255, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+366, 181174, 1, -8851.25, -2594.26, 20.4285, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+367, 181174, 1, -8833.52, -2616.1, 23.621, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+368, 181174, 1, -8833.35, -2582.71, 18.6093, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+369, 181174, 1, -8815.68, -2598.3, 19.8856, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
+        (@GOBJ_ZONES_GUID+370, 181215, 1, -8333.68, -3966.4, 77.8483, 1.37881, 0, 0, 0.636078, 0.771625, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
+        (@GOBJ_ZONES_GUID+371, 181215, 1, -7399.95, -3733.06, 61.0504, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
+        (@GOBJ_ZONES_GUID+372, 181215, 1, -8633.21, -2499.82, 114.017, 2.82743, 0, 0, 0.987688, 0.156436, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
+        (@GOBJ_ZONES_GUID+373, 181136, 1, 7822.94, -4220.18, 675.491, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+374, 181136, 1, 6284.69, -4782.17, 757.315, 2.33874, 0, 0, 0.920505, 0.390732, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+375, 181136, 1, 6547.4, -3482.39, 643.628, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+376, 181136, 1, 6052.6, -4749.63, 785.534, 1.27409, 0, 0, 0.594822, 0.803857, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+377, 181136, 1, 7687.87, -3877.74, 687.152, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+378, 181136, 1, 6072.11, -5040.12, 789.939, 5.13127, 0, 0, -0.544639, 0.838671, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+379, 181136, 1, 7939.65, -3870.93, 695.403, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+380, 181136, 1, 6782, -3585.64, 712.276, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+381, 181136, 1, 6742.24, -3352.34, 688.371, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Winterspring.
+        (@GOBJ_ZONES_GUID+382, 181173, 1, 6557.24, -3474.46, 645.709, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+383, 181173, 1, 6553.72, -3489.82, 647.38, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+384, 181173, 1, 6540.5, -3491.92, 643.55, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+385, 181173, 1, 6293.4, -4783.96, 758.477, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+386, 181173, 1, 6284.65, -4791.1, 758.13, 4.32842, 0, 0, -0.829037, 0.559194, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+387, 181173, 1, 6280.31, -4772.92, 756.073, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+388, 181173, 1, 6291, -4774.14, 756.714, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),            -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+389, 181173, 1, 6275.49, -4782.48, 756.862, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+390, 181173, 1, 7815.5, -4209.39, 675.145, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+391, 181173, 1, 7840.28, -4217.08, 675.564, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+392, 181173, 1, 7811.98, -4226.34, 677.522, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+393, 181173, 1, 7830.69, -4208.48, 675.725, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+394, 181173, 1, 7822.53, -4234.33, 680.112, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+395, 181173, 1, 6547.01, -3471.53, 639.958, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+396, 181173, 1, 6536.37, -3480.21, 639.161, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+397, 181173, 1, 6056.9, -4757.58, 785.737, 4.32842, 0, 0, -0.829037, 0.559194, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+398, 181173, 1, 6063.71, -4749.13, 778.662, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+399, 181173, 1, 6053.48, -4740.55, 785.28, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+400, 181173, 1, 6047.01, -4754.71, 790.205, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+401, 181173, 1, 6046.73, -4744.43, 789.809, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+402, 181173, 1, 7688.84, -3892.03, 689.552, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+403, 181173, 1, 7675.17, -3868.89, 685.395, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+404, 181173, 1, 7689.83, -3862.5, 686.37, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+405, 181173, 1, 7677.07, -3887.32, 687.06, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+406, 181173, 1, 7701.99, -3880.54, 687.945, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+407, 181173, 1, 6065.6, -5029.22, 785.481, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+408, 181173, 1, 6061.29, -5044.73, 790.336, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+409, 181173, 1, 6080.37, -5030.69, 788.598, 3.7001, 0, 0, -0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+410, 181173, 1, 6081.69, -5044.22, 792.539, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+411, 181173, 1, 6070.33, -5052.18, 794.006, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+412, 181173, 1, 7932.25, -3861.72, 695.668, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+413, 181173, 1, 7926.74, -3878.23, 695.294, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+414, 181173, 1, 7939.62, -3882.95, 695.515, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+415, 181173, 1, 7945.81, -3859.84, 695.185, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+416, 181173, 1, 7951.54, -3875.18, 694.948, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+417, 181173, 1, 6773.85, -3579.55, 710.883, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+418, 181173, 1, 6773.62, -3590.98, 714.233, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+419, 181173, 1, 6791.23, -3586.77, 712.718, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+420, 181173, 1, 6787.01, -3575.92, 708.803, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+421, 181173, 1, 6783.48, -3595.3, 715.923, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+422, 181173, 1, 6751.78, -3360.8, 684.975, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+423, 181173, 1, 6732.46, -3350.71, 687.625, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+424, 181173, 1, 6752.31, -3349.22, 685.869, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+425, 181173, 1, 6737.26, -3361.34, 687.013, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+426, 181173, 1, 6740.9, -3342.74, 686.804, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Winterspring.
+        (@GOBJ_ZONES_GUID+427, 181174, 1, 6557.24, -3474.46, 645.709, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+428, 181174, 1, 6553.72, -3489.82, 647.38, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+429, 181174, 1, 6540.5, -3491.92, 643.55, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+430, 181174, 1, 6293.4, -4783.96, 758.477, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+431, 181174, 1, 6284.65, -4791.1, 758.13, 4.32842, 0, 0, -0.829037, 0.559194, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+432, 181174, 1, 6280.31, -4772.92, 756.073, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+433, 181174, 1, 6291, -4774.14, 756.714, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),            -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+434, 181174, 1, 6275.49, -4782.48, 756.862, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+435, 181174, 1, 7815.5, -4209.39, 675.145, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+436, 181174, 1, 7840.28, -4217.08, 675.564, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+437, 181174, 1, 7811.98, -4226.34, 677.522, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+438, 181174, 1, 7830.69, -4208.48, 675.725, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+439, 181174, 1, 7822.53, -4234.33, 680.112, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+440, 181174, 1, 6547.01, -3471.53, 639.958, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+441, 181174, 1, 6536.37, -3480.21, 639.161, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+442, 181174, 1, 6056.9, -4757.58, 785.737, 4.32842, 0, 0, -0.829037, 0.559194, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+443, 181174, 1, 6063.71, -4749.13, 778.662, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+444, 181174, 1, 6053.48, -4740.55, 785.28, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+445, 181174, 1, 6047.01, -4754.71, 790.205, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+446, 181174, 1, 6046.73, -4744.43, 789.809, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+447, 181174, 1, 7688.84, -3892.03, 689.552, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+448, 181174, 1, 7675.17, -3868.89, 685.395, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+449, 181174, 1, 7689.83, -3862.5, 686.37, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+450, 181174, 1, 7677.07, -3887.32, 687.06, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+451, 181174, 1, 7701.99, -3880.54, 687.945, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+452, 181174, 1, 6065.6, -5029.22, 785.481, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+453, 181174, 1, 6061.29, -5044.73, 790.336, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+454, 181174, 1, 6080.37, -5030.69, 788.598, 3.7001, 0, 0, -0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+455, 181174, 1, 6081.69, -5044.22, 792.539, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+456, 181174, 1, 6070.33, -5052.18, 794.006, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+457, 181174, 1, 7932.25, -3861.72, 695.668, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+458, 181174, 1, 7926.74, -3878.23, 695.294, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+459, 181174, 1, 7939.62, -3882.95, 695.515, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+460, 181174, 1, 7945.81, -3859.84, 695.185, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+461, 181174, 1, 7951.54, -3875.18, 694.948, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+462, 181174, 1, 6773.85, -3579.55, 710.883, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+463, 181174, 1, 6773.62, -3590.98, 714.233, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+464, 181174, 1, 6791.23, -3586.77, 712.718, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+465, 181174, 1, 6787.01, -3575.92, 708.803, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+466, 181174, 1, 6783.48, -3595.3, 715.923, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+467, 181174, 1, 6751.78, -3360.8, 684.975, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+468, 181174, 1, 6732.46, -3350.71, 687.625, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+469, 181174, 1, 6752.31, -3349.22, 685.869, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+470, 181174, 1, 6737.26, -3361.34, 687.013, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+471, 181174, 1, 6740.9, -3342.74, 686.804, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
+        (@GOBJ_ZONES_GUID+472, 181223, 1, 7755.75, -4030.91, 786.496, 0.471238, 0, 0, 0.233445, 0.97237, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Necropolis (scale 3.5)" in Winterspring.
+        (@GOBJ_ZONES_GUID+473, 181223, 1, 6646.69, -3442.36, 792.916, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 3.5)" in Winterspring.
+        (@GOBJ_ZONES_GUID+474, 181373, 1, 6184.28, -4913.32, 807.676, 6.0912, 0, 0, -0.0958452, 0.995396, 120, 120, 100, 1, 0, 0, 9, 10);       -- GameObject: "Necropolis (scale 1.5)" in Winterspring.
+
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_ZONES_GUID+373 AND @GOBJ_ZONES_GUID+474;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_ZONES_GUID+271 AND @GOBJ_ZONES_GUID+372;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_ZONES_GUID+69 AND @GOBJ_ZONES_GUID+136;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_ZONES_GUID+1 AND @GOBJ_ZONES_GUID+68;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_ZONES_GUID+203 AND @GOBJ_ZONES_GUID+270;
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES
+    FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_ZONES_GUID+137 AND @GOBJ_ZONES_GUID+202;
 
     -- GameObject "Buttress Spawner"
     INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -5908,6 +6399,2610 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_SKULLPILE_AZSHARA_GUID+431, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10),
         (@GOBJ_SKULLPILE_AZSHARA_GUID+432, @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108, 0, 'Scourge Invasion Azshara, Skullpile', 0, 9, 10);
     INSERT INTO `pool_template` SELECT pool_gameobject.pool_entry, 1, 'Scourge Invasion Azshara, Skullpile', 0, 0, 9, 10 FROM `pool_gameobject` WHERE pool_gameobject.pool_entry BETWEEN @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+1 AND @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY+108 GROUP BY pool_gameobject.pool_entry;
+
+    -- GameObject: "Skullpile" in Blasted Lands
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+1, 181191, 0, -11588.6, -3252.7, 8.55592, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+2, 181192, 0, -11588.6, -3252.7, 8.55592, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+3, 181193, 0, -11588.6, -3252.7, 8.55592, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+4, 181194, 0, -11588.6, -3252.7, 8.55592, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+5, 181191, 0, -11585.6, -3316.06, 8.30476, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+6, 181192, 0, -11585.6, -3316.06, 8.30476, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+7, 181193, 0, -11585.6, -3316.06, 8.30476, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+8, 181194, 0, -11585.6, -3316.06, 8.30476, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+9, 181191, 0, -11573.3, -3249.13, 6.40786, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+10, 181192, 0, -11573.3, -3249.13, 6.40786, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+11, 181193, 0, -11573.3, -3249.13, 6.40786, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+12, 181194, 0, -11573.3, -3249.13, 6.40786, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+13, 181191, 0, -11570.6, -3281.41, 10.2427, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+14, 181192, 0, -11570.6, -3281.41, 10.2427, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+15, 181193, 0, -11570.6, -3281.41, 10.2427, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+16, 181194, 0, -11570.6, -3281.41, 10.2427, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+17, 181191, 0, -11569.9, -3282.3, 10.1818, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+18, 181192, 0, -11569.9, -3282.3, 10.1818, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+19, 181193, 0, -11569.9, -3282.3, 10.1818, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+20, 181194, 0, -11569.9, -3282.3, 10.1818, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+21, 181191, 0, -11569.6, -3281.51, 10.1382, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+22, 181192, 0, -11569.6, -3281.51, 10.1382, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+23, 181193, 0, -11569.6, -3281.51, 10.1382, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+24, 181194, 0, -11569.6, -3281.51, 10.1382, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+25, 181191, 0, -11562.9, -3275.06, 8.61297, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+26, 181192, 0, -11562.9, -3275.06, 8.61297, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+27, 181193, 0, -11562.9, -3275.06, 8.61297, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+28, 181194, 0, -11562.9, -3275.06, 8.61297, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+29, 181191, 0, -11558.9, -3255.88, 6.88916, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+30, 181192, 0, -11558.9, -3255.88, 6.88916, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+31, 181193, 0, -11558.9, -3255.88, 6.88916, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+32, 181194, 0, -11558.9, -3255.88, 6.88916, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+33, 181191, 0, -11545.7, -3245.35, 6.74961, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+34, 181192, 0, -11545.7, -3245.35, 6.74961, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+35, 181193, 0, -11545.7, -3245.35, 6.74961, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+36, 181194, 0, -11545.7, -3245.35, 6.74961, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+37, 181191, 0, -11544.7, -3245.97, 6.78339, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+38, 181192, 0, -11544.7, -3245.97, 6.78339, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+39, 181193, 0, -11544.7, -3245.97, 6.78339, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+40, 181194, 0, -11544.7, -3245.97, 6.78339, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+41, 181191, 0, -11540, -3311.94, 8.04234, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+42, 181192, 0, -11540, -3311.94, 8.04234, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+43, 181193, 0, -11540, -3311.94, 8.04234, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+44, 181194, 0, -11540, -3311.94, 8.04234, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+45, 181191, 0, -11538.7, -3297.1, 8.37852, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+46, 181192, 0, -11538.7, -3297.1, 8.37852, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+47, 181193, 0, -11538.7, -3297.1, 8.37852, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+48, 181194, 0, -11538.7, -3297.1, 8.37852, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+49, 181191, 0, -11537.8, -3275.93, 7.97432, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+50, 181192, 0, -11537.8, -3275.93, 7.97432, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+51, 181193, 0, -11537.8, -3275.93, 7.97432, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+52, 181194, 0, -11537.8, -3275.93, 7.97432, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+53, 181191, 0, -11537.1, -3276.36, 8.05586, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+54, 181192, 0, -11537.1, -3276.36, 8.05586, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+55, 181193, 0, -11537.1, -3276.36, 8.05586, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+56, 181194, 0, -11537.1, -3276.36, 8.05586, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+57, 181191, 0, -11528.1, -3250.03, 6.90311, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+58, 181192, 0, -11528.1, -3250.03, 6.90311, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+59, 181193, 0, -11528.1, -3250.03, 6.90311, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+60, 181194, 0, -11528.1, -3250.03, 6.90311, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+61, 181191, 0, -11519.8, -3310.07, 8.64683, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+62, 181192, 0, -11519.8, -3310.07, 8.64683, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+63, 181193, 0, -11519.8, -3310.07, 8.64683, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+64, 181194, 0, -11519.8, -3310.07, 8.64683, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+65, 181191, 0, -11518.1, -3275.79, 7.65164, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+66, 181192, 0, -11518.1, -3275.79, 7.65164, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+67, 181193, 0, -11518.1, -3275.79, 7.65164, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+68, 181194, 0, -11518.1, -3275.79, 7.65164, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+69, 181191, 0, -11509.4, -3289.26, 8.31943, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+70, 181192, 0, -11509.4, -3289.26, 8.31943, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+71, 181193, 0, -11509.4, -3289.26, 8.31943, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+72, 181194, 0, -11509.4, -3289.26, 8.31943, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+73, 181191, 0, -11454.6, -2823.16, -1.42783, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+74, 181192, 0, -11454.6, -2823.16, -1.42783, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+75, 181193, 0, -11454.6, -2823.16, -1.42783, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+76, 181194, 0, -11454.6, -2823.16, -1.42783, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+77, 181191, 0, -11447.3, -2853.42, 0.316006, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+78, 181192, 0, -11447.3, -2853.42, 0.316006, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+79, 181193, 0, -11447.3, -2853.42, 0.316006, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+80, 181194, 0, -11447.3, -2853.42, 0.316006, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+81, 181191, 0, -11444.7, -2840.39, -0.528655, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+82, 181192, 0, -11444.7, -2840.39, -0.528655, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+83, 181193, 0, -11444.7, -2840.39, -0.528655, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+84, 181194, 0, -11444.7, -2840.39, -0.528655, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+85, 181191, 0, -11444.2, -2790.83, -0.916143, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+86, 181192, 0, -11444.2, -2790.83, -0.916143, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+87, 181193, 0, -11444.2, -2790.83, -0.916143, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+88, 181194, 0, -11444.2, -2790.83, -0.916143, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+89, 181191, 0, -11441.7, -2816.53, -1.56979, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+90, 181192, 0, -11441.7, -2816.53, -1.56979, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+91, 181193, 0, -11441.7, -2816.53, -1.56979, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+92, 181194, 0, -11441.7, -2816.53, -1.56979, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+93, 181191, 0, -11428.4, -2807.11, -0.345578, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+94, 181192, 0, -11428.4, -2807.11, -0.345578, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+95, 181193, 0, -11428.4, -2807.11, -0.345578, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+96, 181194, 0, -11428.4, -2807.11, -0.345578, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+97, 181191, 0, -11427.7, -2806.39, -0.251402, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+98, 181192, 0, -11427.7, -2806.39, -0.251402, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+99, 181193, 0, -11427.7, -2806.39, -0.251402, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+100, 181194, 0, -11427.7, -2806.39, -0.251402, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+101, 181191, 0, -11419.8, -2852.42, 1.0657, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+102, 181192, 0, -11419.8, -2852.42, 1.0657, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+103, 181193, 0, -11419.8, -2852.42, 1.0657, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+104, 181194, 0, -11419.8, -2852.42, 1.0657, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+105, 181191, 0, -11419.5, -2850.98, 0.854349, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+106, 181192, 0, -11419.5, -2850.98, 0.854349, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+107, 181193, 0, -11419.5, -2850.98, 0.854349, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+108, 181194, 0, -11419.5, -2850.98, 0.854349, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+109, 181191, 0, -11416, -2783.94, 1.47755, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+110, 181192, 0, -11416, -2783.94, 1.47755, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+111, 181193, 0, -11416, -2783.94, 1.47755, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+112, 181194, 0, -11416, -2783.94, 1.47755, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+113, 181191, 0, -11406.5, -2826.39, -2.88244, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+114, 181192, 0, -11406.5, -2826.39, -2.88244, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+115, 181193, 0, -11406.5, -2826.39, -2.88244, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+116, 181194, 0, -11406.5, -2826.39, -2.88244, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+117, 181191, 0, -11396.8, -2841.24, -2.43388, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+118, 181192, 0, -11396.8, -2841.24, -2.43388, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+119, 181193, 0, -11396.8, -2841.24, -2.43388, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+120, 181194, 0, -11396.8, -2841.24, -2.43388, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+121, 181191, 0, -11391.8, -2822.67, -2.36443, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+122, 181192, 0, -11391.8, -2822.67, -2.36443, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+123, 181193, 0, -11391.8, -2822.67, -2.36443, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+124, 181194, 0, -11391.8, -2822.67, -2.36443, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+125, 181191, 0, -11391.3, -2822.06, -2.3644, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+126, 181192, 0, -11391.3, -2822.06, -2.3644, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+127, 181193, 0, -11391.3, -2822.06, -2.3644, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+128, 181194, 0, -11391.3, -2822.06, -2.3644, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+129, 181191, 0, -11386.2, -2858.03, 3.66751, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+130, 181192, 0, -11386.2, -2858.03, 3.66751, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+131, 181193, 0, -11386.2, -2858.03, 3.66751, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+132, 181194, 0, -11386.2, -2858.03, 3.66751, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+133, 181191, 0, -11381.4, -2847.9, 3.27664, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+134, 181192, 0, -11381.4, -2847.9, 3.27664, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+135, 181193, 0, -11381.4, -2847.9, 3.27664, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+136, 181194, 0, -11381.4, -2847.9, 3.27664, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+137, 181191, 0, -11380.5, -2781.23, 3.66675, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+138, 181192, 0, -11380.5, -2781.23, 3.66675, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+139, 181193, 0, -11380.5, -2781.23, 3.66675, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+140, 181194, 0, -11380.5, -2781.23, 3.66675, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+141, 181191, 0, -11378.9, -2780.56, 3.8241, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+142, 181192, 0, -11378.9, -2780.56, 3.8241, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+143, 181193, 0, -11378.9, -2780.56, 3.8241, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+144, 181194, 0, -11378.9, -2780.56, 3.8241, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+145, 181191, 0, -11375.3, -3149.41, 9.39994, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+146, 181192, 0, -11375.3, -3149.41, 9.39994, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+147, 181193, 0, -11375.3, -3149.41, 9.39994, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+148, 181194, 0, -11375.3, -3149.41, 9.39994, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+149, 181191, 0, -11374.3, -3149.12, 9.19029, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+150, 181192, 0, -11374.3, -3149.12, 9.19029, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+151, 181193, 0, -11374.3, -3149.12, 9.19029, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+152, 181194, 0, -11374.3, -3149.12, 9.19029, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+153, 181191, 0, -11373.6, -3175.95, 12.1172, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+154, 181192, 0, -11373.6, -3175.95, 12.1172, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+155, 181193, 0, -11373.6, -3175.95, 12.1172, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+156, 181194, 0, -11373.6, -3175.95, 12.1172, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+157, 181191, 0, -11370.5, -3116.58, 3.47254, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+158, 181192, 0, -11370.5, -3116.58, 3.47254, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+159, 181193, 0, -11370.5, -3116.58, 3.47254, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+160, 181194, 0, -11370.5, -3116.58, 3.47254, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+161, 181191, 0, -11362.9, -3163.56, 9.51303, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+162, 181192, 0, -11362.9, -3163.56, 9.51303, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+163, 181193, 0, -11362.9, -3163.56, 9.51303, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+164, 181194, 0, -11362.9, -3163.56, 9.51303, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+165, 181191, 0, -11362.1, -3104.35, 2.20197, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+166, 181192, 0, -11362.1, -3104.35, 2.20197, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+167, 181193, 0, -11362.1, -3104.35, 2.20197, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+168, 181194, 0, -11362.1, -3104.35, 2.20197, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+169, 181191, 0, -11360.7, -3103.99, 1.74725, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+170, 181192, 0, -11360.7, -3103.99, 1.74725, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+171, 181193, 0, -11360.7, -3103.99, 1.74725, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+172, 181194, 0, -11360.7, -3103.99, 1.74725, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+173, 181191, 0, -11359.1, -3139.28, 6.13144, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+174, 181192, 0, -11359.1, -3139.28, 6.13144, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+175, 181193, 0, -11359.1, -3139.28, 6.13144, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+176, 181194, 0, -11359.1, -3139.28, 6.13144, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+177, 181191, 0, -11347.3, -3191.07, 9.86258, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+178, 181192, 0, -11347.3, -3191.07, 9.86258, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+179, 181193, 0, -11347.3, -3191.07, 9.86258, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+180, 181194, 0, -11347.3, -3191.07, 9.86258, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+181, 181191, 0, -11346.7, -3180.8, 11.0252, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+182, 181192, 0, -11346.7, -3180.8, 11.0252, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+183, 181193, 0, -11346.7, -3180.8, 11.0252, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+184, 181194, 0, -11346.7, -3180.8, 11.0252, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+185, 181191, 0, -11346.4, -3180.5, 11.1409, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+186, 181192, 0, -11346.4, -3180.5, 11.1409, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+187, 181193, 0, -11346.4, -3180.5, 11.1409, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+188, 181194, 0, -11346.4, -3180.5, 11.1409, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+189, 181191, 0, -11336.3, -3142.19, 6.28316, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+190, 181192, 0, -11336.3, -3142.19, 6.28316, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+191, 181193, 0, -11336.3, -3142.19, 6.28316, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+192, 181194, 0, -11336.3, -3142.19, 6.28316, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+193, 181191, 0, -11336.2, -3116.36, -1.65432, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+194, 181192, 0, -11336.2, -3116.36, -1.65432, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+195, 181193, 0, -11336.2, -3116.36, -1.65432, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+196, 181194, 0, -11336.2, -3116.36, -1.65432, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+197, 181191, 0, -11335.4, -3141.92, 6.45337, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+198, 181192, 0, -11335.4, -3141.92, 6.45337, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+199, 181193, 0, -11335.4, -3141.92, 6.45337, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+200, 181194, 0, -11335.4, -3141.92, 6.45337, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+201, 181191, 0, -11326.7, -3121.21, -1.62494, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+202, 181192, 0, -11326.7, -3121.21, -1.62494, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+203, 181193, 0, -11326.7, -3121.21, -1.62494, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+204, 181194, 0, -11326.7, -3121.21, -1.62494, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+205, 181191, 0, -11321.1, -3150.07, 6.12652, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+206, 181192, 0, -11321.1, -3150.07, 6.12652, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+207, 181193, 0, -11321.1, -3150.07, 6.12652, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+208, 181194, 0, -11321.1, -3150.07, 6.12652, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+209, 181191, 0, -11317.5, -3152.81, 6.27768, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+210, 181192, 0, -11317.5, -3152.81, 6.27768, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+211, 181193, 0, -11317.5, -3152.81, 6.27768, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+212, 181194, 0, -11317.5, -3152.81, 6.27768, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+213, 181191, 0, -11283.1, -3381.82, 8.24883, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+214, 181192, 0, -11283.1, -3381.82, 8.24883, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+215, 181193, 0, -11283.1, -3381.82, 8.24883, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+216, 181194, 0, -11283.1, -3381.82, 8.24883, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+217, 181191, 0, -11279.5, -3345.42, 9.61636, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+218, 181192, 0, -11279.5, -3345.42, 9.61636, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+219, 181193, 0, -11279.5, -3345.42, 9.61636, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+220, 181194, 0, -11279.5, -3345.42, 9.61636, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+221, 181191, 0, -11275.1, -3376.35, 6.07523, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+222, 181192, 0, -11275.1, -3376.35, 6.07523, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+223, 181193, 0, -11275.1, -3376.35, 6.07523, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+224, 181194, 0, -11275.1, -3376.35, 6.07523, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+225, 181191, 0, -11271.4, -3361.43, 5.99592, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+226, 181192, 0, -11271.4, -3361.43, 5.99592, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+227, 181193, 0, -11271.4, -3361.43, 5.99592, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+228, 181194, 0, -11271.4, -3361.43, 5.99592, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+229, 181191, 0, -11261.2, -3343.55, 10.1273, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+230, 181192, 0, -11261.2, -3343.55, 10.1273, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+231, 181193, 0, -11261.2, -3343.55, 10.1273, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+232, 181194, 0, -11261.2, -3343.55, 10.1273, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+233, 181191, 0, -11255.2, -3319.01, 20.5497, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+234, 181192, 0, -11255.2, -3319.01, 20.5497, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+235, 181193, 0, -11255.2, -3319.01, 20.5497, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+236, 181194, 0, -11255.2, -3319.01, 20.5497, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+237, 181191, 0, -11254.5, -3318.65, 20.4367, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+238, 181192, 0, -11254.5, -3318.65, 20.4367, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+239, 181193, 0, -11254.5, -3318.65, 20.4367, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+240, 181194, 0, -11254.5, -3318.65, 20.4367, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+241, 181191, 0, -11251.2, -3380.98, 7.34449, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+242, 181192, 0, -11251.2, -3380.98, 7.34449, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+243, 181193, 0, -11251.2, -3380.98, 7.34449, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+244, 181194, 0, -11251.2, -3380.98, 7.34449, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+245, 181191, 0, -11251, -3380.69, 7.32356, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+246, 181192, 0, -11251, -3380.69, 7.32356, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+247, 181193, 0, -11251, -3380.69, 7.32356, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+248, 181194, 0, -11251, -3380.69, 7.32356, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+249, 181191, 0, -11246.1, -3363.18, 9.74607, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+250, 181192, 0, -11246.1, -3363.18, 9.74607, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+251, 181193, 0, -11246.1, -3363.18, 9.74607, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+252, 181194, 0, -11246.1, -3363.18, 9.74607, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+253, 181191, 0, -11239.8, -3340.94, 9.11304, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+254, 181192, 0, -11239.8, -3340.94, 9.11304, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+255, 181193, 0, -11239.8, -3340.94, 9.11304, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+256, 181194, 0, -11239.8, -3340.94, 9.11304, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+257, 181191, 0, -11239.4, -3339.89, 9.12619, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+258, 181192, 0, -11239.4, -3339.89, 9.12619, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+259, 181193, 0, -11239.4, -3339.89, 9.12619, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+260, 181194, 0, -11239.4, -3339.89, 9.12619, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+261, 181191, 0, -11236.3, -3373.25, 9.05493, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+262, 181192, 0, -11236.3, -3373.25, 9.05493, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+263, 181193, 0, -11236.3, -3373.25, 9.05493, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+264, 181194, 0, -11236.3, -3373.25, 9.05493, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+265, 181191, 0, -11228, -3336.56, 9.46834, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+266, 181192, 0, -11228, -3336.56, 9.46834, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+267, 181193, 0, -11228, -3336.56, 9.46834, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+268, 181194, 0, -11228, -3336.56, 9.46834, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+269, 181191, 0, -11227.9, -2992.87, 3.46904, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+270, 181192, 0, -11227.9, -2992.87, 3.46904, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+271, 181193, 0, -11227.9, -2992.87, 3.46904, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+272, 181194, 0, -11227.9, -2992.87, 3.46904, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+273, 181191, 0, -11227, -3327.39, 9.00909, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+274, 181192, 0, -11227, -3327.39, 9.00909, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+275, 181193, 0, -11227, -3327.39, 9.00909, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+276, 181194, 0, -11227, -3327.39, 9.00909, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+277, 181191, 0, -11226.2, -3371.7, 9.3219, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+278, 181192, 0, -11226.2, -3371.7, 9.3219, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+279, 181193, 0, -11226.2, -3371.7, 9.3219, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+280, 181194, 0, -11226.2, -3371.7, 9.3219, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+281, 181191, 0, -11225.2, -3354.03, 5.00269, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+282, 181192, 0, -11225.2, -3354.03, 5.00269, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+283, 181193, 0, -11225.2, -3354.03, 5.00269, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+284, 181194, 0, -11225.2, -3354.03, 5.00269, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+285, 181191, 0, -11224.7, -3352.88, 5.0027, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+286, 181192, 0, -11224.7, -3352.88, 5.0027, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+287, 181193, 0, -11224.7, -3352.88, 5.0027, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+288, 181194, 0, -11224.7, -3352.88, 5.0027, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+289, 181191, 0, -11215.6, -2948.61, 9.523, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+290, 181192, 0, -11215.6, -2948.61, 9.523, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+291, 181193, 0, -11215.6, -2948.61, 9.523, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+292, 181194, 0, -11215.6, -2948.61, 9.523, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+293, 181191, 0, -11213.9, -2986.06, 3.57035, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+294, 181192, 0, -11213.9, -2986.06, 3.57035, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+295, 181193, 0, -11213.9, -2986.06, 3.57035, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+296, 181194, 0, -11213.9, -2986.06, 3.57035, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+297, 181191, 0, -11212.2, -3006.55, 3.45062, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+298, 181192, 0, -11212.2, -3006.55, 3.45062, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+299, 181193, 0, -11212.2, -3006.55, 3.45062, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+300, 181194, 0, -11212.2, -3006.55, 3.45062, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+301, 181191, 0, -11211.3, -3007.63, 3.47926, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+302, 181192, 0, -11211.3, -3007.63, 3.47926, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+303, 181193, 0, -11211.3, -3007.63, 3.47926, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+304, 181194, 0, -11211.3, -3007.63, 3.47926, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+305, 181191, 0, -11203.6, -2959.86, 9.16768, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+306, 181192, 0, -11203.6, -2959.86, 9.16768, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+307, 181193, 0, -11203.6, -2959.86, 9.16768, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+308, 181194, 0, -11203.6, -2959.86, 9.16768, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+309, 181191, 0, -11194.1, -2974.03, 8.55119, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+310, 181192, 0, -11194.1, -2974.03, 8.55119, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+311, 181193, 0, -11194.1, -2974.03, 8.55119, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+312, 181194, 0, -11194.1, -2974.03, 8.55119, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+313, 181191, 0, -11194, -2975.29, 8.59496, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+314, 181192, 0, -11194, -2975.29, 8.59496, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+315, 181193, 0, -11194, -2975.29, 8.59496, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+316, 181194, 0, -11194, -2975.29, 8.59496, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+317, 181191, 0, -11186.9, -2963.88, 8.17708, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+318, 181192, 0, -11186.9, -2963.88, 8.17708, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+319, 181193, 0, -11186.9, -2963.88, 8.17708, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+320, 181194, 0, -11186.9, -2963.88, 8.17708, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+321, 181191, 0, -11186.2, -3010.96, 7.94982, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+322, 181192, 0, -11186.2, -3010.96, 7.94982, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+323, 181193, 0, -11186.2, -3010.96, 7.94982, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+324, 181194, 0, -11186.2, -3010.96, 7.94982, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+325, 181191, 0, -11183.8, -2948.68, 18.891, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+326, 181192, 0, -11183.8, -2948.68, 18.891, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+327, 181193, 0, -11183.8, -2948.68, 18.891, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+328, 181194, 0, -11183.8, -2948.68, 18.891, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+329, 181191, 0, -11175.5, -3021.69, 7.32877, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+330, 181192, 0, -11175.5, -3021.69, 7.32877, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+331, 181193, 0, -11175.5, -3021.69, 7.32877, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+332, 181194, 0, -11175.5, -3021.69, 7.32877, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+333, 181191, 0, -11173.8, -2993.97, 9.54054, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+334, 181192, 0, -11173.8, -2993.97, 9.54054, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+335, 181193, 0, -11173.8, -2993.97, 9.54054, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+336, 181194, 0, -11173.8, -2993.97, 9.54054, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+337, 181191, 0, -11160.3, -2989, 8.60169, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+338, 181192, 0, -11160.3, -2989, 8.60169, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+339, 181193, 0, -11160.3, -2989, 8.60169, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+340, 181194, 0, -11160.3, -2989, 8.60169, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+341, 181191, 0, -11159.4, -3009.7, 8.18247, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+342, 181192, 0, -11159.4, -3009.7, 8.18247, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+343, 181193, 0, -11159.4, -3009.7, 8.18247, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+344, 181194, 0, -11159.4, -3009.7, 8.18247, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+345, 181191, 0, -11159.4, -3008.26, 8.14676, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+346, 181192, 0, -11159.4, -3008.26, 8.14676, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+347, 181193, 0, -11159.4, -3008.26, 8.14676, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+348, 181194, 0, -11159.4, -3008.26, 8.14676, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+349, 181191, 0, -11157.2, -2987.25, 8.60665, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+350, 181192, 0, -11157.2, -2987.25, 8.60665, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+351, 181193, 0, -11157.2, -2987.25, 8.60665, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+352, 181194, 0, -11157.2, -2987.25, 8.60665, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+353, 181191, 0, -11147, -2961.9, 9.2982, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+354, 181192, 0, -11147, -2961.9, 9.2982, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+355, 181193, 0, -11147, -2961.9, 9.2982, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+356, 181194, 0, -11147, -2961.9, 9.2982, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+357, 181191, 0, -11051, -2790.25, 6.5906, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+358, 181192, 0, -11051, -2790.25, 6.5906, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+359, 181193, 0, -11051, -2790.25, 6.5906, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+360, 181194, 0, -11051, -2790.25, 6.5906, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+361, 181191, 0, -11050.7, -2789.54, 6.56607, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+362, 181192, 0, -11050.7, -2789.54, 6.56607, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+363, 181193, 0, -11050.7, -2789.54, 6.56607, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+364, 181194, 0, -11050.7, -2789.54, 6.56607, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+365, 181191, 0, -11048.1, -2809.05, 7.60497, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+366, 181192, 0, -11048.1, -2809.05, 7.60497, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+367, 181193, 0, -11048.1, -2809.05, 7.60497, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+368, 181194, 0, -11048.1, -2809.05, 7.60497, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+369, 181191, 0, -11043.4, -2751.83, 1.87099, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+370, 181192, 0, -11043.4, -2751.83, 1.87099, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+371, 181193, 0, -11043.4, -2751.83, 1.87099, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+372, 181194, 0, -11043.4, -2751.83, 1.87099, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+373, 181191, 0, -11041.1, -2824.76, 13.9447, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+374, 181192, 0, -11041.1, -2824.76, 13.9447, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+375, 181193, 0, -11041.1, -2824.76, 13.9447, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+376, 181194, 0, -11041.1, -2824.76, 13.9447, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+377, 181191, 0, -11035.7, -2763.43, 4.62899, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+378, 181192, 0, -11035.7, -2763.43, 4.62899, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+379, 181193, 0, -11035.7, -2763.43, 4.62899, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+380, 181194, 0, -11035.7, -2763.43, 4.62899, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+381, 181191, 0, -11026.9, -2772.87, 3.89268, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+382, 181192, 0, -11026.9, -2772.87, 3.89268, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+383, 181193, 0, -11026.9, -2772.87, 3.89268, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+384, 181194, 0, -11026.9, -2772.87, 3.89268, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+385, 181191, 0, -11021.1, -2795.17, 5.22782, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+386, 181192, 0, -11021.1, -2795.17, 5.22782, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+387, 181193, 0, -11021.1, -2795.17, 5.22782, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+388, 181194, 0, -11021.1, -2795.17, 5.22782, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+389, 181191, 0, -11020.9, -2794.48, 5.16899, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+390, 181192, 0, -11020.9, -2794.48, 5.16899, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+391, 181193, 0, -11020.9, -2794.48, 5.16899, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+392, 181194, 0, -11020.9, -2794.48, 5.16899, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+393, 181191, 0, -11014.6, -2754.4, 3.78119, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+394, 181192, 0, -11014.6, -2754.4, 3.78119, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+395, 181193, 0, -11014.6, -2754.4, 3.78119, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+396, 181194, 0, -11014.6, -2754.4, 3.78119, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+397, 181191, 0, -11012.8, -2806.25, 6.10035, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+398, 181192, 0, -11012.8, -2806.25, 6.10035, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+399, 181193, 0, -11012.8, -2806.25, 6.10035, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+400, 181194, 0, -11012.8, -2806.25, 6.10035, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+401, 181191, 0, -11012.2, -2816.72, 6.92621, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+402, 181192, 0, -11012.2, -2816.72, 6.92621, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+403, 181193, 0, -11012.2, -2816.72, 6.92621, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+404, 181194, 0, -11012.2, -2816.72, 6.92621, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+405, 181191, 0, -11004.7, -2789.47, 5.05259, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+406, 181192, 0, -11004.7, -2789.47, 5.05259, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+407, 181193, 0, -11004.7, -2789.47, 5.05259, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+408, 181194, 0, -11004.7, -2789.47, 5.05259, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+409, 181191, 0, -10994.7, -2762.28, 4.3075, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+410, 181192, 0, -10994.7, -2762.28, 4.3075, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+411, 181193, 0, -10994.7, -2762.28, 4.3075, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+412, 181194, 0, -10994.7, -2762.28, 4.3075, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+413, 181191, 0, -10984.8, -2815.37, 6.07834, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+414, 181192, 0, -10984.8, -2815.37, 6.07834, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+415, 181193, 0, -10984.8, -2815.37, 6.07834, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+416, 181194, 0, -10984.8, -2815.37, 6.07834, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+417, 181191, 0, -10984.2, -2815.63, 6.10166, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+418, 181192, 0, -10984.2, -2815.63, 6.10166, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+419, 181193, 0, -10984.2, -2815.63, 6.10166, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+420, 181194, 0, -10984.2, -2815.63, 6.10166, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+421, 181191, 0, -10974.5, -2778.92, 4.87717, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+422, 181192, 0, -10974.5, -2778.92, 4.87717, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+423, 181193, 0, -10974.5, -2778.92, 4.87717, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+424, 181194, 0, -10974.5, -2778.92, 4.87717, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+425, 181191, 0, -10974.4, -2779.72, 4.94576, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+426, 181192, 0, -10974.4, -2779.72, 4.94576, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+427, 181193, 0, -10974.4, -2779.72, 4.94576, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Blasted Lands
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+428, 181194, 0, -10974.4, -2779.72, 4.94576, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10);    -- GameObject: "Skullpile 04" in Blasted Lands
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_SKULLPILE_BLASTED_LANDS_GUID+1 AND @GOBJ_SKULLPILE_BLASTED_LANDS_GUID+428;
+
+    INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+1, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+1, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+2, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+1, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+3, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+1, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+4, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+1, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+5, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+2, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+6, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+2, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+7, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+2, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+8, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+2, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+9, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+3, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+10, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+3, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+11, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+3, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+12, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+3, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+13, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+4, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+14, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+4, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+15, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+4, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+16, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+4, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+17, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+5, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+18, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+5, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+19, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+5, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+20, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+5, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+21, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+6, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+22, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+6, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+23, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+6, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+24, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+6, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+25, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+7, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+26, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+7, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+27, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+7, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+28, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+7, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+29, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+8, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+30, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+8, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+31, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+8, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+32, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+8, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+33, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+9, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+34, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+9, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+35, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+9, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+36, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+9, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+37, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+10, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+38, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+10, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+39, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+10, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+40, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+10, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+41, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+11, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+42, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+11, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+43, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+11, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+44, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+11, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+45, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+12, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+46, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+12, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+47, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+12, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+48, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+12, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+49, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+13, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+50, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+13, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+51, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+13, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+52, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+13, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+53, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+14, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+54, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+14, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+55, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+14, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+56, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+14, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+57, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+15, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+58, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+15, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+59, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+15, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+60, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+15, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+61, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+16, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+62, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+16, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+63, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+16, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+64, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+16, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+65, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+17, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+66, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+17, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+67, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+17, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+68, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+17, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+69, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+18, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+70, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+18, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+71, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+18, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+72, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+18, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+73, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+19, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+74, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+19, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+75, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+19, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+76, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+19, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+77, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+20, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+78, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+20, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+79, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+20, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+80, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+20, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+81, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+21, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+82, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+21, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+83, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+21, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+84, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+21, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+85, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+22, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+86, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+22, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+87, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+22, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+88, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+22, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+89, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+23, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+90, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+23, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+91, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+23, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+92, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+23, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+93, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+24, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+94, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+24, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+95, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+24, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+96, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+24, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+97, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+25, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+98, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+25, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+99, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+25, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+100, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+25, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+101, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+26, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+102, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+26, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+103, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+26, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+104, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+26, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+105, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+27, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+106, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+27, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+107, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+27, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+108, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+27, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+109, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+28, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+110, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+28, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+111, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+28, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+112, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+28, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+113, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+29, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+114, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+29, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+115, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+29, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+116, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+29, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+117, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+30, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+118, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+30, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+119, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+30, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+120, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+30, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+121, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+31, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+122, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+31, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+123, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+31, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+124, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+31, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+125, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+32, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+126, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+32, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+127, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+32, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+128, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+32, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+129, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+33, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+130, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+33, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+131, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+33, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+132, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+33, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+133, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+34, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+134, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+34, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+135, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+34, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+136, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+34, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+137, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+35, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+138, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+35, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+139, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+35, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+140, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+35, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+141, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+36, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+142, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+36, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+143, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+36, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+144, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+36, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+145, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+37, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+146, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+37, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+147, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+37, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+148, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+37, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+149, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+38, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+150, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+38, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+151, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+38, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+152, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+38, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+153, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+39, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+154, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+39, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+155, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+39, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+156, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+39, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+157, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+40, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+158, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+40, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+159, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+40, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+160, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+40, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+161, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+41, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+162, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+41, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+163, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+41, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+164, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+41, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+165, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+42, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+166, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+42, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+167, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+42, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+168, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+42, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+169, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+43, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+170, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+43, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+171, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+43, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+172, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+43, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+173, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+44, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+174, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+44, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+175, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+44, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+176, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+44, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+177, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+45, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+178, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+45, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+179, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+45, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+180, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+45, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+181, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+46, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+182, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+46, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+183, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+46, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+184, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+46, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+185, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+47, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+186, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+47, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+187, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+47, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+188, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+47, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+189, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+48, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+190, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+48, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+191, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+48, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+192, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+48, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+193, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+49, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+194, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+49, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+195, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+49, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+196, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+49, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+197, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+50, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+198, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+50, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+199, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+50, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+200, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+50, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+201, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+51, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+202, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+51, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+203, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+51, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+204, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+51, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+205, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+52, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+206, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+52, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+207, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+52, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+208, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+52, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+209, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+53, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+210, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+53, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+211, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+53, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+212, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+53, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+213, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+54, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+214, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+54, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+215, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+54, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+216, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+54, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+217, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+55, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+218, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+55, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+219, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+55, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+220, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+55, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+221, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+56, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+222, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+56, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+223, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+56, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+224, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+56, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+225, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+57, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+226, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+57, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+227, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+57, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+228, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+57, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+229, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+58, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+230, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+58, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+231, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+58, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+232, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+58, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+233, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+59, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+234, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+59, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+235, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+59, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+236, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+59, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+237, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+60, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+238, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+60, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+239, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+60, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+240, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+60, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+241, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+61, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+242, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+61, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+243, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+61, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+244, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+61, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+245, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+62, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+246, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+62, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+247, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+62, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+248, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+62, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+249, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+63, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+250, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+63, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+251, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+63, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+252, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+63, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+253, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+64, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+254, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+64, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+255, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+64, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+256, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+64, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+257, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+65, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+258, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+65, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+259, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+65, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+260, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+65, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+261, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+66, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+262, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+66, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+263, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+66, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+264, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+66, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+265, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+67, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+266, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+67, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+267, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+67, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+268, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+67, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+269, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+68, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+270, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+68, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+271, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+68, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+272, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+68, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+273, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+69, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+274, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+69, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+275, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+69, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+276, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+69, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+277, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+70, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+278, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+70, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+279, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+70, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+280, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+70, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+281, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+71, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+282, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+71, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+283, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+71, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+284, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+71, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+285, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+72, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+286, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+72, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+287, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+72, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+288, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+72, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+289, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+73, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+290, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+73, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+291, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+73, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+292, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+73, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+293, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+74, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+294, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+74, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+295, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+74, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+296, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+74, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+297, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+75, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+298, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+75, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+299, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+75, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+300, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+75, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+301, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+76, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+302, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+76, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+303, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+76, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+304, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+76, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+305, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+77, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+306, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+77, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+307, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+77, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+308, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+77, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+309, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+78, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+310, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+78, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+311, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+78, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+312, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+78, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+313, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+79, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+314, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+79, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+315, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+79, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+316, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+79, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+317, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+80, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+318, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+80, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+319, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+80, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+320, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+80, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+321, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+81, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+322, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+81, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+323, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+81, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+324, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+81, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+325, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+82, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+326, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+82, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+327, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+82, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+328, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+82, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+329, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+83, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+330, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+83, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+331, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+83, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+332, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+83, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+333, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+84, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+334, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+84, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+335, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+84, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+336, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+84, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+337, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+85, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+338, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+85, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+339, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+85, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+340, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+85, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+341, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+86, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+342, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+86, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+343, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+86, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+344, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+86, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+345, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+87, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+346, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+87, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+347, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+87, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+348, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+87, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+349, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+88, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+350, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+88, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+351, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+88, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+352, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+88, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+353, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+89, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+354, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+89, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+355, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+89, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+356, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+89, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+357, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+90, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+358, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+90, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+359, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+90, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+360, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+90, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+361, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+91, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+362, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+91, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+363, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+91, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+364, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+91, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+365, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+92, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+366, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+92, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+367, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+92, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+368, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+92, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+369, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+93, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+370, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+93, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+371, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+93, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+372, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+93, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+373, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+94, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+374, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+94, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+375, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+94, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+376, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+94, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+377, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+95, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+378, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+95, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+379, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+95, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+380, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+95, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+381, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+96, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+382, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+96, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+383, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+96, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+384, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+96, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+385, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+97, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+386, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+97, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+387, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+97, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+388, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+97, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+389, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+98, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+390, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+98, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+391, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+98, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+392, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+98, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+393, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+99, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+394, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+99, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+395, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+99, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+396, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+99, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+397, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+100, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+398, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+100, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+399, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+100, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+400, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+100, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+401, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+101, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+402, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+101, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+403, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+101, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+404, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+101, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+405, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+102, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+406, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+102, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+407, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+102, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+408, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+102, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+409, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+103, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+410, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+103, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+411, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+103, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+412, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+103, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+413, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+104, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+414, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+104, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+415, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+104, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+416, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+104, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+417, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+105, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+418, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+105, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+419, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+105, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+420, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+105, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+421, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+106, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+422, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+106, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+423, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+106, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+424, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+106, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+425, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+107, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+426, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+107, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+427, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+107, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BLASTED_LANDS_GUID+428, @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+107, 0, 'Scourge Invasion Blasted Lands, Skullpile', 0, 9, 10);
+    INSERT INTO `pool_template` SELECT pool_gameobject.pool_entry, 1, 'Scourge Invasion Blasted Lands, Skullpile', 0, 0, 9, 10 FROM `pool_gameobject` WHERE pool_gameobject.pool_entry BETWEEN @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+1 AND @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY+107 GROUP BY pool_gameobject.pool_entry;
+
+    -- GameObject: "Skullpile" in Eastern Plaguelands
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+1, 181191, 0, 1568.39, -3051.2, 78.6488, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+2, 181192, 0, 1568.39, -3051.2, 78.6488, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+3, 181193, 0, 1568.39, -3051.2, 78.6488, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+4, 181194, 0, 1568.39, -3051.2, 78.6488, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+5, 181191, 0, 1569.98, -3050.95, 78.8824, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+6, 181192, 0, 1569.98, -3050.95, 78.8824, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+7, 181193, 0, 1569.98, -3050.95, 78.8824, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+8, 181194, 0, 1569.98, -3050.95, 78.8824, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+9, 181191, 0, 1585.78, -3039.62, 79.899, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+10, 181192, 0, 1585.78, -3039.62, 79.899, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+11, 181193, 0, 1585.78, -3039.62, 79.899, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+12, 181194, 0, 1585.78, -3039.62, 79.899, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+13, 181191, 0, 1586.16, -3040.48, 80.0321, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+14, 181192, 0, 1586.16, -3040.48, 80.0321, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+15, 181193, 0, 1586.16, -3040.48, 80.0321, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+16, 181194, 0, 1586.16, -3040.48, 80.0321, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+17, 181191, 0, 1586.57, -3040.22, 80.0009, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+18, 181192, 0, 1586.57, -3040.22, 80.0009, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+19, 181193, 0, 1586.57, -3040.22, 80.0009, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+20, 181194, 0, 1586.57, -3040.22, 80.0009, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+21, 181191, 0, 1587.12, -3015.42, 81.611, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+22, 181192, 0, 1587.12, -3015.42, 81.611, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+23, 181193, 0, 1587.12, -3015.42, 81.611, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+24, 181194, 0, 1587.12, -3015.42, 81.611, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+25, 181191, 0, 1587.5, -3013.96, 81.7142, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+26, 181192, 0, 1587.5, -3013.96, 81.7142, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+27, 181193, 0, 1587.5, -3013.96, 81.7142, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+28, 181194, 0, 1587.5, -3013.96, 81.7142, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+29, 181191, 0, 1592.62, -3031.2, 78.8748, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+30, 181192, 0, 1592.62, -3031.2, 78.8748, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+31, 181193, 0, 1592.62, -3031.2, 78.8748, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+32, 181194, 0, 1592.62, -3031.2, 78.8748, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+33, 181191, 0, 1593.2, -3066.88, 79.9349, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+34, 181192, 0, 1593.2, -3066.88, 79.9349, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+35, 181193, 0, 1593.2, -3066.88, 79.9349, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+36, 181194, 0, 1593.2, -3066.88, 79.9349, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+37, 181191, 0, 1595.76, -3064.81, 79.9576, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+38, 181192, 0, 1595.76, -3064.81, 79.9576, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+39, 181193, 0, 1595.76, -3064.81, 79.9576, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+40, 181194, 0, 1595.76, -3064.81, 79.9576, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+41, 181191, 0, 1603.07, -3025.87, 79.0196, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+42, 181192, 0, 1603.07, -3025.87, 79.0196, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+43, 181193, 0, 1603.07, -3025.87, 79.0196, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+44, 181194, 0, 1603.07, -3025.87, 79.0196, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+45, 181191, 0, 1604.12, -3025.66, 79.0573, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+46, 181192, 0, 1604.12, -3025.66, 79.0573, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+47, 181193, 0, 1604.12, -3025.66, 79.0573, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+48, 181194, 0, 1604.12, -3025.66, 79.0573, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+49, 181191, 0, 1611.98, -3065.57, 78.606, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+50, 181192, 0, 1611.98, -3065.57, 78.606, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+51, 181193, 0, 1611.98, -3065.57, 78.606, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+52, 181194, 0, 1611.98, -3065.57, 78.606, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+53, 181191, 0, 1613.93, -3065.54, 78.6501, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+54, 181192, 0, 1613.93, -3065.54, 78.6501, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+55, 181193, 0, 1613.93, -3065.54, 78.6501, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+56, 181194, 0, 1613.93, -3065.54, 78.6501, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+57, 181191, 0, 1615.02, -3037.84, 77.6618, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+58, 181192, 0, 1615.02, -3037.84, 77.6618, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+59, 181193, 0, 1615.02, -3037.84, 77.6618, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+60, 181194, 0, 1615.02, -3037.84, 77.6618, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+61, 181191, 0, 1622.07, -3046.96, 79.0298, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+62, 181192, 0, 1622.07, -3046.96, 79.0298, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+63, 181193, 0, 1622.07, -3046.96, 79.0298, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+64, 181194, 0, 1622.07, -3046.96, 79.0298, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+65, 181191, 0, 1631.92, -3034.03, 79.7854, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+66, 181192, 0, 1631.92, -3034.03, 79.7854, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+67, 181193, 0, 1631.92, -3034.03, 79.7854, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+68, 181194, 0, 1631.92, -3034.03, 79.7854, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+69, 181191, 0, 1633.33, -3033.08, 79.8429, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+70, 181192, 0, 1633.33, -3033.08, 79.8429, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+71, 181193, 0, 1633.33, -3033.08, 79.8429, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+72, 181194, 0, 1633.33, -3033.08, 79.8429, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+73, 181191, 0, 1761.02, -2841.03, 71.8429, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+74, 181192, 0, 1761.02, -2841.03, 71.8429, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+75, 181193, 0, 1761.02, -2841.03, 71.8429, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+76, 181194, 0, 1761.02, -2841.03, 71.8429, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+77, 181191, 0, 1767.81, -2866.3, 71.5783, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+78, 181192, 0, 1767.81, -2866.3, 71.5783, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+79, 181193, 0, 1767.81, -2866.3, 71.5783, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+80, 181194, 0, 1767.81, -2866.3, 71.5783, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+81, 181191, 0, 1774.62, -2826.27, 69.0928, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+82, 181192, 0, 1774.62, -2826.27, 69.0928, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+83, 181193, 0, 1774.62, -2826.27, 69.0928, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+84, 181194, 0, 1774.62, -2826.27, 69.0928, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+85, 181191, 0, 1775.91, -2849.46, 68.1007, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+86, 181192, 0, 1775.91, -2849.46, 68.1007, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+87, 181193, 0, 1775.91, -2849.46, 68.1007, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+88, 181194, 0, 1775.91, -2849.46, 68.1007, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+89, 181191, 0, 1777.22, -2849.02, 68.1269, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+90, 181192, 0, 1777.22, -2849.02, 68.1269, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+91, 181193, 0, 1777.22, -2849.02, 68.1269, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+92, 181194, 0, 1777.22, -2849.02, 68.1269, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+93, 181191, 0, 1783.78, -2826.47, 69.0158, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+94, 181192, 0, 1783.78, -2826.47, 69.0158, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+95, 181193, 0, 1783.78, -2826.47, 69.0158, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+96, 181194, 0, 1783.78, -2826.47, 69.0158, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+97, 181191, 0, 1784.67, -2826.46, 68.9567, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+98, 181192, 0, 1784.67, -2826.46, 68.9567, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+99, 181193, 0, 1784.67, -2826.46, 68.9567, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+100, 181194, 0, 1784.67, -2826.46, 68.9567, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+101, 181191, 0, 1787.88, -2844.15, 67.7934, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+102, 181192, 0, 1787.88, -2844.15, 67.7934, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+103, 181193, 0, 1787.88, -2844.15, 67.7934, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+104, 181194, 0, 1787.88, -2844.15, 67.7934, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+105, 181191, 0, 1792.49, -2845.07, 68.9933, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+106, 181192, 0, 1792.49, -2845.07, 68.9933, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+107, 181193, 0, 1792.49, -2845.07, 68.9933, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+108, 181194, 0, 1792.49, -2845.07, 68.9933, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+109, 181191, 0, 1798.88, -2852.22, 68.3892, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+110, 181192, 0, 1798.88, -2852.22, 68.3892, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+111, 181193, 0, 1798.88, -2852.22, 68.3892, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+112, 181194, 0, 1798.88, -2852.22, 68.3892, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+113, 181191, 0, 1800.54, -2830.87, 69.9442, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+114, 181192, 0, 1800.54, -2830.87, 69.9442, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+115, 181193, 0, 1800.54, -2830.87, 69.9442, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+116, 181194, 0, 1800.54, -2830.87, 69.9442, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+117, 181191, 0, 1805.24, -2867.62, 67.8789, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+118, 181192, 0, 1805.24, -2867.62, 67.8789, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+119, 181193, 0, 1805.24, -2867.62, 67.8789, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+120, 181194, 0, 1805.24, -2867.62, 67.8789, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+121, 181191, 0, 1806.21, -2867.52, 67.9099, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+122, 181192, 0, 1806.21, -2867.52, 67.9099, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+123, 181193, 0, 1806.21, -2867.52, 67.9099, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+124, 181194, 0, 1806.21, -2867.52, 67.9099, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+125, 181191, 0, 1814.01, -2841.04, 72.0197, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+126, 181192, 0, 1814.01, -2841.04, 72.0197, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+127, 181193, 0, 1814.01, -2841.04, 72.0197, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+128, 181194, 0, 1814.01, -2841.04, 72.0197, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+129, 181191, 0, 1821.46, -2826.06, 83.0323, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+130, 181192, 0, 1821.46, -2826.06, 83.0323, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+131, 181193, 0, 1821.46, -2826.06, 83.0323, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+132, 181194, 0, 1821.46, -2826.06, 83.0323, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+133, 181191, 0, 1825.73, -2841.49, 77.7955, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+134, 181192, 0, 1825.73, -2841.49, 77.7955, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+135, 181193, 0, 1825.73, -2841.49, 77.7955, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+136, 181194, 0, 1825.73, -2841.49, 77.7955, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+137, 181191, 0, 1826.08, -2840.09, 77.9095, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+138, 181192, 0, 1826.08, -2840.09, 77.9095, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+139, 181193, 0, 1826.08, -2840.09, 77.9095, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+140, 181194, 0, 1826.08, -2840.09, 77.9095, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+141, 181191, 0, 1830.81, -2853.76, 82.9595, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+142, 181192, 0, 1830.81, -2853.76, 82.9595, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+143, 181193, 0, 1830.81, -2853.76, 82.9595, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+144, 181194, 0, 1830.81, -2853.76, 82.9595, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+145, 181191, 0, 1906.72, -4772.17, 105.462, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+146, 181192, 0, 1906.72, -4772.17, 105.462, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+147, 181193, 0, 1906.72, -4772.17, 105.462, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+148, 181194, 0, 1906.72, -4772.17, 105.462, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+149, 181191, 0, 1919, -5145.38, 73.9771, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+150, 181192, 0, 1919, -5145.38, 73.9771, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+151, 181193, 0, 1919, -5145.38, 73.9771, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+152, 181194, 0, 1919, -5145.38, 73.9771, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+153, 181191, 0, 1920.02, -4756.39, 99.25, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+154, 181192, 0, 1920.02, -4756.39, 99.25, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+155, 181193, 0, 1920.02, -4756.39, 99.25, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+156, 181194, 0, 1920.02, -4756.39, 99.25, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+157, 181191, 0, 1920.29, -4757.25, 99.1512, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+158, 181192, 0, 1920.29, -4757.25, 99.1512, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+159, 181193, 0, 1920.29, -4757.25, 99.1512, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+160, 181194, 0, 1920.29, -4757.25, 99.1512, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+161, 181191, 0, 1920.82, -4756.28, 98.998, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+162, 181192, 0, 1920.82, -4756.28, 98.998, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+163, 181193, 0, 1920.82, -4756.28, 98.998, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+164, 181194, 0, 1920.82, -4756.28, 98.998, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+165, 181191, 0, 1921.05, -4772.1, 100.649, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+166, 181192, 0, 1921.05, -4772.1, 100.649, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+167, 181193, 0, 1921.05, -4772.1, 100.649, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+168, 181194, 0, 1921.05, -4772.1, 100.649, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+169, 181191, 0, 1922.1, -4791.41, 103.396, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+170, 181192, 0, 1922.1, -4791.41, 103.396, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+171, 181193, 0, 1922.1, -4791.41, 103.396, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+172, 181194, 0, 1922.1, -4791.41, 103.396, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+173, 181191, 0, 1924.33, -4732.5, 101.178, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+174, 181192, 0, 1924.33, -4732.5, 101.178, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+175, 181193, 0, 1924.33, -4732.5, 101.178, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+176, 181194, 0, 1924.33, -4732.5, 101.178, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+177, 181191, 0, 1930.41, -5125.72, 100.939, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+178, 181192, 0, 1930.41, -5125.72, 100.939, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+179, 181193, 0, 1930.41, -5125.72, 100.939, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+180, 181194, 0, 1930.41, -5125.72, 100.939, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+181, 181191, 0, 1931.61, -4785.54, 99.6964, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+182, 181192, 0, 1931.61, -4785.54, 99.6964, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+183, 181193, 0, 1931.61, -4785.54, 99.6964, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+184, 181194, 0, 1931.61, -4785.54, 99.6964, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+185, 181191, 0, 1932.6, -4784.9, 99.4538, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+186, 181192, 0, 1932.6, -4784.9, 99.4538, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+187, 181193, 0, 1932.6, -4784.9, 99.4538, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+188, 181194, 0, 1932.6, -4784.9, 99.4538, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+189, 181191, 0, 1935.82, -4731, 100.673, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+190, 181192, 0, 1935.82, -4731, 100.673, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+191, 181193, 0, 1935.82, -4731, 100.673, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+192, 181194, 0, 1935.82, -4731, 100.673, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+193, 181191, 0, 1936.16, -5172.28, 73.6389, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+194, 181192, 0, 1936.16, -5172.28, 73.6389, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+195, 181193, 0, 1936.16, -5172.28, 73.6389, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+196, 181194, 0, 1936.16, -5172.28, 73.6389, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+197, 181191, 0, 1938.05, -4745.24, 96.8655, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+198, 181192, 0, 1938.05, -4745.24, 96.8655, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+199, 181193, 0, 1938.05, -4745.24, 96.8655, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+200, 181194, 0, 1938.05, -4745.24, 96.8655, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+201, 181191, 0, 1939.99, -5140.97, 73.6643, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+202, 181192, 0, 1939.99, -5140.97, 73.6643, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+203, 181193, 0, 1939.99, -5140.97, 73.6643, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+204, 181194, 0, 1939.99, -5140.97, 73.6643, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+205, 181191, 0, 1940.62, -5146.29, 73.6236, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+206, 181192, 0, 1940.62, -5146.29, 73.6236, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+207, 181193, 0, 1940.62, -5146.29, 73.6236, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+208, 181194, 0, 1940.62, -5146.29, 73.6236, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+209, 181191, 0, 1941.33, -3095.81, 85.892, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+210, 181192, 0, 1941.33, -3095.81, 85.892, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+211, 181193, 0, 1941.33, -3095.81, 85.892, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+212, 181194, 0, 1941.33, -3095.81, 85.892, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+213, 181191, 0, 1941.64, -3093.77, 85.4658, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+214, 181192, 0, 1941.64, -3093.77, 85.4658, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+215, 181193, 0, 1941.64, -3093.77, 85.4658, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+216, 181194, 0, 1941.64, -3093.77, 85.4658, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+217, 181191, 0, 1942.18, -5099.56, 84.6481, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+218, 181192, 0, 1942.18, -5099.56, 84.6481, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+219, 181193, 0, 1942.18, -5099.56, 84.6481, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+220, 181194, 0, 1942.18, -5099.56, 84.6481, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+221, 181191, 0, 1942.63, -3116.1, 89.4823, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+222, 181192, 0, 1942.63, -3116.1, 89.4823, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+223, 181193, 0, 1942.63, -3116.1, 89.4823, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+224, 181194, 0, 1942.63, -3116.1, 89.4823, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+225, 181191, 0, 1944.42, -3116.68, 89.3527, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+226, 181192, 0, 1944.42, -3116.68, 89.3527, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+227, 181193, 0, 1944.42, -3116.68, 89.3527, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+228, 181194, 0, 1944.42, -3116.68, 89.3527, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+229, 181191, 0, 1945.23, -4776.45, 98.3861, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+230, 181192, 0, 1945.23, -4776.45, 98.3861, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+231, 181193, 0, 1945.23, -4776.45, 98.3861, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+232, 181194, 0, 1945.23, -4776.45, 98.3861, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+233, 181191, 0, 1945.48, -5109, 81.6221, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+234, 181192, 0, 1945.48, -5109, 81.6221, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+235, 181193, 0, 1945.48, -5109, 81.6221, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+236, 181194, 0, 1945.48, -5109, 81.6221, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+237, 181191, 0, 1945.95, -5110.36, 81.0997, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+238, 181192, 0, 1945.95, -5110.36, 81.0997, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+239, 181193, 0, 1945.95, -5110.36, 81.0997, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+240, 181194, 0, 1945.95, -5110.36, 81.0997, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+241, 181191, 0, 1946.93, -3069.19, 78.6248, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+242, 181192, 0, 1946.93, -3069.19, 78.6248, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+243, 181193, 0, 1946.93, -3069.19, 78.6248, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+244, 181194, 0, 1946.93, -3069.19, 78.6248, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+245, 181191, 0, 1950.81, -5105.51, 83.3676, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+246, 181192, 0, 1950.81, -5105.51, 83.3676, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+247, 181193, 0, 1950.81, -5105.51, 83.3676, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+248, 181194, 0, 1950.81, -5105.51, 83.3676, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+249, 181191, 0, 1953.76, -5166.41, 78.0603, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+250, 181192, 0, 1953.76, -5166.41, 78.0603, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+251, 181193, 0, 1953.76, -5166.41, 78.0603, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+252, 181194, 0, 1953.76, -5166.41, 78.0603, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+253, 181191, 0, 1954.2, -4753, 97.0392, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+254, 181192, 0, 1954.2, -4753, 97.0392, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+255, 181193, 0, 1954.2, -4753, 97.0392, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+256, 181194, 0, 1954.2, -4753, 97.0392, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+257, 181191, 0, 1954.51, -3122.99, 88.5028, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+258, 181192, 0, 1954.51, -3122.99, 88.5028, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+259, 181193, 0, 1954.51, -3122.99, 88.5028, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+260, 181194, 0, 1954.51, -3122.99, 88.5028, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+261, 181191, 0, 1955.3, -4751.92, 96.864, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+262, 181192, 0, 1955.3, -4751.92, 96.864, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+263, 181193, 0, 1955.3, -4751.92, 96.864, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+264, 181194, 0, 1955.3, -4751.92, 96.864, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+265, 181191, 0, 1955.66, -3123.42, 88.0313, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+266, 181192, 0, 1955.66, -3123.42, 88.0313, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+267, 181193, 0, 1955.66, -3123.42, 88.0313, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+268, 181194, 0, 1955.66, -3123.42, 88.0313, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+269, 181191, 0, 1956.29, -4724.43, 98.3988, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+270, 181192, 0, 1956.29, -4724.43, 98.3988, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+271, 181193, 0, 1956.29, -4724.43, 98.3988, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+272, 181194, 0, 1956.29, -4724.43, 98.3988, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+273, 181191, 0, 1957.21, -3079.93, 79.2057, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+274, 181192, 0, 1957.21, -3079.93, 79.2057, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+275, 181193, 0, 1957.21, -3079.93, 79.2057, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+276, 181194, 0, 1957.21, -3079.93, 79.2057, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+277, 181191, 0, 1959.67, -5139.13, 74.3765, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+278, 181192, 0, 1959.67, -5139.13, 74.3765, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+279, 181193, 0, 1959.67, -5139.13, 74.3765, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+280, 181194, 0, 1959.67, -5139.13, 74.3765, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+281, 181191, 0, 1961.1, -4764.02, 97.6069, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+282, 181192, 0, 1961.1, -4764.02, 97.6069, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+283, 181193, 0, 1961.1, -4764.02, 97.6069, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+284, 181194, 0, 1961.1, -4764.02, 97.6069, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+285, 181191, 0, 1962.15, -4763.61, 97.2999, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+286, 181192, 0, 1962.15, -4763.61, 97.2999, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+287, 181193, 0, 1962.15, -4763.61, 97.2999, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+288, 181194, 0, 1962.15, -4763.61, 97.2999, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+289, 181191, 0, 1963.22, -5099.92, 85.679, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+290, 181192, 0, 1963.22, -5099.92, 85.679, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+291, 181193, 0, 1963.22, -5099.92, 85.679, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+292, 181194, 0, 1963.22, -5099.92, 85.679, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+293, 181191, 0, 1963.39, -4744.69, 96.1348, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+294, 181192, 0, 1963.39, -4744.69, 96.1348, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+295, 181193, 0, 1963.39, -4744.69, 96.1348, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+296, 181194, 0, 1963.39, -4744.69, 96.1348, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+297, 181191, 0, 1966.58, -3128.49, 84.4406, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+298, 181192, 0, 1966.58, -3128.49, 84.4406, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+299, 181193, 0, 1966.58, -3128.49, 84.4406, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+300, 181194, 0, 1966.58, -3128.49, 84.4406, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+301, 181191, 0, 1966.66, -5165.72, 78.4688, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+302, 181192, 0, 1966.66, -5165.72, 78.4688, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+303, 181193, 0, 1966.66, -5165.72, 78.4688, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+304, 181194, 0, 1966.66, -5165.72, 78.4688, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+305, 181191, 0, 1966.66, -3105.85, 83.0617, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+306, 181192, 0, 1966.66, -3105.85, 83.0617, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+307, 181193, 0, 1966.66, -3105.85, 83.0617, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+308, 181194, 0, 1966.66, -3105.85, 83.0617, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+309, 181191, 0, 1967.12, -5165.38, 78.2974, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+310, 181192, 0, 1967.12, -5165.38, 78.2974, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+311, 181193, 0, 1967.12, -5165.38, 78.2974, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+312, 181194, 0, 1967.12, -5165.38, 78.2974, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+313, 181191, 0, 1969.54, -3082.61, 78.2019, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+314, 181192, 0, 1969.54, -3082.61, 78.2019, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+315, 181193, 0, 1969.54, -3082.61, 78.2019, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+316, 181194, 0, 1969.54, -3082.61, 78.2019, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+317, 181191, 0, 1970.66, -3100.07, 82.4968, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+318, 181192, 0, 1970.66, -3100.07, 82.4968, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+319, 181193, 0, 1970.66, -3100.07, 82.4968, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+320, 181194, 0, 1970.66, -3100.07, 82.4968, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+321, 181191, 0, 1971.77, -3122.4, 81.6347, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+322, 181192, 0, 1971.77, -3122.4, 81.6347, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+323, 181193, 0, 1971.77, -3122.4, 81.6347, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+324, 181194, 0, 1971.77, -3122.4, 81.6347, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+325, 181191, 0, 1971.87, -5173.95, 80.2897, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+326, 181192, 0, 1971.87, -5173.95, 80.2897, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+327, 181193, 0, 1971.87, -5173.95, 80.2897, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+328, 181194, 0, 1971.87, -5173.95, 80.2897, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+329, 181191, 0, 1974.99, -3108.66, 81.2376, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+330, 181192, 0, 1974.99, -3108.66, 81.2376, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+331, 181193, 0, 1974.99, -3108.66, 81.2376, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+332, 181194, 0, 1974.99, -3108.66, 81.2376, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+333, 181191, 0, 1975.08, -3089.1, 80.0972, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+334, 181192, 0, 1975.08, -3089.1, 80.0972, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+335, 181193, 0, 1975.08, -3089.1, 80.0972, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+336, 181194, 0, 1975.08, -3089.1, 80.0972, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+337, 181191, 0, 1975.42, -3109.73, 80.8529, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+338, 181192, 0, 1975.42, -3109.73, 80.8529, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+339, 181193, 0, 1975.42, -3109.73, 80.8529, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+340, 181194, 0, 1975.42, -3109.73, 80.8529, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+341, 181191, 0, 1976.12, -5181.19, 79.6858, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+342, 181192, 0, 1976.12, -5181.19, 79.6858, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+343, 181193, 0, 1976.12, -5181.19, 79.6858, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+344, 181194, 0, 1976.12, -5181.19, 79.6858, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+345, 181191, 0, 1979.31, -5107.51, 87.8338, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+346, 181192, 0, 1979.31, -5107.51, 87.8338, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+347, 181193, 0, 1979.31, -5107.51, 87.8338, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+348, 181194, 0, 1979.31, -5107.51, 87.8338, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+349, 181191, 0, 1981.4, -3082.29, 76.7232, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+350, 181192, 0, 1981.4, -3082.29, 76.7232, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+351, 181193, 0, 1981.4, -3082.29, 76.7232, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+352, 181194, 0, 1981.4, -3082.29, 76.7232, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+353, 181191, 0, 1984.65, -5138.32, 82.831, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+354, 181192, 0, 1984.65, -5138.32, 82.831, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+355, 181193, 0, 1984.65, -5138.32, 82.831, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+356, 181194, 0, 1984.65, -5138.32, 82.831, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+357, 181191, 0, 1988.23, -3099.97, 78.9845, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+358, 181192, 0, 1988.23, -3099.97, 78.9845, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+359, 181193, 0, 1988.23, -3099.97, 78.9845, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+360, 181194, 0, 1988.23, -3099.97, 78.9845, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+361, 181191, 0, 2287.98, -4915.14, 97.5112, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+362, 181192, 0, 2287.98, -4915.14, 97.5112, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+363, 181193, 0, 2287.98, -4915.14, 97.5112, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+364, 181194, 0, 2287.98, -4915.14, 97.5112, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+365, 181191, 0, 2289.23, -4915.06, 97.4164, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+366, 181192, 0, 2289.23, -4915.06, 97.4164, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+367, 181193, 0, 2289.23, -4915.06, 97.4164, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+368, 181194, 0, 2289.23, -4915.06, 97.4164, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+369, 181191, 0, 2299, -4950.76, 77.8985, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+370, 181192, 0, 2299, -4950.76, 77.8985, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+371, 181193, 0, 2299, -4950.76, 77.8985, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+372, 181194, 0, 2299, -4950.76, 77.8985, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+373, 181191, 0, 2303.79, -4910.37, 94.6176, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+374, 181192, 0, 2303.79, -4910.37, 94.6176, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+375, 181193, 0, 2303.79, -4910.37, 94.6176, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+376, 181194, 0, 2303.79, -4910.37, 94.6176, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+377, 181191, 0, 2305.04, -4941.07, 80.2708, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+378, 181192, 0, 2305.04, -4941.07, 80.2708, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+379, 181193, 0, 2305.04, -4941.07, 80.2708, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+380, 181194, 0, 2305.04, -4941.07, 80.2708, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+381, 181191, 0, 2305.68, -4927.74, 86.4454, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+382, 181192, 0, 2305.68, -4927.74, 86.4454, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+383, 181193, 0, 2305.68, -4927.74, 86.4454, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+384, 181194, 0, 2305.68, -4927.74, 86.4454, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+385, 181191, 0, 2314.24, -4945.6, 78.1637, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+386, 181192, 0, 2314.24, -4945.6, 78.1637, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+387, 181193, 0, 2314.24, -4945.6, 78.1637, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+388, 181194, 0, 2314.24, -4945.6, 78.1637, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+389, 181191, 0, 2315, -4921.65, 86.328, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+390, 181192, 0, 2315, -4921.65, 86.328, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+391, 181193, 0, 2315, -4921.65, 86.328, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+392, 181194, 0, 2315, -4921.65, 86.328, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+393, 181191, 0, 2315.1, -4945.22, 78.2012, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+394, 181192, 0, 2315.1, -4945.22, 78.2012, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+395, 181193, 0, 2315.1, -4945.22, 78.2012, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+396, 181194, 0, 2315.1, -4945.22, 78.2012, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+397, 181191, 0, 2320.73, -4973.29, 72.4793, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+398, 181192, 0, 2320.73, -4973.29, 72.4793, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+399, 181193, 0, 2320.73, -4973.29, 72.4793, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+400, 181194, 0, 2320.73, -4973.29, 72.4793, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+401, 181191, 0, 2321.23, -4972.05, 72.3983, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+402, 181192, 0, 2321.23, -4972.05, 72.3983, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+403, 181193, 0, 2321.23, -4972.05, 72.3983, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+404, 181194, 0, 2321.23, -4972.05, 72.3983, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+405, 181191, 0, 2321.27, -4971.29, 72.3842, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+406, 181192, 0, 2321.27, -4971.29, 72.3842, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+407, 181193, 0, 2321.27, -4971.29, 72.3842, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+408, 181194, 0, 2321.27, -4971.29, 72.3842, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+409, 181191, 0, 2325.87, -4923.38, 82.4325, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+410, 181192, 0, 2325.87, -4923.38, 82.4325, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+411, 181193, 0, 2325.87, -4923.38, 82.4325, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+412, 181194, 0, 2325.87, -4923.38, 82.4325, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+413, 181191, 0, 2332.87, -4946.56, 73.514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+414, 181192, 0, 2332.87, -4946.56, 73.514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+415, 181193, 0, 2332.87, -4946.56, 73.514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+416, 181194, 0, 2332.87, -4946.56, 73.514, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+417, 181191, 0, 2332.91, -4934.26, 77.6943, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+418, 181192, 0, 2332.91, -4934.26, 77.6943, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+419, 181193, 0, 2332.91, -4934.26, 77.6943, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+420, 181194, 0, 2332.91, -4934.26, 77.6943, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+421, 181191, 0, 2333.7, -4935.03, 77.1431, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+422, 181192, 0, 2333.7, -4935.03, 77.1431, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+423, 181193, 0, 2333.7, -4935.03, 77.1431, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+424, 181194, 0, 2333.7, -4935.03, 77.1431, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+425, 181191, 0, 2350.44, -4913.78, 74.405, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+426, 181192, 0, 2350.44, -4913.78, 74.405, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+427, 181193, 0, 2350.44, -4913.78, 74.405, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+428, 181194, 0, 2350.44, -4913.78, 74.405, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+429, 181191, 0, 2351.85, -4914.2, 74.3483, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+430, 181192, 0, 2351.85, -4914.2, 74.3483, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+431, 181193, 0, 2351.85, -4914.2, 74.3483, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Eastern Plaguelands
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+432, 181194, 0, 2351.85, -4914.2, 74.3483, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10);    -- GameObject: "Skullpile 04" in Eastern Plaguelands
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+1 AND @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+432;
+
+    INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+1, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+1, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+2, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+1, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+3, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+1, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+4, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+1, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+5, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+2, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+6, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+2, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+7, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+2, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+8, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+2, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+9, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+3, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+10, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+3, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+11, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+3, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+12, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+3, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+13, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+4, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+14, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+4, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+15, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+4, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+16, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+4, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+17, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+5, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+18, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+5, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+19, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+5, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+20, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+5, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+21, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+6, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+22, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+6, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+23, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+6, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+24, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+6, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+25, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+7, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+26, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+7, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+27, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+7, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+28, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+7, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+29, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+8, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+30, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+8, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+31, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+8, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+32, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+8, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+33, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+9, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+34, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+9, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+35, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+9, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+36, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+9, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+37, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+10, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+38, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+10, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+39, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+10, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+40, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+10, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+41, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+11, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+42, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+11, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+43, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+11, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+44, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+11, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+45, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+12, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+46, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+12, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+47, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+12, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+48, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+12, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+49, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+13, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+50, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+13, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+51, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+13, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+52, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+13, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+53, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+14, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+54, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+14, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+55, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+14, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+56, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+14, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+57, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+15, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+58, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+15, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+59, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+15, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+60, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+15, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+61, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+16, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+62, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+16, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+63, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+16, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+64, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+16, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+65, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+17, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+66, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+17, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+67, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+17, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+68, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+17, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+69, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+18, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+70, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+18, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+71, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+18, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+72, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+18, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+73, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+19, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+74, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+19, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+75, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+19, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+76, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+19, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+77, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+20, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+78, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+20, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+79, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+20, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+80, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+20, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+81, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+21, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+82, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+21, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+83, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+21, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+84, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+21, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+85, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+22, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+86, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+22, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+87, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+22, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+88, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+22, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+89, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+23, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+90, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+23, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+91, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+23, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+92, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+23, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+93, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+24, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+94, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+24, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+95, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+24, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+96, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+24, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+97, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+25, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+98, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+25, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+99, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+25, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+100, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+25, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+101, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+26, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+102, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+26, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+103, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+26, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+104, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+26, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+105, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+27, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+106, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+27, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+107, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+27, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+108, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+27, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+109, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+28, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+110, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+28, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+111, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+28, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+112, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+28, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+113, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+29, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+114, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+29, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+115, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+29, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+116, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+29, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+117, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+30, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+118, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+30, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+119, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+30, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+120, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+30, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+121, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+31, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+122, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+31, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+123, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+31, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+124, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+31, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+125, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+32, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+126, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+32, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+127, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+32, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+128, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+32, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+129, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+33, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+130, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+33, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+131, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+33, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+132, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+33, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+133, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+34, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+134, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+34, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+135, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+34, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+136, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+34, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+137, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+35, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+138, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+35, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+139, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+35, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+140, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+35, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+141, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+36, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+142, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+36, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+143, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+36, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+144, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+36, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+145, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+37, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+146, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+37, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+147, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+37, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+148, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+37, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+149, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+38, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+150, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+38, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+151, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+38, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+152, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+38, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+153, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+39, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+154, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+39, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+155, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+39, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+156, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+39, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+157, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+40, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+158, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+40, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+159, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+40, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+160, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+40, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+161, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+41, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+162, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+41, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+163, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+41, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+164, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+41, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+165, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+42, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+166, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+42, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+167, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+42, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+168, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+42, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+169, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+43, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+170, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+43, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+171, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+43, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+172, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+43, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+173, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+44, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+174, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+44, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+175, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+44, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+176, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+44, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+177, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+45, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+178, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+45, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+179, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+45, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+180, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+45, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+181, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+46, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+182, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+46, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+183, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+46, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+184, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+46, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+185, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+47, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+186, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+47, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+187, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+47, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+188, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+47, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+189, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+48, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+190, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+48, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+191, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+48, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+192, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+48, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+193, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+49, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+194, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+49, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+195, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+49, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+196, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+49, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+197, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+50, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+198, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+50, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+199, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+50, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+200, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+50, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+201, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+51, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+202, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+51, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+203, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+51, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+204, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+51, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+205, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+52, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+206, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+52, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+207, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+52, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+208, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+52, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+209, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+53, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+210, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+53, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+211, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+53, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+212, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+53, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+213, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+54, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+214, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+54, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+215, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+54, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+216, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+54, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+217, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+55, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+218, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+55, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+219, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+55, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+220, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+55, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+221, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+56, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+222, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+56, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+223, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+56, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+224, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+56, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+225, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+57, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+226, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+57, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+227, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+57, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+228, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+57, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+229, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+58, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+230, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+58, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+231, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+58, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+232, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+58, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+233, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+59, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+234, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+59, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+235, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+59, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+236, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+59, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+237, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+60, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+238, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+60, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+239, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+60, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+240, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+60, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+241, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+61, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+242, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+61, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+243, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+61, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+244, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+61, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+245, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+62, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+246, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+62, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+247, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+62, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+248, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+62, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+249, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+63, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+250, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+63, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+251, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+63, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+252, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+63, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+253, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+64, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+254, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+64, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+255, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+64, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+256, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+64, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+257, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+65, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+258, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+65, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+259, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+65, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+260, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+65, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+261, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+66, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+262, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+66, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+263, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+66, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+264, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+66, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+265, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+67, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+266, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+67, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+267, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+67, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+268, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+67, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+269, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+68, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+270, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+68, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+271, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+68, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+272, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+68, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+273, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+69, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+274, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+69, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+275, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+69, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+276, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+69, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+277, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+70, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+278, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+70, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+279, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+70, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+280, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+70, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+281, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+71, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+282, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+71, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+283, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+71, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+284, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+71, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+285, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+72, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+286, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+72, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+287, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+72, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+288, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+72, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+289, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+73, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+290, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+73, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+291, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+73, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+292, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+73, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+293, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+74, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+294, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+74, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+295, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+74, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+296, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+74, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+297, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+75, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+298, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+75, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+299, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+75, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+300, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+75, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+301, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+76, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+302, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+76, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+303, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+76, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+304, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+76, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+305, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+77, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+306, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+77, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+307, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+77, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+308, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+77, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+309, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+78, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+310, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+78, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+311, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+78, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+312, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+78, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+313, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+79, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+314, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+79, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+315, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+79, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+316, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+79, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+317, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+80, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+318, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+80, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+319, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+80, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+320, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+80, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+321, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+81, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+322, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+81, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+323, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+81, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+324, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+81, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+325, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+82, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+326, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+82, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+327, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+82, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+328, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+82, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+329, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+83, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+330, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+83, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+331, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+83, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+332, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+83, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+333, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+84, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+334, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+84, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+335, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+84, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+336, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+84, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+337, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+85, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+338, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+85, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+339, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+85, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+340, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+85, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+341, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+86, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+342, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+86, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+343, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+86, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+344, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+86, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+345, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+87, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+346, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+87, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+347, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+87, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+348, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+87, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+349, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+88, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+350, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+88, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+351, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+88, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+352, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+88, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+353, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+89, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+354, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+89, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+355, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+89, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+356, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+89, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+357, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+90, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+358, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+90, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+359, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+90, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+360, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+90, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+361, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+91, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+362, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+91, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+363, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+91, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+364, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+91, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+365, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+92, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+366, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+92, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+367, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+92, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+368, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+92, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+369, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+93, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+370, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+93, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+371, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+93, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+372, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+93, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+373, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+94, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+374, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+94, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+375, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+94, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+376, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+94, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+377, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+95, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+378, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+95, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+379, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+95, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+380, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+95, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+381, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+96, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+382, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+96, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+383, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+96, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+384, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+96, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+385, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+97, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+386, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+97, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+387, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+97, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+388, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+97, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+389, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+98, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+390, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+98, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+391, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+98, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+392, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+98, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+393, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+99, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+394, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+99, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+395, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+99, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+396, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+99, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+397, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+100, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+398, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+100, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+399, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+100, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+400, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+100, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+401, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+101, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+402, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+101, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+403, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+101, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+404, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+101, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+405, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+102, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+406, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+102, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+407, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+102, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+408, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+102, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+409, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+103, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+410, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+103, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+411, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+103, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+412, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+103, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+413, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+104, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+414, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+104, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+415, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+104, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+416, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+104, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+417, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+105, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+418, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+105, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+419, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+105, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+420, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+105, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+421, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+106, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+422, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+106, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+423, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+106, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+424, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+106, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+425, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+107, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+426, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+107, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+427, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+107, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+428, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+107, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+429, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+108, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+430, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+108, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+431, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+108, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID+432, @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+108, 0, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 9, 10);
+    INSERT INTO `pool_template` SELECT pool_gameobject.pool_entry, 1, 'Scourge Invasion Eastern Plaguelands, Skullpile', 0, 0, 9, 10 FROM `pool_gameobject` WHERE pool_gameobject.pool_entry BETWEEN @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+1 AND @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY+108 GROUP BY pool_gameobject.pool_entry;
+
+    -- GameObject: "Skullpile" in Burning Steppes
+    INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+1, 181191, 0, -8433.5, -1267.95, 218.048, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+2, 181192, 0, -8433.5, -1267.95, 218.048, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+3, 181193, 0, -8433.5, -1267.95, 218.048, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+4, 181194, 0, -8433.5, -1267.95, 218.048, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+5, 181191, 0, -8432.31, -1247.49, 211.001, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+6, 181192, 0, -8432.31, -1247.49, 211.001, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+7, 181193, 0, -8432.31, -1247.49, 211.001, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+8, 181194, 0, -8432.31, -1247.49, 211.001, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+9, 181191, 0, -8424.23, -1257.97, 213.001, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+10, 181192, 0, -8424.23, -1257.97, 213.001, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+11, 181193, 0, -8424.23, -1257.97, 213.001, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+12, 181194, 0, -8424.23, -1257.97, 213.001, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+13, 181191, 0, -8415.65, -1250.67, 207.519, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+14, 181192, 0, -8415.65, -1250.67, 207.519, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+15, 181193, 0, -8415.65, -1250.67, 207.519, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+16, 181194, 0, -8415.65, -1250.67, 207.519, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+17, 181191, 0, -8414.85, -1250.54, 207.285, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+18, 181192, 0, -8414.85, -1250.54, 207.285, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+19, 181193, 0, -8414.85, -1250.54, 207.285, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+20, 181194, 0, -8414.85, -1250.54, 207.285, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+21, 181191, 0, -8413.57, -1233.1, 197.218, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+22, 181192, 0, -8413.57, -1233.1, 197.218, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+23, 181193, 0, -8413.57, -1233.1, 197.218, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+24, 181194, 0, -8413.57, -1233.1, 197.218, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+25, 181191, 0, -8412.9, -1232.9, 196.897, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+26, 181192, 0, -8412.9, -1232.9, 196.897, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+27, 181193, 0, -8412.9, -1232.9, 196.897, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+28, 181194, 0, -8412.9, -1232.9, 196.897, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+29, 181191, 0, -8409.35, -1267.67, 215.369, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+30, 181192, 0, -8409.35, -1267.67, 215.369, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+31, 181193, 0, -8409.35, -1267.67, 215.369, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+32, 181194, 0, -8409.35, -1267.67, 215.369, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+33, 181191, 0, -8401.86, -1239.32, 198.169, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+34, 181192, 0, -8401.86, -1239.32, 198.169, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+35, 181193, 0, -8401.86, -1239.32, 198.169, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+36, 181194, 0, -8401.86, -1239.32, 198.169, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+37, 181191, 0, -8395.2, -949.871, 201.625, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+38, 181192, 0, -8395.2, -949.871, 201.625, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+39, 181193, 0, -8395.2, -949.871, 201.625, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+40, 181194, 0, -8395.2, -949.871, 201.625, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+41, 181191, 0, -8392.18, -963.944, 194.591, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+42, 181192, 0, -8392.18, -963.944, 194.591, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+43, 181193, 0, -8392.18, -963.944, 194.591, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+44, 181194, 0, -8392.18, -963.944, 194.591, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+45, 181191, 0, -8391.61, -1265.83, 210.55, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+46, 181192, 0, -8391.61, -1265.83, 210.55, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+47, 181193, 0, -8391.61, -1265.83, 210.55, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+48, 181194, 0, -8391.61, -1265.83, 210.55, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+49, 181191, 0, -8391.25, -1264.89, 210.08, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+50, 181192, 0, -8391.25, -1264.89, 210.08, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+51, 181193, 0, -8391.25, -1264.89, 210.08, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+52, 181194, 0, -8391.25, -1264.89, 210.08, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+53, 181191, 0, -8391.06, -964.633, 194.041, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+54, 181192, 0, -8391.06, -964.633, 194.041, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+55, 181193, 0, -8391.06, -964.633, 194.041, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+56, 181194, 0, -8391.06, -964.633, 194.041, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+57, 181191, 0, -8390, -1221.27, 189.737, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+58, 181192, 0, -8390, -1221.27, 189.737, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+59, 181193, 0, -8390, -1221.27, 189.737, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+60, 181194, 0, -8390, -1221.27, 189.737, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+61, 181191, 0, -8380.72, -945.081, 200.524, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+62, 181192, 0, -8380.72, -945.081, 200.524, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+63, 181193, 0, -8380.72, -945.081, 200.524, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+64, 181194, 0, -8380.72, -945.081, 200.524, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+65, 181191, 0, -8379.61, -944.806, 200.392, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+66, 181192, 0, -8379.61, -944.806, 200.392, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+67, 181193, 0, -8379.61, -944.806, 200.392, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+68, 181194, 0, -8379.61, -944.806, 200.392, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+69, 181191, 0, -8379.32, -982.256, 187.678, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+70, 181192, 0, -8379.32, -982.256, 187.678, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+71, 181193, 0, -8379.32, -982.256, 187.678, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+72, 181194, 0, -8379.32, -982.256, 187.678, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+73, 181191, 0, -8379.25, -1233.79, 193.823, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+74, 181192, 0, -8379.25, -1233.79, 193.823, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+75, 181193, 0, -8379.25, -1233.79, 193.823, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+76, 181194, 0, -8379.25, -1233.79, 193.823, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+77, 181191, 0, -8378.7, -981.541, 187.686, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+78, 181192, 0, -8378.7, -981.541, 187.686, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+79, 181193, 0, -8378.7, -981.541, 187.686, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+80, 181194, 0, -8378.7, -981.541, 187.686, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+81, 181191, 0, -8378.61, -1234.11, 193.818, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+82, 181192, 0, -8378.61, -1234.11, 193.818, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+83, 181193, 0, -8378.61, -1234.11, 193.818, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+84, 181194, 0, -8378.61, -1234.11, 193.818, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+85, 181191, 0, -8377.69, -958.731, 193.846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+86, 181192, 0, -8377.69, -958.731, 193.846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+87, 181193, 0, -8377.69, -958.731, 193.846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+88, 181194, 0, -8377.69, -958.731, 193.846, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+89, 181191, 0, -8377.68, -982.149, 187.548, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+90, 181192, 0, -8377.68, -982.149, 187.548, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+91, 181193, 0, -8377.68, -982.149, 187.548, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+92, 181194, 0, -8377.68, -982.149, 187.548, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+93, 181191, 0, -8366.26, -1279.55, 212.048, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+94, 181192, 0, -8366.26, -1279.55, 212.048, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+95, 181193, 0, -8366.26, -1279.55, 212.048, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+96, 181194, 0, -8366.26, -1279.55, 212.048, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+97, 181191, 0, -8366.14, -1277.8, 211.669, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+98, 181192, 0, -8366.14, -1277.8, 211.669, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+99, 181193, 0, -8366.14, -1277.8, 211.669, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+100, 181194, 0, -8366.14, -1277.8, 211.669, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+101, 181191, 0, -8364.4, -966.61, 189.125, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+102, 181192, 0, -8364.4, -966.61, 189.125, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+103, 181193, 0, -8364.4, -966.61, 189.125, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+104, 181194, 0, -8364.4, -966.61, 189.125, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+105, 181191, 0, -8359.07, -930.49, 207.002, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+106, 181192, 0, -8359.07, -930.49, 207.002, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+107, 181193, 0, -8359.07, -930.49, 207.002, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+108, 181194, 0, -8359.07, -930.49, 207.002, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+109, 181191, 0, -8358.67, -929.78, 207.349, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+110, 181192, 0, -8358.67, -929.78, 207.349, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+111, 181193, 0, -8358.67, -929.78, 207.349, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+112, 181194, 0, -8358.67, -929.78, 207.349, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+113, 181191, 0, -8358.66, -947.965, 194.263, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+114, 181192, 0, -8358.66, -947.965, 194.263, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+115, 181193, 0, -8358.66, -947.965, 194.263, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+116, 181194, 0, -8358.66, -947.965, 194.263, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+117, 181191, 0, -8357.6, -930.427, 207.274, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+118, 181192, 0, -8357.6, -930.427, 207.274, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+119, 181193, 0, -8357.6, -930.427, 207.274, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+120, 181194, 0, -8357.6, -930.427, 207.274, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+121, 181191, 0, -8356.36, -982.168, 185.507, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+122, 181192, 0, -8356.36, -982.168, 185.507, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+123, 181193, 0, -8356.36, -982.168, 185.507, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+124, 181194, 0, -8356.36, -982.168, 185.507, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+125, 181191, 0, -8354.97, -1255.32, 194.544, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+126, 181192, 0, -8354.97, -1255.32, 194.544, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+127, 181193, 0, -8354.97, -1255.32, 194.544, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+128, 181194, 0, -8354.97, -1255.32, 194.544, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+129, 181191, 0, -8353.58, -1256.07, 194.868, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+130, 181192, 0, -8353.58, -1256.07, 194.868, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+131, 181193, 0, -8353.58, -1256.07, 194.868, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+132, 181194, 0, -8353.58, -1256.07, 194.868, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+133, 181191, 0, -8353.23, -958.709, 189.964, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+134, 181192, 0, -8353.23, -958.709, 189.964, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+135, 181193, 0, -8353.23, -958.709, 189.964, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+136, 181194, 0, -8353.23, -958.709, 189.964, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+137, 181191, 0, -8351.73, -959.321, 189.72, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+138, 181192, 0, -8351.73, -959.321, 189.72, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+139, 181193, 0, -8351.73, -959.321, 189.72, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+140, 181194, 0, -8351.73, -959.321, 189.72, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+141, 181191, 0, -8351.62, -972.482, 186.748, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+142, 181192, 0, -8351.62, -972.482, 186.748, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+143, 181193, 0, -8351.62, -972.482, 186.748, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+144, 181194, 0, -8351.62, -972.482, 186.748, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+145, 181191, 0, -8050.72, -996.258, 130.698, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+146, 181192, 0, -8050.72, -996.258, 130.698, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+147, 181193, 0, -8050.72, -996.258, 130.698, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+148, 181194, 0, -8050.72, -996.258, 130.698, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+149, 181191, 0, -8050.55, -972.639, 132.138, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+150, 181192, 0, -8050.55, -972.639, 132.138, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+151, 181193, 0, -8050.55, -972.639, 132.138, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+152, 181194, 0, -8050.55, -972.639, 132.138, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+153, 181191, 0, -8049.84, -997.107, 130.537, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+154, 181192, 0, -8049.84, -997.107, 130.537, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+155, 181193, 0, -8049.84, -997.107, 130.537, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+156, 181194, 0, -8049.84, -997.107, 130.537, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+157, 181191, 0, -8049.32, -971.909, 131.784, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+158, 181192, 0, -8049.32, -971.909, 131.784, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+159, 181193, 0, -8049.32, -971.909, 131.784, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+160, 181194, 0, -8049.32, -971.909, 131.784, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+161, 181191, 0, -8035.09, -960.794, 130.82, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+162, 181192, 0, -8035.09, -960.794, 130.82, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+163, 181193, 0, -8035.09, -960.794, 130.82, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+164, 181194, 0, -8035.09, -960.794, 130.82, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+165, 181191, 0, -8034.57, -959.944, 131.149, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+166, 181192, 0, -8034.57, -959.944, 131.149, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+167, 181193, 0, -8034.57, -959.944, 131.149, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+168, 181194, 0, -8034.57, -959.944, 131.149, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+169, 181191, 0, -8032.87, -1002.25, 122.634, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+170, 181192, 0, -8032.87, -1002.25, 122.634, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+171, 181193, 0, -8032.87, -1002.25, 122.634, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+172, 181194, 0, -8032.87, -1002.25, 122.634, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+173, 181191, 0, -8025.99, -970.899, 122.647, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+174, 181192, 0, -8025.99, -970.899, 122.647, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+175, 181193, 0, -8025.99, -970.899, 122.647, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+176, 181194, 0, -8025.99, -970.899, 122.647, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+177, 181191, 0, -8023.52, -989.657, 122.647, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+178, 181192, 0, -8023.52, -989.657, 122.647, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+179, 181193, 0, -8023.52, -989.657, 122.647, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+180, 181194, 0, -8023.52, -989.657, 122.647, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+181, 181191, 0, -8022.38, -988.255, 122.647, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+182, 181192, 0, -8022.38, -988.255, 122.647, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+183, 181193, 0, -8022.38, -988.255, 122.647, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+184, 181194, 0, -8022.38, -988.255, 122.647, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+185, 181191, 0, -8022, -990.26, 122.647, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+186, 181192, 0, -8022, -990.26, 122.647, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+187, 181193, 0, -8022, -990.26, 122.647, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+188, 181194, 0, -8022, -990.26, 122.647, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+189, 181191, 0, -8021.04, -1013.84, 128.752, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+190, 181192, 0, -8021.04, -1013.84, 128.752, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+191, 181193, 0, -8021.04, -1013.84, 128.752, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+192, 181194, 0, -8021.04, -1013.84, 128.752, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+193, 181191, 0, -8020.25, -1013.67, 128.933, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+194, 181192, 0, -8020.25, -1013.67, 128.933, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+195, 181193, 0, -8020.25, -1013.67, 128.933, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+196, 181194, 0, -8020.25, -1013.67, 128.933, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+197, 181191, 0, -8018.94, -2436.24, 127.586, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+198, 181192, 0, -8018.94, -2436.24, 127.586, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+199, 181193, 0, -8018.94, -2436.24, 127.586, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+200, 181194, 0, -8018.94, -2436.24, 127.586, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+201, 181191, 0, -8012.74, -2417.08, 125.16, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+202, 181192, 0, -8012.74, -2417.08, 125.16, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+203, 181193, 0, -8012.74, -2417.08, 125.16, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+204, 181194, 0, -8012.74, -2417.08, 125.16, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+205, 181191, 0, -8011.98, -2417.71, 125.316, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+206, 181192, 0, -8011.98, -2417.71, 125.316, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+207, 181193, 0, -8011.98, -2417.71, 125.316, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+208, 181194, 0, -8011.98, -2417.71, 125.316, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+209, 181191, 0, -8011.56, -2416.17, 124.975, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+210, 181192, 0, -8011.56, -2416.17, 124.975, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+211, 181193, 0, -8011.56, -2416.17, 124.975, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+212, 181194, 0, -8011.56, -2416.17, 124.975, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+213, 181191, 0, -8011.44, -955.784, 130.491, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+214, 181192, 0, -8011.44, -955.784, 130.491, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+215, 181193, 0, -8011.44, -955.784, 130.491, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+216, 181194, 0, -8011.44, -955.784, 130.491, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+217, 181191, 0, -8011.15, -2453.95, 131.804, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+218, 181192, 0, -8011.15, -2453.95, 131.804, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+219, 181193, 0, -8011.15, -2453.95, 131.804, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+220, 181194, 0, -8011.15, -2453.95, 131.804, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+221, 181191, 0, -8010.96, -983.187, 127.41, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+222, 181192, 0, -8010.96, -983.187, 127.41, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+223, 181193, 0, -8010.96, -983.187, 127.41, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+224, 181194, 0, -8010.96, -983.187, 127.41, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+225, 181191, 0, -8010.8, -2453.43, 131.654, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+226, 181192, 0, -8010.8, -2453.43, 131.654, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+227, 181193, 0, -8010.8, -2453.43, 131.654, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+228, 181194, 0, -8010.8, -2453.43, 131.654, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+229, 181191, 0, -8010.23, -981.925, 127.578, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+230, 181192, 0, -8010.23, -981.925, 127.578, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+231, 181193, 0, -8010.23, -981.925, 127.578, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+232, 181194, 0, -8010.23, -981.925, 127.578, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+233, 181191, 0, -8001.2, -2435.98, 131.14, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+234, 181192, 0, -8001.2, -2435.98, 131.14, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+235, 181193, 0, -8001.2, -2435.98, 131.14, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+236, 181194, 0, -8001.2, -2435.98, 131.14, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+237, 181191, 0, -7995.82, -1002.28, 129.203, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+238, 181192, 0, -7995.82, -1002.28, 129.203, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+239, 181193, 0, -7995.82, -1002.28, 129.203, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+240, 181194, 0, -7995.82, -1002.28, 129.203, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+241, 181191, 0, -7989.55, -2420.37, 127.713, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+242, 181192, 0, -7989.55, -2420.37, 127.713, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+243, 181193, 0, -7989.55, -2420.37, 127.713, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+244, 181194, 0, -7989.55, -2420.37, 127.713, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+245, 181191, 0, -7989.18, -2421.23, 128.044, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+246, 181192, 0, -7989.18, -2421.23, 128.044, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+247, 181193, 0, -7989.18, -2421.23, 128.044, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+248, 181194, 0, -7989.18, -2421.23, 128.044, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+249, 181191, 0, -7987.15, -970.404, 128.898, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+250, 181192, 0, -7987.15, -970.404, 128.898, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+251, 181193, 0, -7987.15, -970.404, 128.898, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+252, 181194, 0, -7987.15, -970.404, 128.898, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+253, 181191, 0, -7983.05, -2443.49, 131.162, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+254, 181192, 0, -7983.05, -2443.49, 131.162, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+255, 181193, 0, -7983.05, -2443.49, 131.162, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+256, 181194, 0, -7983.05, -2443.49, 131.162, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+257, 181191, 0, -7982.49, -2442.67, 130.99, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+258, 181192, 0, -7982.49, -2442.67, 130.99, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+259, 181193, 0, -7982.49, -2442.67, 130.99, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+260, 181194, 0, -7982.49, -2442.67, 130.99, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+261, 181191, 0, -7982.37, -2456.56, 132.788, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+262, 181192, 0, -7982.37, -2456.56, 132.788, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+263, 181193, 0, -7982.37, -2456.56, 132.788, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+264, 181194, 0, -7982.37, -2456.56, 132.788, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+265, 181191, 0, -7982.2, -2443.23, 131.006, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+266, 181192, 0, -7982.2, -2443.23, 131.006, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+267, 181193, 0, -7982.2, -2443.23, 131.006, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+268, 181194, 0, -7982.2, -2443.23, 131.006, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+269, 181191, 0, -7976.1, -2411.7, 125.535, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+270, 181192, 0, -7976.1, -2411.7, 125.535, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+271, 181193, 0, -7976.1, -2411.7, 125.535, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+272, 181194, 0, -7976.1, -2411.7, 125.535, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+273, 181191, 0, -7969.08, -2433.74, 127.042, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+274, 181192, 0, -7969.08, -2433.74, 127.042, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+275, 181193, 0, -7969.08, -2433.74, 127.042, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+276, 181194, 0, -7969.08, -2433.74, 127.042, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+277, 181191, 0, -7958.07, -2416.88, 126.889, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+278, 181192, 0, -7958.07, -2416.88, 126.889, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+279, 181193, 0, -7958.07, -2416.88, 126.889, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+280, 181194, 0, -7958.07, -2416.88, 126.889, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+281, 181191, 0, -7952.66, -2436.15, 127.879, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+282, 181192, 0, -7952.66, -2436.15, 127.879, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+283, 181193, 0, -7952.66, -2436.15, 127.879, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+284, 181194, 0, -7952.66, -2436.15, 127.879, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+285, 181191, 0, -7952.01, -2437.23, 128.365, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+286, 181192, 0, -7952.01, -2437.23, 128.365, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+287, 181193, 0, -7952.01, -2437.23, 128.365, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+288, 181194, 0, -7952.01, -2437.23, 128.365, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+289, 181191, 0, -7766.38, -2238.1, 133.528, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+290, 181192, 0, -7766.38, -2238.1, 133.528, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+291, 181193, 0, -7766.38, -2238.1, 133.528, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+292, 181194, 0, -7766.38, -2238.1, 133.528, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+293, 181191, 0, -7765.77, -2237.39, 133.541, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+294, 181192, 0, -7765.77, -2237.39, 133.541, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+295, 181193, 0, -7765.77, -2237.39, 133.541, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+296, 181194, 0, -7765.77, -2237.39, 133.541, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+297, 181191, 0, -7753.81, -2219.62, 133.439, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+298, 181192, 0, -7753.81, -2219.62, 133.439, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+299, 181193, 0, -7753.81, -2219.62, 133.439, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+300, 181194, 0, -7753.81, -2219.62, 133.439, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+301, 181191, 0, -7752.97, -2201.82, 133.439, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+302, 181192, 0, -7752.97, -2201.82, 133.439, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+303, 181193, 0, -7752.97, -2201.82, 133.439, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+304, 181194, 0, -7752.97, -2201.82, 133.439, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+305, 181191, 0, -7750.94, -2253.1, 133.596, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+306, 181192, 0, -7750.94, -2253.1, 133.596, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+307, 181193, 0, -7750.94, -2253.1, 133.596, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+308, 181194, 0, -7750.94, -2253.1, 133.596, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+309, 181191, 0, -7750.86, -2253.54, 133.605, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+310, 181192, 0, -7750.86, -2253.54, 133.605, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+311, 181193, 0, -7750.86, -2253.54, 133.605, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+312, 181194, 0, -7750.86, -2253.54, 133.605, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+313, 181191, 0, -7742.58, -2236.3, 134.159, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+314, 181192, 0, -7742.58, -2236.3, 134.159, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+315, 181193, 0, -7742.58, -2236.3, 134.159, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+316, 181194, 0, -7742.58, -2236.3, 134.159, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+317, 181191, 0, -7742.49, -2235.79, 134.134, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+318, 181192, 0, -7742.49, -2235.79, 134.134, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+319, 181193, 0, -7742.49, -2235.79, 134.134, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+320, 181194, 0, -7742.49, -2235.79, 134.134, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+321, 181191, 0, -7737.11, -2256.78, 135.901, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+322, 181192, 0, -7737.11, -2256.78, 135.901, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+323, 181193, 0, -7737.11, -2256.78, 135.901, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+324, 181194, 0, -7737.11, -2256.78, 135.901, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+325, 181191, 0, -7734.07, -2207.99, 133.439, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+326, 181192, 0, -7734.07, -2207.99, 133.439, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+327, 181193, 0, -7734.07, -2207.99, 133.439, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+328, 181194, 0, -7734.07, -2207.99, 133.439, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+329, 181191, 0, -7732.74, -2206.9, 133.439, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+330, 181192, 0, -7732.74, -2206.9, 133.439, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+331, 181193, 0, -7732.74, -2206.9, 133.439, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+332, 181194, 0, -7732.74, -2206.9, 133.439, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+333, 181191, 0, -7730.7, -2240.86, 136.298, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+334, 181192, 0, -7730.7, -2240.86, 136.298, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+335, 181193, 0, -7730.7, -2240.86, 136.298, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+336, 181194, 0, -7730.7, -2240.86, 136.298, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+337, 181191, 0, -7729.55, -2239.88, 136.404, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+338, 181192, 0, -7729.55, -2239.88, 136.404, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+339, 181193, 0, -7729.55, -2239.88, 136.404, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+340, 181194, 0, -7729.55, -2239.88, 136.404, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+341, 181191, 0, -7726.68, -2225.7, 134.645, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+342, 181192, 0, -7726.68, -2225.7, 134.645, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+343, 181193, 0, -7726.68, -2225.7, 134.645, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+344, 181194, 0, -7726.68, -2225.7, 134.645, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+345, 181191, 0, -7723.87, -2252.1, 138.787, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+346, 181192, 0, -7723.87, -2252.1, 138.787, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+347, 181193, 0, -7723.87, -2252.1, 138.787, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+348, 181194, 0, -7723.87, -2252.1, 138.787, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+349, 181191, 0, -7718.51, -2228.76, 135.882, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+350, 181192, 0, -7718.51, -2228.76, 135.882, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+351, 181193, 0, -7718.51, -2228.76, 135.882, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+352, 181194, 0, -7718.51, -2228.76, 135.882, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+353, 181191, 0, -7717.21, -2228.17, 135.888, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+354, 181192, 0, -7717.21, -2228.17, 135.888, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+355, 181193, 0, -7717.21, -2228.17, 135.888, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+356, 181194, 0, -7717.21, -2228.17, 135.888, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+357, 181191, 0, -7716.51, -2228.38, 135.988, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+358, 181192, 0, -7716.51, -2228.38, 135.988, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+359, 181193, 0, -7716.51, -2228.38, 135.988, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+360, 181194, 0, -7716.51, -2228.38, 135.988, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+361, 181191, 0, -7626.21, -2575.31, 132.021, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+362, 181192, 0, -7626.21, -2575.31, 132.021, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+363, 181193, 0, -7626.21, -2575.31, 132.021, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+364, 181194, 0, -7626.21, -2575.31, 132.021, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+365, 181191, 0, -7625.13, -2576.57, 131.763, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+366, 181192, 0, -7625.13, -2576.57, 131.763, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+367, 181193, 0, -7625.13, -2576.57, 131.763, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+368, 181194, 0, -7625.13, -2576.57, 131.763, 3.01941, 0, 0, 0.998135, 0.0610518, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+369, 181191, 0, -7624.22, -2602.44, 132.385, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+370, 181192, 0, -7624.22, -2602.44, 132.385, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+371, 181193, 0, -7624.22, -2602.44, 132.385, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+372, 181194, 0, -7624.22, -2602.44, 132.385, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+373, 181191, 0, -7623.63, -2603.38, 132.377, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+374, 181192, 0, -7623.63, -2603.38, 132.377, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+375, 181193, 0, -7623.63, -2603.38, 132.377, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+376, 181194, 0, -7623.63, -2603.38, 132.377, 0.453785, 0, 0, 0.224951, 0.97437, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+377, 181191, 0, -7623.44, -2604.28, 132.392, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+378, 181192, 0, -7623.44, -2604.28, 132.392, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+379, 181193, 0, -7623.44, -2604.28, 132.392, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+380, 181194, 0, -7623.44, -2604.28, 132.392, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+381, 181191, 0, -7608.6, -2612.26, 133.953, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+382, 181192, 0, -7608.6, -2612.26, 133.953, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+383, 181193, 0, -7608.6, -2612.26, 133.953, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+384, 181194, 0, -7608.6, -2612.26, 133.953, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+385, 181191, 0, -7608.55, -2613.28, 133.934, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+386, 181192, 0, -7608.55, -2613.28, 133.934, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+387, 181193, 0, -7608.55, -2613.28, 133.934, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+388, 181194, 0, -7608.55, -2613.28, 133.934, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+389, 181191, 0, -7607.81, -2587.44, 134.445, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+390, 181192, 0, -7607.81, -2587.44, 134.445, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+391, 181193, 0, -7607.81, -2587.44, 134.445, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+392, 181194, 0, -7607.81, -2587.44, 134.445, 5.07891, 0, 0, -0.566406, 0.824126, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+393, 181191, 0, -7607.78, -2629.18, 133.869, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+394, 181192, 0, -7607.78, -2629.18, 133.869, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+395, 181193, 0, -7607.78, -2629.18, 133.869, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+396, 181194, 0, -7607.78, -2629.18, 133.869, 2.44346, 0, 0, 0.939692, 0.34202, 120, 120, 100, 1, 0, 0, 9, 10),    -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+397, 181191, 0, -7598.04, -2604.17, 136.117, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+398, 181192, 0, -7598.04, -2604.17, 136.117, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+399, 181193, 0, -7598.04, -2604.17, 136.117, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+400, 181194, 0, -7598.04, -2604.17, 136.117, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+401, 181191, 0, -7596.82, -2566.68, 133.868, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+402, 181192, 0, -7596.82, -2566.68, 133.868, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+403, 181193, 0, -7596.82, -2566.68, 133.868, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+404, 181194, 0, -7596.82, -2566.68, 133.868, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+405, 181191, 0, -7595.88, -2566.53, 133.876, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+406, 181192, 0, -7595.88, -2566.53, 133.876, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+407, 181193, 0, -7595.88, -2566.53, 133.876, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+408, 181194, 0, -7595.88, -2566.53, 133.876, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+409, 181191, 0, -7591.88, -2620.63, 135.565, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+410, 181192, 0, -7591.88, -2620.63, 135.565, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+411, 181193, 0, -7591.88, -2620.63, 135.565, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+412, 181194, 0, -7591.88, -2620.63, 135.565, 1.32645, 0, 0, 0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 9, 10),   -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+413, 181191, 0, -7589.27, -2583.24, 137.281, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+414, 181192, 0, -7589.27, -2583.24, 137.281, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+415, 181193, 0, -7589.27, -2583.24, 137.281, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+416, 181194, 0, -7589.27, -2583.24, 137.281, 0.523598, 0, 0, 0.258819, 0.965926, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+417, 181191, 0, -7588.9, -2607.11, 136.995, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+418, 181192, 0, -7588.9, -2607.11, 136.995, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+419, 181193, 0, -7588.9, -2607.11, 136.995, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+420, 181194, 0, -7588.9, -2607.11, 136.995, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),     -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+421, 181191, 0, -7588.45, -2582.06, 137.095, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+422, 181192, 0, -7588.45, -2582.06, 137.095, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+423, 181193, 0, -7588.45, -2582.06, 137.095, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+424, 181194, 0, -7588.45, -2582.06, 137.095, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+425, 181191, 0, -7587.87, -2607.69, 137.044, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+426, 181192, 0, -7587.87, -2607.69, 137.044, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+427, 181193, 0, -7587.87, -2607.69, 137.044, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+428, 181194, 0, -7587.87, -2607.69, 137.044, 3.05433, 0, 0, 0.999048, 0.0436193, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 04" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+429, 181191, 0, -7587.59, -2606.65, 137.194, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 01" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+430, 181192, 0, -7587.59, -2606.65, 137.194, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 02" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+431, 181193, 0, -7587.59, -2606.65, 137.194, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10),  -- GameObject: "Skullpile 03" in Burning Steppes
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+432, 181194, 0, -7587.59, -2606.65, 137.194, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0, 0, 9, 10);  -- GameObject: "Skullpile 04" in Burning Steppes
+    INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_SKULLPILE_BURNING_STEPPES_GUID+1 AND @GOBJ_SKULLPILE_BURNING_STEPPES_GUID+432;
+
+    INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+1, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+1, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+2, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+1, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+3, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+1, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+4, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+1, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+5, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+2, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+6, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+2, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+7, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+2, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+8, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+2, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+9, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+3, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+10, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+3, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+11, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+3, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+12, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+3, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+13, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+4, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+14, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+4, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+15, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+4, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+16, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+4, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+17, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+5, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+18, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+5, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+19, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+5, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+20, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+5, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+21, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+6, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+22, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+6, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+23, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+6, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+24, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+6, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+25, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+7, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+26, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+7, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+27, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+7, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+28, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+7, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+29, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+8, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+30, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+8, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+31, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+8, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+32, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+8, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+33, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+9, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+34, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+9, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+35, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+9, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+36, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+9, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+37, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+10, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+38, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+10, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+39, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+10, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+40, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+10, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+41, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+11, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+42, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+11, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+43, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+11, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+44, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+11, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+45, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+12, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+46, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+12, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+47, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+12, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+48, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+12, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+49, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+13, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+50, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+13, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+51, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+13, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+52, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+13, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+53, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+14, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+54, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+14, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+55, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+14, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+56, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+14, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+57, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+15, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+58, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+15, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+59, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+15, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+60, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+15, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+61, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+16, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+62, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+16, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+63, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+16, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+64, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+16, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+65, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+17, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+66, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+17, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+67, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+17, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+68, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+17, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+69, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+18, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+70, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+18, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+71, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+18, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+72, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+18, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+73, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+19, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+74, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+19, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+75, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+19, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+76, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+19, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+77, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+20, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+78, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+20, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+79, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+20, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+80, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+20, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+81, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+21, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+82, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+21, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+83, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+21, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+84, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+21, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+85, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+22, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+86, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+22, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+87, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+22, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+88, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+22, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+89, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+23, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+90, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+23, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+91, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+23, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+92, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+23, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+93, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+24, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+94, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+24, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+95, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+24, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+96, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+24, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+97, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+25, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+98, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+25, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+99, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+25, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+100, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+25, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+101, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+26, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+102, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+26, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+103, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+26, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+104, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+26, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+105, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+27, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+106, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+27, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+107, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+27, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+108, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+27, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+109, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+28, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+110, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+28, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+111, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+28, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+112, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+28, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+113, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+29, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+114, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+29, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+115, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+29, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+116, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+29, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+117, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+30, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+118, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+30, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+119, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+30, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+120, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+30, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+121, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+31, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+122, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+31, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+123, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+31, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+124, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+31, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+125, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+32, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+126, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+32, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+127, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+32, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+128, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+32, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+129, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+33, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+130, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+33, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+131, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+33, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+132, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+33, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+133, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+34, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+134, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+34, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+135, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+34, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+136, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+34, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+137, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+35, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+138, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+35, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+139, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+35, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+140, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+35, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+141, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+36, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+142, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+36, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+143, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+36, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+144, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+36, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+145, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+37, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+146, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+37, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+147, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+37, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+148, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+37, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+149, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+38, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+150, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+38, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+151, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+38, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+152, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+38, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+153, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+39, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+154, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+39, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+155, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+39, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+156, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+39, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+157, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+40, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+158, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+40, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+159, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+40, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+160, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+40, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+161, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+41, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+162, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+41, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+163, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+41, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+164, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+41, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+165, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+42, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+166, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+42, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+167, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+42, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+168, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+42, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+169, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+43, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+170, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+43, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+171, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+43, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+172, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+43, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+173, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+44, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+174, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+44, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+175, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+44, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+176, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+44, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+177, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+45, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+178, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+45, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+179, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+45, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+180, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+45, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+181, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+46, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+182, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+46, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+183, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+46, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+184, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+46, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+185, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+47, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+186, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+47, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+187, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+47, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+188, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+47, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+189, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+48, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+190, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+48, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+191, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+48, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+192, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+48, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+193, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+49, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+194, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+49, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+195, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+49, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+196, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+49, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+197, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+50, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+198, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+50, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+199, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+50, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+200, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+50, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+201, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+51, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+202, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+51, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+203, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+51, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+204, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+51, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+205, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+52, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+206, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+52, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+207, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+52, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+208, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+52, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+209, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+53, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+210, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+53, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+211, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+53, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+212, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+53, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+213, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+54, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+214, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+54, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+215, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+54, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+216, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+54, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+217, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+55, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+218, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+55, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+219, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+55, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+220, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+55, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+221, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+56, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+222, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+56, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+223, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+56, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+224, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+56, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+225, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+57, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+226, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+57, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+227, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+57, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+228, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+57, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+229, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+58, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+230, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+58, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+231, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+58, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+232, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+58, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+233, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+59, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+234, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+59, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+235, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+59, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+236, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+59, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+237, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+60, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+238, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+60, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+239, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+60, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+240, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+60, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+241, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+61, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+242, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+61, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+243, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+61, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+244, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+61, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+245, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+62, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+246, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+62, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+247, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+62, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+248, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+62, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+249, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+63, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+250, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+63, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+251, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+63, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+252, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+63, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+253, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+64, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+254, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+64, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+255, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+64, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+256, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+64, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+257, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+65, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+258, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+65, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+259, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+65, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+260, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+65, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+261, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+66, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+262, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+66, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+263, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+66, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+264, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+66, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+265, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+67, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+266, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+67, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+267, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+67, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+268, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+67, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+269, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+68, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+270, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+68, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+271, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+68, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+272, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+68, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+273, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+69, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+274, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+69, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+275, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+69, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+276, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+69, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+277, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+70, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+278, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+70, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+279, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+70, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+280, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+70, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+281, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+71, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+282, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+71, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+283, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+71, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+284, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+71, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+285, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+72, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+286, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+72, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+287, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+72, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+288, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+72, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+289, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+73, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+290, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+73, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+291, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+73, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+292, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+73, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+293, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+74, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+294, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+74, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+295, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+74, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+296, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+74, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+297, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+75, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+298, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+75, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+299, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+75, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+300, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+75, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+301, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+76, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+302, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+76, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+303, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+76, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+304, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+76, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+305, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+77, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+306, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+77, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+307, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+77, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+308, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+77, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+309, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+78, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+310, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+78, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+311, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+78, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+312, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+78, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+313, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+79, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+314, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+79, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+315, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+79, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+316, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+79, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+317, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+80, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+318, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+80, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+319, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+80, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+320, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+80, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+321, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+81, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+322, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+81, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+323, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+81, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+324, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+81, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+325, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+82, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+326, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+82, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+327, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+82, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+328, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+82, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+329, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+83, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+330, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+83, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+331, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+83, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+332, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+83, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+333, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+84, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+334, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+84, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+335, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+84, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+336, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+84, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+337, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+85, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+338, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+85, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+339, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+85, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+340, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+85, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+341, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+86, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+342, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+86, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+343, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+86, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+344, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+86, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+345, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+87, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+346, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+87, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+347, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+87, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+348, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+87, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+349, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+88, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+350, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+88, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+351, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+88, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+352, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+88, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+353, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+89, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+354, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+89, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+355, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+89, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+356, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+89, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+357, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+90, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+358, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+90, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+359, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+90, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+360, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+90, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+361, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+91, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+362, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+91, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+363, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+91, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+364, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+91, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+365, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+92, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+366, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+92, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+367, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+92, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+368, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+92, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+369, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+93, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+370, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+93, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+371, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+93, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+372, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+93, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+373, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+94, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+374, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+94, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+375, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+94, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+376, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+94, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+377, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+95, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+378, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+95, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+379, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+95, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+380, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+95, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+381, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+96, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+382, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+96, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+383, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+96, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+384, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+96, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+385, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+97, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+386, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+97, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+387, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+97, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+388, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+97, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+389, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+98, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+390, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+98, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+391, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+98, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+392, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+98, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+393, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+99, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+394, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+99, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+395, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+99, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+396, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+99, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+397, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+100, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+398, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+100, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+399, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+100, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+400, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+100, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+401, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+101, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+402, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+101, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+403, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+101, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+404, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+101, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+405, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+102, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+406, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+102, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+407, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+102, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+408, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+102, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+409, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+103, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+410, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+103, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+411, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+103, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+412, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+103, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+413, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+104, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+414, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+104, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+415, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+104, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+416, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+104, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+417, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+105, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+418, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+105, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+419, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+105, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+420, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+105, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+421, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+106, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+422, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+106, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+423, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+106, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+424, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+106, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+425, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+107, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+426, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+107, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+427, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+107, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+428, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+107, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+429, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+108, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+430, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+108, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+431, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+108, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10),
+        (@GOBJ_SKULLPILE_BURNING_STEPPES_GUID+432, @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+108, 0, 'Scourge Invasion Burning Steppes, Skullpile', 0, 9, 10);
+    INSERT INTO `pool_template` SELECT pool_gameobject.pool_entry, 1, 'Scourge Invasion Burning Steppes, Skullpile', 0, 0, 9, 10 FROM `pool_gameobject` WHERE pool_gameobject.pool_entry BETWEEN @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+1 AND @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY+108 GROUP BY pool_gameobject.pool_entry;
 
 
 -- 8. TEMPORARY FIXES
