@@ -5937,122 +5937,55 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
     if (!id)
         return;
 
-    SkillStatusMap::iterator itr = mSkillStatus.find(id);
+    auto itr = mSkillStatus.find(id);
+    const bool exists = (itr != mSkillStatus.end());
 
-    //has skill
-    if (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED)
+    if (exists && itr->second.uState != SKILL_DELETED)  // Update/remove existing
+        SetSkill(itr, currVal, maxVal, step);
+    else if (currVal)                                     // Add new
     {
-        if (currVal)
+        if (!exists)
         {
-            if (step)                                      // need update step
-                SetUInt32Value(PLAYER_SKILL_INDEX(itr->second.pos), MAKE_PAIR32(id, step));
-            // update value
-            SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos), MAKE_SKILL_VALUE(currVal, maxVal));
-            if (itr->second.uState != SKILL_NEW)
-                itr->second.uState = SKILL_CHANGED;
-
-            // Learn all spells auto-trained by this skill on change
-            UpdateSkillTrainedSpells(id, currVal);
-        }
-        else                                                //remove
-        {
-            // Unapply skill bonuses
-            // temporary bonuses
-            AuraList const& lModSkill = GetAurasByType(SPELL_AURA_MOD_SKILL);
-            for (const auto j : lModSkill)
-                if (j->GetModifier()->m_miscvalue == int32(id))
-                    j->ApplyModifier(false);
-
-            // permanent bonuses
-            AuraList const& lModSkillTalent = GetAurasByType(SPELL_AURA_MOD_SKILL_TALENT);
-            for (const auto j : lModSkillTalent)
-                if (j->GetModifier()->m_miscvalue == int32(id))
-                    j->ApplyModifier(false);
-
-            // clear skill fields
-            SetUInt32Value(PLAYER_SKILL_INDEX(itr->second.pos), 0);
-            SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos), 0);
-            SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(itr->second.pos), 0);
-
-            // mark as deleted or simply remove from map if not saved yet
-            if (itr->second.uState != SKILL_NEW)
-                itr->second.uState = SKILL_DELETED;
-            else
-                mSkillStatus.erase(itr);
-
-            // Remove all spells dependent on this skill unconditionally
-            UpdateSkillTrainedSpells(id, 0);
-
-            // remove all quests related to this skill (else the spell will be automatically learned at next login, cf Player::LearnQuestRewardedSpells)
-            for (auto& itr : mQuestStatus)
-            { 
-                if (Quest const* quest = sObjectMgr.GetQuestTemplate(itr.first))
-                {
-                    if (quest->GetRequiredSkill() == id)
-                    {
-                        // remove all quest entries for 'entry' from quest log
-                        for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
-                        {
-                            if (GetQuestSlotQuestId(slot) == itr.first)
-                            {
-                                SetQuestSlot(slot, 0);
-                                TakeOrReplaceQuestStartItems(itr.first, false, false);
-                                break;
-                            }
-                        }
-
-                        // set quest status to not started (will updated in DB at next save)
-                        SetQuestStatus(itr.first, QUEST_STATUS_NONE); // Does not invalidate the iterator
-                        itr.second.uState = QUEST_DELETED;
-                    }
-                }
-            }
-        }
-    }
-    else if (currVal)                                       // add
-    {
-        for (int i = 0; i < PLAYER_MAX_SKILLS; ++i)
-        {
-            if (!GetUInt32Value(PLAYER_SKILL_INDEX(i)))
+            SkillLineEntry const* entry = sSkillLineStore.LookupEntry(id);
+            if (!entry)
             {
-                SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(id);
-                if (!pSkill)
-                {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Skill not found in SkillLineStore: skill #%u", id);
-                    return;
-                }
-
-                SetUInt32Value(PLAYER_SKILL_INDEX(i), MAKE_PAIR32(id, step));
-                SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i), MAKE_SKILL_VALUE(currVal, maxVal));
-
-                // insert new entry or update if not deleted old entry yet
-                if (itr != mSkillStatus.end())
-                {
-                    itr->second.pos = i;
-                    itr->second.uState = SKILL_CHANGED;
-                }
-                else
-                    mSkillStatus.insert(SkillStatusMap::value_type(id, SkillStatusData(i, SKILL_NEW)));
-
-                // apply skill bonuses
-                SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(i), 0);
-
-                // temporary bonuses
-                AuraList const& lModSkill = GetAurasByType(SPELL_AURA_MOD_SKILL);
-                for (const auto j : lModSkill)
-                    if (j->GetModifier()->m_miscvalue == int32(id))
-                        j->ApplyModifier(true);
-
-                // permanent bonuses
-                AuraList const& lModSkillTalent = GetAurasByType(SPELL_AURA_MOD_SKILL_TALENT);
-                for (const auto j : lModSkillTalent)
-                    if (j->GetModifier()->m_miscvalue == int32(id))
-                        j->ApplyModifier(true);
-
-                // Learn all spells auto-trained by this skill
-                UpdateSkillTrainedSpells(id, currVal);
+                sLog.outError("Skill not found in SkillLineStore: skill #%u", id);
                 return;
             }
+        }
+
+        for (uint8 pos = 0; pos < PLAYER_MAX_SKILLS; ++pos)
+        {
+            if (GetUInt32Value(PLAYER_SKILL_INDEX(pos)))
+                continue;
+
+            if (exists) // Re-use and move data for old status entry if not deleted yet
+            {
+                itr->second.pos = pos;
+                itr->second.uState = SKILL_CHANGED;
+            }
+            else        // Add a completely new status entry
+            {
+                auto result = mSkillStatus.insert(SkillStatusMap::value_type(id, SkillStatusData(pos, SKILL_NEW)));
+
+                if (!result.second) // Insert failed
+                    return;
+
+                itr = result.first;
+            }
+
+            SetUInt32Value(PLAYER_SKILL_INDEX(pos), MAKE_PAIR32(id, step));         // Set/reset skill id and step
+            SetSkill(itr, currVal, maxVal);                                              // Set current and max values
+            SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(pos), 0);                       // Reset bonus data
+            for (auto type : { SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT }) // Set temporary, permanent bonuses
+            {
+                for (auto aura : GetAurasByType(type))
+                {
+                    if (aura->GetModifier()->m_miscvalue == int32(id))
+                        aura->ApplyModifier(true);
+                }
+            }
+            break;
         }
     }
 }
