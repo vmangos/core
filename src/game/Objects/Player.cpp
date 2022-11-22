@@ -5932,24 +5932,76 @@ void Player::UpdateSkillsToMaxSkillsForLevel()
 
 // This functions sets a skill line value (and adds if doesn't exist yet)
 // To "remove" a skill line, set it's values to zero
-void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0*/)
+void Player::SetSkill(SkillStatusMap::iterator itr, uint16 currVal, uint16 maxVal, uint16 step/* = 0*/)
+{
+    if (itr == mSkillStatus.end())
+        return;
+
+    const uint16 id = uint16(itr->first);
+    SkillStatusData& status = itr->second;
+
+    if (status.uState == SKILL_DELETED)
+        return;
+
+    if (currVal)  // Update
+    {
+        if (step)
+            SetUInt32Value(PLAYER_SKILL_INDEX(status.pos), MAKE_PAIR32(id, step));
+
+        SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(status.pos), MAKE_SKILL_VALUE(value, max));
+
+        if (status.uState != SKILL_NEW)
+            status.uState = SKILL_CHANGED;
+    }
+    else        // Remove
+    {
+        SetUInt32Value(PLAYER_SKILL_INDEX(status.pos), 0);
+        SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(status.pos), 0);
+        SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(status.pos), 0);
+
+        if (status.uState == SKILL_NEW)
+            mSkillStatus.erase(itr);
+        else
+            status.uState = SKILL_DELETED;
+    }
+
+    // Learn/unlearn all spells auto-trained by this skill on change
+    UpdateSkillTrainedSpells(id, value);
+
+    // On updating specific skills values
+    switch (id)
+    {
+        case SKILL_DEFENSE:     UpdateDefenseBonusesMod();  break;
+    }
+}
+
+void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step/* = 0*/)
 {
     if (!id)
         return;
 
     SkillStatusMap::iterator itr = mSkillStatus.find(id);
-    const bool exists = (itr != mSkillStatus.end());
 
-    if (exists && itr->second.uState != SKILL_DELETED)  // Update/remove existing
+    if (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED)  // Update/remove existing
         SetSkill(itr, currVal, maxVal, step);
     else if (currVal)                                     // Add new
     {
+        if (itr == mSkillStatus.end())
+        {
+            SkillLineEntry const* entry = sSkillLineStore.LookupEntry(id);
+            if (!entry)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Skill not found in SkillLineStore: skill #%u", id);
+                return;
+            }
+        }
+
         for (uint8 pos = 0; pos < PLAYER_MAX_SKILLS; ++pos)
         {
             if (GetUInt32Value(PLAYER_SKILL_INDEX(pos)))
                 continue;
 
-            if (exists) // Re-use and move data for old status entry if not deleted yet
+            if (itr != mSkillStatus.end()) // Re-use and move data for old status entry if not deleted yet
             {
                 itr->second.pos = pos;
                 itr->second.uState = SKILL_CHANGED;
@@ -5965,7 +6017,7 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
             }
 
             SetUInt32Value(PLAYER_SKILL_INDEX(pos), MAKE_PAIR32(id, step));         // Set/reset skill id and step
-            SetSkill(itr, currVal, maxVal);                                              // Set current and max values
+            SetSkill(itr, value, max);                                              // Set current and max values
             SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(pos), 0);                       // Reset bonus data
             for (auto type : { SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT }) // Set temporary, permanent bonuses
             {
