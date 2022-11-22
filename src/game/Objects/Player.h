@@ -1748,6 +1748,7 @@ class Player final: public Unit
 
         void UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence);
 
+        void SetSkill(SkillStatusMap::iterator itr, uint16 currVal, uint16 maxVal, uint16 step = 0);
         void SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step = 0);
         uint16 GetSkill(uint16 id, bool bonusPerm, bool bonusTemp, bool max = false) const;
         inline uint16 GetSkillValue(uint16 id) const { return GetSkill(id, true, true); }           // skill value + perm. bonus + temp bonus
