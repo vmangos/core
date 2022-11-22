@@ -5944,16 +5944,6 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
         SetSkill(itr, currVal, maxVal, step);
     else if (currVal)                                     // Add new
     {
-        if (!exists)
-        {
-            SkillLineEntry const* entry = sSkillLineStore.LookupEntry(id);
-            if (!entry)
-            {
-                sLog.outError("Skill not found in SkillLineStore: skill #%u", id);
-                return;
-            }
-        }
-
         for (uint8 pos = 0; pos < PLAYER_MAX_SKILLS; ++pos)
         {
             if (GetUInt32Value(PLAYER_SKILL_INDEX(pos)))
