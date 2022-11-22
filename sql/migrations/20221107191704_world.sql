@@ -43,13 +43,6 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11024, -1, 11023, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
 (11025, -3, 11007, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
 (11026, -2, 11025, 11008, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies includes if both requirements are met (Uses engineering text for now because I have no idea what is correct)
--- For some reason there are seperate broadcast texts for male and female characters even though there is no difference in text. I'm just adding the female text option to the one that only had the male text because that is stupid.
--- I'm not sure if this means if the localisations are messed up too.
-UPDATE `broadcast_text` SET `female_text` = 'I cannot teach you dragonscale leatherworking, $n. You must go to Tanaris and find the home of Narain Soothfancy. Once there, consult the book \"Soothsaying for Dummies.\"' WHERE `entry` = 11894;
-
-UPDATE `broadcast_text` SET `female_text` = 'I cannot teach you elemental leatherworking, $n. You must go to Tanaris and find the home of Narain Soothfancy. Once there, consult the book \"Soothsaying for Dummies.\"' WHERE `entry` = 11900;
-
-UPDATE `broadcast_text` SET `female_text` = 'I cannot teach you tribal leatherworking, $n. You must go to Tanaris and find the home of Narain Soothfancy. Once there, consult the book \"Soothsaying for Dummies.\"' WHERE `entry` = 11902;
 
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES 
 (21000, 11880, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -60,6 +53,8 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastText
 (21005, 11900, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (21006, 11902, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (21007, 11892, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(21008, 11899, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(21009, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
 (1469, 21000, 0, 11002), -- Gossip for Nixx Sprocketspring
@@ -67,9 +62,11 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (1467, 21002, 0, 11006), -- Gossip for Oglethorpe Obnoticus
 (7058, 21003, 0, 11026), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
 (7058, 21007, 0, 11024), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
-(22000, 21004, 0, 0), -- Gossip sub-menu for Dragonscale Leatherworking
-(22001, 21005, 0, 0), -- Gossip sub-menu for Elemental Leatherworking
-(22002, 21006, 0, 0); -- Gossip sub-menu for Tribal Leatherworking
+(22000, 21004, 0, 0), -- Gossip sub-menu for Dragonscale Leatherworking (male)
+(22001, 21005, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (male)
+(22002, 21006, 0, 0); -- Gossip sub-menu for Tribal Leatherworking (male)
+(22003, 21008, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (female)
+(22004, 21009, 0, 0); -- Gossip sub-menu for Tribal Leatherworking (male)
 
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2861, 0, 0, 15, 20221, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Book Soothsaying for Dummies - Teach Goblin Engineering'),
@@ -87,8 +84,8 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3067, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 0, 0, 0, '', 0, 11023),
 (3068, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 0, 0, 0, '', 0, 11023),
 (3069, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22001, 0, 0, 0, 0, '', 0, 11023),
-(3070, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22001, 0, 0, 0, 0, '', 0, 11023),
-(3072, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 0, 0, 0, '', 0, 11023), -- I don't know why it skips 3071
+(3070, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22003, 0, 0, 0, 0, '', 0, 11023),
+(3072, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22004, 0, 0, 0, 0, '', 0, 11023), -- I don't know why it skips 3071
 (3073, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 0, 0, 0, '', 0, 11023);
 
 -- End of migration.
