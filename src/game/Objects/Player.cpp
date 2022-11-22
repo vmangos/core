@@ -5948,7 +5948,7 @@ void Player::SetSkill(SkillStatusMap::iterator itr, uint16 currVal, uint16 maxVa
         if (step)
             SetUInt32Value(PLAYER_SKILL_INDEX(status.pos), MAKE_PAIR32(id, step));
 
-        SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(status.pos), MAKE_SKILL_VALUE(value, max));
+        SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(status.pos), MAKE_SKILL_VALUE(currVal, maxVal));
 
         if (status.uState != SKILL_NEW)
             status.uState = SKILL_CHANGED;
@@ -5966,7 +5966,7 @@ void Player::SetSkill(SkillStatusMap::iterator itr, uint16 currVal, uint16 maxVa
     }
 
     // Learn/unlearn all spells auto-trained by this skill on change
-    UpdateSkillTrainedSpells(id, value);
+    UpdateSkillTrainedSpells(id, currVal);
 
     // On updating specific skills values
     switch (id)
@@ -6017,7 +6017,7 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step/* = 
             }
 
             SetUInt32Value(PLAYER_SKILL_INDEX(pos), MAKE_PAIR32(id, step));         // Set/reset skill id and step
-            SetSkill(itr, value, max);                                              // Set current and max values
+            SetSkill(itr, currVal, maxVal);                                         // Set current and max values
             SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(pos), 0);                       // Reset bonus data
             for (auto type : { SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT }) // Set temporary, permanent bonuses
             {
