@@ -52,8 +52,8 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastText
 (21004, 11894, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (21005, 11900, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (21006, 11902, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21007, 11892, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-(21008, 11899, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(21007, 11892, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(21008, 11899, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (21009, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
@@ -64,7 +64,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (7058, 21007, 0, 11024), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
 (22000, 21004, 0, 0), -- Gossip sub-menu for Dragonscale Leatherworking (male)
 (22001, 21005, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (male)
-(22002, 21006, 0, 0); -- Gossip sub-menu for Tribal Leatherworking (male)
+(22002, 21006, 0, 0), -- Gossip sub-menu for Tribal Leatherworking (male)
 (22003, 21008, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (female)
 (22004, 21009, 0, 0); -- Gossip sub-menu for Tribal Leatherworking (male)
 
