@@ -5937,7 +5937,7 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
     if (!id)
         return;
 
-    auto itr = mSkillStatus.find(id);
+    SkillStatusMap::iterator itr = mSkillStatus.find(id);
     const bool exists = (itr != mSkillStatus.end());
 
     if (exists && itr->second.uState != SKILL_DELETED)  // Update/remove existing
