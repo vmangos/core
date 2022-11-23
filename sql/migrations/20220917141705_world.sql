@@ -732,6 +732,11 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (960, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1219, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu - Talk');
 UPDATE `quest_template` SET `CompleteScript` = 960 WHERE  `entry` IN (960, 961);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Various Gobjects Should Not Despawn When Looted
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (26242, 42485, 27082, 18541);
+
 
 -- End of migration.
 END IF;
