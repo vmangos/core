@@ -19,83 +19,6 @@
 #include "CreatureGroups.h"
 #include "Utilities/EventMap.h"
 
-inline uint32 GetCampType(Creature* pUnit) { return pUnit->HasAura(SPELL_CAMP_TYPE_GHOST_SKELETON) || pUnit->HasAura(SPELL_CAMP_TYPE_GHOST_GHOUL) || pUnit->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON); };
-
-void ChangeZoneEventStatus(Creature* pMouth, bool on)
-{
-    if (!pMouth)
-        return;
-
-    switch (pMouth->GetZoneId())
-    {
-        case ZONEID_WINTERSPRING:
-            if (on)
-            {
-                if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING))
-                    sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING, true);
-            }
-            else
-                sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING, true);
-            break;
-        case ZONEID_TANARIS:
-            if (on)
-            {
-                if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS))
-                    sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS, true);
-            }
-            else
-                sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS, true);
-            break;
-        case ZONEID_AZSHARA:
-            if (on)
-            {
-                if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA))
-                    sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA, true);
-            }
-            else
-                sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA, true);
-            break;
-        case ZONEID_BLASTED_LANDS:
-            if (on)
-            {
-                if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS))
-                    sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS, true);
-            }
-            else
-                sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS, true);
-            break;
-        case ZONEID_EASTERN_PLAGUELANDS:
-            if (on)
-            {
-                if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS))
-                    sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS, true);
-            }
-            else
-                sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS, true);
-            break;
-        case ZONEID_BURNING_STEPPES:
-            if (on)
-            {
-                if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES))
-                    sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES, true);
-            }
-            else
-                sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES, true);
-            break;
-    }
-}
-
-void DespawnNecropolis(Unit* pDespawner)
-{
-    if (!pDespawner)
-        return;
-
-    std::list<GameObject*> necropolisList;
-    GetGameObjectListWithEntryInGrid(necropolisList, pDespawner, { GOBJ_NECROPOLIS_TINY, GOBJ_NECROPOLIS_SMALL, GOBJ_NECROPOLIS_MEDIUM, GOBJ_NECROPOLIS_BIG, GOBJ_NECROPOLIS_HUGE }, ATTACK_DISTANCE);
-    for (const auto pNecropolis : necropolisList)
-        pNecropolis->Despawn();
-}
-
 /*
 Mouth of Kel'Thuzad
 */
@@ -104,35 +27,199 @@ struct MouthAI : public ScriptedAI
     MouthAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_events.Reset();
-        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, (IN_MILLISECONDS * HOUR));
+        m_creature->SetActiveObjectState(true);
+        Initialise();
+
+        if (m_eventID)
+            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS));
     }
 
     EventMap m_events;
+    int m_eventID       = GetZoneEventID();
+    int m_worldstateID  = GetWorldStateID();
+    int m_remainingID   = GetRemainingVariableID();
 
     void Reset() override {}
 
-    void OnScriptEventHappened(uint32 uiEvent, uint32 /*uiData*/, WorldObject* /*pInvoker*/) override
+    void UpdateWorldState()
     {
-        switch (uiEvent)
+        // Updating map icon worlstate
+        int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
+        int REMAINING = sObjectMgr.GetSavedVariable(m_remainingID);
+
+        HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
+        for (const auto& itr : m)
         {
-            case EVENT_MOUTH_OF_KELTHUZAD_ZONE_START:
+            Player* pPlayer = itr.second;
+
+            if (!pPlayer->IsInWorld())
+                continue;
+
+            pPlayer->SendUpdateWorldState(m_worldstateID, REMAINING > 0 ? 1 : 0);
+            pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
+            pPlayer->SendUpdateWorldState(m_worldstateID, REMAINING);
+        }
+    }
+
+    void Initialise()
+    {
+        if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION) || !m_remainingID)
+            return;
+
+        if (!sGameEventMgr.IsValidEvent(m_eventID))
+            return;
+
+        int remaining = 0;
+
+        if (CreatureGroup* group = m_creature->GetCreatureGroup())
+        {
+            for (const auto& itr : group->GetMembers())
             {
-                ChangeZoneEventStatus(m_creature, true);
-                m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
-                DoScriptText(PickRandomValue(
-                    BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5
-                ), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                CreatureGroupMember* pCreature = itr.second;
+
+                if (pCreature)
+                    remaining++;
+            }
+        }
+
+        sObjectMgr.SetSavedVariable(m_remainingID, remaining, true);
+    }
+
+    int GetWorldStateID()
+    {
+        switch (m_creature->GetZoneId())
+        {
+            case ZONEID_WINTERSPRING:
+            {
+                return WORLDSTATE_WINTERSPRING;
                 break;
             }
-            case EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP:
+            case ZONEID_AZSHARA:
             {
-                DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_2), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
-                ChangeZoneEventStatus(m_creature, false);
-                m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
-                m_creature->RemoveFromWorld();
+                return WORLDSTATE_AZSHARA;
+                break;
+            }
+            case ZONEID_EASTERN_PLAGUELANDS:
+            {
+                return WORLDSTATE_EASTERN_PLAGUELANDS;
+                break;
+            }
+            case ZONEID_BLASTED_LANDS:
+            {
+                return WORLDSTATE_BLASTED_LANDS;
+                break;
+            }
+            case ZONEID_BURNING_STEPPES:
+            {
+                return WORLDSTATE_BURNING_STEPPES;
+                break;
+            }
+            case ZONEID_TANARIS:
+            {
+                return WORLDSTATE_TANARIS;
                 break;
             }
         }
+        return 0;
+    }
+
+    int GetRemainingVariableID()
+    {
+        switch (m_creature->GetZoneId())
+        {
+            case ZONEID_WINTERSPRING:
+            {
+                return VARIABLE_SI_WINTERSPRING_REMAINING;
+                break;
+            }
+            case ZONEID_AZSHARA:
+            {
+                return VARIABLE_SI_AZSHARA_REMAINING;
+                break;
+            }
+            case ZONEID_EASTERN_PLAGUELANDS:
+            {
+                return VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
+                break;
+            }
+            case ZONEID_BLASTED_LANDS:
+            {
+                return VARIABLE_SI_BLASTED_LANDS_REMAINING;
+                break;
+            }
+            case ZONEID_BURNING_STEPPES:
+            {
+                return VARIABLE_SI_BURNING_STEPPES_REMAINING;
+                break;
+            }
+            case ZONEID_TANARIS:
+            {
+                return VARIABLE_SI_TANARIS_REMAINING;
+                break;
+            }
+        }
+        return 0;
+    }
+
+    int GetZoneEventID()
+    {
+        switch (m_creature->GetZoneId())
+        {
+            case ZONEID_WINTERSPRING:
+            {
+                return GAME_EVENT_SCOURGE_INVASION_WINTERSPRING;
+                break;
+            }
+            case ZONEID_AZSHARA:
+            {
+                return GAME_EVENT_SCOURGE_INVASION_AZSHARA;
+                break;
+            }
+            case ZONEID_EASTERN_PLAGUELANDS:
+            {
+                return GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS;
+                break;
+            }
+            case ZONEID_BLASTED_LANDS:
+            {
+                return GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS;
+                break;
+            }
+            case ZONEID_BURNING_STEPPES:
+            {
+                return GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES;
+                break;
+            }
+            case ZONEID_TANARIS:
+            {
+                return GAME_EVENT_SCOURGE_INVASION_TANARIS;
+                break;
+            }
+        }
+        return 0;
+    }
+
+    int GetActiveZones()
+    {
+        int count = 0;
+
+        for (uint32 i = GAME_EVENT_SCOURGE_INVASION_WINTERSPRING; i < GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES; i++)
+        {
+            if (sGameEventMgr.IsActiveEvent(i))
+                count++;
+        }
+        return count;
+    }
+
+    void GroupMemberJustDied(Creature* pUnit, bool isLeader) override
+    {
+        if (isLeader)
+            return;
+
+        sObjectMgr.SetSavedVariable(m_remainingID, sObjectMgr.GetSavedVariable(m_remainingID) - 1, true);
+
+        if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
+            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP, (IN_MILLISECONDS * 5));
     }
 
     void UpdateAI(uint32 const diff) override
@@ -143,12 +230,55 @@ struct MouthAI : public ScriptedAI
         {
             switch (Events)
             {
+                case EVENT_MOUTH_OF_KELTHUZAD_UPDATE:
+                {
+                    if (sGameEventMgr.IsActiveEvent(m_eventID)) // Zone is already being Attacked.
+                    {
+                        // Do random Zone Yell.
+                        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, 0);
+                    }
+                    else // Zone is not Active.
+                    {
+                        // Possible attack another Zone? All Zones getting attacked if there is no Victory yet (Scourge Invasion Start).
+                        if (!sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES, true) || GetActiveZones() < sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT))
+                        {
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Scourge Invasion] Starting in Zone: %u, VARIABLE_SI_VICTORIES: %u, CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT: %u", m_creature->GetZoneId(), sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES), sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT));
+                            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START, 0);
+                            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, 0);
+                        }
+                    }
+                    m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, (IN_MILLISECONDS * urand(ZONE_ATTACK_TIMER_MIN, ZONE_ATTACK_TIMER_MAX)));
+                    break;
+                }
                 case EVENT_MOUTH_OF_KELTHUZAD_YELL:
+                {
                     DoScriptText(PickRandomValue(
                         BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5
                     ), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
-                    m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, (IN_MILLISECONDS * HOUR));
                     break;
+                }
+                case EVENT_MOUTH_OF_KELTHUZAD_ZONE_START:
+                {
+                    m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
+                    sGameEventMgr.StartEvent(m_eventID);
+                    UpdateWorldState();
+                    break;
+                }
+                case EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP:
+                {
+                    if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
+                    {
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Scourge Invasion] Stoping in Zone: %u with m_remainingID: %u", m_creature->GetZoneId(), m_remainingID);
+                        DoScriptText(PickRandomValue(
+                            BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_2
+                        ), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                        m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
+                        sGameEventMgr.StopEvent(m_eventID);
+                        sObjectMgr.SetSavedVariable(VARIABLE_SI_VICTORIES, sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES) + 1, true);
+                        UpdateWorldState();
+                    }
+                    break;
+                }
             }
         }
     }
@@ -157,120 +287,6 @@ struct MouthAI : public ScriptedAI
 CreatureAI* GetAI_Mouth(Creature* pCreature)
 {
     return new MouthAI(pCreature);
-}
-
-/*
-Necropolis
-
-struct NecropolisAI : public ScriptedAI
-{
-    NecropolisAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_creature->SetActiveObjectState(true);
-        m_creature->SetVisibilityModifier(3000.0f);
-    }
-
-    void Reset() override {}
-
-    void SpellHit(SpellCaster*, SpellEntry const* spell) override
-    {
-        if (m_creature->HasAura(SPELL_COMMUNIQUE_TIMER_NECROPOLIS))
-            return;
-
-        if (spell->Id == SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS)
-            m_creature->AddAura(SPELL_COMMUNIQUE_TIMER_NECROPOLIS);
-    }
-
-    void UpdateAI(uint32 const uiDiff) override {}
-};
-
-CreatureAI* GetAI_Necropolis(Creature* pCreature)
-{
-    return new NecropolisAI(pCreature);
-}
-*/
-
-
-/*
-Necropolis Health
-*/
-struct NecropolisHealthAI : public ScriptedAI
-{
-    NecropolisHealthAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_creature->SetVisibilityModifier(3000.0f);
-    }
-
-    //int m_zapped = 0; // 3 = death.
-
-    void Reset() override {}
-
-    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
-    {
-        if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            m_creature->CastSpell(m_creature, SPELL_ZAP_NECROPOLIS, true);
-
-        // Just to make sure it finally dies!
-
-        /*
-        if (spell->Id == SPELL_ZAP_NECROPOLIS)
-        {
-            if (++m_zapped >= 3)
-                m_creature->DoKillUnit(m_creature);
-        }*/
-    }
-
-    void JustDied(Unit* pKiller) override
-    {
-        if (Creature* pNecropolis = m_creature->FindNearestCreature(NPC_NECROPOLIS, ATTACK_DISTANCE))
-            m_creature->CastSpell(pNecropolis, SPELL_DESPAWNER_OTHER, true);
-
-        int TEMP_SI_ATTACK_ZONE = 0;
-
-        switch (m_creature->GetZoneId())
-        {
-            case ZONEID_TANARIS:
-                TEMP_SI_ATTACK_ZONE = VARIABLE_SI_TANARIS_REMAINING;
-                break;
-            case ZONEID_BLASTED_LANDS:
-                TEMP_SI_ATTACK_ZONE = VARIABLE_SI_BLASTED_LANDS_REMAINING;
-                break;
-            case ZONEID_EASTERN_PLAGUELANDS:
-                TEMP_SI_ATTACK_ZONE = VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
-                break;
-            case ZONEID_BURNING_STEPPES:
-                TEMP_SI_ATTACK_ZONE = VARIABLE_SI_BURNING_STEPPES_REMAINING;
-                break;
-            case ZONEID_WINTERSPRING:
-                TEMP_SI_ATTACK_ZONE = VARIABLE_SI_WINTERSPRING_REMAINING;
-                break;
-            case ZONEID_AZSHARA:
-                TEMP_SI_ATTACK_ZONE = VARIABLE_SI_AZSHARA_REMAINING;
-                break;
-        }
-
-        int numb = sObjectMgr.GetSavedVariable(TEMP_SI_ATTACK_ZONE);
-        if (numb > 0)
-            sObjectMgr.SetSavedVariable(TEMP_SI_ATTACK_ZONE, (numb - 1), true);
-    }
-
-    void SpellHitTarget(Unit* pTarget, SpellEntry const* spell) override
-    {
-        // Make sure m_creature despawn after SPELL_DESPAWNER_OTHER triggered.
-        if (spell->Id == SPELL_DESPAWNER_OTHER && pTarget->GetEntry() == NPC_NECROPOLIS)
-        {
-            DespawnNecropolis(pTarget);
-            pTarget->ToCreature()->RemoveFromWorld();
-            m_creature->RemoveFromWorld();
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override {}
-};
-
-CreatureAI* GetAI_NecropolisHealth(Creature* pCreature)
-{
-    return new NecropolisHealthAI(pCreature);
 }
 
 /*
@@ -392,7 +408,7 @@ bool GossipSelect_npc_argent_emissary(Player* pPlayer, Creature* pCreature, uint
 bool GossipHello_npc_argent_emissary(Player* pPlayer, Creature* pCreature)
 {
     // Get current values
-    uint32 VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
+    uint32 VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
     uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
     uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
     uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
@@ -427,11 +443,6 @@ void AddSC_scourge_invasion()
     newscript = new Script;
     newscript->Name = "scourge_invasion_mouth";
     newscript->GetAI = &GetAI_Mouth;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_necropolis_health";
-    newscript->GetAI = &GetAI_NecropolisHealth;
     newscript->RegisterSelf();
 
     newscript = new Script;

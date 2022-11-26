@@ -283,7 +283,6 @@ enum ScourgeInvasionMisc
     GOBJ_NECROPOLIS_HUGE                                = 181223, // Necropolis (scale 3.5).
     GOBJ_NECROPOLIS_CITY                                = 181172, // Necropolis at the Citys (scale 2.5).
 
-    // These timers may fail if you set it under 1 minute.
     ZONE_ATTACK_TIMER_MIN                               = MINUTE * 45, // 45 min.
     ZONE_ATTACK_TIMER_MAX                               = MINUTE * 60, // 60 min.
 
@@ -309,10 +308,10 @@ enum ScourgeInvasionMisc
 
 enum ScourgeInvasionNPCEvents
 {
-    EVENT_MOUTH_OF_KELTHUZAD_YELL           = 6,
-    EVENT_MOUTH_OF_KELTHUZAD_ZONE_START     = 7,
-    EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP      = 8,
-    EVENT_MOUTH_OF_KELTHUZAD_UPDATE         = 9,
+    EVENT_MOUTH_OF_KELTHUZAD_YELL           = 1,
+    EVENT_MOUTH_OF_KELTHUZAD_ZONE_START     = 2,
+    EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP      = 3,
+    EVENT_MOUTH_OF_KELTHUZAD_UPDATE         = 4,
 };
 
 enum ScourgeInvasionWorldStatesVariables
@@ -334,15 +333,7 @@ enum ScourgeInvasionWorldStatesVariables
     WORLDSTATE_SI_WINTERSPRING                  = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
 
     // Variables
-    VARIABLE_TANARIS_ATTACK_TIME                = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_TANARIS,
-    VARIABLE_BLASTED_LANDS_ATTACK_TIME          = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_BLASTED_LANDS,
-    VARIABLE_EASTERN_PLAGUELANDS_ATTACK_TIME    = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_EASTERN_PLAGUELANDS,
-    VARIABLE_BURNING_STEPPES_ATTACK_TIME        = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_BURNING_STEPPES,
-    VARIABLE_WINTERSPRING_ATTACK_TIME           = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_WINTERSPRING,
-    VARIABLE_AZSHARA_ATTACK_TIME                = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_AZSHARA,
-    VARIABLE_SI_ATTACK_COUNT                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 0,
-    VARIABLE_SI_LAST_ATTACK_ZONE                = (GAME_EVENT_SCOURGE_INVASION * 1000) + 1,
-
+    VARIABLE_SI_VICTORIES                       = (GAME_EVENT_SCOURGE_INVASION * 1000) + 0,
     VARIABLE_SI_WINTERSPRING_REMAINING          = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_WINTERSPRING,
     VARIABLE_SI_AZSHARA_REMAINING               = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_AZSHARA,
     VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING   = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS,

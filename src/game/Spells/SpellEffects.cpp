@@ -440,6 +440,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             This Spell is castet on the NPC "Necropolis Health" if a Shard dies.
                             There are always 3 Necrotic Shards spawns per Necropolis.
                             */
+                            unitTarget->SetArmor(0);
                             damage = unitTarget->CountPctFromMaxHealth(34);
                         }
                         break;
@@ -674,15 +675,26 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     unitTarget->CastSpell(unitTarget, 28281, true);
                     return;
                 }
+                case 28349: // [Event: Scourge Invasion] Despawner, other
+                {
+                    std::list<GameObject*> necropolisList;
+                    GetGameObjectListWithEntryInGrid(necropolisList, unitTarget, { 181154,181373,181374,181215,181223 }, ATTACK_DISTANCE);
+                    for (const auto pNecropolis : necropolisList)
+                        pNecropolis->Despawn();
+
+                    unitTarget->ToCreature()->RemoveFromWorld();
+                    m_casterUnit->ToCreature()->RemoveFromWorld();
+                    return;
+                }
                 case 28351: // [Event: Scourge Invasion] Communique, Camp-to-Relay, Death
                 {
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Event: Scourge Invasion] Communique, Camp-to-Relay, Death, caster: %s, target: %s", m_casterUnit->GetName(), unitTarget->GetName());
+
                     // Make sure m_casterUnit gets removed from the map to avoid getting hit by Purple bolt again after respawn.
-                    if (m_casterUnit->GetEntry() == 16386 || m_casterUnit->GetEntry() == 16398)
-                        return;
-
-                    if (Creature* pCreature = ToCreature(m_casterUnit))
-                        pCreature->m_Events.AddLambdaEventAtOffset([pCreature]{pCreature->RemoveFromWorld();}, 1);
-
+                   // if (m_casterUnit->GetEntry() == 16386 || m_casterUnit->GetEntry() == 16398)
+                       // return;
+                    unitTarget->MonsterYell("I'm Dying!");
+                    unitTarget->RemoveFromWorld();
                     return;
                 }
                 case 23383: // Alliance Flag Click

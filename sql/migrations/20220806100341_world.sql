@@ -11,7 +11,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 -- 0. SETUP
 
-    SET @NPC_FLAMESHOCKER_GUID                                  	= 66900;
+    SET @NPC_FLAMESHOCKER_GUID                                      = 66900;
+    SET @NPC_MOUTH_OF_KELTHUZAD_GUID                                = 31274;
+    SET @NPC_NECROPOLIS_HEALTH_GUID                                 = 16207;
     SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 21841;
     SET @GOBJ_ZONES_GUID                                            = 82090; -- 474 Entries
 
@@ -36,6 +38,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     SET @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID        = 27173;
     SET @GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID            = 27341;
 
+    SET @EVENT_SCOURGE_INVASION                                     = 17;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING              = 90;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS                   = 91;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA                   = 92;
@@ -54,10 +57,10 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_template` SET `auras`='28346 27887' WHERE `entry` IN (16136, 16172);
     UPDATE `creature_template` SET `auras`='28395' WHERE `entry`=16401;
     UPDATE `creature_template` SET `spell_list_id`=163830, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16383;
-    UPDATE `creature_template` SET `unit_flags`=832, `spell_list_id`=161430, `detection_range`=15, `call_for_help_range`=25, `spawn_spell_id`=10389, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
+    UPDATE `creature_template` SET `unit_flags`=832, `spell_list_id`=161430, `detection_range`=15, `call_for_help_range`=20, `spawn_spell_id`=10389, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
     UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16394;
     UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16382;
-    UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16401, 16386, 16398, 16172, 16230, 16136, 16356, 16306, 16336, 16338);
+    UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16401, 16386, 16398, 16172, 16230, 16136, 16356, 16306, 16336, 16338, 16421);
     UPDATE `creature_template` SET `flags_extra`=252162 WHERE `entry` IN (16172, 16136);
     UPDATE `creature_template` SET `detection_range`=5 WHERE `entry` IN (16299, 16141, 16298, 16438, 16437, 16422, 16423);
 
@@ -153,6 +156,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16356));
     DELETE FROM `creature` WHERE `id` IN (16356);
 
+    -- Delete all NPCs (Necropolis health)
+    DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16421));
+    DELETE FROM `creature` WHERE `id` IN (16421);
 
 -- 3. WAYPOINTS
 
@@ -419,10 +425,15 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     -- Events list for Necropolis health
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16421;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642101, 16421, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1642101, 0, 0, 'Necropolis Health - Hit By Spell');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642102, 16421, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1642102, 0, 0, 'Necropolis Health - Death');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1642101;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1642101, 0, 0, 15, 28386, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Health - Cast Spell');
+
+    DELETE FROM `creature_ai_scripts` WHERE `id`=1642102;
+    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1642102, 0, 0, 15, 28349, 2, 0, 0, 16401, 5, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Health - Cast Spell');
 
     -- Events list for Pallid Horror
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16394;
@@ -707,11 +718,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Events list for Necropolis Relay
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16386;
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-    (1638601, 16386, 0, 8, 0, 100, 1, 28366, 1, 0, 0, 1638601, 0, 0, 'Necropolis Relay - Hit by Communique, Proxy-to-Relay'),
-    (1638603, 16386, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1638603, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay, Death'),
-    (1638602, 16386, 0, 8, 0, 100, 1, 28281, 1, 0, 0, 1638602, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay'),
-    (1638604, 16386, 0, 8, 0, 100, 0, 28366, 1, 0, 0, 1638604, 0, 0, 'Necropolis Relay - Hit by Communique, Proxy-to-Relay Once to activate Circle');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638601, 16386, 0, 8, 0, 100, 1, 28366, 1, 0, 0, 1638601, 0, 0, 'Necropolis Relay - Hit by Communique, Proxy-to-Relay');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638602, 16386, 0, 8, 0, 100, 1, 28281, 1, 0, 0, 1638602, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638603, 16386, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1638603, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay, Death');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638601;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -752,8 +761,12 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1639803, 0, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Despawn Self');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639804;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639804, 0, 0, 13, 0, 0, 0, 0, 181136, 200, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Activate Circle');
+    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1639804, 0, 0, 68, 1639801, 0, 181136, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Start Script For All');
+
+    DELETE FROM `generic_scripts` WHERE `id`=1639801;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1639801, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Activate Circle');
 
     -- Events list for Necrotic Shard
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16136;
@@ -826,7 +839,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1617202, 0, 1, 15, 28201, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Choose Camp Type'),
     (1617202, 0, 2, 15, 27887, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, small'),
     (1617202, 0, 3, 15, 27886, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Disturb Minion Trap, Buttress'),
-    (1617202, 0, 3, 18, 4000, 0, 0, 0, 16136, 5, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Despawn Necrotic Shard'),
+    (1617202, 0, 4, 18, 4000, 0, 0, 0, 16136, 5, 8, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Despawn Necrotic Shard'),
     (1617202, 0, 5, 15, 27888, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, Buttress');
 
     -- Events list for Cultist Engineer
@@ -859,6 +872,68 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 
 -- 6. CREATURE RESPAWNS
+
+    -- Add all Mouth of Kel'Thuzad.
+    INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, 16995, 0, 0, 0, 0, -11429.3, -3327.82, 7.73628, 1.0821, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),    -- Mouth of Kel'Thuzad in Blasted Lands.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+2, 16995, 0, 0, 0, 1, 3273.75, -4276.98, 125.509, 5.44543, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),    -- Mouth of Kel'Thuzad in Azshara.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+3, 16995, 0, 0, 0, 0, -8229.53, -1118.11, 144.012, 6.17846, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),   -- Mouth of Kel'Thuzad in Burning Steppes.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+4, 16995, 0, 0, 0, 0, 2014.55, -4934.52, 73.9846, 0.0698132, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),  -- Mouth of Kel'Thuzad in Eastern Plaguelands.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, 16995, 0, 0, 0, 1, -8352.68, -3972.68, 10.0753, 2.14675, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),   -- Mouth of Kel'Thuzad in Tanaris.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, 16995, 0, 0, 0, 1, 7736.56, -4033.75, 696.327, 5.51524, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),    -- Mouth of Kel'Thuzad in Winterspring.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+7, 16995, 0, 0, 0, 0, 1805.6, 238.504, 62.837, 4.41568, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),       -- Mouth of Kel'Thuzad in Undercity.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+8, 16995, 0, 0, 0, 0, -8955.74, 570.615, 93.878, 0.0872665, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),   -- Mouth of Kel'Thuzad in Stormwind City.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+9, 16995, 0, 0, 0, 0, -4978.74, -886.326, 501.719, 4.11898, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),   -- Mouth of Kel'Thuzad in Ironforge.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+10, 16995, 0, 0, 0, 1, 1488.39, -4415.53, 23.7461, 5.06145, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),   -- Mouth of Kel'Thuzad in Orgrimmar.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+11, 16995, 0, 0, 0, 1, -1300.34, 173.278, 68.6351, 4.18879, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10),   -- Mouth of Kel'Thuzad in Thunder Bluff.
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+12, 16995, 0, 0, 0, 1, 9952.88, 2246.56, 1334.5, 4.24115, 120, 120, 0, 100, 100, 0, 1, 0, 9, 10);     -- Mouth of Kel'Thuzad in Darnassus.
+    INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION FROM `creature` WHERE creature.guid BETWEEN @NPC_MOUTH_OF_KELTHUZAD_GUID+1 AND @NPC_MOUTH_OF_KELTHUZAD_GUID+12;
+
+    INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@NPC_NECROPOLIS_HEALTH_GUID+1, 16421, 0, 0, 0, 0, -11402.1, -3316.55, 111.272, 4.46804, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),    -- Necropolis health in Blasted Lands.
+        (@NPC_NECROPOLIS_HEALTH_GUID+2, 16421, 0, 0, 0, 0, -11233.9, -2841.77, 185.686, 4.45059, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),    -- Necropolis health in Blasted Lands.
+        (@NPC_NECROPOLIS_HEALTH_GUID+3, 16421, 0, 0, 0, 1, 3299.55, -4301.3, 177.891, 5.81195, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),      -- Necropolis health in Azshara.
+        (@NPC_NECROPOLIS_HEALTH_GUID+4, 16421, 0, 0, 0, 1, 3544.98, -5610.26, 67.196, 2.82743, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),      -- Necropolis health in Azshara.
+        (@NPC_NECROPOLIS_HEALTH_GUID+5, 16421, 0, 0, 0, 0, -8232.78, -1099.86, 201.572, 5.18363, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),    -- Necropolis health in Burning Steppes.
+        (@NPC_NECROPOLIS_HEALTH_GUID+6, 16421, 0, 0, 0, 0, -7733.72, -2432.74, 190.869, 2.67035, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),    -- Necropolis health in Burning Steppes.
+        (@NPC_NECROPOLIS_HEALTH_GUID+7, 16421, 0, 0, 0, 0, 1766.67, -3033.34, 132.888, 5.18363, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),     -- Necropolis health in Eastern Plaguelands.
+        (@NPC_NECROPOLIS_HEALTH_GUID+8, 16421, 0, 0, 0, 0, 2101.69, -4930.03, 168.364, 1.0472, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),      -- Necropolis health in Eastern Plaguelands.
+        (@NPC_NECROPOLIS_HEALTH_GUID+9, 16421, 0, 0, 0, 1, -8633.21, -2499.82, 114.1, 2.82743, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),      -- Necropolis health in Tanaris.
+        (@NPC_NECROPOLIS_HEALTH_GUID+10, 16421, 0, 0, 0, 1, -8333.68, -3966.4, 77.9316, 1.37881, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),    -- Necropolis health in Tanaris.
+        (@NPC_NECROPOLIS_HEALTH_GUID+11, 16421, 0, 0, 0, 1, -7399.95, -3733.06, 61.1337, 5.81195, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),   -- Necropolis health in Tanaris.
+        (@NPC_NECROPOLIS_HEALTH_GUID+12, 16421, 0, 0, 0, 1, 6184.28, -4913.32, 807.76, 6.0912, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),      -- Necropolis health in Winterspring.
+        (@NPC_NECROPOLIS_HEALTH_GUID+13, 16421, 0, 0, 0, 1, 6646.69, -3442.36, 793, 4.86947, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10),        -- Necropolis health in Winterspring.
+        (@NPC_NECROPOLIS_HEALTH_GUID+14, 16421, 0, 0, 0, 1, 7755.75, -4030.91, 786.58, 0.471238, 120, 120, 0, 100, 100, 0, 1, 533, 9, 10);    -- Necropolis health in Winterspring.
+
+    INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING
+        FROM `creature` WHERE creature.guid BETWEEN @NPC_NECROPOLIS_HEALTH_GUID+12 AND @NPC_NECROPOLIS_HEALTH_GUID+14;
+    INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION_ATTACKING_TANARIS
+        FROM `creature` WHERE creature.guid BETWEEN @NPC_NECROPOLIS_HEALTH_GUID+9 AND @NPC_NECROPOLIS_HEALTH_GUID+11;
+    INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION_ATTACKING_AZSHARA
+        FROM `creature` WHERE creature.guid BETWEEN @NPC_NECROPOLIS_HEALTH_GUID+3 AND @NPC_NECROPOLIS_HEALTH_GUID+4;
+    INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BLASTED_LANDS
+        FROM `creature` WHERE creature.guid BETWEEN @NPC_NECROPOLIS_HEALTH_GUID+1 AND @NPC_NECROPOLIS_HEALTH_GUID+2;
+    INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION_ATTACKING_EASTERN_PLAGUELANDS
+        FROM `creature` WHERE creature.guid BETWEEN @NPC_NECROPOLIS_HEALTH_GUID+7 AND @NPC_NECROPOLIS_HEALTH_GUID+8;
+    INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION_ATTACKING_BURNING_STEPPES
+        FROM `creature` WHERE creature.guid BETWEEN @NPC_NECROPOLIS_HEALTH_GUID+5 AND @NPC_NECROPOLIS_HEALTH_GUID+6;
+
+    -- Add Necropolis Health to Mouths group to get informed on death.
+    INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, @NPC_NECROPOLIS_HEALTH_GUID+1, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, @NPC_NECROPOLIS_HEALTH_GUID+2, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+2, @NPC_NECROPOLIS_HEALTH_GUID+3, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+2, @NPC_NECROPOLIS_HEALTH_GUID+4, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+3, @NPC_NECROPOLIS_HEALTH_GUID+5, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+3, @NPC_NECROPOLIS_HEALTH_GUID+6, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+4, @NPC_NECROPOLIS_HEALTH_GUID+7, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+4, @NPC_NECROPOLIS_HEALTH_GUID+8, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+9, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+10, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+11, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+12, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+13, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+14, 0, 0, 64);
 
     -- Pallid and Flameshockers respawn.
     INSERT INTO `creature`(`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -999,67 +1074,67 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (1442, 1, 'Pallids in Undercity', 0, 0, 0, 10);
 
     INSERT INTO `game_event_creature`(`guid`, `event`) VALUES
-    (@NPC_FLAMESHOCKER_GUID+1, 17),
-    (@NPC_FLAMESHOCKER_GUID+2, 17),
-    (@NPC_FLAMESHOCKER_GUID+3, 17),
-    (@NPC_FLAMESHOCKER_GUID+4, 17),
-    (@NPC_FLAMESHOCKER_GUID+5, 17),
-    (@NPC_FLAMESHOCKER_GUID+6, 17),
-    (@NPC_FLAMESHOCKER_GUID+7, 17),
-    (@NPC_FLAMESHOCKER_GUID+8, 17),
-    (@NPC_FLAMESHOCKER_GUID+9, 17),
-    (@NPC_FLAMESHOCKER_GUID+10, 17),
-    (@NPC_FLAMESHOCKER_GUID+11, 17),
-    (@NPC_FLAMESHOCKER_GUID+12, 17),
-    (@NPC_FLAMESHOCKER_GUID+13, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+14, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+15, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+16, 17),
-    (@NPC_FLAMESHOCKER_GUID+17, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+18, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+19, 17),
-    (@NPC_FLAMESHOCKER_GUID+20, 17),
-    (@NPC_FLAMESHOCKER_GUID+21, 17),
-    (@NPC_FLAMESHOCKER_GUID+22, 17),
-    (@NPC_FLAMESHOCKER_GUID+23, 17),
-    (@NPC_FLAMESHOCKER_GUID+24, 17),
-    (@NPC_FLAMESHOCKER_GUID+25, 17),
-    (@NPC_FLAMESHOCKER_GUID+26, 17),
-    (@NPC_FLAMESHOCKER_GUID+27, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+28, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+29, 17),
-    (@NPC_FLAMESHOCKER_GUID+30, 17),
-    (@NPC_FLAMESHOCKER_GUID+31, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+32, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+33, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+34, 17),
-    (@NPC_FLAMESHOCKER_GUID+35, 17),
-    (@NPC_FLAMESHOCKER_GUID+36, 17),
-    (@NPC_FLAMESHOCKER_GUID+37, 17),
-    (@NPC_FLAMESHOCKER_GUID+38, 17),
-    (@NPC_FLAMESHOCKER_GUID+39, 17),
-    (@NPC_FLAMESHOCKER_GUID+40, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+41, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+42, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+43, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+44, 17),
-    (@NPC_FLAMESHOCKER_GUID+45, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+46, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+47, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+48, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+49, 17),
-    -- (@NPC_FLAMESHOCKER_GUID+50, 17),
-    (@NPC_FLAMESHOCKER_GUID+51, 17),
-    (@NPC_FLAMESHOCKER_GUID+52, 17),
-    (@NPC_FLAMESHOCKER_GUID+53, 17),
-    (@NPC_FLAMESHOCKER_GUID+54, 17),
-    (@NPC_FLAMESHOCKER_GUID+55, 17),
-    (@NPC_FLAMESHOCKER_GUID+56, 17),
-    (@NPC_FLAMESHOCKER_GUID+57, 17),
-    (@NPC_FLAMESHOCKER_GUID+58, 17),
-    (@NPC_FLAMESHOCKER_GUID+59, 17),
-    (@NPC_FLAMESHOCKER_GUID+60, 17),
-    (@NPC_FLAMESHOCKER_GUID+61, 17);
+        (@NPC_FLAMESHOCKER_GUID+1, 17),
+        (@NPC_FLAMESHOCKER_GUID+2, 17),
+        (@NPC_FLAMESHOCKER_GUID+3, 17),
+        (@NPC_FLAMESHOCKER_GUID+4, 17),
+        (@NPC_FLAMESHOCKER_GUID+5, 17),
+        (@NPC_FLAMESHOCKER_GUID+6, 17),
+        (@NPC_FLAMESHOCKER_GUID+7, 17),
+        (@NPC_FLAMESHOCKER_GUID+8, 17),
+        (@NPC_FLAMESHOCKER_GUID+9, 17),
+        (@NPC_FLAMESHOCKER_GUID+10, 17),
+        (@NPC_FLAMESHOCKER_GUID+11, 17),
+        (@NPC_FLAMESHOCKER_GUID+12, 17),
+        (@NPC_FLAMESHOCKER_GUID+13, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+14, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+15, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+16, 17),
+        (@NPC_FLAMESHOCKER_GUID+17, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+18, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+19, 17),
+        (@NPC_FLAMESHOCKER_GUID+20, 17),
+        (@NPC_FLAMESHOCKER_GUID+21, 17),
+        (@NPC_FLAMESHOCKER_GUID+22, 17),
+        (@NPC_FLAMESHOCKER_GUID+23, 17),
+        (@NPC_FLAMESHOCKER_GUID+24, 17),
+        (@NPC_FLAMESHOCKER_GUID+25, 17),
+        (@NPC_FLAMESHOCKER_GUID+26, 17),
+        (@NPC_FLAMESHOCKER_GUID+27, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+28, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+29, 17),
+        (@NPC_FLAMESHOCKER_GUID+30, 17),
+        (@NPC_FLAMESHOCKER_GUID+31, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+32, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+33, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+34, 17),
+        (@NPC_FLAMESHOCKER_GUID+35, 17),
+        (@NPC_FLAMESHOCKER_GUID+36, 17),
+        (@NPC_FLAMESHOCKER_GUID+37, 17),
+        (@NPC_FLAMESHOCKER_GUID+38, 17),
+        (@NPC_FLAMESHOCKER_GUID+39, 17),
+        (@NPC_FLAMESHOCKER_GUID+40, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+41, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+42, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+43, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+44, 17),
+        (@NPC_FLAMESHOCKER_GUID+45, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+46, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+47, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+48, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+49, 17),
+        -- (@NPC_FLAMESHOCKER_GUID+50, 17),
+        (@NPC_FLAMESHOCKER_GUID+51, 17),
+        (@NPC_FLAMESHOCKER_GUID+52, 17),
+        (@NPC_FLAMESHOCKER_GUID+53, 17),
+        (@NPC_FLAMESHOCKER_GUID+54, 17),
+        (@NPC_FLAMESHOCKER_GUID+55, 17),
+        (@NPC_FLAMESHOCKER_GUID+56, 17),
+        (@NPC_FLAMESHOCKER_GUID+57, 17),
+        (@NPC_FLAMESHOCKER_GUID+58, 17),
+        (@NPC_FLAMESHOCKER_GUID+59, 17),
+        (@NPC_FLAMESHOCKER_GUID+60, 17),
+        (@NPC_FLAMESHOCKER_GUID+61, 17);
 
 
 -- 7. GAMEOBJECT RESPAWNS
@@ -1131,16 +1206,16 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_ZONES_GUID+64, 181174, 0, -11542.8, -3272.75, 7.43698, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Blasted Lands.
         (@GOBJ_ZONES_GUID+65, 181174, 0, -11547.6, -3294.89, 7.6757, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire Aura" in Blasted Lands.
         (@GOBJ_ZONES_GUID+66, 181174, 0, -11557.1, -3274.81, 7.65565, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Blasted Lands.
-        (@GOBJ_ZONES_GUID+67, 181223, 0, -11402.1, -3316.55, 111.188, 4.46804, 0, 0, -0.788011, 0.615662, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 3.5)" in Blasted Lands.
-        (@GOBJ_ZONES_GUID+68, 181374, 0, -11233.9, -2841.77, 185.603, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 2.0)" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+67, 181223, 0, -11402.1, -3316.55, 111.188, 4.46804, 0, 0, -0.788011, 0.615662, 120, 120, 100, 1, 1, 533, 9, 10),     -- GameObject: "Necropolis (scale 3.5)" in Blasted Lands.
+        (@GOBJ_ZONES_GUID+68, 181374, 0, -11233.9, -2841.77, 185.603, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 1, 533, 9, 10),     -- GameObject: "Necropolis (scale 2.0)" in Blasted Lands.
         (@GOBJ_ZONES_GUID+69, 181136, 1, 3366.27, -5566.33, 11.1423, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Circle" in Azshara.
         (@GOBJ_ZONES_GUID+70, 181136, 1, 3516.26, -4151.82, 106.875, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Azshara.
         (@GOBJ_ZONES_GUID+71, 181136, 1, 3086.48, -4215.71, 97.6507, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Azshara.
         (@GOBJ_ZONES_GUID+72, 181136, 1, 3518.32, -5712.41, 4.82692, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Azshara.
         (@GOBJ_ZONES_GUID+73, 181136, 1, 3666.47, -5533.42, 20.5987, 4.60767, 0, 0, -0.743144, 0.669131, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Azshara.
         (@GOBJ_ZONES_GUID+74, 181136, 1, 3337.51, -4516.62, 97.713, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Circle" in Azshara.
-        (@GOBJ_ZONES_GUID+75, 181154, 1, 3299.55, -4301.3, 177.808, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Necropolis" in Azshara.
-        (@GOBJ_ZONES_GUID+76, 181154, 1, 3544.98, -5610.26, 67.1127, 2.82743, 0, 0, 0.987688, 0.156436, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Necropolis" in Azshara.
+        (@GOBJ_ZONES_GUID+75, 181154, 1, 3299.55, -4301.3, 177.808, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 1, 533, 9, 10),        -- GameObject: "Necropolis" in Azshara.
+        (@GOBJ_ZONES_GUID+76, 181154, 1, 3544.98, -5610.26, 67.1127, 2.82743, 0, 0, 0.987688, 0.156436, 120, 120, 100, 1, 1, 533, 9, 10),       -- GameObject: "Necropolis" in Azshara.
         (@GOBJ_ZONES_GUID+77, 181173, 1, 3351.3, -5559, 13.5844, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),             -- GameObject: "Undead Fire" in Azshara.
         (@GOBJ_ZONES_GUID+78, 181173, 1, 3380.17, -5556.3, 13.0397, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Undead Fire" in Azshara.
         (@GOBJ_ZONES_GUID+79, 181173, 1, 3490.81, -4165.98, 100.503, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Azshara.
@@ -1207,8 +1282,8 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_ZONES_GUID+140, 181136, 0, -8371.14, -963.306, 191.002, 5.23599, 0, 0, -0.5, 0.866025, 120, 120, 100, 1, 0, 0, 9, 10),           -- GameObject: "Circle" in Burning Steppes.
         (@GOBJ_ZONES_GUID+141, 181136, 0, -7603.63, -2596.44, 135.679, 1.37881, 0, 0, 0.636078, 0.771625, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Burning Steppes.
         (@GOBJ_ZONES_GUID+142, 181136, 0, -7981.86, -2433.27, 129.776, 0.733038, 0, 0, 0.358368, 0.93358, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Burning Steppes.
-        (@GOBJ_ZONES_GUID+143, 181154, 0, -8232.78, -1099.86, 201.488, 5.18363, 0, 0, -0.522498, 0.85264, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis" in Burning Steppes.
-        (@GOBJ_ZONES_GUID+144, 181154, 0, -7733.72, -2432.74, 190.786, 2.67035, 0, 0, 0.972369, 0.233448, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+143, 181154, 0, -8232.78, -1099.86, 201.488, 5.18363, 0, 0, -0.522498, 0.85264, 120, 120, 100, 1, 1, 533, 9, 10),     -- GameObject: "Necropolis" in Burning Steppes.
+        (@GOBJ_ZONES_GUID+144, 181154, 0, -7733.72, -2432.74, 190.786, 2.67035, 0, 0, 0.972369, 0.233448, 120, 120, 100, 1, 1, 533, 9, 10),     -- GameObject: "Necropolis" in Burning Steppes.
         (@GOBJ_ZONES_GUID+145, 181173, 0, -7735.35, -2214.41, 133.439, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
         (@GOBJ_ZONES_GUID+146, 181173, 0, -7717.37, -2225.96, 135.464, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Burning Steppes.
         (@GOBJ_ZONES_GUID+147, 181173, 0, -7722.01, -2243.29, 138.13, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire" in Burning Steppes.
@@ -1273,8 +1348,8 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_ZONES_GUID+206, 181136, 0, 1963.32, -5125.08, 78.7029, 3.9619, 0, 0, -0.91706, 0.39875, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Eastern Plaguelands.
         (@GOBJ_ZONES_GUID+207, 181136, 0, 2315.23, -4933.08, 83.0351, 5.21854, 0, 0, -0.507538, 0.861629, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Eastern Plaguelands.
         (@GOBJ_ZONES_GUID+208, 181136, 0, 1957.07, -3101.68, 83.5755, 2.1293, 0, 0, 0.874619, 0.48481, 120, 120, 100, 1, 0, 0, 9, 10),          -- GameObject: "Circle" in Eastern Plaguelands.
-        (@GOBJ_ZONES_GUID+209, 181154, 0, 2101.69, -4930.03, 168.281, 1.0472, 0, 0, 0.5, 0.866025, 120, 120, 100, 1, 0, 0, 9, 10),              -- GameObject: "Necropolis" in Eastern Plaguelands.
-        (@GOBJ_ZONES_GUID+210, 181154, 0, 1766.67, -3033.34, 132.804, 5.18363, 0, 0, -0.522498, 0.85264, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Necropolis" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+209, 181154, 0, 2101.69, -4930.03, 168.281, 1.0472, 0, 0, 0.5, 0.866025, 120, 120, 100, 1, 1, 533, 9, 10),            -- GameObject: "Necropolis" in Eastern Plaguelands.
+        (@GOBJ_ZONES_GUID+210, 181154, 0, 1766.67, -3033.34, 132.804, 5.18363, 0, 0, -0.522498, 0.85264, 120, 120, 100, 1, 1, 533, 9, 10),      -- GameObject: "Necropolis" in Eastern Plaguelands.
         (@GOBJ_ZONES_GUID+211, 181173, 0, 1948.52, -4775.06, 99.0672, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
         (@GOBJ_ZONES_GUID+212, 181173, 0, 1930.57, -4741.03, 98.0023, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire" in Eastern Plaguelands.
         (@GOBJ_ZONES_GUID+213, 181173, 0, 1927.29, -4778.58, 99.4498, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire" in Eastern Plaguelands.
@@ -1434,9 +1509,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_ZONES_GUID+367, 181174, 1, -8833.52, -2616.1, 23.621, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Tanaris.
         (@GOBJ_ZONES_GUID+368, 181174, 1, -8833.35, -2582.71, 18.6093, 0.890117, 0, 0, 0.430511, 0.902586, 120, 120, 100, 1, 0, 0, 9, 10),      -- GameObject: "Undead Fire Aura" in Tanaris.
         (@GOBJ_ZONES_GUID+369, 181174, 1, -8815.68, -2598.3, 19.8856, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Undead Fire Aura" in Tanaris.
-        (@GOBJ_ZONES_GUID+370, 181215, 1, -8333.68, -3966.4, 77.8483, 1.37881, 0, 0, 0.636078, 0.771625, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
-        (@GOBJ_ZONES_GUID+371, 181215, 1, -7399.95, -3733.06, 61.0504, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
-        (@GOBJ_ZONES_GUID+372, 181215, 1, -8633.21, -2499.82, 114.017, 2.82743, 0, 0, 0.987688, 0.156436, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
+        (@GOBJ_ZONES_GUID+370, 181215, 1, -8333.68, -3966.4, 77.8483, 1.37881, 0, 0, 0.636078, 0.771625, 120, 120, 100, 1, 1, 533, 9, 10),      -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
+        (@GOBJ_ZONES_GUID+371, 181215, 1, -7399.95, -3733.06, 61.0504, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 1, 533, 9, 10),     -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
+        (@GOBJ_ZONES_GUID+372, 181215, 1, -8633.21, -2499.82, 114.017, 2.82743, 0, 0, 0.987688, 0.156436, 120, 120, 100, 1, 1, 533, 9, 10),     -- GameObject: "Necropolis (scale 2.5)" in Tanaris.
         (@GOBJ_ZONES_GUID+373, 181136, 1, 7822.94, -4220.18, 675.491, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Circle" in Winterspring.
         (@GOBJ_ZONES_GUID+374, 181136, 1, 6284.69, -4782.17, 757.315, 2.33874, 0, 0, 0.920505, 0.390732, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Winterspring.
         (@GOBJ_ZONES_GUID+375, 181136, 1, 6547.4, -3482.39, 643.628, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Circle" in Winterspring.
@@ -1536,9 +1611,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@GOBJ_ZONES_GUID+469, 181174, 1, 6752.31, -3349.22, 685.869, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
         (@GOBJ_ZONES_GUID+470, 181174, 1, 6737.26, -3361.34, 687.013, 5.42797, 0, 0, -0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Undead Fire Aura" in Winterspring.
         (@GOBJ_ZONES_GUID+471, 181174, 1, 6740.9, -3342.74, 686.804, 3.87463, 0, 0, -0.93358, 0.358368, 120, 120, 100, 1, 0, 0, 9, 10),         -- GameObject: "Undead Fire Aura" in Winterspring.
-        (@GOBJ_ZONES_GUID+472, 181223, 1, 7755.75, -4030.91, 786.496, 0.471238, 0, 0, 0.233445, 0.97237, 120, 120, 100, 1, 0, 0, 9, 10),        -- GameObject: "Necropolis (scale 3.5)" in Winterspring.
-        (@GOBJ_ZONES_GUID+473, 181223, 1, 6646.69, -3442.36, 792.916, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 9, 10),       -- GameObject: "Necropolis (scale 3.5)" in Winterspring.
-        (@GOBJ_ZONES_GUID+474, 181373, 1, 6184.28, -4913.32, 807.676, 6.0912, 0, 0, -0.0958452, 0.995396, 120, 120, 100, 1, 0, 0, 9, 10);       -- GameObject: "Necropolis (scale 1.5)" in Winterspring.
+        (@GOBJ_ZONES_GUID+472, 181223, 1, 7755.75, -4030.91, 786.496, 0.471238, 0, 0, 0.233445, 0.97237, 120, 120, 100, 1, 1, 533, 9, 10),      -- GameObject: "Necropolis (scale 3.5)" in Winterspring.
+        (@GOBJ_ZONES_GUID+473, 181223, 1, 6646.69, -3442.36, 792.916, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 1, 533, 9, 10),     -- GameObject: "Necropolis (scale 3.5)" in Winterspring.
+        (@GOBJ_ZONES_GUID+474, 181373, 1, 6184.28, -4913.32, 807.676, 6.0912, 0, 0, -0.0958452, 0.995396, 120, 120, 100, 1, 1, 533, 9, 10);     -- GameObject: "Necropolis (scale 1.5)" in Winterspring.
 
     INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING
     FROM `gameobject` WHERE gameobject.guid BETWEEN @GOBJ_ZONES_GUID+373 AND @GOBJ_ZONES_GUID+474;
