@@ -30,14 +30,17 @@ struct MouthAI : public ScriptedAI
         m_creature->SetActiveObjectState(true);
         Initialise();
 
-        if (m_eventID)
-            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS));
+        if (!m_eventID)
+            return;
+
+        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(0 * IN_MILLISECONDS, 5 * IN_MILLISECONDS));
     }
 
     EventMap m_events;
     int m_eventID       = GetZoneEventID();
     int m_worldstateID  = GetWorldStateID();
     int m_remainingID   = GetRemainingVariableID();
+    bool m_resume         = false;
 
     void Reset() override {}
 
@@ -45,7 +48,7 @@ struct MouthAI : public ScriptedAI
     {
         // Updating map icon worlstate
         int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
-        int REMAINING = sObjectMgr.GetSavedVariable(m_remainingID);
+        int REMAINING = sObjectMgr.GetSavedVariable(m_remainingID, true);
 
         HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
         for (const auto& itr : m)
@@ -69,7 +72,13 @@ struct MouthAI : public ScriptedAI
         if (!sGameEventMgr.IsValidEvent(m_eventID))
             return;
 
-        int remaining = 0;
+        int REMAINING = 0;
+
+        // Resuming after server restart?
+        if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
+            m_resume = false;
+        else
+            m_resume = true;
 
         if (CreatureGroup* group = m_creature->GetCreatureGroup())
         {
@@ -78,11 +87,11 @@ struct MouthAI : public ScriptedAI
                 CreatureGroupMember* pCreature = itr.second;
 
                 if (pCreature)
-                    remaining++;
+                    REMAINING++;
             }
         }
 
-        sObjectMgr.SetSavedVariable(m_remainingID, remaining, true);
+        sObjectMgr.SetSavedVariable(m_remainingID, REMAINING, true);
     }
 
     int GetWorldStateID()
@@ -234,11 +243,17 @@ struct MouthAI : public ScriptedAI
                 {
                     if (sGameEventMgr.IsActiveEvent(m_eventID)) // Zone is already being Attacked.
                     {
-                        // Do random Zone Yell.
+                        // Do random Zone Yell (Only in invasion zones).
                         m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, 0);
                     }
                     else // Zone is not Active.
                     {
+                        if (!m_resume) // If this is not a resuming zone, give it some time to try to start again if possible.
+                        {
+                            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(0 * IN_MILLISECONDS, 5 * IN_MILLISECONDS));
+                            return;
+                        }
+
                         // Possible attack another Zone? All Zones getting attacked if there is no Victory yet (Scourge Invasion Start).
                         if (!sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES, true) || GetActiveZones() < sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT))
                         {

@@ -690,11 +690,14 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 {
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Event: Scourge Invasion] Communique, Camp-to-Relay, Death, caster: %s, target: %s", m_casterUnit->GetName(), unitTarget->GetName());
 
-                    // Make sure m_casterUnit gets removed from the map to avoid getting hit by Purple bolt again after respawn.
                    // if (m_casterUnit->GetEntry() == 16386 || m_casterUnit->GetEntry() == 16398)
-                       // return;
-                    unitTarget->MonsterYell("I'm Dying!");
-                    unitTarget->RemoveFromWorld();
+                     //   return;
+                    if (Creature* pCreature = ToCreature(m_casterUnit))
+                    {
+                        pCreature->MonsterYell("I'm Dying!");
+                        pCreature->DisappearAndDie();
+                        pCreature->RemoveFromWorld();
+                    }
                     return;
                 }
                 case 23383: // Alliance Flag Click
