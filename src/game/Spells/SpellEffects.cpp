@@ -688,13 +688,8 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 }
                 case 28351: // [Event: Scourge Invasion] Communique, Camp-to-Relay, Death
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Event: Scourge Invasion] Communique, Camp-to-Relay, Death, caster: %s, target: %s", m_casterUnit->GetName(), unitTarget->GetName());
-
-                   // if (m_casterUnit->GetEntry() == 16386 || m_casterUnit->GetEntry() == 16398)
-                     //   return;
                     if (Creature* pCreature = ToCreature(m_casterUnit))
                     {
-                        pCreature->MonsterYell("I'm Dying!");
                         pCreature->DisappearAndDie();
                         pCreature->RemoveFromWorld();
                     }

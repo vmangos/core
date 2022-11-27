@@ -8472,15 +8472,15 @@ void Player::SendInitWorldStates(uint32 zoneid) const
         int REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
         int REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
-        data << uint32(WORLDSTATE_AZSHARA)              << uint32(REMAINING_AZSHARA > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_BLASTED_LANDS)        << uint32(REMAINING_BLASTED_LANDS > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_BURNING_STEPPES)      << uint32(REMAINING_BURNING_STEPPES > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS)  << uint32(REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_TANARIS)              << uint32(REMAINING_TANARIS > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_WINTERSPRING)         << uint32(REMAINING_WINTERSPRING > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_AZSHARA) << uint32(sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA) ? 1 : 0);
+        data << uint32(WORLDSTATE_BLASTED_LANDS) << uint32(sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS) ? 1 : 0);
+        data << uint32(WORLDSTATE_BURNING_STEPPES) << uint32(sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES) ? 1 : 0);
+        data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS) << uint32(sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS) ? 1 : 0);
+        data << uint32(WORLDSTATE_TANARIS) << uint32(sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS) ? 1 : 0);
+        data << uint32(WORLDSTATE_WINTERSPRING) << uint32(sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING) ? 1 : 0);
 
         // Battles & remaining necropolisses
-        data << uint32(WORLDSTATE_SI_BATTLES_WON) << uint32(VICTORIES);
+        data << uint32(WORLDSTATE_SI_VICTORIES) << uint32(VICTORIES);
         data << uint32(WORLDSTATE_SI_AZSHARA_REMAINING) << uint32(REMAINING_AZSHARA);
         data << uint32(WORLDSTATE_SI_BLASTED_LANDS_REMAINING) << uint32(REMAINING_BLASTED_LANDS);
         data << uint32(WORLDSTATE_SI_BURNING_STEPPES_REMAINING) << uint32(REMAINING_BURNING_STEPPES);

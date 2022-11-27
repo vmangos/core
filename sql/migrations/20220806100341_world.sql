@@ -55,7 +55,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_template` SET `auras`=NULL, `flags_extra`=0 WHERE `entry`=16230;
     -- UPDATE `creature_template` SET `spawn_spell_id`=28234 WHERE `entry` IN (16230, 16299, 16141, 16298, 14697, 16380, 16379, 16438, 16437, 16422, 16423, 16394, 16382, 16383);
     UPDATE `creature_template` SET `auras`='28346 27887' WHERE `entry` IN (16136, 16172);
-    UPDATE `creature_template` SET `auras`='28395' WHERE `entry`=16401;
     UPDATE `creature_template` SET `spell_list_id`=163830, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16383;
     UPDATE `creature_template` SET `unit_flags`=832, `spell_list_id`=161430, `detection_range`=15, `call_for_help_range`=20, `spawn_spell_id`=10389, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
     UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16394;
@@ -143,14 +142,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `conditions` WHERE `condition_entry`=3322;
 
     -- Delete some old AIEvents
-    DELETE FROM `creature_ai_events` WHERE `id`=143202;
-    DELETE FROM `creature_ai_events` WHERE `id`=351802;
-    DELETE FROM `creature_ai_events` WHERE `id`=454901;
-    DELETE FROM `creature_ai_events` WHERE `id`=455102;
-    DELETE FROM `creature_ai_events` WHERE `id`=457502;
-    DELETE FROM `creature_ai_events` WHERE `id`=617402;
-    DELETE FROM `creature_ai_events` WHERE `id`=674102;
-    DELETE FROM `creature_ai_events` WHERE `id`=1576601;
+    DELETE FROM `creature_ai_events` WHERE `id` IN (143202, 351802, 454901, 455102, 457502, 617402, 674102, 1576601);
+    DELETE FROM `creature_ai_scripts` WHERE `id` IN (454901, 454902, 455102, 455103, 457502, 457503, 674102, 674103, 1638604);
+    DELETE FROM `creature_movement_scripts` WHERE `id` IN (151921, 151912);
 
     -- Delete all NPCs (Scourge Invasion Minion, finder)
     DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16356));
@@ -327,23 +321,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     -- 16143:  Not (Source Is Player)
     REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16143, 28, 0, 0, 0, 0, 1);
 
-    -- 1    Dun Morogh
-    -- 4    Blasted Lands
-    -- 12    Elwynn Forest
-    -- 14    Durotar
-    -- 16    Azshara
-    -- 28    Western Plaguelands
-    -- 46    Burning Steppes
-    -- 85    Tirisfal Glades
-    -- 139    Eastern Plaguelands
-    -- 141    Teldrassil
-    -- 440    Tanaris
-    -- 618    Winterspring
-    -- 1497    Undercity
-    -- 1519    Stormwind City
-    -- 1637    Orgrimmar
-    -- 1638    Thunder Bluff
-
 
 -- 5. EVENTAI
 
@@ -381,7 +358,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1635601, 0, 1, 15, 28203, 2, 0, 0, 16172, 60, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Cast Spell On Damaged Necrotic Shrard'),
     (1635601, 0, 1, 15, 28203, 2, 0, 0, 16136, 60, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Cast Spell On Necrotic Shard'),
-    (1635601, 2, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Despawn self');
+    (1635601, 2, 2, 18, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Finder - Despawn self');
 
     -- Events list for Scourge Invasion Minion, spawner, Ghost/Ghoul
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16306;
@@ -394,7 +371,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `generic_scripts` WHERE `id`=1630601;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1630601, 2, 1, 15, 28183, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Cast Spell'),
-    (1630601, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Despawn self');
+    (1630601, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Ghoul - Despawn self');
 
     -- Events list for Scourge Invasion Minion, spawner, Ghost/Skeleton
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16336;
@@ -407,7 +384,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `generic_scripts` WHERE `id`=1633601;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1633601, 2, 0, 15, 28184, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Cast Spell'),
-    (1633601, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Despawn self');
+    (1633601, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghost/Skeleton - Despawn self');
 
     -- Events list for Scourge Invasion Minion, spawner, Ghoul/Skeleton
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16338;
@@ -420,7 +397,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `generic_scripts` WHERE `id`=1633801;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1633801, 2, 0, 15, 28185, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Cast Spell'),
-    (1633801, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Despawn self');
+    (1633801, 4, 2, 18, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion Minion, spawner, Ghoul/Skeleton - Despawn self');
 
     -- Events list for Necropolis health
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16421;
@@ -434,6 +411,18 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_scripts` WHERE `id`=1642102;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1642102, 0, 0, 15, 28349, 2, 0, 0, 16401, 5, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Health - Cast Spell');
+
+    -- Events list for Necropolis
+    DELETE FROM `creature_ai_events` WHERE `creature_id`=16401;
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1640101, 16401, 0, 11, 0, 100, 1, 0, 0, 0, 0, 1640101, 0, 0, 'Necropolis - Just Spawned');
+
+    DELETE FROM `creature_ai_scripts` WHERE `id`=1640101;
+    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1640101, 0, 0, 39, 1640101, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis - Start Script');
+
+    DELETE FROM `generic_scripts` WHERE `id`=1640101;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1640101, 5, 0, 15, 28395, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis - Cast Spell');
 
     -- Events list for Pallid Horror
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16394;
@@ -491,34 +480,34 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639403;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, -8585.14, 903.542, 81.7025, 4.72984, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, -8583.97, 906.899, 81.7026, 3.83972, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, -8583.51, 901.15, 81.7033, 4.08407, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, -8580.33, 901.258, 81.7028, 3.92699, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, -8579.29, 907.101, 81.702, 3.92699, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 151902, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Stormwind Cathedral');
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8585.14, 903.542, 81.7025, 4.72984, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.97, 906.899, 81.7026, 3.83972, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.51, 901.15, 81.7033, 4.08407, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8580.33, 901.258, 81.7028, 3.92699, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8579.29, 907.101, 81.702, 3.92699, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 151902, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Stormwind Cathedral');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639404;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1532.72, 273.599, -62.0943, 1.25664, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1532.99, 278.193, -62.0943, 1.53589, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1536.4, 271.839, -62.0943, 1.23918, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1537.21, 278.743, -62.0943, 1.20428, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1539.85, 274.237, -62.0943, 1.20428, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 149701, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Canals');
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1532.72, 273.599, -62.0943, 1.25664, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1532.99, 278.193, -62.0943, 1.53589, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1536.4, 271.839, -62.0943, 1.23918, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1537.21, 278.743, -62.0943, 1.20428, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1539.85, 274.237, -62.0943, 1.20428, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149701, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Canals');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639405;
-    INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1626.6, 481.696, -22.7855, 5.23599, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1627.48, 477.444, -22.7847, 4.71239, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1627.97, 484.273, -22.7855, 6.21337, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1629.02, 477.154, -22.7847, 1.88496, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1630.92, 484.171, -22.7855, 3.26377, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1631.27, 477.82, -22.785, 5.27089, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1632.22, 481.066, -22.7855, 5.41052, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1634.59, 477.738, -21.8358, 4.4855, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 0, 6, 1638301, -1, 7, 1634.67, 479.701, -21.8066, 1.64061, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 149702, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Sewers');
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1626.6, 481.696, -22.7855, 5.23599, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1634.67, 479.701, -21.8066, 1.64061, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1634.59, 477.738, -21.8358, 4.4855, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1632.22, 481.066, -22.7855, 5.41052, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1631.27, 477.82, -22.785, 5.27089, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1630.92, 484.171, -22.7855, 3.26377, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1629.02, 477.154, -22.7847, 1.88496, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1627.97, 484.273, -22.7855, 6.21337, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1627.48, 477.444, -22.7847, 4.71239, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149702, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Sewers');
 
     -- Events list for Skeletal Shocktrooper
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16299;
@@ -664,19 +653,19 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638303;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638303, 0, 0, 20, 10, 0, 2000, 0, 79820, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Collin Mauren'),
-    (1638303, 1, 0, 39, 1638302, 1638303, 0, 0, 79820, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Collin Mauren');
+    (1638303, 0, 0, 39, 1638302, 1638303, 0, 0, 79820, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Collin Mauren');
 
     -- Stormwind City Mage Quarter - Archmage Malin
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638304;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638304, 0, 0, 20, 10, 0, 2000, 0, 90442, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Archmage Malin'),
-    (1638304, 1, 0, 39, 1638302, 1638303, 0, 0, 90442, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Archmage Malin');
+    (1638304, 0, 0, 39, 1638302, 1638303, 0, 0, 90442, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Archmage Malin');
 
     -- Stormwind City Mage Quarter - Erich Lohan
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638305;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638305, 0, 0, 20, 10, 0, 2000, 0, 90445, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Erich Lohan'),
-    (1638305, 1, 0, 39, 1638302, 1638303, 0, 0, 90445, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Erich Lohan');
+    (1638305, 0, 0, 39, 1638302, 1638303, 0, 0, 90445, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Erich Lohan');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638308;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -721,6 +710,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638601, 16386, 0, 8, 0, 100, 1, 28366, 1, 0, 0, 1638601, 0, 0, 'Necropolis Relay - Hit by Communique, Proxy-to-Relay');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638602, 16386, 0, 8, 0, 100, 1, 28281, 1, 0, 0, 1638602, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638603, 16386, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1638603, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay, Death');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638604, 16386, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1638604, 0, 0, 'Necropolis Relay - Just Spawned');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638601;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -735,16 +725,19 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1638603, 0, 1, 15, 28351, 2, 0, 0, 16398, 200, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Cast Communique, Camp-to-Relay, Death On Necropolis Proxy');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638604;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638604, 0, 0, 13, 0, 0, 0, 0, 181136, 200, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Activate Circle');
+    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638604, 0, 0, 39, 1638601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Start Script');
+
+    DELETE FROM `generic_scripts` WHERE `id`=1638601;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638601, 5, 0, 13, 0, 0, 0, 0, 181136, 200, 11, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Activate GameObject');
 
     -- Events list for Necropolis Proxy
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16398;
     INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
     (1639801, 16398, 0, 8, 0, 100, 1, 28373, 1, 0, 0, 1639801, 0, 0, 'Necropolis Proxy - Hit by Communique, Necropolis-to-Proxies'),
     (1639802, 16398, 0, 8, 0, 100, 1, 28365, 1, 0, 0, 1639802, 0, 0, 'Necropolis Proxy - Hit by Communique, Relay-to-Proxy'),
-    (1639803, 16398, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1639803, 0, 0, 'Necropolis Proxy - Hit by Communique, Camp-to-Relay, Death'),
-    (1639804, 16398, 0, 8, 0, 100, 0, 28373, 1, 0, 0, 1639804, 0, 0, 'Necropolis Proxy - Hit by Communique, Proxy-to-Relay Once to activate Circle');
+    (1639803, 16398, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1639803, 0, 0, 'Necropolis Proxy - Hit by Communique, Camp-to-Relay, Death');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639801;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -757,14 +750,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639803;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639803, 0, 1, 15, 28351, 2, 0, 0, 16421, 200, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Cast Communique, Camp-to-Relay, Death On Necropolis health');
-
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1639804;
-    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639804, 0, 0, 68, 1639801, 0, 181136, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Start Script For All');
-
-    DELETE FROM `generic_scripts` WHERE `id`=1639801;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639801, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Activate Circle');
 
     -- Events list for Necrotic Shard
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16136;
@@ -808,16 +793,15 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1617202, 0, 1, 39, 1617202, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1617203;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1617203, 0, 0, 18, 4000, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Despawn self'),
-    (1617203, 0, 0, 68, 1617201, 0, 181136, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(Circle)'),
-    (1617203, 0, 0, 68, 1617201, 0, 181173, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(Undead Fire)'),
-    (1617203, 0, 0, 68, 1617201, 0, 181174, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(Undead Fire Aura)'),
-    (1617203, 0, 0, 68, 1617201, 0, 181191, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile1)'),
-    (1617203, 0, 0, 68, 1617201, 0, 181192, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile2)'),
-    (1617203, 0, 0, 68, 1617201, 0, 181193, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile3)'),
-    (1617203, 0, 0, 68, 1617201, 0, 181194, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile4)'),
+    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1617203, 0, 0, 15, 28681, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Soul Revival'),
+    (1617203, 0, 0, 68, 1617201, 0, 181194, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile4)'),
+    (1617203, 0, 0, 68, 1617201, 0, 181193, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile3)'),
+    (1617203, 0, 0, 68, 1617201, 0, 181192, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile2)'),
+    (1617203, 0, 0, 68, 1617201, 0, 181191, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(SkullPile1)'),
+    (1617203, 0, 0, 68, 1617201, 0, 181174, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(Undead Fire Aura)'),
+    (1617203, 0, 0, 68, 1617201, 0, 181173, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(Undead Fire)'),
+    (1617203, 0, 0, 68, 1617201, 0, 181136, 60, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Start Script For All(Circle)'),
     (1617203, 0, 0, 15, 28351, 2, 0, 0, 16386, 200, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Communique, Camp-to-Relay, Death');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1617204;

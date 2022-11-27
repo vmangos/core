@@ -491,14 +491,7 @@ bool ToastingGoblets::ShouldEnable() const
 }
 
 ScourgeInvasionEvent::ScourgeInvasionEvent()
-    :WorldEvent(GAME_EVENT_SCOURGE_INVASION)
-{
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_VICTORIES, 0);
-    for (uint32 i = VARIABLE_SI_WINTERSPRING_REMAINING; i < VARIABLE_SI_BURNING_STEPPES_REMAINING; i++)
-    {
-        sObjectMgr.SetSavedVariable(i, 0, true);
-    }
-}
+    :WorldEvent(GAME_EVENT_SCOURGE_INVASION){}
 
 void ScourgeInvasionEvent::EnableAndStartEvent(uint16 event_id)
 {

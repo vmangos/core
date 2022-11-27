@@ -283,9 +283,6 @@ enum ScourgeInvasionMisc
     GOBJ_NECROPOLIS_HUGE                                = 181223, // Necropolis (scale 3.5).
     GOBJ_NECROPOLIS_CITY                                = 181172, // Necropolis at the Citys (scale 2.5).
 
-    ZONE_ATTACK_TIMER_MIN                               = MINUTE * 45, // 45 min.
-    ZONE_ATTACK_TIMER_MAX                               = MINUTE * 60, // 60 min.
-
     ZONEID_WINTERSPRING                                 = 618,
     ZONEID_AZSHARA                                      = 16,
     ZONEID_EASTERN_PLAGUELANDS                          = 139,
@@ -324,7 +321,7 @@ enum ScourgeInvasionWorldStatesVariables
     WORLDSTATE_BURNING_STEPPES                  = 0x08D6, // 2262 - Icon on map.
     WORLDSTATE_TANARIS                          = 0x08D7, // 2263 - Icon on map.
 
-    WORLDSTATE_SI_BATTLES_WON                   = 2219, // We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over. & We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them. & We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
+    WORLDSTATE_SI_VICTORIES                     = 2219, // We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over. & We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them. & We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
     WORLDSTATE_SI_AZSHARA_REMAINING             = 2279, // The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
     WORLDSTATE_SI_BLASTED_LANDS_REMAINING       = 2280, // The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
     WORLDSTATE_SI_BURNING_STEPPES_REMAINING     = 2281, // If additional support is not soon sent to the Burning Steppes, I fear the Scourge will establish a base of operations there. If you can, you should go there to aid the defenders.$B$BNumber of Necropolises remaining: $2281W

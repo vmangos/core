@@ -29,18 +29,12 @@ struct MouthAI : public ScriptedAI
         m_events.Reset();
         m_creature->SetActiveObjectState(true);
         Initialise();
-
-        if (!m_eventID)
-            return;
-
-        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(0 * IN_MILLISECONDS, 5 * IN_MILLISECONDS));
     }
 
     EventMap m_events;
     int m_eventID       = GetZoneEventID();
     int m_worldstateID  = GetWorldStateID();
     int m_remainingID   = GetRemainingVariableID();
-    bool m_resume         = false;
 
     void Reset() override {}
 
@@ -58,9 +52,9 @@ struct MouthAI : public ScriptedAI
             if (!pPlayer->IsInWorld())
                 continue;
 
-            pPlayer->SendUpdateWorldState(m_worldstateID, REMAINING > 0 ? 1 : 0);
-            pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
-            pPlayer->SendUpdateWorldState(m_worldstateID, REMAINING);
+            pPlayer->SendUpdateWorldState(m_worldstateID, sGameEventMgr.IsActiveEvent(m_eventID) ? 1 : 0);
+            pPlayer->SendUpdateWorldState(WORLDSTATE_SI_VICTORIES, VICTORIES);
+            //pPlayer->SendUpdateWorldState(m_worldstateID, REMAINING);
         }
     }
 
@@ -72,26 +66,15 @@ struct MouthAI : public ScriptedAI
         if (!sGameEventMgr.IsValidEvent(m_eventID))
             return;
 
-        int REMAINING = 0;
+        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(6 * IN_MILLISECONDS, 15 * IN_MILLISECONDS));
+    }
 
-        // Resuming after server restart?
-        if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
-            m_resume = false;
+    void EnableInvasionWeather(bool invasion)
+    {
+        if (invasion)
+            m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
         else
-            m_resume = true;
-
-        if (CreatureGroup* group = m_creature->GetCreatureGroup())
-        {
-            for (const auto& itr : group->GetMembers())
-            {
-                CreatureGroupMember* pCreature = itr.second;
-
-                if (pCreature)
-                    REMAINING++;
-            }
-        }
-
-        sObjectMgr.SetSavedVariable(m_remainingID, REMAINING, true);
+            m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_FINE, 0.0f, false);
     }
 
     int GetWorldStateID()
@@ -211,12 +194,19 @@ struct MouthAI : public ScriptedAI
     int GetActiveZones()
     {
         int count = 0;
-
+        /*
         for (uint32 i = GAME_EVENT_SCOURGE_INVASION_WINTERSPRING; i < GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES; i++)
         {
             if (sGameEventMgr.IsActiveEvent(i))
                 count++;
+        }*/
+
+        for (uint32 i = VARIABLE_SI_WINTERSPRING_REMAINING; i < VARIABLE_SI_BURNING_STEPPES_REMAINING; i++)
+        {
+            if (sObjectMgr.GetSavedVariable(i, true) > 0)
+                count++;
         }
+
         return count;
     }
 
@@ -241,6 +231,20 @@ struct MouthAI : public ScriptedAI
             {
                 case EVENT_MOUTH_OF_KELTHUZAD_UPDATE:
                 {
+                    int VICTORIES                   = 0;    // Victories against the Scourge (defeated zones).
+                    int REMAINING                   = 0;    // Remaining Necropolis in a Zone.
+                    int ACTIVE                      = 0;    // Amount of active zones (Invasions).
+                    int LIMIT                       = 2;    // How many zones can be attacked at the same time (On event start all zones getting attacked)
+                    int ZONE_ATTACK_TIMER_MIN       = 45;   // How many minutes it takes at least until another zone gets attacked (Invasion starts).
+                    int ZONE_ATTACK_TIMER_MAX       = 60;   // How many minutes it takes at most until another zone gets attacked (Invasion starts).
+
+                    VICTORIES               = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
+                    REMAINING               = sObjectMgr.GetSavedVariable(m_remainingID);
+                    ACTIVE                  = GetActiveZones();
+                    LIMIT                   = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT);
+                    ZONE_ATTACK_TIMER_MIN   = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MIN) * MINUTE;
+                    ZONE_ATTACK_TIMER_MAX   = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MAX) * MINUTE;
+
                     if (sGameEventMgr.IsActiveEvent(m_eventID)) // Zone is already being Attacked.
                     {
                         // Do random Zone Yell (Only in invasion zones).
@@ -248,16 +252,12 @@ struct MouthAI : public ScriptedAI
                     }
                     else // Zone is not Active.
                     {
-                        if (!m_resume) // If this is not a resuming zone, give it some time to try to start again if possible.
-                        {
-                            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(0 * IN_MILLISECONDS, 5 * IN_MILLISECONDS));
-                            return;
-                        }
+                        if (ZONE_ATTACK_TIMER_MIN > 24 * HOUR || ZONE_ATTACK_TIMER_MAX > 24 * HOUR)
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Scourge Invasion] Zone respawn timer is set over 24 hours. Is this on purpose?");
 
-                        // Possible attack another Zone? All Zones getting attacked if there is no Victory yet (Scourge Invasion Start).
-                        if (!sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES, true) || GetActiveZones() < sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT))
+                        // Is it Possible to attack another Zone?
+                        if (VICTORIES == 0 || REMAINING > 0 || VICTORIES > 0 && REMAINING == 0 && ACTIVE < LIMIT)
                         {
-                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Scourge Invasion] Starting in Zone: %u, VARIABLE_SI_VICTORIES: %u, CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT: %u", m_creature->GetZoneId(), sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES), sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT));
                             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START, 0);
                             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, 0);
                         }
@@ -267,27 +267,47 @@ struct MouthAI : public ScriptedAI
                 }
                 case EVENT_MOUTH_OF_KELTHUZAD_YELL:
                 {
-                    DoScriptText(PickRandomValue(
-                        BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5
-                    ), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                    DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
                     break;
                 }
                 case EVENT_MOUTH_OF_KELTHUZAD_ZONE_START:
                 {
-                    m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
+                    int REMAINING = 0;
+
+                    // Mouth of Kel'Thuzad is the group leader of all Necropolis Healths in a zone. It's the best way to check if a Necropolis dies.
+                    if (CreatureGroup* group = m_creature->GetCreatureGroup())
+                    {
+                        for (const auto& itr : group->GetMembers())
+                        {
+                            CreatureGroupMember* pCreature = itr.second;
+
+                            if (pCreature)
+                                REMAINING++;
+                        }
+                    }
+
+                    if (!REMAINING)
+                    {
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Scourge Invasion] Trying to start invasion in Zone: %u but Creature GUID %u has no group members.", m_creature->GetZoneId(), m_creature->GetGUID());
+                        return;
+                    }
+
+                    EnableInvasionWeather(true);
                     sGameEventMgr.StartEvent(m_eventID);
+                    sObjectMgr.SetSavedVariable(m_remainingID, REMAINING, true);
                     UpdateWorldState();
+
+                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion] Start Invasion in Zone: %u, set remaining Necropolis to: %u", m_creature->GetZoneId(), sObjectMgr.GetSavedVariable(m_remainingID, true));
+
                     break;
                 }
                 case EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP:
                 {
                     if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
                     {
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Scourge Invasion] Stoping in Zone: %u with m_remainingID: %u", m_creature->GetZoneId(), m_remainingID);
-                        DoScriptText(PickRandomValue(
-                            BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_2
-                        ), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
-                        m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion] Ending Invasion in Zone: %u with m_remainingID: %u", m_creature->GetZoneId(), m_remainingID);
+                        DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_2), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                        EnableInvasionWeather(false);
                         sGameEventMgr.StopEvent(m_eventID);
                         sObjectMgr.SetSavedVariable(VARIABLE_SI_VICTORIES, sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES) + 1, true);
                         UpdateWorldState();
@@ -432,7 +452,7 @@ bool GossipHello_npc_argent_emissary(Player* pPlayer, Creature* pCreature)
     uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
     // Send to client
-    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
+    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_VICTORIES, VICTORIES);
     pPlayer->SendUpdateWorldState(WORLDSTATE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
     pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
     pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
