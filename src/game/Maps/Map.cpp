@@ -54,6 +54,7 @@
 #include "ThreadPool.h"
 #include "AuraRemovalMgr.h"
 #include "world/world_event_wareffort.h"
+#include "CreatureGroups.h"
 
 Map::~Map()
 {
@@ -3514,4 +3515,54 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     Add(go);
     go->SetWorldMask(worldMask);
     return go;
+}
+
+Creature* Map::LoadCreatureSpawn(uint32 dbGuid, bool delaySpawn)
+{
+    CreatureData const* pSpawnData = sObjectMgr.GetCreatureData(dbGuid);
+    if (!pSpawnData)
+        return nullptr;
+
+    Creature* pCreature;
+    ObjectGuid guid = pSpawnData->GetObjectGuid(dbGuid);
+    if (pCreature = GetCreature(guid))
+        return pCreature;
+
+    if (!IsLoaded(pSpawnData->position.x, pSpawnData->position.y))
+        return nullptr;
+
+    pCreature = new Creature();
+    if (!pCreature->LoadFromDB(dbGuid, this, true))
+    {
+        delete pCreature;
+        return nullptr;
+    }
+
+    if (delaySpawn)
+    {
+        pCreature->SetRespawnTime(pCreature->GetRespawnDelay());
+        if (sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATELY) || pCreature->IsWorldBoss())
+            pCreature->SaveRespawnTime();
+    }
+    
+    Add(pCreature);
+    return pCreature;
+}
+
+Creature* Map::LoadCreatureSpawnWithGroup(uint32 leaderDbGuid, bool delaySpawn)
+{
+    Creature* pLeader = LoadCreatureSpawn(leaderDbGuid);
+    if (!pLeader)
+        return nullptr;
+
+    if (CreatureGroup* pGroup = pLeader->GetCreatureGroup())
+    {
+        for (auto const& itr : pGroup->GetMembers())
+            LoadCreatureSpawn(itr.first.GetCounter());
+
+        if (pGroup->HasGroupFlag(OPTION_RESPAWN_TOGETHER) && pLeader->IsAlive())
+            pGroup->RespawnAll(pLeader);
+    }
+
+    return pLeader;
 }

@@ -64,6 +64,10 @@ struct boss_kurinnaxxAI : public ScriptedAI
         m_uiTrash_Timer = 10000;
         m_uiWideSlash_Timer = 15000;
         m_bHasEnraged = false;
+    }
+
+    void JustRespawned() override
+    {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_KURINNAXX, NOT_STARTED);
     }

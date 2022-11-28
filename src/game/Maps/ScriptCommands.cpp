@@ -26,6 +26,7 @@
 #include "GameEventMgr.h"
 #include "ObjectMgr.h"
 #include "Group.h"
+#include "CreatureGroups.h"
 
 // Script commands should return false by default.
 // If they return true the rest of the script is aborted.
@@ -647,6 +648,8 @@ bool Map::ScriptCommand_PlaySound(ScriptInfo const& script, WorldObject* source,
 
     if (script.playSound.flags & SF_PLAYSOUND_DISTANCE_DEPENDENT)
         pSource->PlayDistanceSound(script.playSound.soundId, pTarget);
+    else if (script.playSound.flags & SF_PLAYSOUND_TO_ALL_IN_ZONE)
+        PlayDirectSoundToMap(script.playSound.soundId, IsContinent() ? pSource->GetZoneId() : 0);
     else
         pSource->PlayDirectSound(script.playSound.soundId, pTarget);
 
@@ -684,7 +687,7 @@ bool Map::ScriptCommand_DespawnCreature(ScriptInfo const& script, WorldObject* s
     // Fix possible crash due to double aura deletion when creature is despawned on death.
     uint32 const despawnDelay = !pSource->IsAlive() && (script.despawn.despawnDelay == 0) ? 1 : script.despawn.despawnDelay;
 
-    pSource->DespawnOrUnsummon(despawnDelay);
+    pSource->DespawnOrUnsummon(despawnDelay, script.despawn.respawnDelay);
 
     return false;
 }
@@ -1264,8 +1267,7 @@ bool Map::ScriptCommand_SetData64(ScriptInfo const& script, WorldObject* source,
     return false;
 }
 
-// SCRIPT_COMMAND_START_SCRIPT (39)
-bool Map::ScriptCommand_StartScript(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+static uint32 ChooseScriptIdToStart(ScriptInfo const& script)
 {
     uint32 const roll = urand(1, 100);
     uint32 sum = 0;
@@ -1289,8 +1291,16 @@ bool Map::ScriptCommand_StartScript(ScriptInfo const& script, WorldObject* sourc
         sum += currentChance;
     }
 
-    if (chosenId)
-        ScriptsStart(sGenericScripts, chosenId, source ? source->GetObjectGuid() : ObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+    return chosenId;
+}
+
+// SCRIPT_COMMAND_START_SCRIPT (39)
+bool Map::ScriptCommand_StartScript(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    uint32 const scriptId = ChooseScriptIdToStart(script);
+
+    if (scriptId)
+        ScriptsStart(sGenericScripts, scriptId, source ? source->GetObjectGuid() : ObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
     else
         return ShouldAbortScript(script);
 
@@ -2423,5 +2433,54 @@ bool Map::ScriptCommand_PlayCustomAnim(ScriptInfo const& script, WorldObject* so
     }
 
     pGo->SendGameObjectCustomAnim(script.playCustomAnim.animId);
+    return false;
+}
+
+// SCRIPT_COMMAND_START_SCRIPT_ON_GROUP (90)
+bool Map::ScriptCommand_StartScriptOnGroup(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    Unit* pSource = ToUnit(source);
+
+    if (!pSource)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SCRIPT_COMMAND_START_SCRIPT_ON_GROUP (script id %u) call for a nullptr or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    uint32 const scriptId = ChooseScriptIdToStart(script);
+    if (!scriptId)
+        return ShouldAbortScript(script);
+
+    ScriptsStart(sGenericScripts, scriptId, pSource->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+
+    if (Creature* pCreature = pSource->ToCreature())
+    {
+        if (CreatureGroup* pGroup = pCreature->GetCreatureGroup())
+        {
+            if (pGroup->GetLeaderGuid() != pCreature->GetObjectGuid())
+                ScriptsStart(sGenericScripts, scriptId, pGroup->GetLeaderGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+
+            for (auto const& itr : pGroup->GetMembers())
+            {
+                if (itr.first != pCreature->GetObjectGuid())
+                    ScriptsStart(sGenericScripts, scriptId, itr.first, target ? target->GetObjectGuid() : ObjectGuid());
+            }
+        }
+    }
+    else if (Player* pPlayer = pSource->ToPlayer())
+    {
+        if (Group* pGroup = pPlayer->GetGroup())
+        {
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember->GetObjectGuid() != pPlayer->GetObjectGuid())
+                        ScriptsStart(sGenericScripts, scriptId, pMember->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+                }
+            }
+        }
+    }
+
     return false;
 }
