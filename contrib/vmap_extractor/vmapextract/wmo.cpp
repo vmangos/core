@@ -30,7 +30,6 @@
 #include "mpq_libmpq04.h"
 
 using namespace std;
-extern uint16* LiqType;
 
 WMORoot::WMORoot(std::string& filename)
     : filename(filename), color(0), nTextures(0), nGroups(0), nPortals(0), nLights(0),
