@@ -359,7 +359,12 @@ bool AuthSocket::_HandleLogonChallenge()
     _login = (const char*)ch->I;
     _build = ch->build;
 
+    ch->os[3] = '\0';
+    std::reverse(ch->os, ch->os + 3);
     memcpy(&_os, ch->os, sizeof(_os));
+
+    ch->platform[3] = '\0';
+    std::reverse(ch->platform, ch->platform + 3);
     memcpy(&_platform, ch->platform, sizeof(_platform));
 
     ///- Normalize account name
@@ -1043,7 +1048,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             if (realmflags & REALM_FLAG_SPECIFYBUILD)
             {
                 char buf[20];
-                snprintf(buf, 20, " (%u,%u,%u)", buildInfo->major_version, buildInfo->minor_version, buildInfo->bugfix_version);
+                snprintf(buf, 20, " (%u,%u,%u)", buildInfo->majorVersion, buildInfo->minorVersion, buildInfo->bugfixVersion);
                 name += buf;
             }
 
@@ -1112,9 +1117,9 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 
             if (realmFlags & REALM_FLAG_SPECIFYBUILD)
             {
-                pkt << uint8(buildInfo->major_version);
-                pkt << uint8(buildInfo->minor_version);
-                pkt << uint8(buildInfo->bugfix_version);
+                pkt << uint8(buildInfo->majorVersion);
+                pkt << uint8(buildInfo->minorVersion);
+                pkt << uint8(buildInfo->bugfixVersion);
                 pkt << uint16(_build);
             }
         }
@@ -1399,38 +1404,38 @@ bool AuthSocket::GeographicalLockCheck()
 
 bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect)
 {
-    if (!((_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX)))
+    std::vector<RealmBuildInfo const*> allowedClients = FindBuildInfo(_build, _os, _platform);
+    if (allowedClients.empty())
         return false;
 
     if (!sConfig.GetBoolDefault("StrictVersionCheck", false))
         return true;
 
-    std::array<uint8, 20> zeros = { {} };
-    std::array<uint8, 20> const* versionHash = nullptr;
-    if (!isReconnect)
+    for (RealmBuildInfo const* pBuildInfo : allowedClients)
     {
-        RealmBuildInfo const* buildInfo = FindBuildInfo(_build);
-        if (!buildInfo)
-            return false;
+        std::array<uint8, 20> zeros = { {} };
+        std::array<uint8, 20> const* versionHash = nullptr;
+        if (!isReconnect)
+        {
+            versionHash = &pBuildInfo->integrityHash;
 
-        if (_os == Win)
-            versionHash = &buildInfo->WindowsHash;
-        else if (_os == OSX)
-            versionHash = &buildInfo->MacHash;
+            if (!versionHash)
+                return false;
 
-        if (!versionHash)
-            return false;
+            if (!memcmp(versionHash->data(), zeros.data(), zeros.size()))
+                return true;                                                            // not filled serverside
+        }
+        else
+            versionHash = &zeros;
 
-        if (!memcmp(versionHash->data(), zeros.data(), zeros.size()))
-            return true;                                                            // not filled serverside
+        Sha1Hash version;
+        version.UpdateData(a, aLength);
+        version.UpdateData(versionHash->data(), versionHash->size());
+        version.Finalize();
+
+        if (memcmp(versionProof, version.GetDigest(), version.GetLength()) == 0)
+            return true;
     }
-    else
-        versionHash = &zeros;
 
-    Sha1Hash version;
-    version.UpdateData(a, aLength);
-    version.UpdateData(versionHash->data(), versionHash->size());
-    version.Finalize();
-
-    return memcmp(versionProof, version.GetDigest(), version.GetLength()) == 0;
+    return false;
 }

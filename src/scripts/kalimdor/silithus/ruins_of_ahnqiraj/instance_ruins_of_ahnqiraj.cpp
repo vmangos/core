@@ -22,6 +22,7 @@ SDCategory: Ruins of Ahn'Qiraj
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "Group.h"
 #include "CreatureGroups.h"
 #include "ruins_of_ahnqiraj.h"
 
@@ -33,8 +34,6 @@ instance_ruins_of_ahnqiraj::instance_ruins_of_ahnqiraj(Map* pMap) : ScriptedInst
 void instance_ruins_of_ahnqiraj::Initialize()
 {
     m_uiKurinnaxxGUID = 0;
-    for (uint32 & waveIndex : m_uiWaveMembersCount)
-        waveIndex = WAVE_MEMBERS_INIT_COUNT;
     m_uiBuruGUID = 0;
     m_uiOssirianGUID = 0;
     m_uiAndorovGUID = 0;
@@ -137,9 +136,26 @@ void instance_ruins_of_ahnqiraj::OnCreatureEnterCombat(Creature * pCreature)
             if (CreatureGroup* g = pCreature->GetCreatureGroup())
                 if (g->GetOriginalLeaderGuid().GetEntry() == NPC_MAJOR_YEGGETH)
                     m_lYeggethShieldList.push_back(pCreature->GetGUID());
-            // If any creature from Rajaxx's wave enters combat, start Rajaxx event.
-            if (m_auiEncounter[TYPE_RAJAXX] == NOT_STARTED)
-                SetData(TYPE_RAJAXX, IN_PROGRESS);
+
+            // Fight Change in 1.10.1
+            // https://wowpedia.fandom.com/wiki/General_Rajaxx?oldid=180046
+            // "Second, the strategy to NOT talk to the NPCs before you start the fight,"
+            // "and just call them at the end to help with Rajaxx himself no longer works,"
+            // "as soon as you pull the liutenant runs in with his group and starts to fight,"
+            // "and actually blizzard even goofed that, if u pull before talking to the NPCs,"
+            // "the NPCs run right past the first wave and wait at the door for them."
+            if (m_auiEncounter[TYPE_RAJAXX] != DONE &&
+               (m_auiEncounter[TYPE_GENERAL_ANDOROV] == NOT_STARTED || m_auiEncounter[TYPE_GENERAL_ANDOROV] == FAIL) &&
+                sWorld.GetWowPatch() >= WOW_PATCH_110)
+            {
+                if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
+                {
+                    if (!pAndorov->IsAlive())
+                        pAndorov->Respawn();
+                    GetMap()->ScriptsStart(sGenericScripts, ANDOROV_START_SCRIPT, pAndorov->GetObjectGuid(), pAndorov->GetObjectGuid());
+                    SetData(TYPE_GENERAL_ANDOROV, IN_PROGRESS);
+                }
+            }
             m_bRajaxxEventIsToReset = false;
         // no break
         case NPC_KURINNAXX:
@@ -216,16 +232,16 @@ void instance_ruins_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
     switch (pCreature->GetEntry())
     {
         case NPC_KURINNAXX:
-            m_uiKurinnaxxGUID   = pCreature->GetGUID();
+            m_uiKurinnaxxGUID = pCreature->GetGUID();
             break;
         case NPC_CAPTAIN_QEEZ:
-            m_uiQeezGUID     = pCreature->GetGUID();
+            m_uiQeezGUID = pCreature->GetGUID();
             break;
         case NPC_CAPTAIN_TUUBID:
             m_uiTuubidGUID = pCreature->GetGUID();
             break;
         case NPC_CAPTAIN_DRENN:
-            m_uiDrennGUID   = pCreature->GetGUID();
+            m_uiDrennGUID = pCreature->GetGUID();
             break;
         case NPC_CAPTAIN_XURREM:
             m_uiXurremGUID = pCreature->GetGUID();
@@ -234,39 +250,25 @@ void instance_ruins_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
             m_uiYeggethGUID = pCreature->GetGUID();
             break;
         case NPC_MAJOR_PAKKON:
-            m_uiPakkonGUID   = pCreature->GetGUID();
+            m_uiPakkonGUID = pCreature->GetGUID();
             break;
         case NPC_COLONEL_ZERRAN:
             m_uiZerranGUID = pCreature->GetGUID();
             break;
         case NPC_RAJAXX:
-            m_uiRajaxxGUID         = pCreature->GetGUID();
+            m_uiRajaxxGUID = pCreature->GetGUID();
             break;
         case NPC_BURU:
-            m_uiBuruGUID             = pCreature->GetGUID();
+            m_uiBuruGUID = pCreature->GetGUID();
             break;
         case NPC_OSSIRIAN:
-            m_uiOssirianGUID     = pCreature->GetGUID();
+            m_uiOssirianGUID = pCreature->GetGUID();
             break;
         case NPC_GENERAL_ANDOROV:
-            // Andorov is spawn only if Kurinnaxx is dead and Rajaxx alive.
             m_uiAndorovGUID = pCreature->GetGUID();
-            if ((m_auiEncounter[TYPE_KURINNAXX] != DONE) || (m_auiEncounter[TYPE_RAJAXX] == DONE))
-            {
-                pCreature->ForcedDespawn(0);
-                pCreature->SetRespawnTime(AQ_RESPAWN_5_MINUTES);
-                //    pCreature->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
-            }
             break;
         case NPC_KALDOREI_ELITE:
-            // Elites are spawn only if Kurinnaxx is dead and Rajaxx alive.
             m_lKaldoreiElites.push_back(pCreature->GetGUID());
-            if ((m_auiEncounter[TYPE_KURINNAXX] != DONE) || (m_auiEncounter[TYPE_RAJAXX] == DONE))
-            {
-                pCreature->ForcedDespawn(0);
-                pCreature->SetRespawnTime(AQ_RESPAWN_5_MINUTES);
-                //    pCreature->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
-            }
             break;
         default:
             break;
@@ -306,6 +308,9 @@ void instance_ruins_of_ahnqiraj::OnCreatureDeath(Creature* pCreature)
         case NPC_MOAM:
         case NPC_AYAMISS:
         case NPC_OSSIRIAN:
+            if (pCreature->GetEntry() == NPC_RAJAXX)
+                GiveRepAfterRajaxxDeath(pCreature);
+
             if (m_bIsAQDoorOn)
             {
                 if (GameObject* door = pCreature->GetMap()->GetGameObject(p_doorGuid))
@@ -323,19 +328,10 @@ void instance_ruins_of_ahnqiraj::OnCreatureDeath(Creature* pCreature)
         case NPC_COLONEL_ZERRAN:
         case NPC_SWARMGUARD_NEEDLER:
         case NPC_QIRAJI_WARRIOR:
-
             if (pCreature->GetEntry() == NPC_SWARMGUARD_NEEDLER || pCreature->GetEntry() == NPC_QIRAJI_WARRIOR)
             {
                 pCreature->ForcedDespawn(3000);
                 pCreature->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
-            }
-            // Count deaths in Rajaxx's waves
-            if (GetWaveFromCreature(pCreature) > 0)
-            {
-                uint8 waveIndex = GetWaveFromCreature(pCreature) - 1;
-                ASSERT(waveIndex < WAVE_MAX);
-                if (m_uiWaveMembersCount[waveIndex] > 0)
-                    m_uiWaveMembersCount[waveIndex]--;
             }
             break;
         case NPC_GENERAL_ANDOROV:
@@ -368,15 +364,6 @@ uint32 instance_ruins_of_ahnqiraj::GetData(uint32 uiType)
         case TYPE_AYAMISS:
         case TYPE_OSSIRIAN:
             return m_auiEncounter[uiType];
-        case TYPE_WAVE1:
-        case TYPE_WAVE2:
-        case TYPE_WAVE3:
-        case TYPE_WAVE4:
-        case TYPE_WAVE5:
-        case TYPE_WAVE6:
-        case TYPE_WAVE7:
-            ASSERT(uiType - WAVE_OFFSET < WAVE_MAX);
-            return m_uiWaveMembersCount[uiType - WAVE_OFFSET];
         default:
             return 0;
     }
@@ -393,10 +380,6 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
                 m_uiGladiatorDeath = 0;
             return;
         case TYPE_KURINNAXX:
-            /** Spawn Andorov 3 minutes after Kurinaxx death */
-            if (uiData == DONE)
-                SetAndorovSquadRespawnTime(AQ_RESPAWN_3_MINUTES);
-
             m_auiEncounter[TYPE_KURINNAXX] = uiData;
             break;
         case TYPE_GENERAL_ANDOROV:
@@ -407,7 +390,7 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             }
             if (uiData == IN_PROGRESS)
             {
-                SetAndorovSquadFaction(1254);
+                SetAndorovSquadImmunity(false);
                 if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
                 {
                     pAndorov->SetDefaultGossipMenuId(ANDOROV_GOSSIP_IN_PROGRESS);
@@ -422,10 +405,6 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
                 /** Respawn Andorov and elite in 15 minutes */
                 if (m_auiEncounter[TYPE_KURINNAXX] == DONE)
                     SetAndorovSquadRespawnTime(AQ_RESPAWN_15_MINUTES);
-
-                /** Reset waves casualties count */
-                for (uint32 & waveIndex : m_uiWaveMembersCount)
-                    waveIndex = WAVE_MEMBERS_INIT_COUNT;
             }
             if (uiData == DONE)
             {
@@ -440,19 +419,10 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
                     pAndorov->SetDefaultGossipMenuId(ANDOROV_GOSSIP_DONE);
                     pAndorov->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
                 }
-                ForceAndorovSquadDespawn(120000); // Andorov disapears 2 minutes after end of combat
+                SetAndorovSquadImmunity(true);
             }
             m_bRajaxxEventIsToReset = false;
             m_auiEncounter[TYPE_RAJAXX] = uiData;
-            break;
-        case TYPE_WAVE1:
-        case TYPE_WAVE2:
-        case TYPE_WAVE3:
-        case TYPE_WAVE4:
-        case TYPE_WAVE5:
-        case TYPE_WAVE6:
-        case TYPE_WAVE7:
-            m_uiWaveMembersCount[uiType - WAVE_OFFSET] = uiData;
             break;
         case TYPE_OSSIRIAN:
             if (uiData == FAIL || uiData == DONE)
@@ -526,6 +496,15 @@ void instance_ruins_of_ahnqiraj::Load(char const* chrIn)
 
 void instance_ruins_of_ahnqiraj::Update(uint32 uiDiff)
 {
+    if (m_auiEncounter[TYPE_KURINNAXX] == DONE && m_auiEncounter[TYPE_RAJAXX] != DONE && !m_uiAndorovGUID)
+    {
+        if (Creature* pAndorov = GetMap()->LoadCreatureSpawnWithGroup(ANDOROV_DB_GUID))
+        {
+            pAndorov->SetDefaultGossipMenuId(ANDOROV_GOSSIP_IN_PROGRESS);
+            pAndorov->GetMotionMaster()->MoveWaypoint(0, 0, 0, 0, 0, false);
+        }
+    }
+
     if (m_bRajaxxEventIsToReset)
     {
         if (m_uiRajaxxEventResetTimer < uiDiff)
@@ -599,36 +578,95 @@ void instance_ruins_of_ahnqiraj::SetAndorovSquadRespawnTime(uint32 nextRespawnDe
     }
 }
 
-void instance_ruins_of_ahnqiraj::SetAndorovSquadFaction(uint32 faction)
+void instance_ruins_of_ahnqiraj::SetAndorovSquadImmunity(bool immune)
 {
     if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
     {
-        pAndorov->SetFactionTemplateId(faction);
-        pAndorov->SetPvP(true);
+        if (immune)
+            pAndorov->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        else
+            pAndorov->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
     for (const auto& guid : m_lKaldoreiElites)
     {
         if (Creature* pElite = instance->GetCreature(guid))
         {
-            pElite->SetFactionTemplateId(faction);
-            pElite->SetPvP(true);
+            if (immune)
+                pElite->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            else
+                pElite->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
     }
 }
 
-void instance_ruins_of_ahnqiraj::ForceAndorovSquadDespawn(uint32 timeToDespawn)
+void instance_ruins_of_ahnqiraj::GiveRepAfterRajaxxDeath(Creature* pRajaxx)
 {
-    if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
+    FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(609); // Cenarion Circle
+    if (!factionEntry)
     {
-        pAndorov->ForcedDespawn(timeToDespawn);
-        pAndorov->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Rajaxx just died, unable to find Cenarion Circle faction");
+        return;
     }
-    for (const auto& guid : m_lKaldoreiElites)
+
+    bool andorovAlive = false;
+    if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
+        if (pAndorov->IsAlive())
+            andorovAlive = true;
+
+    std::list<Creature*> helpers;
+    GetCreatureListWithEntryInGrid(helpers, pRajaxx, NPC_KALDOREI_ELITE, 400.0f);
+
+    int helpersAlive = 0;
+    for (const auto it : helpers)
     {
-        if (Creature* pElite = instance->GetCreature(guid))
+        if (it->IsAlive())
         {
-            pElite->ForcedDespawn(timeToDespawn);
-            pElite->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
+            helpersAlive++;
+            if (!andorovAlive)
+            {
+                it->DespawnOrUnsummon(); // kaldorei despawn if andorov is dead
+                it->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
+            }
+        }
+    }
+
+    if (andorovAlive)
+        helpersAlive++;
+
+    // Rep gain was buffed in patch 1.10.
+    // Old - https://www.youtube.com/watch?v=NOF6xI7Iwj8
+    // New - https://www.youtube.com/watch?v=ETO4UsKbKOY
+    int const repForKill = sWorld.GetWowPatch() >= WOW_PATCH_110 ? 50 : irand(33, 34);
+    int const repPerHelper = sWorld.GetWowPatch() >= WOW_PATCH_110 ? 45 : 30;
+
+    auto GiveRep = [factionEntry, helpersAlive, repForKill, repPerHelper](Player* pPlayer)
+    {
+        uint32 current_reputation_rank1 = pPlayer->GetReputationMgr().GetRank(factionEntry);
+        if (factionEntry && current_reputation_rank1 <= 7)
+        {
+            for (int i = 0; i < 3; i++)
+                pPlayer->GetReputationMgr().ModifyReputation(factionEntry, repForKill);
+
+            // you get 45 rep for every alive helper
+            for (int i = 0; i < helpersAlive; i++)
+                pPlayer->GetReputationMgr().ModifyReputation(factionEntry, repPerHelper);
+        }
+    };
+
+    if (Player* pLootRecepient = pRajaxx->GetLootRecipient())
+    {
+        GiveRep(pLootRecepient);
+
+        if (Group* pGroup = pLootRecepient->GetGroup())
+        {
+            for (GroupReference *itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player* pGroupGuy = itr->getSource();
+                if (!pGroupGuy || !pGroupGuy->IsInWorld() || pGroupGuy == pLootRecepient)
+                    continue;
+
+                GiveRep(pGroupGuy);
+            }
         }
     }
 }
