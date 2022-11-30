@@ -1298,12 +1298,13 @@ GuidReserveSize.GameObject = 1000
 #        Chat protection from creating fake messages using a lot spaces (other invisible symbols),
 #        not applied to addon language messages, but can prevent old addons from working
 #        if they use normal languages for sending data to other clients.
-#        Default: 0 (disable fake messages preventing)
-#                 1 (enable fake messages preventing)
+#        Default: 1 (enable fake messages preventing)
+#                 0 (disable fake messages preventing)
 #
 #    ChatStrictLinkChecking.Severity
 #        Check chat messages for ingame links to spells, items, quests, achievements etc.
-#        Default: 0 (disable link checking)
+#        Default: 2
+#                 0 (disable link checking)
 #                 1 (check if only valid pipe commands are used. This prevents posting pictures for example)
 #                 2 (verifiy that pipe commands are used in a correct order)
 #                 3 (check if color, entry and name don't contradict each other. For correct work, please assure
@@ -1387,8 +1388,8 @@ GuidReserveSize.GameObject = 1000
 #
 ###################################################################################################################
 
-ChatFakeMessagePreventing = 0
-ChatStrictLinkChecking.Severity = 0
+ChatFakeMessagePreventing = 1
+ChatStrictLinkChecking.Severity = 2
 ChatStrictLinkChecking.Kick = 0
 ChatFlood.MessageCount = 10
 ChatFlood.MessageDelay = 1
