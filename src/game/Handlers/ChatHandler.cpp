@@ -41,7 +41,7 @@
 #include "Anticheat.h"
 #include "AccountMgr.h"
 
-bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
+bool WorldSession::CheckChatMessageValidity(std::string& msg, uint32 lang, uint32 msgType)
 {
     if (!IsLanguageAllowedForChatType(lang, msgType))
         return false;
@@ -55,12 +55,19 @@ bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32
         if (sWorld.getConfig(CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName(),
-                          GetPlayer()->GetGUIDLow(), msg.c_str());
+                GetPlayer()->GetGUIDLow(), msg.c_str());
             if (sWorld.getConfig(CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_KICK))
                 KickPlayer();
             return false;
         }
     }
+    return true;
+}
+
+bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
+{
+    if (!CheckChatMessageValidity(msg, lang, msgType))
+        return false;
 
     ChatHandler handler(this);
 
@@ -254,8 +261,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         case CHAT_MSG_GUILD:
         case CHAT_MSG_OFFICER:
         case CHAT_MSG_RAID:
-        case CHAT_MSG_AFK:
-        case CHAT_MSG_DND:
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case CHAT_MSG_RAID_LEADER:
         case CHAT_MSG_RAID_WARNING:
@@ -267,6 +272,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             if (!ProcessChatMessageAfterSecurityCheck(msg, lang, type))
                 return;
             if (msg.empty())
+                return;
+            break;
+        }
+        case CHAT_MSG_AFK:
+        case CHAT_MSG_DND:
+        {
+            recv_data >> msg;
+            if (!CheckChatMessageValidity(msg, lang, type))
                 return;
             break;
         }
