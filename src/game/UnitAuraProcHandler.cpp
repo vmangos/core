@@ -1514,12 +1514,11 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                     return SPELL_AURA_PROC_FAILED;
 
                 // procspell is triggered spell but we need mana cost of original casted spell
-                // The casted spell is in a variable: Player::m_castingSpell. Otherwise we can not find the spell that caused the proc.
-
-                SpellEntry const* originalSpell = sSpellMgr.GetSpellEntry(pPlayer->m_castingSpell);
+                
+                SpellEntry const* originalSpell = sSpellMgr.GetSpellEntry(procSpell->Id);
                 if (!originalSpell)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unit::HandleProcTriggerSpell: Spell %u unknown but selected as original in Illu", pPlayer->m_castingSpell);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unit::HandleProcTriggerSpell: Spell %u unknown but selected as original in Illu", procSpell->Id);
                     return SPELL_AURA_PROC_FAILED;
                 }
                 // Histoire de pas reproc une autre fois ... :S
