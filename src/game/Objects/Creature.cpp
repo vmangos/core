@@ -3449,8 +3449,13 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
         if (GetReputationId() >= 0)
         {
             if (Player* pPlayer = pWho->ToPlayer())
+            {
                 if (pPlayer->GetReputationMgr().SetAtWar(GetReputationId(), true))
+                {
+                    pPlayer->SetTemporaryAtWarWithFaction(GetFactionId());
                     pPlayer->SendFactionAtWar(GetReputationId(), true);
+                }
+            }
         }
 
         if (CanSummonGuards())
