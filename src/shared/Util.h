@@ -152,7 +152,7 @@ inline float round_float_chance(float value)
 {
     float const remainder = value - floor(value);
     if (remainder && roll_chance_f(remainder * 100.0f))
-        return ceilf(value);
+        return ceil(value);
 
     return floor(value);
 }
