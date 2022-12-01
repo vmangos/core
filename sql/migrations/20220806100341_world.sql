@@ -156,7 +156,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature` WHERE `id` IN (16421);
 	
 	-- Delete all Low Level Minions
-    DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16438, 16437, 16422, 16423);
+    DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16438, 16437, 16422, 16423));
     DELETE FROM `creature` WHERE `id` IN (16438, 16437, 16422, 16423);
 
 -- 3. WAYPOINTS
@@ -1073,7 +1073,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@NPC_LOW_LEVEL_MINION_GUID+209, 16438, 0, 0, 0, 1, -1507.54, 58.8243, 8.78051, 3.86994, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10);    -- Skeletal Trooper in Mulgore. group: 1659479136407
     INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION FROM `creature` WHERE creature.guid BETWEEN @NPC_LOW_LEVEL_MINION_GUID+1 AND @NPC_LOW_LEVEL_MINION_GUID+209;
 
-    INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, @NPC_NECROPOLIS_HEALTH_GUID+1, 0, 0, 64);
+    INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
         (@NPC_LOW_LEVEL_MINION_GUID+1, @NPC_LOW_LEVEL_MINION_GUID+2, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477174739
         (@NPC_LOW_LEVEL_MINION_GUID+1, @NPC_LOW_LEVEL_MINION_GUID+3, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477174739
         (@NPC_LOW_LEVEL_MINION_GUID+1, @NPC_LOW_LEVEL_MINION_GUID+4, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477174739
@@ -1244,23 +1244,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@NPC_LOW_LEVEL_MINION_GUID+205, @NPC_LOW_LEVEL_MINION_GUID+207, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479136407
         (@NPC_LOW_LEVEL_MINION_GUID+205, @NPC_LOW_LEVEL_MINION_GUID+208, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479136407
         (@NPC_LOW_LEVEL_MINION_GUID+205, @NPC_LOW_LEVEL_MINION_GUID+209, 0, 0, 8);      -- Skeletal Trooper in Mulgore. group: 1659479136407
-
-    -- Add Necropolis Health to Mouths group to get informed on death.
-    INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, @NPC_NECROPOLIS_HEALTH_GUID+1, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, @NPC_NECROPOLIS_HEALTH_GUID+2, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+2, @NPC_NECROPOLIS_HEALTH_GUID+3, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+2, @NPC_NECROPOLIS_HEALTH_GUID+4, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+3, @NPC_NECROPOLIS_HEALTH_GUID+5, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+3, @NPC_NECROPOLIS_HEALTH_GUID+6, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+4, @NPC_NECROPOLIS_HEALTH_GUID+7, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+4, @NPC_NECROPOLIS_HEALTH_GUID+8, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+9, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+10, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+11, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+12, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+13, 0, 0, 64),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+14, 0, 0, 64);
 
     -- Add all Mouth of Kel'Thuzad.
     INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
