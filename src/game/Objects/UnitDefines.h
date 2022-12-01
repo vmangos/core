@@ -62,7 +62,8 @@ enum MovementChangeType
 #define ATTACK_DISPLAY_DELAY 200
 
 // For this time difference is computed regen value
-#define REGEN_TIME_FULL     2000
+#define REGEN_TIME_PLAYER_FULL     2000
+#define REGEN_TIME_CREATURE_FULL   5000
 
 #define UNIT_PVP_COMBAT_TIMER 5500
 

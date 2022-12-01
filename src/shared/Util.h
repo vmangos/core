@@ -148,6 +148,15 @@ inline float round_float(float value)
     return floor(value);
 }
 
+inline float round_float_chance(float value)
+{
+    float const remainder = value - floor(value);
+    if (remainder && roll_chance_f(remainder * 100.0f))
+        return ceilf(value);
+
+    return floor(value);
+}
+
 inline void ApplyModUInt32Var(uint32& var, int32 val, bool apply)
 {
     int32 cur = var;

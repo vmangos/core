@@ -2669,7 +2669,7 @@ void Player::RegenerateAll()
     Regenerate(POWER_ENERGY);
     Regenerate(POWER_MANA);
 
-    m_regenTimer += REGEN_TIME_FULL;
+    m_regenTimer += REGEN_TIME_PLAYER_FULL;
 }
 
 void Player::Regenerate(Powers power)
@@ -2773,7 +2773,7 @@ void Player::RegenerateHealth()
         {
             AuraList const& lModHealthRegen = GetAurasByType(SPELL_AURA_MOD_REGEN);
             for (const auto i : lModHealthRegen)
-                addvalue += i->GetModifier()->m_amount * (float(REGEN_TIME_FULL) / float(i->GetModifier()->periodictime));
+                addvalue += i->GetModifier()->m_amount * (float(REGEN_TIME_PLAYER_FULL) / float(i->GetModifier()->periodictime));
         }
     }
 

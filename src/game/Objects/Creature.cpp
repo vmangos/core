@@ -929,7 +929,7 @@ void Creature::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 
     RegenerateMana();
 
-    m_regenTimer = REGEN_TIME_FULL;
+    m_regenTimer = REGEN_TIME_CREATURE_FULL;
 }
 
 void Creature::RegenerateMana()
@@ -949,7 +949,7 @@ void Creature::RegenerateMana()
     if (IsInCombat() || GetCharmerOrOwnerGuid().IsPlayer())
     {
         if (!IsUnderLastManaUseEffect())
-            addvalue = m_manaRegen;
+            addvalue = round_float_chance(m_manaRegen);
     }
     else
         addvalue = maxValue / 3;
