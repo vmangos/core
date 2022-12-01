@@ -11,6 +11,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 -- 0. SETUP
 
+    SET @NPC_LOW_LEVEL_MINION_GUID                                  = 68543;
     SET @NPC_FLAMESHOCKER_GUID                                      = 66900;
     SET @NPC_MOUTH_OF_KELTHUZAD_GUID                                = 31274;
     SET @NPC_NECROPOLIS_HEALTH_GUID                                 = 16207;
@@ -153,6 +154,10 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     -- Delete all NPCs (Necropolis health)
     DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16421));
     DELETE FROM `creature` WHERE `id` IN (16421);
+	
+	-- Delete all Low Level Minions
+    DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (16438, 16437, 16422, 16423);
+    DELETE FROM `creature` WHERE `id` IN (16438, 16437, 16422, 16423);
 
 -- 3. WAYPOINTS
 
@@ -426,13 +431,13 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Events list for Pallid Horror
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16394;
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639401, 16394, 0, 1, 0, 100, 3, 0, 0, 60000, 90000, 1639401, 1639402, 0, 'Pallid Horror - Timer OOC');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639403, 16394, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1639403, 0, 0, 'Pallid Horror - Just Spawned');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639404, 16394, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1639404, 0, 0, 'Pallid Horror - Death');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639405, 16394, 0, 11, 0, 50, 0, 0, 0, 0, 0, 1639405, 0, 0, 'Pallid Horror - Just Spawned: Random Entry');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639406, 16394, 0, 27, 0, 100, 0, 28313, 1, 0, 0, 1639406, 0, 0, 'Pallid Horror - Missing Aura');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639407, 16394, 603, 6, 0, 100, 0, 0, 0, 0, 0, 1639407, 0, 0, 'Pallid Horror - Death: Undercity');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639408, 16394, 604, 6, 0, 100, 0, 0, 0, 0, 0, 1639408, 0, 0, 'Pallid Horror - Death: Stormwind');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639401, 16394, 0, 1, 0, 100, 3, 0, 0, 60000, 90000, 1639401, 1639402, 0, 'Pallid Horror - Timer OOC');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639406, 16394, 0, 27, 0, 100, 0, 28313, 1, 0, 0, 1639406, 0, 0, 'Pallid Horror - Missing Aura');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639405, 16394, 0, 11, 0, 50, 1, 0, 0, 0, 0, 1639405, 0, 0, 'Pallid Horror - Just Spawned: Random Entry');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639403, 16394, 0, 11, 0, 100, 1, 0, 0, 0, 0, 1639403, 0, 0, 'Pallid Horror - Just Spawned');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639407, 16394, 603, 6, 0, 100, 0, 0, 0, 0, 0, 1639407, 0, 0, 'Pallid Horror - Death: Undercity');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639408, 16394, 604, 6, 0, 100, 0, 0, 0, 0, 0, 1639408, 0, 0, 'Pallid Horror - Death: Stormwind');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1639404, 16394, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1639404, 0, 0, 'Pallid Horror - Death');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639401;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -854,6 +859,408 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 
 -- 6. CREATURE RESPAWNS
+
+    -- Low Level Minions Respawn.
+    INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+        (@NPC_LOW_LEVEL_MINION_GUID+1, 16438, 0, 0, 0, 0, -5191.06, -623.539, 399.448, 5.84918, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+2, 16438, 0, 0, 0, 0, -5176.3, -591.736, 397.886, 4.81711, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+3, 16438, 0, 0, 0, 0, -5144.77, -609.512, 398.967, 4.495, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+4, 16438, 0, 0, 0, 0, -5143.07, -588.042, 399.502, 2.62044, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+5, 16438, 0, 0, 0, 0, -5141.23, -659.017, 401.799, 4.33643, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+6, 16438, 0, 0, 0, 0, -5208.71, -611.287, 404.816, 2.63866, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+7, 16438, 0, 0, 0, 0, -5193.07, -661.447, 413.937, 3.61884, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+8, 16438, 0, 0, 0, 0, -5178.42, -553.342, 398.102, 2.9553, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+9, 16438, 0, 0, 0, 0, -5172.09, -606.646, 397.746, 3.72271, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+10, 16438, 0, 0, 0, 0, -5157.45, -574.434, 398.998, 4.903, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+11, 16437, 0, 0, 0, 0, -5194.43, -559.338, 396.88, 1.14633, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+12, 16437, 0, 0, 0, 0, -5172.85, -666.148, 408.721, 1.18356, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+13, 16437, 0, 0, 0, 0, -5126.87, -672.696, 408.134, 2.83411, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+14, 16437, 0, 0, 0, 0, -5125.61, -572.409, 403.128, 4.56886, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+15, 16437, 0, 0, 0, 0, -5124.48, -608.489, 398.888, 0.292252, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+16, 16437, 0, 0, 0, 0, -5208.49, -576.049, 400.961, 4.15947, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+17, 16437, 0, 0, 0, 0, -5193.44, -608.284, 398.297, 0.593264, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+18, 16437, 0, 0, 0, 0, -5193.28, -638.902, 403.036, 3.00478, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+19, 16437, 0, 0, 0, 0, -5159.11, -659.359, 401.477, 0.618696, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+20, 16437, 0, 0, 0, 0, -5141.73, -625.044, 396, 2.51587, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),        -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+21, 16438, 0, 0, 0, 0, -5193.83, -589.28, 398.769, 0.75173, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+22, 16438, 0, 0, 0, 0, -5177.64, -647.163, 401.092, 1.63087, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+23, 16438, 0, 0, 0, 0, -5173.32, -574.801, 396.83, 4.19687, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+24, 16438, 0, 0, 0, 0, -5158.14, -641.97, 395.852, 0.0418265, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+25, 16438, 0, 0, 0, 0, -5157.25, -624.006, 396.869, 0.585034, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+26, 16437, 0, 0, 0, 0, -5193.22, -574.374, 398.728, 5.74848, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+27, 16437, 0, 0, 0, 0, -5176.13, -624.952, 396.463, 5.98386, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+28, 16437, 0, 0, 0, 0, -5159.66, -606.987, 399.423, 5.30307, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+29, 16437, 0, 0, 0, 0, -5157.64, -589.138, 399.107, 0.0929254, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),  -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+30, 16437, 0, 0, 0, 0, -5138.2, -640.783, 396.344, 3.21955, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+31, 16422, 0, 0, 0, 0, -9226.52, 257.796, 72.3674, 5.27089, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+32, 16422, 0, 0, 0, 0, -9225.41, 354.81, 73.3402, 0.366519, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+33, 16422, 0, 0, 0, 0, -9223.56, 323.409, 73.3968, 2.61799, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+34, 16422, 0, 0, 0, 0, -9209.55, 353.762, 73.849, 1.23918, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+35, 16422, 0, 0, 0, 0, -9208.3, 324.625, 73.6151, 3.94444, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+36, 16422, 0, 0, 0, 0, -9207.19, 255.207, 73.9707, 4.55531, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+37, 16423, 0, 0, 0, 0, -9241.08, 322.691, 74.4411, 3.57792, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+38, 16423, 0, 0, 0, 0, -9226.37, 306.575, 74.5378, 2.75762, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+39, 16423, 0, 0, 0, 0, -9225.49, 373.623, 73.1641, 5.89921, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+40, 16423, 0, 0, 0, 0, -9223.56, 339.456, 73.8513, 4.71239, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+41, 16423, 0, 0, 0, 0, -9208.61, 307.017, 74.7344, 2.75762, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+42, 16423, 0, 0, 0, 0, -9207.78, 339.332, 72.7628, 3.07178, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+43, 16423, 0, 0, 0, 0, -9192.88, 357.69, 75.1755, 0.0872665, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+44, 16423, 0, 0, 0, 0, -9190.56, 374.964, 74.6175, 5.61996, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+45, 16423, 0, 0, 0, 0, -9222.97, 409.064, 86.3431, 4.76326, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659472025587
+        (@NPC_LOW_LEVEL_MINION_GUID+46, 16423, 0, 0, 0, 0, -9173.54, 393.35, 85.455, 3.99305, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Spectral Apparition in Elwynn Forest. group: 1659472025587
+        (@NPC_LOW_LEVEL_MINION_GUID+47, 16422, 0, 0, 0, 0, -9206.37, 426.964, 89.4854, 4.14536, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472025616
+        (@NPC_LOW_LEVEL_MINION_GUID+48, 16422, 0, 0, 0, 0, -9190.32, 424.626, 91.5562, 4.03192, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472025616
+        (@NPC_LOW_LEVEL_MINION_GUID+49, 16422, 0, 0, 0, 0, -9172.41, 408.582, 89.635, 3.10427, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Soldier in Elwynn Forest. group: 1659472025616
+        (@NPC_LOW_LEVEL_MINION_GUID+50, 16422, 0, 0, 0, 0, -9153.97, 408.422, 92.5331, 2.76085, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472025616
+        (@NPC_LOW_LEVEL_MINION_GUID+51, 16423, 0, 0, 0, 0, -9127.29, 339.268, 93.9964, 1.05193, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+52, 16423, 0, 0, 0, 0, -9126.39, 325.608, 93.5681, 5.57384, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+53, 16423, 0, 0, 0, 0, -9125.72, 356.334, 93.168, 3.68107, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+54, 16423, 0, 0, 0, 0, -9108.16, 308.57, 93.9508, 5.85173, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+55, 16423, 0, 0, 0, 0, -9091.68, 341.222, 94.2467, 4.92252, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+56, 16423, 0, 0, 0, 0, -9091.55, 326.751, 94.2161, 0.877631, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+57, 16423, 0, 0, 0, 0, -9059.74, 357.756, 93.1185, 0.0629808, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+58, 16423, 0, 0, 0, 0, -9047.96, 339.823, 94.8636, 0.472567, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+59, 16423, 0, 0, 0, 0, -9045.48, 355.503, 94.379, 4.06777, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+60, 16423, 0, 0, 0, 0, -9044, 323.21, 93.7645, 3.66519, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),         -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+61, 16422, 0, 0, 0, 0, -9139.32, 340.707, 92.0264, 1.01229, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+62, 16422, 0, 0, 0, 0, -9123.93, 308.548, 93.2522, 4.09884, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+63, 16422, 0, 0, 0, 0, -9110.32, 341.523, 93.5801, 0.0180196, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+64, 16422, 0, 0, 0, 0, -9109.42, 357.807, 93.6503, 2.70421, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+65, 16422, 0, 0, 0, 0, -9108.85, 325.219, 93.3783, 4.01843, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+66, 16422, 0, 0, 0, 0, -9094.11, 308.377, 94.9155, 2.21233, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+67, 16422, 0, 0, 0, 0, -9076.5, 355.643, 94.0576, 0.946578, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+68, 16422, 0, 0, 0, 0, -9074.97, 304.922, 92.7926, 1.58089, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+69, 16422, 0, 0, 0, 0, -9073.69, 339.895, 93.1489, 1.05052, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+70, 16422, 0, 0, 0, 0, -9060.14, 340.087, 93.8768, 2.11632, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+71, 16437, 0, 0, 0, 1, 1147.36, -4324.34, 23.8895, 2.57482, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+72, 16437, 0, 0, 0, 1, 1189.68, -4321.83, 21.7062, 2.60527, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+73, 16437, 0, 0, 0, 1, 1210.3, -4323.29, 23.2734, 1.10274, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+74, 16437, 0, 0, 0, 1, 1226.92, -4325.25, 25.8494, 2.14814, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+75, 16437, 0, 0, 0, 1, 1242.5, -4308.1, 28.4669, 1.46432, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+76, 16437, 0, 0, 0, 1, 1171.95, -4342.67, 25.3053, 5.77195, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+77, 16437, 0, 0, 0, 1, 1173.62, -4308.4, 20.8017, 4.50295, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+78, 16437, 0, 0, 0, 1, 1204.55, -4339.09, 25.5045, 5.52536, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+79, 16437, 0, 0, 0, 1, 1227.44, -4308.01, 25.112, 4.36058, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+80, 16437, 0, 0, 0, 1, 1243.96, -4358.3, 30.9391, 5.33122, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+81, 16438, 0, 0, 0, 1, 1172.73, -4327.02, 22.0216, 1.09122, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+82, 16438, 0, 0, 0, 1, 1175.07, -4357.89, 26.8588, 5.32325, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+83, 16438, 0, 0, 0, 1, 1225.33, -4341.79, 26.5733, 3.82625, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+84, 16438, 0, 0, 0, 1, 1240.89, -4325.15, 29.9222, 0.398358, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+85, 16438, 0, 0, 0, 1, 1244.84, -4374.43, 27.9372, 5.04125, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+86, 16437, 0, 0, 0, 1, 1156.1, -4343.53, 25.8797, 1.78485, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+87, 16437, 0, 0, 0, 1, 1191.08, -4357.62, 27.749, 2.41905, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+88, 16437, 0, 0, 0, 1, 1191.45, -4286.37, 21.2201, 0.593412, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+89, 16437, 0, 0, 0, 1, 1207.68, -4287.86, 22.485, 3.83972, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+90, 16437, 0, 0, 0, 1, 1258.84, -4373.13, 28.7774, 3.82573, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+91, 16438, 0, 0, 0, 1, 1173.75, -4283.53, 20.7698, 0.408861, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+92, 16438, 0, 0, 0, 1, 1189.31, -4343.56, 25.8441, 4.3805, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+93, 16438, 0, 0, 0, 1, 1224.77, -4287.22, 23.3625, 3.3798, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+94, 16438, 0, 0, 0, 1, 1226.42, -4372.58, 28.7022, 1.99807, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+95, 16438, 0, 0, 0, 1, 1246.95, -4385.95, 28.4688, 4.33315, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+96, 16438, 0, 0, 0, 1, 1155.88, -4309.86, 20.9188, 3.81997, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+97, 16438, 0, 0, 0, 1, 1192.17, -4306.93, 21.2328, 3.55576, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+98, 16438, 0, 0, 0, 1, 1209.29, -4358.01, 27.4716, 0.748028, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+99, 16438, 0, 0, 0, 1, 1209.36, -4310.8, 22.9504, 5.41146, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+100, 16438, 0, 0, 0, 1, 1224.25, -4356.61, 27.4585, 2.26117, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+101, 16423, 0, 0, 0, 0, 1959.11, 339.51, 39.5347, 2.05452, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+102, 16423, 0, 0, 0, 0, 1959.47, 324.664, 39.1019, 3.78206, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+103, 16423, 0, 0, 0, 0, 1975.08, 310.348, 41.0603, 3.4924, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+104, 16423, 0, 0, 0, 0, 2010.31, 292.357, 47.9491, 5.46729, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+105, 16423, 0, 0, 0, 0, 2025.48, 326.184, 46.5013, 3.27346, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+106, 16422, 0, 0, 0, 0, 1974.25, 341.438, 41.4593, 1.05711, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+107, 16422, 0, 0, 0, 0, 1977.65, 323.949, 39.8178, 2.22497, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+108, 16422, 0, 0, 0, 0, 1992.23, 291.987, 45.7473, 4.00686, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+109, 16422, 0, 0, 0, 0, 2009.02, 309.944, 44.3937, 4.32473, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+110, 16422, 0, 0, 0, 0, 2025.8, 310.15, 48.1345, 3.89455, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+111, 16422, 0, 0, 0, 0, 1958.5, 307.881, 40.707, 1.84164, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+112, 16422, 0, 0, 0, 0, 2007.28, 277.22, 47.5046, 0.978459, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+113, 16422, 0, 0, 0, 0, 2011.09, 343.75, 41.5145, 0.621711, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+114, 16422, 0, 0, 0, 0, 2011.66, 322.469, 43.3085, 5.53327, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+115, 16422, 0, 0, 0, 0, 2025.08, 293.85, 50.4982, 4.49549, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+116, 16423, 0, 0, 0, 0, 1977.61, 292.986, 41.515, 4.8069, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+117, 16423, 0, 0, 0, 0, 1990.49, 345.272, 40.0696, 3.11451, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+118, 16423, 0, 0, 0, 0, 1992.29, 277.838, 47.1022, 2.64704, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+119, 16423, 0, 0, 0, 0, 1992.55, 310.513, 41.3644, 3.69803, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+120, 16423, 0, 0, 0, 0, 2041.46, 326.857, 50.2251, 0.195571, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+121, 16437, 0, 0, 0, 1, 9938.96, 1954.86, 1336.19, 2.45828, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510819433
+        (@NPC_LOW_LEVEL_MINION_GUID+122, 16437, 0, 0, 0, 1, 9939.58, 1924.22, 1329.63, 5.19475, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510819433
+        (@NPC_LOW_LEVEL_MINION_GUID+123, 16437, 0, 0, 0, 1, 9940.18, 1941.78, 1331.63, 1.78871, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510819433
+        (@NPC_LOW_LEVEL_MINION_GUID+124, 16437, 0, 0, 0, 1, 9957.69, 1927.02, 1327.63, 2.04258, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510819433
+        (@NPC_LOW_LEVEL_MINION_GUID+125, 16437, 0, 0, 0, 1, 9873.54, 1884.92, 1325.33, 1.69418, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+126, 16437, 0, 0, 0, 1, 9876.61, 1858.47, 1318.17, 0.585651, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+127, 16437, 0, 0, 0, 1, 9892.83, 1875.85, 1321.08, 1.66425, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+128, 16437, 0, 0, 0, 1, 9918.12, 1907.26, 1326.7, 1.87834, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+129, 16437, 0, 0, 0, 1, 9924.22, 1875.52, 1324.16, 2.69687, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+130, 16437, 0, 0, 0, 1, 9906.68, 1838.98, 1320.12, 4.15255, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+131, 16437, 0, 0, 0, 1, 9908.57, 1891.95, 1323.73, 0.237701, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+132, 16437, 0, 0, 0, 1, 9924.45, 1860.94, 1321.93, 3.88484, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+133, 16437, 0, 0, 0, 1, 9925.8, 1823.69, 1324.68, 1.88202, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+134, 16437, 0, 0, 0, 1, 9942.75, 1891.84, 1327.68, 6.14527, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+135, 16438, 0, 0, 0, 1, 9906.01, 1876.06, 1320.33, 2.26344, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+136, 16438, 0, 0, 0, 1, 9923.05, 1891.13, 1326.2, 3.08222, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+137, 16438, 0, 0, 0, 1, 9941.11, 1877.21, 1325.8, 1.05252, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+138, 16438, 0, 0, 0, 1, 9941.21, 1858.05, 1324.08, 1.19285, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+139, 16438, 0, 0, 0, 1, 9962.93, 1877.05, 1324.08, 3.77807, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+140, 16438, 0, 0, 0, 1, 9875.3, 1873.51, 1323.4, 0.878897, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+141, 16438, 0, 0, 0, 1, 9891.73, 1861.1, 1317.83, 1.11893, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+142, 16438, 0, 0, 0, 1, 9893.47, 1845.49, 1318.71, 5.69514, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+143, 16438, 0, 0, 0, 1, 9906.07, 1858.92, 1319.42, 3.40977, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+144, 16438, 0, 0, 0, 1, 9927.71, 1839.56, 1323.69, 5.33672, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+145, 16438, 0, 0, 0, 1, 9926.14, 1957.92, 1338.42, 2.681, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+146, 16438, 0, 0, 0, 1, 9926.22, 1942.52, 1333.04, 5.06612, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+147, 16438, 0, 0, 0, 1, 9959.91, 1907.95, 1326.38, 4.64346, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+148, 16438, 0, 0, 0, 1, 9973.9, 1942.07, 1327.11, 5.58978, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+149, 16438, 0, 0, 0, 1, 9974.07, 1926.18, 1326.44, 4.53907, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+150, 16437, 0, 0, 0, 1, 9954.81, 1943.21, 1328.8, 0.0523599, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Teldrassil. group: 1659511219027
+        (@NPC_LOW_LEVEL_MINION_GUID+151, 16437, 0, 0, 0, 1, 9907.36, 1840.28, 1319.96, 3.134, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+152, 16437, 0, 0, 0, 1, 9907.63, 1890.99, 1323.66, 2.34083, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+153, 16437, 0, 0, 0, 1, 9924.32, 1824.72, 1324.44, 4.00108, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+154, 16437, 0, 0, 0, 1, 9927.95, 1861.29, 1322.51, 4.57036, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+155, 16437, 0, 0, 0, 1, 9943.01, 1888.31, 1327.05, 5.41015, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+156, 16438, 0, 0, 0, 1, 9872.75, 1869.78, 1322.73, 0.642818, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+157, 16438, 0, 0, 0, 1, 9889.47, 1860.38, 1317.56, 0.820189, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+158, 16438, 0, 0, 0, 1, 9892.34, 1844.96, 1319.13, 6.19493, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+159, 16438, 0, 0, 0, 1, 9906.6, 1860.25, 1319.66, 4.87306, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+160, 16438, 0, 0, 0, 1, 9926.35, 1840.37, 1323.2, 0.488692, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+161, 16438, 0, 0, 0, 1, 9925.01, 1938.92, 1331.95, 1.23843, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+162, 16438, 0, 0, 0, 1, 9926.43, 1959.37, 1339.14, 3.39693, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+163, 16437, 0, 0, 0, 1, 9939.2, 1924.07, 1329.66, 0.322857, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+164, 16437, 0, 0, 0, 1, 9940.2, 1939.91, 1330.9, 0.959543, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+165, 16437, 0, 0, 0, 1, 9940.23, 1954.28, 1335.71, 1.23125, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+166, 16437, 0, 0, 0, 1, 9957.71, 1925.8, 1327.6, 5.46493, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),       -- Spectral Spirit in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+167, 16438, 0, 0, 0, 1, 9958.77, 1904.66, 1326.6, 1.92877, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+168, 16438, 0, 0, 0, 1, 9972.37, 1941.5, 1327.35, 4.28463, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+169, 16438, 0, 0, 0, 1, 9972.98, 1926.66, 1326.75, 6.02832, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+170, 16438, 0, 0, 0, 1, 9907.55, 1872.97, 1320.55, 1.68137, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+171, 16438, 0, 0, 0, 1, 9923.62, 1891.61, 1326.37, 4.00497, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+172, 16438, 0, 0, 0, 1, 9941.27, 1875.73, 1325.67, 5.35285, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+173, 16438, 0, 0, 0, 1, 9942.75, 1859.53, 1324.35, 4.01576, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+174, 16438, 0, 0, 0, 1, 9960.69, 1873.77, 1324.49, 1.80977, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+175, 16437, 0, 0, 0, 1, 9873.22, 1860.1, 1319.36, 5.27792, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+176, 16437, 0, 0, 0, 1, 9873.98, 1881.84, 1325.2, 2.15389, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+177, 16437, 0, 0, 0, 1, 9894.58, 1873.58, 1320.51, 2.84407, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+178, 16437, 0, 0, 0, 1, 9920.43, 1906.32, 1327.07, 4.72763, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+179, 16437, 0, 0, 0, 1, 9923.78, 1878.97, 1324.58, 5.77704, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+180, 16437, 0, 0, 0, 1, -1575.6, 44.6215, 1.63601, 3.02242, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+181, 16437, 0, 0, 0, 1, -1557.58, -22.776, 8.83432, 0.884217, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+182, 16437, 0, 0, 0, 1, -1541.86, 89.9928, -0.836067, 0.837758, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10), -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+183, 16437, 0, 0, 0, 1, -1523.54, 54.8383, 6.13107, 0.125006, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+184, 16437, 0, 0, 0, 1, -1475.24, 7.83225, 26.2654, 0.361255, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+185, 16437, 0, 0, 0, 1, -1574.84, 77.7345, -7.23697, 2.74253, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+186, 16437, 0, 0, 0, 1, -1542.25, 57.6243, 3.68054, 3.77022, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+187, 16437, 0, 0, 0, 1, -1541.74, 24.4095, 12.7886, 3.24659, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+188, 16437, 0, 0, 0, 1, -1506.54, 76.2188, 6.25629, 0.750718, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+189, 16437, 0, 0, 0, 1, -1489.36, 58.1138, 12.7463, 2.78068, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+190, 16437, 0, 0, 0, 1, -1575.05, 23.9854, 4.85027, 4.3839, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+191, 16437, 0, 0, 0, 1, -1558.53, 41.1742, 7.06617, 1.16937, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+192, 16437, 0, 0, 0, 1, -1523.32, 42.4703, 10.2417, 0.774447, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+193, 16437, 0, 0, 0, 1, -1509.16, 92.1356, 3.19217, 4.27606, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+194, 16437, 0, 0, 0, 1, -1489.11, 91.5441, 6.36338, 5.49487, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+195, 16438, 0, 0, 0, 1, -1559.1, 24.0625, 8.7196, 1.91986, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),      -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+196, 16438, 0, 0, 0, 1, -1557.8, 76.2171, -3.3495, 0.536828, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+197, 16438, 0, 0, 0, 1, -1543.48, 42.5353, 8.50159, 2.76799, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+198, 16438, 0, 0, 0, 1, -1508.9, 42.3158, 11.5504, 2.42609, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+199, 16438, 0, 0, 0, 1, -1488.71, 76.3296, 9.2439, 1.40822, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+200, 16438, 0, 0, 0, 1, -1558.06, 57.5885, 2.02549, 5.03573, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+201, 16438, 0, 0, 0, 1, -1540.14, -22.9825, 13.7193, 2.99244, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+202, 16438, 0, 0, 0, 1, -1539.75, 76.8899, 0.381858, 2.72271, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+203, 16438, 0, 0, 0, 1, -1523.79, 26.224, 14.3512, 4.93879, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),     -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+204, 16438, 0, 0, 0, 1, -1523.47, 76.5106, 3.67229, 5.12642, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),    -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+205, 16438, 0, 0, 0, 1, -1593.79, 23.9679, -0.107843, 5.18309, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),  -- Skeletal Trooper in Mulgore. group: 1659479136407
+        (@NPC_LOW_LEVEL_MINION_GUID+206, 16438, 0, 0, 0, 1, -1593.03, 41.182, -3.30581, 0.878813, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Skeletal Trooper in Mulgore. group: 1659479136407
+        (@NPC_LOW_LEVEL_MINION_GUID+207, 16438, 0, 0, 0, 1, -1592.87, 57.2176, -8.33858, 5.88176, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Skeletal Trooper in Mulgore. group: 1659479136407
+        (@NPC_LOW_LEVEL_MINION_GUID+208, 16438, 0, 0, 0, 1, -1573.32, 61.2735, -2.99172, 4.41404, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10),   -- Skeletal Trooper in Mulgore. group: 1659479136407
+        (@NPC_LOW_LEVEL_MINION_GUID+209, 16438, 0, 0, 0, 1, -1507.54, 58.8243, 8.78051, 3.86994, 120, 120, 0, 100, 100, 0, 0, 0, 9, 10);    -- Skeletal Trooper in Mulgore. group: 1659479136407
+    INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION FROM `creature` WHERE creature.guid BETWEEN @NPC_LOW_LEVEL_MINION_GUID+1 AND @NPC_LOW_LEVEL_MINION_GUID+209;
+
+    INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, @NPC_NECROPOLIS_HEALTH_GUID+1, 0, 0, 64);
+        (@NPC_LOW_LEVEL_MINION_GUID+1, @NPC_LOW_LEVEL_MINION_GUID+2, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+1, @NPC_LOW_LEVEL_MINION_GUID+3, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+1, @NPC_LOW_LEVEL_MINION_GUID+4, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+1, @NPC_LOW_LEVEL_MINION_GUID+5, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477174739
+        (@NPC_LOW_LEVEL_MINION_GUID+6, @NPC_LOW_LEVEL_MINION_GUID+7, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+6, @NPC_LOW_LEVEL_MINION_GUID+8, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+6, @NPC_LOW_LEVEL_MINION_GUID+9, 0, 0, 8),          -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+6, @NPC_LOW_LEVEL_MINION_GUID+10, 0, 0, 8),         -- Skeletal Trooper in Dun Morogh. group: 1659477181647
+        (@NPC_LOW_LEVEL_MINION_GUID+11, @NPC_LOW_LEVEL_MINION_GUID+12, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+11, @NPC_LOW_LEVEL_MINION_GUID+13, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+11, @NPC_LOW_LEVEL_MINION_GUID+14, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+11, @NPC_LOW_LEVEL_MINION_GUID+15, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477203182
+        (@NPC_LOW_LEVEL_MINION_GUID+16, @NPC_LOW_LEVEL_MINION_GUID+17, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+16, @NPC_LOW_LEVEL_MINION_GUID+18, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+16, @NPC_LOW_LEVEL_MINION_GUID+19, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+16, @NPC_LOW_LEVEL_MINION_GUID+20, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477218591
+        (@NPC_LOW_LEVEL_MINION_GUID+21, @NPC_LOW_LEVEL_MINION_GUID+22, 0, 0, 8),        -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+21, @NPC_LOW_LEVEL_MINION_GUID+23, 0, 0, 8),        -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+21, @NPC_LOW_LEVEL_MINION_GUID+24, 0, 0, 8),        -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+21, @NPC_LOW_LEVEL_MINION_GUID+25, 0, 0, 8),        -- Skeletal Trooper in Dun Morogh. group: 1659477244138
+        (@NPC_LOW_LEVEL_MINION_GUID+26, @NPC_LOW_LEVEL_MINION_GUID+27, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+26, @NPC_LOW_LEVEL_MINION_GUID+28, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+26, @NPC_LOW_LEVEL_MINION_GUID+29, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+26, @NPC_LOW_LEVEL_MINION_GUID+30, 0, 0, 8),        -- Spectral Spirit in Dun Morogh. group: 1659477281083
+        (@NPC_LOW_LEVEL_MINION_GUID+31, @NPC_LOW_LEVEL_MINION_GUID+32, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+31, @NPC_LOW_LEVEL_MINION_GUID+33, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+31, @NPC_LOW_LEVEL_MINION_GUID+34, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+31, @NPC_LOW_LEVEL_MINION_GUID+35, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+31, @NPC_LOW_LEVEL_MINION_GUID+36, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659471448257
+        (@NPC_LOW_LEVEL_MINION_GUID+37, @NPC_LOW_LEVEL_MINION_GUID+38, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+37, @NPC_LOW_LEVEL_MINION_GUID+39, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+37, @NPC_LOW_LEVEL_MINION_GUID+40, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+37, @NPC_LOW_LEVEL_MINION_GUID+41, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+37, @NPC_LOW_LEVEL_MINION_GUID+42, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+37, @NPC_LOW_LEVEL_MINION_GUID+43, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+37, @NPC_LOW_LEVEL_MINION_GUID+44, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659471453461
+        (@NPC_LOW_LEVEL_MINION_GUID+45, @NPC_LOW_LEVEL_MINION_GUID+46, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472025587
+        (@NPC_LOW_LEVEL_MINION_GUID+47, @NPC_LOW_LEVEL_MINION_GUID+48, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472025616
+        (@NPC_LOW_LEVEL_MINION_GUID+47, @NPC_LOW_LEVEL_MINION_GUID+49, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472025616
+        (@NPC_LOW_LEVEL_MINION_GUID+47, @NPC_LOW_LEVEL_MINION_GUID+50, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472025616
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+52, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+53, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+54, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+55, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+56, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+57, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+58, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+59, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+51, @NPC_LOW_LEVEL_MINION_GUID+60, 0, 0, 8),        -- Spectral Apparition in Elwynn Forest. group: 1659472671525
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+62, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+63, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+64, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+65, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+66, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+67, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+68, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+69, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+61, @NPC_LOW_LEVEL_MINION_GUID+70, 0, 0, 8),        -- Skeletal Soldier in Elwynn Forest. group: 1659472793261
+        (@NPC_LOW_LEVEL_MINION_GUID+71, @NPC_LOW_LEVEL_MINION_GUID+72, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+71, @NPC_LOW_LEVEL_MINION_GUID+73, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+71, @NPC_LOW_LEVEL_MINION_GUID+74, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+71, @NPC_LOW_LEVEL_MINION_GUID+75, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466428661
+        (@NPC_LOW_LEVEL_MINION_GUID+76, @NPC_LOW_LEVEL_MINION_GUID+77, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+76, @NPC_LOW_LEVEL_MINION_GUID+78, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+76, @NPC_LOW_LEVEL_MINION_GUID+79, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+76, @NPC_LOW_LEVEL_MINION_GUID+80, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466496939
+        (@NPC_LOW_LEVEL_MINION_GUID+81, @NPC_LOW_LEVEL_MINION_GUID+82, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+81, @NPC_LOW_LEVEL_MINION_GUID+83, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+81, @NPC_LOW_LEVEL_MINION_GUID+84, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+81, @NPC_LOW_LEVEL_MINION_GUID+85, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466533098
+        (@NPC_LOW_LEVEL_MINION_GUID+86, @NPC_LOW_LEVEL_MINION_GUID+87, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+86, @NPC_LOW_LEVEL_MINION_GUID+88, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+86, @NPC_LOW_LEVEL_MINION_GUID+89, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+86, @NPC_LOW_LEVEL_MINION_GUID+90, 0, 0, 8),        -- Spectral Spirit in Durotar. group: 1659466569264
+        (@NPC_LOW_LEVEL_MINION_GUID+91, @NPC_LOW_LEVEL_MINION_GUID+92, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+91, @NPC_LOW_LEVEL_MINION_GUID+93, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+91, @NPC_LOW_LEVEL_MINION_GUID+94, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+91, @NPC_LOW_LEVEL_MINION_GUID+95, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466600929
+        (@NPC_LOW_LEVEL_MINION_GUID+96, @NPC_LOW_LEVEL_MINION_GUID+97, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+96, @NPC_LOW_LEVEL_MINION_GUID+98, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+96, @NPC_LOW_LEVEL_MINION_GUID+99, 0, 0, 8),        -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+96, @NPC_LOW_LEVEL_MINION_GUID+100, 0, 0, 8),       -- Skeletal Trooper in Durotar. group: 1659466632185
+        (@NPC_LOW_LEVEL_MINION_GUID+101, @NPC_LOW_LEVEL_MINION_GUID+102, 0, 0, 8),      -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+101, @NPC_LOW_LEVEL_MINION_GUID+103, 0, 0, 8),      -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+101, @NPC_LOW_LEVEL_MINION_GUID+104, 0, 0, 8),      -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+101, @NPC_LOW_LEVEL_MINION_GUID+105, 0, 0, 8),      -- Spectral Apparition in Tirisfal Glades. group: 1659468409524
+        (@NPC_LOW_LEVEL_MINION_GUID+106, @NPC_LOW_LEVEL_MINION_GUID+107, 0, 0, 8),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+106, @NPC_LOW_LEVEL_MINION_GUID+108, 0, 0, 8),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+106, @NPC_LOW_LEVEL_MINION_GUID+109, 0, 0, 8),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+106, @NPC_LOW_LEVEL_MINION_GUID+110, 0, 0, 8),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468466754
+        (@NPC_LOW_LEVEL_MINION_GUID+111, @NPC_LOW_LEVEL_MINION_GUID+112, 0, 0, 8),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+111, @NPC_LOW_LEVEL_MINION_GUID+113, 0, 0, 8),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+111, @NPC_LOW_LEVEL_MINION_GUID+114, 0, 0, 8),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+111, @NPC_LOW_LEVEL_MINION_GUID+115, 0, 0, 8),      -- Skeletal Soldier in Tirisfal Glades. group: 1659468512995
+        (@NPC_LOW_LEVEL_MINION_GUID+116, @NPC_LOW_LEVEL_MINION_GUID+117, 0, 0, 8),      -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+116, @NPC_LOW_LEVEL_MINION_GUID+118, 0, 0, 8),      -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+116, @NPC_LOW_LEVEL_MINION_GUID+119, 0, 0, 8),      -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+116, @NPC_LOW_LEVEL_MINION_GUID+120, 0, 0, 8),      -- Spectral Apparition in Tirisfal Glades. group: 1659468533695
+        (@NPC_LOW_LEVEL_MINION_GUID+121, @NPC_LOW_LEVEL_MINION_GUID+122, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510819433
+        (@NPC_LOW_LEVEL_MINION_GUID+121, @NPC_LOW_LEVEL_MINION_GUID+123, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510819433
+        (@NPC_LOW_LEVEL_MINION_GUID+121, @NPC_LOW_LEVEL_MINION_GUID+124, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510819433
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+126, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+127, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+128, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+129, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510872053
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+131, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+132, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+133, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+134, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659510877325
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+136, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+137, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+138, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+139, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510897994
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+141, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+142, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+143, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+144, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510919051
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+146, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+147, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+148, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+149, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659510944961
+        (@NPC_LOW_LEVEL_MINION_GUID+151, @NPC_LOW_LEVEL_MINION_GUID+152, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+151, @NPC_LOW_LEVEL_MINION_GUID+153, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+151, @NPC_LOW_LEVEL_MINION_GUID+154, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+151, @NPC_LOW_LEVEL_MINION_GUID+155, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511757145
+        (@NPC_LOW_LEVEL_MINION_GUID+156, @NPC_LOW_LEVEL_MINION_GUID+157, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+156, @NPC_LOW_LEVEL_MINION_GUID+158, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+156, @NPC_LOW_LEVEL_MINION_GUID+159, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+156, @NPC_LOW_LEVEL_MINION_GUID+160, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511860806
+        (@NPC_LOW_LEVEL_MINION_GUID+161, @NPC_LOW_LEVEL_MINION_GUID+162, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+161, @NPC_LOW_LEVEL_MINION_GUID+163, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+161, @NPC_LOW_LEVEL_MINION_GUID+164, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+161, @NPC_LOW_LEVEL_MINION_GUID+165, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+161, @NPC_LOW_LEVEL_MINION_GUID+166, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+161, @NPC_LOW_LEVEL_MINION_GUID+167, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+161, @NPC_LOW_LEVEL_MINION_GUID+168, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+161, @NPC_LOW_LEVEL_MINION_GUID+169, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511871772
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+171, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+172, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+173, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+174, 0, 0, 8),      -- Skeletal Trooper in Teldrassil. group: 1659511902577
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+176, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+177, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+178, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+179, 0, 0, 8),      -- Spectral Spirit in Teldrassil. group: 1659511907847
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+181, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+182, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+183, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+184, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659478964420
+        (@NPC_LOW_LEVEL_MINION_GUID+185, @NPC_LOW_LEVEL_MINION_GUID+186, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+185, @NPC_LOW_LEVEL_MINION_GUID+187, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+185, @NPC_LOW_LEVEL_MINION_GUID+188, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+185, @NPC_LOW_LEVEL_MINION_GUID+189, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659479069069
+        (@NPC_LOW_LEVEL_MINION_GUID+190, @NPC_LOW_LEVEL_MINION_GUID+191, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+190, @NPC_LOW_LEVEL_MINION_GUID+192, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+190, @NPC_LOW_LEVEL_MINION_GUID+193, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+190, @NPC_LOW_LEVEL_MINION_GUID+194, 0, 0, 8),      -- Spectral Spirit in Mulgore. group: 1659479079604
+        (@NPC_LOW_LEVEL_MINION_GUID+195, @NPC_LOW_LEVEL_MINION_GUID+195, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+195, @NPC_LOW_LEVEL_MINION_GUID+196, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+195, @NPC_LOW_LEVEL_MINION_GUID+197, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+195, @NPC_LOW_LEVEL_MINION_GUID+198, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+195, @NPC_LOW_LEVEL_MINION_GUID+199, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479094608
+        (@NPC_LOW_LEVEL_MINION_GUID+200, @NPC_LOW_LEVEL_MINION_GUID+201, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+200, @NPC_LOW_LEVEL_MINION_GUID+202, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+200, @NPC_LOW_LEVEL_MINION_GUID+203, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+200, @NPC_LOW_LEVEL_MINION_GUID+204, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479100277
+        (@NPC_LOW_LEVEL_MINION_GUID+205, @NPC_LOW_LEVEL_MINION_GUID+206, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479136407
+        (@NPC_LOW_LEVEL_MINION_GUID+205, @NPC_LOW_LEVEL_MINION_GUID+207, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479136407
+        (@NPC_LOW_LEVEL_MINION_GUID+205, @NPC_LOW_LEVEL_MINION_GUID+208, 0, 0, 8),      -- Skeletal Trooper in Mulgore. group: 1659479136407
+        (@NPC_LOW_LEVEL_MINION_GUID+205, @NPC_LOW_LEVEL_MINION_GUID+209, 0, 0, 8);      -- Skeletal Trooper in Mulgore. group: 1659479136407
+
+    -- Add Necropolis Health to Mouths group to get informed on death.
+    INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, @NPC_NECROPOLIS_HEALTH_GUID+1, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+1, @NPC_NECROPOLIS_HEALTH_GUID+2, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+2, @NPC_NECROPOLIS_HEALTH_GUID+3, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+2, @NPC_NECROPOLIS_HEALTH_GUID+4, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+3, @NPC_NECROPOLIS_HEALTH_GUID+5, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+3, @NPC_NECROPOLIS_HEALTH_GUID+6, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+4, @NPC_NECROPOLIS_HEALTH_GUID+7, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+4, @NPC_NECROPOLIS_HEALTH_GUID+8, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+9, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+10, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_NECROPOLIS_HEALTH_GUID+11, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+12, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+13, 0, 0, 64),
+        (@NPC_MOUTH_OF_KELTHUZAD_GUID+6, @NPC_NECROPOLIS_HEALTH_GUID+14, 0, 0, 64);
 
     -- Add all Mouth of Kel'Thuzad.
     INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
