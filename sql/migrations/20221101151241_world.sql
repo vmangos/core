@@ -152,6 +152,47 @@ UPDATE `item_loot_template` SET `ChanceOrQuestChance`=9, `groupid`=3 WHERE `entr
 -- Cuergo's Gold with Worm does not drop from creatures https://www.wowhead.com/classic/item=9361/cuergos-gold-with-worm
 DELETE FROM `creature_loot_template` WHERE `item`=9361;
 
+-- Core of Earth https://www.wowhead.com/classic/item=7075/core-of-earth#dropped-by
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=66 WHERE `entry`=14464 AND `item`=7075; -- Avalanchion
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=9 WHERE `entry`=15208 AND `item`=7075; -- The Duke of Shards <Abyssal Council>
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=9 WHERE `entry`=15205 AND `item`=7075; -- Baron Kazum <Abyssal High Council>
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=6 WHERE `entry`=11988 AND `item`=7075; -- Golemagg the Incinerator
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=6 WHERE `entry`=12057 AND `item`=7075; -- Garr
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=5 WHERE `entry`=11746 AND `item`=7075; -- Desert Rumbler
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=5 WHERE `entry`=7032 AND `item`=7075; -- Greater Obsidian Elemental
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=5 WHERE `entry`=14462 AND `item`=7075; -- Thundering Invader
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=5 WHERE `entry`=7031 AND `item`=7075; -- Obsidian Elemental
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=5 WHERE `entry`=7136 AND `item`=7075; -- Infernal Sentry
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=5 WHERE `entry`=7135 AND `item`=7075; -- Infernal Bodyguard
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=4 WHERE `entry`=11784 AND `item`=7075; -- Theradrim Guardian
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=4 WHERE `entry`=15307 AND `item`=7075; -- Earthen Templar <Abyssal Council>
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=4 WHERE `entry`=2919 AND `item`=7075; -- Fam'retor Guardian
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=4 WHERE `entry`=11747 AND `item`=7075; -- Desert Rager
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=4 WHERE `entry`=7137 AND `item`=7075; -- Immolatus
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=4 WHERE `entry`=8278 AND `item`=7075; -- Smoldar
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=3 WHERE `entry`=11783 AND `item`=7075; -- Theradrim Shardling
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=3 WHERE `entry`=9396 AND `item`=7075; -- Ground Pounder
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=3 WHERE `entry`=5465 AND `item`=7075; -- Land Rager
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=2 WHERE `entry`=2755 AND `item`=7075; -- Myzrael
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=2 WHERE `entry`=10119 AND `item`=7075; -- Volchan
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.8 WHERE `entry`=9025 AND `item`=7075; -- Lord Roccor
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.7 WHERE `entry`=12101 AND `item`=7075; -- Lava Surger
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.6 WHERE `entry`=11782 AND `item`=7075; -- Ambershard Destroyer
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.5 WHERE `entry`=2752 AND `item`=7075; -- Rumbler
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.4 WHERE `entry`=12203 AND `item`=7075; -- Landslide
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.3 WHERE `entry`=11665 AND `item`=7075; -- Lava Annihilator
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.1 WHERE `entry`=11781 AND `item`=7075; -- Ambershard Crusher
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1 WHERE `entry`=2791 AND `item`=7075; -- Enraged Rock Elemental
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.9 WHERE `entry`=2736 AND `item`=7075; -- Greater Rock Elemental
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.9 WHERE `entry`=12076 AND `item`=7075; -- Lava Elemental
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.9 WHERE `entry`=11658 AND `item`=7075; -- Molten Giant
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.9 WHERE `entry`=12100 AND `item`=7075; -- Lava Reaver
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.9 WHERE `entry`=9938 AND `item`=7075; -- Magmus
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.8 WHERE `entry`=9016 AND `item`=7075; -- Bael'Gar
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.6 WHERE `entry`=11777 AND `item`=7075; -- Shadowshard Rumbler
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.6 WHERE `entry`=11778 AND `item`=7075; -- Shadowshard Smasher
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.4 WHERE `entry`=11659 AND `item`=7075; -- Molten Destroyer
+
 -- End of migration.
 END IF;
 END??
