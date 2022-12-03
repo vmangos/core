@@ -67,7 +67,6 @@ typedef struct
 
 map_id* map_ids;
 uint16* areas;
-uint16* LiqType;
 char output_path[128] = ".";
 char input_path[128] = ".";
 uint32 maxAreaId = 0;
@@ -230,27 +229,6 @@ void ReadAreaTableDBC()
     maxAreaId = dbc.getMaxId();
 
     printf("Done! (%u areas loaded)\n", uint32(area_count));
-}
-
-void ReadLiquidTypeTableDBC()
-{
-    printf("Read LiquidType.dbc file...");
-    DBCFile dbc("DBFilesClient\\LiquidType.dbc");
-    if (!dbc.open())
-    {
-        printf("Fatal error: Invalid LiquidType.dbc file format!\n");
-        exit(1);
-    }
-
-    size_t LiqType_count = dbc.getRecordCount();
-    size_t LiqType_maxid = dbc.getMaxId();
-    LiqType = new uint16[LiqType_maxid + 1];
-    memset(LiqType, 0xff, (LiqType_maxid + 1) * sizeof(uint16));
-
-    for (uint32 x = 0; x < LiqType_count; ++x)
-        LiqType[dbc.getRecord(x).getUInt(0)] = dbc.getRecord(x).getUInt(3);
-
-    printf("Done! (%u LiqTypes loaded)\n", uint32(LiqType_count));
 }
 
 //
@@ -537,7 +515,7 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
             map.heightMapSize += sizeof(V9) + sizeof(V8);
     }
 
-    // Get from MCLQ chunk (old)
+    // Get from MCLQ chunk (vanilla and tbc)
     for (int i = 0; i < ADT_CELLS_PER_GRID; i++)
     {
         for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
@@ -599,75 +577,6 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
         }
     }
 
-    // Get liquid map for grid (in WOTLK used MH2O chunk)
-    adt_MH2O* h2o = adt.a_grid->getMH2O();
-    if (h2o)
-    {
-        for (int i = 0; i < ADT_CELLS_PER_GRID; i++)
-        {
-            for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
-            {
-                adt_liquid_header* h = h2o->getLiquidData(i, j);
-                if (!h)
-                    continue;
-
-                int count = 0;
-                uint64 show = h2o->getLiquidShowMap(h);
-                for (int y = 0; y < h->height; y++)
-                {
-                    int cy = i * ADT_CELL_SIZE + y + h->yOffset;
-                    for (int x = 0; x < h->width; x++)
-                    {
-                        int cx = j * ADT_CELL_SIZE + x + h->xOffset;
-                        if (show & 1)
-                        {
-                            liquid_show[cy][cx] = true;
-                            ++count;
-                        }
-                        show >>= 1;
-                    }
-                }
-
-                liquid_entry[i][j] = h->liquidType;
-                switch (LiqType[h->liquidType])
-                {
-                    case LIQUID_TYPE_WATER: liquid_flags[i][j] |= MAP_LIQUID_TYPE_WATER; break;
-                    case LIQUID_TYPE_OCEAN: liquid_flags[i][j] |= MAP_LIQUID_TYPE_OCEAN; break;
-                    case LIQUID_TYPE_MAGMA: liquid_flags[i][j] |= MAP_LIQUID_TYPE_MAGMA; break;
-                    case LIQUID_TYPE_SLIME: liquid_flags[i][j] |= MAP_LIQUID_TYPE_SLIME; break;
-                    default:
-                        printf("\nCan't find Liquid type %u for map %s\nchunk %d,%d\n", h->liquidType, filename, i, j);
-                        break;
-                }
-                // Dark water detect
-                if (LiqType[h->liquidType] == LIQUID_TYPE_OCEAN)
-                {
-                    uint8* lm = h2o->getLiquidLightMap(h);
-                    if (!lm)
-                        liquid_flags[i][j] |= MAP_LIQUID_TYPE_DEEP_WATER;
-                }
-
-                if (!count && liquid_flags[i][j])
-                    printf("Wrong liquid detect in MH2O chunk");
-
-                float* height = h2o->getLiquidHeightMap(h);
-                int pos = 0;
-                for (int y = 0; y <= h->height; y++)
-                {
-                    int cy = i * ADT_CELL_SIZE + y + h->yOffset;
-                    for (int x = 0; x <= h->width; x++)
-                    {
-                        int cx = j * ADT_CELL_SIZE + x + h->xOffset;
-                        if (height)
-                            liquid_height[cy][cx] = height[pos];
-                        else
-                            liquid_height[cy][cx] = h->heightLevel1;
-                        pos++;
-                    }
-                }
-            }
-        }
-    }
     //============================================
     // Pack liquid data
     //============================================
@@ -848,7 +757,6 @@ void ExtractMapsFromMpq()
     uint32 map_count = ReadMapDBC();
 
     ReadAreaTableDBC();
-    ReadLiquidTypeTableDBC();
 
     std::string path = output_path;
     path += "/maps/";
