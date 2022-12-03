@@ -23,6 +23,7 @@
 #include "Log.h"
 #include "Map.h"
 #include "Transport.h"
+#include "Geometry.h"
 
 #include "Detour/Include/DetourCommon.h"
 
@@ -62,29 +63,37 @@ bool PathInfo::calculate(float destX, float destY, float destZ, bool forceDest, 
 
 bool PathInfo::calculate(Vector3 const& start, Vector3 dest, bool forceDest, bool offsets)
 {
+    m_pathPoints.clear();
+    m_forceDestination = forceDest;
+    m_type = PATHFIND_BLANK;
+
+    Vector3 oldDest = getEndPosition();
+    setEndPosition(dest);
+    setStartPosition(start);
+
     // A m_navMeshQuery object is not thread safe, but a same PathInfo can be shared between threads.
     // So need to get a new one.
     MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
     if (m_transport)
     {
         if (!offsets)
+        {
             m_transport->CalculatePassengerOffset(dest.x, dest.y, dest.z);
+            setEndPosition(dest);
+        }
         m_navMeshQuery = mmap->GetModelNavMeshQuery(m_transport->GetDisplayId());
     }
-    else
-        m_navMeshQuery = mmap->GetNavMeshQuery(m_sourceUnit->GetMapId());
+    else if (!(m_navMeshQuery = mmap->GetNavMeshQuery(m_sourceUnit->GetMapId())))
+    {
+        if (BuildPathWithoutMMaps(start, dest))
+        {
+            m_type = PathType(PATHFIND_NORMAL);
+            return true;
+        }
+    }
 
     if (m_navMeshQuery)
         m_navMesh = m_navMeshQuery->getAttachedNavMesh();
-
-    m_pathPoints.clear();
-
-    Vector3 oldDest = getEndPosition();
-    setEndPosition(dest);
-    setStartPosition(start);
-
-    m_forceDestination = forceDest;
-    m_type = PATHFIND_BLANK;
 
     //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++ PathFinder::calculate() for %u \n", m_sourceUnit->GetGUIDLow());
 
@@ -514,6 +523,97 @@ void PathInfo::BuildUnderwaterPath()
     if (!(m_type & PATHFIND_INCOMPLETE))
         m_type |= PATHFIND_NORMAL;
     m_type |= PATHFIND_UNDERWATER;
+}
+
+static constexpr float orientationOffsets[] =
+{
+    0,
+    (M_PI_F / 6.0f) * 1,
+    (M_PI_F / 6.0f) * 11,
+    (M_PI_F / 6.0f) * 2,
+    (M_PI_F / 6.0f) * 10,
+    (M_PI_F / 6.0f) * 3,
+    (M_PI_F / 6.0f) * 9,
+    (M_PI_F / 6.0f) * 4,
+    (M_PI_F / 6.0f) * 8,
+    (M_PI_F / 6.0f) * 5,
+    (M_PI_F / 6.0f) * 7,
+    (M_PI_F / 6.0f) * 6,
+};
+
+bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map const* pMap, std::vector<Vector3>& fullPath, std::vector<Vector3>& checkedPositions, float stepSize, uint32& stepsRemaining, float angle)
+{
+    float const currentDistance = Geometry::GetDistance3D(targetPos, currentPos);
+    if (currentDistance < (stepSize + 1))
+        return true;
+
+    if (!stepsRemaining)
+        return false;
+
+    stepsRemaining--;
+
+    for (int i = 0; i < 12; i++)
+    {
+        Vector3 newPos;
+        Geometry::GetNearPoint2DAroundPosition(currentPos.x, currentPos.y, newPos.x, newPos.y, stepSize, Geometry::ClampOrientation(angle + orientationOffsets[i]));
+        newPos.z = pMap->GetHeight(newPos.x, newPos.y, currentPos.z + 0.1f, true);
+
+        float const zdiff = newPos.z - currentPos.z;
+        if (((zdiff < -0.0f) ? (-zdiff > stepSize) : (zdiff > stepSize * 0.9f)))
+            continue;
+
+        bool skip = false;;
+        for (auto const& checkedPos : checkedPositions)
+        {
+            if (Geometry::GetDistance3D(checkedPos, newPos) < stepSize * 0.5f)
+            {
+                skip = true;
+                break;
+            }
+        }
+
+        if (skip)
+            continue;
+
+        checkedPositions.push_back(newPos);
+        if (BuildPathStep(newPos, targetPos, pMap, fullPath, checkedPositions, stepSize, stepsRemaining, Geometry::GetAngle(targetPos, newPos)))
+        {
+            fullPath.push_back(newPos);
+            return true;
+        }
+    }
+
+
+    return false;
+}
+
+bool PathInfo::BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest)
+{
+    clear();
+    float stepSize = 5.0f;
+    float totalDistance = Geometry::GetDistance3D(start, dest);
+    if (totalDistance <= stepSize || m_sourceUnit->CanFly() || 
+        (m_sourceUnit->CanSwim() &&
+         m_sourceUnit->CanSwimAtPosition(start) &&
+         m_sourceUnit->CanSwimAtPosition(dest)))
+    {
+        m_pathPoints.resize(2);
+        m_pathPoints[0] = start;
+        m_pathPoints[1] = dest;
+        return true;
+    }
+    uint32 maxSteps = (totalDistance / stepSize) + 3;
+
+    std::vector<Vector3> checkedPositions; // positions we've already been to
+    checkedPositions.reserve(maxSteps);
+    m_pathPoints.reserve(maxSteps);
+    m_pathPoints.push_back(start);
+    
+    maxSteps *= 2;
+
+    bool ok = BuildPathStep(dest, start, m_sourceUnit->FindMap(), m_pathPoints, checkedPositions, stepSize, maxSteps, m_sourceUnit->GetAngle(dest.x, dest.y));
+    m_pathPoints.push_back(dest);
+    return ok;
 }
 
 void PathInfo::createFilter()
@@ -1005,4 +1105,11 @@ bool PathInfo::inRange(Vector3 const& p1, Vector3 const& p2, float r, float h)
 float PathInfo::dist3DSqr(Vector3 const& p1, Vector3 const& p2)
 {
     return (p1 - p2).squaredLength();
+}
+
+bool WorldObject::HasMMapsForCurrentMap() const
+{
+    MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
+    dtNavMeshQuery const* m_navMeshQuery = GetTransport() ? mmap->GetModelNavMeshQuery(GetTransport()->GetDisplayId()) : mmap->GetNavMeshQuery(GetMapId());
+    return m_navMeshQuery != nullptr;
 }
