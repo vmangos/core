@@ -796,6 +796,12 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 UPDATE `creature` SET `wander_distance` = 20 WHERE `id` = 1088;
 DELETE FROM `creature` WHERE `guid` IN (38723, 42830, 38756);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Scourgestone Quests Require Argent Dawn Commision Quests
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7412, -2, 472, 473, 474, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 7412 WHERE `entry` IN (5510, 5509, 5508, 5404, 5403, 5402, 5406, 5407, 5408);
+
 
 -- End of migration.
 END IF;
