@@ -17,7 +17,7 @@ UPDATE `gameobject_template` SET `patch`=1 WHERE `entry`=179552;
 -- crimson courier was missing her mount
 UPDATE `creature_addon` SET `mount_display_id`='2410' WHERE  `guid`=92287 AND `patch`=0;
 -- Change Crimson Courier weapon
-UPDATE `creature_equip_template` SET `equipentry1`='193' WHERE  `entry`=429 AND `patch`=0;
+UPDATE `creature_equip_template` SET `equipentry1`='1903' WHERE  `entry`=429 AND `patch`=0;
 
 -- End of migration.
 END IF;
