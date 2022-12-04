@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20221204184605');
 -- Add your query below.
 
 -- Remove alliance only condition from Captain Sander's Treasure Map
-UPDATE `creauture_loot_template` SET `condition_id`=0 WHERE item=1357;
+UPDATE `creature_loot_template` SET `condition_id`=0 WHERE `item`=1357;
 
 -- Change GO Schematic: Field Repair Bot 74A to patch 1.3
 UPDATE `gameobject_template` SET `patch`=1 WHERE `entry`=179552;
