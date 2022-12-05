@@ -5127,13 +5127,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 case 28184:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghost/skeleton)
                 case 28185:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghoul/skeleton)
                 {
-                    // 0.2% Chance of a Rare Spawn.
-                    uint32 roll = urand(1, 500);
-
                     bool UncommonMinionspawner = false;
                     bool CanSummon = true;
 
-                    if (roll == 1)
+                    // 0.2% Chance of a Rare Spawn.
+                    if (roll_chance_f(0.2f)) 
                         UncommonMinionspawner = true;
 
                     uint32 Entry = PickRandomValue(16298, 16141, 16299); // just in case.

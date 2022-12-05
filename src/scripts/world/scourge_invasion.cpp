@@ -27,7 +27,7 @@ struct MouthAI : public ScriptedAI
     MouthAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_events.Reset();
-        m_creature->SetActiveObjectState(true);
+        m_creature->SetActiveObjectState(true); // Important to keep the event running in zones without players.
         Initialise();
     }
 
@@ -35,6 +35,9 @@ struct MouthAI : public ScriptedAI
     int m_eventID       = GetZoneEventID();
     int m_worldstateID  = GetWorldStateID();
     int m_remainingID   = GetRemainingVariableID();
+    int m_timer_min     = 45;   // How many minutes it takes at least until another zone gets attacked (Invasion starts).
+    int m_timer_max     = 60;   // How many minutes it takes at most until another zone gets attacked (Invasion starts).
+    int m_limit         = 2;    // How many zones can be attacked at the same time (On event start all zones getting attacked)
 
     void Reset() override {}
 
@@ -65,6 +68,10 @@ struct MouthAI : public ScriptedAI
 
         if (!sGameEventMgr.IsValidEvent(m_eventID))
             return;
+
+        m_timer_min = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MIN) * MINUTE;
+        m_timer_max = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MAX) * MINUTE;
+        m_limit     = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT);
 
         m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(6 * IN_MILLISECONDS, 15 * IN_MILLISECONDS));
     }
@@ -112,7 +119,7 @@ struct MouthAI : public ScriptedAI
                 break;
             }
         }
-        return 0;
+        return NULL;
     }
 
     int inline GetRemainingVariableID()
@@ -150,7 +157,7 @@ struct MouthAI : public ScriptedAI
                 break;
             }
         }
-        return 0;
+        return NULL;
     }
 
     int inline GetZoneEventID()
@@ -188,22 +195,16 @@ struct MouthAI : public ScriptedAI
                 break;
             }
         }
-        return 0;
+        return NULL;
     }
 
     int inline GetActiveZones()
     {
-        int count = 0;
-        /*
-        for (uint32 i = GAME_EVENT_SCOURGE_INVASION_WINTERSPRING; i < GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES; i++)
-        {
-            if (sGameEventMgr.IsActiveEvent(i))
-                count++;
-        }*/
+        int count = NULL;
 
         for (uint32 i = VARIABLE_SI_WINTERSPRING_REMAINING; i < VARIABLE_SI_BURNING_STEPPES_REMAINING; i++)
         {
-            if (sObjectMgr.GetSavedVariable(i, true) > 0)
+            if (sObjectMgr.GetSavedVariable(i, true) > NULL)
                 count++;
         }
 
@@ -219,7 +220,10 @@ struct MouthAI : public ScriptedAI
 
         // No group member left, stop invasion in this Zone.
         if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
+        {
+            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, (IN_MILLISECONDS * urand(m_timer_min, m_timer_max))); // Restart update timer to not invade the zone again shortly after stopping it.
             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP, (IN_MILLISECONDS * 5));
+        }
     }
 
     void UpdateAI(uint32 const diff) override
@@ -235,16 +239,10 @@ struct MouthAI : public ScriptedAI
                     int VICTORIES   = 0;    // Victories against the Scourge (defeated zones).
                     int REMAINING   = 0;    // Remaining Necropolisses in a Zone.
                     int ACTIVE      = 0;    // Amount of active zones (Invasions).
-                    int LIMIT       = 2;    // How many zones can be attacked at the same time (On event start all zones getting attacked)
-                    int TIMER_MIN   = 45;   // How many minutes it takes at least until another zone gets attacked (Invasion starts).
-                    int TIMER_MAX   = 60;   // How many minutes it takes at most until another zone gets attacked (Invasion starts).
 
                     VICTORIES   = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
                     REMAINING   = sObjectMgr.GetSavedVariable(m_remainingID);
                     ACTIVE      = GetActiveZones();
-                    LIMIT       = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT);
-                    TIMER_MIN   = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MIN) * MINUTE;
-                    TIMER_MAX   = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MAX) * MINUTE;
 
                     if (sGameEventMgr.IsActiveEvent(m_eventID)) // Zone is already being Attacked.
                     {
@@ -253,17 +251,17 @@ struct MouthAI : public ScriptedAI
                     }
                     else // Zone is not Active.
                     {
-                        if (TIMER_MIN > 24 * HOUR || TIMER_MAX > 24 * HOUR)
+                        if (m_timer_min > 24 * HOUR || m_timer_max > 24 * HOUR)
                             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Scourge Invasion] Zone respawn timer is set over 24 hours. Is this on purpose?");
 
                         // Is it Possible to attack another Zone?
-                        if (VICTORIES == 0 || REMAINING > 0 || VICTORIES > 0 && REMAINING == 0 && ACTIVE < LIMIT)
+                        if (VICTORIES == 0 || REMAINING > 0 || VICTORIES > 0 && REMAINING == 0 && ACTIVE < m_limit)
                         {
                             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START, 0);
                             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, 0);
                         }
                     }
-                    m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, (IN_MILLISECONDS * urand(TIMER_MIN, TIMER_MAX)));
+                    m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, (IN_MILLISECONDS * urand(m_timer_min, m_timer_max)));
                     break;
                 }
                 case EVENT_MOUTH_OF_KELTHUZAD_YELL:

@@ -216,10 +216,7 @@ enum ScourgeInvasionNPC
     NPC_SKELETAL_SOLDIER                                = 16422,
     NPC_SPECTRAL_APPARITATION                           = 16423,
 
-    /* Rare Minions
-    I sniffed out 17000 minion spawns and 32 rare spawns. That means a rare spawn ratio of 1 to 531.25.
-    I have also seen multiple Rare spawns per Camp, but maybe it's also an "WoW Classic issue".
-    */
+    // Rare Minions
     NPC_LUMBERING_HORROR                                = 14697,
     NPC_BONE_WITCH                                      = 16380,
     NPC_SPIRIT_OF_THE_DAMNED                            = 16379,
