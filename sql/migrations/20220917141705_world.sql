@@ -802,6 +802,16 @@ DELETE FROM `creature` WHERE `guid` IN (38723, 42830, 38756);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7412, -2, 472, 473, 474, 0, 0);
 UPDATE `quest_template` SET `RequiredCondition` = 7412 WHERE `entry` IN (5510, 5509, 5508, 5404, 5403, 5402, 5406, 5407, 5408);
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Captain Sander's Treasure Map Should Drop For Horde Chars
+UPDATE `creature_loot_template` SET `condition_id` = 0 WHERE `item` = 1357;
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Attack on Camp Narache is Not Exclusive To Tauren
+UPDATE `quest_template` SET `RequiredRaces` = 0 WHERE `entry` = 781;
+
 
 -- End of migration.
 END IF;
