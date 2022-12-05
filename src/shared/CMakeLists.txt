@@ -63,6 +63,7 @@ set (shared_SRCS
     Database/SqlPreparedStatement.h
     Database/SQLStorage.h
     Database/SQLStorageImpl.h
+    Multithreading/Messager.h
     SRP6/SRP6.h
     nonstd/optional.hpp
     Common.cpp
@@ -94,6 +95,7 @@ set (shared_SRCS
     Database/SqlOperations.cpp
     Database/SqlPreparedStatement.cpp
     Database/SQLStorage.cpp
+    Multithreading/Messager.cpp
     SRP6/SRP6.cpp
 )
 

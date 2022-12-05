@@ -218,7 +218,7 @@ class BattleGroundMgr
         BattleGround* GetBattleGroundTemplate(BattleGroundTypeId bgTypeId);
         BattleGround* CreateNewBattleGround(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId);
 
-        uint32 CreateBattleGround(BattleGroundTypeId bgTypeId, uint32 minPlayersPerTeam, uint32 maxPlayersPerTeam, uint32 LevelMin, uint32 LevelMax, uint32 AllianceWinSpell, uint32 AllianceLoseSpell, uint32 HordeWinSpell, uint32 HordeLoseSpell, char const* BattleGroundName, uint32 MapID, float Team1StartLocX, float Team1StartLocY, float Team1StartLocZ, float Team1StartLocO, float Team2StartLocX, float Team2StartLocY, float Team2StartLocZ, float Team2StartLocO);
+        uint32 CreateBattleGround(BattleGroundTypeId bgTypeId, uint32 minPlayersPerTeam, uint32 maxPlayersPerTeam, uint32 levelMin, uint32 levelMax, uint32 allianceWinSpell, uint32 allianceLoseSpell, uint32 hordeWinSpell, uint32 hordeLoseSpell, char const* battleGroundName, uint32 mapID, float team1StartLocX, float team1StartLocY, float team1StartLocZ, float team1StartLocO, float team2StartLocX, float team2StartLocY, float team2StartLocZ, float team2StartLocO, uint32 playerSkinReflootId);
 
         void AddBattleGround(uint32 instanceId, BattleGroundTypeId bgTypeId, BattleGround* bg) { m_battleGrounds[bgTypeId][instanceId] = bg; };
         void RemoveBattleGround(uint32 instanceID, BattleGroundTypeId bgTypeId) { m_battleGrounds[bgTypeId].erase(instanceID); }
@@ -292,6 +292,7 @@ class BattleGroundMgr
         static HolidayIds BgTypeToWeekendHolidayId(BattleGroundTypeId bgTypeId);
         static BattleGroundTypeId WeekendHolidayIdToBgType(HolidayIds holiday);
         static bool IsBgWeekend(BattleGroundTypeId bgTypeId);
+        std::set<uint32> const& GetUsedRefLootIds() const { return m_usedRefloot; }
         void PlayerLoggedIn(Player* player);
         void PlayerLoggedOut(Player* player);
     private:
@@ -306,6 +307,7 @@ class BattleGroundMgr
         typedef std::set<uint32> ClientBattleGroundIdSet;
         ClientBattleGroundIdSet m_clientBattleGroundIds[MAX_BATTLEGROUND_TYPE_ID][MAX_BATTLEGROUND_BRACKETS]; // the instanceids just visible for the client
         bool   m_testing;
+        std::set<uint32> m_usedRefloot;
 };
 
 #define sBattleGroundMgr MaNGOS::Singleton<BattleGroundMgr>::Instance()

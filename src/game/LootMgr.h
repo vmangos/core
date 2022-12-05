@@ -342,7 +342,7 @@ struct Loot
     LootItem* LootItemInSlot(uint32 lootslot, uint32 playerGuid, QuestItem** qitem = nullptr, QuestItem** ffaitem = nullptr, QuestItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(uint32 playerGuid) const;
 
-    WorldObject const* GetLootTarget() const { return m_lootTarget; }
+    WorldObject const* GetLootTarget() const;
 
     // TrinityCore
     bool hasItemFor(Player* player) const;
@@ -405,9 +405,11 @@ void LoadLootTemplates_Pickpocketing();
 void LoadLootTemplates_Skinning();
 void LoadLootTemplates_Disenchant();
 
-void LoadLootTemplates_Reference();
+void LoadLootTemplates_Reference(LootIdSet& ids_set);
 
-inline void LoadLootTables()
+void CheckLootTemplates_Reference(LootIdSet& ids_set); // has to be split due to bg usage
+
+inline void LoadLootTables(LootIdSet& ids_set)
 {
     LoadLootTemplates_Creature();
     LoadLootTemplates_Fishing();
@@ -418,7 +420,9 @@ inline void LoadLootTables()
     LoadLootTemplates_Skinning();
     LoadLootTemplates_Disenchant();
 
-    LoadLootTemplates_Reference();
+    LoadLootTemplates_Reference(ids_set);
 }
+
+bool ExistsRefLootTemplate(uint32 refLootId);
 
 #endif

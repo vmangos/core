@@ -56,7 +56,7 @@ void PetEventAI::MoveInLineOfSight(Unit* pWho)
     if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature))
     {
         float const attackRadius = m_creature->GetAttackDistance(pWho);
-        if (m_creature->IsWithinDistInMap(pWho, attackRadius, true, false) && m_creature->IsHostileTo(pWho) &&
+        if (m_creature->IsWithinDistInMap(pWho, attackRadius, true, SizeFactor::None) && m_creature->IsHostileTo(pWho) &&
             pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             AttackStart(pWho);
     }

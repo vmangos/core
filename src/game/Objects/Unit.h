@@ -178,6 +178,9 @@ extern pAuraProcHandler AuraProcHandler[TOTAL_AURAS];
 
 #define UNIT_SPELL_UPDATE_TIME_BUFFER 60
 
+// According to data from sniffs, combat is checked every 3 batches of 400 ms.
+#define UNIT_COMBAT_CHECK_TIMER_MAX 1200u
+
 struct SpellImmune
 {
     uint32 type;
@@ -900,7 +903,8 @@ class Unit : public SpellCaster
         /*********************************************************/
 
     private:
-        uint32 m_CombatTimer;
+        uint32 m_combatTimer;
+        ObjectGuid m_combatTimerTarget;
         uint32 m_extraAttacks;
         bool m_extraMute;
         bool m_doExtraAttacks;
@@ -1134,8 +1138,8 @@ class Unit : public SpellCaster
         void SetInCombatWithVictim(Unit* pVictim, bool touchOnly = false, uint32 combatTimer = 0);
         inline void SetOutOfCombatWithVictim(Unit* pVictim) { SetInCombatWithVictim(pVictim, true); }
         void TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly = false);
-        uint32 GetCombatTimer() const { return m_CombatTimer; }
-        void SetCombatTimer(uint32 t) { m_CombatTimer = t; }
+        uint32 GetCombatTimer() const { return m_combatTimer; }
+        void SetCombatTimer(uint32 t) { m_combatTimer = t; }
         virtual void OnEnterCombat(Unit* /*pAttacker*/, bool /*notInCombat*/) {} // (pAttacker must be valid)
 
         // Stop this unit from combat, if includingCast==true, also interrupt casting
@@ -1284,6 +1288,7 @@ class Unit : public SpellCaster
         uint32 m_movementCounter = 0;
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
         std::map<MovementChangeType, uint32> m_lastMovementChangeCounterPerType;
+        bool m_hasPendingSplineDone = false;
         float m_casterChaseDistance;
         float m_speed_rate[MAX_MOVE_TYPE];
         float m_jumpInitialSpeed = 0;
@@ -1340,6 +1345,8 @@ class Unit : public SpellCaster
         bool FindPendingMovementKnockbackChange(MovementInfo& movementInfo, uint32 movementCounter);
         bool FindPendingMovementSpeedChange(float speedReceived, uint32 movementCounter, UnitMoveType moveType);
         void CheckPendingMovementChanges();
+        bool HasPendingSplineDone() const { return m_hasPendingSplineDone; }
+        void SetSplineDonePending(bool state) { m_hasPendingSplineDone = state; }
 
         void SetWalk(bool enable, bool asDefault = true);
         void SetSpeedRate(UnitMoveType mtype, float rate);

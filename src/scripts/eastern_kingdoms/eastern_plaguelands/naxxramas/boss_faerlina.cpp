@@ -81,7 +81,7 @@ struct boss_faerlinaAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         if (!m_pInstance)
-            sLog.outError("boss_faerlinaAI::ctor failed to cast instanceData to instance_naxxramas");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_faerlinaAI::ctor failed to cast instanceData to instance_naxxramas");
         CheckRespawnAdds();
         Reset();
     }
@@ -139,7 +139,7 @@ struct boss_faerlinaAI : public ScriptedAI
                 }
                 else
                 {
-                    sLog.outError("boss_faerlinaAI::CheckRespawnAdds failed to spawn naxxramas follower");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_faerlinaAI::CheckRespawnAdds failed to spawn naxxramas follower");
                 }
             }
         }
@@ -156,7 +156,7 @@ struct boss_faerlinaAI : public ScriptedAI
                 }
                 else
                 {
-                    sLog.outError("boss_faerlinaAI::CheckRespawnAdds failed to spawn naxxramas worshipper");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_faerlinaAI::CheckRespawnAdds failed to spawn naxxramas worshipper");
                 }
             }
         }

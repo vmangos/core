@@ -2125,9 +2125,14 @@ bool CombatBotBaseAI::FindAndHealInjuredAlly(float selfHealPercent, float groupH
 template <class T>
 SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* pTarget, std::set<SpellEntry const*, T>& spellList) const
 {
+    return SelectMostEfficientHealingSpell(pTarget, pTarget->GetMaxHealth() - pTarget->GetHealth(), spellList);
+}
+
+template <class T>
+SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* pTarget, int32 missingHealth, std::set<SpellEntry const*, T>& spellList) const
+{
     SpellEntry const* pHealSpell = nullptr;
     int32 healthDiff = INT32_MAX;
-    int32 const missingHealth = pTarget->GetMaxHealth() - pTarget->GetHealth();
 
     // Find most efficient healing spell.
     for (const auto pSpellEntry : spellList)
@@ -2151,7 +2156,6 @@ SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* p
                 }
             }
 
-            pSpellEntry->GetMaxDuration();
             int32 const diff = basePoints - missingHealth;
             if (std::abs(diff) < healthDiff)
             {
@@ -2166,6 +2170,15 @@ SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* p
     }
 
     return pHealSpell;
+}
+
+int32 CombatBotBaseAI::GetIncomingdamage(Unit const* pTarget) const
+{
+    int32 damage = 0;
+    for (auto const& pAttacker : pTarget->GetAttackers())
+        if (pAttacker->CanReachWithMeleeAutoAttack(pTarget))
+            damage += int32((pAttacker->GetFloatValue(UNIT_FIELD_MINDAMAGE) + pAttacker->GetFloatValue(UNIT_FIELD_MAXDAMAGE)) / 2);
+    return damage;
 }
 
 bool CombatBotBaseAI::HealInjuredTarget(Unit* pTarget)
@@ -2284,12 +2297,67 @@ Unit* CombatBotBaseAI::SelectPeriodicHealTarget(float selfHealPercent, float gro
     return nullptr;
 }
 
+bool CombatBotBaseAI::FindAndPreHealTarget()
+{
+    Unit* pTarget = me;
+    int32 maxIncomingDamage = GetIncomingdamage(me);
+
+    if (Group* pGroup = me->GetGroup())
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Unit* pMember = itr->getSource())
+            {
+                // We already checked self.
+                if (pMember == me)
+                    continue;
+
+                // Avoid all healers picking same target.
+                if (pTarget && !IsTankClass(pMember->GetClass()) && AreOthersOnSameTarget(pMember->GetObjectGuid(), false, true))
+                    continue;
+
+                int32 incomingDamage = GetIncomingdamage(pMember);
+                if (!incomingDamage)
+                    continue;
+
+                // Check if we should heal party member.
+                if (incomingDamage > maxIncomingDamage &&
+                    IsValidHealTarget(pMember))
+                {
+                    maxIncomingDamage = incomingDamage;
+                    pTarget = pMember;
+                }
+            }
+        }
+    }
+
+    if (!maxIncomingDamage)
+        return false;
+
+    // Add currently missing health too.
+    maxIncomingDamage += int32(pTarget->GetMaxHealth() - pTarget->GetHealth());
+    if (maxIncomingDamage < int32(pTarget->GetMaxHealth() / 2))
+        return false;
+
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, maxIncomingDamage, spellListDirectHeal))
+    {
+        if (pHealSpell->GetCastTime(me) > 1000 && CanTryToCastSpell(pTarget, pHealSpell))
+        {
+            if (DoCastSpell(pTarget, pHealSpell) == SPELL_CAST_OK)
+                return true;
+        }
+    }
+
+    return pTarget;
+}
+
 bool CombatBotBaseAI::IsValidHostileTarget(Unit const* pTarget) const
 {
     return me->IsValidAttackTarget(pTarget) &&
            pTarget->IsVisibleForOrDetect(me, me, false) &&
            !pTarget->HasBreakableByDamageCrowdControlAura() &&
-           !pTarget->IsTotalImmune();
+           !pTarget->IsTotalImmune() &&
+           pTarget->GetTransport() == me->GetTransport();
 }
 
 bool CombatBotBaseAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const
@@ -2634,14 +2702,12 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
     LearnArmorProficiencies();
 
     std::map<uint32 /*slot*/, std::vector<ItemPrototype const*>> itemsPerSlot;
-    for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(i);
-        if (!pProto)
-            continue;
+        ItemPrototype const* pProto = &itr.second;
 
         // Only items that have already been discovered by someone
-        if (!pProto->m_bDiscovered)
+        if (!pProto->Discovered)
             continue;
 
         // Skip unobtainable items
@@ -2652,17 +2718,32 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if (pProto->Class != ITEM_CLASS_WEAPON && pProto->Class != ITEM_CLASS_ARMOR)
             continue;
 
-        // No item level check for tabards and shirts
-        if (pProto->InventoryType != INVTYPE_TABARD && pProto->InventoryType != INVTYPE_BODY)
+        // No tabards and shirts
+        if (pProto->InventoryType == INVTYPE_TABARD || pProto->InventoryType == INVTYPE_BODY)
+            continue;
+
+        if (pProto->SourceQuestRaces && !(pProto->SourceQuestRaces & me->GetRaceMask()))
+            continue;
+
+        if (pProto->SourceQuestClasses && !(pProto->SourceQuestClasses & me->GetClassMask()))
+            continue;
+
+        if (pProto->SourceQuestLevel < 0)
         {
             // Avoid higher level items with no level requirement
             if (!pProto->RequiredLevel && pProto->ItemLevel > me->GetLevel())
                 continue;
-
-            // Avoid low level items
-            if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        }
+        else
+        {
+            // Item is from a high level quest
+            if (uint32(pProto->SourceQuestLevel) > me->GetLevel())
                 continue;
         }
+
+        // Avoid low level items
+        if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+            continue;
 
         if (me->CanUseItem(pProto) != EQUIP_ERR_OK)
             continue;
@@ -2708,7 +2789,6 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                         m_role != ROLE_HEALER && m_role != ROLE_RANGE_DPS)
                         continue;
                 }
-
 
                 itemsPerSlot[slot].push_back(pProto);
 
@@ -2915,11 +2995,9 @@ void CombatBotBaseAI::AddHunterAmmo()
                 }
 
                 ItemPrototype const* pAmmoProto = nullptr;
-                for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
+                for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
                 {
-                    ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(i);
-                    if (!pProto)
-                        continue;
+                    ItemPrototype const* pProto = &itr.second;
 
                     if (pProto->Class == ITEM_CLASS_PROJECTILE &&
                         pProto->SubClass == ammoType &&

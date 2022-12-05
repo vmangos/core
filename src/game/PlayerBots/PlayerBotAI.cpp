@@ -88,7 +88,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     uint32 guid = botEntry->playerGUID;
     if (!newChar->Create(guid, name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))
     {
-        sLog.outError("PlayerBotAI::SpawnNewPlayer: Unable to create a player!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "PlayerBotAI::SpawnNewPlayer: Unable to create a player!");
         delete newChar;
         return false;
     }
@@ -107,7 +107,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     Map* map = sMapMgr.FindMap(mapId, instanceId);
     if (!map)
     {
-        sLog.outError("PlayerBotAI::SpawnNewPlayer: Map (%u, %u) not found!", mapId, instanceId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "PlayerBotAI::SpawnNewPlayer: Map (%u, %u) not found!", mapId, instanceId);
         delete newChar;
         return false;
     }
@@ -121,7 +121,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     mPlayer->SetSocial(sSocialMgr.LoadFromDB(nullptr, newChar->GetObjectGuid()));
     if (!newChar->GetMap()->Add(newChar))
     {
-        sLog.outError("PlayerBotAI::SpawnNewPlayer: Unable to add player to map!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "PlayerBotAI::SpawnNewPlayer: Unable to add player to map!");
         delete newChar;
         return false;
     }

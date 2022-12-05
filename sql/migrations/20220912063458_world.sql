@@ -248,11 +248,11 @@ UPDATE `pet_levelstats` SET `hp`=1742 WHERE `creature_entry`=417 && `level`=51;
 UPDATE `pet_levelstats` SET `hp`=1802 WHERE `creature_entry`=417 && `level`=52;
 UPDATE `pet_levelstats` SET `hp`=1864 WHERE `creature_entry`=417 && `level`=53;
 UPDATE `pet_levelstats` SET `hp`=1925 WHERE `creature_entry`=417 && `level`=54;
-UPDATE `pet_levelstats` SET `hp`=2046 WHERE `creature_entry`=417 && `level`=55;
-UPDATE `pet_levelstats` SET `hp`=2113 WHERE `creature_entry`=417 && `level`=56;
--- Missing data for level 57
+UPDATE `pet_levelstats` SET `hp`=1986 WHERE `creature_entry`=417 && `level`=55;
+UPDATE `pet_levelstats` SET `hp`=2052 WHERE `creature_entry`=417 && `level`=56;
+UPDATE `pet_levelstats` SET `hp`=2116 WHERE `creature_entry`=417 && `level`=57;
 UPDATE `pet_levelstats` SET `hp`=2182 WHERE `creature_entry`=417 && `level`=58;
--- Missing data for level 59
+UPDATE `pet_levelstats` SET `hp`=2250 WHERE `creature_entry`=417 && `level`=59;
 UPDATE `pet_levelstats` SET `hp`=2320 WHERE `creature_entry`=417 && `level`=60;
 UPDATE `pet_levelstats` SET `mana`=656 WHERE `creature_entry`=417 && `level`=30;
 UPDATE `pet_levelstats` SET `mana`=676 WHERE `creature_entry`=417 && `level`=31;
@@ -520,7 +520,7 @@ UPDATE `pet_levelstats` SET `hp`=1373 WHERE `creature_entry`=1863 && `level`=53;
 UPDATE `pet_levelstats` SET `hp`=1418 WHERE `creature_entry`=1863 && `level`=54;
 UPDATE `pet_levelstats` SET `hp`=1464 WHERE `creature_entry`=1863 && `level`=55;
 UPDATE `pet_levelstats` SET `hp`=1511 WHERE `creature_entry`=1863 && `level`=56;
--- Missing data for level 57
+UPDATE `pet_levelstats` SET `hp`=1559 WHERE `creature_entry`=1863 && `level`=57;
 UPDATE `pet_levelstats` SET `hp`=1608 WHERE `creature_entry`=1863 && `level`=58;
 UPDATE `pet_levelstats` SET `hp`=1658 WHERE `creature_entry`=1863 && `level`=59;
 UPDATE `pet_levelstats` SET `hp`=1709 WHERE `creature_entry`=1863 && `level`=60;

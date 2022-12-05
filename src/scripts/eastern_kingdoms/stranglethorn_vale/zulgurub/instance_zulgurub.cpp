@@ -24,9 +24,6 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "zulgurub.h"
 
-#define ZG_LOG sLog.outDebug
-//#define ZG_LOG sLog.outError(
-
 #define BOSS_GRILEK                     15082
 #define BOSS_HAZZARAH                   15083
 #define BOSS_RENATAKI                   15084
@@ -327,7 +324,7 @@ void instance_zulgurub::Create()
 
 void instance_zulgurub::OnCreatureDeath(Creature * pCreature)
 {
-    ZG_LOG("OnCreatureDeath %u", pCreature->GetEntry());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OnCreatureDeath %u", pCreature->GetEntry());
     if (pCreature->GetEntry() >= 15082 && pCreature->GetEntry() <= 15085)
         SetData(TYPE_RANDOM_BOSS, DONE);
 
@@ -345,7 +342,7 @@ uint32 instance_zulgurub::GenerateRandomBoss()
     uint32 weekmod = ((dayCount - (dayCount % 14)) / 14) % 3;
     uint32 bossId = 15082 + weekmod;
     randomBossEntry = bossId;
-    ZG_LOG("GenerateRandomBoss %u -> %u", weekmod, bossId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "GenerateRandomBoss %u -> %u", weekmod, bossId);
     return bossId;
 }
 

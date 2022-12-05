@@ -165,7 +165,7 @@ void GameObject::RemoveFromWorld()
                 owner->RemoveGameObject(this, false);
             else
             {
-                sLog.outError("Delete %s with SpellId %u LinkedGO %u that lost references to owner %s GO list. Crash possible later.",
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Delete %s with SpellId %u LinkedGO %u that lost references to owner %s GO list. Crash possible later.",
                               GetGuidStr().c_str(), m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), owner_guid.GetString().c_str());
             }
         }
@@ -189,7 +189,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
 
     if (!IsPositionValid())
     {
-        sLog.outError("Gameobject (GUID: %u Entry: %u ) not created. Suggested coordinates are invalid (X: %f Y: %f)", guidlow, name_id, x, y);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Gameobject (GUID: %u Entry: %u ) not created. Suggested coordinates are invalid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
 
@@ -198,7 +198,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
     GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(name_id);
     if (!goinfo)
     {
-        sLog.outErrorDb("Gameobject (GUID: %u) not created: Entry %u does not exist in `gameobject_template`. Map: %u  (X: %f Y: %f Z: %f) ang: %f rotation0: %f rotation1: %f rotation2: %f rotation3: %f", guidlow, name_id, map->GetId(), x, y, z, ang, rotation0, rotation1, rotation2, rotation3);
+        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (GUID: %u) not created: Entry %u does not exist in `gameobject_template`. Map: %u  (X: %f Y: %f Z: %f) ang: %f rotation0: %f rotation1: %f rotation2: %f rotation3: %f", guidlow, name_id, map->GetId(), x, y, z, ang, rotation0, rotation1, rotation2, rotation3);
         return false;
     }
 
@@ -208,7 +208,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
 
     if (goinfo->type >= MAX_GAMEOBJECT_TYPE)
     {
-        sLog.outErrorDb("Gameobject (GUID: %u) not created: Entry %u has invalid type %u in `gameobject_template`. It may crash client if created.", guidlow, name_id, goinfo->type);
+        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (GUID: %u) not created: Entry %u has invalid type %u in `gameobject_template`. It may crash client if created.", guidlow, name_id, goinfo->type);
         return false;
     }
 
@@ -675,7 +675,7 @@ void GameObject::JustDespawnedWaitingRespawn()
         sPoolMgr.GetPoolGameObjects(poolid).DespawnObject(state, guidLow); // Calls 'AddObjectToRemoveList', so the object is deleted. Do not use any class method / attribute!
         if (!IsDeleted())
         {
-            sLog.outInfo("[Pool #%u] %s is not deleted but should be", poolid, GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Pool #%u] %s is not deleted but should be", poolid, GetGuidStr().c_str());
             AddObjectToRemoveList();
         }
         sPoolMgr.UpdatePool<GameObject>(state, poolid, GetGUIDLow());
@@ -717,7 +717,7 @@ void GameObject::AddUniqueUse(Player* player)
             SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(info->summoningRitual.animSpell);
             if (!spellInfo)
             {
-                sLog.outError("WORLD: unknown spell id %u at play anim for gameobject (Entry: %u GoType: %u )", info->summoningRitual.animSpell, GetEntry(), GetGoType());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown spell id %u at play anim for gameobject (Entry: %u GoType: %u )", info->summoningRitual.animSpell, GetEntry(), GetGoType());
                 return;
             }
             Spell* spell = new Spell(player, spellInfo, true, GetObjectGuid());
@@ -850,7 +850,7 @@ void GameObject::SaveToDB()
     GameObjectData const* data = sObjectMgr.GetGOData(GetGUIDLow());
     if (!data)
     {
-        sLog.outError("GameObject::SaveToDB failed, cannot get gameobject data!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameObject::SaveToDB failed, cannot get gameobject data!");
         return;
     }
 
@@ -919,7 +919,7 @@ bool GameObject::LoadFromDB(uint32 guid, Map* map, bool force)
 
     if (!data)
     {
-        sLog.outErrorDb("Gameobject (GUID: %u) not found in table `gameobject`, can't load. ", guid);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (GUID: %u) not found in table `gameobject`, can't load. ", guid);
         return false;
     }
 
@@ -1001,7 +1001,7 @@ void GameObject::DeleteFromDB() const
 {
     if (!HasStaticDBSpawnData())
     {
-        DEBUG_LOG("Trying to delete not saved gameobject!");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Trying to delete not saved gameobject!");
         return;
     }
 
@@ -1690,13 +1690,13 @@ void GameObject::Use(Unit* user)
 
                     //provide error, no fishable zone or area should be 0
                     if (!zone_skill)
-                        sLog.outErrorDb("Fishable areaId %u are not properly defined in `skill_fishing_base_level`.", subzone);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Fishable areaId %u are not properly defined in `skill_fishing_base_level`.", subzone);
 
                     int32 skill = player->GetSkillValue(SKILL_FISHING);
                     int32 chance = skill - zone_skill + 5;
                     int32 roll = irand(1, 100);
 
-                    DEBUG_LOG("Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
 
                     // normal chance
                     bool success = skill >= zone_skill && chance >= roll;
@@ -2010,7 +2010,7 @@ void GameObject::Use(Unit* user)
         }
 #endif
         default:
-            sLog.outError("GameObject::Use unhandled GameObject type %u (entry %u).", GetGoType(), GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameObject::Use unhandled GameObject type %u (entry %u).", GetGoType(), GetEntry());
             break;
     }
 
@@ -2020,7 +2020,7 @@ void GameObject::Use(Unit* user)
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
     {
-        sLog.outError("WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u )", spellId, GetEntry(), GetGoType());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u )", spellId, GetEntry(), GetGoType());
         return;
     }
 
@@ -2328,13 +2328,13 @@ struct SpawnGameObjectInMapsWorker
             ObjectGuid guid(HIGHGUID_GAMEOBJECT, i_data->id, i_guid);
             if (GameObject* go = map->GetGameObject(guid))
             {
-                sLog.outString("[CRASH] Spawning already spawned Gobj ! GUID=%u", i_guid);
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Spawning already spawned Gobj ! GUID=%u", i_guid);
                 return;
             }
             GameObjectData const* data = sObjectMgr.GetGOData(i_guid);
             MANGOS_ASSERT(data);
             GameObject* pGameobject = GameObject::CreateGameObject(data->id);
-            //DEBUG_LOG("Spawning gameobject %u", *itr);
+            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Spawning gameobject %u", *itr);
             if (!pGameobject->LoadFromDB(i_guid, map))
                 delete pGameobject;
             else

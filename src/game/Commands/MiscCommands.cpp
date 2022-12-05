@@ -285,6 +285,8 @@ bool RegisterPlayerToBG(WorldSession* sess, BattleGroundTypeId bgid)
     Player* pPlayer = sess->GetPlayer();
     if (!pPlayer->GetBGAccessByLevel(bgid))
         return false;
+    if (pPlayer->InBattleGround())
+        return false;
     pPlayer->SetBattleGroundEntryPoint(pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation());
     sess->SendBattleGroundList(pPlayer->GetObjectGuid(), bgid);
     return true;
@@ -920,7 +922,7 @@ bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
             return false;
         }
 
-        ItemPrototype const* item_proto = ObjectMgr::GetItemPrototype(itemId);
+        ItemPrototype const* item_proto = sObjectMgr.GetItemPrototype(itemId);
         if (!item_proto)
         {
             PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);

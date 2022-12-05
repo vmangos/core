@@ -432,7 +432,7 @@ AreaAura::AreaAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *cu
                 m_modifier.m_auraname = SPELL_AURA_NONE;
             break;
         default:
-            sLog.outError("Wrong spell effect in AreaAura constructor");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Wrong spell effect in AreaAura constructor");
             MANGOS_ASSERT(false);
             break;
     }
@@ -523,13 +523,18 @@ void Aura::Update(uint32 diff)
 {
     if (m_isPeriodic)
     {
-        m_periodicTimer -= diff;
+        m_periodicTimer -= (int32)(diff & 0x7FFFFFFF);
 
         if (m_periodicTimer <= 0) // tick also at m_periodicTimer==0 to prevent lost last tick in case max m_duration == (max m_periodicTimer)*N
         {
             // update before applying (aura can be removed in TriggerSpell or PeriodicTick calls)
-            m_periodicTimer += m_modifier.periodictime;
-            ++m_periodicTick;                               // for some infinity auras in some cases can overflow and reset
+            // dont allow timer to drift off to huge negative value over time for permanent periodic auras on mobs
+            if (m_periodicTimer < -m_modifier.periodictime)
+                m_periodicTimer = 0;
+            else
+                m_periodicTimer += m_modifier.periodictime;
+
+            ++m_periodicTick; // for some infinity auras in some cases can overflow and reset
             PeriodicTick();
         }
     }
@@ -783,7 +788,7 @@ void AreaAura::Update(uint32 diff)
                 else if (!target->AddSpellAuraHolder(holder))
                     holder = nullptr;
 
-                DETAIL_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
+                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
 
                 // Add holder to spell if it's channeled so the updates are synced
                 if (holder && IsChanneled() && !addedToExisting)
@@ -1650,7 +1655,7 @@ void Aura::TriggerSpell()
         if (Unit* caster = GetCaster())
         {
             if (triggerTarget->GetTypeId() != TYPEID_UNIT || !sScriptMgr.OnEffectDummy(caster, GetId(), GetEffIndex(), (Creature*)triggerTarget))
-                sLog.outError("Aura::TriggerSpell: Spell %u have 0 in EffectTriggered[%d], not handled custom case?", GetId(), GetEffIndex());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Aura::TriggerSpell: Spell %u have 0 in EffectTriggered[%d], not handled custom case?", GetId(), GetEffIndex());
         }
     }
 }
@@ -2186,12 +2191,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 ((Player*)target)->UpdateAttackPowerAndDamage();
                 return;
             }
-            // Enrage
-            if ((target->GetTypeId() == TYPEID_PLAYER) && (GetId() == 5229))
-            {
-                ((Player*)target)->UpdateArmor(); // Spell managed in UpdateArmor()
-                return;
-            }
             break;
         }
         case SPELLFAMILY_ROGUE:
@@ -2284,7 +2283,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
         CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(m_modifier.m_miscvalue);
         if (!ci)
         {
-            sLog.outErrorDb("AuraMounted: `creature_template`='%u' not found in database (only need its display_id)", m_modifier.m_miscvalue);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "AuraMounted: `creature_template`='%u' not found in database (only need its display_id)", m_modifier.m_miscvalue);
             return;
         }
         uint32 displayId  = Creature::ChooseDisplayId(ci);
@@ -2451,7 +2450,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
     SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
     if (!ssEntry)
     {
-        sLog.outError("Unknown shapeshift form %u in spell %u", form, GetId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unknown shapeshift form %u in spell %u", form, GetId());
         return;
     }
 
@@ -2742,7 +2741,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                         break;
                     }
                     default:
-                        sLog.outError("Aura::HandleAuraTransform, spell %u does not have creature entry defined, need custom defined display id.", GetId());
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Aura::HandleAuraTransform, spell %u does not have creature entry defined, need custom defined display id.", GetId());
                         break;
                 }
             }
@@ -2753,7 +2752,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 if (!ci)
                 {
                     display_id = UNIT_DISPLAY_ID_BOX;
-                    sLog.outError("Aura::HandleAuraTransform - Unknown creature id (%d) (only need its display_id) for spell %d.", m_modifier.m_miscvalue, GetId());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Aura::HandleAuraTransform - Unknown creature id (%d) (only need its display_id) for spell %d.", m_modifier.m_miscvalue, GetId());
                 }
                 else
                     display_id = Creature::ChooseDisplayId(ci, nullptr, nullptr, nullptr, &displayScale);   // Will use the default display id here
@@ -3201,6 +3200,10 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
 
                 pCreature->AttackedBy(pCaster);
             }
+
+            // remove pvp flag on charm end if creature is not pvp flagged by default
+            if (pCreature->IsPvP() && !pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_PVP))
+                pCreature->SetPvP(false);
         }
         else
             pTarget->StopMoving(true);
@@ -3372,9 +3375,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
                     if (target->GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS) == 0)
                     {
                         if (cinfo->unit_class == 0)
-                            sLog.outErrorDb("Creature (Entry: %u) have unit_class = 0 but used in charmed spell, that will be result client crash.", cinfo->entry);
+                            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) have unit_class = 0 but used in charmed spell, that will be result client crash.", cinfo->entry);
                         else
-                            sLog.outError("Creature (Entry: %u) have unit_class = %u but at charming have class 0!!! that will be result client crash.", cinfo->entry, cinfo->unit_class);
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature (Entry: %u) have unit_class = %u but at charming have class 0!!! that will be result client crash.", cinfo->entry, cinfo->unit_class);
 
                         target->SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS, CLASS_MAGE);
                     }
@@ -3432,7 +3435,13 @@ void Aura::HandleModCharm(bool apply, bool Real)
                     target->SetFactionTemplateId(cinfo->faction);
             }
             else if (cinfo)                             // normal creature
+            {
                 target->SetFactionTemplateId(cinfo->faction);
+
+                // remove pvp flag on charm end if creature is not pvp flagged by default
+                if (pCreatureTarget->IsPvP() && !pCreatureTarget->HasExtraFlag(CREATURE_FLAG_EXTRA_PVP))
+                    pCreatureTarget->SetPvP(false);
+            }
 
             // restore UNIT_FIELD_BYTES_0
             if (cinfo && caster && caster->IsPlayer() && caster->GetClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
@@ -3443,7 +3452,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
                 if (target->GetCharmInfo())
                     target->GetCharmInfo()->SetPetNumber(0, true);
                 else
-                    sLog.outError("Aura::HandleModCharm: target (GUID: %u TypeId: %u) has a charm aura but no charm info!", target->GetGUIDLow(), target->GetTypeId());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Aura::HandleModCharm: target (GUID: %u TypeId: %u) has a charm aura but no charm info!", target->GetGUIDLow(), target->GetTypeId());
             }
         }
 
@@ -3730,7 +3739,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
                     spell_id = 24135;
                     break;
                 default:
-                    sLog.outError("Spell selection called for unexpected original spell %u, new spell for this spell family?", GetId());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell selection called for unexpected original spell %u, new spell for this spell family?", GetId());
                     return;
             }
 
@@ -4687,7 +4696,7 @@ void Aura::HandleAuraModStat(bool apply, bool /*Real*/)
 {
     if (m_modifier.m_miscvalue < -2 || m_modifier.m_miscvalue > 4)
     {
-        sLog.outError("WARNING: Spell %u effect %u have unsupported misc value (%i) for SPELL_AURA_MOD_STAT ", GetId(), GetEffIndex(), m_modifier.m_miscvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Spell %u effect %u have unsupported misc value (%i) for SPELL_AURA_MOD_STAT ", GetId(), GetEffIndex(), m_modifier.m_miscvalue);
         return;
     }
 
@@ -4698,22 +4707,25 @@ void Aura::HandleAuraModStat(bool apply, bool /*Real*/)
     {
         if (apply)
         {
-            int32 staminaToRemove = 0;
-            Unit::AuraList const& auraClassScripts = GetCaster()->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-            for (const auto& aura : auraClassScripts)
+            if (Unit* pCaster = GetCaster())
             {
-                bool exitLoop = false;
-                switch (aura->GetModifier()->m_miscvalue)
+                int32 staminaToRemove = 0;
+                Unit::AuraList const& auraClassScripts = pCaster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                for (const auto& aura : auraClassScripts)
                 {
-                    case 2388: staminaToRemove = m_modifier.m_amount * 10 / 100; exitLoop = true; break; // Rank 1
-                    case 2389: staminaToRemove = m_modifier.m_amount * 20 / 100; exitLoop = true; break; // Rank 2
-                    case 2390: staminaToRemove = m_modifier.m_amount * 30 / 100; exitLoop = true; break; // Rank 3
+                    bool exitLoop = false;
+                    switch (aura->GetModifier()->m_miscvalue)
+                    {
+                        case 2388: staminaToRemove = m_modifier.m_amount * 10 / 100; exitLoop = true; break; // Rank 1
+                        case 2389: staminaToRemove = m_modifier.m_amount * 20 / 100; exitLoop = true; break; // Rank 2
+                        case 2390: staminaToRemove = m_modifier.m_amount * 30 / 100; exitLoop = true; break; // Rank 3
+                    }
+                    if (exitLoop)
+                        break;
                 }
-                if (exitLoop)
-                    break;
+                if (staminaToRemove)
+                    pCaster->CastCustomSpell(target, 19486, staminaToRemove, {}, {}, true);
             }
-            if (staminaToRemove)
-                GetCaster()->CastCustomSpell(target, 19486, staminaToRemove, {}, {}, true);
         }
         else
             target->RemoveAurasDueToSpell(19486, this->GetHolder());
@@ -4736,7 +4748,7 @@ void Aura::HandleModPercentStat(bool apply, bool /*Real*/)
 {
     if (m_modifier.m_miscvalue < -1 || m_modifier.m_miscvalue > 4)
     {
-        sLog.outError("WARNING: Misc Value for SPELL_AURA_MOD_PERCENT_STAT not valid");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Misc Value for SPELL_AURA_MOD_PERCENT_STAT not valid");
         return;
     }
 
@@ -4784,7 +4796,7 @@ void Aura::HandleModTotalPercentStat(bool apply, bool /*Real*/)
 {
     if (m_modifier.m_miscvalue < -1 || m_modifier.m_miscvalue > 4)
     {
-        sLog.outError("WARNING: Misc Value for SPELL_AURA_MOD_PERCENT_STAT not valid");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Misc Value for SPELL_AURA_MOD_PERCENT_STAT not valid");
         return;
     }
 
@@ -4822,7 +4834,7 @@ void Aura::HandleAuraModResistenceOfStatPercent(bool /*apply*/, bool /*Real*/)
     {
         // support required adding replace UpdateArmor by loop by UpdateResistence at intellect update
         // and include in UpdateResistence same code as in UpdateArmor for aura mod apply.
-        sLog.outError("Aura SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT(182) need adding support for non-armor resistances!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Aura SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT(182) need adding support for non-armor resistances!");
         return;
     }
 
@@ -5011,7 +5023,7 @@ void Aura::HandleAuraModDodgePercent(bool /*apply*/, bool /*Real*/)
         return;
 
     ((Player*)GetTarget())->UpdateDodgePercentage();
-    //sLog.outError("BONUS DODGE CHANCE: + %f", float(m_modifier.m_amount));
+    //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BONUS DODGE CHANCE: + %f", float(m_modifier.m_amount));
 }
 
 void Aura::HandleAuraModBlockPercent(bool /*apply*/, bool /*Real*/)
@@ -5020,7 +5032,7 @@ void Aura::HandleAuraModBlockPercent(bool /*apply*/, bool /*Real*/)
         return;
 
     ((Player*)GetTarget())->UpdateBlockPercentage();
-    //sLog.outError("BONUS BLOCK CHANCE: + %f", float(m_modifier.m_amount));
+    //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BONUS BLOCK CHANCE: + %f", float(m_modifier.m_amount));
 }
 
 void Aura::HandleAuraModRegenInterrupt(bool /*apply*/, bool Real)
@@ -6422,7 +6434,7 @@ void Aura::PeriodicDummyTick()
                 case 7054:
                 {
                     uint32 spellRandom = urand(0, 14) + 7038;
-                    sLog.outInfo("7054 %u", spellRandom);
+                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "7054 %u", spellRandom);
 
                     target->CastSpell(target, spellRandom, true, nullptr, this);
                     // Possibly need cast one of them (but
@@ -6908,7 +6920,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
         }
 
         // reset cooldown state for spells
-        if (caster && GetSpellProto()->HasAttribute(SPELL_ATTR_DISABLED_WHILE_ACTIVE))
+        if (caster && GetSpellProto()->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
         {
             // some spells need to start cooldown at aura fade (like stealth)
             caster->AddCooldown(*GetSpellProto());
@@ -8376,7 +8388,7 @@ bool Aura::ExclusiveAuraCanApply()
     {
         if (mostImportant->IsInUse())
         {
-            sLog.outInfo("[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraCanApply IsInUse", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraCanApply IsInUse", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
             return false;
         }
         ASSERT(!mostImportant->IsInUse());
@@ -8387,7 +8399,7 @@ bool Aura::ExclusiveAuraCanApply()
                 // Normally 'mostImportant' being the most important in its category should be applied.
                 if (!mostImportant->IsApplied())
                 {
-                    sLog.outInfo("[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraCanApply IsApplied", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
+                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraCanApply IsApplied", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
                     return false;
                 }
                 ASSERT(mostImportant->IsApplied());
@@ -8415,12 +8427,12 @@ void Aura::ExclusiveAuraUnapply()
     {
         if (mostImportant->IsInUse())
         {
-            sLog.outInfo("[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraUnapply IsInUse", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraUnapply IsInUse", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
             return;
         }
         if (mostImportant->IsApplied())
         {
-            sLog.outInfo("[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraUnapply IsApplied", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraUnapply IsApplied", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
             return;
         }
         ASSERT(!mostImportant->IsInUse());

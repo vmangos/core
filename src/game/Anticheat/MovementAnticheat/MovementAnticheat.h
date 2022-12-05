@@ -70,8 +70,8 @@ class MovementAnticheat
         uint32 Finalize(Player* pPlayer, std::stringstream& reason);
 
         // Public methods called from the movement handler upon received a packet.
-        bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
-        bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
+        uint32 HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
+        uint32 HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         bool HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId);
         void LogMovementPacket(bool isClientPacket, WorldPacket& packet);
 
@@ -82,6 +82,7 @@ class MovementAnticheat
         void OnExplore(AreaEntry const* pArea);
         void OnWrongAckData();
         void OnFailedToAckChange();
+        void OnDeath();
 
 private:
         bool CheckTeleport(MovementInfo const& movementInfo) const;
@@ -103,6 +104,7 @@ private:
 
         bool m_knockBack = false;
         uint32 m_lastSplineId = 0;
+        uint32 m_deathTime = 0;
 
         // Multi jump
         uint32 m_jumpCount = 0;

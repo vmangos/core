@@ -307,8 +307,8 @@ void CreatureGroupsManager::Load()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outErrorDb(">>  Loaded 0 creature groups. DB table `creature_groups` is empty!");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, ">>  Loaded 0 creature groups. DB table `creature_groups` is empty!");
         return;
     }
 
@@ -328,12 +328,12 @@ void CreatureGroupsManager::Load()
         if (leaderGuid.IsEmpty())
         {
             if (!sObjectMgr.IsExistingCreatureGuid(fields[0].GetUInt32()))
-                sLog.outErrorDb("CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
         }
         else if (memberGuid.IsEmpty())
         {
             if (!sObjectMgr.IsExistingCreatureGuid(fields[1].GetUInt32()))
-                sLog.outErrorDb("CREATURE GROUPS: Bad member guid %u", fields[1].GetUInt32());
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad member guid %u", fields[1].GetUInt32());
         }
         else
         {
@@ -348,8 +348,8 @@ void CreatureGroupsManager::Load()
     }
     while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u creature groups in %u ms", count, WorldTimer::getMSTime() - oldMSTime);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creature groups in %u ms", count, WorldTimer::getMSTime() - oldMSTime);
 }
 
 void CreatureGroupsManager::LoadCreatureGroup(Creature* creature, CreatureGroup*& group)

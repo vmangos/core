@@ -179,7 +179,7 @@ CanCastResult CreatureAI::DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32
             return CAST_OK;
         }
 
-        sLog.outErrorDb("DoCastSpellIfCan by creature entry %u attempt to cast spell %u but spell does not exist.", m_creature->GetEntry(), uiSpell);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "DoCastSpellIfCan by creature entry %u attempt to cast spell %u but spell does not exist.", m_creature->GetEntry(), uiSpell);
         return CAST_FAIL_OTHER;
     }
 
@@ -193,7 +193,7 @@ void CreatureAI::SetSpellsList(uint32 entry)
     else if (CreatureSpellsList const* pSpellsTemplate = sObjectMgr.GetCreatureSpellsList(entry))
         SetSpellsList(pSpellsTemplate);
     else
-        sLog.outError("CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
 }
 
 void CreatureAI::SetSpellsList(CreatureSpellsList const* pSpellsList)
