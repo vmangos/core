@@ -812,6 +812,17 @@ UPDATE `creature_loot_template` SET `condition_id` = 0 WHERE `item` = 1357;
 -- Attack on Camp Narache is Not Exclusive To Tauren
 UPDATE `quest_template` SET `RequiredRaces` = 0 WHERE `entry` = 781;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Threshadon Should Only Have Water Movement
+UPDATE `creature_template` SET `inhabit_type` = 2 WHERE `entry`=1224;
+UPDATE `creature_template` SET `inhabit_type` = 2 WHERE `entry`=2188;
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Reduce Lord Baurles K. Wishock Respawn Timer (credit cmangos)
+UPDATE `creature` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `guid` = 79749;
+
 
 -- End of migration.
 END IF;
