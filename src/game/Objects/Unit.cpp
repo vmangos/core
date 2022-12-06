@@ -5850,6 +5850,9 @@ void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/
         SetInCombatWith(pAggressor);
         if (Creature* pCreature = ToCreature())
             pCreature->UpdateLeashExtensionTime();
+
+        if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
+            pOwner->SetInCombatWithAggressor(pAggressor, false);
     }
 }
 
