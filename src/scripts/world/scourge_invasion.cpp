@@ -76,7 +76,7 @@ struct MouthAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(6 * IN_MILLISECONDS, 15 * IN_MILLISECONDS));
     }
 
-    void EnableInvasionWeather(bool invasion)
+    void inline EnableInvasionWeather(bool invasion)
     {
         if (invasion)
             m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
@@ -221,7 +221,7 @@ struct MouthAI : public ScriptedAI
         // No group member left, stop invasion in this Zone.
         if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
         {
-            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, (IN_MILLISECONDS * urand(m_timer_min, m_timer_max))); // Restart update timer to not invade the zone again shortly after stopping it.
+            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, (IN_MILLISECONDS * urand(m_timer_min, m_timer_max))); // Restart update timer to prevent invading the zone again shortly after stopping it.
             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP, (IN_MILLISECONDS * 5));
         }
     }
@@ -237,7 +237,7 @@ struct MouthAI : public ScriptedAI
                 case EVENT_MOUTH_OF_KELTHUZAD_UPDATE:
                 {
                     int VICTORIES   = 0;    // Victories against the Scourge (defeated zones).
-                    int REMAINING   = 0;    // Remaining Necropolisses in a Zone.
+                    int REMAINING   = 0;    // Remaining Necropolises in a Zone.
                     int ACTIVE      = 0;    // Amount of active zones (Invasions).
 
                     VICTORIES   = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
@@ -278,10 +278,21 @@ struct MouthAI : public ScriptedAI
                     {
                         for (const auto& itr : group->GetMembers())
                         {
-                            CreatureGroupMember* pCreature = itr.second;
+                            CreatureGroupMember* pCreatureGroupMember = itr.second;
 
-                            if (pCreature)
-                                REMAINING++;
+                            if (!pCreatureGroupMember)
+                                continue;
+
+                            /*
+                            Creature* pCreature = m_creature->GetMap()->GetCreature(itr.first);
+
+                            if (!pCreature)
+                                continue;
+
+                            if (pCreature->IsAlive())
+                            */
+
+                            REMAINING++;
                         }
                     }
 
@@ -296,7 +307,7 @@ struct MouthAI : public ScriptedAI
                     sObjectMgr.SetSavedVariable(m_remainingID, REMAINING, true);
                     UpdateWorldState();
 
-                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion] Start Invasion in Zone: %u, set remaining Necropolisses to: %u", m_creature->GetZoneId(), sObjectMgr.GetSavedVariable(m_remainingID, true));
+                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion] Start Invasion in Zone: %u, set remaining Necropolises to: %u", m_creature->GetZoneId(), REMAINING);
 
                     break;
                 }

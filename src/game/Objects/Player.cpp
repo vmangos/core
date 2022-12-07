@@ -8482,7 +8482,7 @@ void Player::SendInitWorldStates(uint32 zoneid) const
         data << uint32(WORLDSTATE_TANARIS) << uint32(sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS) ? 1 : 0);
         data << uint32(WORLDSTATE_WINTERSPRING) << uint32(sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING) ? 1 : 0);
 
-        // Battles & remaining necropolisses
+        // Battles & remaining Necropolises
         data << uint32(WORLDSTATE_SI_VICTORIES) << uint32(VICTORIES);
         data << uint32(WORLDSTATE_SI_AZSHARA_REMAINING) << uint32(REMAINING_AZSHARA);
         data << uint32(WORLDSTATE_SI_BLASTED_LANDS_REMAINING) << uint32(REMAINING_BLASTED_LANDS);

@@ -177,6 +177,51 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_movement_special` SET `waittime`=2000 WHERE `id`=149702 AND `point`=58;
     UPDATE `creature_movement_special` SET `waittime`=2000 WHERE `id`=149702 AND `point`=72;
 
+    -- Waypoints to Stormwind Keep (Guessed)
+    DELETE FROM `creature_movement_special` WHERE `id`=151901;
+    INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+        (151901, 1, -8797.09, 1111.77, 90.5994, 100, 0, 0, 0), -- In the Park
+        (151901, 2, -8795.73, 1097.15, 90.7806, 100, 0, 0, 0),
+        (151901, 3, -8786, 1076.07, 90.7787, 100, 0, 0, 0),
+        (151901, 4, -8742.15, 1063.57, 89.7332, 100, 0, 0, 0),
+        (151901, 5, -8732.61, 1032.48, 93.5898, 100, 0, 0, 0),
+        (151901, 6, -8729.97, 986.728, 96.8782, 100, 0, 0, 0),
+        (151901, 7, -8741.06, 952.676, 100.401, 100, 0, 0, 0),
+        (151901, 8, -8709, 912.219, 101.242, 100, 0, 0, 0),
+        (151901, 9, -8736.32, 892.105, 101.198, 100, 0, 0, 0),
+        (151901, 10, -8709.69, 859.022, 96.9956, 100, 0, 0, 0),
+        (151901, 11, -8726.39, 835.466, 96.1401, 100, 0, 0, 0),
+        (151901, 12, -8726.38, 809.717, 97.055, 100, 0, 0, 0),
+        (151901, 13, -8715.62, 793.512, 97.23, 100, 0, 0, 0),
+        (151901, 14, -8728.84, 772.401, 98.134, 100, 0, 0, 0),
+        (151901, 15, -8730.1, 755.638, 98.084, 100, 0, 0, 0),
+        (151901, 16, -8716.64, 738.251, 97.7734, 100, 0, 0, 0),
+        (151901, 17, -8699.34, 715.925, 97.0171, 100, 0, 0, 0),
+        (151901, 18, -8679.45, 691.505, 98.1432, 100, 0, 0, 0),
+        (151901, 19, -8661.11, 665.416, 100.488, 100, 0, 0, 0),
+        (151901, 20, -8638.16, 656.052, 100.964, 100, 0, 0, 0),
+        (151901, 21, -8622.29, 653.616, 99.3348, 100, 0, 0, 0),
+        (151901, 22, -8585.9, 661.857, 98.0191, 100, 0, 0, 0),
+        (151901, 23, -8562.8, 672.267, 97.0151, 100, 0, 0, 0),
+        (151901, 24, -8540.98, 688.767, 97.673, 100, 0, 0, 0),
+        (151901, 25, -8517.65, 663.487, 102.198, 100, 0, 0, 0),
+        (151901, 26, -8508.64, 650.59, 100.292, 100, 0, 0, 0),
+        (151901, 27, -8520.84, 641.771, 100.011, 100, 0, 0, 0),
+        (151901, 28, -8551.33, 619.666, 101.83, 100, 0, 0, 0),
+        (151901, 29, -8574.73, 603.074, 103.226, 100, 0, 0, 0),
+        (151901, 30, -8581.22, 589.127, 103.784, 100, 0, 0, 0),
+        (151901, 31, -8580.73, 555.411, 101.822, 100, 0, 0, 0),
+        (151901, 32, -8570.19, 537.401, 101.588, 100, 0, 0, 0),
+        (151901, 33, -8557.57, 519.798, 100.076, 100, 0, 0, 0),
+        (151901, 34, -8535.21, 489.425, 100.892, 100, 0, 0, 0),
+        (151901, 35, -8545.59, 470.08, 104.457, 100, 0, 0, 0),
+        (151901, 36, -8544.27, 461.522, 104.346, 100, 0, 0, 0),
+        (151901, 37, -8528.58, 442.172, 104.945, 100, 0, 0, 0),
+        (151901, 38, -8504.26, 411.637, 108.386, 100, 0, 0, 0),
+        (151901, 39, -8482.59, 384.436, 110.237, 100, 0, 0, 0),
+        (151901, 40, -8462.14, 358.763, 118.442, 100, 0, 0, 0),
+        (151901, 41, -8443.94, 337.059, 121.746, 100, 0, 0, 0); -- In the Keep
+
     -- Waypoints to Stormwind City Trade District
     DELETE FROM `creature_movement_special` WHERE `id`=151902;
     INSERT INTO `creature_movement_special`(`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -637,13 +682,11 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Events list for Flameshocker
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16383;
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638301, 16383, 0, 1, 4, 100, 1, 503, 382828, 503, 382828, 1638301, 0, 0, 'Flameshocker - Timer OOC');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638302, 16383, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1638302, 0, 0, 'Flameshocker - Death');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638303, 16383, 605, 11, 0, 100, 0, 0, 0, 0, 0, 1638303, 1638304, 1638305, 'Flameshocker - Just Spawned in Stormwind City Mage Quarter');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638308, 16383, 0, 8, 0, 100, 0, 17680, 1, 0, 0, 1638308, 0, 0, 'Flameshocker - Hit by Spell');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638309, 16383, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1638309, 0, 0, 'Flameshocker - Just Spawned');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638310, 16383, 0, 1, 4, 100, 3, 0, 10000, 5000, 10000, 1638310, 1638311, 0, 'Flameshocker - Timer OOC: Random speed');
-    INSERT INTO `creature_ai_events`(`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638312, 16383, 0, 32, 0, 100, 0, 0, 1, 0, 0, 1638312, 0, 0, 'Flameshocker - Leader died');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638301, 16383, 0, 1, 4, 100, 1, 503, 382828, 503, 382828, 1638301, 0, 0, 'Flameshocker - Timer OOC');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638302, 16383, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1638302, 0, 0, 'Flameshocker - Death');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638308, 16383, 0, 8, 0, 100, 0, 17680, 1, 0, 0, 1638308, 0, 0, 'Flameshocker - Hit by Spell');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638309, 16383, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1638309, 0, 0, 'Flameshocker - Just Spawned');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638312, 16383, 0, 32, 0, 100, 0, 0, 1, 0, 0, 1638312, 0, 0, 'Flameshocker - Leader died');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638301;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -654,39 +697,22 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1638302, 0, 0, 15, 28323, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Cast Spell: Flameshocker\'s Revenge On Death'),
     (1638302, 0, 0, 18, 10000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Despawn 10 seconds after Death');
 
-    -- Stormwind City Mage Quarter - Collin Mauren
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638303;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638303, 0, 0, 20, 10, 0, 2000, 0, 79820, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Collin Mauren'),
-    (1638303, 0, 0, 39, 1638302, 1638303, 0, 0, 79820, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Collin Mauren');
-
-    -- Stormwind City Mage Quarter - Archmage Malin
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638304;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638304, 0, 0, 20, 10, 0, 2000, 0, 90442, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Archmage Malin'),
-    (1638304, 0, 0, 39, 1638302, 1638303, 0, 0, 90442, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Archmage Malin');
-
-    -- Stormwind City Mage Quarter - Erich Lohan
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638305;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638305, 0, 0, 20, 10, 0, 2000, 0, 90445, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Distract Movement from Reactor in Stormwind City Mage Quarter - Erich Lohan'),
-    (1638305, 0, 0, 39, 1638302, 1638303, 0, 0, 90445, 0, 9, 2, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script in Stormwind City Mage Quarter - Erich Lohan');
-
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638308;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638308, 0, 0, 18, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Despawn after Spirit Spawn-out');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638309;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638309, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 1');
-
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638310;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638310, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Toggle Walking');
-
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638311;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638311, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Toggle Running');
+    (1638309, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 1'),
+    (1638309, 0, 0, 39, 1638305, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 605, 'Flameshocker - Start Script Stormwind Mage Quarter'), -- 86597, 90442, 90445, 79820
+    (1638309, 0, 0, 39, 1638306, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 606, 'Flameshocker - Start Script Stormwind Trade District'), -- 79688, 79723, 79680, 79695
+    (1638309, 0, 0, 39, 1638307, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 607, 'Flameshocker - Start Script Stormwind The Park'), -- 90452, 90477, 90479, 90480, 90483
+    (1638309, 0, 0, 39, 1638308, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 608, 'Flameshocker - Start Script Stormwind Old Town'), -- 79770, 79746, 79788
+    (1638309, 0, 0, 39, 1638309, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 609, 'Flameshocker - Start Script Stormwind Dwarven District'), -- 5169, 48358, 48424
+    (1638309, 0, 0, 39, 1638310, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 612, 'Flameshocker - Start Script Undercity Rogues Quarter'), -- 31882, 31883, 38104, 38097
+    (1638309, 0, 0, 39, 1638311, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 615, 'Flameshocker - Start Script Undercity Trade Quarter'), -- 38402, 38057, 38407
+    (1638309, 0, 0, 39, 1638312, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 618, 'Flameshocker - Start Script Undercity Magic Quarter'), -- 38423, 31860, 38415
+    (1638309, 0, 0, 39, 1638313, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 619, 'Flameshocker - Start Script Undercity War Quarter'); -- 38428, 38435, 38105
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638312;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -703,12 +729,84 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1638301, 0, 2, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 2');
 
     DELETE FROM `generic_scripts` WHERE `id`=1638302;
-    INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638302, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12366, 12367, 12368, 12369, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638302, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12366, 12367, 12368, 12369, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
 
     DELETE FROM `generic_scripts` WHERE `id`=1638303;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12370, 12371, 12372, 12373, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
+    (1638303, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12370, 12371, 12372, 12373, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
+
+    DELETE FROM `generic_scripts` WHERE `id`=1638304;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638304, 0, 0, 20, 10, 0, 6000, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 116, 'Flameshocker - Distract Movement from Reactor'),
+    (1638304, 2, 0, 39, 1638302, 1638303, 0, 0, 0, 0, 0, 4, 50, 50, 0, 0, 0, 0, 0, 0, 116, 'Flameshocker - Start Script');
+
+    -- Undercity War Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638313;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638313, 0, 0, 39, 1638304, 0, 0, 0, 38428, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Basil Frye'),
+    (1638313, 0, 0, 39, 1638304, 0, 0, 0, 38435, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sergeant Houser'),
+    (1638313, 0, 0, 39, 1638304, 0, 0, 0, 38105, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lysta Bancroft');
+
+    -- Undercity Magic Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638312;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638312, 0, 0, 39, 1638304, 0, 0, 0, 38423, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Hannah Akeley'),
+    (1638312, 0, 0, 39, 1638304, 0, 0, 0, 31860, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lucille Castleton'),
+    (1638312, 0, 0, 39, 1638304, 0, 0, 0, 38415, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Carendin Halgar');
+
+    -- Undercity Trade Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638311;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638311, 0, 0, 39, 1638304, 0, 0, 0, 38402, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For William Montague'),
+    (1638311, 0, 0, 39, 1638304, 0, 0, 0, 38057, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Michael Garrett'),
+    (1638311, 0, 0, 39, 1638304, 0, 0, 0, 38407, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Innkeeper Norman');
+
+    -- Undercity Rogues Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638310;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638310, 0, 0, 39, 1638304, 0, 0, 0, 31882, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lysta Bancroft'),
+    (1638310, 0, 0, 39, 1638304, 0, 0, 0, 31883, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Ezekiel Graves'),
+    (1638310, 0, 0, 39, 1638304, 0, 0, 0, 38104, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Cedric Stumpel'),
+    (1638310, 0, 0, 39, 1638304, 0, 0, 0, 38097, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Gothard Winslow');
+
+    -- Stormwind Dwarven District
+    DELETE FROM `generic_scripts` WHERE `id`=1638309;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638309, 0, 0, 39, 1638304, 0, 0, 0, 5169, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Dane Lindgren'),
+    (1638309, 0, 0, 39, 1638304, 0, 0, 0, 48358, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sprite Jumpsprocket'),
+    (1638309, 0, 0, 39, 1638304, 0, 0, 0, 48424, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Jenova Stoneshield');
+
+    -- Stormwind Old Town
+    DELETE FROM `generic_scripts` WHERE `id`=1638308;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638308, 0, 0, 39, 1638304, 0, 0, 0, 79770, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Nikova Raskol'),
+    (1638308, 0, 0, 39, 1638304, 0, 0, 0, 79746, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Jenn Langston'),
+    (1638308, 0, 0, 39, 1638304, 0, 0, 0, 79788, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Osborne the Night Man');
+
+    -- Stormwind The Park
+    DELETE FROM `generic_scripts` WHERE `id`=1638307;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90452, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Argos Nightwhisper'),
+    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90477, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Shailiea'),
+    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90479, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sylista'),
+    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90480, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Nara Meideros'),
+    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90483, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Imelda');
+
+    -- Stormwind Mage Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638305;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638305, 0, 0, 39, 1638304, 0, 0, 0, 90442, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Archmage Malin'),
+    (1638305, 0, 0, 39, 1638304, 0, 0, 0, 90445, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Erich Lohan'),
+    (1638305, 0, 0, 39, 1638304, 0, 0, 0, 79820, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Collin Mauren');
+
+    -- Stormwind Trade District
+    DELETE FROM `generic_scripts` WHERE `id`=1638306;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638306, 0, 0, 39, 1638304, 0, 0, 0, 79688, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Renato Gallina'),
+    (1638306, 0, 0, 39, 1638304, 0, 0, 0, 79723, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Thomas Miller'),
+    (1638306, 0, 0, 39, 1638304, 0, 0, 0, 79680, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Stephanie Turner'),
+    (1638306, 0, 0, 39, 1638304, 0, 0, 0, 79695, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Officer Maloof');
 
     -- Events list for Necropolis Relay
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16386;

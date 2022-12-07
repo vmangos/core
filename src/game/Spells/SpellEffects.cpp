@@ -5114,7 +5114,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     // Casted by Necrotic Shard and Damaged Necrotic Shard on spawn. They should have 0 Armor and a huge visibility.
                     m_casterUnit->SetArmor(0);
                     m_casterUnit->SetActiveObjectState(true);
-                    m_casterUnit->SetVisibilityModifier(DEFAULT_VISIBILITY_BG);
+                    m_casterUnit->SetVisibilityModifier(VISIBILITY_DISTANCE_LARGE); // Visibility distance in Classic is 200 yards.
                     m_casterUnit->CastSpell(m_casterUnit, PickRandomValue(28199, 28198, 28197), true);
                     return;
                 }
