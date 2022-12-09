@@ -808,7 +808,7 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_IS_ARCANE_CONCENTRATION    = 0x00800000,            // 23 Only mage Arcane Concentration have this flag
     SPELL_ATTR_EX2_UNK24                      = 0x01000000,            // 24
     SPELL_ATTR_EX2_UNK25                      = 0x02000000,            // 25
-    SPELL_ATTR_EX2_UNK26                      = 0x04000000,            // 26 unaffected by school immunity
+    SPELL_ATTR_EX2_NO_SCHOOL_IMMUNITIES       = 0x04000000,            // 26
     SPELL_ATTR_EX2_UNK27                      = 0x08000000,            // 27
     SPELL_ATTR_EX2_NOT_AN_ACTION              = 0x10000000,            // 28 no breaks stealth if it fails??
     SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Spell can't crit
