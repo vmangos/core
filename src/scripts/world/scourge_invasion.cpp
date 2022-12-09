@@ -200,15 +200,15 @@ struct MouthAI : public ScriptedAI
 
     int inline GetActiveZones()
     {
-        int count = NULL;
+        int COUNT = NULL;
 
         for (uint32 i = VARIABLE_SI_WINTERSPRING_REMAINING; i < VARIABLE_SI_BURNING_STEPPES_REMAINING; i++)
         {
             if (sObjectMgr.GetSavedVariable(i, true) > NULL)
-                count++;
+                COUNT++;
         }
 
-        return count;
+        return COUNT;
     }
 
     void GroupMemberJustDied(Creature* pUnit, bool isLeader) override
@@ -225,6 +225,19 @@ struct MouthAI : public ScriptedAI
             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP, (IN_MILLISECONDS * 5));
         }
     }
+
+    /*
+    void OnRemoveFromWorld() override
+    {
+        // Reseting Variables if the event stops.
+        for (uint32 i = VARIABLE_SI_WINTERSPRING_REMAINING; i < VARIABLE_SI_BURNING_STEPPES_REMAINING; i++)
+        {
+            sObjectMgr.SetSavedVariable(m_remainingID, NULL, true);
+        }
+
+        sObjectMgr.SetSavedVariable(VARIABLE_SI_VICTORIES, NULL, true);
+    }
+    */
 
     void UpdateAI(uint32 const diff) override
     {
@@ -273,6 +286,9 @@ struct MouthAI : public ScriptedAI
                 {
                     int REMAINING = 0;
 
+                    EnableInvasionWeather(true);
+                    sGameEventMgr.StartEvent(m_eventID);
+
                     // Mouth of Kel'Thuzad is the group leader of all Necropolis Healths in a zone. It's the best way to check if a Necropolis dies.
                     if (CreatureGroup* group = m_creature->GetCreatureGroup())
                     {
@@ -283,16 +299,13 @@ struct MouthAI : public ScriptedAI
                             if (!pCreatureGroupMember)
                                 continue;
 
-                            /*
                             Creature* pCreature = m_creature->GetMap()->GetCreature(itr.first);
 
                             if (!pCreature)
                                 continue;
 
-                            if (pCreature->IsAlive())
-                            */
-
-                            REMAINING++;
+                            if (!pCreature->IsDespawned() && pCreature->IsAlive())
+                                REMAINING++;
                         }
                     }
 
@@ -302,8 +315,6 @@ struct MouthAI : public ScriptedAI
                         return;
                     }
 
-                    EnableInvasionWeather(true);
-                    sGameEventMgr.StartEvent(m_eventID);
                     sObjectMgr.SetSavedVariable(m_remainingID, REMAINING, true);
                     UpdateWorldState();
 
@@ -315,12 +326,12 @@ struct MouthAI : public ScriptedAI
                 {
                     if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
                     {
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion] Ending Invasion in Zone: %u with m_remainingID: %u", m_creature->GetZoneId(), m_remainingID);
                         DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_2), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
                         EnableInvasionWeather(false);
                         sGameEventMgr.StopEvent(m_eventID);
                         sObjectMgr.SetSavedVariable(VARIABLE_SI_VICTORIES, sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES) + 1, true);
                         UpdateWorldState();
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion] Ending Invasion in Zone: %u with m_remainingID: %u", m_creature->GetZoneId(), m_remainingID);
                     }
                     break;
                 }

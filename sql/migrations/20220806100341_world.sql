@@ -563,7 +563,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16299;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629901, 16299, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1629901, 0, 0, 'Skeletal Shocktrooper - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629902, 16299, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1629902, 0, 0, 'Skeletal Shocktrooper - Despawn on Hit by Spirit Spawn-out');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629903, 16299, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1629903, 0, 0, 'Skeletal Shocktrooper - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629903, 16299, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1629903, 0, 0, 'Skeletal Shocktrooper - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1629903;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -574,7 +574,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614101, 16141, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1614101, 0, 0, 'Ghoul Berserker - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614102, 16141, 0, 2, 0, 100, 1, 20, 1, 5000, 10000, 1614102, 0, 0, 'Ghoul Berserker - Enrage at 20% HP');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614103, 16141, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1614103, 0, 0, 'Ghoul Berserker - Despawn on Hit by Spirit Spawn-out');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614104, 16141, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1614104, 0, 0, 'Ghoul Berserker - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1614104, 16141, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1614104, 0, 0, 'Ghoul Berserker - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1614104;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -584,7 +584,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16298;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629801, 16298, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1629801, 0, 0, 'Spectral Soldier - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629802, 16298, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1629802, 0, 0, 'Spectral Soldier - Despawn on Hit by Spirit Spawn-out');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629803, 16298, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1629803, 0, 0, 'Spectral Soldier - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1629803, 16298, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1629803, 0, 0, 'Spectral Soldier - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1629803;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -594,7 +594,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_events` WHERE `creature_id`=14697;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469701, 14697, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1469701, 0, 0, 'Lumbering Horror - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469702, 14697, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1469702, 0, 0, 'Lumbering Horror - Despawn on Hit by Spirit Spawn-out');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469703, 14697, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1469703, 0, 0, 'Lumbering Horror - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469703, 14697, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1469703, 0, 0, 'Lumbering Horror - Cast Scourge Strike');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1469704, 14697, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1469704, 0, 0, 'Lumbering Horror - Cast Aura of Fear');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1469703;
@@ -605,7 +605,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16380;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638001, 16380, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1638001, 0, 0, 'Bone Witch - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638002, 16380, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1638002, 0, 0, 'Bone Witch - Despawn on Hit by Spirit Spawn-out');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638003, 16380, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1638003, 0, 0, 'Bone Witch - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638003, 16380, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1638003, 0, 0, 'Bone Witch - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638003;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -615,7 +615,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16379;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637901, 16379, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1637901, 0, 0, 'Spirit of the Damned - Cast Zap Crystal on Death');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637902, 16379, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 1637902, 0, 0, 'Spirit of the Damned - Despawn on Hit by Spirit Spawn-out');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637903, 16379, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1637903, 0, 0, 'Spirit of the Damned - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1637903, 16379, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1637903, 0, 0, 'Spirit of the Damned - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1637903;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -623,7 +623,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Events list for Skeletal Trooper
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16438;
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643801, 16438, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1643801, 0, 0, 'Skeletal Trooper - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643801, 16438, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1643801, 0, 0, 'Skeletal Trooper - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1643801;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -631,7 +631,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Events list for Spectral Spirit
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16437;
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643701, 16437, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1643701, 0, 0, 'Spectral Spirit - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643701, 16437, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1643701, 0, 0, 'Spectral Spirit - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1643701;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -639,7 +639,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Events list for Skeletal Soldier
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16422;
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642201, 16422, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1642201, 0, 0, 'Skeletal Soldier - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642201, 16422, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1642201, 0, 0, 'Skeletal Soldier - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1642201;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -647,7 +647,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Events list for Spectral Apparition
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16423;
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642301, 16423, 0, 0, 0, 100, 1, 0, 35000, 5000, 30000, 1642301, 0, 0, 'Spectral Apparition - Cast Scourge Strike');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1642301, 16423, 0, 0, 0, 100, 1, 0, 6000, 5000, 30000, 1642301, 0, 0, 'Spectral Apparition - Cast Scourge Strike');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1642301;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -684,9 +684,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16383;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638301, 16383, 0, 1, 4, 100, 1, 503, 382828, 503, 382828, 1638301, 0, 0, 'Flameshocker - Timer OOC');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638302, 16383, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1638302, 0, 0, 'Flameshocker - Death');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638308, 16383, 0, 8, 0, 100, 0, 17680, 1, 0, 0, 1638308, 0, 0, 'Flameshocker - Hit by Spell');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638309, 16383, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1638309, 0, 0, 'Flameshocker - Just Spawned');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638312, 16383, 0, 32, 0, 100, 0, 0, 1, 0, 0, 1638312, 0, 0, 'Flameshocker - Leader died');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638303, 16383, 0, 8, 0, 100, 0, 17680, 1, 0, 0, 1638303, 0, 0, 'Flameshocker - Hit by Spell');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638304, 16383, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1638304, 0, 0, 'Flameshocker - Just Spawned');
+    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638305, 16383, 0, 32, 0, 100, 0, 0, 1, 0, 0, 1638305, 0, 0, 'Flameshocker - Leader died');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638301;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -697,30 +697,30 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1638302, 0, 0, 15, 28323, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Cast Spell: Flameshocker\'s Revenge On Death'),
     (1638302, 0, 0, 18, 10000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Despawn 10 seconds after Death');
 
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638308;
+    DELETE FROM `creature_ai_scripts` WHERE `id`=1638303;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638308, 0, 0, 18, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Despawn after Spirit Spawn-out');
+    (1638303, 0, 0, 18, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Despawn after Spirit Spawn-out');
 
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638309;
+    DELETE FROM `creature_ai_scripts` WHERE `id`=1638304;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638309, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 1'),
-    (1638309, 0, 0, 39, 1638305, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 605, 'Flameshocker - Start Script Stormwind Mage Quarter'), -- 86597, 90442, 90445, 79820
-    (1638309, 0, 0, 39, 1638306, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 606, 'Flameshocker - Start Script Stormwind Trade District'), -- 79688, 79723, 79680, 79695
-    (1638309, 0, 0, 39, 1638307, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 607, 'Flameshocker - Start Script Stormwind The Park'), -- 90452, 90477, 90479, 90480, 90483
-    (1638309, 0, 0, 39, 1638308, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 608, 'Flameshocker - Start Script Stormwind Old Town'), -- 79770, 79746, 79788
-    (1638309, 0, 0, 39, 1638309, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 609, 'Flameshocker - Start Script Stormwind Dwarven District'), -- 5169, 48358, 48424
-    (1638309, 0, 0, 39, 1638310, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 612, 'Flameshocker - Start Script Undercity Rogues Quarter'), -- 31882, 31883, 38104, 38097
-    (1638309, 0, 0, 39, 1638311, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 615, 'Flameshocker - Start Script Undercity Trade Quarter'), -- 38402, 38057, 38407
-    (1638309, 0, 0, 39, 1638312, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 618, 'Flameshocker - Start Script Undercity Magic Quarter'), -- 38423, 31860, 38415
-    (1638309, 0, 0, 39, 1638313, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 619, 'Flameshocker - Start Script Undercity War Quarter'); -- 38428, 38435, 38105
+    (1638304, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 1'),
+    (1638304, 0, 0, 39, 1638315, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 605, 'Flameshocker - Start Script Stormwind Mage Quarter'), -- 90442, 90445, 79820
+    (1638304, 0, 0, 39, 1638316, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 606, 'Flameshocker - Start Script Stormwind Trade District'), -- 79688, 79723, 79680, 79695
+    (1638304, 0, 0, 39, 1638314, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 607, 'Flameshocker - Start Script Stormwind The Park'), -- 90452, 90477, 90479, 90480
+    (1638304, 0, 0, 39, 1638313, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 608, 'Flameshocker - Start Script Stormwind Old Town'), -- 79770, 79746, 79788
+    (1638304, 0, 0, 39, 1638312, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 609, 'Flameshocker - Start Script Stormwind Dwarven District'), -- 5169, 48358, 48424
+    (1638304, 0, 0, 39, 1638311, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 612, 'Flameshocker - Start Script Undercity Rogues Quarter'), -- 31882, 31883, 38104, 38097, 31888
+    (1638304, 0, 0, 39, 1638310, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 615, 'Flameshocker - Start Script Undercity Trade Quarter'), -- 38402, 38057, 38407
+    (1638304, 0, 0, 39, 1638309, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 618, 'Flameshocker - Start Script Undercity Magic Quarter'), -- 38423, 31860, 38415, 38070
+    (1638304, 0, 0, 39, 1638308, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 619, 'Flameshocker - Start Script Undercity War Quarter'); -- 38428, 38435, 38105, 38433
 
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638312;
+    DELETE FROM `creature_ai_scripts` WHERE `id`=1638305;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638312, 0, 1, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Leave Creature Group'),
-    (1638312, 0, 2, 34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Home Position'),
-    (1638312, 0, 3, 67, 1, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Random Movement'),
-    (1638312, 0, 4, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 2'),
-    (1638312, 0, 5, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Evade');
+    (1638305, 0, 1, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Leave Creature Group'),
+    (1638305, 0, 2, 34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Home Position'),
+    (1638305, 0, 3, 67, 1, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Random Movement'),
+    (1638305, 0, 4, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 2'),
+    (1638305, 0, 5, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Evade');
 
     DELETE FROM `generic_scripts` WHERE `id`=1638301;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -730,83 +730,99 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `generic_scripts` WHERE `id`=1638302;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638302, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12366, 12367, 12368, 12369, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
+    (1638302, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12366, 12367, 12368, 12369, 0, 0, 0, 0, 0, 'Flameshocker - Stormwind Reactor Say');
 
     DELETE FROM `generic_scripts` WHERE `id`=1638303;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638303, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12370, 12371, 12372, 12373, 0, 0, 0, 0, 0, 'Flameshocker - Reactor Say');
+    (1638303, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12370, 12371, 12372, 12373, 0, 0, 0, 0, 0, 'Flameshocker - Stormwind Reactor Say');
 
     DELETE FROM `generic_scripts` WHERE `id`=1638304;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638304, 0, 0, 20, 10, 0, 6000, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 116, 'Flameshocker - Distract Movement from Reactor'),
-    (1638304, 2, 0, 39, 1638302, 1638303, 0, 0, 0, 0, 0, 4, 50, 50, 0, 0, 0, 0, 0, 0, 116, 'Flameshocker - Start Script');
+    (1638304, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12355, 12356, 12357, 12358, 0, 0, 0, 0, 0, 'Flameshocker - Undercity Reactor Say');
 
-    -- Undercity War Quarter
-    DELETE FROM `generic_scripts` WHERE `id`=1638313;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638313, 0, 0, 39, 1638304, 0, 0, 0, 38428, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Basil Frye'),
-    (1638313, 0, 0, 39, 1638304, 0, 0, 0, 38435, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sergeant Houser'),
-    (1638313, 0, 0, 39, 1638304, 0, 0, 0, 38105, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lysta Bancroft');
-
-    -- Undercity Magic Quarter
-    DELETE FROM `generic_scripts` WHERE `id`=1638312;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638312, 0, 0, 39, 1638304, 0, 0, 0, 38423, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Hannah Akeley'),
-    (1638312, 0, 0, 39, 1638304, 0, 0, 0, 31860, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lucille Castleton'),
-    (1638312, 0, 0, 39, 1638304, 0, 0, 0, 38415, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Carendin Halgar');
-
-    -- Undercity Trade Quarter
-    DELETE FROM `generic_scripts` WHERE `id`=1638311;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638311, 0, 0, 39, 1638304, 0, 0, 0, 38402, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For William Montague'),
-    (1638311, 0, 0, 39, 1638304, 0, 0, 0, 38057, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Michael Garrett'),
-    (1638311, 0, 0, 39, 1638304, 0, 0, 0, 38407, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Innkeeper Norman');
-
-    -- Undercity Rogues Quarter
-    DELETE FROM `generic_scripts` WHERE `id`=1638310;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638310, 0, 0, 39, 1638304, 0, 0, 0, 31882, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lysta Bancroft'),
-    (1638310, 0, 0, 39, 1638304, 0, 0, 0, 31883, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Ezekiel Graves'),
-    (1638310, 0, 0, 39, 1638304, 0, 0, 0, 38104, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Cedric Stumpel'),
-    (1638310, 0, 0, 39, 1638304, 0, 0, 0, 38097, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Gothard Winslow');
-
-    -- Stormwind Dwarven District
-    DELETE FROM `generic_scripts` WHERE `id`=1638309;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638309, 0, 0, 39, 1638304, 0, 0, 0, 5169, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Dane Lindgren'),
-    (1638309, 0, 0, 39, 1638304, 0, 0, 0, 48358, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sprite Jumpsprocket'),
-    (1638309, 0, 0, 39, 1638304, 0, 0, 0, 48424, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Jenova Stoneshield');
-
-    -- Stormwind Old Town
-    DELETE FROM `generic_scripts` WHERE `id`=1638308;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638308, 0, 0, 39, 1638304, 0, 0, 0, 79770, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Nikova Raskol'),
-    (1638308, 0, 0, 39, 1638304, 0, 0, 0, 79746, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Jenn Langston'),
-    (1638308, 0, 0, 39, 1638304, 0, 0, 0, 79788, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Osborne the Night Man');
-
-    -- Stormwind The Park
-    DELETE FROM `generic_scripts` WHERE `id`=1638307;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90452, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Argos Nightwhisper'),
-    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90477, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Shailiea'),
-    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90479, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sylista'),
-    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90480, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Nara Meideros'),
-    (1638307, 0, 0, 39, 1638304, 0, 0, 0, 90483, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Imelda');
-
-    -- Stormwind Mage Quarter
     DELETE FROM `generic_scripts` WHERE `id`=1638305;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638305, 0, 0, 39, 1638304, 0, 0, 0, 90442, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Archmage Malin'),
-    (1638305, 0, 0, 39, 1638304, 0, 0, 0, 90445, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Erich Lohan'),
-    (1638305, 0, 0, 39, 1638304, 0, 0, 0, 79820, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Collin Mauren');
+    INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638305, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12359, 12360, 12361, 12362, 0, 0, 0, 0, 0, 'Flameshocker - Undercity Reactor Say');
 
-    -- Stormwind Trade District
     DELETE FROM `generic_scripts` WHERE `id`=1638306;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638306, 0, 0, 39, 1638304, 0, 0, 0, 79688, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Renato Gallina'),
-    (1638306, 0, 0, 39, 1638304, 0, 0, 0, 79723, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Thomas Miller'),
-    (1638306, 0, 0, 39, 1638304, 0, 0, 0, 79680, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Stephanie Turner'),
-    (1638306, 0, 0, 39, 1638304, 0, 0, 0, 79695, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Officer Maloof');
+    (1638306, 0, 0, 20, 10, 0, 6000, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 116, 'Flameshocker - Distract Movement from Reactor'),
+    (1638306, 2, 0, 39, 1638302, 1638303, 0, 0, 0, 0, 0, 4, 50, 50, 0, 0, 0, 0, 0, 0, 116, 'Flameshocker - Start Script: Stormwind');
+
+    DELETE FROM `generic_scripts` WHERE `id`=1638307;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638307, 0, 0, 20, 10, 0, 6000, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 116, 'Flameshocker - Distract Movement from Reactor'),
+    (1638307, 2, 0, 39, 1638305, 1638306, 0, 0, 0, 0, 0, 4, 50, 50, 0, 0, 0, 0, 0, 0, 116, 'Flameshocker - Start Script: Undercity');
+
+    -- Undercity War Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638308;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638308, 0, 0, 39, 1638307, 0, 0, 0, 38428, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Basil Frye'),
+    (1638308, 0, 0, 39, 1638307, 0, 0, 0, 38435, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sergeant Houser'),
+    (1638308, 0, 0, 39, 1638307, 0, 0, 0, 38105, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lysta Bancroft'),
+    (1638308, 0, 0, 39, 1638307, 0, 0, 0, 38433, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sarah Killian');
+
+    -- Undercity Magic Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638309;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638309, 0, 0, 39, 1638307, 0, 0, 0, 38423, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Hannah Akeley'),
+    (1638309, 0, 0, 39, 1638307, 0, 0, 0, 31860, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lucille Castleton'),
+    (1638309, 0, 0, 39, 1638307, 0, 0, 0, 38415, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Carendin Halgar'),
+    (1638309, 0, 0, 39, 1638307, 0, 0, 0, 38070, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Salazar Bloch');
+
+    -- Undercity Trade Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638310;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638310, 0, 0, 39, 1638307, 0, 0, 0, 38402, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For William Montague'),
+    (1638310, 0, 0, 39, 1638307, 0, 0, 0, 38057, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Michael Garrett'),
+    (1638310, 0, 0, 39, 1638307, 0, 0, 0, 38407, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Innkeeper Norman');
+
+    -- Undercity Rogues Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638311;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638311, 0, 0, 39, 1638307, 0, 0, 0, 31882, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Lucian Fenner'),
+    (1638311, 0, 0, 39, 1638307, 0, 0, 0, 31883, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Ezekiel Graves'),
+    (1638311, 0, 0, 39, 1638307, 0, 0, 0, 38104, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Cedric Stumpel'),
+    (1638311, 0, 0, 39, 1638307, 0, 0, 0, 38097, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Gothard Winslow'),
+    (1638311, 0, 0, 39, 1638307, 0, 0, 0, 31888, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Gillian Moore');
+
+    -- Stormwind Dwarven District
+    DELETE FROM `generic_scripts` WHERE `id`=1638312;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638312, 0, 0, 39, 1638306, 0, 0, 0, 5169, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Dane Lindgren'),
+    (1638312, 0, 0, 39, 1638306, 0, 0, 0, 48358, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sprite Jumpsprocket'),
+    (1638312, 0, 0, 39, 1638306, 0, 0, 0, 48424, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Jenova Stoneshield');
+
+    -- Stormwind Old Town
+    DELETE FROM `generic_scripts` WHERE `id`=1638313;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638313, 0, 0, 39, 1638306, 0, 0, 0, 79770, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Nikova Raskol'),
+    (1638313, 0, 0, 39, 1638306, 0, 0, 0, 79746, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Jenn Langston'),
+    (1638313, 0, 0, 39, 1638306, 0, 0, 0, 79788, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Osborne the Night Man');
+
+    -- Stormwind The Park
+    DELETE FROM `generic_scripts` WHERE `id`=1638314;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638314, 0, 0, 39, 1638306, 0, 0, 0, 90452, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Argos Nightwhisper'),
+    (1638314, 0, 0, 39, 1638306, 0, 0, 0, 90477, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Shailiea'),
+    (1638314, 0, 0, 39, 1638306, 0, 0, 0, 90479, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Sylista'),
+    (1638314, 0, 0, 39, 1638306, 0, 0, 0, 90480, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Nara Meideros'),
+    (1638314, 0, 0, 39, 1638306, 0, 0, 0, 90483, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Imelda');
+
+    -- Stormwind Mage Quarter
+    DELETE FROM `generic_scripts` WHERE `id`=1638315;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638315, 0, 0, 39, 1638306, 0, 0, 0, 90442, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Archmage Malin'),
+    (1638315, 0, 0, 39, 1638306, 0, 0, 0, 90445, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Erich Lohan'),
+    (1638315, 0, 0, 39, 1638306, 0, 0, 0, 79820, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Collin Mauren');
+
+    -- Stormwind Trade District
+    DELETE FROM `generic_scripts` WHERE `id`=1638316;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638316, 0, 0, 39, 1638306, 0, 0, 0, 79688, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Renato Gallina'),
+    (1638316, 0, 0, 39, 1638306, 0, 0, 0, 79723, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Thomas Miller'),
+    (1638316, 0, 0, 39, 1638306, 0, 0, 0, 79680, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Stephanie Turner'),
+    (1638316, 0, 0, 39, 1638306, 0, 0, 0, 79695, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Start Script For Officer Maloof');
 
     -- Events list for Necropolis Relay
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16386;
@@ -1143,186 +1159,186 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `game_event_creature` SELECT creature.guid, @EVENT_SCOURGE_INVASION FROM `creature` WHERE creature.guid BETWEEN @NPC_LOW_LEVEL_MINION_GUID+1 AND @NPC_LOW_LEVEL_MINION_GUID+180;
 
     INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+1, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+2, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+3, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+4, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+5, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+6, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+7, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+8, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+9, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+10, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+11, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+12, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+13, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+14, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+15, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+16, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+17, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+18, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+19, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+20, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+21, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+22, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+23, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+24, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+25, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+26, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+27, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+28, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+29, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+30, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+31, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+32, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+33, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+34, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+35, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+36, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+37, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+38, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+39, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+40, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+41, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+42, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+43, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+44, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+45, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+46, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+47, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+48, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+49, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+50, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+51, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+52, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+53, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+54, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+55, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+56, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+57, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+58, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+59, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+60, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+61, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+62, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+63, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+64, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+65, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+66, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+67, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+68, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+69, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+70, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+71, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+72, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+73, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+74, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+75, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+76, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+77, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+78, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+79, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+80, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+81, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+82, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+83, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+84, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+85, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+86, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+87, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+88, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+89, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+90, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+91, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+92, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+93, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+94, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+95, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+96, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+97, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+98, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+99, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+100, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+101, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+102, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+103, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+104, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+105, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+106, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+107, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+108, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+109, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+110, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+111, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+112, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+113, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+114, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+115, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+116, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+117, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+118, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+119, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+120, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+121, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+122, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+123, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+124, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+125, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+126, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+127, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+128, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+129, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+130, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+131, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+132, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+133, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+134, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+135, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+136, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+137, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+138, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+139, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+140, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+141, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+142, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+143, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+144, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+145, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+146, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+147, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+148, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+149, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+150, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+151, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+152, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+153, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+154, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+155, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+156, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+157, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+158, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+159, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+160, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+161, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+162, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+163, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+164, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+165, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+166, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+167, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+168, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+169, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+170, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+171, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+172, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+173, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+174, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+175, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+176, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+177, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+178, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+179, 0, 0, 8),
-        (@NPC_MOUTH_OF_KELTHUZAD_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+180, 0, 0, 8);
+        (@NPC_LOW_LEVEL_MINION_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+1, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+2, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+3, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+4, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+5, @NPC_LOW_LEVEL_MINION_GUID+5, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+6, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+7, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+8, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+9, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+10, @NPC_LOW_LEVEL_MINION_GUID+10, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+11, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+12, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+13, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+14, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+15, @NPC_LOW_LEVEL_MINION_GUID+15, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+16, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+17, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+18, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+19, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+20, @NPC_LOW_LEVEL_MINION_GUID+20, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+21, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+22, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+23, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+24, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+25, @NPC_LOW_LEVEL_MINION_GUID+25, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+26, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+27, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+28, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+29, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+30, @NPC_LOW_LEVEL_MINION_GUID+30, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+31, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+32, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+33, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+34, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+35, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+36, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+37, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+38, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+39, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+40, @NPC_LOW_LEVEL_MINION_GUID+40, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+41, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+42, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+43, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+44, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+45, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+46, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+47, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+48, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+49, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+50, @NPC_LOW_LEVEL_MINION_GUID+50, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+51, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+52, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+53, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+54, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+55, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+56, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+57, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+58, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+59, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+60, @NPC_LOW_LEVEL_MINION_GUID+60, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+61, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+62, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+63, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+64, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+65, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+66, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+67, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+68, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+69, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+70, @NPC_LOW_LEVEL_MINION_GUID+70, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+71, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+72, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+73, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+74, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+75, @NPC_LOW_LEVEL_MINION_GUID+75, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+76, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+77, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+78, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+79, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+80, @NPC_LOW_LEVEL_MINION_GUID+80, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+81, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+82, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+83, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+84, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+85, @NPC_LOW_LEVEL_MINION_GUID+85, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+86, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+87, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+88, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+89, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+90, @NPC_LOW_LEVEL_MINION_GUID+90, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+91, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+92, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+93, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+94, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+95, @NPC_LOW_LEVEL_MINION_GUID+95, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+96, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+97, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+98, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+99, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+100, @NPC_LOW_LEVEL_MINION_GUID+100, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+101, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+102, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+103, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+104, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+105, @NPC_LOW_LEVEL_MINION_GUID+105, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+106, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+107, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+108, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+109, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+110, @NPC_LOW_LEVEL_MINION_GUID+110, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+111, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+112, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+113, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+114, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+115, @NPC_LOW_LEVEL_MINION_GUID+115, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+116, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+117, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+118, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+119, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+120, @NPC_LOW_LEVEL_MINION_GUID+120, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+121, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+122, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+123, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+124, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+125, @NPC_LOW_LEVEL_MINION_GUID+125, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+126, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+127, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+128, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+129, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+130, @NPC_LOW_LEVEL_MINION_GUID+130, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+131, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+132, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+133, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+134, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+135, @NPC_LOW_LEVEL_MINION_GUID+135, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+136, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+137, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+138, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+139, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+140, @NPC_LOW_LEVEL_MINION_GUID+140, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+141, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+142, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+143, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+144, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+145, @NPC_LOW_LEVEL_MINION_GUID+145, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+146, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+147, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+148, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+149, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+150, @NPC_LOW_LEVEL_MINION_GUID+150, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+151, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+152, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+153, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+154, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+155, @NPC_LOW_LEVEL_MINION_GUID+155, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+156, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+157, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+158, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+159, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+160, @NPC_LOW_LEVEL_MINION_GUID+160, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+161, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+162, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+163, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+164, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+165, @NPC_LOW_LEVEL_MINION_GUID+165, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+166, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+167, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+168, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+169, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+170, @NPC_LOW_LEVEL_MINION_GUID+170, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+171, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+172, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+173, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+174, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+175, @NPC_LOW_LEVEL_MINION_GUID+175, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+176, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+177, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+178, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+179, 0, 0, 8),
+        (@NPC_LOW_LEVEL_MINION_GUID+180, @NPC_LOW_LEVEL_MINION_GUID+180, 0, 0, 8);
 
     -- Add all Mouth of Kel'Thuzad.
     INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -1447,82 +1463,84 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@NPC_FLAMESHOCKER_GUID+57, 16383, 0, 0, 0, 0, 1724.52, 369.016, -60.4011, 0.802851, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Undercity War Quarter.
         (@NPC_FLAMESHOCKER_GUID+58, 16383, 0, 0, 0, 0, 1738.85, 95.2721, -62.1996, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
         (@NPC_FLAMESHOCKER_GUID+59, 16383, 0, 0, 0, 0, 1767.03, 339.711, -62.205, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Undercity War Quarter.
-        (@NPC_FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10);      -- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
+        (@NPC_FLAMESHOCKER_GUID+61, 16382, 0, 0, 0, 0, -8796.63, 1125, 90.5218, 5.85239, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10);        -- Patchwork Terror in Stormwind The Park.
 
     INSERT INTO `pool_creature`(`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
-        (@NPC_FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+2, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+3, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+4, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+5, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+6, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+7, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+8, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+9, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+10, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+11, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+12, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+13, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+14, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+15, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+16, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+17, 1441, 0, 'Pallid Horror in Stormwind City Cathedral of Light', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+18, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+19, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+20, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+21, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+22, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+23, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+24, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+25, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+26, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+27, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+28, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+29, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+30, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+31, 1442, 0, 'Pallid Horror in Undercity Canals', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+32, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+33, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+34, 1442, 0, 'Flameshocker in Undercity Canals', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+35, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+36, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+37, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+38, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+39, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+40, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+41, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+42, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+43, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+44, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+45, 1442, 0, 'Pallid Horror in Undercity Sewers', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+46, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+47, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+48, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+49, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+50, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+51, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+52, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+53, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+54, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+55, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+56, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+57, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+58, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+59, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 0, 10),
-        (@NPC_FLAMESHOCKER_GUID+60, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 0, 10);
+        (@NPC_FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+2, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+3, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+4, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+5, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+6, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+7, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+8, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+9, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+10, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+11, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+12, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+13, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+14, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+15, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+16, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+17, 1441, 0, 'Pallid Horror in Stormwind City Cathedral of Light', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+18, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+19, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+20, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+21, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+22, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+23, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+24, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+25, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+26, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+27, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+28, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+29, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+30, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+31, 1442, 0, 'Pallid Horror in Undercity Canals', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+32, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+33, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+34, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+35, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+36, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+37, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+38, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+39, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+40, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+41, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+42, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+43, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+44, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+45, 1442, 0, 'Pallid Horror in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+46, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+47, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+48, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+49, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+50, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+51, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+52, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+53, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+54, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+55, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+56, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+57, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+58, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+59, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+60, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+61, 1441, 0, 'Patchwork Terror in Stormwind The Park', 0, 9, 10);
 
     INSERT INTO `pool_template`(`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-        (1431, 1, 'Flameshockers in Stormwind City Mage Quarter', 0, 0, 0, 10),
-        (1432, 1, 'Flameshockers in Stormwind City Trade District', 0, 0, 0, 10),
-        (1433, 1, 'Flameshockers in Stormwind City The Park', 0, 0, 0, 10),
-        (1434, 1, 'Flameshockers in Stormwind City Old Town', 0, 0, 0, 10),
-        (1435, 1, 'Flameshockers in Stormwind City Dwarven District', 0, 0, 0, 10),
-        (1436, 1, 'Flameshockers in Undercity Rogues Quarter', 0, 0, 0, 10),
-        (1437, 1, 'Flameshockers in Undercity Trade Quarter', 0, 0, 0, 10),
-        (1438, 1, 'Flameshockers in Undercity Magic Quarter', 0, 0, 0, 10),
-        (1439, 1, 'Flameshockers in Undercity War Quarter', 0, 0, 0, 10),
-        (1441, 1, 'Pallids in Stormwind City', 0, 0, 0, 10),
-        (1442, 1, 'Pallids in Undercity', 0, 0, 0, 10);
+        (1431, 1, 'Flameshockers in Stormwind City Mage Quarter', 0, 0, 9, 10),
+        (1432, 1, 'Flameshockers in Stormwind City Trade District', 0, 0, 9, 10),
+        (1433, 1, 'Flameshockers in Stormwind City The Park', 0, 0, 9, 10),
+        (1434, 1, 'Flameshockers in Stormwind City Old Town', 0, 0, 9, 10),
+        (1435, 1, 'Flameshockers in Stormwind City Dwarven District', 0, 0, 9, 10),
+        (1436, 1, 'Flameshockers in Undercity Rogues Quarter', 0, 0, 9, 10),
+        (1437, 1, 'Flameshockers in Undercity Trade Quarter', 0, 0, 9, 10),
+        (1438, 1, 'Flameshockers in Undercity Magic Quarter', 0, 0, 9, 10),
+        (1439, 1, 'Flameshockers in Undercity War Quarter', 0, 0, 9, 10),
+        (1441, 1, 'Pallids in Stormwind City', 0, 0, 9, 10),
+        (1442, 1, 'Pallids in Undercity', 0, 0, 9, 10);
 
     INSERT INTO `game_event_creature`(`guid`, `event`) VALUES
         (@NPC_FLAMESHOCKER_GUID+1, 17),
