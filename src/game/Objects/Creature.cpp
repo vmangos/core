@@ -1915,22 +1915,26 @@ void Creature::DeleteFromDB(uint32 lowguid, CreatureData const* data)
     WorldDatabase.CommitTransaction();
 }
 
-float Creature::GetAttackDistance(Unit const* pl) const
+float Creature::GetAttackDistance(Unit const* pTarget) const
 {
     float const aggroRate = sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     if (aggroRate == 0)
         return 0.0f;
 
-    uint32 const playerlevel   = pl->GetLevelForTarget(this);
-    uint32 const creaturelevel = GetLevelForTarget(pl);
+    // proximity aggro does not target disabled pets (owner is mounted)
+    if (pTarget->IsPet() && !static_cast<Pet const*>(pTarget)->IsEnabled())
+        return 0.0f;
 
-    int32 leveldif       = int32(playerlevel) - int32(creaturelevel);
+    uint32 const targetlevel = pTarget->GetLevelForTarget(this);
+    uint32 const creaturelevel = GetLevelForTarget(pTarget);
+
+    int32 leveldif = int32(targetlevel) - int32(creaturelevel);
 
     // "The maximum Aggro Radius has a cap of 25 levels under. Example: A level 30 char has the same Aggro Radius of a level 5 char on a level 60 mob."
     if (leveldif < - 25)
         leveldif = -25;
 
-    // "The aggro radius of a mob having the same level as the player is roughly 20 yards"
+    // "The aggro radius of a mob having the same level as the player is roughly 18 yards"
     float const detectionRange = GetDetectionRange();
     float finalDistance = detectionRange;
     if (finalDistance < 1)
@@ -1941,14 +1945,14 @@ float Creature::GetAttackDistance(Unit const* pl) const
     finalDistance -= (float)leveldif;
 
     // detect range auras
-    // SPELL_AURA_MOD_DETECT_RANGE: Par exemple [2908 - Apaiser les animaux]. Affecte uniquement si niveau < 70 par exemple (rang 3).
+    // SPELL_AURA_MOD_DETECT_RANGE: For exemple [2908 - Soothe Animal]. Affects only if level < 70 (rank 3).
     AuraList const& nModDetectRange = GetAurasByType(SPELL_AURA_MOD_DETECT_RANGE);
     for (const auto i : nModDetectRange)
         if (i->GetSpellProto()->MaxTargetLevel >= GetLevel())
             finalDistance += i->GetModifier()->m_amount;
 
     // detected range auras
-    finalDistance += pl->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
+    finalDistance += pTarget->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
 
     // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
     float const minDistance = std::min(detectionRange, 5.0f);
