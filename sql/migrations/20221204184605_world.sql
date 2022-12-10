@@ -19,6 +19,9 @@ UPDATE `creature_addon` SET `mount_display_id`='2410' WHERE  `guid`=92287 AND `p
 -- Change Crimson Courier weapon
 UPDATE `creature_equip_template` SET `equipentry1`='1903' WHERE  `entry`=429 AND `patch`=0;
 
+-- Replace equipment for crimson bodyguards according to sniffs
+UPDATE `creature_equip_template` SET `equipentry1`=3361, `equipentry2`=12932, `equipentry3`=0 WHERE `entry`=2058 AND `patch`=0;
+
 -- End of migration.
 END IF;
 END??
