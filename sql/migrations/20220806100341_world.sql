@@ -56,10 +56,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_template` SET `auras`=NULL, `flags_extra`=0 WHERE `entry`=16230;
     -- UPDATE `creature_template` SET `spawn_spell_id`=28234 WHERE `entry` IN (16141, 16230, 16298, 16299, 16379, 16380, 16383, 16394, 16422, 16423, 16437, 16438);
     UPDATE `creature_template` SET `auras`='28346 27887' WHERE `entry` IN (16136, 16172);
-    UPDATE `creature_template` SET `spell_list_id`=163830, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16383;
+    UPDATE `creature_template` SET `spell_list_id`=163830, `ai_name`='EventAI', `script_name`='', `flags_extra`=4096 WHERE `entry`=16383;
     UPDATE `creature_template` SET `unit_flags`=832, `spell_list_id`=161430, `detection_range`=15, `call_for_help_range`=20, `spawn_spell_id`=10389, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
-    UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16394;
-    UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33554432 WHERE `entry`=16382;
+    UPDATE `creature_template` SET `auras`='28126', `script_name`='', `ai_name`='EventAI', `spell_list_id`=163940, `speed_run`=0.8, `flags_extra`=33558528 WHERE `entry` IN (16394, 16382);
     UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16401, 16386, 16398, 16172, 16230, 16136, 16356, 16306, 16336, 16338, 16421);
     UPDATE `creature_template` SET `flags_extra`=252162 WHERE `entry` IN (16172, 16136);
     UPDATE `creature_template` SET `detection_range`=5 WHERE `entry` IN (16299, 16141, 16298, 16438, 16437, 16422, 16423);
@@ -374,28 +373,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 -- 5. EVENTAI
 
-    -- Events list for Mouth of Kel'Thuzad
-    DELETE FROM `creature_ai_events` WHERE `creature_id`=16995;
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1699501, 16995, 0, 1, 0, 100, 1, 0, 2700000, 2700000, 2700000, 1699501, 0, 0, 'Mouth of Kel\'Thuzad - Timer OOC');
-
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1699501;
-    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1699501, 0, 1, 39, 1699501, 1699502, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 628, 'Mouth of Kel\'Thuzad - Start Script: Random Yell'),
-    (1699501, 0, 2, 39, 1699503, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Start Script: Start Zone');
-
-    DELETE FROM `generic_scripts` WHERE `id`=1699501;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1699501, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13121, 13122, 13123, 13124, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk');
-
-    DELETE FROM `generic_scripts` WHERE `id`=1699502;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1699502, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13125, 13126, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk');
-
-    DELETE FROM `generic_scripts` WHERE `id`=1699503;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1699503, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 13121, 13123, 13125, 13126, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Talk'),
-    (1699503, 0, 0, 53, 90, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mouth of Kel\'Thuzad - Start Game Event');
-
     -- Events list for Scourge Invasion Minion, finder
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16356;
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1635601, 16356, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1635601, 0, 0, 'Finder - Just Spawned');
@@ -509,8 +486,8 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1639405, 0, 0, 27, 16382, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Update Entry to Patchwork Terror');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639406;
-    INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639406, 0, 0, 74, 28313, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Add Aura of Fear');
+    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1639406, 0, 0, 74, 28313, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Add Aura: Aura of Fear');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639407;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -530,34 +507,34 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639403;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8585.14, 903.542, 81.7025, 4.72984, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.97, 906.899, 81.7026, 3.83972, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.51, 901.15, 81.7033, 4.08407, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8580.33, 901.258, 81.7028, 3.92699, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8579.29, 907.101, 81.702, 3.92699, 0, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 151902, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Stormwind Cathedral');
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8585.14, 903.542, 81.7025, 4.72984, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.97, 906.899, 81.7026, 3.83972, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.51, 901.15, 81.7033, 4.08407, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8580.33, 901.258, 81.7028, 3.92699, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8579.29, 907.101, 81.702, 3.92699, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
+    (1639403, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 151902, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Stormwind Cathedral');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639404;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1532.72, 273.599, -62.0943, 1.25664, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1532.99, 278.193, -62.0943, 1.53589, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1536.4, 271.839, -62.0943, 1.23918, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1537.21, 278.743, -62.0943, 1.20428, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1539.85, 274.237, -62.0943, 1.20428, 0, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
-    (1639404, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149701, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Canals');
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1532.72, 273.599, -62.0943, 1.25664, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1532.99, 278.193, -62.0943, 1.53589, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1536.4, 271.839, -62.0943, 1.23918, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1537.21, 278.743, -62.0943, 1.20428, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1539.85, 274.237, -62.0943, 1.20428, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Canals'),
+    (1639404, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149701, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Undercity Canals');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639405;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1626.6, 481.696, -22.7855, 5.23599, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1634.67, 479.701, -21.8066, 1.64061, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1634.59, 477.738, -21.8358, 4.4855, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1632.22, 481.066, -22.7855, 5.41052, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1631.27, 477.82, -22.785, 5.27089, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1630.92, 484.171, -22.7855, 3.26377, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1629.02, 477.154, -22.7847, 1.88496, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1627.97, 484.273, -22.7855, 6.21337, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1627.48, 477.444, -22.7847, 4.71239, 0, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149702, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Waypoints in Undercity Sewers');
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1626.6, 481.696, -22.7855, 5.23599, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1634.67, 479.701, -21.8066, 1.64061, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1634.59, 477.738, -21.8358, 4.4855, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1632.22, 481.066, -22.7855, 5.41052, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1631.27, 477.82, -22.785, 5.27089, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1630.92, 484.171, -22.7855, 3.26377, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1629.02, 477.154, -22.7847, 1.88496, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1627.97, 484.273, -22.7855, 6.21337, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1627.48, 477.444, -22.7847, 4.71239, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149702, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Undercity Sewers');
 
     -- Events list for Skeletal Shocktrooper
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16299;
@@ -723,9 +700,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1638305, 0, 5, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Evade');
 
     DELETE FROM `generic_scripts` WHERE `id`=1638301;
-    INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638301, 0, 1, 78, 199, 0, 0, 0, 16382, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Join Creature Group: Patchwork Terror'),
-    (1638301, 0, 1, 78, 199, 0, 0, 0, 16394, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Join Creature Group: Pallid Horror'),
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1638301, 0, 1, 78, 193, 0, 0, 0, 16382, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Join Creature Group: Patchwork Terror'),
+    (1638301, 0, 1, 78, 193, 0, 0, 0, 16394, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Join Creature Group: Pallid Horror'),
     (1638301, 0, 2, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 2');
 
     DELETE FROM `generic_scripts` WHERE `id`=1638302;
@@ -1420,7 +1397,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         -- (@NPC_FLAMESHOCKER_GUID+14, 16383, 0, 0, 0, 0, -8585.14, 903.542, 81.7025, 4.72984, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Stormwind City Cathedral of Light.
         -- (@NPC_FLAMESHOCKER_GUID+15, 16383, 0, 0, 0, 0, -8583.97, 906.899, 81.7026, 3.83972, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Stormwind City Cathedral of Light.
         -- (@NPC_FLAMESHOCKER_GUID+16, 16383, 0, 0, 0, 0, -8583.51, 901.15, 81.7033, 4.08407, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),    -- Flameshocker in Stormwind City Cathedral of Light.
-        (@NPC_FLAMESHOCKER_GUID+17, 16394, 0, 0, 0, 0, -8581.79, 904.538, 81.7021, 3.82227, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10),     -- Pallid Horror in Stormwind City Cathedral of Light.
+        (@NPC_FLAMESHOCKER_GUID+17, 16394, 0, 0, 0, 0, -8581.79, 904.538, 81.7021, 3.82227, 2700, 2700, 5, 100, 0, 1, 1, 0, 9, 10),     -- Pallid Horror in Stormwind City Cathedral of Light.
         -- (@NPC_FLAMESHOCKER_GUID+18, 16383, 0, 0, 0, 0, -8580.33, 901.258, 81.7028, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),   -- Flameshocker in Stormwind City Cathedral of Light.
         -- (@NPC_FLAMESHOCKER_GUID+19, 16383, 0, 0, 0, 0, -8579.29, 907.101, 81.702, 3.92699, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),    -- Flameshocker in Stormwind City Cathedral of Light.
         (@NPC_FLAMESHOCKER_GUID+20, 16383, 0, 0, 0, 0, -8450.78, 587.494, 94.1273, 0.663225, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),     -- Flameshocker in Stormwind City Dwarven District.
@@ -1464,7 +1441,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@NPC_FLAMESHOCKER_GUID+58, 16383, 0, 0, 0, 0, 1738.85, 95.2721, -62.1996, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
         (@NPC_FLAMESHOCKER_GUID+59, 16383, 0, 0, 0, 0, 1767.03, 339.711, -62.205, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Undercity War Quarter.
         (@NPC_FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
-        (@NPC_FLAMESHOCKER_GUID+61, 16382, 0, 0, 0, 0, -8796.63, 1125, 90.5218, 5.85239, 2700, 2700, 5, 100, 0, 1, 1, 0, 0, 10);        -- Patchwork Terror in Stormwind The Park.
+        (@NPC_FLAMESHOCKER_GUID+61, 16382, 0, 0, 0, 0, -8796.63, 1125, 90.5218, 5.85239, 2700, 2700, 5, 100, 0, 1, 1, 0, 9, 10);        -- Patchwork Terror in Stormwind The Park.
 
     INSERT INTO `pool_creature`(`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
         (@NPC_FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
