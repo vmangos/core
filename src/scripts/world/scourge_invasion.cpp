@@ -198,6 +198,24 @@ struct MouthAI : public ScriptedAI
         return NULL;
     }
 
+    bool inline IsInCity()
+    {
+        switch (m_creature->GetZoneId())
+        {
+            case ZONEID_UNDERCITY:
+            case ZONEID_STORMWIND_CITY:
+            case ZONEID_IRONFORGE:
+            case ZONEID_ORGRIMMAR:
+            case ZONEID_THUNDER_BLUFF:
+            case ZONEID_DARNASSUS:
+            {
+                return true;
+                break;
+            }
+        }
+        return false;
+    }
+
     int inline GetActiveZones()
     {
         int COUNT = NULL;
@@ -225,19 +243,6 @@ struct MouthAI : public ScriptedAI
             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP, (IN_MILLISECONDS * 5));
         }
     }
-
-    /*
-    void OnRemoveFromWorld() override
-    {
-        // Reseting Variables if the event stops.
-        for (uint32 i = VARIABLE_SI_WINTERSPRING_REMAINING; i < VARIABLE_SI_BURNING_STEPPES_REMAINING; i++)
-        {
-            sObjectMgr.SetSavedVariable(m_remainingID, NULL, true);
-        }
-
-        sObjectMgr.SetSavedVariable(VARIABLE_SI_VICTORIES, NULL, true);
-    }
-    */
 
     void UpdateAI(uint32 const diff) override
     {
@@ -279,7 +284,12 @@ struct MouthAI : public ScriptedAI
                 }
                 case EVENT_MOUTH_OF_KELTHUZAD_YELL:
                 {
-                    DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                    if (sGameEventMgr.IsActiveEvent(m_eventID) && !IsInCity()) // In a invasion Zone?
+                        DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                    
+                    if (IsInCity()) // In a City?
+                        DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_5, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_6, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_7, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_8), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
+                    
                     break;
                 }
                 case EVENT_MOUTH_OF_KELTHUZAD_ZONE_START:

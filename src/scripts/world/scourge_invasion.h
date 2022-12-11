@@ -287,6 +287,13 @@ enum ScourgeInvasionMisc
     ZONEID_BURNING_STEPPES                              = 46,
     ZONEID_TANARIS                                      = 440,
 
+    ZONEID_UNDERCITY                                    = 1497,
+    ZONEID_STORMWIND_CITY                               = 1519,
+    ZONEID_IRONFORGE                                    = 1537,
+    ZONEID_ORGRIMMAR                                    = 1637,
+    ZONEID_THUNDER_BLUFF                                = 1638,
+    ZONEID_DARNASSUS                                    = 1657,
+
     GAME_EVENT_SCOURGE_INVASION                         = 17,
     GAME_EVENT_SCOURGE_INVASION_WINTERSPRING            = 90,
     GAME_EVENT_SCOURGE_INVASION_TANARIS                 = 91,
@@ -416,15 +423,27 @@ enum ScourgeInvasionLang
     BCT_SHADOW_OF_DOOM_TEXT_1                           = 12421, // These heroics mean nothing, $c.  Your future is sealed and your soul is doomed to servitude!
     BCT_SHADOW_OF_DOOM_TEXT_2                           = 12422, // Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
     BCT_SHADOW_OF_DOOM_TEXT_3                           = 12243, // You will not stop our deepening shadow, $c.  Now... join us!  Join the ranks of the Chosen!
+    // Occurring every 45 - 60 minutes
     BCT_MOUTH_OF_KELTHUZAD_TEXT_0                       = 13121, // [Start, Random] - Can you feel it, pathetic creatures? The pall over this land is but a precursor. Soon your precious holdings will be in our grasp! You will fall before the might of the Scourge!
     BCT_MOUTH_OF_KELTHUZAD_TEXT_1                       = 13122, // [Start, Random] - Despair, mortals! Your doom has come!
     BCT_MOUTH_OF_KELTHUZAD_TEXT_2                       = 13123, // [Start, Random] - Let this gloom serve to remind you: the shadow of the Scourge is all-encompassing! There is no escape!
     BCT_MOUTH_OF_KELTHUZAD_TEXT_3                       = 13124, // [Start, Random] - As you fall in battle, we continue to grow in strength. There is only one inevitable outcome. Prepare for your end!
     BCT_MOUTH_OF_KELTHUZAD_TEXT_4                       = 13125, // [Start, Random] - Forward, my minions! Forward! Let none stand in our way!
     BCT_MOUTH_OF_KELTHUZAD_TEXT_5                       = 13126, // [Start, Random] - Cower before our might! Flee! There will be no victory for the living!
+    // Occurring only if the invasion has been defeated in a zone.
     BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_0              = 13165, // [Defeat] - You may think you have won, worms, but against the might of the Scourge there is no victory for the living! You have not seen the last of us!
     BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_1              = 13164, // [Defeat] - You dare disrupt our works here?! The master will not be pleased. Take this time to prepare yourselves... when we return, there will be nothing but death and destruction in our wake!
     BCT_MOUTH_OF_KELTHUZAD_DEFEATED_TEXT_2              = 13163, // [Defeat] - So, the frail members of the living have some teeth after all. Take this place, then, for the time being. We will return, twice as strong, and your paltry forces will fall!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_0                  = 13169, // Do you truly believe you are doing well ? Hah!Our numbers are limitless!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_1                  = 13170, // You may succeed on the field of battle briefly... but you cannot hope to win against the Scourge!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_2                  = 13172, // You've reclaimed a few paltry territories. Pathetic. In short order they will again be ours!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_3                  = 13173, // Do you truly believe you're making progress? You can never defeat the Scourge! These small victories are nothing more than a ploy to make you overconfident!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_4                  = 13174, // Think you the master is daunted by your games ? We will never fall to you!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_5                  = 13175, // You fools!Keep fighting, if that is your wish!With every battle, more of you fall, and the ranks of the undead swell!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_6                  = 13176, // The toils of the living never cease to amaze.Your numbers are limited, and with every battle they dwindle further.You will not live to see the end!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_7                  = 13177, // Do you truly believe you can win against the armies of Kel'Thuzad? No army of the living, no power you could possibly bring to bear can destroy our ranks!
+    BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_8                  = 13178, // This constant, annoying resistance is futile, you maggots!There will be nothing in the end but death!
+  
     BCT_ARGENT_EMISSARY_OPTION_0                        = 12176, // What's happening?
     BCT_ARGENT_EMISSARY_OPTION_1                        = 12207, // What can I do?
     BCT_ARGENT_EMISSARY_OPTION_2                        = 12434, // Where are we battling the Scourge?

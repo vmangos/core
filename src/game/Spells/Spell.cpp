@@ -2665,7 +2665,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
                 if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
                 {
-                    // search all GO's with entry, within range of m_destN
+                    // Search all GO's with entry, within range of m_destN. Pick nearest first.
                     GetGameObjectListWithEntryInGrid(tempTargetGOList, m_casterUnit, i_spellST->second.targetEntry, radius);
                     tempTargetGOList.sort(ObjectDistanceOrder(m_casterUnit));
                 }
@@ -2674,8 +2674,10 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             if (!tempTargetGOList.empty())
             {
                 for (const auto& iter : tempTargetGOList)
-                    if (iter->isSpawned())
+                {
+                    if (iter->isSpawned()) // Makes sense?
                         AddGOTarget(iter, effIndex);
+                }
             }
 
             break;
