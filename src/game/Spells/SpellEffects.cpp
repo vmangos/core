@@ -3227,12 +3227,11 @@ void Spell::EffectDispel(SpellEffectIndex effIdx)
         {
             int32 count = successList.size();
             WorldPacket data(SMSG_SPELLDISPELLOG, 8 + 8 + 4 + count * 4);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
             data << unitTarget->GetPackGUID();              // Victim GUID
             data << m_caster->GetPackGUID();                // Caster GUID
 #else
             data << unitTarget->GetGUID();              // Victim GUID
-            data << m_caster->GetGUID();                // Caster GUID
 #endif
             data << uint32(count);
             for (const auto& j : successList)
