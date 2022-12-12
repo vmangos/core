@@ -2647,10 +2647,12 @@ void Creature::LoadCreatureAddon(bool reload)
     if (CreatureDataAddon const* cainfo = GetCreatureAddon())
     {
         if (!reload)
+        {
             if (cainfo->mount_display_id >= 0)
                 m_mountId = cainfo->mount_display_id;
             else
                 m_mountId = m_creatureInfo->mount_display_id;
+        }
 
         if (m_mountId != 0)
             Mount(m_mountId);
