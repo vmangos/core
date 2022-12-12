@@ -14,13 +14,10 @@ UPDATE `creature_loot_template` SET `condition_id`=0 WHERE `item`=1357;
 -- Change GO Schematic: Field Repair Bot 74A to patch 1.3
 UPDATE `gameobject_template` SET `patch`=1 WHERE `entry`=179552;
 
--- crimson courier was missing her mount
-UPDATE `creature_addon` SET `mount_display_id`='2410' WHERE  `guid`=92287 AND `patch`=0;
--- Change Crimson Courier weapon
-UPDATE `creature_equip_template` SET `equipentry1`='1903' WHERE  `entry`=429 AND `patch`=0;
-
--- Replace equipment for crimson bodyguards according to sniffs
-UPDATE `creature_equip_template` SET `equipentry1`=3361, `equipentry2`=12932, `equipentry3`=0 WHERE `entry`=2058 AND `patch`=0;
+-- Remove creature addon from crimson courier and her bodyguards
+-- Not needed and referenced wrong equipment ids
+DELETE FROM `creature_addon` WHERE `guid`=92287 AND `patch`=0;
+DELETE FROM `creature_addon` WHERE `patch`=0 AND `guid` IN (92288,92289,92290,92291);
 
 -- End of migration.
 END IF;
