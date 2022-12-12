@@ -354,10 +354,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             DoLootRelease(lootGuid);
     }
 
-    _player->m_castingSpell = spellId;
-    if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-        _player->m_castingSpell = _player->GetComboPoints();
-
     Spell* spell = new Spell(_player, spellInfo, false, ObjectGuid(), nullptr, targets.getUnitTarget());
 
     // Spell has been down-ranked, remember what client wanted to cast.

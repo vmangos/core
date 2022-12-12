@@ -1576,8 +1576,6 @@ class Player final: public Unit
                     ++spellCDItr;
             }
         }
-        
-        uint32 m_castingSpell; // Last spell cast by client, or combo points if player is rogue
 
         /*********************************************************/
         /***                   TALENT SYSTEM                   ***/
