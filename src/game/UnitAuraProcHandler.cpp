@@ -1514,11 +1514,27 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                     return SPELL_AURA_PROC_FAILED;
 
                 // procspell is triggered spell but we need mana cost of original casted spell
-                
-                SpellEntry const* originalSpell = sSpellMgr.GetSpellEntry(procSpell->Id);
+                uint32 originalSpellId = procSpell->Id;
+
+                // Holy Shock
+                if (procSpell->IsFitToFamilyMask<CF_PALADIN_HOLY_SHOCK>())
+                {
+                    switch (procSpell->Id)
+                    {
+                        case 25914: originalSpellId = 20473; break;
+                        case 25913: originalSpellId = 20929; break;
+                        case 25903: originalSpellId = 20930; break;
+                        default:
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unit::HandleProcTriggerSpell: Spell %u not handled in HShock", procSpell->Id);
+
+                        return SPELL_AURA_PROC_FAILED;
+                    }
+                }
+
+                SpellEntry const* originalSpell = sSpellMgr.GetSpellEntry(originalSpellId);
                 if (!originalSpell)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unit::HandleProcTriggerSpell: Spell %u unknown but selected as original in Illu", procSpell->Id);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unit::HandleProcTriggerSpell: Spell %u unknown but selected as original in Illu", originalSpellId);
                     return SPELL_AURA_PROC_FAILED;
                 }
                 // Histoire de pas reproc une autre fois ... :S
