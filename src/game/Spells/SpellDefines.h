@@ -796,7 +796,7 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_HEALTH_FUNNEL              = 0x00000800,            // 11
     SPELL_ATTR_EX2_UNK12                      = 0x00001000,            // 12
     SPELL_ATTR_EX2_PRESERVE_ENCHANT_IN_ARENA  = 0x00002000,            // 13 Items enchanted by spells with this flag preserve the enchant to arenas
-    SPELL_ATTR_EX2_UNK14                      = 0x00004000,            // 14
+    SPELL_ATTR_EX2_ALLOW_WHILE_INVISIBLE      = 0x00004000,            // 14
     SPELL_ATTR_EX2_UNK15                      = 0x00008000,            // 15 not set in 2.4.2
     SPELL_ATTR_EX2_TAME_BEAST                 = 0x00010000,            // 16
     SPELL_ATTR_EX2_NOT_RESET_AUTO_ACTIONS     = 0x00020000,            // 17 don't reset timers for melee autoattacks (swings) or ranged autoattacks (autoshoots)
