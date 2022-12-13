@@ -2960,10 +2960,7 @@ void Aura::HandleBindSight(bool apply, bool /*Real*/)
     if (apply)
         camera.SetView(GetTarget());
     else
-    {
         camera.ResetView();
-        caster->SendCreateUpdateToPlayer(caster);
-    }
 }
 
 void Aura::HandleFarSight(bool apply, bool /*Real*/)
