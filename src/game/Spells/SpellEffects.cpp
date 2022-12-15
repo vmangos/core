@@ -3931,7 +3931,7 @@ void Spell::EffectSummonPet(SpellEffectIndex effIdx)
 
 ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLevel)
 {
-    if (!UnsummonOldPetBeforeNewSummon(petEntry))
+    if (!UnsummonOldPetBeforeNewSummon(petEntry, true))
         return ObjectGuid();
 
     CreatureInfo const* cInfo = petEntry ? sCreatureStorage.LookupEntry<CreatureInfo>(petEntry) : nullptr;

@@ -1207,7 +1207,7 @@ class Unit : public SpellCaster
         Pet* GetPet() const;
         void SetPet(Pet* pet);
         virtual Pet* GetMiniPet() const { return nullptr; }    // overwritten in Player
-        bool UnsummonOldPetBeforeNewSummon(uint32 newPetEntry);
+        bool UnsummonOldPetBeforeNewSummon(uint32 newPetEntry, bool canUnsummon);
 
         // Pet responses methods
         void SendPetCastFail(uint32 spellid, SpellCastResult msg);

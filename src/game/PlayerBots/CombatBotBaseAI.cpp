@@ -215,7 +215,7 @@ void CombatBotBaseAI::PopulateSpellData()
         if (pSpellEntry->HasAttribute(SPELL_ATTR_PASSIVE))
             continue;
 
-        if (pSpellEntry->HasAttribute(SPELL_ATTR_HIDDEN_CLIENTSIDE))
+        if (pSpellEntry->HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY))
             continue;
 
         switch (me->GetClass())
