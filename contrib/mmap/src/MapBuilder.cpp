@@ -1523,6 +1523,7 @@ namespace MMAP
                 fprintf(objFile, "f %d %d %d\n", p[0] + 1, p[j - 1] + 1, p[j] + 1);
             }
         }
+        fclose(objFile);
 
         return true;
     }
@@ -1568,6 +1569,7 @@ namespace MMAP
                     (int)(bverts + tris[j * 4 + 2]) + 1);
             }
         }
+        fclose(objFile);
 
         return true;
     }
