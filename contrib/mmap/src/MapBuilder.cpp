@@ -1524,6 +1524,8 @@ namespace MMAP
             }
         }
 
+        fclose(objFile);
+
         return true;
     }
 
@@ -1568,6 +1570,7 @@ namespace MMAP
                     (int)(bverts + tris[j * 4 + 2]) + 1);
             }
         }
+        fclose(objFile);
 
         return true;
     }
