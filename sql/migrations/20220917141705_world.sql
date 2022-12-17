@@ -831,6 +831,42 @@ UPDATE `creature_template` SET `inhabit_type` = 2 WHERE `entry`=2188;
 -- Reduce Lord Baurles K. Wishock Respawn Timer (credit cmangos)
 UPDATE `creature` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `guid` = 79749;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Corrections to Dunemaul Compound
+UPDATE `creature` SET `id` = 5472, `id2` = 5474 WHERE `id` = 5474;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8545.49, `position_y` = -2992.34,`position_z` = 10.248, `orientation` = 5.98197, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23193;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8543.34, `position_y` = -2971.38, `position_z` = 9.43386, `orientation` = 2.35826, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23156;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8513.1, `position_y` = -3022.68, `position_z` = 9.63054, `orientation` = 2.14871, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23196;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8490.92, `position_y` = -3031, `position_z` = 9.09877, `orientation` = 0.886886, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23157;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8480.08, `position_y` = -3074.01, `position_z` = 10.4744, `orientation` = 0.366519, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23194;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8448.01, `position_y` = -3153.98, `position_z` = 8.73415, `orientation` = 6.21337, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23182;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8370.97, `position_y` = -2984.35, `position_z` = 8.58642, `orientation` = 0.865984, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23172;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8358.53, `position_y` = -3021.53, `position_z` = 8.85765, `orientation` = 3.36982, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23154;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8328.57, `position_y` = -3131.45, `position_z` = 8.91409, `orientation` = 0.631058, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23153;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8318.6, `position_y` = -3163.25, `position_z` = 13.6378, `orientation` = 2.57397, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23183;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8315.21, `position_y` = -3120.98, `position_z` = 8.7969, `orientation` = 3.97935, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23184;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8307, `position_y` = -2864.82, `position_z` = 10.9717, `orientation` = 6.25112, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23137;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8265.5, `position_y` = -3064.66, `position_z` = 10.6851, `orientation` = 1.64061, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23186;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8265.08, `position_y` = -2899.93, `position_z` = 14.0473, `orientation` = 5.65371, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23141;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8261.14, `position_y` = -2923.12, `position_z` = 12.9615, `orientation` = 5.90834, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23170;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8247.64, `position_y` = -2996.96, `position_z` = 8.71352, `orientation` = 6.04627, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23177;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8236.2, `position_y` = -2987.86, `position_z` = 9.53265, `orientation` = 2.43283, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23147;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8230.15, `position_y` = -2928.9, `position_z` = 15.4798, `orientation` = 0.631691, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23169;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8216.84, `position_y` = -2969.43, `position_z` = 11.2148, `orientation` = 0.0125323, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23143;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8201.07, `position_y` = -3015.69, `position_z` = 12.615, `orientation` = 4.73902, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23175;
+
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1823, 5472, 5474, 0, 0, 1, -8484.65, -3053.38, 10.5251, 1.49253, 300, 300, 2, 100, 0, 1, 0, 0, 0, 10),
+(1881, 5471, 5472, 5473, 5475, 1, -8538.98, -3006.87, 8.97602,  1.08488, 300, 300, 3, 100, 100, 1, 0, 0, 0, 10),
+(1882, 5471, 5472, 5473, 5475, 1, -8335.4, -3110.77, 9.08832, 5.00028, 300, 300, 3, 100, 100, 1, 0, 0, 0, 10);
+
+DELETE FROM `creature` WHERE `guid` = 23147;
+
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0 WHERE `guid` IN  (23146, 23144, 23151, 23145, 23149, 23148);
+UPDATE `creature` SET `position_x` = -8418.63, `position_y` = -3082.32,`position_z` = 8.70868, `orientation` = 3.56047, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23132;
+UPDATE `creature` SET `position_x` = -8348.79, `position_y` = -3081.22,`position_z` = 8.70805, `orientation` = 1.15154, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23165;
+
 
 -- End of migration.
 END IF;
