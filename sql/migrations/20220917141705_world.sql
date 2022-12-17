@@ -857,7 +857,7 @@ UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position
 UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8201.07, `position_y` = -3015.69, `position_z` = 12.615, `orientation` = 4.73902, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23175;
 
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(10161, 5472, 5474, 0, 0, 1, -8484.65, -3053.38, 10.5251, 1.49253, 300, 300, 2, 100, 0, 1, 0, 0, 0, 10),
+(10161, 5472, 5474, 0, 0, 1, -8484.69, -3053.96, 10.5458, 3.92506, 300, 300, 2, 100, 0, 1, 0, 0, 0, 10),
 (10196, 5471, 5472, 5473, 5475, 1, -8538.98, -3006.87, 8.97602,  1.08488, 300, 300, 3, 100, 100, 1, 0, 0, 0, 10),
 (10200, 5471, 5472, 5473, 5475, 1, -8335.4, -3110.77, 9.08832, 5.00028, 300, 300, 3, 100, 100, 1, 0, 0, 0, 10);
 
