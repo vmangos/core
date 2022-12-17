@@ -170,6 +170,14 @@ UPDATE `quest_template` SET `BreadcrumbForQuestId` = 4734 WHERE `entry` = 4907; 
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 4734;
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1699;
 
+UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry`=1529;
+UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry`=1522;
+UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry`=2983;
+UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry`=1523;
+UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry`=1528;
+UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry`=2984;
+UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry`=2985;
+
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Modify elementals dmgschool to deal elemental damage on melee attacks (credit azerothcore)
