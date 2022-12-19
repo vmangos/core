@@ -193,6 +193,11 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.6 WHERE `entry`=1177
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.6 WHERE `entry`=11778 AND `item`=7075; -- Shadowshard Smasher
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=0.4 WHERE `entry`=11659 AND `item`=7075; -- Molten Destroyer
 
+-- Pristine Yeti Horn - increase from 10% to 25% (Quest: Are We There, Yeti?)
+-- https://www.wowhead.com/classic/item=12367/pristine-yeti-horn#dropped-by
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=-25 WHERE `entry`=7459 AND `item`=12367; -- Ice Thistle Matriarch
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=-25 WHERE `entry`=7460 AND `item`=12367; -- Ice Thistle Patriarch
+
 -- End of migration.
 END IF;
 END??
