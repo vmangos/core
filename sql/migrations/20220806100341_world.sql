@@ -176,13 +176,21 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_movement_special` SET `waittime`=2000 WHERE `id`=149702 AND `point`=58;
     UPDATE `creature_movement_special` SET `waittime`=2000 WHERE `id`=149702 AND `point`=72;
 
+    DELETE FROM `creature_movement_scripts` WHERE `id`=151909;
+    INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (151909, 0, 0, 10, 68, 300000, 0, 0, 0, 0, 0, 0, 2, 151909, -1, 1, -8729.73, 1024.91, 94.352, 1.81538, 0, 'Scourge Invasion: Pallid Horror - Spawn Stormwind City Guard 1 in the Park');
+
+    DELETE FROM `generic_scripts` WHERE `id`=151909;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (151909, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12315, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion: Stormwind City Guard - Light help us... the Scourge are in the Park!');
+
     -- Waypoints to Stormwind Keep (Guessed)
     DELETE FROM `creature_movement_special` WHERE `id`=151901;
     INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
         (151901, 1, -8797.09, 1111.77, 90.5994, 100, 0, 0, 0), -- In the Park
         (151901, 2, -8795.73, 1097.15, 90.7806, 100, 0, 0, 0),
         (151901, 3, -8786, 1076.07, 90.7787, 100, 0, 0, 0),
-        (151901, 4, -8742.15, 1063.57, 89.7332, 100, 0, 0, 0),
+        (151901, 4, -8742.15, 1063.57, 89.7332, 100, 2000, 0, 151909),
         (151901, 5, -8732.61, 1032.48, 93.5898, 100, 0, 0, 0),
         (151901, 6, -8729.97, 986.728, 96.8782, 100, 0, 0, 0),
         (151901, 7, -8741.06, 952.676, 100.401, 100, 0, 0, 0),
@@ -213,7 +221,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (151901, 32, -8570.19, 537.401, 101.588, 100, 0, 0, 0),
         (151901, 33, -8557.57, 519.798, 100.076, 100, 0, 0, 0),
         (151901, 34, -8535.21, 489.425, 100.892, 100, 0, 0, 0),
-        (151901, 35, -8545.59, 470.08, 104.457, 100, 0, 0, 0),
+        (151901, 35, -8545.59, 470.08, 104.457, 100, 2000, 0, 151911),
         (151901, 36, -8544.27, 461.522, 104.346, 100, 0, 0, 0),
         (151901, 37, -8528.58, 442.172, 104.945, 100, 0, 0, 0),
         (151901, 38, -8504.26, 411.637, 108.386, 100, 0, 0, 0),
@@ -472,7 +480,8 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639403;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639403, 0, 0, 59, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Set React State Defensive'),
-    (1639403, 0, 0, 39, 1639403, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 601, 'Pallid Horror - Start Script: Stormwind Cathedral'),
+    (1639403, 0, 0, 39, 1639403, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 601, 'Pallid Horror - Start Script: Stormwind Cathedral of Light'),
+    (1639403, 0, 0, 39, 1639406, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 604, 'Pallid Horror - Start Script: Stormwind The Park'),
     (1639403, 0, 0, 39, 1639404, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 602, 'Pallid Horror - Start Script: Undercity Canals'),
     (1639403, 0, 0, 39, 1639405, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 603, 'Pallid Horror - Start Script: Undercity Sewers');
 
@@ -507,12 +516,12 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639403;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8585.14, 903.542, 81.7025, 4.72984, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.97, 906.899, 81.7026, 3.83972, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.51, 901.15, 81.7033, 4.08407, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8580.33, 901.258, 81.7028, 3.92699, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8579.29, 907.101, 81.702, 3.92699, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral'),
-    (1639403, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 151902, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Stormwind Cathedral');
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8585.14, 903.542, 81.7025, 4.72984, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral of Light'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.97, 906.899, 81.7026, 3.83972, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral of Light'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8583.51, 901.15, 81.7033, 4.08407, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral of Light'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8580.33, 901.258, 81.7028, 3.92699, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral of Light'),
+    (1639403, 0, 1, 10, 16383, 0, 5, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8579.29, 907.101, 81.702, 3.92699, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind Cathedral of Light'),
+    (1639403, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 151902, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Stormwind Cathedral of Light');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639404;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -535,6 +544,19 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1627.97, 484.273, -22.7855, 6.21337, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
     (1639405, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, 1627.48, 477.444, -22.7847, 4.71239, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
     (1639405, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149702, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Undercity Sewers');
+
+    DELETE FROM `generic_scripts` WHERE `id`=1639406;
+    INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8792.541016, 1123.120850, 90.730232, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8792.290039, 1126.188721, 90.830284, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8794.069336, 1128.700439, 90.830284, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8797.046875, 1129.480591, 90.830284, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8799.829102, 1128.164307, 90.830284, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8801.115234, 1125.367432, 90.770615, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8800.301758, 1122.398560, 90.430962, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8797.770508, 1120.646973, 90.339996, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 1, 10, 16383, 0, 9, 15, 0, 0, 0, 16, 6, 1638301, -1, 7, -8794.705078, 1120.932251, 90.469536, 5.852390, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 2, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 151901, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Stormwind The Park');
 
     -- Events list for Skeletal Shocktrooper
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16299;
@@ -1441,7 +1463,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (@NPC_FLAMESHOCKER_GUID+58, 16383, 0, 0, 0, 0, 1738.85, 95.2721, -62.1996, 2.37365, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
         (@NPC_FLAMESHOCKER_GUID+59, 16383, 0, 0, 0, 0, 1767.03, 339.711, -62.205, 1.32645, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),       -- Flameshocker in Undercity War Quarter.
         (@NPC_FLAMESHOCKER_GUID+60, 16383, 0, 0, 0, 0, 1769.06, 132.345, -62.2104, 3.56047, 900, 900, 25, 100, 0, 1, 0, 0, 9, 10),      -- Flameshocker in Undercity Magic Quarter.
-        (@NPC_FLAMESHOCKER_GUID+61, 16382, 0, 0, 0, 0, -8796.63, 1125, 90.5218, 5.85239, 2700, 2700, 5, 100, 0, 1, 1, 0, 9, 10);        -- Patchwork Terror in Stormwind The Park.
+        (@NPC_FLAMESHOCKER_GUID+61, 16394, 0, 0, 0, 0, -8796.63, 1125, 90.5218, 5.85239, 2700, 2700, 5, 100, 0, 1, 1, 0, 9, 10);        -- Patchwork Terror in Stormwind The Park.
 
     INSERT INTO `pool_creature`(`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
         (@NPC_FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),

@@ -44,8 +44,8 @@ struct MouthAI : public ScriptedAI
     void UpdateWorldState()
     {
         // Updating map icon worlstate
-        int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
-        int REMAINING = sObjectMgr.GetSavedVariable(m_remainingID, true);
+        int victories = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
+        int remaining = sObjectMgr.GetSavedVariable(m_remainingID, true);
 
         HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
         for (const auto& itr : m)
@@ -56,7 +56,7 @@ struct MouthAI : public ScriptedAI
                 continue;
 
             pPlayer->SendUpdateWorldState(m_worldstateID, sGameEventMgr.IsActiveEvent(m_eventID) ? 1 : 0);
-            pPlayer->SendUpdateWorldState(WORLDSTATE_SI_VICTORIES, VICTORIES);
+            pPlayer->SendUpdateWorldState(WORLDSTATE_SI_VICTORIES, victories);
             //pPlayer->SendUpdateWorldState(m_worldstateID, REMAINING);
         }
     }
@@ -218,15 +218,15 @@ struct MouthAI : public ScriptedAI
 
     int inline GetActiveZones()
     {
-        int COUNT = NULL;
+        int count = NULL;
 
         for (uint32 i = VARIABLE_SI_WINTERSPRING_REMAINING; i < VARIABLE_SI_BURNING_STEPPES_REMAINING; i++)
         {
             if (sObjectMgr.GetSavedVariable(i, true) > NULL)
-                COUNT++;
+                count++;
         }
 
-        return COUNT;
+        return count;
     }
 
     void GroupMemberJustDied(Creature* pUnit, bool isLeader) override
@@ -254,13 +254,13 @@ struct MouthAI : public ScriptedAI
             {
                 case EVENT_MOUTH_OF_KELTHUZAD_UPDATE:
                 {
-                    int VICTORIES   = 0;    // Victories against the Scourge (defeated zones).
-                    int REMAINING   = 0;    // Remaining Necropolises in a Zone.
-                    int ACTIVE      = 0;    // Amount of active zones (Invasions).
+                    int victories   = 0;    // Victories against the Scourge (defeated zones).
+                    int remaining   = 0;    // Remaining Necropolises in a Zone.
+                    int active      = 0;    // Amount of active zones (Invasions).
 
-                    VICTORIES   = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
-                    REMAINING   = sObjectMgr.GetSavedVariable(m_remainingID);
-                    ACTIVE      = GetActiveZones();
+                    victories   = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
+                    remaining   = sObjectMgr.GetSavedVariable(m_remainingID);
+                    active      = GetActiveZones();
 
                     if (sGameEventMgr.IsActiveEvent(m_eventID)) // Zone is already being Attacked.
                     {
@@ -273,7 +273,7 @@ struct MouthAI : public ScriptedAI
                             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Scourge Invasion] Zone respawn timer is set over 24 hours. Is this on purpose?");
 
                         // Is it Possible to attack another Zone?
-                        if (VICTORIES == 0 || REMAINING > 0 || VICTORIES > 0 && REMAINING == 0 && ACTIVE < m_limit)
+                        if (victories == 0 || remaining > 0 || victories > 0 && remaining == 0 && active < m_limit)
                         {
                             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START, 0);
                             m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, 0);
@@ -286,8 +286,7 @@ struct MouthAI : public ScriptedAI
                 {
                     if (sGameEventMgr.IsActiveEvent(m_eventID) && !IsInCity()) // In a invasion Zone?
                         DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_TEXT_5), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
-                    
-                    if (IsInCity()) // In a City?
+                    else // In a City?
                         DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_0, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_1, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_2, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_3, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_4, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_5, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_6, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_7, BCT_MOUTH_OF_KELTHUZAD_CITY_TEXT_8), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
                     
                     break;
