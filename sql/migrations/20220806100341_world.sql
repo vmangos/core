@@ -54,7 +54,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_template` SET `regeneration`=0 WHERE `entry`=16136;
     UPDATE `creature_template` SET `regeneration`=0 WHERE `entry`=16172;
     UPDATE `creature_template` SET `auras`=NULL, `flags_extra`=0 WHERE `entry`=16230;
-    -- UPDATE `creature_template` SET `spawn_spell_id`=28234 WHERE `entry` IN (16141, 16230, 16298, 16299, 16379, 16380, 16383, 16394, 16422, 16423, 16437, 16438);
+    UPDATE `creature_template` SET `spawn_spell_id`=28234 WHERE `entry` IN (16141, 16230, 16298, 16299, 16379, 16380, 16383, 16394, 16422, 16423, 16437, 16438);
     UPDATE `creature_template` SET `auras`='28346 27887' WHERE `entry` IN (16136, 16172);
     UPDATE `creature_template` SET `spell_list_id`=163830, `ai_name`='EventAI', `script_name`='', `flags_extra`=4096 WHERE `entry`=16383;
     UPDATE `creature_template` SET `unit_flags`=832, `spell_list_id`=161430, `detection_range`=15, `call_for_help_range`=20, `spawn_spell_id`=10389, `ai_name`='EventAI', `script_name`='' WHERE `entry`=16143;
@@ -73,6 +73,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (181156, 9, 6, 5811, 'Minion Spawner, ghoul/skeleton', 0, 0, 1, 0, 0, 0, 28187, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
         (181163, 9, 6, 327, 'Minion Spawner, finder', 0, 0, 1, 0, 0, 0, 28227, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
         -- (181214, 9, 6, 327, 'Necropolis critter spawner', 0, 0, 1, 0, 0, 0, 27866, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+    -- If a spawn spell has not EffectImplicitTargetA = 1, then it will not trigger the spawn effect wich removes the spawn flag and it will stay unattackable.
+    INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (28234, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, NULL);
 
     -- spell_script_target:
     UPDATE `spell_script_target` SET `type`=0, `targetEntry`=181142 WHERE `entry`=31315 AND `type`=1 AND `targetEntry`=16230;
@@ -959,11 +962,11 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `generic_scripts` WHERE `id`=1623001;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1623001, 0, 1, 35, 0, 0, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Face Damaged Necrotic Shard'),
-    (1623001, 0, 2, 15, 28132, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Create Summoner Shield'),
+    (1623001, 0, 0, 2, 16, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Field Set'),
+    (1623001, 0, 1, 35, 0, 0, 0, 0, 16172, 15, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Face Damaged Necrotic Shard'),
     (1623001, 0, 3, 44, 1, 1, 0, 0, 16172, 10, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Set Phase for Damaged Necrotic Shard'),
-    (1623001, 0, 4, 15, 29826, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Self Stun(DND)'),
-    (1623001, 2, 5, 15, 28078, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel'),
+    (1623001, 2, 2, 15, 28132, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Create Summoner Shield'),
+    (1623001, 2, 5, 15, 28078, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel'),
     (1623001, 3598, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Deal Damage');
 
     DELETE FROM `gossip_scripts` WHERE `id`=7166;
@@ -9550,7 +9553,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 -- 8. TEMPORARY FIXES
 
-    UPDATE `creature_template` SET `spawn_spell_id`=0 WHERE `spawn_spell_id`=28234;
     -- Minion Spawner, finder
     -- Server Side and charges = 1
     UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181163;
