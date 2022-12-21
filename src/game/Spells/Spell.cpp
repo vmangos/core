@@ -1713,7 +1713,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
 
             // not break stealth by cast targeting
             // skip gobject caster because of buffs in wsg
-            if (!m_casterGo)
+            if (!m_casterGo && !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NOT_AN_ACTION))
             {
                 if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX_ALLOW_WHILE_STEALTHED))
                     unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
