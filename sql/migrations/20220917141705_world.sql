@@ -957,6 +957,11 @@ UPDATE `gossip_menu_option` SET `condition_id` = 602 WHERE `menu_id` = 1403 AND 
 UPDATE `quest_template` SET `PrevQuestId` = 3781, `ExclusiveGroup` = 0, `NextQuestInChain` = 0, `BreadcrumbForQuestId` = 3791 WHERE `entry` IN (3788, 3787);
 UPDATE `quest_template` SET `PrevQuestId` = 3791 WHERE `entry` = 3792;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Option To Purchase Tharlendris Seeds Unlocks When Quest 3761 is Complete.
+UPDATE `gossip_menu_option` SET `condition_id` = 60002 WHERE `menu_id` = 1701 AND `id` = 1;
+
 
 -- End of migration.
 END IF;
