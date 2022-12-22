@@ -940,6 +940,24 @@ UPDATE `creature` SET `id` = 5984, `id2` = 5988 WHERE `id` = 5984 AND `id2` = 0;
 UPDATE `creature` SET `id` = 5991, `id2` = 5993 WHERE `id` = 5991 AND `id2` = 0;
 UPDATE `creature` SET `id` = 5990, `id2` = 5992 WHERE `id` = 5990 AND `id2` = 0;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Remove Incorrect Gossip Option
+DELETE FROM `gossip_menu_option` WHERE  `menu_id` = 347 AND `id` = 0;
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Option To Purchase Tharlendris Seeds Unlocks When Quest 3764 is Complete.
+UPDATE `gossip_menu_option` SET `condition_id` = 602 WHERE `menu_id` = 1922 AND `id` = 1;
+UPDATE `gossip_menu_option` SET `condition_id` = 602 WHERE `menu_id` = 1403 AND `id` = 1;
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Corrections To Alliance Morrowgrain Quest Chain
+UPDATE `quest_template` SET `PrevQuestId` = 3781, `ExclusiveGroup` = 0, `NextQuestInChain` = 0, `BreadcrumbForQuestId` = 3791 WHERE `entry` IN (3788, 3787);
+UPDATE `quest_template` SET `PrevQuestId` = 3791 WHERE `entry` = 3792;
+
+
 -- End of migration.
 END IF;
 END??
