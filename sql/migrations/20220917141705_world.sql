@@ -928,7 +928,8 @@ UPDATE `creature` SET `id` = 5991, `id2` = 5993 WHERE `id` = 5993;
 UPDATE `creature` SET `id` = 5984, `id2` = 5988 WHERE `id` = 5988;
 UPDATE `creature` SET `id` = 5985, `id2` = 5988, `id3` = 5993 WHERE `id` = 5985;
 UPDATE `creature` SET `id` = 5984, `id2` = 5988 WHERE `id` = 5984;
-
+UPDATE `creature` SET `id` = 5991, `id2` = 5993 WHERE `id` = 5991;
+UPDATE `creature` SET `id` = 5990, `id2` = 5992 WHERE `id` = 5990;
 
 -- End of migration.
 END IF;
