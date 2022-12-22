@@ -250,10 +250,18 @@ INSERT INTO `quest_greeting` (`entry`, `type`, `emote_id`, `emote_delay`, `conte
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Update Scourgestone Quests
-UPDATE `creature_involvedrelation` SET `id`= 10839 WHERE `id`=10840 AND `quest`=5407;
-UPDATE `creature_involvedrelation` SET `id`= 10839 WHERE `id`=10840 AND `quest`=5408;
-UPDATE `creature_involvedrelation` SET `id`= 10840 WHERE `id`=10839 AND `quest`=5403;
-UPDATE `creature_involvedrelation` SET `id`= 10840 WHERE `id`=10839 AND `quest`=5402;
+UPDATE `creature_questrelation` SET `id` = 10839 WHERE `quest` = 5407;
+UPDATE `creature_involvedrelation` SET `id`= 10839 WHERE `quest` = 5407;
+
+UPDATE `creature_questrelation` SET `id`= 10839 WHERE `quest` = 5408;
+UPDATE `creature_involvedrelation` SET `id`= 10839 WHERE `quest` = 5408;
+
+UPDATE `creature_questrelation` SET `id`= 10840 WHERE `quest` = 5403;
+UPDATE `creature_involvedrelation` SET `id`= 10840 WHERE `quest` = 5403;
+
+UPDATE `creature_questrelation` SET `id`= 10840 WHERE `quest` = 5402;
+UPDATE `creature_involvedrelation` SET `id`= 10840 WHERE `quest` = 5402;
+
 UPDATE `quest_template` SET `RequiredRaces` = 0 WHERE `entry` IN (5401, 5402, 5403, 5404);
 UPDATE `quest_template` SET `RequiredRaces` = 0 WHERE `entry` IN (5405, 5406, 5407, 5408);
 
