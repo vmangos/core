@@ -603,6 +603,7 @@ DELETE FROM `gossip_menu` WHERE  `entry` = 9406 AND `text_id` = 5495;
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Add Condition For Arch Druid Staghelm Gossip Option
+UPDATE `gossip_menu_option` SET `condition_id` = 604 WHERE `menu_id` = 1630 AND `id` = 0;
 -- 602: Target Has Quest 3781 In Log
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (602, 9, 3781, 0, 0, 0, 0);
 -- 603:  Not (Target Has 1 Points In Skill 182)
