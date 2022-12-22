@@ -187,9 +187,9 @@ UPDATE `creature_template` SET `damage_school` = 5 WHERE `entry` IN (521, 3470, 
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- Gurubashi Bat Rider and Bloodshot Are Not Skinnable
-UPDATE `creature_template` SET `skinning_loot_id`= 0 WHERE `entry` IN  (14750, 11614);
-DELETE FROM `skinning_loot_template` WHERE `entry` IN (10151, 14750);
+-- Gurubashi Bat Rider, Giant Buzzard and Bloodshot Are Not Skinnable
+UPDATE `creature_template` SET `skinning_loot_id`= 0 WHERE `entry` IN  (14750, 11614, 2831);
+DELETE FROM `skinning_loot_template` WHERE `entry` IN (10151, 14750, 2831);
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
