@@ -871,7 +871,7 @@ UPDATE `creature` SET `position_x` = -8348.79, `position_y` = -3081.22,`position
 
 -- Redo Blasted Lands Creatures
 -- Remove Obvious Duplicates
-DELETE FROM `creature` WHERE `guid` IN (3838, 3919, 3837, 3916, 3944, 3940, 3943, 3939, 3910, 3836, 3942, 3904, 3899, 3900, 5982, 3898, 3896);
+DELETE FROM `creature` WHERE `guid` IN (3838, 3919, 3837, 3916, 3944, 3940, 3943, 3939, 3910, 3836, 3942, 3904, 3899, 3900, 5982, 3898, 3896, 1448);
 
 -- Add Correct Spawns and ID's
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
