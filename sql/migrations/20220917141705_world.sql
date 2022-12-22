@@ -924,6 +924,11 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (34066, 5982, 0, 0, 0, 0, -10947.2, -2914.35, 8.26888, 4.46249, 300, 300, 10, 100, 0, 1, 0, 0, 0, 10),
 (34067, 5984, 5988, 0, 0, 0, -10917.6, -2884.86, 12.5298, 2.52241, 300, 300, 10, 100, 0, 1, 0, 0, 0, 10);
 
+UPDATE `creature` SET `id` = 5991, `id2` = 5993 WHERE `id` = 5993;
+UPDATE `creature` SET `id` = 5984, `id2` = 5988 WHERE `id` = 5988;
+UPDATE `creature` SET `id` = 5985, `id2` = 5988, `id3` = 5993 WHERE `id` = 5985;
+UPDATE `creature` SET `id` = 5984, `id2` = 5988 WHERE `id` = 5984;
+
 
 -- End of migration.
 END IF;
