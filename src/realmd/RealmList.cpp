@@ -48,15 +48,15 @@ std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, uint32 os, uint32
     return matchingBuilds;
 }
 
-RealmBuildInfo const* FindBuildInfo(uint16 _build)
+RealmBuildInfo const* FindBuildInfo(uint16 build)
 {
     // first build is low bound of always accepted range
-    if (_build >= ExpectedRealmdClientBuilds[0].build)
+    if (build >= ExpectedRealmdClientBuilds[0].build)
         return &ExpectedRealmdClientBuilds[0];
 
     // continue from 1 with explicit equal check
     for (int i = 1; ExpectedRealmdClientBuilds[i].build; ++i)
-        if (_build == ExpectedRealmdClientBuilds[i].build)
+        if (build == ExpectedRealmdClientBuilds[i].build)
             return &ExpectedRealmdClientBuilds[i];
 
     // none appropriate build
