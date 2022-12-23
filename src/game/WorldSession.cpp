@@ -877,7 +877,7 @@ void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
 
 void WorldSession::SendAccountDataTimes()
 {
-    WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, NUM_ACCOUNT_DATA_TYPES * MD5_DIGEST_LENGTH);
+    WorldPacket data(SMSG_ACCOUNT_DATA_MD5, NUM_ACCOUNT_DATA_TYPES * MD5_DIGEST_LENGTH);
     for (AccountData const& itr : m_accountData)
     {
         if (itr.data.empty())
