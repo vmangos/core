@@ -183,14 +183,6 @@ typedef struct AuthHandler
 
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
-/// Constructor - set the N and g values for SRP6
-AuthSocket::AuthSocket() : m_promptPin(false), m_status(STATUS_CHALLENGE), m_gridSeed(0), m_geoUnlockPIN(0), m_os(0), m_platform(0), m_accountId(0), m_lastRealmListRequest(0), m_build(0)
-{
-    m_accountDefaultSecurityLevel = SEC_PLAYER;
-
-    m_patch = ACE_INVALID_HANDLE;
-}
-
 /// Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
 {

@@ -470,7 +470,7 @@ void npc_doctorAI::PatientSaved(Creature* /*soldier*/, Player* pPlayer, Location
 
                 switch (m_creature->GetEntry())
                 {
-                    case DOCTOR_ALLIANCE: pPlayer->GroupEventHappens(QUEST_TRIAGE_A, m_creature);; break;
+                    case DOCTOR_ALLIANCE: pPlayer->GroupEventHappens(QUEST_TRIAGE_A, m_creature); break;
                     case DOCTOR_HORDE:    pPlayer->GroupEventHappens(QUEST_TRIAGE_H, m_creature); break;
                     default:
                         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");

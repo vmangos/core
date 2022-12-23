@@ -562,7 +562,7 @@ bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map cons
         if (((zdiff < -0.0f) ? (-zdiff > stepSize) : (zdiff > stepSize * 0.9f)))
             continue;
 
-        bool skip = false;;
+        bool skip = false;
         for (auto const& checkedPos : checkedPositions)
         {
             if (Geometry::GetDistance3D(checkedPos, newPos) < stepSize * 0.5f)

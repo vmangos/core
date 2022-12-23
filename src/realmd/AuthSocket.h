@@ -57,7 +57,7 @@ class AuthSocket: public BufferedSocket
     public:
         const static int s_BYTE_SIZE = 32;
 
-        AuthSocket();
+        AuthSocket() = default;
         ~AuthSocket();
 
         void OnAccept();
