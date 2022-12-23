@@ -212,14 +212,14 @@ static Location HordeCoords[] =
 #define H_RUNTOY -3508.48f
 #define H_RUNTOZ 62.96f
 
-const uint32 AllianceSoldierId[3] =
+uint32 const AllianceSoldierId[3] =
 {
     12938,                                                  // 12938 Injured Alliance Soldier
     12936,                                                  // 12936 Badly injured Alliance Soldier
     12937                                                   // 12937 Critically injured Alliance Soldier
 };
 
-const uint32 HordeSoldierId[3] =
+uint32 const HordeSoldierId[3] =
 {
     12923,                                                  // 12923 Injured Soldier
     12924,                                                  // 12924 Badly injured Soldier
@@ -266,7 +266,7 @@ struct npc_doctorAI : public ScriptedAI
     void BeginEvent(Player* pPlayer);
     void PatientDied(Location* pPoint);
     void PatientSaved(Creature* pSoldier, Player* pPlayer, Location* pPoint);
-    void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 /*#####
@@ -317,7 +317,7 @@ struct npc_injured_patientAI : public ScriptedAI
         }
     }
 
-    void SpellHit(SpellCaster* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override
     {
         if (pCaster->GetTypeId() == TYPEID_PLAYER && m_creature->IsAlive() && pSpell->Id == 20804)
         {
@@ -363,7 +363,7 @@ struct npc_injured_patientAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Don't reduce health if already healed
         if (isSaved)
@@ -486,7 +486,7 @@ void npc_doctorAI::PatientSaved(Creature* /*soldier*/, Player* pPlayer, Location
     }
 }
 
-void npc_doctorAI::UpdateAI(const uint32 uiDiff)
+void npc_doctorAI::UpdateAI(uint32 const uiDiff)
 {
     if (m_bIsEventInProgress && m_uiSummonPatientCount >= 21)	// worst case scenario : 5 deads + 15 saved
     {
@@ -532,7 +532,7 @@ void npc_doctorAI::UpdateAI(const uint32 uiDiff)
     }
 }
 
-bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if ((pQuest->GetQuestId() == QUEST_TRIAGE_A) || (pQuest->GetQuestId() == QUEST_TRIAGE_H))
     {
