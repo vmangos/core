@@ -70,7 +70,10 @@ struct boss_mothersmolderwebAI : public ScriptedAI
         // Mothers Milk
         if (m_uiMothersMilkTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature, SPELL_MOTHERSMILK);
+            if (!m_creature->GetVictim()->HasAura(SPELL_MOTHERSMILK))
+            {
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MOTHERSMILK);
+            }
             m_uiMothersMilkTimer = urand(5000, 12500);
         }
         else
