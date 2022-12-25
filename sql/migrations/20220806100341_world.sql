@@ -484,11 +484,11 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639407;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639407, 0, 3, 39, 1639401, 0, 0, 0, 32039, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Undercity Sewers: Lady Sylvanas Windrunner Zone Yell');
+    (1639407, 0, 3, 39, 1639402, 0, 0, 0, 32039, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Undercity Sewers: Lady Sylvanas Windrunner Zone Yell');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639408;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639408, 0, 1, 39, 1639402, 0, 0, 0, 10495, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
+    (1639408, 0, 1, 39, 1639401, 0, 0, 0, 10495, 0, 9, 18, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639409;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -498,15 +498,15 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1639410, 0, 0, 44, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Set Phase: Decrement');
 
-    DELETE FROM `generic_scripts` WHERE `id`=1639401;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639401, 0, 1, 62, 1639402, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - End Map Event: Undercity'),
-    (1639401, 5, 2, 0, 6, 0, 0, 0, 0, 0, 0, 16, 12331, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Undercity Sewers: Lady Sylvanas Windrunner Zone Yell');
-
     DELETE FROM `generic_scripts` WHERE `id`=1639402;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639402, 0, 1, 62, 1639401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - End Map Event: Stormwind'),
-    (1639402, 5, 2, 0, 6, 0, 0, 0, 0, 0, 0, 16, 12318, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
+    (1639402, 0, 1, 62, 1639402, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - End Map Event: Undercity'),
+    (1639402, 5, 2, 0, 6, 0, 0, 0, 0, 0, 0, 16, 12331, 0, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Death from Undercity Sewers: Lady Sylvanas Windrunner Zone Yell');
+
+    DELETE FROM `generic_scripts` WHERE `id`=1639401;
+    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (1639401, 0, 1, 62, 1639401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - End Map Event: Stormwind'),
+    (1639401, 5, 2, 0, 6, 0, 0, 0, 0, 0, 0, 16, 12318, 0, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Death from Stormwind: Highlord Bolvar Fordragon Zone Yell');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639403;
     INSERT INTO `generic_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -528,33 +528,35 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639405;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639405, 0, 1, 61, 1639402, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Map Event: Undercity Sewers'),
-    (1639405, 0, 2, 63, 1639402, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Add Map Event Target: Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1626.6, 481.696, -22.7855, 5.23599, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1634.67, 479.701, -21.8066, 1.64061, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1634.59, 477.738, -21.8358, 4.4855, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1632.22, 481.066, -22.7855, 5.41052, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1631.27, 477.82, -22.785, 5.27089, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1630.92, 484.171, -22.7855, 3.26377, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1629.02, 477.154, -22.7847, 1.88496, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1627.97, 484.273, -22.7855, 6.21337, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1627.48, 477.444, -22.7847, 4.71239, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
-    (1639405, 0, 3, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149702, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Undercity Sewers');
+    (1639405, 0, 1, 62, 1639402, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - End Map Event: Undercity Sewers'),
+    (1639405, 0, 2, 61, 1639402, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Map Event: Undercity Sewers'),
+    (1639405, 0, 3, 63, 1639402, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Add Map Event Target: Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1626.6, 481.696, -22.7855, 5.23599, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1634.67, 479.701, -21.8066, 1.64061, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1634.59, 477.738, -21.8358, 4.4855, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1632.22, 481.066, -22.7855, 5.41052, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1631.27, 477.82, -22.785, 5.27089, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1630.92, 484.171, -22.7855, 3.26377, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1629.02, 477.154, -22.7847, 1.88496, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1627.97, 484.273, -22.7855, 6.21337, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639408, -1, 7, 1627.48, 477.444, -22.7847, 4.71239, 1000, 'Pallid Horror - Summon Flameshocker in Undercity Sewers'),
+    (1639405, 0, 4, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 149702, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Undercity Sewers');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639406;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639406, 0, 1, 61, 1639401, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Map Event: Stormwind The Park'),
-    (1639406, 0, 2, 63, 1639401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Add Map Event Target: Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8792.54, 1123.12, 90.7302, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8797.05, 1129.48, 90.8303, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8801.12, 1125.37, 90.7706, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8797.77, 1120.65, 90.34, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8794.71, 1120.93, 90.4695, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8800.3, 1122.4, 90.431, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8799.83, 1128.16, 90.8303, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8794.07, 1128.7, 90.8303, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 2, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8792.29, 1126.19, 90.8303, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
-    (1639406, 0, 3, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 151901, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Stormwind The Park');
+    (1639406, 0, 1, 62, 1639401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - End Map Event: Stormwind The Park'),
+    (1639406, 0, 2, 61, 1639401, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Start Map Event: Stormwind The Park'),
+    (1639406, 0, 3, 63, 1639401, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Add Map Event Target: Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8794.07, 1128.7, 90.8303, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8800.3, 1122.4, 90.431, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8792.29, 1126.19, 90.8303, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8799.83, 1128.16, 90.8303, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8797.05, 1129.48, 90.8303, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8794.71, 1120.93, 90.4695, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8801.12, 1125.37, 90.7706, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8797.77, 1120.65, 90.34, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 3, 10, 16383, 0, 0, 0, 0, 0, 0, 16, 2, 1639407, -1, 7, -8792.54, 1123.12, 90.7302, 5.85239, 1000, 'Pallid Horror - Summon Flameshocker in Stormwind The Park'),
+    (1639406, 0, 4, 60, 3, 0, 10000, 0, 0, 0, 0, 16, 0, 151901, 0, 0, 0, 0, 0, 0, 1000, 'Pallid Horror - Start Waypoints in Stormwind The Park');
 
     DELETE FROM `generic_scripts` WHERE `id`=1639407;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
