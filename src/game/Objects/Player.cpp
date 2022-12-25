@@ -21849,7 +21849,7 @@ bool Player::HasFreeBattleGroundQueueId() const
     return false;
 }
 
-void Player::TaxiStepFinished()
+void Player::TaxiStepFinished(bool lastPointReached)
 {
     if (!IsInWorld())
         return;
@@ -21914,7 +21914,8 @@ void Player::TaxiStepFinished()
     else
     {
         // When the player reaches the last flight point, teleport to destination taxi node location
-        TeleportTo(curDestNode->map_id, curDestNode->x, curDestNode->y, curDestNode->z, GetOrientation());
+        if (lastPointReached)
+            TeleportTo(curDestNode->map_id, curDestNode->x, curDestNode->y, curDestNode->z, GetOrientation());
         m_taxi.ClearTaxiDestinations();        // not destinations, clear source node
     } 
 }
