@@ -176,12 +176,7 @@ enum
     HORDE_COORDS                = 6
 };
 
-struct Location
-{
-    float x, y, z, o;
-};
-
-static Location AllianceCoords[] =
+static std::vector<Position> const AllianceCoords =
 {
     { -3757.38f, -4533.05f, 14.16f, 3.62f},                 // Top-far-right bunk as seen from entrance
     { -3754.36f, -4539.13f, 14.16f, 5.13f},                 // Top-far-left bunk
@@ -197,7 +192,7 @@ static Location AllianceCoords[] =
 #define A_RUNTOY -4531.52f
 #define A_RUNTOZ 11.91f
 
-static Location HordeCoords[] =
+static std::vector<Position> const HordeCoords =
 {
     { -1013.75f, -3492.59f, 62.62f, 4.34f},                 // Left, Behind
     { -1017.72f, -3490.92f, 62.62f, 4.34f},                 // Right, Behind
@@ -232,7 +227,10 @@ uint32 const HordeSoldierId[3] =
 
 struct npc_doctorAI : public ScriptedAI
 {
-    npc_doctorAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
+    npc_doctorAI(Creature* pCreature) : ScriptedAI(pCreature), m_vPatientSummonCoordinates(pCreature->GetEntry() == DOCTOR_ALLIANCE ? AllianceCoords : HordeCoords)
+    {
+        Reset();
+    }
 
     ObjectGuid m_playerGuid;
 
@@ -241,31 +239,25 @@ struct npc_doctorAI : public ScriptedAI
     uint32 m_uiPatientDiedCount;
     uint32 m_uiPatientSavedCount;
 
-    bool m_bIsEventInProgress;
-
-    GuidList m_lPatientGuids;
-    std::vector<Location*> m_vPatientSummonCoordinates;
+    ObjectGuidSet m_patientGuids;
+    std::vector<Position> const& m_vPatientSummonCoordinates;
 
     void Reset() override
     {
         m_playerGuid.Clear();
 
         m_uiSummonPatientTimer = 10000;
-        m_uiSummonPatientCount = 0;
         m_uiPatientDiedCount = 0;
         m_uiPatientSavedCount = 0;
 
-        m_lPatientGuids.clear();
-        m_vPatientSummonCoordinates.clear();
-
-        m_bIsEventInProgress = false;
-
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_patientGuids.clear();
     }
 
+    void EndEvent(bool success);
     void BeginEvent(Player* pPlayer);
-    void PatientDied(Location* pPoint);
-    void PatientSaved(Creature* pSoldier, Player* pPlayer, Location* pPoint);
+    void PatientDied(Creature* pSoldier);
+    void PatientSaved(Creature* pSoldier, Player* pPlayer);
+    Position const* GetPatientSpawnPosition();
     void UpdateAI(uint32 const uiDiff) override;
 };
 
@@ -278,7 +270,6 @@ struct npc_injured_patientAI : public ScriptedAI
     npc_injured_patientAI(Creature* pCreature) : ScriptedAI(pCreature), isSaved(false) {Reset();}
 
     ObjectGuid m_doctorGuid;
-    Location* m_pCoord;
     bool isSaved;
 
     void EnterEvadeMode() override
@@ -290,7 +281,6 @@ struct npc_injured_patientAI : public ScriptedAI
     void Reset() override
     {
         m_doctorGuid.Clear();
-        m_pCoord = nullptr;
 
         // no select
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -327,7 +317,7 @@ struct npc_injured_patientAI : public ScriptedAI
                 if (Creature* pDoctor = m_creature->GetMap()->GetCreature(m_doctorGuid))
                 {
                     if (npc_doctorAI* pDocAI = dynamic_cast<npc_doctorAI*>(pDoctor->AI()))
-                        pDocAI->PatientSaved(m_creature, pPlayer, m_pCoord);
+                        pDocAI->PatientSaved(m_creature, pPlayer);
                 }
             }
             // make not selectable
@@ -386,7 +376,7 @@ struct npc_injured_patientAI : public ScriptedAI
             if (Creature* pDoctor = m_creature->GetMap()->GetCreature(m_doctorGuid))
             {
                 if (npc_doctorAI* pDocAI = dynamic_cast<npc_doctorAI*>(pDoctor->AI()))
-                    pDocAI->PatientDied(m_pCoord);
+                    pDocAI->PatientDied(m_creature);
             }
         }
     }
@@ -409,127 +399,136 @@ void npc_doctorAI::BeginEvent(Player* pPlayer)
     m_uiSummonPatientCount = 0;
     m_uiPatientDiedCount = 0;
     m_uiPatientSavedCount = 0;
-
-    switch (m_creature->GetEntry())
-    {
-        case DOCTOR_ALLIANCE:
-            for (auto& AllianceCoord : AllianceCoords)
-                m_vPatientSummonCoordinates.push_back(&AllianceCoord);
-            break;
-        case DOCTOR_HORDE:
-            for (auto& HordeCoord : HordeCoords)
-                m_vPatientSummonCoordinates.push_back(&HordeCoord);
-            break;
-    }
-
-    m_bIsEventInProgress = true;
-    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 }
 
-void npc_doctorAI::PatientDied(Location* pPoint)
+void npc_doctorAI::EndEvent(bool success)
 {
-    Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid);
-
-    if (pPlayer && (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE))
+    if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
     {
-        ++m_uiPatientDiedCount;
-
-        if (m_uiPatientDiedCount > 5)
+        if (success)
         {
             if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
+                pPlayer->GroupEventHappens(QUEST_TRIAGE_A, m_creature);
+            else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
+                pPlayer->GroupEventHappens(QUEST_TRIAGE_H, m_creature);
+        }
+        else
+        {
+            if(pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
                 pPlayer->FailQuest(QUEST_TRIAGE_A);
             else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
                 pPlayer->FailQuest(QUEST_TRIAGE_H);
-
-            Reset();
-            return;
         }
-
-        m_vPatientSummonCoordinates.push_back(pPoint);
     }
-    else
-        // If no player or player abandon quest in progress
-        Reset();
+
+    for (auto const& guid : m_patientGuids)
+    {
+        if (Creature* pPatient = m_creature->GetMap()->GetCreature(guid))
+            pPatient->DespawnOrUnsummon(1);
+    }
+    
+    Reset();
 }
 
-void npc_doctorAI::PatientSaved(Creature* /*soldier*/, Player* pPlayer, Location* pPoint)
+void npc_doctorAI::PatientDied(Creature* pCreature)
 {
-    if (pPlayer && m_playerGuid == pPlayer->GetObjectGuid())
+    m_patientGuids.erase(pCreature->GetObjectGuid());
+    ++m_uiPatientDiedCount;
+
+    if (m_uiPatientDiedCount > 5)
     {
-        if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
+        EndEvent(false);
+        return;
+    }
+}
+
+void npc_doctorAI::PatientSaved(Creature* pCreature, Player* pPlayer)
+{
+    m_patientGuids.erase(pCreature->GetObjectGuid());
+    if (pPlayer->GetObjectGuid() != m_playerGuid)
+        return;
+
+    ++m_uiPatientSavedCount;
+    if (m_uiPatientSavedCount >= 15)
+        EndEvent(true);
+}
+
+Position const* npc_doctorAI::GetPatientSpawnPosition()
+{
+    std::vector<Position const*> freeSpots;
+    for (auto const& pos : m_vPatientSummonCoordinates)
+        freeSpots.push_back(&pos);
+
+    for (auto const& guid : m_patientGuids)
+    {
+        if (Creature* pPatient = m_creature->GetMap()->GetCreature(guid))
         {
-            ++m_uiPatientSavedCount;
-
-            if (m_uiPatientSavedCount == 15)
+            for (auto itr = freeSpots.begin(); itr != freeSpots.end();)
             {
-                for (GuidList::const_iterator itr = m_lPatientGuids.begin(); itr != m_lPatientGuids.end(); ++itr)
-                {
-                    if (Creature* pPatient = m_creature->GetMap()->GetCreature(*itr))
-                        pPatient->SetDeathState(JUST_DIED);
-                }
-
-                switch (m_creature->GetEntry())
-                {
-                    case DOCTOR_ALLIANCE: pPlayer->GroupEventHappens(QUEST_TRIAGE_A, m_creature); break;
-                    case DOCTOR_HORDE:    pPlayer->GroupEventHappens(QUEST_TRIAGE_H, m_creature); break;
-                    default:
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
-                        return;
-                }
-
-                Reset();
-                return;
+                if (pPatient->GetDistance3dToCenter(**itr) < 1.0f)
+                    itr = freeSpots.erase(itr);
+                else
+                    itr++;
             }
 
-            m_vPatientSummonCoordinates.push_back(pPoint);
+            if (freeSpots.empty())
+                return nullptr;
         }
     }
+
+    return SelectRandomContainerElement(freeSpots);
 }
 
 void npc_doctorAI::UpdateAI(uint32 const uiDiff)
 {
-    if (m_bIsEventInProgress && m_uiSummonPatientCount >= 21)	// worst case scenario : 5 deads + 15 saved
+    if (!m_playerGuid.IsEmpty())
     {
-        Reset();
-        return;
-    }
-
-    if (m_bIsEventInProgress && !m_vPatientSummonCoordinates.empty())
-    {
-        if (m_uiSummonPatientTimer < uiDiff)
+        if (m_uiSummonPatientCount >= 21)	// worst case scenario : 5 dead + 15 saved
         {
-            std::vector<Location*>::iterator itr = m_vPatientSummonCoordinates.begin() + urand(0, m_vPatientSummonCoordinates.size() - 1);
-            uint32 patientEntry = 0;
+            EndEvent(true);
+            return;
+        }
 
-            switch (m_creature->GetEntry())
+        Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid);
+        if (pPlayer && pPlayer->IsWithinDist(m_creature, DEFAULT_VISIBILITY_DISTANCE))
+        {
+            if (m_uiSummonPatientTimer < uiDiff)
             {
-                case DOCTOR_ALLIANCE: patientEntry = AllianceSoldierId[urand(0, 2)]; break;
-                case DOCTOR_HORDE:    patientEntry = HordeSoldierId[urand(0, 2)];    break;
-                default:
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
-                    return;
-            }
-
-            if (Creature* pPatient = m_creature->SummonCreature(patientEntry, (*itr)->x, (*itr)->y, (*itr)->z, (*itr)->o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5000))
-            {
-                // 2.4.3, this flag appear to be required for client side item->spell to work (TARGET_UNIT_FRIEND)
-                pPatient->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
-
-                m_lPatientGuids.push_back(pPatient->GetObjectGuid());
-
-                if (npc_injured_patientAI* pPatientAI = dynamic_cast<npc_injured_patientAI*>(pPatient->AI()))
+                if (Position const* pos = GetPatientSpawnPosition())
                 {
-                    pPatientAI->m_doctorGuid = m_creature->GetObjectGuid();
-                    pPatientAI->m_pCoord = *itr;
-                    m_vPatientSummonCoordinates.erase(itr);
+                    uint32 patientEntry = 0;
+                    switch (m_creature->GetEntry())
+                    {
+                        case DOCTOR_ALLIANCE: patientEntry = AllianceSoldierId[urand(0, 2)]; break;
+                        case DOCTOR_HORDE:    patientEntry = HordeSoldierId[urand(0, 2)];    break;
+                        default:
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
+                            return;
+                    }
+
+                    if (Creature* pPatient = m_creature->SummonCreature(patientEntry, pos->x, pos->y, pos->z, pos->o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5000))
+                    {
+                        // 2.4.3, this flag appear to be required for client side item->spell to work (TARGET_UNIT_FRIEND)
+                        pPatient->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
+                        m_patientGuids.insert(pPatient->GetObjectGuid());
+                        if (npc_injured_patientAI* pPatientAI = dynamic_cast<npc_injured_patientAI*>(pPatient->AI()))
+                            pPatientAI->m_doctorGuid = m_creature->GetObjectGuid();
+                        ++m_uiSummonPatientCount;
+                    }
                 }
+
+                m_uiSummonPatientTimer = 10000;
             }
-            m_uiSummonPatientTimer = 10000;
-            ++m_uiSummonPatientCount;
+            else
+                m_uiSummonPatientTimer -= uiDiff;
         }
         else
-            m_uiSummonPatientTimer -= uiDiff;
+        {
+            EndEvent(false);
+        }
     }
+
+    ScriptedAI::UpdateAI(uiDiff);
 }
 
 bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
