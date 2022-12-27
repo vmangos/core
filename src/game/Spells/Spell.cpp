@@ -6880,6 +6880,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!m_caster->IsPlayer())
                     return SPELL_FAILED_BAD_TARGETS;
 
+                if (!m_targets.getUnitTarget())
+                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+
                 if (m_targets.getUnitTarget() == m_casterUnit)
                     return SPELL_FAILED_BAD_TARGETS;
 
@@ -6897,9 +6900,6 @@ SpellCastResult Spell::CheckCast(bool strict)
 #else
                     return SPELL_FAILED_FIZZLE;
 #endif
-
-                if (!m_targets.getUnitTarget())
-                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
                 if (m_targets.getUnitTarget()->GetCharmerGuid())
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
@@ -6919,6 +6919,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!m_casterUnit)
                     return SPELL_FAILED_BAD_TARGETS;
 
+                if (!m_targets.getUnitTarget())
+                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+
                 if (m_targets.getUnitTarget() == m_casterUnit)
                     return SPELL_FAILED_BAD_TARGETS;
 
@@ -6936,9 +6939,6 @@ SpellCastResult Spell::CheckCast(bool strict)
 #else
                     return SPELL_FAILED_FIZZLE;
 #endif
-
-                if (!m_targets.getUnitTarget())
-                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
                 if (m_targets.getUnitTarget()->GetCharmerGuid())
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
