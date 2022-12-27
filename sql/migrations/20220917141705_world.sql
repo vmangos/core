@@ -962,6 +962,30 @@ UPDATE `quest_template` SET `PrevQuestId` = 3791 WHERE `entry` = 3792;
 -- Option To Purchase Tharlendris Seeds Unlocks When Quest 3761 is Complete.
 UPDATE `gossip_menu_option` SET `condition_id` = 60002 WHERE `menu_id` = 1701 AND `id` = 1;
 
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Update Of Forgotten Memories (credit cmangos)
+DELETE FROM `creature_ai_scripts` WHERE `id`=1188601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1188601, 0, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mercutio Filthgorger - Increment Phase'),
+(1188601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7261, 0, 0, 0, 0, 0, 0, 0, 0, 'Mercutio Filthgorger - Talk');
+
+UPDATE `creature_template` SET `movement_type` = 2 WHERE `entry` = 11886;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(11886, 1, 1568.343, -3263.964, 87.08144, 100, 0, 0, 0),
+(11886, 2, 1562.12, -3274.806, 87.43697, 100, 600000, 0, 0);
+
+DELETE FROM `event_scripts` WHERE `id`=5759;
+INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(5759, 1, 0, 10, 11887, 600000, 3, 0, 0, 0, 0, 0, 8, 1188701, -1, 1, 1573.96, -3256.98, 86.7919, 4.03171, 0, 'Of Forgotten Memories - Summon Creature'),
+(5759, 1, 0, 10, 11887, 600000, 3, 0, 0, 0, 0, 0, 8, 1188702, -1, 1, 1570.57, -3254.73, 86.7141, 4.50295, 0, 'Of Forgotten Memories - Summon Creature'),
+(5759, 1, 0, 10, 11886, 600000, 1, 0, 0, 0, 0, 0, 8, 0, -1, 1, 1571.65, -3257.46, 86.8517, 4.38078, 0, 'Of Forgotten Memories - Summon Creature'),
+(5759, 1, 0, 10, 11887, 600000, 3, 0, 0, 0, 0, 0, 8, 1188703, -1, 1, 1573.05, -3253.93, 86.7212, 4.34587, 0, 'Of Forgotten Memories - Summon Creature');
+
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1188701, 0, 0, 78, 7, 0, 0, 0, 11886, 10, 8, 0, 0, 0, 0, 0, 2, 0, 0, 2.08, 0, 'Crypt Robber - Join Creature Group'),
+(1188702, 0, 0, 78, 7, 0, 0, 0, 11886, 10, 8, 0, 0, 0, 0, 0, 2, 0, 0, 4.16, 0, 'Crypt Robber - Join Creature Group'),
+(1188703, 0, 0, 78, 7, 0, 0, 0, 11886, 10, 8, 0, 0, 0, 0, 0, 3, 0, 0, 3.12, 0, 'Crypt Robber - Join Creature Group');
 
 -- End of migration.
 END IF;
