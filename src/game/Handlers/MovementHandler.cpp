@@ -370,6 +370,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
     }
 
+    // CMSG opcode has no handler in client, should not be sent to others.
+    // It is sent by client when you jump and hit something on the way up,
+    // thus stopping upward movement and causing you to descend sooner.
+    if (opcode == CMSG_MOVE_FALL_RESET)
+        return;
+
     WorldPacket data(opcode, recvData.size());
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

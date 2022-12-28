@@ -1735,6 +1735,19 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
+#    Anticheat.BadFallReset.Enable
+#        Description: Check for wrong data in fall reset opcode.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.BadFallReset.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.BadFallReset.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Kick
+#
 #    Anticheat.Teleport.Enable
 #        Description: Check for players teleporting far away from their current position.
 #        Default:     1 - (Enabled)
@@ -2031,6 +2044,9 @@ Anticheat.NoFallTime.Enable = 1
 Anticheat.NoFallTime.Reject = 1
 Anticheat.NoFallTime.Threshold = 5
 Anticheat.NoFallTime.Penalty = 11
+Anticheat.BadFallReset.Enable = 1
+Anticheat.BadFallReset.Threshold = 1
+Anticheat.BadFallReset.Penalty = 11
 Anticheat.Teleport.Enable = 1
 Anticheat.Teleport.Reject = 1
 Anticheat.Teleport.Distance = 40.0
