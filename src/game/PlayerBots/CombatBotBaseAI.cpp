@@ -215,7 +215,7 @@ void CombatBotBaseAI::PopulateSpellData()
         if (pSpellEntry->HasAttribute(SPELL_ATTR_PASSIVE))
             continue;
 
-        if (pSpellEntry->HasAttribute(SPELL_ATTR_HIDDEN_CLIENTSIDE))
+        if (pSpellEntry->HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY))
             continue;
 
         switch (me->GetClass())
@@ -2937,7 +2937,6 @@ SpellCastResult CombatBotBaseAI::DoCastSpell(Unit* pTarget, SpellEntry const* pS
         me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     me->SetTargetGuid(pTarget->GetObjectGuid());
-    me->m_castingSpell = (me->GetClass() == CLASS_ROGUE) ? me->GetComboPoints() : pSpellEntry->Id;
     auto result = me->CastSpell(pTarget, pSpellEntry, false);
 
     //printf("cast %s result %u\n", pSpellEntry->SpellName[0].c_str(), result);

@@ -1490,7 +1490,7 @@ class Player final: public Unit
         void SetTemporaryUnsummonedPetNumber(uint32 petNumber) { m_temporaryUnsummonedPetNumber = petNumber; }
         void UnsummonPetTemporaryIfAny();
         void ResummonPetTemporaryUnSummonedIfAny();
-        bool IsPetNeedBeTemporaryUnsummoned() const { return !IsInWorld() || !IsAlive() || IsMounted() /*+in flight*/; }
+        bool IsPetNeedBeTemporaryUnsummoned() const;
         
         /*********************************************************/
         /***                   SPELL SYSTEM                    ***/
@@ -1576,8 +1576,6 @@ class Player final: public Unit
                     ++spellCDItr;
             }
         }
-        
-        uint32 m_castingSpell; // Last spell cast by client, or combo points if player is rogue
 
         /*********************************************************/
         /***                   TALENT SYSTEM                   ***/
@@ -1838,6 +1836,8 @@ class Player final: public Unit
         float  m_summon_z;
 
         Camera m_camera;
+        ObjectGuid m_pendingCameraUpdate;
+        uint32 m_cameraUpdateTimer;
         float m_longSightRange;
         uint32 m_longSightSpell;
 
@@ -1957,6 +1957,7 @@ class Player final: public Unit
         void LeaveCombatWithFarAwayCreatures();
 
         Camera& GetCamera() { return m_camera; }
+        void ScheduleCameraUpdate(ObjectGuid guid);
 
         uint32 GetLongSight() const { return m_longSightSpell; }
         void SetLongSight(Aura const* aura = nullptr);
@@ -2101,7 +2102,7 @@ class Player final: public Unit
         void InitTaxiNodes() { m_taxi.InitTaxiNodes(GetRace(), GetLevel()); }
         bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc = nullptr, uint32 spellid = 0, bool nocheck = false);
         bool ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid = 0, bool nocheck = false);
-        void TaxiStepFinished();
+        void TaxiStepFinished(bool lastPointReached);
         void ContinueTaxiFlight();
 
         /*********************************************************/
@@ -2336,6 +2337,7 @@ class Player final: public Unit
     private:
         Team m_team;
         ReputationMgr  m_reputationMgr;
+        std::set<uint32> m_temporaryAtWarFactions;
     public:
         static Team TeamForRace(uint8 race);
         Team GetTeam() const final { return m_team; }
@@ -2349,6 +2351,8 @@ class Player final: public Unit
         void RewardReputation(Unit* pVictim, float rate);
         void RewardReputation(Quest const* pQuest);
         int32 CalculateReputationGain(ReputationSource source, int32 rep, int32 faction, uint32 creatureOrQuestLevel = 0, bool noAuraBonus = false);
+        void SetTemporaryAtWarWithFaction(uint32 factionId) { m_temporaryAtWarFactions.insert(factionId); }
+        void ClearTemporaryWarWithFactions();
 
         bool ChangeRace(uint8 newRace);
         bool ChangeItemsForRace(uint8 oldRace, uint8 newRace);

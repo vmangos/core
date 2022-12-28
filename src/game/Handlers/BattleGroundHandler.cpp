@@ -319,7 +319,7 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_d
             if (_player->GetTeam() == ALLIANCE)
                 pFlagCarrier = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGuid());
             else
-                pFlagCarrier = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());;
+                pFlagCarrier = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());
 
             data << uint8(pFlagCarrier ? 1 : 0);
 

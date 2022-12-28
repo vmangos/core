@@ -451,7 +451,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 loot->clear();
                 corpse->RemoveFlag(CORPSE_FIELD_DYNAMIC_FLAGS, CORPSE_DYNFLAG_LOOTABLE);
             }
-            corpse->ForceValuesUpdateAtIndex(CORPSE_DYNFLAG_LOOTABLE);
+            corpse->ForceValuesUpdateAtIndex(CORPSE_FIELD_DYNAMIC_FLAGS);
             corpse->ExecuteDelayedActions();
             break;
         }

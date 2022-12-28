@@ -55,6 +55,7 @@
 #include "AuraRemovalMgr.h"
 #include "world/world_event_wareffort.h"
 #include "CreatureGroups.h"
+#include "Geometry.h"
 
 Map::~Map()
 {
@@ -3139,46 +3140,56 @@ bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y,
 {
     ASSERT(MaNGOS::IsValidMapCoord(x, y, z));
 
-    // Trouver le navMeshQuery
+    // Find the navMeshQuery.
     MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
     dtNavMeshQuery const* m_navMeshQuery = transport ? mmap->GetModelNavMeshQuery(transport->GetDisplayId()) : mmap->GetNavMeshQuery(GetId());
     float radius = maxRadius * rand_norm_f();
-    if (!m_navMeshQuery)
-        return false;
-    // Trouver une position valide a cote.
-    float point[3] = {y, z, x};
+
+    // Find a valid position nearby.
+    float endPosition[3];
+    float point[3] = { y, z, x };
     if (transport)
         transport->CalculatePassengerOffset(point[2], point[0], point[1]);
 
-    // ATTENTION : Positions en Y,Z,X
-    float closestPoint[3] = {0.0f, 0.0f, 0.0f};
-    dtQueryFilter filter;
-    filter.setIncludeFlags(moveAllowedFlags);
-    filter.setExcludeFlags(NAV_STEEP_SLOPES);
-    dtPolyRef startRef = PathInfo::FindWalkPoly(m_navMeshQuery, point, filter, closestPoint);
-    if (!startRef)
-        return false;
+    if (m_navMeshQuery)
+    {
+        // ATTENTION : Positions are Y,Z,X
+        float closestPoint[3] = { 0.0f, 0.0f, 0.0f };
+        dtQueryFilter filter;
+        filter.setIncludeFlags(moveAllowedFlags);
+        filter.setExcludeFlags(NAV_STEEP_SLOPES);
+        dtPolyRef startRef = PathInfo::FindWalkPoly(m_navMeshQuery, point, filter, closestPoint);
+        if (!startRef)
+            return false;
 
-    dtPolyRef randomPosRef = 0;
-    dtStatus result = m_navMeshQuery->findRandomPointAroundCircle(startRef, closestPoint, maxRadius, &filter, rand_norm_f, &randomPosRef, point);
-    if (dtStatusFailed(result) || !MaNGOS::IsValidMapCoord(point[2], point[0], point[1]))
-        return false;
+        dtPolyRef randomPosRef = 0;
+        dtStatus result = m_navMeshQuery->findRandomPointAroundCircle(startRef, closestPoint, maxRadius, &filter, rand_norm_f, &randomPosRef, point);
+        if (dtStatusFailed(result) || !MaNGOS::IsValidMapCoord(point[2], point[0], point[1]))
+            return false;
 
-    // Random point may be at a bigger distance than allowed
-    float d = sqrt(pow(x - point[2], 2) + pow(y - point[0], 2));
-    float endPosition[3] = {y + radius*(y - point[0]) / d, z, x + radius*(x - point[2]) / d};
-    float t = 0.0f;
-    dtPolyRef visited[10] = {0};
-    int visitedCount = 0;
-    float hitNormal[3] = {0}; // Normal of wall hit.
-    result = m_navMeshQuery->raycast(startRef, closestPoint, endPosition, &filter, &t, hitNormal, visited, &visitedCount, 10);
-    if (dtStatusFailed(result) || !visitedCount)
-        return false;
-    for (int i = 0; i < 3; ++i)
-                endPosition[i] += hitNormal[i] * 0.5f;
-    result = m_navMeshQuery->closestPointOnPoly(visited[visitedCount - 1], endPosition, endPosition, nullptr);
-    if (dtStatusFailed(result) || !MaNGOS::IsValidMapCoord(endPosition[2], endPosition[0], endPosition[1]))
-        return false;
+        // Random point may be at a bigger distance than allowed
+        float d = sqrt(pow(x - point[2], 2) + pow(y - point[0], 2));
+        endPosition[0] = y + radius*(y - point[0]) / d;
+        endPosition[1] = z;
+        endPosition[2] = x + radius*(x - point[2]) / d;
+        float t = 0.0f;
+        dtPolyRef visited[10] = { 0 };
+        int visitedCount = 0;
+        float hitNormal[3] = { 0 }; // Normal of wall hit.
+        result = m_navMeshQuery->raycast(startRef, closestPoint, endPosition, &filter, &t, hitNormal, visited, &visitedCount, 10);
+        if (dtStatusFailed(result) || !visitedCount)
+            return false;
+        for (int i = 0; i < 3; ++i)
+            endPosition[i] += hitNormal[i] * 0.5f;
+        result = m_navMeshQuery->closestPointOnPoly(visited[visitedCount - 1], endPosition, endPosition, nullptr);
+        if (dtStatusFailed(result) || !MaNGOS::IsValidMapCoord(endPosition[2], endPosition[0], endPosition[1]))
+            return false;
+    }
+    else
+    {
+        Geometry::GetNearPoint2DAroundPosition(point[2], point[0], endPosition[2], endPosition[0], radius, frand(0, M_PI_F * 2));
+        endPosition[1] = point[1];
+    }
 
     if (transport)
         transport->CalculatePassengerPosition(endPosition[2], endPosition[0], endPosition[1]);
@@ -3187,7 +3198,7 @@ bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y,
     x = endPosition[2];
     y = endPosition[0];
     z = endPosition[1];
-    // 2. On precise avec les vmaps (la premiere etape permet en gros de selectionner l'etage)
+    // 2. We specify with the vmaps (the first step basically allows you to select the floor)
     if (transport)
         z += 0.5f; // Allow us a little error (mmaps not very precise regarding height computations)
     else

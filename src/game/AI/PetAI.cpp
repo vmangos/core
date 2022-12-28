@@ -202,6 +202,9 @@ void PetAI::UpdateAI(uint32 const diff)
             if (!spellInfo)
                 continue;
 
+            if (!spellInfo->IsAutocastable())
+                continue;
+
             if (m_creature->HasGCD(spellInfo))
                 continue;
 

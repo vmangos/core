@@ -593,7 +593,7 @@ void Opcodes::BuildOpcodeList()
     /*0x206*/  StoreOpcode(SMSG_GMTICKET_CREATE,              "SMSG_GMTICKET_CREATE",             STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x207*/  StoreOpcode(CMSG_GMTICKET_UPDATETEXT,          "CMSG_GMTICKET_UPDATETEXT",         STATUS_LOGGEDIN,  PACKET_PROCESS_WORLD,         &WorldSession::HandleGMTicketUpdateTextOpcode);
     /*0x208*/  StoreOpcode(SMSG_GMTICKET_UPDATETEXT,          "SMSG_GMTICKET_UPDATETEXT",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
-    /*0x209*/  StoreOpcode(SMSG_ACCOUNT_DATA_TIMES,           "SMSG_ACCOUNT_DATA_TIMES",          STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
+    /*0x209*/  StoreOpcode(SMSG_ACCOUNT_DATA_MD5,             "SMSG_ACCOUNT_DATA_MD5",            STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x20A*/  StoreOpcode(CMSG_REQUEST_ACCOUNT_DATA,         "CMSG_REQUEST_ACCOUNT_DATA",        STATUS_LOGGEDIN,  PACKET_PROCESS_WORLD,         &WorldSession::HandleRequestAccountData);
     /*0x20B*/  StoreOpcode(CMSG_UPDATE_ACCOUNT_DATA,          "CMSG_UPDATE_ACCOUNT_DATA",         STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT, PACKET_PROCESS_WORLD,         &WorldSession::HandleUpdateAccountData);
     /*0x20C*/  StoreOpcode(SMSG_UPDATE_ACCOUNT_DATA,          "SMSG_UPDATE_ACCOUNT_DATA",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);

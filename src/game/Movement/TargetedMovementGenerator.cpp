@@ -209,7 +209,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         if (dist > speedupDistance)
         {
             Unit* pOwner = owner.GetCharmerOrOwner();
-            if (pOwner && !pOwner->IsInCombat() && !owner.IsInCombat())
+            if (pOwner && (!pOwner->IsInCombat() && !owner.IsInCombat() || pOwner->IsPlayer() && pOwner->IsMounted()))
             {
                 float distFactor = 1.0f;
                 if (pOwner->IsMounted())

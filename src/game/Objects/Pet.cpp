@@ -67,7 +67,7 @@ Pet::Pet(PetType type) :
     m_loyaltyPoints(0), m_bonusdamage(0), m_auraUpdateMask(0), m_loading(false), m_pTmpCache(nullptr), m_unSummoned(false), m_enabled(true)
 {
     m_name = "Pet";
-    m_regenTimer = REGEN_TIME_FULL;
+    m_regenTimer = REGEN_TIME_CREATURE_FULL;
 
     // pets always have a charminfo, even if they are not actually charmed
     InitCharmInfo(this);
@@ -404,6 +404,9 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
+        if (owner->IsMounted())
+            m_enabled = false;
+
         ((Player*)owner)->PetSpellInitialize();
         if (((Player*)owner)->GetGroup())
             ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
@@ -736,7 +739,7 @@ void Pet::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 
         RegenerateMana();
 
-        m_regenTimer = REGEN_TIME_FULL;
+        m_regenTimer = REGEN_TIME_CREATURE_FULL;
     }
     else
         m_regenTimer -= update_diff;

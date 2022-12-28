@@ -929,7 +929,7 @@ void Creature::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 
     RegenerateMana();
 
-    m_regenTimer = REGEN_TIME_FULL;
+    m_regenTimer = REGEN_TIME_CREATURE_FULL;
 }
 
 void Creature::RegenerateMana()
@@ -949,7 +949,7 @@ void Creature::RegenerateMana()
     if (IsInCombat() || GetCharmerOrOwnerGuid().IsPlayer())
     {
         if (!IsUnderLastManaUseEffect())
-            addvalue = m_manaRegen;
+            addvalue = round_float_chance(m_manaRegen);
     }
     else
         addvalue = maxValue / 3;
@@ -1915,22 +1915,26 @@ void Creature::DeleteFromDB(uint32 lowguid, CreatureData const* data)
     WorldDatabase.CommitTransaction();
 }
 
-float Creature::GetAttackDistance(Unit const* pl) const
+float Creature::GetAttackDistance(Unit const* pTarget) const
 {
     float const aggroRate = sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     if (aggroRate == 0)
         return 0.0f;
 
-    uint32 const playerlevel   = pl->GetLevelForTarget(this);
-    uint32 const creaturelevel = GetLevelForTarget(pl);
+    // proximity aggro does not target disabled pets (owner is mounted)
+    if (pTarget->IsPet() && !static_cast<Pet const*>(pTarget)->IsEnabled())
+        return 0.0f;
 
-    int32 leveldif       = int32(playerlevel) - int32(creaturelevel);
+    uint32 const targetlevel = pTarget->GetLevelForTarget(this);
+    uint32 const creaturelevel = GetLevelForTarget(pTarget);
+
+    int32 leveldif = int32(targetlevel) - int32(creaturelevel);
 
     // "The maximum Aggro Radius has a cap of 25 levels under. Example: A level 30 char has the same Aggro Radius of a level 5 char on a level 60 mob."
     if (leveldif < - 25)
         leveldif = -25;
 
-    // "The aggro radius of a mob having the same level as the player is roughly 20 yards"
+    // "The aggro radius of a mob having the same level as the player is roughly 18 yards"
     float const detectionRange = GetDetectionRange();
     float finalDistance = detectionRange;
     if (finalDistance < 1)
@@ -1941,14 +1945,14 @@ float Creature::GetAttackDistance(Unit const* pl) const
     finalDistance -= (float)leveldif;
 
     // detect range auras
-    // SPELL_AURA_MOD_DETECT_RANGE: Par exemple [2908 - Apaiser les animaux]. Affecte uniquement si niveau < 70 par exemple (rang 3).
+    // SPELL_AURA_MOD_DETECT_RANGE: For exemple [2908 - Soothe Animal]. Affects only if level < 70 (rank 3).
     AuraList const& nModDetectRange = GetAurasByType(SPELL_AURA_MOD_DETECT_RANGE);
     for (const auto i : nModDetectRange)
         if (i->GetSpellProto()->MaxTargetLevel >= GetLevel())
             finalDistance += i->GetModifier()->m_amount;
 
     // detected range auras
-    finalDistance += pl->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
+    finalDistance += pTarget->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
 
     // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
     float const minDistance = std::min(detectionRange, 5.0f);
@@ -2646,8 +2650,13 @@ void Creature::LoadCreatureAddon(bool reload)
 {
     if (CreatureDataAddon const* cainfo = GetCreatureAddon())
     {
-        if (!reload && cainfo->mount_display_id >= 0)
-            m_mountId = cainfo->mount_display_id;
+        if (!reload)
+        {
+            if (cainfo->mount_display_id >= 0)
+                m_mountId = cainfo->mount_display_id;
+            else
+                m_mountId = m_creatureInfo->mount_display_id;
+        }
 
         if (m_mountId != 0)
             Mount(m_mountId);
@@ -3449,27 +3458,20 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
         if (GetReputationId() >= 0)
         {
             if (Player* pPlayer = pWho->ToPlayer())
+            {
                 if (pPlayer->GetReputationMgr().SetAtWar(GetReputationId(), true))
+                {
+                    pPlayer->SetTemporaryAtWarWithFaction(GetFactionId());
                     pPlayer->SendFactionAtWar(GetReputationId(), true);
+                }
+            }
         }
 
         if (CanSummonGuards())
             sGuardMgr.SummonGuard(this, pWho);
 
-        if (Unit* pOwner = GetCharmerOrOwner())
-        {
-            if (pOwner->IsPlayer())
-            {
-                if (pWho->IsValidAttackTarget(pOwner))
-                {
-                    pWho->AddThreat(pOwner);
-                    pWho->SetInCombatWithVictim(pOwner);
-                    pOwner->SetInCombatWithAggressor(pWho);
-                }
-            }
-            else
-                SetLastLeashExtensionTimePtr(static_cast<Creature*>(pOwner)->GetLastLeashExtensionTimePtr());
-        }
+        if (Creature* pOwner = GetOwnerCreature())
+            SetLastLeashExtensionTimePtr(pOwner->GetLastLeashExtensionTimePtr());
     }
 }
 

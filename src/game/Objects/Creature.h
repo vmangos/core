@@ -500,7 +500,7 @@ class Creature : public Unit
         void SetTempPacified(uint32 timer)  { if (m_pacifiedTimer < timer) m_pacifiedTimer = timer; }
         uint32 GetTempPacifiedTimer() const { return m_pacifiedTimer; }
         uint32 m_pacifiedTimer;
-        uint32 m_manaRegen;
+        float m_manaRegen;
 
         void RegenerateHealth();
         void RegenerateMana();

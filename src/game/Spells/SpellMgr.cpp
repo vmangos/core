@@ -917,7 +917,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
         return false;
 
     if (spellId_1 == spellId_2)
-        return false;
+        return spellInfo_1->HasAttribute(SPELL_ATTR_EX_AURA_UNIQUE);
 
     // Resurrection sickness
     if ((spellInfo_1->Id == SPELL_ID_PASSIVE_RESURRECTION_SICKNESS) != (spellInfo_2->Id == SPELL_ID_PASSIVE_RESURRECTION_SICKNESS))
@@ -3304,7 +3304,7 @@ namespace SpellInternal
     bool IsReflectableSpell(SpellEntry const* spellInfo)
     {
         return spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !spellInfo->HasAttribute(SPELL_ATTR_IS_ABILITY)
-            && !spellInfo->HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !spellInfo->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
+            && !spellInfo->HasAttribute(SPELL_ATTR_EX_NO_REFLECTION) && !spellInfo->HasAttribute(SPELL_ATTR_NO_IMMUNITIES)
             && !spellInfo->HasAttribute(SPELL_ATTR_PASSIVE) && !spellInfo->IsPositiveSpell();
     }
 
@@ -3411,7 +3411,7 @@ namespace SpellInternal
 
     bool IsPvEHeartBeat(SpellEntry const* spellInfo)
     {
-        if (!spellInfo->HasAttribute(SPELL_ATTR_DIMINISHING_RETURNS))
+        if (!spellInfo->HasAttribute(SPELL_ATTR_HEARTBEAT_RESIST))
             return false;
 
         for (uint32 i : spellInfo->EffectApplyAuraName)

@@ -41,7 +41,7 @@ struct RealmBuildInfo
     std::array<uint8, 20> integrityHash = { };
 };
 
-RealmBuildInfo const* FindBuildInfo(uint16 _build);
+RealmBuildInfo const* FindBuildInfo(uint16 build);
 std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, uint32 os, uint32 platform);
 
 extern std::vector<RealmBuildInfo> ExpectedRealmdClientBuilds;

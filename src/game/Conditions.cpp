@@ -215,7 +215,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             Unit::SpellAuraHolderMap const& auras = target->ToPlayer()->GetSpellAuraHolderMap();
             for (const auto& aura : auras)
-                if ((aura.second->GetSpellProto()->Attributes & SPELL_ATTR_CASTABLE_WHILE_MOUNTED || aura.second->GetSpellProto()->Attributes & SPELL_ATTR_IS_ABILITY) && aura.second->GetSpellProto()->SpellVisual == 3580)
+                if ((aura.second->GetSpellProto()->Attributes & SPELL_ATTR_ALLOW_WHILE_MOUNTED || aura.second->GetSpellProto()->Attributes & SPELL_ATTR_IS_ABILITY) && aura.second->GetSpellProto()->SpellVisual == 3580)
                     return true;
             return false;
         }

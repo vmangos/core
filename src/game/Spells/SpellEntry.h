@@ -169,6 +169,7 @@ namespace Spells
         }
     }
 
+    bool IsAutocastable(uint32 spellId);
     bool IsPassiveSpell(uint32 spellId);
     bool IsPositiveSpell(uint32 spellId);
     bool IsPositiveSpell(uint32 spellId, Unit* caster, Unit* victim);
@@ -746,12 +747,12 @@ class SpellEntry
 
         bool IsNextMeleeSwingSpell() const
         {
-            return Attributes & (SPELL_ATTR_ON_NEXT_SWING_1 | SPELL_ATTR_ON_NEXT_SWING_2);
+            return Attributes & (SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE | SPELL_ATTR_ON_NEXT_SWING);
         }
 
         bool IsRangedSpell() const
         {
-            return Attributes & SPELL_ATTR_RANGED;
+            return Attributes & SPELL_ATTR_USES_RANGED_SLOT;
         }
 
         bool IsSealSpell() const
@@ -807,7 +808,7 @@ class SpellEntry
 
         bool IsNonCombatSpell() const
         {
-            return (Attributes & SPELL_ATTR_CANT_USED_IN_COMBAT) != 0;
+            return (Attributes & SPELL_ATTR_NOT_IN_COMBAT_ONLY_PEACEFUL) != 0;
         }
 
         bool IsPositiveSpell() const
@@ -906,9 +907,14 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_CROWD_CONTROL;
         }
 
+        bool IsAutocastable() const
+        {
+            return !(HasAttribute(SPELL_ATTR_EX_NO_AUTOCAST_AI) || HasAttribute(SPELL_ATTR_PASSIVE));
+        }
+
         bool IsAutoRepeatRangedSpell() const
         {
-            return (Attributes & SPELL_ATTR_RANGED) && (AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG);
+            return (Attributes & SPELL_ATTR_USES_RANGED_SLOT) && (AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG);
         }
 
         bool IsSpellRequiresRangedAP() const
@@ -918,12 +924,12 @@ class SpellEntry
 
         bool IsChanneledSpell() const
         {
-            return (AttributesEx & (SPELL_ATTR_EX_CHANNELED_1 | SPELL_ATTR_EX_CHANNELED_2));
+            return (AttributesEx & (SPELL_ATTR_EX_IS_CHANNELED | SPELL_ATTR_EX_IS_SELF_CHANNELED));
         }
 
         bool NeedsComboPoints() const
         {
-            return (AttributesEx & (SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS | SPELL_ATTR_EX_REQ_COMBO_POINTS));
+            return (AttributesEx & (SPELL_ATTR_EX_FINISHING_MOVE_DAMAGE | SPELL_ATTR_EX_FINISHING_MOVE_DURATION));
         }
 
         bool IsTotemSummonSpell() const
@@ -976,7 +982,7 @@ class SpellEntry
 
         bool IsNeedCastSpellAtFormApply(ShapeshiftForm form) const
         {
-            if (!(Attributes & (SPELL_ATTR_PASSIVE | SPELL_ATTR_HIDDEN_CLIENTSIDE)) || !form)
+            if (!(Attributes & (SPELL_ATTR_PASSIVE | SPELL_ATTR_DO_NOT_DISPLAY)) || !form)
                 return false;
 
             // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!
@@ -987,7 +993,7 @@ class SpellEntry
 
         inline bool IsNeedCastSpellAtOutdoor() const
         {
-            return (HasAttribute(SPELL_ATTR_OUTDOORS_ONLY) && HasAttribute(SPELL_ATTR_PASSIVE));
+            return (HasAttribute(SPELL_ATTR_ONLY_OUTDOORS) && HasAttribute(SPELL_ATTR_PASSIVE));
         }
 
         // Spell effects require a specific power type on the target

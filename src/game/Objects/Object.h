@@ -34,7 +34,6 @@
 #include "Timer.h"
 #include "Camera.h"
 #include "Cell.h"
-
 #include <string>
 
 class WorldPacket;
@@ -876,6 +875,7 @@ class WorldObject : public Object
 
         //obtain terrain data for map where this object belong...
         TerrainInfo const* GetTerrain() const;
+        bool HasMMapsForCurrentMap() const;
 
         void SetZoneScript();
         ZoneScript* GetZoneScript() const { return m_zoneScript; }

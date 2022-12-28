@@ -549,7 +549,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 
 Player::Player(WorldSession* session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this), m_saveDisabled(false),
-    m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_castingSpell(0), m_repopAtGraveyardPending(false),
+    m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_repopAtGraveyardPending(false),
     m_honorMgr(this), m_bNextRelocationsIgnored(0), m_personalXpRate(-1.0f), m_isStandUpScheduled(false), m_foodEmoteTimer(0)
 {
     m_objectType |= TYPEMASK_PLAYER;
@@ -722,6 +722,7 @@ Player::Player(WorldSession* session) : Unit(),
 
     m_justBoarded = false;
 
+    m_cameraUpdateTimer = 0;
     m_longSightSpell = 0;
     m_longSightRange = 0.0f;
 }
@@ -1547,6 +1548,18 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     // Update items that have just a limited lifetime
     if (now > m_lastTick)
         UpdateItemDuration(uint32(now - m_lastTick));
+
+    if (m_cameraUpdateTimer)
+    {
+        if (m_cameraUpdateTimer <= update_diff)
+        {
+            SetGuidValue(PLAYER_FARSIGHT, m_pendingCameraUpdate);
+            m_pendingCameraUpdate.Clear();
+            m_cameraUpdateTimer = 0;
+        }
+        else
+            m_cameraUpdateTimer -= update_diff;
+    }
 
     if (!m_timedquests.empty())
     {
@@ -2669,7 +2682,7 @@ void Player::RegenerateAll()
     Regenerate(POWER_ENERGY);
     Regenerate(POWER_MANA);
 
-    m_regenTimer += REGEN_TIME_FULL;
+    m_regenTimer += REGEN_TIME_PLAYER_FULL;
 }
 
 void Player::Regenerate(Powers power)
@@ -2773,7 +2786,7 @@ void Player::RegenerateHealth()
         {
             AuraList const& lModHealthRegen = GetAurasByType(SPELL_AURA_MOD_REGEN);
             for (const auto i : lModHealthRegen)
-                addvalue += i->GetModifier()->m_amount * (float(REGEN_TIME_FULL) / float(i->GetModifier()->periodictime));
+                addvalue += i->GetModifier()->m_amount * (float(REGEN_TIME_PLAYER_FULL) / float(i->GetModifier()->periodictime));
         }
     }
 
@@ -4065,9 +4078,12 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
 
 bool Player::IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const
 {
+    if (spellInfo->HasAttribute(SPELL_ATTR_EX_CAST_WHEN_LEARNED))
+        return true;
+
     ShapeshiftForm form = GetShapeshiftForm();
 
-    if (spellInfo->IsNeedCastSpellAtFormApply(form))        // SPELL_ATTR_PASSIVE | SPELL_ATTR_UNK7 spells
+    if (spellInfo->IsNeedCastSpellAtFormApply(form))        // SPELL_ATTR_PASSIVE | SPELL_ATTR_DO_NOT_DISPLAY spells
         return true;                                        // all stance req. cases, not have auarastate cases
 
     if (!(spellInfo->Attributes & SPELL_ATTR_PASSIVE))
@@ -6547,7 +6563,7 @@ void Player::CheckAreaExploreAndOutdoor()
         }
     }
     else if (sWorld.getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) && !IsGameMaster())
-        RemoveAurasWithAttribute(SPELL_ATTR_OUTDOORS_ONLY);
+        RemoveAurasWithAttribute(SPELL_ATTR_ONLY_OUTDOORS);
 
     if (areaFlag == 0xffff)
         return;
@@ -7724,7 +7740,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets)
             continue;
         }
 
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ITEM_USE_CANCELS, 0, false, spellInfo->HasAttribute(SPELL_ATTR_EX_NOT_BREAK_STEALTH));
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ITEM_USE_CANCELS, 0, false, spellInfo->HasAttribute(SPELL_ATTR_EX_ALLOW_WHILE_STEALTHED));
 
         Spell* spell = new Spell(this, spellInfo, ((count > 0) || proto->HasExtraFlag(ITEM_EXTRA_CAST_AS_TRIGGERED)));
         spell->SetCastItem(item);
@@ -19030,6 +19046,17 @@ void Player::UpdateLongSight()
                          GetPositionZ());
 }
 
+void Player::ScheduleCameraUpdate(ObjectGuid guid)
+{
+    if (guid.IsEmpty() && m_pendingCameraUpdate.IsEmpty())
+        SetGuidValue(PLAYER_FARSIGHT, guid);
+    else
+    {
+        m_cameraUpdateTimer = BATCHING_INTERVAL;
+        m_pendingCameraUpdate = guid;
+    }
+}
+
 void Player::InitPrimaryProfessions()
 {
     SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL));
@@ -20869,6 +20896,17 @@ void Player::ResummonPetTemporaryUnSummonedIfAny()
     m_temporaryUnsummonedPetNumber = 0;
 }
 
+bool Player::IsPetNeedBeTemporaryUnsummoned() const
+{
+    if (!IsInWorld() || !IsAlive() || IsTaxiFlying())
+        return true;
+
+    if (IsMounted() && sWorld.getConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT))
+        return true;
+
+    return false;
+}
+
 void Player::_SaveBGData()
 {
     // nothing save
@@ -21811,7 +21849,7 @@ bool Player::HasFreeBattleGroundQueueId() const
     return false;
 }
 
-void Player::TaxiStepFinished()
+void Player::TaxiStepFinished(bool lastPointReached)
 {
     if (!IsInWorld())
         return;
@@ -21876,7 +21914,8 @@ void Player::TaxiStepFinished()
     else
     {
         // When the player reaches the last flight point, teleport to destination taxi node location
-        TeleportTo(curDestNode->map_id, curDestNode->x, curDestNode->y, curDestNode->z, GetOrientation());
+        if (lastPointReached)
+            TeleportTo(curDestNode->map_id, curDestNode->x, curDestNode->y, curDestNode->z, GetOrientation());
         m_taxi.ClearTaxiDestinations();        // not destinations, clear source node
     } 
 }
@@ -21986,7 +22025,7 @@ void Player::AddGCD(SpellEntry const& spellEntry, uint32 /*forcedDuration = 0*/,
     // apply haste rating
     if (spellEntry.StartRecoveryCategory == 133 && gcdDuration == 1500 &&
         spellEntry.DmgClass != SPELL_DAMAGE_CLASS_MELEE && spellEntry.DmgClass != SPELL_DAMAGE_CLASS_RANGED &&
-        !spellEntry.HasAttribute(SPELL_ATTR_RANGED) && !spellEntry.HasAttribute(SPELL_ATTR_IS_ABILITY))
+        !spellEntry.HasAttribute(SPELL_ATTR_USES_RANGED_SLOT) && !spellEntry.HasAttribute(SPELL_ATTR_IS_ABILITY))
     {
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         gcdDuration = int32(float(gcdDuration) * GetFloatValue(UNIT_MOD_CAST_SPEED));
@@ -22071,7 +22110,7 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
     {
         // shoot spells used equipped item cooldown values already assigned in GetAttackTime(RANGED_ATTACK)
         // prevent 0 cooldowns set by another way
-        if (spellEntry.HasAttribute(SPELL_ATTR_RANGED) && !spellEntry.HasAttribute(SPELL_ATTR_EX2_NOT_RESET_AUTO_ACTIONS))
+        if (spellEntry.HasAttribute(SPELL_ATTR_USES_RANGED_SLOT) && !spellEntry.HasAttribute(SPELL_ATTR_EX2_NOT_RESET_AUTO_ACTIONS))
             recTime += GetFloatValue(UNIT_FIELD_RANGEDATTACKTIME);
     }
 
@@ -22481,5 +22520,20 @@ void Log::Player(uint32 accountId, LogType logType, char const* subType, LogLeve
     {
         // Player logs should never go to the console
         OutFile(logType, logLevel, log);
+    }
+}
+
+void Player::ClearTemporaryWarWithFactions()
+{
+    if (!m_temporaryAtWarFactions.empty())
+    {
+        for (auto const& factionId : m_temporaryAtWarFactions)
+        {
+            if (FactionEntry const* pFactionEntry = sObjectMgr.GetFactionEntry(factionId))
+                if (GetReputationMgr().GetRank(pFactionEntry) > REP_HOSTILE)
+                    if (GetReputationMgr().SetAtWar(pFactionEntry->reputationListID, false))
+                        SendFactionAtWar(pFactionEntry->reputationListID, false);
+        }
+        m_temporaryAtWarFactions.clear();
     }
 }

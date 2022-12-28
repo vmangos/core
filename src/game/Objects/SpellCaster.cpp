@@ -34,7 +34,7 @@ Unit* SpellCaster::SelectMagnetTarget(Unit* victim, Spell* spell, SpellEffectInd
     SpellEntry const* pProto = spell->m_spellInfo;
     if (!pProto) return nullptr;
     // Example spell: Cause Insanity (Hakkar)
-    if (pProto->AttributesEx & SPELL_ATTR_EX_CANT_BE_REDIRECTED)
+    if (pProto->AttributesEx & SPELL_ATTR_EX_NO_REDIRECTION)
         return victim;
     // Magic case
 
@@ -48,7 +48,7 @@ Unit* SpellCaster::SelectMagnetTarget(Unit* victim, Spell* spell, SpellEffectInd
         {
             if (Unit* magnet = magnetAura->GetCaster())
             {
-                if (magnet->IsAlive() && magnet->IsWithinLOSInMap(this) && spell->CheckTarget(magnet, eff))
+                if (magnet->IsAlive() && magnet->IsInMap(this) && spell->CheckTarget(magnet, eff))
                 {
                     if (SpellAuraHolder* holder = magnetAura->GetHolder())
                         if (holder->DropAuraCharge())
@@ -167,7 +167,7 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         return SPELL_MISS_EVADE;
 
     // Check for immune (use charges)
-    if (pVictim != this && !spell->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY) &&
+    if (pVictim != this && !spell->HasAttribute(SPELL_ATTR_NO_IMMUNITIES) &&
         pVictim->IsImmuneToSpell(spell, pVictim == this))
         return SPELL_MISS_IMMUNE;
 
@@ -413,7 +413,7 @@ SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* 
     bool canParry = true;
 
     // Same spells cannot be parry/dodge
-    if (spell->Attributes & SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK)
+    if (spell->Attributes & SPELL_ATTR_NO_ACTIVE_DEFENSE)
         return SPELL_MISS_NONE;
 
     // Ranged attack cannot be parry/dodge
@@ -906,10 +906,10 @@ float SpellCaster::CalculateSpellEffectValue(Unit const* target, SpellEntry cons
             modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_ALL_EFFECTS, value, spell);
     }
 
-    if (spellProto->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION && spellProto->spellLevel &&
-            spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
-            spellProto->Effect[effect_index] != SPELL_EFFECT_KNOCK_BACK &&
-            (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
+    if (spellProto->HasAttribute(SPELL_ATTR_SCALES_WITH_CREATURE_LEVEL) && spellProto->spellLevel &&
+        spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
+        spellProto->Effect[effect_index] != SPELL_EFFECT_KNOCK_BACK &&
+        (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
         value = value * 0.25f * exp(GetLevel() * (70 - spellProto->spellLevel) / 1000.0f);
 
     return value;

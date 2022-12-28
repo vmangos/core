@@ -354,10 +354,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             DoLootRelease(lootGuid);
     }
 
-    _player->m_castingSpell = spellId;
-    if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-        _player->m_castingSpell = _player->GetComboPoints();
-
     Spell* spell = new Spell(_player, spellInfo, false, ObjectGuid(), nullptr, targets.getUnitTarget());
 
     // Spell has been down-ranked, remember what client wanted to cast.
@@ -399,7 +395,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     if (!spellInfo)
         return;
 
-    if (spellInfo->Attributes & SPELL_ATTR_CANT_CANCEL)
+    if (spellInfo->Attributes & SPELL_ATTR_NO_AURA_CANCEL)
         return;
 
     if (spellInfo->IsPassiveSpell())
