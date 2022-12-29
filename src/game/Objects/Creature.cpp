@@ -1925,8 +1925,10 @@ float Creature::GetAttackDistance(Unit const* pTarget) const
     if (pTarget->IsPet() && !static_cast<Pet const*>(pTarget)->IsEnabled())
         return 0.0f;
 
-    uint32 const targetlevel = pTarget->GetLevelForTarget(this);
-    uint32 const creaturelevel = GetLevelForTarget(pTarget);
+    // pets and charmed mobs use owner level
+    Player* pPlayer = pTarget->GetCharmerOrOwnerPlayer();
+    uint32 const targetlevel = pPlayer ? pPlayer->GetLevelForTarget(this) : pTarget->GetLevelForTarget(this);
+    uint32 const creaturelevel = GetLevelForTarget(pPlayer ? pPlayer : pTarget);
 
     int32 leveldif = int32(targetlevel) - int32(creaturelevel);
 
