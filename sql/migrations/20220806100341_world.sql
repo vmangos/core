@@ -63,6 +63,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_template` SET `flags_extra`=252162 WHERE `entry` IN (16172, 16136);
     UPDATE `creature_template` SET `detection_range`=5 WHERE `entry` IN (16299, 16141, 16298, 16438, 16437, 16422, 16423);
     UPDATE `creature_template` SET `script_name`='npc_scourge_invasion_mouth' WHERE `entry`=16995;
+    UPDATE `creature_template` SET `mechanic_immune_mask`=8602129 WHERE `entry` IN (16299, 16422);
 
     -- gameobject_template:
     UPDATE `gameobject_template` SET `script_name`='go_scourge_invasion_circle' WHERE `entry`=181136;
