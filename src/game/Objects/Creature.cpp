@@ -2729,15 +2729,22 @@ void Creature::SetInCombatWithZone(bool initialPulse)
         return;
 
     if (!HasCreatureState(CSTATE_COMBAT_WITH_ZONE))
+    {
         UpdateCombatWithZoneState(true);
+
+        // Attack closest player first.
+        // Prevent case where boss runs to somebody who just entered raid.
+        if (initialPulse && !GetVictim() && AI())
+        {
+            if (Player* pPlayer = FindNearestHostilePlayer(MAX_VISIBILITY_DISTANCE))
+                AI()->AttackStart(pPlayer);
+        }
+    }
 
     for (const auto& i : PlList)
     {
         if (Player* pPlayer = i.getSource())
         {
-            if (pPlayer->IsGameMaster())
-                continue;
-
             if (!initialPulse && pPlayer->IsInCombat())
                 continue;
 
