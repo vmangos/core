@@ -5154,8 +5154,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     {
                         if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, IN_MILLISECONDS * 2))
                         {
-                            // m_casterUnit->SendSpellGo(m_casterUnit, 28234);
-                            UncommonMinionspawner ? pMinion->SetWanderDistance(5.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.
+                            UncommonMinionspawner ? pMinion->SetWanderDistance(10.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.
+                            pMinion->SetActiveObjectState(true);
                         }
                     }
 

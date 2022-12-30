@@ -73,7 +73,7 @@ struct MouthAI : public ScriptedAI
         m_timer_max = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MAX) * MINUTE;
         m_limit     = sWorld.getConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT);
 
-        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, urand(6 * IN_MILLISECONDS, 15 * IN_MILLISECONDS));
+        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, Seconds(urand(5, 15)));
     }
 
     void inline EnableInvasionWeather(bool invasion)
@@ -89,35 +89,17 @@ struct MouthAI : public ScriptedAI
         switch (m_creature->GetZoneId())
         {
             case ZONEID_WINTERSPRING:
-            {
                 return WORLDSTATE_WINTERSPRING;
-                break;
-            }
             case ZONEID_AZSHARA:
-            {
                 return WORLDSTATE_AZSHARA;
-                break;
-            }
             case ZONEID_EASTERN_PLAGUELANDS:
-            {
                 return WORLDSTATE_EASTERN_PLAGUELANDS;
-                break;
-            }
             case ZONEID_BLASTED_LANDS:
-            {
                 return WORLDSTATE_BLASTED_LANDS;
-                break;
-            }
             case ZONEID_BURNING_STEPPES:
-            {
                 return WORLDSTATE_BURNING_STEPPES;
-                break;
-            }
             case ZONEID_TANARIS:
-            {
                 return WORLDSTATE_TANARIS;
-                break;
-            }
         }
         return NULL;
     }
@@ -127,35 +109,17 @@ struct MouthAI : public ScriptedAI
         switch (m_creature->GetZoneId())
         {
             case ZONEID_WINTERSPRING:
-            {
                 return VARIABLE_SI_WINTERSPRING_REMAINING;
-                break;
-            }
             case ZONEID_AZSHARA:
-            {
                 return VARIABLE_SI_AZSHARA_REMAINING;
-                break;
-            }
             case ZONEID_EASTERN_PLAGUELANDS:
-            {
                 return VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
-                break;
-            }
             case ZONEID_BLASTED_LANDS:
-            {
                 return VARIABLE_SI_BLASTED_LANDS_REMAINING;
-                break;
-            }
             case ZONEID_BURNING_STEPPES:
-            {
                 return VARIABLE_SI_BURNING_STEPPES_REMAINING;
-                break;
-            }
             case ZONEID_TANARIS:
-            {
                 return VARIABLE_SI_TANARIS_REMAINING;
-                break;
-            }
         }
         return NULL;
     }
@@ -165,35 +129,17 @@ struct MouthAI : public ScriptedAI
         switch (m_creature->GetZoneId())
         {
             case ZONEID_WINTERSPRING:
-            {
                 return GAME_EVENT_SCOURGE_INVASION_WINTERSPRING;
-                break;
-            }
             case ZONEID_AZSHARA:
-            {
                 return GAME_EVENT_SCOURGE_INVASION_AZSHARA;
-                break;
-            }
             case ZONEID_EASTERN_PLAGUELANDS:
-            {
                 return GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS;
-                break;
-            }
             case ZONEID_BLASTED_LANDS:
-            {
                 return GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS;
-                break;
-            }
             case ZONEID_BURNING_STEPPES:
-            {
                 return GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES;
-                break;
-            }
             case ZONEID_TANARIS:
-            {
                 return GAME_EVENT_SCOURGE_INVASION_TANARIS;
-                break;
-            }
         }
         return NULL;
     }
@@ -239,8 +185,8 @@ struct MouthAI : public ScriptedAI
         // No group member left, stop invasion in this Zone.
         if (!sObjectMgr.GetSavedVariable(m_remainingID, true))
         {
-            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, (IN_MILLISECONDS * urand(m_timer_min, m_timer_max))); // Restart update timer to prevent invading the zone again shortly after stopping it.
-            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP, (IN_MILLISECONDS * 5));
+            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, Seconds(urand(m_timer_min, m_timer_max))); // Restart update timer to prevent invading the zone again shortly after stopping it.
+            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP, Seconds(5));
         }
     }
 
@@ -352,6 +298,47 @@ struct MouthAI : public ScriptedAI
 CreatureAI* GetAI_Mouth(Creature* pCreature)
 {
     return new MouthAI(pCreature);
+}
+
+enum
+{
+    EVENT_CRYSTAL_SPAWN = 1,
+};
+
+struct go_scourge_invasion_circle : public GameObjectAI
+{
+    go_scourge_invasion_circle(GameObject* gobj) : GameObjectAI(gobj)
+    {
+        m_events.ScheduleEvent(EVENT_CRYSTAL_SPAWN, Seconds(3));
+    }
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (!me->isSpawned())
+            return;
+
+        m_events.Update(diff);
+        while (uint32 eventId = m_events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case EVENT_CRYSTAL_SPAWN:
+            {
+                me->CastSpell(nullptr, SPELL_CREATE_CRYSTAL, false);
+                break;
+            }
+            default:
+                break;
+            }
+        }
+    }
+private:
+    EventMap m_events;
+};
+
+GameObjectAI* GetAI_go_scourge_invasion_circle(GameObject* gameobject)
+{
+    return new go_scourge_invasion_circle(gameobject);
 }
 
 /*
@@ -506,7 +493,7 @@ void AddSC_scourge_invasion()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "scourge_invasion_mouth";
+    newscript->Name = "npc_scourge_invasion_mouth";
     newscript->GetAI = &GetAI_Mouth;
     newscript->RegisterSelf();
 
@@ -514,5 +501,10 @@ void AddSC_scourge_invasion()
     newscript->Name = "npc_argent_emissary";
     newscript->pGossipHello = &GossipHello_npc_argent_emissary;
     newscript->pGossipSelect = &GossipSelect_npc_argent_emissary;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_scourge_invasion_circle";
+    newscript->GOGetAI = &GetAI_go_scourge_invasion_circle;
     newscript->RegisterSelf();
 }

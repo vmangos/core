@@ -62,9 +62,10 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16401, 16386, 16398, 16172, 16230, 16136, 16356, 16306, 16336, 16338, 16421);
     UPDATE `creature_template` SET `flags_extra`=252162 WHERE `entry` IN (16172, 16136);
     UPDATE `creature_template` SET `detection_range`=5 WHERE `entry` IN (16299, 16141, 16298, 16438, 16437, 16422, 16423);
+    UPDATE `creature_template` SET `script_name`='npc_scourge_invasion_mouth' WHERE `entry`=16995;
 
     -- gameobject_template:
-    UPDATE `gameobject_template` SET `script_name`='' WHERE `entry`=181136;
+    UPDATE `gameobject_template` SET `script_name`='go_scourge_invasion_circle' WHERE `entry`=181136;
     UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` IN (181154, 181373, 181374, 181215, 181223, 181172);
     INSERT INTO `gameobject_template`(`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES
         (181111, 9, 6, 5811, 'Minion Spawner, ghost/ghoul', 0, 0, 1, 0, 0, 0, 27883, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
@@ -696,8 +697,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1614301, 0, 0, 41, 0, 0, 0, 0, 181142, 2, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Object(Summoner Shield)'),
     (1614301, 0, 0, 44, 1, 1, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Set Phase for Damaged Necrotic Shard'),
     (1614301, 2, 0, 0, 0, 0, 0, 0, 2, 0, 4, 16, 12420, 12421, 12422, 12243, 0, 0, 0, 0, 0, 'Shadow of Doom - Talk'),
-    (1614301, 5, 0, 4, 46, 768, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Unit Flags'),
-    (1614301, 3590, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Deal Damage');
+    (1614301, 5, 0, 4, 46, 768, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Unit Flags');
 
     -- Events list for Flameshocker
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16383;
@@ -841,7 +841,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638601, 16386, 0, 8, 0, 100, 1, 28366, 1, 0, 0, 1638601, 0, 0, 'Necropolis Relay - Hit by Communique, Proxy-to-Relay');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638602, 16386, 0, 8, 0, 100, 1, 28281, 1, 0, 0, 1638602, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay');
     INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638603, 16386, 0, 8, 0, 100, 1, 28351, 1, 0, 0, 1638603, 0, 0, 'Necropolis Relay - Hit by Communique, Camp-to-Relay, Death');
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1638604, 16386, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1638604, 0, 0, 'Necropolis Relay - Just Spawned');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638601;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -854,14 +853,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638603;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638603, 0, 1, 15, 28351, 2, 0, 0, 16398, 200, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Cast Communique, Camp-to-Relay, Death On Necropolis Proxy');
-
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1638604;
-    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638604, 0, 0, 39, 1638601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Start Script');
-
-    DELETE FROM `generic_scripts` WHERE `id`=1638601;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1638601, 5, 0, 13, 0, 0, 0, 0, 181136, 200, 11, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Activate GameObject');
 
     -- Events list for Necropolis Proxy
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16398;
@@ -976,36 +967,11 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1623001, 0, 1, 35, 0, 0, 0, 0, 16172, 15, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Face Damaged Necrotic Shard'),
     (1623001, 0, 3, 44, 1, 1, 0, 0, 16172, 10, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Set Phase for Damaged Necrotic Shard'),
     (1623001, 2, 2, 15, 28132, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Create Summoner Shield'),
-    (1623001, 2, 5, 15, 28078, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel'),
-    (1623001, 3590, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Deal Damage');
+    (1623001, 2, 5, 15, 28078, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Buttress Channel');
 
     DELETE FROM `gossip_scripts` WHERE `id`=7166;
     INSERT INTO `gossip_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (7166, 0, 0, 15, 27852, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Summon Shadow of Doom');
-
-    -- Events list for Faint Necrotic Crystal
-    DELETE FROM `creature_ai_events` WHERE `creature_id`=16531;
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1653101, 16531, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1653101, 0, 0, 'Faint Necrotic Crystal - Just Spawned');
-
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1653101;
-    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1653101, 590, 0, 39, 1653101, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Faint Necrotic Crystal - Start Script');
-
-    DELETE FROM `generic_scripts` WHERE `id`=1653101;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1653101, 0, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Faint Necrotic Crystal - Deal Damage');
-
-    -- Events list for Cracked Necrotic Crystal
-    DELETE FROM `creature_ai_events` WHERE `creature_id`=16431;
-    INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1643101, 16431, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1643101, 0, 0, 'Cracked Necrotic Crystal - Just Spawned');
-
-    DELETE FROM `creature_ai_scripts` WHERE `id`=1643101;
-    INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1643101, 590, 0, 39, 1643101, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Cracked Necrotic Crystal - Start Script');
-
-    DELETE FROM `generic_scripts` WHERE `id`=1643101;
-    INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1643101, 0, 0, 48, 100, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cracked Necrotic Crystal - Deal Damage');
 
 
 -- 6. CREATURE RESPAWNS
