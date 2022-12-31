@@ -35,13 +35,14 @@ void instance_ruins_of_ahnqiraj::Initialize()
 {
     m_uiKurinnaxxGUID = 0;
     m_uiBuruGUID = 0;
+    m_uiAyamissGUID = 0;
+    m_uiMoamGUID = 0;
     m_uiOssirianGUID = 0;
     m_uiAndorovGUID = 0;
     m_lKaldoreiElites.clear();
     m_lOssirianPylons.clear();
 
-    m_bIsAQDoorOn = false;
-    p_doorGuid.Clear();
+    m_doorGuid.Clear();
 
     m_uiGladiatorDeath = 0;
 
@@ -79,6 +80,10 @@ uint64 instance_ruins_of_ahnqiraj::GetData64(uint32 uiData)
             return m_uiOssirianGUID;
         case DATA_BURU:
             return m_uiBuruGUID;
+        case DATA_AYAMISS:
+            return m_uiAyamissGUID;
+        case DATA_MOAM:
+            return m_uiMoamGUID;
         case DATA_ANDOROV:
             return m_uiAndorovGUID;
         case DATA_KURINNAXX:
@@ -157,24 +162,6 @@ void instance_ruins_of_ahnqiraj::OnCreatureEnterCombat(Creature * pCreature)
                 }
             }
             m_bRajaxxEventIsToReset = false;
-        // no break
-        case NPC_KURINNAXX:
-        case NPC_RAJAXX:
-        case NPC_BURU:
-        case NPC_MOAM:
-        case NPC_AYAMISS:
-        case NPC_OSSIRIAN:
-            if (!m_bIsAQDoorOn)
-            {
-                GameObject *pAQDoor = pCreature->SummonGameObject(176149,
-                                        -8526,
-                                        1507.4f,
-                                        49,
-                                        4.20662f, 0, 0, 0.861534f, -0.5077f, -1, false);
-
-                p_doorGuid = pAQDoor->GetObjectGuid();
-                m_bIsAQDoorOn = true;
-            }
             break;
         default:
             break;
@@ -197,20 +184,6 @@ void instance_ruins_of_ahnqiraj::OnCreatureEvade(Creature* pCreature)
             // If any creature from Rajaxx's wave is on evade mode, reset Rajaxx.
             m_uiRajaxxEventResetTimer = 2000;
             m_bRajaxxEventIsToReset = true;
-        // no break
-        case NPC_KURINNAXX:
-        case NPC_RAJAXX:
-        case NPC_BURU:
-        case NPC_MOAM:
-        case NPC_AYAMISS:
-        case NPC_OSSIRIAN:
-            if (m_bIsAQDoorOn)
-            {
-                if (GameObject* door = pCreature->GetMap()->GetGameObject(p_doorGuid))
-                    door->AddObjectToRemoveList();
-                p_doorGuid.Clear();
-                m_bIsAQDoorOn = false;
-            }
             break;
         case NPC_KALDOREI_ELITE:
             if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
@@ -261,6 +234,12 @@ void instance_ruins_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
         case NPC_BURU:
             m_uiBuruGUID = pCreature->GetGUID();
             break;
+        case NPC_AYAMISS:
+            m_uiAyamissGUID = pCreature->GetGUID();
+            break;
+        case NPC_MOAM:
+            m_uiMoamGUID = pCreature->GetGUID();
+            break;
         case NPC_OSSIRIAN:
             m_uiOssirianGUID = pCreature->GetGUID();
             break;
@@ -302,22 +281,8 @@ void instance_ruins_of_ahnqiraj::OnCreatureDeath(Creature* pCreature)
 {
     switch (pCreature->GetEntry())
     {
-        case NPC_KURINNAXX:
         case NPC_RAJAXX:
-        case NPC_BURU:
-        case NPC_MOAM:
-        case NPC_AYAMISS:
-        case NPC_OSSIRIAN:
-            if (pCreature->GetEntry() == NPC_RAJAXX)
-                GiveRepAfterRajaxxDeath(pCreature);
-
-            if (m_bIsAQDoorOn)
-            {
-                if (GameObject* door = pCreature->GetMap()->GetGameObject(p_doorGuid))
-                    door->AddObjectToRemoveList();
-                p_doorGuid.Clear();
-                m_bIsAQDoorOn = false;
-            }
+            GiveRepAfterRajaxxDeath(pCreature);
             break;
         case NPC_CAPTAIN_QEEZ:
         case NPC_CAPTAIN_TUUBID:
@@ -496,6 +461,40 @@ void instance_ruins_of_ahnqiraj::Load(char const* chrIn)
 
 void instance_ruins_of_ahnqiraj::Update(uint32 uiDiff)
 {
+    /*
+    Fight Change in 1.10.1
+
+    This fight has changed somewhat, first off if someone dies
+    they are no longer able to return via release and run back,
+    there is a big door that closes and you cannot get past it.
+
+    https://wowwiki-archive.fandom.com/wiki/General_Rajaxx?oldid=121120#Fight_Change_in_1.10.1
+    */
+    if (sWorld.GetWowPatch() > WOW_PATCH_109)
+    {
+        if (IsAnyBossInCombat())
+        {
+            if (m_doorGuid.IsEmpty())
+            {
+                if (GameObject* pAQDoor = GetMap()->SummonGameObject(176149,
+                    -8526,
+                    1507.4f,
+                    49,
+                    4.20662f, 0, 0, 0.861534f, -0.5077f, -1, 0))
+                    m_doorGuid = pAQDoor->GetObjectGuid();
+            }
+        }
+        else
+        {
+            if (!m_doorGuid.IsEmpty())
+            {
+                if (GameObject* pAQDoor = GetMap()->GetGameObject(m_doorGuid))
+                    pAQDoor->AddObjectToRemoveList();
+                m_doorGuid.Clear();
+            }
+        }
+    }
+
     if (m_auiEncounter[TYPE_KURINNAXX] == DONE && m_auiEncounter[TYPE_RAJAXX] != DONE && !m_uiAndorovGUID)
     {
         if (Creature* pAndorov = GetMap()->LoadCreatureSpawnWithGroup(ANDOROV_DB_GUID))
@@ -531,34 +530,21 @@ void instance_ruins_of_ahnqiraj::Update(uint32 uiDiff)
 
 /* Private methods */
 
-uint8 instance_ruins_of_ahnqiraj::GetWaveFromCreature(Creature* creature)
+bool instance_ruins_of_ahnqiraj::IsAnyBossInCombat()
 {
-    CreatureGroup* group = creature->GetCreatureGroup();
-    if (!group)
+    if (GetData(TYPE_GENERAL_ANDOROV) == IN_PROGRESS)
+        return true;
+
+    for (int i = DATA_KURINNAXX; i <= DATA_ZERRAN; i++)
     {
-//sLog.nostalrius("no group");
-        return 0;
+        if (uint64 guid = GetData64(i))
+        {
+            if (Creature* pCreature = GetMap()->GetCreature(guid))
+                if (pCreature->IsAlive() && pCreature->GetVictim())
+                    return true;
+        }
     }
-//sLog.nostalrius("group leader : %u",group->GetLeaderGuid().GetEntry());
-    switch (group->GetOriginalLeaderGuid().GetEntry())
-    {
-        case NPC_CAPTAIN_QEEZ:
-            return 1;
-        case NPC_CAPTAIN_TUUBID:
-            return 2;
-        case NPC_CAPTAIN_DRENN:
-            return 3;
-        case NPC_CAPTAIN_XURREM:
-            return 4;
-        case NPC_MAJOR_YEGGETH:
-            return 5;
-        case NPC_MAJOR_PAKKON:
-            return 6;
-        case NPC_COLONEL_ZERRAN:
-            return 7;
-        default:
-            return 0;
-    }
+    return false;
 }
 
 void instance_ruins_of_ahnqiraj::SetAndorovSquadRespawnTime(uint32 nextRespawnDelay)

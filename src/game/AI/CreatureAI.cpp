@@ -115,7 +115,7 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, 
     if (pSpell->rangeIndex == SPELL_RANGE_IDX_SELF_ONLY)
         return CAST_OK;
 
-    if (!(pSpell->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !m_creature->IsWithinLOSInMap(pTarget))
+    if (!(pSpell->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LINE_OF_SIGHT) && !m_creature->IsWithinLOSInMap(pTarget))
         return CAST_FAIL_NOT_IN_LOS;
 
     if (SpellRangeEntry const* pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))

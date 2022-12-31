@@ -26,6 +26,7 @@ enum CheatType
     CHEAT_TYPE_PVE_FLYHACK,
     CHEAT_TYPE_FLY_HACK_SWIM,
     CHEAT_TYPE_NO_FALL_TIME,
+    CHEAT_TYPE_BAD_FALL_RESET,
     CHEAT_TYPE_TELEPORT,
     CHEAT_TYPE_TELEPORT_TRANSPORT,
     CHEAT_TYPE_FAKE_TRANSPORT,
@@ -91,6 +92,7 @@ private:
         bool CheckMultiJump(uint16 opcode);
         bool CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const;
         bool CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode);
+        bool CheckFallReset(MovementInfo const& movementInfo) const;
         bool CheckFakeTransport(MovementInfo const& movementInfo);
         bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);

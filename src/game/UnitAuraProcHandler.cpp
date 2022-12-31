@@ -231,7 +231,7 @@ inline bool SpellCanTrigger(SpellEntry const* spellProto, SpellEntry const* proc
     return (procSpell && procSpell->SpellFamilyName == spellProto->SpellFamilyName && procSpell->SpellFamilyFlags & spellProto->EffectItemType[eff_idx]);
 }
 
-bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent, bool isSpellTriggeredByAura) const
+SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent, bool isSpellTriggeredByAura) const
 {
     SpellEntry const* spellProto = holder->GetSpellProto();
     /*
@@ -244,11 +244,11 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
 
     // Flurry can't proc on additional windfury attacks
     if (spellProto->SpellIconID == 108 && spellProto->SpellVisual == 2759 && m_extraAttacks)
-        return false;
+        return SPELL_PROC_TRIGGER_FAILED;
 
     // Don't proc weapons on Sap
     if (spellProto->Id == 14076 || spellProto->Id == 14094 || spellProto->Id == 14095)
-        return false;
+        return SPELL_PROC_TRIGGER_FAILED;
 
     /// [TODO]
     /// Delete all these spells, and manage it via the DB (spell_proc_event)
@@ -262,27 +262,37 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
         if (spellProto->SpellIconID == 1799)
 #endif
         {
-            return procFlag & PROC_FLAG_TAKE_HARMFUL_SPELL && procExtra & PROC_EX_CRITICAL_HIT;
+            if (procFlag & PROC_FLAG_TAKE_HARMFUL_SPELL && procExtra & PROC_EX_CRITICAL_HIT)
+                return SPELL_PROC_TRIGGER_OK;
+            else
+                return SPELL_PROC_TRIGGER_FAILED;
         }
 #endif
         // Improved Lay on Hands
         if (spellProto->SpellIconID == 79 && spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
         {
-            return procSpell->SpellFamilyName == SPELLFAMILY_PALADIN && procSpell->SpellIconID == 79
-                    && procSpell->Category == 56 && !isVictim;
+            if (procSpell->SpellFamilyName == SPELLFAMILY_PALADIN && procSpell->SpellIconID == 79 && procSpell->Category == 56 && !isVictim)
+                return SPELL_PROC_TRIGGER_OK;
+            else
+                return SPELL_PROC_TRIGGER_FAILED;
         }
         // Wrath of Cenarius - Spell Blasting
         if (spellProto->Id == 25906)
         {
             // Should be able to proc when negative magical effect lands on a target.
             if (!isVictim && (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC) && !procSpell->IsPositiveSpell() && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(procSpell->IsSpellAppliesAura() && (procFlag & PROC_FLAG_DEAL_HARMFUL_PERIODIC)))
-                return roll_chance_f((float)spellProto->procChance);
+            {
+                if (roll_chance_f((float)spellProto->procChance))
+                    return SPELL_PROC_TRIGGER_OK;
+                else
+                    return SPELL_PROC_TRIGGER_ROLL_FAILED;
+            }
         }
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
         // World of Warcraft Client Patch 1.11.0 (2006-06-20)
         // - Vengeance: Seal of Command critical hits can now trigger this ability
         if ((procSpell->Id == 20424) && (spellProto->SpellIconID == 84))
-            return false;
+            return SPELL_PROC_TRIGGER_FAILED;
 #endif
         // Zandalarian Hero Charm - Unstable Power
         if (spellProto->Id == 24658)
@@ -297,11 +307,11 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
             //   and Consecration. Only one charge will be burned per area spell cast,
             //   rather than multiple charges per target hit as was previously the case.  
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            if ((procFlag & (PROC_FLAG_DEAL_MELEE_ABILITY | PROC_FLAG_DEAL_RANGED_ABILITY | PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT)) && (procSpell->School != SPELL_SCHOOL_NORMAL))
-                return true;
+            if ((procFlag & (PROC_FLAG_DEAL_MELEE_ABILITY | PROC_FLAG_DEAL_RANGED_ABILITY)) && (procSpell->School != SPELL_SCHOOL_NORMAL))
+                return SPELL_PROC_TRIGGER_OK;
 #else
             if ((procFlag & (PROC_FLAG_DEAL_HARMFUL_PERIODIC)) && (procSpell->School != SPELL_SCHOOL_NORMAL))
-                return true;
+                return SPELL_PROC_TRIGGER_OK;
 #endif
         }
         // DRUID
@@ -309,16 +319,24 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
         if (spellProto->Id == 16864)
         {
             if (!procSpell && (procFlag & (PROC_FLAG_DEAL_MELEE_SWING | PROC_FLAG_DEAL_MELEE_ABILITY)))
-                return urand(0, 99) < 10;
-            return false;
+            {
+                if (roll_chance_u(10))
+                    return SPELL_PROC_TRIGGER_OK;
+                else
+                    return SPELL_PROC_TRIGGER_ROLL_FAILED;
+            }
+            return SPELL_PROC_TRIGGER_FAILED;
         }
         // PRIEST
         // Inspiration
         if (spellProto->SpellIconID == 79 && spellProto->SpellFamilyName == SPELLFAMILY_PRIEST)
         {
-            return procSpell->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_PRAYER_OF_HEALING, CF_PRIEST_HEAL,
+            if (procSpell->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_PRAYER_OF_HEALING, CF_PRIEST_HEAL,
                 CF_PRIEST_FLASH_HEAL, CF_PRIEST_FLASH_HEAL2, CF_PRIEST_GREATER_HEAL>() &&
-                procExtra & PROC_EX_CRITICAL_HIT && procFlag & PROC_FLAG_DEAL_HELPFUL_SPELL;
+                procExtra & PROC_EX_CRITICAL_HIT && procFlag & PROC_FLAG_DEAL_HELPFUL_SPELL)
+                return SPELL_PROC_TRIGGER_OK;
+            else
+                return SPELL_PROC_TRIGGER_FAILED;
         }
         // SPELL_AURA_ADD_TARGET_PROC
         // Chance of proc calculated after.
@@ -327,16 +345,20 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
             // Tous les sorts qui proc sur la victime
             // Puis les autres
             if (isVictim)
-                return false;
+                return SPELL_PROC_TRIGGER_FAILED;
 
-            // Wolfshead Helm (Part 1 only, from the pig system that does not count the effects :s)
-            if (spellProto->Id == 17768)
-                return SpellCanTrigger(spellProto, procSpell);
-            // Frosty Zap
-            if (spellProto->Id == 24392)
-                return SpellCanTrigger(spellProto, procSpell);
+            switch (spellProto->Id)
+            {
+                // Wolfshead Helm (Part 1 only, from the pig system that does not count the effects :s)
+                case 17768:
+                // Frosty Zap
+                case 24392:
+                    if (SpellCanTrigger(spellProto, procSpell))
+                        return SPELL_PROC_TRIGGER_OK;
+                    break;
+            }
 
-            return false;
+            return SPELL_PROC_TRIGGER_FAILED;
         }
 
         // World of Warcraft Client Patch 1.10.0 (2006-03-28)
@@ -353,14 +375,14 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
         {
             // Never proc for Execute.
             if (procSpell->SpellIconID == 1648)
-                return false;
+                return SPELL_PROC_TRIGGER_FAILED;
 
             // Proc for every Whirlwind hit.
             if (procSpell->SpellIconID == 83)
-                return true;
+                return SPELL_PROC_TRIGGER_OK;
 
             if (procSpell->IsDirectDamageSpell() && (procFlag & (PROC_FLAG_DEAL_MELEE_SWING | PROC_FLAG_DEAL_MELEE_ABILITY)))
-                return true;
+                return SPELL_PROC_TRIGGER_OK;
         }
 #endif
 
@@ -369,7 +391,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
         // Do not consume aura if spell did not benefit from crit chance bonus.
         // Can happen if aura was cast after damaging spell was already launched.
         if (spellProto->Id == 16166 && (procExtra & PROC_EX_NORMAL_HIT))
-            return false;
+            return SPELL_PROC_TRIGGER_FAILED;
     }
 
     // Get proc Event Entry
@@ -381,7 +403,10 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
         // Fear Ward always procs on any Fear (except ones cast by ourselves...)
         if (spellProto->Id == 6346 && isVictim)
         {
-            return procSpell->Mechanic == MECHANIC_FEAR;
+            if (procSpell->Mechanic == MECHANIC_FEAR)
+                return SPELL_PROC_TRIGGER_OK;
+            else
+                return SPELL_PROC_TRIGGER_FAILED;
         }
     }
 
@@ -393,23 +418,23 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
         EventProcFlag = spellProto->procFlags;       // else get from spell proto
     // Continue if no trigger exist
     if (!EventProcFlag)
-        return false;
+        return SPELL_PROC_TRIGGER_FAILED;
 
     // Check spellProcEvent data requirements
     if (!SpellMgr::IsSpellProcEventCanTriggeredBy(spellProcEvent, EventProcFlag, procSpell, procFlag, procExtra))
-        return false;
+        return SPELL_PROC_TRIGGER_FAILED;
 
     // In most cases req get honor or XP from kill
     if ((EventProcFlag & PROC_FLAG_KILL) && IsPlayer())
     {
         bool allow = ((Player*)this)->IsHonorOrXPTarget(pVictim);
         if (!allow)
-            return false;
+            return SPELL_PROC_TRIGGER_FAILED;
     }
     // Aura added by spell can`t trigger from self (prevent drop charges/do triggers)
     // But except periodic triggers (can triggered from self)
     if (procSpell && procSpell->Id == spellProto->Id && !(EventProcFlag & PROC_FLAG_TAKE_HARMFUL_PERIODIC))
-        return false;
+        return SPELL_PROC_TRIGGER_FAILED;
 
     // Check if current equipment allows aura to proc
     if (!isVictim && IsPlayer())
@@ -425,24 +450,24 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
                 item = ((Player*)this)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
 
             if (!CanUseEquippedWeapon(attType))
-                return false;
+                return SPELL_PROC_TRIGGER_FAILED;
 
             if (!item || item->IsBroken() || item->GetProto()->Class != ITEM_CLASS_WEAPON || !((1 << item->GetProto()->SubClass) & spellProto->EquippedItemSubClassMask))
-                return false;
+                return SPELL_PROC_TRIGGER_FAILED;
         }
         else if (spellProto->EquippedItemClass == ITEM_CLASS_ARMOR)
         {
             // Check if player is wearing shield
             Item *item = ((Player*)this)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
             if (!item || item->IsBroken() || item->GetProto()->Class != ITEM_CLASS_ARMOR || !((1 << item->GetProto()->SubClass) & spellProto->EquippedItemSubClassMask))
-                return false;
+                return SPELL_PROC_TRIGGER_FAILED;
         }
     }
 
     if (isSpellTriggeredByAura && procSpell &&
         !procSpell->HasAttribute(SPELL_ATTR_EX3_NOT_A_PROC) &&
         !spellProto->HasAttribute(SPELL_ATTR_EX3_CAN_PROC_FROM_PROCS))
-        return false;
+        return SPELL_PROC_TRIGGER_FAILED;
 
     // Get chance from spell
     float chance = (float)spellProto->procChance;
@@ -462,10 +487,13 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
     {
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CHANCE_OF_SUCCESS, chance);
         if (modOwner->HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC))
-            return true;
+            return SPELL_PROC_TRIGGER_OK;
     }
 
-    return roll_chance_f(chance);
+    if (roll_chance_f(chance))
+        return SPELL_PROC_TRIGGER_OK;
+
+    return SPELL_PROC_TRIGGER_ROLL_FAILED;
 }
 
 SpellAuraProcResult Unit::TriggerProccedSpell(Unit* target, int32* basepoints, uint32 triggeredSpellId, Item* castItem, Aura* triggeredByAura, uint32 cooldown, ObjectGuid originalCaster, SpellEntry const* triggeredByParent)
@@ -1253,7 +1281,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                 }
                 case 28200:                                 // Talisman of Ascendance
                 {
-                    if (procFlags & (PROC_FLAG_SUCCESSFUL_AOE))
+                    if (procSpell && procSpell->IsAreaOfEffectSpell())
                         return SPELL_AURA_PROC_FAILED;
                     break;
                 }
@@ -1381,16 +1409,6 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
         case SPELLFAMILY_DRUID:
             break;
         case SPELLFAMILY_HUNTER:
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-            switch (auraSpellInfo->Id)
-            {
-                // Patch 1.9: Aspect of the Pack and Aspect of the Cheetah - Periodic damage will no longer trigger the Dazed effect.
-                case 5118:  // Aspect of the Cheetah
-                case 13159: // Aspect of the Pack
-                    if (procFlags & (PROC_FLAG_DEAL_HARMFUL_PERIODIC | PROC_FLAG_TAKE_HARMFUL_PERIODIC | PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT | PROC_FLAG_TAKEN_PERIODIC_SPELL_HIT))
-                        return SPELL_AURA_PROC_FAILED;
-            }
-#endif
             break;
         case SPELLFAMILY_PALADIN:
         {

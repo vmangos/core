@@ -45,6 +45,8 @@ const char* GetMovementCheatName(CheatType flagId)
             return "FlyHackSwim";
         case CHEAT_TYPE_NO_FALL_TIME:
             return "NoFallTime";
+        case CHEAT_TYPE_BAD_FALL_RESET:
+            return "BadFallReset";
         case CHEAT_TYPE_TELEPORT:
             return "TeleportHack";
         case CHEAT_TYPE_TELEPORT_TRANSPORT:
@@ -236,6 +238,7 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     AddPenaltyForCheat(true, CHEAT_TYPE_PVE_FLYHACK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_UNREACHABLE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FLY_HACK_SWIM, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_NO_FALL_TIME, CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_BAD_FALL_RESET, CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FAKE_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_PENALTY);
@@ -610,6 +613,10 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
     if (CheckNoFallTime(movementInfo, opcode))
         APPEND_CHEAT(CHEAT_TYPE_NO_FALL_TIME);
 
+    if (opcode == CMSG_MOVE_FALL_RESET &&
+        CheckFallReset(movementInfo))
+        APPEND_CHEAT(CHEAT_TYPE_BAD_FALL_RESET);
+
     // Distance computation related. No need to do it if teleport detected.
     if (!teleportDetected)
     {
@@ -861,6 +868,20 @@ bool MovementAnticheat::CheckNoFallTime(MovementInfo const& movementInfo, uint16
        (movementInfo.stime - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
        (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
        (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY);
+}
+
+bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED))
+        return false;
+
+    if (GetLastMovementInfo().ctime)
+    {
+        if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+            return true;
+    }
+    
+    return movementInfo.fallTime != 0 || movementInfo.jump.zspeed != 0.0f;
 }
 
 uint32 MovementAnticheat::CheckTimeDesync(MovementInfo const& movementInfo)

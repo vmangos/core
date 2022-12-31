@@ -577,6 +577,10 @@ std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget(bool allowAutoS
 
 void PetAI::HandleReturnMovement()
 {
+    // This can happen somehow, even though pet should always have charminfo.
+    if (!m_creature->GetCharmInfo())
+        return;
+
     // Handles moving the pet back to stay or owner
 
     // Prevent activating movement when under control of spells

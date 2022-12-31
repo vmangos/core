@@ -2543,7 +2543,7 @@ bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
                     // skip passives
                     if (pNewSpell->HasAttribute(SPELL_ATTR_PASSIVE) ||
                         pNewSpell->HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY) ||
-                        pNewSpell->HasAttribute(SPELL_ATTR_EX2_DISPLAY_IN_STANCE_BAR))
+                        pNewSpell->HasAttribute(SPELL_ATTR_EX2_USE_SHAPESHIFT_BAR))
                         continue;
                 } 
 

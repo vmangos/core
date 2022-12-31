@@ -710,110 +710,110 @@ enum SpellVisualKit
 // ***********************************
 enum SpellAttributes
 {
-    SPELL_ATTR_PROC_FAILURE_BURNS_CHARGE        = 0x00000001,          // 0
-    SPELL_ATTR_USES_RANGED_SLOT                 = 0x00000002,          // 1 All ranged abilites have this flag
-    SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE          = 0x00000004,          // 2
-    SPELL_ATTR_NEED_EXOTIC_AMMO                 = 0x00000008,          // 3 Vanilla only attribute removed in TBC
-    SPELL_ATTR_IS_ABILITY                       = 0x00000010,          // 4 Client puts 'ability' instead of 'spell' in game strings for these spells
-    SPELL_ATTR_IS_TRADESKILL                    = 0x00000020,          // 5 Trade spells, will be added by client to a sublist of profession spell
-    SPELL_ATTR_PASSIVE                          = 0x00000040,          // 6
-    SPELL_ATTR_DO_NOT_DISPLAY                   = 0x00000080,          // 7 Spells with this attribute are not visible in spellbook or aura bar
-    SPELL_ATTR_DO_NOT_LOG                       = 0x00000100,          // 8 This attributes controls whether spell appears in combat logs
-    SPELL_ATTR_HELD_ITEM_ONLY                   = 0x00000200,          // 9 Client automatically selects item from mainhand slot as a cast target
-    SPELL_ATTR_ON_NEXT_SWING                    = 0x00000400,          // 10
-    SPELL_ATTR_WEARER_CASTS_PROC_TRIGGER        = 0x00000800,          // 11
-    SPELL_ATTR_DAYTIME_ONLY                     = 0x00001000,          // 12 Only useable at daytime, not set in 2.4.2
-    SPELL_ATTR_NIGHT_ONLY                       = 0x00002000,          // 13 Only useable at night, not set in 2.4.2
-    SPELL_ATTR_ONLY_INDOORS                     = 0x00004000,          // 14 Only useable indoors, not set in 2.4.2
-    SPELL_ATTR_ONLY_OUTDOORS                    = 0x00008000,          // 15 Only useable outdoors
-    SPELL_ATTR_NOT_SHAPESHIFT                   = 0x00010000,          // 16 Not while shapeshifted
-    SPELL_ATTR_ONLY_STEALTHED                   = 0x00020000,          // 17 Must be in stealth
-    SPELL_ATTR_DO_NOT_SHEATH                    = 0x00040000,          // 18 Client won't hide unit weapons in sheath on cast/channel
-    SPELL_ATTR_SCALES_WITH_CREATURE_LEVEL       = 0x00080000,          // 19 Spell damage depends on caster level
-    SPELL_ATTR_CANCELS_AUTO_ATTACK_COMBAT       = 0x00100000,          // 20 Stop attack after use this spell (and not begin attack if use)
-    SPELL_ATTR_NO_ACTIVE_DEFENSE                = 0x00200000,          // 21 Cannot be dodged/parried/blocked
-    SPELL_ATTR_TRACK_TARGET_IN_CAST_PLAYER_ONLY = 0x00400000,          // 22 SetTrackingTarget
-    SPELL_ATTR_ALLOW_CAST_WHILE_DEAD            = 0x00800000,          // 23 Castable while dead
-    SPELL_ATTR_ALLOW_WHILE_MOUNTED              = 0x01000000,          // 24 Castable while mounted
-    SPELL_ATTR_COOLDOWN_ON_EVENT                = 0x02000000,          // 25 Activate and start cooldown after aura fade or remove summoned creature or go
-    SPELL_ATTR_AURA_IS_DEBUFF                   = 0x04000000,          // 26 Almost all negative spells have it
-    SPELL_ATTR_ALLOW_WHILE_SITTING              = 0x08000000,          // 27 Castable while sitting
-    SPELL_ATTR_NOT_IN_COMBAT_ONLY_PEACEFUL      = 0x10000000,          // 28 Cannot be used in combat
-    SPELL_ATTR_NO_IMMUNITIES                    = 0x20000000,          // 29 Unaffected by invulnerability
-    SPELL_ATTR_HEARTBEAT_RESIST                 = 0x40000000,          // 30 Chance for spell effects to break early (heartbeat resist)
-    SPELL_ATTR_NO_AURA_CANCEL                   = 0x80000000           // 31 Positive aura can't be canceled
+    SPELL_ATTR_PROC_FAILURE_BURNS_CHARGE        = 0x00000001,            // 0
+    SPELL_ATTR_USES_RANGED_SLOT                 = 0x00000002,            // 1 All ranged abilites have this flag
+    SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE          = 0x00000004,            // 2
+    SPELL_ATTR_NEED_EXOTIC_AMMO                 = 0x00000008,            // 3 Vanilla only attribute removed in TBC
+    SPELL_ATTR_IS_ABILITY                       = 0x00000010,            // 4 Client puts 'ability' instead of 'spell' in game strings for these spells
+    SPELL_ATTR_IS_TRADESKILL                    = 0x00000020,            // 5 Trade spells, will be added by client to a sublist of profession spell
+    SPELL_ATTR_PASSIVE                          = 0x00000040,            // 6
+    SPELL_ATTR_DO_NOT_DISPLAY                   = 0x00000080,            // 7 Spells with this attribute are not visible in spellbook or aura bar
+    SPELL_ATTR_DO_NOT_LOG                       = 0x00000100,            // 8 This attributes controls whether spell appears in combat logs
+    SPELL_ATTR_HELD_ITEM_ONLY                   = 0x00000200,            // 9 Client automatically selects item from mainhand slot as a cast target
+    SPELL_ATTR_ON_NEXT_SWING                    = 0x00000400,            // 10
+    SPELL_ATTR_WEARER_CASTS_PROC_TRIGGER        = 0x00000800,            // 11
+    SPELL_ATTR_DAYTIME_ONLY                     = 0x00001000,            // 12 Only useable at daytime, not set in 2.4.2
+    SPELL_ATTR_NIGHT_ONLY                       = 0x00002000,            // 13 Only useable at night, not set in 2.4.2
+    SPELL_ATTR_ONLY_INDOORS                     = 0x00004000,            // 14 Only useable indoors, not set in 2.4.2
+    SPELL_ATTR_ONLY_OUTDOORS                    = 0x00008000,            // 15 Only useable outdoors
+    SPELL_ATTR_NOT_SHAPESHIFT                   = 0x00010000,            // 16 Not while shapeshifted
+    SPELL_ATTR_ONLY_STEALTHED                   = 0x00020000,            // 17 Must be in stealth
+    SPELL_ATTR_DO_NOT_SHEATH                    = 0x00040000,            // 18 Client won't hide unit weapons in sheath on cast/channel
+    SPELL_ATTR_SCALES_WITH_CREATURE_LEVEL       = 0x00080000,            // 19 Spell damage depends on caster level
+    SPELL_ATTR_CANCELS_AUTO_ATTACK_COMBAT       = 0x00100000,            // 20 Stop attack after use this spell (and not begin attack if use)
+    SPELL_ATTR_NO_ACTIVE_DEFENSE                = 0x00200000,            // 21 Cannot be dodged/parried/blocked
+    SPELL_ATTR_TRACK_TARGET_IN_CAST_PLAYER_ONLY = 0x00400000,            // 22 SetTrackingTarget
+    SPELL_ATTR_ALLOW_CAST_WHILE_DEAD            = 0x00800000,            // 23 Castable while dead
+    SPELL_ATTR_ALLOW_WHILE_MOUNTED              = 0x01000000,            // 24 Castable while mounted
+    SPELL_ATTR_COOLDOWN_ON_EVENT                = 0x02000000,            // 25 Activate and start cooldown after aura fade or remove summoned creature or go
+    SPELL_ATTR_AURA_IS_DEBUFF                   = 0x04000000,            // 26 Almost all negative spells have it
+    SPELL_ATTR_ALLOW_WHILE_SITTING              = 0x08000000,            // 27 Castable while sitting
+    SPELL_ATTR_NOT_IN_COMBAT_ONLY_PEACEFUL      = 0x10000000,            // 28 Cannot be used in combat
+    SPELL_ATTR_NO_IMMUNITIES                    = 0x20000000,            // 29 Unaffected by invulnerability
+    SPELL_ATTR_HEARTBEAT_RESIST                 = 0x40000000,            // 30 Chance for spell effects to break early (heartbeat resist)
+    SPELL_ATTR_NO_AURA_CANCEL                   = 0x80000000             // 31 Positive aura can't be canceled
 };
 
 enum SpellAttributesEx
 {
-    SPELL_ATTR_EX_DISMISS_PET_FIRST           = 0x00000001,            // 0 For spells without this flag client doesn't allow to summon pet if caster has a pet
-    SPELL_ATTR_EX_USE_ALL_MANA                = 0x00000002,            // 1 Use all power (Only paladin Lay of Hands and Bunyanize)
-    SPELL_ATTR_EX_IS_CHANNELED                = 0x00000004,            // 2
-    SPELL_ATTR_EX_NO_REDIRECTION              = 0x00000008,            // 3
-    SPELL_ATTR_EX_NO_SKILL_INCREASE           = 0x00000010,            // 4 Only assigned to stealth spells for some reason
-    SPELL_ATTR_EX_ALLOW_WHILE_STEALTHED       = 0x00000020,            // 5 Does not break stealth
-    SPELL_ATTR_EX_IS_SELF_CHANNELED           = 0x00000040,            // 6
-    SPELL_ATTR_EX_NO_REFLECTION               = 0x00000080,            // 7
-    SPELL_ATTR_EX_ONLY_PEACEFUL_TARGETS       = 0x00000100,            // 8 Target must not be in combat
-    SPELL_ATTR_EX_INITIATES_COMBAT            = 0x00000200,            // 9 Enables Auto-Attack
-    SPELL_ATTR_EX_NO_THREAT                   = 0x00000400,            // 10
-    SPELL_ATTR_EX_AURA_UNIQUE                 = 0x00000800,            // 11
-    SPELL_ATTR_EX_FAILURE_BREAKS_STEALTH      = 0x00001000,            // 12
-    SPELL_ATTR_EX_TOGGLE_FARSIGHT             = 0x00002000,            // 13
-    SPELL_ATTR_EX_TRACK_TARGET_IN_CHANNEL     = 0x00004000,            // 14 Client automatically forces player to face target when channeling
-    SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT      = 0x00008000,            // 15 Remove auras on immunity
-    SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS = 0x00010000,// 16 Aura that provides immunity prevents positive effects too
-    SPELL_ATTR_EX_NO_AUTOCAST_AI              = 0x00020000,            // 17
-    SPELL_ATTR_EX_PREVENTS_ANIM               = 0x00040000,            // 18 Stun, polymorph, daze, sleep
-    SPELL_ATTR_EX_EXCLUDE_CASTER              = 0x00080000,            // 19
-    SPELL_ATTR_EX_FINISHING_MOVE_DAMAGE       = 0x00100000,            // 20 Uses combo points
-    SPELL_ATTR_EX_THREAT_ONLY_ON_MISS         = 0x00200000,            // 21
-    SPELL_ATTR_EX_FINISHING_MOVE_DURATION     = 0x00400000,            // 22 Uses combo points (in 4.x not required combo point target selected)
-    SPELL_ATTR_EX_UNK23                       = 0x00800000,            // 23 Different in vanilla
-    SPELL_ATTR_EX_SPECIAL_SKILLUP             = 0x01000000,            // 24 Only fishing spells
-    SPELL_ATTR_EX_UNK25                       = 0x02000000,            // 25 Different in vanilla
-    SPELL_ATTR_EX_REQUIRE_ALL_TARGETS         = 0x04000000,            // 26
-    SPELL_ATTR_EX_DISCOUNT_POWER_ON_MISS      = 0x08000000,            // 27 All these spells refund power on parry or deflect
-    SPELL_ATTR_EX_NO_AURA_ICON                = 0x10000000,            // 28 Client doesn't display these spells in aura bar
-    SPELL_ATTR_EX_NAME_IN_CHANNEL_BAR         = 0x20000000,            // 29 Spell name is displayed in cast bar instead of 'channeling' text
-    SPELL_ATTR_EX_COMBO_ON_BLOCK              = 0x40000000,            // 30 Overpower
-    SPELL_ATTR_EX_CAST_WHEN_LEARNED           = 0x80000000             // 31
+    SPELL_ATTR_EX_DISMISS_PET_FIRST             = 0x00000001,            // 0 For spells without this flag client doesn't allow to summon pet if caster has a pet
+    SPELL_ATTR_EX_USE_ALL_MANA                  = 0x00000002,            // 1 Use all power (Only paladin Lay of Hands and Bunyanize)
+    SPELL_ATTR_EX_IS_CHANNELED                  = 0x00000004,            // 2
+    SPELL_ATTR_EX_NO_REDIRECTION                = 0x00000008,            // 3
+    SPELL_ATTR_EX_NO_SKILL_INCREASE             = 0x00000010,            // 4 Only assigned to stealth spells for some reason
+    SPELL_ATTR_EX_ALLOW_WHILE_STEALTHED         = 0x00000020,            // 5 Does not break stealth
+    SPELL_ATTR_EX_IS_SELF_CHANNELED             = 0x00000040,            // 6
+    SPELL_ATTR_EX_NO_REFLECTION                 = 0x00000080,            // 7
+    SPELL_ATTR_EX_ONLY_PEACEFUL_TARGETS         = 0x00000100,            // 8 Target must not be in combat
+    SPELL_ATTR_EX_INITIATES_COMBAT              = 0x00000200,            // 9 Enables Auto-Attack
+    SPELL_ATTR_EX_NO_THREAT                     = 0x00000400,            // 10
+    SPELL_ATTR_EX_AURA_UNIQUE                   = 0x00000800,            // 11
+    SPELL_ATTR_EX_FAILURE_BREAKS_STEALTH        = 0x00001000,            // 12
+    SPELL_ATTR_EX_TOGGLE_FARSIGHT               = 0x00002000,            // 13
+    SPELL_ATTR_EX_TRACK_TARGET_IN_CHANNEL       = 0x00004000,            // 14 Client automatically forces player to face target when channeling
+    SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT        = 0x00008000,            // 15 Remove auras on immunity
+    SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS = 0x00010000, // 16 Aura that provides immunity prevents positive effects too
+    SPELL_ATTR_EX_NO_AUTOCAST_AI                = 0x00020000,            // 17
+    SPELL_ATTR_EX_PREVENTS_ANIM                 = 0x00040000,            // 18 Stun, polymorph, daze, sleep
+    SPELL_ATTR_EX_EXCLUDE_CASTER                = 0x00080000,            // 19
+    SPELL_ATTR_EX_FINISHING_MOVE_DAMAGE         = 0x00100000,            // 20 Uses combo points
+    SPELL_ATTR_EX_THREAT_ONLY_ON_MISS           = 0x00200000,            // 21
+    SPELL_ATTR_EX_FINISHING_MOVE_DURATION       = 0x00400000,            // 22 Uses combo points (in 4.x not required combo point target selected)
+    SPELL_ATTR_EX_UNK23                         = 0x00800000,            // 23 Different in vanilla
+    SPELL_ATTR_EX_SPECIAL_SKILLUP               = 0x01000000,            // 24 Only fishing spells
+    SPELL_ATTR_EX_UNK25                         = 0x02000000,            // 25 Different in vanilla
+    SPELL_ATTR_EX_REQUIRE_ALL_TARGETS           = 0x04000000,            // 26
+    SPELL_ATTR_EX_DISCOUNT_POWER_ON_MISS        = 0x08000000,            // 27 All these spells refund power on parry or deflect
+    SPELL_ATTR_EX_NO_AURA_ICON                  = 0x10000000,            // 28 Client doesn't display these spells in aura bar
+    SPELL_ATTR_EX_NAME_IN_CHANNEL_BAR           = 0x20000000,            // 29 Spell name is displayed in cast bar instead of 'channeling' text
+    SPELL_ATTR_EX_COMBO_ON_BLOCK                = 0x40000000,            // 30 Overpower
+    SPELL_ATTR_EX_CAST_WHEN_LEARNED             = 0x80000000             // 31
 };
 
 enum SpellAttributesEx2
 {
-    SPELL_ATTR_EX2_CAN_TARGET_DEAD            = 0x00000001,            // 0 can target dead unit or corpse
-    SPELL_ATTR_EX2_UNK1                       = 0x00000002,            // 1
-    SPELL_ATTR_EX2_IGNORE_LOS                 = 0x00000004,            // 2 ? used for detect can or not spell reflected // do not need LOS (e.g. 18220 since 3.3.3)
-    SPELL_ATTR_EX2_UNK3                       = 0x00000008,            // 3 auto targeting? (e.g. fishing skill enhancement items since 3.3.3)
-    SPELL_ATTR_EX2_DISPLAY_IN_STANCE_BAR      = 0x00000010,            // 4 client displays icon in stance bar when learned, even if not shapeshift
-    SPELL_ATTR_EX2_AUTOREPEAT_FLAG            = 0x00000020,            // 5
-    SPELL_ATTR_EX2_CANT_TARGET_TAPPED         = 0x00000040,            // 6 target must be tapped by caster
-    SPELL_ATTR_EX2_UNK7                       = 0x00000080,            // 7
-    SPELL_ATTR_EX2_UNK8                       = 0x00000100,            // 8 not set in 2.4.2
-    SPELL_ATTR_EX2_UNK9                       = 0x00000200,            // 9
-    SPELL_ATTR_EX2_UNK10                      = 0x00000400,            // 10
-    SPELL_ATTR_EX2_HEALTH_FUNNEL              = 0x00000800,            // 11
-    SPELL_ATTR_EX2_UNK12                      = 0x00001000,            // 12
-    SPELL_ATTR_EX2_PRESERVE_ENCHANT_IN_ARENA  = 0x00002000,            // 13 Items enchanted by spells with this flag preserve the enchant to arenas
-    SPELL_ATTR_EX2_ALLOW_WHILE_INVISIBLE      = 0x00004000,            // 14
-    SPELL_ATTR_EX2_UNK15                      = 0x00008000,            // 15 not set in 2.4.2
-    SPELL_ATTR_EX2_TAME_BEAST                 = 0x00010000,            // 16
-    SPELL_ATTR_EX2_NOT_RESET_AUTO_ACTIONS     = 0x00020000,            // 17 don't reset timers for melee autoattacks (swings) or ranged autoattacks (autoshoots)
-    SPELL_ATTR_EX2_REQ_DEAD_PET               = 0x00040000,            // 18 Only Revive pet
-    SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT        = 0x00080000,            // 19 does not necessary need shapeshift (pre-3.x not have passive spells with this attribute)
-    SPELL_ATTR_EX2_UNK20                      = 0x00100000,            // 20
-    SPELL_ATTR_EX2_DAMAGE_REDUCED_SHIELD      = 0x00200000,            // 21 for ice blocks, pala immunity buffs, priest absorb shields, but used also for other spells -> not sure!
-    SPELL_ATTR_EX2_NO_INITIAL_THREAT          = 0x00400000,            // 22
-    SPELL_ATTR_EX2_IS_ARCANE_CONCENTRATION    = 0x00800000,            // 23 Only mage Arcane Concentration have this flag
-    SPELL_ATTR_EX2_UNK24                      = 0x01000000,            // 24
-    SPELL_ATTR_EX2_UNK25                      = 0x02000000,            // 25
-    SPELL_ATTR_EX2_NO_SCHOOL_IMMUNITIES       = 0x04000000,            // 26
-    SPELL_ATTR_EX2_UNK27                      = 0x08000000,            // 27
-    SPELL_ATTR_EX2_NOT_AN_ACTION              = 0x10000000,            // 28 no breaks stealth if it fails??
-    SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Spell can't crit
-    SPELL_ATTR_EX2_ACTIVE_THREAT              = 0x40000000,            // 30 NYI - has some sort of active threat component like fire nova totem
-    SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000             // 31 Food or Drink Buff (like Well Fed)
+    SPELL_ATTR_EX2_ALLOW_DEAD_TARGET            = 0x00000001,            // 0 Can target dead unit or corpse
+    SPELL_ATTR_EX2_NO_SHAPESHIFT_UI             = 0x00000002,            // 1
+    SPELL_ATTR_EX2_IGNORE_LINE_OF_SIGHT         = 0x00000004,            // 2
+    SPELL_ATTR_EX2_ALLOW_LOW_LEVEL_BUFF         = 0x00000008,            // 3
+    SPELL_ATTR_EX2_USE_SHAPESHIFT_BAR           = 0x00000010,            // 4 Client displays icon in stance bar when learned, even if not shapeshift
+    SPELL_ATTR_EX2_AUTO_REPEAT                  = 0x00000020,            // 5
+    SPELL_ATTR_EX2_CANNOT_CAST_ON_TAPPED        = 0x00000040,            // 6 Target must be tapped by caster
+    SPELL_ATTR_EX2_DO_NOT_REPORT_SPELL_FAILURE  = 0x00000080,            // 7
+    SPELL_ATTR_EX2_UNK8                         = 0x00000100,            // 8 Unused
+    SPELL_ATTR_EX2_UNK9                         = 0x00000200,            // 9 Unused
+    SPELL_ATTR_EX2_SPECIAL_TAMING_FLAG          = 0x00000400,            // 10
+    SPELL_ATTR_EX2_NO_TARGET_PER_SECOND_COSTS   = 0x00000800,            // 11
+    SPELL_ATTR_EX2_CHAIN_FROM_CASTER            = 0x00001000,            // 12
+    SPELL_ATTR_EX2_ENCHANT_OWN_ITEM_ONLY        = 0x00002000,            // 13
+    SPELL_ATTR_EX2_ALLOW_WHILE_INVISIBLE        = 0x00004000,            // 14
+    SPELL_ATTR_EX2_ENABLE_AFTER_PARRY           = 0x00008000,            // 15 Deprecated in patch 1.8 and moved to CasterAuraState
+    SPELL_ATTR_EX2_NO_ACTIVE_PETS               = 0x00010000,            // 16
+    SPELL_ATTR_EX2_DO_NOT_RESET_COMBAT_TIMERS   = 0x00020000,            // 17 Don't reset timers for melee autoattacks (swings) or ranged autoattacks (autoshoots)
+    SPELL_ATTR_EX2_REQ_DEAD_PET                 = 0x00040000,            // 18 Only Revive pet has it
+    SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED = 0x00080000,            // 19 Does not necessary need shapeshift (pre-3.x not have passive spells with this attribute)
+    SPELL_ATTR_EX2_INITIATE_COMBAT_POST_CAST    = 0x00100000,            // 20 Client will send CMSG_ATTACK_SWING after SMSG_SPELL_GO
+    SPELL_ATTR_EX2_FAIL_ON_ALL_TARGETS_IMMUNE   = 0x00200000,            // 21 For ice blocks, pala immunity buffs, priest absorb shields
+    SPELL_ATTR_EX2_NO_INITIAL_THREAT            = 0x00400000,            // 22
+    SPELL_ATTR_EX2_PROC_COOLDOWN_ON_FAILURE     = 0x00800000,            // 23
+    SPELL_ATTR_EX2_ITEM_CAST_WITH_OWNER_SKILL   = 0x01000000,            // 24 NYI
+    SPELL_ATTR_EX2_DONT_BLOCK_MANA_REGEN        = 0x02000000,            // 25
+    SPELL_ATTR_EX2_NO_SCHOOL_IMMUNITIES         = 0x04000000,            // 26
+    SPELL_ATTR_EX2_IGNORE_WEAPONSKILL           = 0x08000000,            // 27 NYI (only fishing has it)
+    SPELL_ATTR_EX2_NOT_AN_ACTION                = 0x10000000,            // 28
+    SPELL_ATTR_EX2_CANT_CRIT                    = 0x20000000,            // 29
+    SPELL_ATTR_EX2_ACTIVE_THREAT                = 0x40000000,            // 30 Caster is put in combat for 5.5 seconds on cast at enemy unit
+    SPELL_ATTR_EX2_RETAIN_ITEM_CAST             = 0x80000000             // 31 Food or Drink Buff (like Well Fed)
 };
 
 enum SpellAttributesEx3
@@ -968,17 +968,6 @@ enum ProcFlags
 
     PROC_FLAG_MAIN_HAND_WEAPON_SWING         = 0x00400000,   // 22 Taken off-hand melee attacks (no spells have it)
     PROC_FLAG_OFF_HAND_WEAPON_SWING          = 0x00800000,   // 23 Successful off-hand melee attacks  (no spells have it)
-
-    // CUSTOM FLAGS
-
-    PROC_FLAG_SUCCESSFUL_AOE                 = 0x01000000,   // 24 Nostalrius: AoE casted. Triggered only once, whatever the number of targets.
-    PROC_FLAG_SUCCESSFUL_SPELL_CAST          = 0x02000000,   // 25 Nostalrius: Spell cast successful (procs only once for AoE)
-
-    PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST     = 0x04000000,   // 26 Successful cast of a mana based spell (procs only once for AoE)
-    PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST     = 0x08000000,   // 27 Successful cast of curing spell (i.e. Cleanse)
-
-    PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT  = 0x10000000,   // 28 Successful do periodic (procs only on initial cast)
-    PROC_FLAG_TAKEN_PERIODIC_SPELL_HIT       = 0x20000000    // 29 Taken spell periodic (procs only on initial cast)
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_DEAL_MELEE_SWING        | \
