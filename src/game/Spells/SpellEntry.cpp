@@ -54,7 +54,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             else
             {
                 // Well Fed buffs (must be exclusive with Food / Drink replenishment effects, or else Well Fed will cause them to be removed)
-                if (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_FOOD_BUFF)
+                if (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_RETAIN_ITEM_CAST)
                     return SPELL_WELL_FED;
             }
             break;
@@ -441,7 +441,7 @@ WeaponAttackType SpellEntry::GetWeaponAttackType() const
             break;
         default:
             // Wands
-            if (HasAttribute(SPELL_ATTR_EX2_AUTOREPEAT_FLAG))
+            if (HasAttribute(SPELL_ATTR_EX2_AUTO_REPEAT))
                 return RANGED_ATTACK;
             else
                 return BASE_ATTACK;
@@ -1038,7 +1038,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
     else
     {
         // needs shapeshift
-        if (!(AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && Stances != 0)
+        if (!(AttributesEx2 & SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) && Stances != 0)
             return SPELL_FAILED_ONLY_SHAPESHIFT;
     }
 

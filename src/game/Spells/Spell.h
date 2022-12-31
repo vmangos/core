@@ -73,8 +73,6 @@ enum SpellNotifyPushType
     PUSH_TARGET_CENTER
 };
 
-bool IsQuestTameSpell(uint32 spellId);
-
 namespace MaNGOS
 {
     struct SpellNotifierPlayer;

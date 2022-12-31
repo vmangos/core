@@ -5407,7 +5407,7 @@ void Spell::EffectSanctuary(SpellEffectIndex effIdx)
     unitTarget->CombatStop();
 
     // Flask of Petrification does not cause mobs to stop attacking.
-    if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX2_FOOD_BUFF))
+    if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX2_RETAIN_ITEM_CAST))
     {
         HostileReference* pReference = unitTarget->GetHostileRefManager().getFirst();
         while (pReference)

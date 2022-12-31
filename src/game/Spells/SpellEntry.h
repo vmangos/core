@@ -790,7 +790,7 @@ class SpellEntry
 
         bool CanTargetDeadTarget() const
         {
-            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);
         }
 
         bool CanTargetAliveState(bool alive) const
@@ -798,7 +798,7 @@ class SpellEntry
             if (HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD))
                 return !alive;
 
-            return alive || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+            return alive || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);
         }
 
         bool IsDeathPersistentSpell() const
@@ -914,7 +914,7 @@ class SpellEntry
 
         bool IsAutoRepeatRangedSpell() const
         {
-            return (Attributes & SPELL_ATTR_USES_RANGED_SLOT) && (AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG);
+            return (Attributes & SPELL_ATTR_USES_RANGED_SLOT) && (AttributesEx2 & SPELL_ATTR_EX2_AUTO_REPEAT);
         }
 
         bool IsSpellRequiresRangedAP() const
@@ -985,10 +985,10 @@ class SpellEntry
             if (!(Attributes & (SPELL_ATTR_PASSIVE | SPELL_ATTR_DO_NOT_DISPLAY)) || !form)
                 return false;
 
-            // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!
+            // passive spells with SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED are already active without shapeshift, do no recast!
             // Feline Swiftness Passive 2a not have 0x1 mask in Stance field in spell data as expected
             return ((Stances & (1 << (form - 1)) || (Id == 24864 && form == FORM_CAT)) &&
-                !HasAttribute(SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
+                !HasAttribute(SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED));
         }
 
         inline bool IsNeedCastSpellAtOutdoor() const
@@ -1023,7 +1023,7 @@ class SpellEntry
         bool IsRemovedOnShapeLostSpell() const
         {
             return (Stances || Id == 24864) &&
-                !(AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) &&
+                !(AttributesEx2 & SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) &&
                 !(Attributes & SPELL_ATTR_NOT_SHAPESHIFT);
         }
 
