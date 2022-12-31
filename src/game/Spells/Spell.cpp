@@ -671,22 +671,38 @@ void Spell::FillTargetMap()
             AddUnitTarget(iunit, SpellEffectIndex(i));
     }
 
-    if (m_spellInfo->HasAttribute(SPELL_ATTR_EX2_FAIL_ON_ALL_TARGETS_IMMUNE) && !m_UniqueTargetInfo.empty())
+    if (!m_UniqueTargetInfo.empty())
     {
-        bool allImmune = true;
-        for (auto& ihit : m_UniqueTargetInfo)
+        if (m_spellInfo->HasAttribute(SPELL_ATTR_EX2_FAIL_ON_ALL_TARGETS_IMMUNE))
         {
-            if (ihit.missCondition != SPELL_MISS_IMMUNE && ihit.missCondition != SPELL_MISS_IMMUNE2)
+            bool allImmune = true;
+            for (auto& ihit : m_UniqueTargetInfo)
             {
-                allImmune = false;
-                break;
+                if (ihit.missCondition != SPELL_MISS_IMMUNE && ihit.missCondition != SPELL_MISS_IMMUNE2)
+                {
+                    allImmune = false;
+                    break;
+                }
+            }
+
+            if (allImmune)
+            {
+                SendCastResult(SPELL_FAILED_IMMUNE); // guessed error
+                finish(false);
             }
         }
 
-        if (allImmune)
+        if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_REQUIRE_ALL_TARGETS))
         {
-            SendCastResult(SPELL_FAILED_IMMUNE); // guessed error
-            finish(false);
+            for (auto& ihit : m_UniqueTargetInfo)
+            {
+                if (ihit.targetGUID == m_targets.getUnitTargetGuid() && ihit.missCondition != SPELL_MISS_NONE)
+                {
+                    for (auto& ihit2 : m_UniqueTargetInfo)
+                        ihit2.effectMask = 0;
+                    return;
+                }
+            }
         }
     }
 }
@@ -4557,12 +4573,13 @@ void Spell::finish(bool ok)
     if (m_casterUnit)
     {
         // Stop Attack for some spells
-        if (m_spellInfo->Attributes & SPELL_ATTR_CANCELS_AUTO_ATTACK_COMBAT)
+        if (m_spellInfo->HasAttribute(SPELL_ATTR_CANCELS_AUTO_ATTACK_COMBAT))
         {
             m_casterUnit->AttackStop();
             m_casterUnit->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
         }
-        else if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_INITIATES_COMBAT))
+        else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_INITIATES_COMBAT) ||
+                 m_spellInfo->HasAttribute(SPELL_ATTR_EX2_INITIATE_COMBAT_POST_CAST))
         {
             // Pets should initiate melee combat on spell with this flag. (Growl)
             if (Pet* pPet = m_casterUnit->ToPet())
