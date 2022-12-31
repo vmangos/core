@@ -946,7 +946,7 @@ void ObjectMgr::LoadCreatureLocales()
 {
     m_CreatureLocaleMap.clear();                              // need for reload case
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `subname_loc1`, `name_loc2`, `subname_loc2`, `name_loc3`, `subname_loc3`, `name_loc4`, `subname_loc4`, `name_loc5`, `subname_loc5`, `name_loc6`, `subname_loc6`, `name_loc7`, `subname_loc7`, `name_loc8`, `subname_loc8` FROM `locales_creature`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `subname_loc1`, `name_loc2`, `subname_loc2`, `name_loc3`, `subname_loc3`, `name_loc4`, `subname_loc4`, `name_loc5`, `subname_loc5`, `name_loc6`, `subname_loc6`, `name_loc7`, `subname_loc7`, `name_loc8`, `subname_loc8`, `name_loc9`, `subname_loc9`, `name_loc10`, `subname_loc10`, `name_loc11`, `subname_loc11`, `name_loc12`, `subname_loc12`, `name_loc13`, `subname_loc13`, `name_loc14`, `subname_loc14`, `name_loc15`, `subname_loc15` FROM `locales_creature`"));
 
     if (!result)
     {
@@ -1018,7 +1018,11 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
                           "`option_text_loc1`, `box_text_loc1`, `option_text_loc2`, `box_text_loc2`,"
                           "`option_text_loc3`, `box_text_loc3`, `option_text_loc4`, `box_text_loc4`,"
                           "`option_text_loc5`, `box_text_loc5`, `option_text_loc6`, `box_text_loc6`,"
-                          "`option_text_loc7`, `box_text_loc7`, `option_text_loc8`, `box_text_loc8` "
+                          "`option_text_loc7`, `box_text_loc7`, `option_text_loc8`, `box_text_loc8`,"
+                          "`option_text_loc9`, `box_text_loc9`, `option_text_loc10`, `box_text_loc10`,"
+                          "`option_text_loc11`, `box_text_loc11`, `option_text_loc12`, `box_text_loc12`,"
+                          "`option_text_loc13`, `box_text_loc13`, `option_text_loc14`, `box_text_loc14`,"
+                          "`option_text_loc15`, `box_text_loc15`"
                           "FROM `locales_gossip_menu_option`"));
 
     if (!result)
@@ -1103,7 +1107,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
 {
     m_PointOfInterestLocaleMap.clear();                              // need for reload case
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `icon_name_loc1`, `icon_name_loc2`, `icon_name_loc3`, `icon_name_loc4`, `icon_name_loc5`, `icon_name_loc6`, `icon_name_loc7`, `icon_name_loc8` FROM `locales_points_of_interest`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `icon_name_loc1`, `icon_name_loc2`, `icon_name_loc3`, `icon_name_loc4`, `icon_name_loc5`, `icon_name_loc6`, `icon_name_loc7`, `icon_name_loc8`, `icon_name_loc9`, `icon_name_loc10`, `icon_name_loc11`, `icon_name_loc12`, `icon_name_loc13`, `icon_name_loc14`, `icon_name_loc15` FROM `locales_points_of_interest`"));
 
     if (!result)
     {
@@ -4062,7 +4066,7 @@ void ObjectMgr::LoadItemLocales()
 {
     m_ItemLocaleMap.clear();                                 // need for reload case
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `description_loc1`, `name_loc2`, `description_loc2`, `name_loc3`, `description_loc3`, `name_loc4`, `description_loc4`, `name_loc5`, `description_loc5`, `name_loc6`, `description_loc6`, `name_loc7`, `description_loc7`, `name_loc8`, `description_loc8` FROM `locales_item`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `description_loc1`, `name_loc2`, `description_loc2`, `name_loc3`, `description_loc3`, `name_loc4`, `description_loc4`, `name_loc5`, `description_loc5`, `name_loc6`, `description_loc6`, `name_loc7`, `description_loc7`, `name_loc8`, `description_loc8`, `name_loc9`, `description_loc9`, `name_loc10`, `description_loc10`, `name_loc11`, `description_loc11`, `name_loc12`, `description_loc12`, `name_loc13`, `description_loc13`, `name_loc14`, `description_loc14`, `name_loc15`, `description_loc15` FROM `locales_item`"));
 
     if (!result)
     {
@@ -5896,7 +5900,14 @@ void ObjectMgr::LoadQuestLocales()
                           "`Title_loc5`, `Details_loc5`, `Objectives_loc5`, `OfferRewardText_loc5`, `RequestItemsText_loc5`, `EndText_loc5`, `ObjectiveText1_loc5`, `ObjectiveText2_loc5`, `ObjectiveText3_loc5`, `ObjectiveText4_loc5`,"
                           "`Title_loc6`, `Details_loc6`, `Objectives_loc6`, `OfferRewardText_loc6`, `RequestItemsText_loc6`, `EndText_loc6`, `ObjectiveText1_loc6`, `ObjectiveText2_loc6`, `ObjectiveText3_loc6`, `ObjectiveText4_loc6`,"
                           "`Title_loc7`, `Details_loc7`, `Objectives_loc7`, `OfferRewardText_loc7`, `RequestItemsText_loc7`, `EndText_loc7`, `ObjectiveText1_loc7`, `ObjectiveText2_loc7`, `ObjectiveText3_loc7`, `ObjectiveText4_loc7`,"
-                          "`Title_loc8`, `Details_loc8`, `Objectives_loc8`, `OfferRewardText_loc8`, `RequestItemsText_loc8`, `EndText_loc8`, `ObjectiveText1_loc8`, `ObjectiveText2_loc8`, `ObjectiveText3_loc8`, `ObjectiveText4_loc8`"
+                          "`Title_loc8`, `Details_loc8`, `Objectives_loc8`, `OfferRewardText_loc8`, `RequestItemsText_loc8`, `EndText_loc8`, `ObjectiveText1_loc8`, `ObjectiveText2_loc8`, `ObjectiveText3_loc8`, `ObjectiveText4_loc8`,"
+                          "`Title_loc9`, `Details_loc9`, `Objectives_loc9`, `OfferRewardText_loc9`, `RequestItemsText_loc9`, `EndText_loc9`, `ObjectiveText1_loc9`, `ObjectiveText2_loc9`, `ObjectiveText3_loc9`, `ObjectiveText4_loc9`,"
+                          "`Title_loc10`, `Details_loc10`, `Objectives_loc10`, `OfferRewardText_loc10`, `RequestItemsText_loc10`, `EndText_loc10`, `ObjectiveText1_loc10`, `ObjectiveText2_loc10`, `ObjectiveText3_loc10`, `ObjectiveText4_loc10`,"
+                          "`Title_loc11`, `Details_loc11`, `Objectives_loc11`, `OfferRewardText_loc11`, `RequestItemsText_loc11`, `EndText_loc11`, `ObjectiveText1_loc11`, `ObjectiveText2_loc11`, `ObjectiveText3_loc11`, `ObjectiveText4_loc11`,"
+                          "`Title_loc12`, `Details_loc12`, `Objectives_loc12`, `OfferRewardText_loc12`, `RequestItemsText_loc12`, `EndText_loc12`, `ObjectiveText1_loc12`, `ObjectiveText2_loc12`, `ObjectiveText3_loc12`, `ObjectiveText4_loc12`,"
+                          "`Title_loc13`, `Details_loc13`, `Objectives_loc13`, `OfferRewardText_loc13`, `RequestItemsText_loc13`, `EndText_loc13`, `ObjectiveText1_loc13`, `ObjectiveText2_loc13`, `ObjectiveText3_loc13`, `ObjectiveText4_loc13`,"
+                          "`Title_loc14`, `Details_loc14`, `Objectives_loc14`, `OfferRewardText_loc14`, `RequestItemsText_loc14`, `EndText_loc14`, `ObjectiveText1_loc14`, `ObjectiveText2_loc14`, `ObjectiveText3_loc14`, `ObjectiveText4_loc14`,"
+                          "`Title_loc15`, `Details_loc15`, `Objectives_loc15`, `OfferRewardText_loc15`, `RequestItemsText_loc15`, `EndText_loc15`, `ObjectiveText1_loc15`, `ObjectiveText2_loc15`, `ObjectiveText3_loc15`, `ObjectiveText4_loc15`"
                           " FROM `locales_quest`"
                                              ));
 
@@ -6248,7 +6259,7 @@ void ObjectMgr::LoadPageTextLocales()
 {
     m_PageTextLocaleMap.clear();                             // need for reload case
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8` FROM `locales_page_text`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`, `text_loc9`, `text_loc10`, `text_loc11`, `text_loc12`, `text_loc13`, `text_loc14`, `text_loc15` FROM `locales_page_text`"));
 
     if (!result)
     {
@@ -7452,7 +7463,7 @@ void ObjectMgr::LoadGameObjectLocales()
 {
     m_GameObjectLocaleMap.clear();                           // need for reload case
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `name_loc7`, `name_loc8` FROM `locales_gameobject`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `name_loc7`, `name_loc8`, `name_loc9`, `name_loc10`, `name_loc11`, `name_loc12`, `name_loc13`, `name_loc14`, `name_loc15` FROM `locales_gameobject`"));
 
     if (!result)
     {
@@ -8070,7 +8081,7 @@ void ObjectMgr::LoadFactions()
 #if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
         // Load localized texts (currently we only have 1.12 locales).
         //                                        0        1            2            3            4            5            6            7                   8                   9                   10                  11                  12
-        result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `description_loc1`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc5`, `description_loc6` FROM `locales_faction`"));
+        result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `name_loc7`, `name_loc8`, `name_loc9`, `name_loc10`, `name_loc11`, `name_loc12`, `name_loc13`, `name_loc14`, `name_loc15`, `description_loc1`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc5`, `description_loc6`, `description_loc7`, `description_loc8`, `description_loc9`, `description_loc10`, `description_loc11`, `description_loc12`, `description_loc13`, `description_loc14`, `description_loc15` FROM `locales_faction`"));
         if (result)
         {
             do
@@ -8659,7 +8670,7 @@ void ObjectMgr::LoadTaxiNodes()
 #if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
     // Load localized texts (currently we only have 1.12 locales).
     //                                        0        1            2            3            4            5            6
-    result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6` FROM `locales_taxi_node`"));
+    result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `name_loc7`, `name_loc8`, `name_loc9`, `name_loc10`, `name_loc11`, `name_loc12`, `name_loc13`, `name_loc14`, `name_loc15` FROM `locales_taxi_node`"));
     if (result)
     {
         do
@@ -9289,7 +9300,7 @@ void ObjectMgr::LoadBroadcastTexts()
 void ObjectMgr::LoadBroadcastTextLocales()
 {
     //                                                               0     1                 2                 3                 4                 5                 6                 7                 8                 9                   10                  11                  12                  13                  14                  15                  16
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `male_text_loc1`, `male_text_loc2`, `male_text_loc3`, `male_text_loc4`, `male_text_loc5`, `male_text_loc6`, `male_text_loc7`, `male_text_loc8`, `female_text_loc1`, `female_text_loc2`, `female_text_loc3`, `female_text_loc4`, `female_text_loc5`, `female_text_loc6`, `female_text_loc7`, `female_text_loc8` FROM `locales_broadcast_text`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `male_text_loc1`, `male_text_loc2`, `male_text_loc3`, `male_text_loc4`, `male_text_loc5`, `male_text_loc6`, `male_text_loc7`, `male_text_loc8`, `male_text_loc9`, `male_text_loc10`, `male_text_loc11`, `male_text_loc12`, `male_text_loc13`, `male_text_loc14`, `male_text_loc15`, `female_text_loc1`, `female_text_loc2`, `female_text_loc3`, `female_text_loc4`, `female_text_loc5`, `female_text_loc6`, `female_text_loc7`, `female_text_loc8`, `female_text_loc9`, `female_text_loc10`, `female_text_loc11`, `female_text_loc12`, `female_text_loc13`, `female_text_loc14`, `female_text_loc15` FROM `locales_broadcast_text`"));
 
     if (!result)
     {
@@ -9436,7 +9447,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
             ++itr;
     }
 
-    std::unique_ptr<QueryResult> result(db.PQuery("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` %s FROM %s", extra_content ? ", `sound`, `type`, `language`, `emote`" : "", table));
+    std::unique_ptr<QueryResult> result(db.PQuery("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `content_loc9`, `content_loc10`, `content_loc11`, `content_loc12`, `content_loc13`, `content_loc14`, `content_loc15` %s FROM %s", extra_content ? ", `sound`, `type`, `language`, `emote`" : "", table));
 
     if (!result)
     {
@@ -9572,7 +9583,7 @@ bool ObjectMgr::LoadQuestGreetings()
     for (auto& i : m_QuestGreetingLocaleMap)
         i.clear(); // need for reload case
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `type`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `emote_id`, `emote_delay` FROM `quest_greeting`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `type`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `content_loc9`, `content_loc10`, `content_loc11`, `content_loc12`, `content_loc13`, `content_loc14`, `content_loc15`, `emote_id`, `emote_delay` FROM `quest_greeting`"));
 
     if (!result)
     {
@@ -9668,7 +9679,7 @@ bool ObjectMgr::LoadTrainerGreetings()
 {
     m_TrainerGreetingLocaleMap.clear();
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` FROM `npc_trainer_greeting`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `content_loc9`, `content_loc10`, `content_loc11`, `content_loc12`, `content_loc13`, `content_loc14`, `content_loc15` FROM `npc_trainer_greeting`"));
 
     if (!result)
     {
@@ -11368,7 +11379,7 @@ void ObjectMgr::LoadAreaLocales()
 {
     m_AreaLocaleMap.clear();
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `Entry`, `NameLoc1`, `NameLoc2`, `NameLoc3`, `NameLoc4`, `NameLoc5`, `NameLoc6`, `NameLoc7`, `NameLoc8` FROM `locales_area`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `Entry`, `NameLoc1`, `NameLoc2`, `NameLoc3`, `NameLoc4`, `NameLoc5`, `NameLoc6`, `NameLoc7`, `NameLoc8`, `NameLoc9`, `NameLoc10`, `NameLoc11`, `NameLoc12`, `NameLoc13`, `NameLoc14`, `NameLoc15` FROM `locales_area`"));
 
     if (!result)
     {

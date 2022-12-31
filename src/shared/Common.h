@@ -216,7 +216,10 @@ enum LocaleConstant
     LOCALE_zhTW = 5,
     LOCALE_esES = 6,
     LOCALE_esMX = 7,
-    LOCALE_ruRU = 8    // not in vanilla                             
+    LOCALE_ruRU = 8,   // not in vanilla
+    LOCALE_jaJP = 9,   // not in vanilla
+    LOCALE_ptBR = 10,  // not in vanilla
+    LOCALE_itIT = 11   // not in vanilla
 };
 
 // Index returned by GetSessionDbLocaleIndex.
@@ -230,11 +233,14 @@ enum DBLocaleConstant : int
     DB_LOCALE_zhTW = 4,
     DB_LOCALE_esES = 5,
     DB_LOCALE_esMX = 6,
-    DB_LOCALE_ruRU = 7
+    DB_LOCALE_ruRU = 7,
+    DB_LOCALE_jaJP = 8,
+    DB_LOCALE_ptBR = 9,
+    DB_LOCALE_itIT = 10
 };
 
 #define MAX_DBC_LOCALE 8
-#define MAX_LOCALE 9
+#define MAX_LOCALE 16
 
 LocaleConstant GetLocaleByName(std::string const& name);
 LocaleConstant GetDbcLocaleFromDbLocale(DBLocaleConstant localeIndex);

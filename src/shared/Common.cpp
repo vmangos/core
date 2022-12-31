@@ -31,6 +31,13 @@ char const* localeNames[MAX_LOCALE] = {
   "esES",
   "esMX",
   "ruRU",
+  "jaJP",
+  "ptBR",
+  "itIT",
+  NULL,
+  NULL,
+  NULL,
+  NULL
 };
 
 // used for search by name or iterate all names
@@ -46,6 +53,8 @@ LocaleNameStr const fullLocaleNameList[] =
     { "esES", LOCALE_esES },
     { "esMX", LOCALE_esMX },
     { "ruRU", LOCALE_ruRU },
+    { "ptBR", LOCALE_ptBR },
+    { "itIT", LOCALE_itIT },
     { NULL,   LOCALE_enUS }
 };
 
@@ -80,6 +89,10 @@ LocaleConstant GetDbcLocaleFromDbLocale(DBLocaleConstant localeIndex)
             return LOCALE_esMX;
         case DB_LOCALE_ruRU:
             return LOCALE_enUS; // there are no russian dbcs for vanilla
+        case DB_LOCALE_ptBR:
+            return LOCALE_enUS; // there are no portuguese dbcs for vanilla
+        case DB_LOCALE_itIT:
+            return LOCALE_enUS; // there are no italian dbcs for vanilla
     }
     return LOCALE_enUS;
 }

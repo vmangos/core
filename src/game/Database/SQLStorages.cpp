@@ -38,7 +38,7 @@ char const MapEntrydstfmt[] = "iiiiiiiffsi";
 char const ConditionsSrcFmt[] = "iiiiiii";
 char const ConditionsDstFmt[] = "iiiiiii";
 char const AreaEntryfmt[] = "iiiiiisii";
-char const MailTemplatefmt[] = "issssssss";
+char const MailTemplatefmt[] = "issssssssssssssss";
 char const CreatureSpellDatafmt[] = "iiiii";
 
 SQLStorage sCreatureStorage(CreatureInfosrcfmt, CreatureInfodstfmt, "entry", "creature_template");
