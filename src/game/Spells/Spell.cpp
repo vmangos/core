@@ -1666,15 +1666,6 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
 
     if (pRealCaster && pRealCaster != unit)
     {
-        // Recheck  UNIT_FLAG_SPAWNING for delayed spells
-        if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
-            unit->GetCharmerOrOwnerGuid() != m_caster->GetObjectGuid())
-        {
-            pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
-            ResetEffectDamageAndHeal();
-            return;
-        }
-
         if (!pRealCaster->IsFriendlyTo(unit))
         {
             if (m_damage) // Example: stealth.
