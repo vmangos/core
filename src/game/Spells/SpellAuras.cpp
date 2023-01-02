@@ -1817,6 +1817,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         m_modifier.periodictime = 3000;
                         break;
                     }
+                    case 24984:
+                    {
+                        target->HandleEmoteCommand(EMOTE_STATE_DANCE);
+                        break;
+                    }
                 }
                 break;
             }
