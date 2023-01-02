@@ -2291,14 +2291,12 @@ bool Pet::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* ci
     {
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC); // always non-attackable
 
-        CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(this->GetEntry());
-        if (!normalInfo)
+        CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(this->GetEntry());
+        if (!cinfo)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Pet::Create creature entry %u does not exist.", this->GetEntry());
             return false;
         }
-
-        CreatureInfo const* cinfo = normalInfo;
 
         if (cinfo->auras)
             LoadDefaultAuras(cinfo->auras, true);
