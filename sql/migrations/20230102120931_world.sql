@@ -66,6 +66,7 @@ UPDATE `creature_template` SET `auras`=19230, `unit_flags`=33536, `speed_run`=1.
 UPDATE `creature_template` SET `auras`=18873, `unit_flags`=33536, `base_attack_time`=2000, `ranged_attack_time`=0 WHERE `entry`=11326;
 UPDATE `creature_template` SET `auras`=19226, `unit_flags`=33536, `ranged_attack_time`=0 WHERE `entry`=11327;
 UPDATE `creature_template` SET `unit_flags`=768, `ranged_attack_time`=0, `faction`=35 WHERE `entry`=12419;
+UPDATE `creature_template` SET `auras`=24983 WHERE `entry` IN (15186, 15361, 16069, 16445);
 
 
 -- End of migration.
