@@ -20,7 +20,6 @@
  */
 
 #include "Pet.h"
-#include "Creature.h"
 #include "Group.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
