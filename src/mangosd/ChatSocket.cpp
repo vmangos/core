@@ -76,7 +76,7 @@ int OfflineChatSocket::open(void* )
 {
     if (reactor ()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK) == -1)
     {
-        sLog.outError ("OfflineChatSocket::open: unable to register client handler errno = %s", ACE_OS::strerror (errno));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "OfflineChatSocket::open: unable to register client handler errno = %s", ACE_OS::strerror (errno));
         return -1;
     }
 
@@ -84,7 +84,7 @@ int OfflineChatSocket::open(void* )
 
     if (peer ().get_remote_addr (remote_addr) == -1)
     {
-        sLog.outError ("OfflineChatSocket::open: peer ().get_remote_addr errno = %s", ACE_OS::strerror (errno));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "OfflineChatSocket::open: peer ().get_remote_addr errno = %s", ACE_OS::strerror (errno));
         return -1;
     }
     return 0;
@@ -127,7 +127,7 @@ int OfflineChatSocket::handle_output (ACE_HANDLE)
     {
         if(reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK) == -1)
         {
-            sLog.outError ("OfflineChatSocket::handle_output: error while cancel_wakeup");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "OfflineChatSocket::handle_output: error while cancel_wakeup");
             return -1;
         }
         outActive = false;
@@ -158,10 +158,10 @@ std::string TrimLeft(const std::string& s)
 
 int OfflineChatSocket::handle_input(ACE_HANDLE)
 {
-    DEBUG_LOG("OfflineChatSocket::handle_input");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OfflineChatSocket::handle_input");
     if (closing_)
     {
-        sLog.outError("Called OfflineChatSocket::handle_input with closing_ = true");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Called OfflineChatSocket::handle_input with closing_ = true");
         return -1;
     }
 
@@ -169,7 +169,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
 
     if (readBytes <= 0)
     {
-        DEBUG_LOG("read %i bytes in OfflineChatSocket::handle_input", readBytes);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "read %i bytes in OfflineChatSocket::handle_input", readBytes);
         return -1;
     }
     DEBUG_OUT_CHAT("OfflineChatSocket::handle_input %i bytes read", readBytes);
@@ -352,7 +352,7 @@ int OfflineChatSocket::sendf(const char* msg)
         if (reactor ()->schedule_wakeup
             (this, ACE_Event_Handler::WRITE_MASK) == -1)
         {
-            sLog.outError ("OfflineChatSocket::sendf error while schedule_wakeup");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "OfflineChatSocket::sendf error while schedule_wakeup");
             return -1;
         }
         outActive = true;

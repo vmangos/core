@@ -38,7 +38,7 @@ void AddItemsSetItem(Player* player, Item* item)
 
     if (!set)
     {
-        sLog.outErrorDb("Item set %u for item (id %u) not found, mods not applied.", setid, proto->ItemId);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Item set %u for item (id %u) not found, mods not applied.", setid, proto->ItemId);
         return;
     }
 
@@ -47,33 +47,10 @@ void AddItemsSetItem(Player* player, Item* item)
         return;
 #endif
 
-    ItemSetEffect* eff = nullptr;
-
-    for (const auto& x : player->m_ItemSetEff)
-    {
-        if (x && x->setid == setid)
-        {
-            eff = x;
-            break;
-        }
-    }
+    ItemSetEffect* eff = player->GetItemSetEffect(setid);
 
     if (!eff)
-    {
-        eff = new ItemSetEffect;
-        memset(eff, 0, sizeof(ItemSetEffect));
-        eff->setid = setid;
-
-        size_t x = 0;
-        for (; x < player->m_ItemSetEff.size(); x++)
-            if (!player->m_ItemSetEff[x])
-                break;
-
-        if (x < player->m_ItemSetEff.size())
-            player->m_ItemSetEff[x] = eff;
-        else
-            player->m_ItemSetEff.push_back(eff);
-    }
+        eff = player->AddItemSetEffect(setid);
 
     ++eff->item_count;
 
@@ -101,7 +78,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(set->spells[x]);
                 if (!spellInfo)
                 {
-                    sLog.outError("WORLD: unknown spell id %u in items set %u effects", set->spells[x], setid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown spell id %u in items set %u effects", set->spells[x], setid);
                     break;
                 }
 
@@ -122,20 +99,11 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
 
     if (!set)
     {
-        sLog.outErrorDb("Item set #%u for item #%u not found, mods not removed.", setid, proto->ItemId);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Item set #%u for item #%u not found, mods not removed.", setid, proto->ItemId);
         return;
     }
 
-    ItemSetEffect* eff = nullptr;
-    size_t setindex = 0;
-    for (; setindex < player->m_ItemSetEff.size(); setindex++)
-    {
-        if (player->m_ItemSetEff[setindex] && player->m_ItemSetEff[setindex]->setid == setid)
-        {
-            eff = player->m_ItemSetEff[setindex];
-            break;
-        }
-    }
+    ItemSetEffect* eff = player->GetItemSetEffect(setid);
 
     // can be in case now enough skill requirement for set appling but set has been appliend when skill requirement not enough
     if (!eff)
@@ -165,11 +133,7 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
     }
 
     if (!eff->item_count)                                    // all items of a set were removed
-    {
-        MANGOS_ASSERT(eff == player->m_ItemSetEff[setindex]);
-        delete eff;
-        player->m_ItemSetEff[setindex] = nullptr;
-    }
+        player->RemoveItemSetEffect(setid);
 }
 
 bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProto)
@@ -243,7 +207,7 @@ bool Item::Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid)
     SetGuidValue(ITEM_FIELD_OWNER, ownerGuid);
     SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
 
-    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(itemid);
+    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(itemid);
     if (!itemProto)
         return false;
 
@@ -256,7 +220,7 @@ bool Item::Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid)
 
     SetUInt32Value(ITEM_FIELD_DURATION, itemProto->Duration);
 
-    itemProto->m_bDiscovered = true;
+    itemProto->Discovered = true;
 
     return true;
 }
@@ -274,7 +238,7 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
     if (!GetUInt32Value(ITEM_FIELD_DURATION))
         return;
 
-    //DEBUG_LOG("Item::UpdateDuration Item (Entry: %u Duration %u Diff %u)", GetEntry(), GetUInt32Value(ITEM_FIELD_DURATION), diff);
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Item::UpdateDuration Item (Entry: %u Duration %u Diff %u)", GetEntry(), GetUInt32Value(ITEM_FIELD_DURATION), diff);
 
     if (GetUInt32Value(ITEM_FIELD_DURATION) <= diff)
     {
@@ -557,12 +521,12 @@ void Item::LoadLootFromDB(Field* fields)
     }
 
     // normal item case
-    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id);
+    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item_id);
 
     if (!proto)
     {
         CharacterDatabase.PExecute("DELETE FROM `item_loot` WHERE `guid` = '%u' AND `item_id` = '%u'", GetGUIDLow(), item_id);
-        sLog.outError("Item::LoadLootFromDB: %s has an unknown item (id: #%u) in item_loot, deleted.", GetOwnerGuid().GetString().c_str(), item_id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::LoadLootFromDB: %s has an unknown item (id: #%u) in item_loot, deleted.", GetOwnerGuid().GetString().c_str(), item_id);
         return;
     }
 
@@ -590,7 +554,7 @@ void Item::DeleteFromInventoryDB()
 
 ItemPrototype const* Item::GetProto() const
 {
-    return ObjectMgr::GetItemPrototype(GetEntry());
+    return sObjectMgr.GetItemPrototype(GetEntry());
 }
 
 Player* Item::GetOwner()const
@@ -815,7 +779,7 @@ uint32 ItemPrototype::GetProficiencySpell() const
 
 int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
 {
-    ItemPrototype const* itemProto = sItemStorage.LookupEntry<ItemPrototype>(item_id);
+    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(item_id);
 
     if (!itemProto)
         return 0;
@@ -827,7 +791,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
         ItemRandomPropertiesEntry const* random_id = sItemRandomPropertiesStore.LookupEntry(randomPropId);
         if (!random_id)
         {
-            sLog.outErrorDb("Enchantment id #%u used but it doesn't have records in 'ItemRandomProperties.dbc'", randomPropId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Enchantment id #%u used but it doesn't have records in 'ItemRandomProperties.dbc'", randomPropId);
             return 0;
         }
 
@@ -893,7 +857,7 @@ void Item::AddToUpdateQueueOf(Player* player)
         player = GetOwner();
         if (!player)
         {
-            sLog.outError("Item::AddToUpdateQueueOf - %s current owner (%s) not in world!",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::AddToUpdateQueueOf - %s current owner (%s) not in world!",
                           GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
             return;
         }
@@ -901,7 +865,7 @@ void Item::AddToUpdateQueueOf(Player* player)
 
     if (player->GetObjectGuid() != GetOwnerGuid())
     {
-        sLog.outError("Item::AddToUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::AddToUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
                       GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
         return;
     }
@@ -923,7 +887,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
         player = GetOwner();
         if (!player)
         {
-            sLog.outError("Item::RemoveFromUpdateQueueOf - %s current owner (%s) not in world!",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::RemoveFromUpdateQueueOf - %s current owner (%s) not in world!",
                           GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
             return;
         }
@@ -931,7 +895,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
 
     if (player->GetObjectGuid() != GetOwnerGuid())
     {
-        sLog.outError("Item::RemoveFromUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::RemoveFromUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
                       GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
         return;
     }
@@ -1045,11 +1009,24 @@ bool Item::IsTargetValidForItemUse(Unit* pUnitTarget)
     return false;
 }
 
-void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges)
+void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, ObjectGuid casterGuid /*= ObjectGuid()*/)
 {
     // Better lost small time at check in comparison lost time at item save to DB.
     if ((GetEnchantmentId(slot) == id) && (GetEnchantmentDuration(slot) == duration) && (GetEnchantmentCharges(slot) == charges))
         return;
+
+    
+    if (slot < MAX_INSPECTED_ENCHANTMENT_SLOT && !casterGuid.IsEmpty())
+    {
+        if (Player* owner = GetOwner())
+        {
+            if (uint32 oldEnchant = GetEnchantmentId(slot))
+                owner->SendEnchantmentLog(ObjectGuid(), GetEntry(), oldEnchant);
+
+            if (id)
+                owner->SendEnchantmentLog(casterGuid, GetEntry(), id);
+        }
+    }
 
     SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET, id);
     SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET, duration);
@@ -1075,10 +1052,16 @@ void Item::SetEnchantmentCharges(EnchantmentSlot slot, uint32 charges)
     SetState(ITEM_CHANGED);
 }
 
-void Item::ClearEnchantment(EnchantmentSlot slot)
+void Item::ClearEnchantment(EnchantmentSlot slot, bool sendToClient)
 {
     if (!GetEnchantmentId(slot))
         return;
+
+    if (slot < MAX_INSPECTED_ENCHANTMENT_SLOT && sendToClient)
+    {
+        if (Player* owner = GetOwner())
+            owner->SendEnchantmentLog(ObjectGuid(), GetEntry(), GetEnchantmentId(slot));
+    }
 
     for (uint8 x = 0; x < 3; ++x)
         SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot * MAX_ENCHANTMENT_OFFSET + x, 0);
@@ -1111,7 +1094,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, ObjectGuid playerGuid)
     if (count < 1)
         return nullptr;                                        //don't create item at zero count
 
-    if (ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(item))
+    if (ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(item))
     {
         if (count > pProto->GetMaxStackSize())
             count = pProto->GetMaxStackSize();

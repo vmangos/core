@@ -472,7 +472,7 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
                     data << uint32(529);
                     break;
                 default:
-                    sLog.outError("BattleBot: Invalid BG queue type!");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");
                     botEntry->requestRemoval = true;
                     return;
             }
@@ -731,22 +731,30 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (!me->InBattleGroundQueue())
         {
+            bool canQueue;
             char args[] = "";
             switch (m_battlegroundId)
             {
                 case BATTLEGROUND_QUEUE_AV:
-                    ChatHandler(me).HandleGoAlteracCommand(args);
+                    canQueue = ChatHandler(me).HandleGoAlteracCommand(args);
                     break;
                 case BATTLEGROUND_QUEUE_WS:
-                    ChatHandler(me).HandleGoWarsongCommand(args);
+                    canQueue = ChatHandler(me).HandleGoWarsongCommand(args);
                     break;
                 case BATTLEGROUND_QUEUE_AB:
-                    ChatHandler(me).HandleGoArathiCommand(args);
+                    canQueue = ChatHandler(me).HandleGoArathiCommand(args);
                     break;
                 default:
-                    sLog.outError("BattleBot: Invalid BG queue type!");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");
                     botEntry->requestRemoval = true;
                     return;
+            }
+
+            if (!canQueue)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Attempt to queue for BG failed! Bot is too low level or BG is not available in this patch.");
+                botEntry->requestRemoval = true;
+                return;
             }
 
             SendFakePacket(CMSG_BATTLEMASTER_JOIN);
@@ -2847,6 +2855,18 @@ void BattleBotAI::UpdateInCombatAI_Druid()
                    return;
            }
        }
+
+        if (m_spells.druid.pRemoveCurse)
+        {
+            if (Unit* pFriend = SelectDispelTarget(m_spells.druid.pRemoveCurse))
+            {
+                if (CanTryToCastSpell(pFriend, m_spells.druid.pRemoveCurse))
+                {
+                    if (DoCastSpell(pFriend, m_spells.druid.pRemoveCurse) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+        }
 
         if (m_spells.druid.pInnervate &&
             me->GetVictim() &&

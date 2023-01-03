@@ -234,8 +234,11 @@ void ChargeMovementGenerator<T>::Initialize(T& unit)
         unit.StopMoving();
     if (path.getPathType() & PATHFIND_NOPATH)
         return;
+
     unit.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     unit.m_movementInfo.moveFlags = unit.m_movementInfo.moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN;
+    unit.m_movementInfo.ctime = 0;
+
     Movement::MoveSplineInit init(unit, "ChargeMovementGenerator<T>::Initialize");
     init.Move(&path);
     init.SetVelocity(m_speed);
@@ -264,10 +267,7 @@ void ChargeMovementGenerator<T>::Finalize(T& unit)
 template<class T>
 void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
 {
-    Vector3 attackPos; // attacker position
     Vector3 victimPos; // victim position
-    Vector3 chargeVect; // vector of the charge
-    Vector3 victimSpd; // speed vector of victim
     float o;
 
     if (GenericTransport* t = attacker.GetTransport())
@@ -278,49 +278,36 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
     if (m_speed > 24.0f)
         m_speed = 24.0f;
 
-    attacker.GetPosition(attackPos.x, attackPos.y, attackPos.z);
     victim.GetPosition(victimPos.x, victimPos.y, victimPos.z);
-    chargeVect = victimPos - attackPos;
-    chargeVect = chargeVect.direction(); // unit vector
 
     // Base path is to current victim position
     path.calculate(victimPos.x, victimPos.y, victimPos.z, false);
 
-    // Improved path to victim future estimated position
-    if (Player* victimPlayer = victim.ToPlayer())
-    {
-        if (sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_CHARGE) && 
-            victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, 1000, victimSpd.x, victimSpd.y, victimSpd.z, o) &&
-            victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, 0, victimPos.x, victimPos.y, victimPos.z, o))
-        {
-            // Victim speed per sec.
-            victimSpd -= victimPos;
-            // We get only the component of the speed in the direction of charge vector
-            float victimSpeed = victimSpd.dot(chargeVect); // dot product
-            if (abs(victimSpeed) > 0.1f)
-            {
-                float currDistance = path.Length();
-                uint32 pathTravelTime;
-                // Equation when matching collision distance, to get collision time:
-                // m_speed * t = currDistance + victimSpeed * t
-                // t = currDistance / (m_speed - victimSpeed)
-                if (m_speed > 2 * victimSpeed) // we don't want to reach target if target speed is more than half charge speed
-                    pathTravelTime = (uint32)(1000 * currDistance / (m_speed - victimSpeed));
-                else
-                    pathTravelTime = (uint32)(1000 * 2 * currDistance / m_speed);
+    Player* victimPlayer = sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_CHARGE) ?
+        victim.ToPlayer() : nullptr;
 
-                pathTravelTime *= 0.45f; // Attenuation factor (empirical)
-                m_extrapolateDelay = (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.stime) + pathTravelTime;
-                if (m_extrapolateDelay > 1500) m_extrapolateDelay = 1500;
-                if (victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, m_extrapolateDelay, victimPos.x, victimPos.y, victimPos.z, o))
-                {
-                    victim.UpdateAllowedPositionZ(victimPos.x, victimPos.y, victimPos.z);
-                    path.calculate(victimPos.x, victimPos.y, victimPos.z, false);
-                    path.UpdateForMelee(&victim, attacker.GetMeleeReach());
-                }
-            }
-            else
-                path.UpdateForMelee(&victim, attacker.GetMeleeReach());
+    // Improved path to victim future estimated position
+    if (victimPlayer && victimPlayer->IsMoving() && victimPlayer->IsMovedByPlayer())
+    {
+        // We need to account for:
+        // 1. Time for stun aura to be applied (spell batching)
+        // 2. Time client has been moving for since last packet
+        // 3. Time it will take for him to ACK the root (latency)
+        m_extrapolateDelay += (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.stime);
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        // latency is not part of ping packet in older clients so we cant use it
+        m_extrapolateDelay += victimPlayer->GetSession()->GetLatency();
+#endif
+
+        if (m_extrapolateDelay > 1500)
+            m_extrapolateDelay = 1500;
+
+        if (victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, m_extrapolateDelay, victimPos.x, victimPos.y, victimPos.z, o))
+        {
+            victim.UpdateAllowedPositionZ(victimPos.x, victimPos.y, victimPos.z);
+            path.calculate(victimPos.x, victimPos.y, victimPos.z, false);
+            path.UpdateForMelee(&victim, attacker.GetMeleeReach());
         }
     }
     else

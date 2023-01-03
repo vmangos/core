@@ -194,16 +194,15 @@ class Pet : public Creature
         bool HaveInDiet(ItemPrototype const* item) const;
         uint32 GetCurrentFoodBenefitLevel(uint32 itemLevel) const;
         void SetDuration(int32 dur) { m_duration = dur; }
+        float GetFollowAngle() const { return m_followAngle; }
+        void SetFollowAngle(float angle) { m_followAngle = angle; }
 
         int32 GetBonusDamage() const { return m_bonusdamage; }
         void SetBonusDamage(int32 damage) { m_bonusdamage = damage; }
 
-        bool UpdateStats(Stats stat) override;
         bool UpdateAllStats() override;
         void UpdateResistances(uint32 school) override;
         void UpdateArmor() override;
-        void UpdateMaxHealth() override;
-        void UpdateMaxPower(Powers power) override;
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
         void UpdateDamagePhysical(WeaponAttackType attType) override;
 
@@ -275,6 +274,7 @@ class Pet : public Creature
         bool    m_loading;
         CharacterPetCache* m_pTmpCache;
         bool    m_unSummoned;                               // If this pet has already been unsummoned
+        float   m_followAngle;
 
     private:
         bool m_enabled;

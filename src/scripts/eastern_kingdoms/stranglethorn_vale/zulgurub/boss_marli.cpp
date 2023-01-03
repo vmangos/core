@@ -99,7 +99,7 @@ struct boss_marliAI : public ScriptedAI
         std::list<GameObject*> lSpiderEggs;
         GetGameObjectListWithEntryInGrid(lSpiderEggs, m_creature, GO_EGG, DEFAULT_VISIBILITY_INSTANCE);
         if (lSpiderEggs.empty())
-            sLog.outDebug("boss_marli, no Eggs with the entry %u were found", GO_EGG);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "boss_marli, no Eggs with the entry %u were found", GO_EGG);
         else
         {
             for (const auto& pGo : lSpiderEggs)
@@ -158,7 +158,7 @@ struct boss_marliAI : public ScriptedAI
         std::list<GameObject*> lEggs;
         GetGameObjectListWithEntryInGrid(lEggs, m_creature, GO_EGG, DEFAULT_VISIBILITY_INSTANCE);
         if (lEggs.empty())
-            sLog.outDebug("boss_marli, no Eggs with the entry %i were found", GO_EGG);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "boss_marli, no Eggs with the entry %i were found", GO_EGG);
         else
         {
             lEggs.sort(ObjectDistanceOrder(m_creature));
@@ -316,9 +316,11 @@ struct boss_marliAI : public ScriptedAI
                 DoScriptText(SAY_TRANSFORM, m_creature);
                 DoCastSpellIfCan(m_creature, SPELL_SPIDER_FORM);
 
-                CreatureInfo const *cinfo = m_creature->GetCreatureInfo();
-                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->dmg_min + ((cinfo->dmg_min / 100) * 35)));
-                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->dmg_max + ((cinfo->dmg_max / 100) * 35)));
+                float dmgMin;
+                float dmgMax;
+                m_creature->GetDefaultDamageRange(dmgMin, dmgMax);
+                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (dmgMin + ((dmgMin / 100) * 35)));
+                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (dmgMax + ((dmgMax / 100) * 35)));
                 m_creature->UpdateDamagePhysical(BASE_ATTACK);
 
                 DoResetThreat();
@@ -334,9 +336,11 @@ struct boss_marliAI : public ScriptedAI
 
                 m_creature->SetDisplayId(m_uiDefaultModel);
 
-                CreatureInfo const *cinfo = m_creature->GetCreatureInfo();
-                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->dmg_min + ((cinfo->dmg_min / 100) * 1)));
-                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->dmg_max + ((cinfo->dmg_max / 100) * 1)));
+                float dmgMin;
+                float dmgMax;
+                m_creature->GetDefaultDamageRange(dmgMin, dmgMax);
+                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (dmgMin + ((dmgMin / 100) * 1)));
+                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (dmgMax + ((dmgMax / 100) * 1)));
                 m_creature->UpdateDamagePhysical(BASE_ATTACK);
 
                 m_bIsInPhaseTwo = false;

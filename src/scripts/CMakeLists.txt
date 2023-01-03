@@ -220,7 +220,6 @@ set (SCRIPTS_SRCS
     kalimdor/silithus/ruins_of_ahnqiraj/boss_kurinnaxx.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/boss_moam.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/boss_ossirian.cpp
-    kalimdor/silithus/ruins_of_ahnqiraj/boss_rajaxx.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/instance_ruins_of_ahnqiraj.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/npc_sandstalker.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/ruins_of_ahnqiraj.cpp

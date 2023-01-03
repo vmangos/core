@@ -37,9 +37,6 @@ enum
 
 npc_j_eevee_dreadsteedAI::npc_j_eevee_dreadsteedAI(Creature* pCreature) : ScriptedAI(pCreature)
 {
-    //m_pInstance = (instance_dire_maul*) pCreature->GetInstanceData();
-    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED);
-    m_creature->SetFactionTemplateId(35); //friendly to everyone
     m_creature->SetWalk(true);
     Reset();
 }
@@ -57,22 +54,21 @@ void npc_j_eevee_dreadsteedAI::MovementInform(uint32 uiType, uint32 uiPointId)
         return;
     switch (uiPointId)
     {
-    case 1:
-    case 2:
-    case 3:
-        m_creature->SetFacingTo(aJeeveeDreadsteedLocations[currentPoint].m_fO);
-        waypointReached = true;
-        m_creature->CastSpell(m_creature, SPELL_J_EEVEE_SUMMONS_OBJECT, false);
-        break;
-    case 4:
-        m_creature->SetFacingTo(aJeeveeDreadsteedLocations[currentPoint].m_fO);
-        waypointReached = true;
-        if (Player* player = m_creature->GetMap()->GetPlayer(guidPlayer))
-            DoScriptText(SAY_J_EEVEE_DREADSTEED_4, m_creature, player);
+        case 1:
+        case 2:
+        case 3:
+            m_creature->SetFacingTo(aJeeveeDreadsteedLocations[currentPoint].m_fO);
+            waypointReached = true;
+            m_creature->CastSpell(m_creature, SPELL_J_EEVEE_SUMMONS_OBJECT, false);
+            break;
+        case 4:
+            m_creature->SetFacingTo(aJeeveeDreadsteedLocations[currentPoint].m_fO);
+            waypointReached = true;
+            if (Player* player = m_creature->GetMap()->GetPlayer(guidPlayer))
+                DoScriptText(SAY_J_EEVEE_DREADSTEED_4, m_creature, player);
 
-        DoCastSpellIfCan(m_creature, SPELL_J_EEVEE_TELEPORT, CF_TRIGGERED);
-        break;
-
+            DoCastSpellIfCan(m_creature, SPELL_J_EEVEE_TELEPORT, CF_TRIGGERED);
+            break;
     }
 }
 void npc_j_eevee_dreadsteedAI::UpdateAI(uint32 const uiDiff)
@@ -87,15 +83,15 @@ void npc_j_eevee_dreadsteedAI::UpdateAI(uint32 const uiDiff)
                 {
                     switch (currentPoint)
                     {
-                    case 0:
-                        DoScriptText(SAY_J_EEVEE_DREADSTEED_1, m_creature);
-                        break;
-                    case 1:
-                        DoScriptText(SAY_J_EEVEE_DREADSTEED_2, m_creature);
-                        break;
-                    case 2:
-                        DoScriptText(SAY_J_EEVEE_DREADSTEED_3, m_creature);
-                        break;
+                        case 0:
+                            DoScriptText(SAY_J_EEVEE_DREADSTEED_1, m_creature);
+                            break;
+                        case 1:
+                            DoScriptText(SAY_J_EEVEE_DREADSTEED_2, m_creature);
+                            break;
+                        case 2:
+                            DoScriptText(SAY_J_EEVEE_DREADSTEED_3, m_creature);
+                            break;
                     }
                     currentPoint++;
                     m_creature->GetMotionMaster()->MovePoint(currentPoint, aJeeveeDreadsteedLocations[currentPoint].m_fX, aJeeveeDreadsteedLocations[currentPoint].m_fY, aJeeveeDreadsteedLocations[currentPoint].m_fZ, true);
@@ -143,13 +139,12 @@ npc_j_eevee_scholomanceAI::npc_j_eevee_scholomanceAI(Creature* pCreature) : Scri
 {
     m_creature->SetWalk(true);
 
-    if (m_creature->IsTemporarySummon()) {
+    if (m_creature->IsTemporarySummon())
+    {
         guidPlayer = ((TemporarySummon*)m_creature)->GetSummonerGuid();
 
-        if (Player *player = m_creature->GetMap()->GetPlayer(guidPlayer)) {
+        if (Player* player = m_creature->GetMap()->GetPlayer(guidPlayer))
             player->HandleEmote(EMOTE_ONESHOT_KNEEL);
-            m_creature->SetFactionTemplateId(player->GetFactionTemplateId()); // player faction, friendly to player but hostile to other mobs
-        }
     }
 
     waitTimer = 4000;
@@ -176,22 +171,22 @@ void npc_j_eevee_scholomanceAI::MovementInform(uint32 uiType, uint32 uiPointId)
     waypointReached = true;
     switch (uiPointId)
     {
-    case 2:
-        m_creature->HandleEmote(EMOTE_ONESHOT_ATTACKUNARMED);
-        attackRepeatTimer = 1000;
-        break;
-    case 7:
-        m_creature->HandleEmote(EMOTE_ONESHOT_ATTACKUNARMED);
-        attackRepeatTimer = 1000;
-        break;
-    case 12:
-        m_creature->HandleEmote(EMOTE_ONESHOT_ATTACKUNARMED);
-        attackRepeatTimer = 1000;
-        break;
-    case 13:
-        DoCastSpellIfCan(m_creature, SPELL_J_EEVEE_TELEPORT, CF_TRIGGERED);
-        finished = true;
-        break;
+        case 2:
+            m_creature->HandleEmote(EMOTE_ONESHOT_ATTACKUNARMED);
+            attackRepeatTimer = 1000;
+            break;
+        case 7:
+            m_creature->HandleEmote(EMOTE_ONESHOT_ATTACKUNARMED);
+            attackRepeatTimer = 1000;
+            break;
+        case 12:
+            m_creature->HandleEmote(EMOTE_ONESHOT_ATTACKUNARMED);
+            attackRepeatTimer = 1000;
+            break;
+        case 13:
+            DoCastSpellIfCan(m_creature, SPELL_J_EEVEE_TELEPORT, CF_TRIGGERED);
+            finished = true;
+            break;
     }
 }
 
@@ -207,27 +202,27 @@ void npc_j_eevee_scholomanceAI::UpdateAI(uint32 const uiDiff)
                 {
                     switch (currentPoint)
                     {
-                    case 0:
-                        DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_1, m_creature);
-                        break;
-                    case 3:
-                        DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_2, m_creature);
-                        break;
-                    case 8:
-                        DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_3, m_creature);
-                        m_creature->SetWalk(false);
-                        break;
-                    case 11:
-                        m_creature->SetWalk(true);
-                        break;
-                    case 12:
-                        // final script text
-                        DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_4, m_creature);
+                        case 0:
+                            DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_1, m_creature);
+                            break;
+                        case 3:
+                            DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_2, m_creature);
+                            break;
+                        case 8:
+                            DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_3, m_creature);
+                            m_creature->SetWalk(false);
+                            break;
+                        case 11:
+                            m_creature->SetWalk(true);
+                            break;
+                        case 12:
+                            // final script text
+                            DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_4, m_creature);
 
-                        if (Player* player = m_creature->GetMap()->GetPlayer(guidPlayer))
-                            player->GroupEventHappens(QUEST_IMP_DELIVERY, m_creature);
+                            if (Player* player = m_creature->GetMap()->GetPlayer(guidPlayer))
+                                player->GroupEventHappens(QUEST_IMP_DELIVERY, m_creature);
 
-                        break;
+                            break;
                     }
 
                     currentPoint++;
@@ -265,7 +260,7 @@ void npc_j_eevee_scholomanceAI::UpdateAI(uint32 const uiDiff)
 
 CreatureAI* GetAI_npc_j_eevee(Creature* pCreature)
 {
-    if (pCreature->GetMapId() == 429) //Map 429 Zone 2557. HT.
+    if (pCreature->GetMapId() == 429) //Map 429 Zone 2557. Dire Maul.
         return new npc_j_eevee_dreadsteedAI(pCreature);
     else if (pCreature->GetMapId() == 289) // Map 289, Zone 2057. Scholomance
         return new npc_j_eevee_scholomanceAI(pCreature);

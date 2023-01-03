@@ -36,7 +36,7 @@
 #define PLAYER_STRONG_MAX_LEVEL 255
 
 // Max creature level in vanilla (included some bosses and elite) (no cls data above this level)
-#define CREATURE_MAX_LEVEL 65
+#define CREATURE_MAX_LEVEL 63
 
 enum AreaTeams
 {

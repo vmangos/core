@@ -41,7 +41,7 @@
 #include "Anticheat.h"
 #include "AccountMgr.h"
 
-bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
+bool WorldSession::CheckChatMessageValidity(std::string& msg, uint32 lang, uint32 msgType)
 {
     if (!IsLanguageAllowedForChatType(lang, msgType))
         return false;
@@ -52,16 +52,22 @@ bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32
         if (sWorld.getConfig(CONFIG_BOOL_CHAT_FAKE_MESSAGE_PREVENTING))
             stripLineInvisibleChars(msg);
 
-        if (sWorld.getConfig(CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_SEVERITY) && GetSecurity() < SEC_MODERATOR
-                && !ChatHandler(this).isValidChatMessage(msg.c_str()))
+        if (sWorld.getConfig(CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
         {
-            sLog.outError("Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName(),
-                          GetPlayer()->GetGUIDLow(), msg.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName(),
+                GetPlayer()->GetGUIDLow(), msg.c_str());
             if (sWorld.getConfig(CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_KICK))
                 KickPlayer();
             return false;
         }
     }
+    return true;
+}
+
+bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
+{
+    if (!CheckChatMessageValidity(msg, lang, msgType))
+        return false;
 
     ChatHandler handler(this);
 
@@ -142,11 +148,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
-        sLog.outError("CHAT: Wrong message type received: %u", type);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHAT: Wrong message type received: %u", type);
         return;
     }
-
-    DEBUG_LOG("CHAT: packet received. type %u, lang %u", type, lang);
 
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
@@ -234,6 +238,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
     switch (type)
     {
         case CHAT_MSG_CHANNEL:
+        {
             recv_data >> channel;
             recv_data >> msg;
 
@@ -243,9 +248,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             if (msg.empty())
                 return;
             break;
+        }
         case CHAT_MSG_WHISPER:
+        {
             recv_data >> to;
             // no break
+        }
         case CHAT_MSG_SAY:
         case CHAT_MSG_EMOTE:
         case CHAT_MSG_YELL:
@@ -259,21 +267,27 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         case CHAT_MSG_BATTLEGROUND:
         case CHAT_MSG_BATTLEGROUND_LEADER:
 #endif
+        {
             recv_data >> msg;
             if (!ProcessChatMessageAfterSecurityCheck(msg, lang, type))
                 return;
             if (msg.empty())
                 return;
-        break;
-
+            break;
+        }
         case CHAT_MSG_AFK:
         case CHAT_MSG_DND:
+        {
             recv_data >> msg;
-        break;
-
+            if (!CheckChatMessageValidity(msg, lang, type))
+                return;
+            break;
+        }
         default:
-            sLog.outError("CHAT: unknown message type %u, lang: %u", type, lang);
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHAT: unknown message type %u, lang: %u", type, lang);
             return;
+        }
     }
 
     /** Enable various spam chat detections */
@@ -737,20 +751,20 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recv_data)
         return;
     }
 
-    uint32 text_emote, emoteNum;
+    uint32 textEmote, emoteNum;
     ObjectGuid guid;
 
-    recv_data >> text_emote;
+    recv_data >> textEmote;
     recv_data >> emoteNum;
     recv_data >> guid;
 
-    EmotesTextEntry const* em = sEmotesTextStore.LookupEntry(text_emote);
+    EmotesTextEntry const* em = sEmotesTextStore.LookupEntry(textEmote);
     if (!em)
         return;
 
-    uint32 emote_id = em->textid;
+    uint32 emoteId = em->textid;
 
-    switch (emote_id)
+    switch (emoteId)
     {
         case EMOTE_STATE_SLEEP:
         case EMOTE_STATE_SIT:
@@ -761,28 +775,26 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recv_data)
         {
             GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_ANIM_CANCELS);
             GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ANIM_CANCELS);
-            GetPlayer()->HandleEmoteCommand(emote_id);
+            GetPlayer()->HandleEmote(emoteId);
             break;
         }
     }
 
     Unit* unit = GetPlayer()->GetMap()->GetUnit(guid);
 
-    MaNGOS::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
+    MaNGOS::EmoteChatBuilder emote_builder(*GetPlayer(), textEmote, emoteNum, unit);
     MaNGOS::LocalizedPacketDo<MaNGOS::EmoteChatBuilder > emote_do(emote_builder);
     MaNGOS::CameraDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), emote_do);
     Cell::VisitWorldObjects(GetPlayer(), emote_worker,  sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE));
 
     //Send scripted event call
-    if (unit && unit->GetTypeId() == TYPEID_UNIT && ((Creature*)unit)->AI())
-        ((Creature*)unit)->AI()->ReceiveEmote(GetPlayer(), text_emote);
+    if (unit && unit->IsCreature() && ((Creature*)unit)->AI())
+        ((Creature*)unit)->AI()->ReceiveEmote(GetPlayer(), textEmote);
 }
 
 void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
 {
     ObjectGuid iguid;
-    //DEBUG_LOG("WORLD: Received CMSG_CHAT_IGNORED");
-
     recv_data >> iguid;
 
     Player* player = sObjectMgr.GetPlayer(iguid);

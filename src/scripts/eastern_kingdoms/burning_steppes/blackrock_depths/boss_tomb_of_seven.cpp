@@ -26,81 +26,17 @@ EndScriptData */
 
 enum
 {
-    FACTION_NEUTRAL             = 734,
-    FACTION_HOSTILE             = 54,
+    FACTION_NEUTRAL                     = 734,
+    FACTION_HOSTILE                     = 54,
 
-    SPELL_SMELT_DARK_IRON       = 14891,
-    SPELL_LEARN_SMELT           = 14894,
-    QUEST_SPECTRAL_CHALICE      = 4083,
-    SKILLPOINT_MIN              = 230
-};
-
-#define GOSSIP_ITEM_TEACH_1 "Teach me the art of smelting dark iron"
-#define GOSSIP_ITEM_TEACH_2 "Continue..."
-#define GOSSIP_ITEM_TRIBUTE "I want to pay tribute"
-
-bool GossipHello_boss_gloomrel(Player* pPlayer, Creature* pCreature)
-{
-    if (ScriptedInstance* pInstance = (ScriptedInstance*)pCreature->GetInstanceData())
-    {
-        if (pInstance->GetData(TYPE_TOMB_OF_SEVEN) == NOT_STARTED)
-        {
-            if (pPlayer->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) &&
-                    pPlayer->GetSkillValue(SKILL_MINING) >= SKILLPOINT_MIN &&
-                    !pPlayer->HasSpell(SPELL_SMELT_DARK_IRON))
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_TEACH_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-            if (!pPlayer->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) &&
-                    pPlayer->GetSkillValue(SKILL_MINING) >= SKILLPOINT_MIN)
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_TRIBUTE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-        }
-    }
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_boss_gloomrel(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_TEACH_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-            pPlayer->SEND_GOSSIP_MENU(2606, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+11:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pCreature->CastSpell(pPlayer, SPELL_LEARN_SMELT, false);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "[PH] Continue...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
-            pPlayer->SEND_GOSSIP_MENU(2604, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+22:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            if (ScriptedInstance* pInstance = (ScriptedInstance*)pCreature->GetInstanceData())
-            {
-                //are 5 minutes expected? go template may have data to despawn when used at quest
-                pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GO_CHALICE), MINUTE * 5);
-            }
-            break;
-    }
-    return true;
-}
-
-enum
-{
     SPELL_SHADOWBOLTVOLLEY              = 15245,
     SPELL_IMMOLATE                      = 12742,
     SPELL_CURSEOFWEAKNESS               = 12493,
     SPELL_DEMONARMOR                    = 13787,
     SPELL_SUMMON_VOIDWALKERS            = 15092,
 
-    SAY_DOOMREL_START_EVENT             = -1230003,
-
     MAX_DWARF                           = 7
 };
-
-#define GOSSIP_ITEM_CHALLENGE   "Your bondage is at an end, Doom'rel. I challenge you!"
 
 struct boss_doomrelAI : public ScriptedAI
 {
@@ -302,48 +238,12 @@ CreatureAI* GetAI_boss_doomrel(Creature* pCreature)
     return new boss_doomrelAI(pCreature);
 }
 
-bool GossipHello_boss_doomrel(Player* pPlayer, Creature* pCreature)
-{
-    if (ScriptedInstance* pInstance = (ScriptedInstance*)pCreature->GetInstanceData())
-    {
-        if (pInstance->GetData(TYPE_TOMB_OF_SEVEN) == NOT_STARTED)
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_CHALLENGE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    }
-
-    pPlayer->SEND_GOSSIP_MENU(2601, pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_boss_doomrel(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            DoScriptText(SAY_DOOMREL_START_EVENT, pCreature, pPlayer);
-            // start event
-            if (ScriptedInstance* pInstance = (ScriptedInstance*)pCreature->GetInstanceData())
-                pInstance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
-
-            break;
-    }
-    return true;
-}
-
 void AddSC_boss_tomb_of_seven()
 {
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "boss_gloomrel";
-    newscript->pGossipHello = &GossipHello_boss_gloomrel;
-    newscript->pGossipSelect = &GossipSelect_boss_gloomrel;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "boss_doomrel";
     newscript->GetAI = &GetAI_boss_doomrel;
-    newscript->pGossipHello = &GossipHello_boss_doomrel;
-    newscript->pGossipSelect = &GossipSelect_boss_doomrel;
     newscript->RegisterSelf();
 }

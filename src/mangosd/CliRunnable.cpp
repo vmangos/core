@@ -89,7 +89,7 @@ void CliRunnable::operator()()
     char commandbuf[256];
 
     ///- Display the list of available CLI functions then beep
-    sLog.outString();
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
 
     if (sConfig.GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert

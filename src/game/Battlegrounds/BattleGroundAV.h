@@ -36,7 +36,7 @@
 #define BG_AV_SCORE_NEAR_LOSE               120
 
 // description: KILL = bonushonor kill one kill is 21honor worth at 0
-// REP reputation, RES = ressources a team will lose
+// REP reputation, RES = resources a team will lose
 #define BG_AV_KILL_BOSS                     6
 #define BG_AV_REP_BOSS                      350
 #define BG_AV_REP_BOSS_HOLIDAY              525
@@ -437,14 +437,14 @@ enum BG_AV_GameObjects
 
 struct BG_AV_NodeInfo
 {
-    BattleGroundAVTeamIndex TotalOwner;
-    BattleGroundAVTeamIndex Owner;
-    BattleGroundAVTeamIndex PrevOwner;
-    BattleGroundAVTeamIndex PrevOtherOwner;
-    BG_AV_States State;
-    BG_AV_States PrevState;
-    uint32       Timer;
-    bool         Tower;
+    BattleGroundAVTeamIndex totalOwner;
+    BattleGroundAVTeamIndex owner;
+    BattleGroundAVTeamIndex prevOwner;
+    BattleGroundAVTeamIndex prevOtherOwner;
+    BG_AV_States state;
+    BG_AV_States prevState;
+    uint32       timer;
+    bool         tower;
 };
 
 inline BG_AV_Nodes &operator++(BG_AV_Nodes &i)
@@ -455,15 +455,15 @@ inline BG_AV_Nodes &operator++(BG_AV_Nodes &i)
 class BattleGroundAVScore : public BattleGroundScore
 {
     public:
-        BattleGroundAVScore() : GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), SecondaryObjectives(0), LieutnantCount(0), SecondaryNPC(0) {};
+        BattleGroundAVScore() : graveyardsAssaulted(0), graveyardsDefended(0), towersAssaulted(0), towersDefended(0), secondaryObjectives(0), lieutnantCount(0), secondaryNPC(0) {};
         ~BattleGroundAVScore() override {};
-        uint32 GraveyardsAssaulted;
-        uint32 GraveyardsDefended;
-        uint32 TowersAssaulted;
-        uint32 TowersDefended;
-        uint32 SecondaryObjectives;
-        uint32 LieutnantCount;
-        uint32 SecondaryNPC;
+        uint32 graveyardsAssaulted;
+        uint32 graveyardsDefended;
+        uint32 towersAssaulted;
+        uint32 towersDefended;
+        uint32 secondaryObjectives;
+        uint32 lieutnantCount;
+        uint32 secondaryNPC;
 };
 
 class BattleGroundAV : public BattleGround
@@ -484,7 +484,7 @@ class BattleGroundAV : public BattleGround
         void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
 
         void RemovePlayer(Player* plr, ObjectGuid guid) override;
-        void HandleAreaTrigger(Player* Source, uint32 Trigger) override;
+        void HandleAreaTrigger(Player* source, uint32 trigger) override;
         void Reset() override;
 
         void ResetTamedEvent(uint32 teamIdx);
@@ -492,20 +492,20 @@ class BattleGroundAV : public BattleGround
 
         /*general stuff*/
         void UpdateScore(BattleGroundTeamIndex teamIdx, int32 points);
-        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value) override;
+        void UpdatePlayerScore(Player* source, uint32 type, uint32 value) override;
         void UpgradeArmor(Object* questGiver, Player* player);
-        uint32 GetActualArmorRessources(uint32 m_faction_id);
+        uint32 GetActualArmorRessources(uint32 factionId);
         /*handle stuff*/ // these are functions which get called from extern scripts
-        void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj) override;
+        void EventPlayerClickedOnFlag(Player* source, GameObject* targetGo) override;
         void HandleKillPlayer(Player* pVictim, Player* pKiller) override;
         void HandleKillUnit(Creature* creature, Player* killer) override;
 
         /** Challenge handler : air or ground assault, world boss assault */
-        bool   isSnivvle;
-        uint32 m_ui_Snivvle;
+        bool   m_snivvleDone;
+        uint32 m_snivvleTimer;
 
-        uint32 m_ui_buff_h;
-        uint32 m_ui_buff_a;
+        uint32 m_buffTimerHorde;
+        uint32 m_buffTimerAlliance;
 
         uint32 m_reinforcementLevel[BG_TEAMS_COUNT];
         uint32 m_challengeStatus[BG_TEAMS_COUNT][BG_AV_NB_CHALLENGES];
@@ -513,24 +513,24 @@ class BattleGroundAV : public BattleGround
         uint32 m_challengeMinReputationNeeded [BG_AV_NB_ASSAULTS]; // Static values
         uint32 m_challengeTimerStart [BG_AV_NB_ASSAULTS]; // Static values
         bool   m_challengePlayerGoStatus [BG_TEAMS_COUNT][BG_AV_NB_ASSAULTS];
-        uint32 getReinforcementLevelGroundUnit (uint32 faction_id);
-        void   setReinforcementLevelGroundUnit (uint32 faction_id, uint32 ressources);
-        bool   isAerialChallengeInvocationReady (uint32 faction_id, uint32 aerial_id);
-        bool   isGroundChallengeInvocationReady (uint32 faction_id);
-        bool   isCavalryChallengeInvocationReady (uint32 faction_id);
-        bool   isWorldBossChallengeInvocationReady (uint32 faction_id);
-        void   setPlayerGoStatus (uint32 faction_id, uint32 challenge_type, bool av_value);
-        uint32 getPlayerGoStatus (uint32 faction_id, uint32 challenge_type);
-        uint32 getMinReputationNeeded (uint32 challenge_type);
-        uint32 getTimerNeeded (uint32 challenge_type);
-        void   resetAerialChallengeInvocation (uint32 faction_id, uint32 aerial_id);
-        void   resetGroundChallengeInvocation (uint32 faction_id);
-        void   resetCavalryChallengeInvocation (uint32 faction_id);
-        void   resetWorldBossChallengeInvocation (uint32 faction_id);
-        uint32 getChallengeInvocationCounter (uint32 faction_id, uint32 challenge_type);
-        uint32 getChallengeInvocationGoals (uint32 faction_id, uint32 challenge_type);
+        uint32 getReinforcementLevelGroundUnit (uint32 factionId);
+        void   setReinforcementLevelGroundUnit (uint32 factionId, uint32 resources);
+        bool   isAerialChallengeInvocationReady (uint32 factionId, uint32 aerialId);
+        bool   isGroundChallengeInvocationReady (uint32 factionId);
+        bool   isCavalryChallengeInvocationReady (uint32 factionId);
+        bool   isWorldBossChallengeInvocationReady (uint32 factionId);
+        void   setPlayerGoStatus (uint32 factionId, uint32 challengeType, bool avValue);
+        uint32 getPlayerGoStatus (uint32 factionId, uint32 challengeType);
+        uint32 getMinReputationNeeded (uint32 challengeType);
+        uint32 getTimerNeeded (uint32 challengeType);
+        void   resetAerialChallengeInvocation (uint32 factionId, uint32 aerialId);
+        void   resetGroundChallengeInvocation (uint32 factionId);
+        void   resetCavalryChallengeInvocation (uint32 factionId);
+        void   resetWorldBossChallengeInvocation (uint32 factionId);
+        uint32 getChallengeInvocationCounter (uint32 factionId, uint32 challengeType);
+        uint32 getChallengeInvocationGoals (uint32 factionId, uint32 challengeType);
         void   initializeChallengeInvocationGoals (void);
-        void   setChallengeInvocationCounter (uint32 faction_id, uint32 challenge_type, uint32 effort_done);
+        void   setChallengeInvocationCounter (uint32 factionId, uint32 challengeType, uint32 effortDone);
 
         void HandleQuestComplete(Unit* questGiver, uint32 questid, Player* player);
         bool PlayerCanDoMineQuest(int32 GOId, Team team);
@@ -556,8 +556,8 @@ class BattleGroundAV : public BattleGround
         void PopulateMineNode(uint8 mine, BattleGroundAVTeamIndex teamIdx, uint32 oldUpgradeAdvance);
 
         static uint32 GetNodeName(BG_AV_Nodes node);
-        bool IsTower(BG_AV_Nodes node) const { return (node >= BG_AV_NODES_MAX) ? false : m_Nodes[node].Tower; }
-        bool IsGrave(BG_AV_Nodes node) const { return (node >= BG_AV_NODES_MAX) ? false : !m_Nodes[node].Tower; }
+        bool IsTower(BG_AV_Nodes node) const { return (node >= BG_AV_NODES_MAX) ? false : m_nodes[node].tower; }
+        bool IsGrave(BG_AV_Nodes node) const { return (node >= BG_AV_NODES_MAX) ? false : !m_nodes[node].tower; }
 
         /*mine*/
         void ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx);
@@ -570,26 +570,26 @@ class BattleGroundAV : public BattleGround
         void CompleteQuestForAll(uint32 questId);
 
         /*variables */
-        uint32 m_Team_QuestStatus[BG_TEAMS_COUNT][9];       // [x][y] x=team y=questcounter
+        uint32 m_teamQuestStatus[BG_TEAMS_COUNT][9];       // [x][y] x=team y=questcounter
 
-        BG_AV_NodeInfo m_Nodes[BG_AV_NODES_MAX];
+        BG_AV_NodeInfo m_nodes[BG_AV_NODES_MAX];
 
         // only for worldstates needed
-        BattleGroundAVTeamIndex m_Mine_Owner[BG_AV_MAX_MINES];
-        BattleGroundAVTeamIndex m_Mine_PrevOwner[BG_AV_MAX_MINES];
-        int32 m_Mine_Timer[BG_AV_MAX_MINES];
-        uint32 m_Mine_Reclaim_Timer[BG_AV_MAX_MINES];
+        BattleGroundAVTeamIndex m_mineOwner[BG_AV_MAX_MINES];
+        BattleGroundAVTeamIndex m_minePrevOwner[BG_AV_MAX_MINES];
+        int32 m_mineTimer[BG_AV_MAX_MINES];
+        uint32 m_mineReclaimTimer[BG_AV_MAX_MINES];
 
-        bool m_IsInformedNearLose[BG_TEAMS_COUNT];
+        bool m_isInformedNearLose[BG_TEAMS_COUNT];
 
-        uint32 m_RepTowerDestruction;
-        uint32 m_RepCommander;
-        uint32 m_RepCaptain;
-        uint32 m_RepBoss;
-        uint32 m_RepOwnedGrave;
-        uint32 m_RepOwnedMine;
-        uint32 m_RepSurviveCaptain;
-        uint32 m_RepSurviveTower;
+        uint32 m_repTowerDestruction;
+        uint32 m_repCommander;
+        uint32 m_repCaptain;
+        uint32 m_repBoss;
+        uint32 m_repOwnedGrave;
+        uint32 m_repOwnedMine;
+        uint32 m_repSurviveCaptain;
+        uint32 m_repSurviveTower;
         ObjectGuid m_shredderOwners[BG_TEAMS_COUNT];
 };
 

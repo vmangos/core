@@ -157,7 +157,6 @@ bool QuestComplete_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, Quest
     return true;
 }
 
-
 /*######
 ## Triage quest
 ######*/
@@ -177,12 +176,7 @@ enum
     HORDE_COORDS                = 6
 };
 
-struct Location
-{
-    float x, y, z, o;
-};
-
-static Location AllianceCoords[] =
+static std::vector<Position> const AllianceCoords =
 {
     { -3757.38f, -4533.05f, 14.16f, 3.62f},                 // Top-far-right bunk as seen from entrance
     { -3754.36f, -4539.13f, 14.16f, 5.13f},                 // Top-far-left bunk
@@ -193,12 +187,12 @@ static Location AllianceCoords[] =
     { -3746.37f, -4525.35f, 14.16f, 5.22f},                 // Left bunk near entrance
 };
 
-//alliance run to where
+// alliance run to where
 #define A_RUNTOX -3742.96f
 #define A_RUNTOY -4531.52f
 #define A_RUNTOZ 11.91f
 
-static Location HordeCoords[] =
+static std::vector<Position> const HordeCoords =
 {
     { -1013.75f, -3492.59f, 62.62f, 4.34f},                 // Left, Behind
     { -1017.72f, -3490.92f, 62.62f, 4.34f},                 // Right, Behind
@@ -208,7 +202,7 @@ static Location HordeCoords[] =
     { -1020.95f, -3499.21f, 62.98f, 4.34f}                  // Right, Front
 };
 
-//horde run to where
+// horde run to where
 #define H_RUNTOX -1016.44f
 #define H_RUNTOY -3508.48f
 #define H_RUNTOZ 62.96f
@@ -222,9 +216,9 @@ uint32 const AllianceSoldierId[3] =
 
 uint32 const HordeSoldierId[3] =
 {
-    12923,                                                  //12923 Injured Soldier
-    12924,                                                  //12924 Badly injured Soldier
-    12925                                                   //12925 Critically injured Soldier
+    12923,                                                  // 12923 Injured Soldier
+    12924,                                                  // 12924 Badly injured Soldier
+    12925                                                   // 12925 Critically injured Soldier
 };
 
 /*######
@@ -233,44 +227,38 @@ uint32 const HordeSoldierId[3] =
 
 struct npc_doctorAI : public ScriptedAI
 {
-    npc_doctorAI(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_doctorAI(Creature* pCreature) : ScriptedAI(pCreature), m_vPatientSummonCoordinates(pCreature->GetEntry() == DOCTOR_ALLIANCE ? AllianceCoords : HordeCoords)
     {
         Reset();
     }
 
-    uint64 Playerguid;
+    ObjectGuid m_playerGuid;
 
-    uint32 SummonPatient_Timer;
-    uint32 SummonPatientCount;
-    uint32 PatientDiedCount;
-    uint32 PatientSavedCount;
+    uint32 m_uiSummonPatientTimer;
+    uint32 m_uiSummonPatientCount;
+    uint32 m_uiPatientDiedCount;
+    uint32 m_uiPatientSavedCount;
 
-    bool Event;
-
-    std::list<uint64> Patients;
-    std::vector<Location*> Coordinates;
+    ObjectGuidSet m_patientGuids;
+    std::vector<Position> const& m_vPatientSummonCoordinates;
 
     void Reset() override
     {
-        Playerguid = 0;
+        m_playerGuid.Clear();
 
-        SummonPatient_Timer = 10000;
-        SummonPatientCount = 0;
-        PatientDiedCount = 0;
-        PatientSavedCount = 0;
+        m_uiSummonPatientTimer = 10000;
+        m_uiPatientDiedCount = 0;
+        m_uiPatientSavedCount = 0;
 
-        Patients.clear();
-        Coordinates.clear();
-
-        Event = false;
-
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_patientGuids.clear();
     }
 
+    void EndEvent(bool success);
     void BeginEvent(Player* pPlayer);
-    void PatientDied(Location* Point);
-    void PatientSaved(Creature* soldier, Player* pPlayer, Location* Point);
-    void UpdateAI(uint32 const diff) override;
+    void PatientDied(Creature* pSoldier);
+    void PatientSaved(Creature* pSoldier, Player* pPlayer);
+    Position const* GetPatientSpawnPosition();
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 /*#####
@@ -279,78 +267,77 @@ struct npc_doctorAI : public ScriptedAI
 
 struct npc_injured_patientAI : public ScriptedAI
 {
-    npc_injured_patientAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
+    npc_injured_patientAI(Creature* pCreature) : ScriptedAI(pCreature), isSaved(false) {Reset();}
 
-    uint64 Doctorguid;
-    Location* Coord;
-    bool Pvloss;
-    uint32 _healthModTimer;
+    ObjectGuid m_doctorGuid;
+    bool isSaved;
+
+    void EnterEvadeMode() override
+    {
+        if (isSaved)
+            ScriptedAI::EnterEvadeMode();
+    }
 
     void Reset() override
     {
-        Doctorguid = 0;
-        Coord = nullptr;
-        Pvloss = false;
-        if (!m_creature->GetDBTableGUIDLow())
-            Pvloss = true;
+        m_doctorGuid.Clear();
 
-        //no select
+        // no select
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        //no regen health
+        // no regen health
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
-        //to make them lay with face down
+        // to make them lay with face down
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-        _healthModTimer = 2000;
 
-        uint32 mobId = m_creature->GetEntry();
-
-        switch (mobId)
+        switch (m_creature->GetEntry())
         {
-            //lower max health
+            // lower max health
             case 12923:
-            case 12938:                                     //Injured Soldier
+            case 12938:                                     // Injured Soldier
                 m_creature->SetHealth(uint32(m_creature->GetMaxHealth()*.75));
                 break;
             case 12924:
-            case 12936:                                     //Badly injured Soldier
+            case 12936:                                     // Badly injured Soldier
                 m_creature->SetHealth(uint32(m_creature->GetMaxHealth()*.50));
                 break;
             case 12925:
-            case 12937:                                     //Critically injured Soldier
+            case 12937:                                     // Critically injured Soldier
                 m_creature->SetHealth(uint32(m_creature->GetMaxHealth()*.25));
                 break;
         }
     }
 
-    void SpellHit(SpellCaster *caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override
     {
-        if (caster->GetTypeId() == TYPEID_PLAYER && m_creature->IsAlive() && spell->Id == 20804)
+        if (pCaster->GetTypeId() == TYPEID_PLAYER && m_creature->IsAlive() && pSpell->Id == 20804)
         {
-            if ((((Player*)caster)->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (((Player*)caster)->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE))
+            Player* pPlayer = static_cast<Player*>(pCaster);
+            if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
             {
-                if (Doctorguid)
+                if (Creature* pDoctor = m_creature->GetMap()->GetCreature(m_doctorGuid))
                 {
-                    if (Creature* Doctor = (m_creature->GetMap()->GetCreature(Doctorguid)))
-                        ((npc_doctorAI*)Doctor->AI())->PatientSaved(m_creature, ((Player*)caster), Coord);
+                    if (npc_doctorAI* pDocAI = dynamic_cast<npc_doctorAI*>(pDoctor->AI()))
+                        pDocAI->PatientSaved(m_creature, pPlayer);
                 }
             }
-            //make not selectable
+            // make not selectable
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            //regen health
+            // regen health
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
-            //Maxinus bool pour désactiver la perte de pv
-            Pvloss = false;
-            //stand up
+            // stand up
             m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-            DoScriptText(PickRandomValue(SAY_DOC1, SAY_DOC2, SAY_DOC3), m_creature);
+
+            switch (urand(0, 2))
+            {
+                case 0: DoScriptText(SAY_DOC1, m_creature); break;
+                case 1: DoScriptText(SAY_DOC2, m_creature); break;
+                case 2: DoScriptText(SAY_DOC3, m_creature); break;
+            }
+
             m_creature->SetWalk(false);
+            isSaved = true;
 
-            uint32 mobId = m_creature->GetEntry();
-
-            switch (mobId)
+            switch (m_creature->GetEntry())
             {
                 case 12923:
                 case 12924:
@@ -366,30 +353,32 @@ struct npc_injured_patientAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(uint32 const diff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (_healthModTimer > diff)
-        {
-            _healthModTimer -= diff;
-            return;
-        }
-        _healthModTimer = 2000; // TODO: Timer ?
-        if (!m_creature->IsAlive() || !Pvloss)
+        // Don't reduce health if already healed
+        if (isSaved)
             return;
 
-        if (m_creature->GetHealth() <= 100)
+        // lower HP on every world tick makes it a useful counter, not officlone though
+        uint32 uiHPLose = uint32(0.05f * uiDiff);
+        if (m_creature->IsAlive() && m_creature->GetHealth() > 1 + uiHPLose)
+        {
+            m_creature->SetHealth(m_creature->GetHealth() - uiHPLose);
+        }
+
+        if (m_creature->IsAlive() && m_creature->GetHealth() <= 1 + uiHPLose)
         {
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->SetDeathState(JUST_DIED);
             m_creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
 
-            if (Doctorguid)
-                if (Creature* Doctor = (m_creature->GetMap()->GetCreature(Doctorguid)))
-                    ((npc_doctorAI*)Doctor->AI())->PatientDied(Coord);
+            if (Creature* pDoctor = m_creature->GetMap()->GetCreature(m_doctorGuid))
+            {
+                if (npc_doctorAI* pDocAI = dynamic_cast<npc_doctorAI*>(pDoctor->AI()))
+                    pDocAI->PatientDied(m_creature);
+            }
         }
-        else
-            m_creature->SetHealth(uint32(m_creature->GetHealth() - 100));
     }
 };
 
@@ -404,166 +393,151 @@ npc_doctor (continue)
 
 void npc_doctorAI::BeginEvent(Player* pPlayer)
 {
-    Playerguid = pPlayer->GetGUID();
+    m_playerGuid = pPlayer->GetObjectGuid();
 
-    SummonPatient_Timer = 10000;
-    SummonPatientCount = 0;
-    PatientDiedCount = 0;
-    PatientSavedCount = 0;
-
-    switch (m_creature->GetEntry())
-    {
-        case DOCTOR_ALLIANCE:
-            for (auto& allianceCoord : AllianceCoords)
-                Coordinates.push_back(&allianceCoord);
-            break;
-        case DOCTOR_HORDE:
-            for (auto& hordeCoord : HordeCoords)
-                Coordinates.push_back(&hordeCoord);
-            break;
-    }
-
-    Event = true;
-    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+    m_uiSummonPatientTimer = 10000;
+    m_uiSummonPatientCount = 0;
+    m_uiPatientDiedCount = 0;
+    m_uiPatientSavedCount = 0;
 }
 
-void npc_doctorAI::PatientDied(Location* Point)
+void npc_doctorAI::EndEvent(bool success)
 {
-    Player* pPlayer = (m_creature->GetMap()->GetPlayer(Playerguid));
-
-    if (pPlayer)
+    if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
     {
-        if ((pPlayer->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (pPlayer->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE))
+        if (success)
         {
-            ++PatientDiedCount;
-
-            if (PatientDiedCount > 5 && Event)
-            {
-                if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
-                    pPlayer->FailQuest(QUEST_TRIAGE_A);
-                else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
-                    pPlayer->FailQuest(QUEST_TRIAGE_H);
-                pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);                
-                Reset();
-                return;
-            }
-
-            Coordinates.push_back(Point);
+            if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
+                pPlayer->GroupEventHappens(QUEST_TRIAGE_A, m_creature);
+            else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
+                pPlayer->GroupEventHappens(QUEST_TRIAGE_H, m_creature);
         }
         else
         {
-            // If no player or player abandon quest in progress
-            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);        
-            Reset();
+            if(pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
+                pPlayer->FailQuest(QUEST_TRIAGE_A);
+            else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
+                pPlayer->FailQuest(QUEST_TRIAGE_H);
         }
+    }
+
+    for (auto const& guid : m_patientGuids)
+    {
+        if (Creature* pPatient = m_creature->GetMap()->GetCreature(guid))
+            pPatient->DespawnOrUnsummon(1);
+    }
+    
+    Reset();
+}
+
+void npc_doctorAI::PatientDied(Creature* pCreature)
+{
+    m_patientGuids.erase(pCreature->GetObjectGuid());
+    ++m_uiPatientDiedCount;
+
+    if (m_uiPatientDiedCount > 5)
+    {
+        EndEvent(false);
+        return;
     }
 }
 
-void npc_doctorAI::PatientSaved(Creature* soldier, Player* pPlayer, Location* Point)
+void npc_doctorAI::PatientSaved(Creature* pCreature, Player* pPlayer)
 {
-    if (pPlayer && Playerguid == pPlayer->GetGUID())
+    m_patientGuids.erase(pCreature->GetObjectGuid());
+    if (pPlayer->GetObjectGuid() != m_playerGuid)
+        return;
+
+    ++m_uiPatientSavedCount;
+    if (m_uiPatientSavedCount >= 15)
+        EndEvent(true);
+}
+
+Position const* npc_doctorAI::GetPatientSpawnPosition()
+{
+    std::vector<Position const*> freeSpots;
+    for (auto const& pos : m_vPatientSummonCoordinates)
+        freeSpots.push_back(&pos);
+
+    for (auto const& guid : m_patientGuids)
     {
-        if ((pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE) || (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE))
+        if (Creature* pPatient = m_creature->GetMap()->GetCreature(guid))
         {
-            ++PatientSavedCount;
-
-            if (PatientSavedCount == 15)
+            for (auto itr = freeSpots.begin(); itr != freeSpots.end();)
             {
-                if (!Patients.empty())
-                {
-                    std::list<uint64>::iterator itr;
-                    for (itr = Patients.begin(); itr != Patients.end(); ++itr)
-                    {
-                        if (Creature* Patient = (m_creature->GetMap()->GetCreature(*itr)))
-                            Patient->SetDeathState(JUST_DIED);
-                    }
-                }
-
-                if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
-                    pPlayer->GroupEventHappens(QUEST_TRIAGE_A, m_creature);
-                else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
-                    pPlayer->GroupEventHappens(QUEST_TRIAGE_H, m_creature);
-
-                Reset();
-                return;
+                if (pPatient->GetDistance3dToCenter(**itr) < 1.0f)
+                    itr = freeSpots.erase(itr);
+                else
+                    itr++;
             }
 
-            Coordinates.push_back(Point);
+            if (freeSpots.empty())
+                return nullptr;
         }
     }
+
+    return SelectRandomContainerElement(freeSpots);
 }
 
-void npc_doctorAI::UpdateAI(uint32 const diff)
+void npc_doctorAI::UpdateAI(uint32 const uiDiff)
 {
-    if (!Event)
-        return;
-    if (SummonPatientCount >= 20)
+    if (!m_playerGuid.IsEmpty())
     {
-        Reset();
-        return;
-    }
-
-    if (SummonPatient_Timer < diff)
-    {
-        Creature* Patient = nullptr;
-        Location* Point = nullptr;
-
-        if (Coordinates.empty())
+        if (m_uiSummonPatientCount >= 21)	// worst case scenario : 5 dead + 15 saved
         {
-            Reset();
+            EndEvent(true);
             return;
         }
 
-        std::vector<Location*>::iterator itr = Coordinates.begin() + rand() % Coordinates.size();
-        uint32 patientEntry = 0;
-
-        switch (m_creature->GetEntry())
+        Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid);
+        if (pPlayer && pPlayer->IsWithinDist(m_creature, DEFAULT_VISIBILITY_DISTANCE))
         {
-            case DOCTOR_ALLIANCE:
-                patientEntry = AllianceSoldierId[urand(0, 2)];
-                break;
-            case DOCTOR_HORDE:
-                patientEntry = HordeSoldierId[urand(0, 2)];
-                break;
-            default:
-                sLog.outError("Invalid entry for Triage doctor. Please check your database");
-                return;
+            if (m_uiSummonPatientTimer < uiDiff)
+            {
+                if (Position const* pos = GetPatientSpawnPosition())
+                {
+                    uint32 patientEntry = 0;
+                    switch (m_creature->GetEntry())
+                    {
+                        case DOCTOR_ALLIANCE: patientEntry = AllianceSoldierId[urand(0, 2)]; break;
+                        case DOCTOR_HORDE:    patientEntry = HordeSoldierId[urand(0, 2)];    break;
+                        default:
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
+                            return;
+                    }
+
+                    if (Creature* pPatient = m_creature->SummonCreature(patientEntry, pos->x, pos->y, pos->z, pos->o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5000))
+                    {
+                        // 2.4.3, this flag appear to be required for client side item->spell to work (TARGET_UNIT_FRIEND)
+                        pPatient->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
+                        m_patientGuids.insert(pPatient->GetObjectGuid());
+                        if (npc_injured_patientAI* pPatientAI = dynamic_cast<npc_injured_patientAI*>(pPatient->AI()))
+                            pPatientAI->m_doctorGuid = m_creature->GetObjectGuid();
+                        ++m_uiSummonPatientCount;
+                    }
+                }
+
+                m_uiSummonPatientTimer = 10000;
+            }
+            else
+                m_uiSummonPatientTimer -= uiDiff;
         }
-
-        Point = *itr;
-
-        Patient = m_creature->SummonCreature(patientEntry, Point->x, Point->y, Point->z, Point->o, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-
-        if (Patient)
+        else
         {
-            Patients.push_back(Patient->GetGUID());
-            ((npc_injured_patientAI*)Patient->AI())->Doctorguid = m_creature->GetGUID();
-            ((npc_injured_patientAI*)Patient->AI())->Coord = Point;
-            Coordinates.erase(itr);
+            EndEvent(false);
         }
-        SummonPatient_Timer = 10000;
-        ++SummonPatientCount;
     }
-    else
-        SummonPatient_Timer -= diff;
+
+    ScriptedAI::UpdateAI(uiDiff);
 }
 
 bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if ((pQuest->GetQuestId() == QUEST_TRIAGE_A) || (pQuest->GetQuestId() == QUEST_TRIAGE_H))
     {
-        pPlayer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         if (npc_doctorAI* pDocAI = dynamic_cast<npc_doctorAI*>(pCreature->AI()))
             pDocAI->BeginEvent(pPlayer);
     }
-
-    return true;
-}
-
-bool QuestRewarded_npc_doctor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if ((pQuest->GetQuestId() == QUEST_TRIAGE_A) || (pQuest->GetQuestId() == QUEST_TRIAGE_H))
-        pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
     return true;
 }
@@ -1210,38 +1184,37 @@ struct FireworkStruct
     uint32 m_uiNpcEntry;
     uint32 m_uiSpellEntry[5];
     bool m_bIsCluster;
+    bool m_bIsLarge;
 };
 
 std::array<FireworkStruct, 25> const Fireworks =
 { {
-    { 15872, {26357, 26303, 26302, 26300, 26301}, true }, // Blue Firework Cluster
-    { 15873, {26360, 26308, 26307, 26306, 26305}, true }, // Red Firework Cluster
-    { 15874, {26358, 26312, 26311, 26310, 26309}, true }, // Green Firework Cluster
-    { 15875, {26359, 26316, 26315, 26314, 26313}, true }, // Purple Firework Cluster
-    { 15876, {26361, 26320, 26319, 26318, 26317}, true }, // White Firework Cluster
-    { 15877, {26362, 26324, 26323, 26322, 26321}, true }, // Yellow Firework Cluster
-    { 15879, {26344, 0,     0,     0,     0},     false}, // Small Blue Rocket
-    { 15880, {26345, 0,     0,     0,     0},     false}, // Small Green Rocket
-    { 15881, {26346, 0,     0,     0,     0},     false}, // Small Purple Rocket
-    { 15882, {26347, 0,     0,     0,     0},     false}, // Small Red Rocket
-    { 15883, {26349, 0,     0,     0,     0},     false}, // Small Yellow Rocket
-    { 15884, {26348, 0,     0,     0,     0},     false}, // Small White Rocket
-    { 15885, {26351, 0,     0,     0,     0},     false}, // Large Blue Rocket
-    { 15886, {26352, 0,     0,     0,     0},     false}, // Large Green Rocket
-    { 15887, {26353, 0,     0,     0,     0},     false}, // Large Purple Rocket
-    { 15888, {26354, 0,     0,     0,     0},     false}, // Large Red Rocket
-    { 15889, {26355, 0,     0,     0,     0},     false}, // Large White Rocket
-    { 15890, {26356, 0,     0,     0,     0},     false}, // Large Yellow Rocket
-    { 15911, {26487, 26486, 26485, 26484, 26483}, true }, // Large Blue Firework Cluster
-    { 15912, {26495, 26494, 26493, 26492, 26491}, true }, // Large Green Firework Cluster
-    { 15913, {26500, 26499, 26498, 26497, 26496}, true }, // Large Purple Firework Cluster
-    { 15914, {26505, 26504, 26503, 26502, 26501}, true }, // Large Red Firework Cluster
-    { 15915, {26510, 26509, 26508, 26507, 26506}, true }, // Large White Firework Cluster
-    { 15916, {26515, 26514, 26513, 26512, 26511}, true }, // Large Yellow Firework Cluster
-    { 15918, {26487, 26509, 26508, 26484, 26483}, true }, // Lucky Rocket Cluster
-}};
-
-static std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
+    { 15872, {26357, 26303, 26302, 26300, 26301}, true, false }, // Blue Firework Cluster
+    { 15873, {26360, 26308, 26307, 26306, 26305}, true, false }, // Red Firework Cluster
+    { 15874, {26358, 26312, 26311, 26310, 26309}, true, false }, // Green Firework Cluster
+    { 15875, {26359, 26316, 26315, 26314, 26313}, true, false }, // Purple Firework Cluster
+    { 15876, {26361, 26320, 26319, 26318, 26317}, true, false }, // White Firework Cluster
+    { 15877, {26362, 26324, 26323, 26322, 26321}, true, false }, // Yellow Firework Cluster
+    { 15879, {26344, 0,     0,     0,     0},     false, false }, // Small Blue Rocket
+    { 15880, {26345, 0,     0,     0,     0},     false, false }, // Small Green Rocket
+    { 15881, {26346, 0,     0,     0,     0},     false, false }, // Small Purple Rocket
+    { 15882, {26347, 0,     0,     0,     0},     false, false }, // Small Red Rocket
+    { 15883, {26349, 0,     0,     0,     0},     false, false }, // Small Yellow Rocket
+    { 15884, {26348, 0,     0,     0,     0},     false, false }, // Small White Rocket
+    { 15885, {26351, 0,     0,     0,     0},     false, true }, // Large Blue Rocket
+    { 15886, {26352, 0,     0,     0,     0},     false, true }, // Large Green Rocket
+    { 15887, {26353, 0,     0,     0,     0},     false, true }, // Large Purple Rocket
+    { 15888, {26354, 0,     0,     0,     0},     false, true }, // Large Red Rocket
+    { 15889, {26355, 0,     0,     0,     0},     false, true }, // Large White Rocket
+    { 15890, {26356, 0,     0,     0,     0},     false, true }, // Large Yellow Rocket
+    { 15911, {26487, 26486, 26485, 26484, 26483}, true, true }, // Large Blue Firework Cluster
+    { 15912, {26495, 26494, 26493, 26492, 26491}, true, true }, // Large Green Firework Cluster
+    { 15913, {26500, 26499, 26498, 26497, 26496}, true, true }, // Large Purple Firework Cluster
+    { 15914, {26505, 26504, 26503, 26502, 26501}, true, true }, // Large Red Firework Cluster
+    { 15915, {26510, 26509, 26508, 26507, 26506}, true, true }, // Large White Firework Cluster
+    { 15916, {26515, 26514, 26513, 26512, 26511}, true, true }, // Large Yellow Firework Cluster
+    { 15918, {26487, 26509, 26508, 26484, 26483}, true, true }, // Lucky Rocket Cluster
+} };
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1290,45 +1263,98 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (!m_bExist || m_bDone)
             return;
 
-        for (uint32 goEntry : Launcher)
-        {
-            if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
-            {
-                pGo->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
-                break;
-            }
-        }
-
         float x, y, z;
         m_creature->GetPosition(x, y, z);
 
         if (Fireworks[m_uiIndex].m_bIsCluster)
         {
-            for (int i = 0; i < 5; ++i)
+            if (Fireworks[m_uiIndex].m_bIsLarge)
             {
-                switch (i)
+                /* BIG Rockets
+                ╔══════╤═════╤═════╗
+                ║ X    │ Y   │ Z   ║
+                ╠══════╪═════╪═════╣
+                ║ 0    │ 0   │ +3  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ +3  │ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ +5.25│ -1.5│ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ -5.25│ -1.5│ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ 0   │ +12 ║
+                ╚══════╧═════╧═════╝
+                */
+                for (int i = 0; i < 5; ++i)
                 {
-                case 0:
-                    m_creature->NearTeleportTo(x, y, z + 7.0f, 0.0f);
-                    break;
-                case 1:
-                    m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + 5.0f, 0.0f);
-                    break;
-                case 2:
-                    m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + 5.0f, 0.0f);
-                    break;
-                case 3:
-                    m_creature->NearTeleportTo(x + 1.5f, y, z + 5.0f, 0.0f);
-                    break;
-                case 4:
-                    m_creature->NearTeleportTo(x, y + 1.5f, z + 3.0f, 0.0f);
-                    break;
+                    switch (i)
+                    {
+                    case 0:
+                        m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
+                        break;
+                    case 1:
+                        m_creature->NearTeleportTo(x, y + 3.0f, z + 7.5f, 0.0f);
+                        break;
+                    case 2:
+                        m_creature->NearTeleportTo(x + 5.25f, y - 1.5f, z + 7.5f, 0.0f);
+                        break;
+                    case 3:
+                        m_creature->NearTeleportTo(x - 5.25f, y - 1.5f, z + 7.5f, 0.0f);
+                        break;
+                    case 4:
+                        m_creature->NearTeleportTo(x, y, z + 12.0f, 0.0f);
+                        break;
+                    }
+                    m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
                 }
-                m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+            }
+            else
+            {
+                /* Normal / Small Rockets
+                ╔══════╤═════╤═════╗
+                ║ X    │ Y   │ Z   ║
+                ╠══════╪═════╪═════╣
+                ║ 0    │ 0   │ +8  ║
+                ╟──────┼─────┼─────╢
+                ║ +3.5 │ -1  │ +5  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ +2  │ +5  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ 0   │ +2  ║
+                ╟──────┼─────┼─────╢
+                ║ -3.5 │ -1  │ +5  ║
+                ╚══════╧═════╧═════╝
+                */
+                for (int i = 0; i < 5; ++i)
+                {
+                    switch (i)
+                    {
+                    case 0:
+                        m_creature->NearTeleportTo(x, y, z + 8.0f, 0.0f);
+                        break;
+                    case 1:
+                        m_creature->NearTeleportTo(x + 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                        break;
+                    case 2:
+                        m_creature->NearTeleportTo(x, y + 2.0f, z + 5.0f, 0.0f);
+                        break;
+                    case 3:
+                        m_creature->NearTeleportTo(x, y, z + 2.0f, 0.0f);
+                        break;
+                    case 4:
+                        m_creature->NearTeleportTo(x - 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                        break;
+                    }
+                    m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                }
             }
         }
         else
+        {
+            // Non Cluster Rockets are always z + 3.0f!
+            m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
             m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[0], true);
+        }
 
         // Lunar Fortune is casted 3 seconds later.
         if (m_bisLucky)
@@ -1405,9 +1431,9 @@ enum
 
     EVENT_TOURNAMENT        = 15,
 
-    YELL_BEGIN              = 10608, // Let the Fishing Tournament BEGIN!
-    YELL_WINNER             = 10609, // We have a winner! $n has won FIRST PLACE in the tournament!
-    YELL_OVER               = 10610, // And the Tastyfish have gone for the week! I will remain for another hour to allow you to turn in your fish!
+    YELL_BEGIN              = 10608,
+    YELL_WINNER             = 10610,
+    YELL_OVER               = 10609
 };
 
 struct npc_riggle_bassbaitAI : ScriptedAI
@@ -1416,6 +1442,11 @@ struct npc_riggle_bassbaitAI : ScriptedAI
     {
         m_uiTimer = 0;
 
+        auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_TOURNAMENT);
+        if (time(nullptr) - prevWinTime > DAY)
+        {
+            sObjectMgr.SetSavedVariable(VAR_TOURN_WINNER, 0, true);
+        }
         npc_riggle_bassbaitAI::Reset();
     }
 
@@ -1492,6 +1523,7 @@ bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, Que
     {
         sObjectMgr.SetSavedVariable(VAR_TOURNAMENT, time(nullptr), true);
         sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 0, true);
+        sObjectMgr.SetSavedVariable(VAR_TOURN_WINNER, 1, true);
         pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         pCreature->MonsterYellToZone(YELL_WINNER, 0, pPlayer);
     }
@@ -2409,7 +2441,6 @@ void AddSC_npcs_special()
     newscript->Name = "npc_doctor";
     newscript->GetAI = &GetAI_npc_doctor;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_doctor;
-    newscript->pQuestRewardedNPC = &QuestRewarded_npc_doctor;
     newscript->RegisterSelf();
 
     newscript = new Script;

@@ -168,7 +168,7 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
             dist = 115.0f;
             break;
         default:
-            sLog.outError("instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
             dist = 9999.0f;
             break;
     }
@@ -242,7 +242,7 @@ void instance_naxxramas::UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32
 
     if (!pGO)
     {
-        sLog.outError("instance_naxxramas::UpdateAutomaticBossEntranceDoor called with nullptr GO");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateAutomaticBossEntranceDoor called with nullptr GO");
         return;
     }
     if (uiData == IN_PROGRESS || uiData == SPECIAL)
@@ -285,7 +285,7 @@ void instance_naxxramas::UpdateBossGate(GameObject* pGO, uint32 uiData)
 {
     if (!pGO)
     {
-        sLog.outError("instance_naxxramas::UpdateBossGate called with nullptr GO");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateBossGate called with nullptr GO");
         return;
     }
     if (uiData == DONE)
@@ -341,7 +341,7 @@ void instance_naxxramas::UpdateTeleporters(uint32 uiType, uint32 uiData)
                 SetTeleporterState(pGO, uiData);
             break;
         default:
-            sLog.outError("instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
     }
 
     if (WingsAreCleared())
@@ -893,7 +893,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 }
                 else
                 {
-                    sLog.outError("4hm just died. Unable to find Argent Dawn faction for reputation ");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "4hm just died. Unable to find Argent Dawn faction for reputation ");
                 }
             }
             break;
@@ -1087,13 +1087,13 @@ uint32 instance_naxxramas::GetData(uint32 uiType)
     if (uiType < MAX_ENCOUNTER)
         return m_auiEncounter[uiType];
 
-    sLog.outError("instance_naxxramas::GetData() called with %d as param. %d is MAX_ENCOUNTERS", uiType, MAX_ENCOUNTER);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::GetData() called with %d as param. %d is MAX_ENCOUNTERS", uiType, MAX_ENCOUNTER);
     return 0;
 }
 
 uint64 instance_naxxramas::GetData64(uint32 uiData)
 {
-    sLog.outBasic("instance_naxxramas::GetData64 called. Not implemented");
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "instance_naxxramas::GetData64 called. Not implemented");
     return 0;
 }
 
@@ -1102,7 +1102,7 @@ uint64 instance_naxxramas::GetGOUuid(NaxxGOs which)
     auto it = m_mNpcEntryGuidStore.find(which);
     if (it == m_mNpcEntryGuidStore.end())
     {
-        sLog.outError("instance_naxxramas::GetGOUuid called with param %d, not found", which);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::GetGOUuid called with param %d, not found", which);
         return 0;
     }
     return it->second;
@@ -1173,7 +1173,7 @@ bool instance_naxxramas::IsInRightSideGothArea(Unit const* pUnit)
     if (GameObject* pCombatGate = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
         return (pCombatGate->GetPositionY() >= pUnit->GetPositionY());
 
-    sLog.outError("left/right side check, Gothik combat area failed.");
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "left/right side check, Gothik combat area failed.");
     return true;
 }
 

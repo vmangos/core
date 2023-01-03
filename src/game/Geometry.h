@@ -82,6 +82,24 @@ namespace Geometry
 
         return distsq < maxRange * maxRange;
     }
+
+    inline void GetNearPoint2DAroundPosition(float ownX, float ownY, float &x, float &y, float distance2d, float absAngle)
+    {
+        x = ownX + distance2d * cos(absAngle);
+        y = ownY + distance2d * sin(absAngle);
+
+        MaNGOS::NormalizeMapCoord(x);
+        MaNGOS::NormalizeMapCoord(y);
+    }
+
+    inline float ClampOrientation(float o)
+    {
+        while (o > M_PI_F * 2.0f)
+            o -= M_PI_F * 2.0f;
+        while (o < 0.0f)
+            o += M_PI_F * 2.0f;
+        return o;
+    }
 }
 
 #endif

@@ -1099,6 +1099,7 @@ struct go_darrowshire_triggerAI : public GameObjectAI
         m_defenderFaction = 113;  // Escort Faction: possible to heal but ... does not attack on sight despite the correct flags :/
         Reset();
         me->SetCreatureSummonLimit(200);
+        me->SetRespawnTime(15 * MINUTE);
     }
 
     bool m_cleanupDone;

@@ -54,7 +54,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             else
             {
                 // Well Fed buffs (must be exclusive with Food / Drink replenishment effects, or else Well Fed will cause them to be removed)
-                if (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_FOOD_BUFF)
+                if (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_RETAIN_ITEM_CAST)
                     return SPELL_WELL_FED;
             }
             break;
@@ -87,7 +87,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
         case SPELLFAMILY_PRIEST:
         {
             // "Well Fed" buff from Blessed Sunfruit, Blessed Sunfruit Juice, Alterac Spring Water
-            if ((spellInfo->Attributes & SPELL_ATTR_CASTABLE_WHILE_SITTING) &&
+            if ((spellInfo->Attributes & SPELL_ATTR_ALLOW_WHILE_SITTING) &&
                  spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_COMBAT) &&
                 (spellInfo->SpellIconID == 52 || spellInfo->SpellIconID == 79))
                 return SPELL_WELL_FED;
@@ -148,7 +148,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
     if ((spellInfo->HasAura(SPELL_AURA_TRACK_CREATURES) ||
             spellInfo->HasAura(SPELL_AURA_TRACK_RESOURCES)  ||
             spellInfo->HasAura(SPELL_AURA_TRACK_STEALTHED)) &&
-            ((spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_RESET_AUTO_ACTIONS) || (spellInfo->Attributes & SPELL_ATTR_CASTABLE_WHILE_MOUNTED)))
+            ((spellInfo->AttributesEx & SPELL_ATTR_EX_NO_AUTOCAST_AI) || (spellInfo->Attributes & SPELL_ATTR_ALLOW_WHILE_MOUNTED)))
         return SPELL_TRACKER;
 
     // elixirs can have different families, but potion most ofc.
@@ -212,6 +212,14 @@ bool Spells::CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry
     }
 
     return false;
+}
+
+bool Spells::IsAutocastable(uint32 spellId)
+{
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    if (!spellInfo)
+        return false;
+    return spellInfo->IsAutocastable();
 }
 
 bool Spells::IsPassiveSpell(uint32 spellId)
@@ -433,7 +441,7 @@ WeaponAttackType SpellEntry::GetWeaponAttackType() const
             break;
         default:
             // Wands
-            if (HasAttribute(SPELL_ATTR_EX2_AUTOREPEAT_FLAG))
+            if (HasAttribute(SPELL_ATTR_EX2_AUTO_REPEAT))
                 return RANGED_ATTACK;
             else
                 return BASE_ATTACK;
@@ -441,7 +449,7 @@ WeaponAttackType SpellEntry::GetWeaponAttackType() const
     }
 }
 
-uint32 SpellEntry::GetCastTime(Spell* spell) const
+uint32 SpellEntry::GetCastTime(SpellCaster const* caster, Spell* spell) const
 {
     if (spell)
     {
@@ -463,7 +471,9 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
     if (!spellCastTimeEntry)
         return 0;
 
-    int32 castTime = spellCastTimeEntry->CastTime;
+    int32 spellRank = caster && caster->GetTypeId() != TYPEID_GAMEOBJECT ? static_cast<Unit const*>(caster)->GetSpellRank(this) : 0;
+    int32 castTime = spellCastTimeEntry->CastTime + spellCastTimeEntry->CastTimePerLevel * (spellRank / 5 - baseLevel);
+    castTime = std::max(castTime, spellCastTimeEntry->MinCastTime);
 
     if (spell)
     {
@@ -474,7 +484,7 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
                 if (Player* modOwner = pUnit->GetSpellModOwner())
                     modOwner->ApplySpellMod(Id, SPELLMOD_CASTING_TIME, castTime, spell);
 
-            if (!(Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_TRADESPELL)))
+            if (!(Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_IS_TRADESKILL)))
             {
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
                 castTime = int32(castTime * pUnit->GetFloatValue(UNIT_MOD_CAST_SPEED));
@@ -489,7 +499,7 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
         }
     }
 
-    if (Attributes & SPELL_ATTR_RANGED && (!spell || !spell->IsAutoRepeat()))
+    if (Attributes & SPELL_ATTR_USES_RANGED_SLOT && (!spell || !spell->IsAutoRepeat()))
         castTime += 500;
 
     return (castTime > 0) ? uint32(castTime) : 0;
@@ -497,7 +507,7 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
 
 uint32 SpellEntry::GetCastTimeForBonus(DamageEffectType damagetype) const
 {
-    uint32 CastingTime = !IsChanneledSpell() ? GetCastTime() : GetDuration();
+    uint32 CastingTime = !IsChanneledSpell() ? GetCastTime(nullptr) : GetDuration();
 
     if (CastingTime > 7000) CastingTime = 7000;
     if (CastingTime < 1500) CastingTime = 1500;
@@ -561,7 +571,7 @@ uint32 SpellEntry::GetCastTimeForBonus(DamageEffectType damagetype) const
     if (overTime > 0 && CastingTime > 0 && DirectDamage)
     {
         // mainly for DoTs which are 3500 here otherwise
-        uint32 OriginalCastTime = GetCastTime();
+        uint32 OriginalCastTime = GetCastTime(nullptr);
         if (OriginalCastTime > 7000) OriginalCastTime = 7000;
         if (OriginalCastTime < 1500) OriginalCastTime = 1500;
         // Portion to Over Time
@@ -755,7 +765,7 @@ uint16 SpellEntry::GetAuraMaxTicks() const
 
 bool SpellEntry::IsPositiveSpell(WorldObject const* caster, WorldObject const* victim) const
 {
-    if (Attributes & SPELL_ATTR_NEGATIVE)
+    if (Attributes & SPELL_ATTR_AURA_IS_DEBUFF)
         return false;
     // spells with at least one negative effect are considered negative
     // some self-applied spells have negative effects but in self casting case negative check ignored.
@@ -811,7 +821,8 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                 {
                     if (CharmInfo const* charm = static_cast<Unit const*>(victim)->GetCharmInfo())
                         if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                            return ft->IsFriendlyTo(*caster->GetFactionTemplateEntry());
+                            if (FactionTemplateEntry const* ft2 = caster->GetFactionTemplateEntry())
+                                return ft->IsFriendlyTo(*ft2);
                 }
                 
                 return caster->IsFriendlyTo(victim);
@@ -975,7 +986,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
         return false;
 
     // Attributes check
-    if (Attributes & SPELL_ATTR_NEGATIVE)
+    if (Attributes & SPELL_ATTR_AURA_IS_DEBUFF)
         return false;
 
     // ok, positive
@@ -985,7 +996,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
 bool SpellEntry::IsReflectableSpell(WorldObject const* caster, WorldObject const* victim) const
 {
     return DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !HasAttribute(SPELL_ATTR_IS_ABILITY)
-        && !HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
+        && !HasAttribute(SPELL_ATTR_EX_NO_REFLECTION) && !HasAttribute(SPELL_ATTR_NO_IMMUNITIES)
         && !HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(caster, victim);
 }
 
@@ -1011,7 +1022,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
         SpellShapeshiftFormEntry const* shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         if (!shapeInfo)
         {
-            sLog.outError("GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
@@ -1027,7 +1038,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
     else
     {
         // needs shapeshift
-        if (!(AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && Stances != 0)
+        if (!(AttributesEx2 & SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) && Stances != 0)
             return SPELL_FAILED_ONLY_SHAPESHIFT;
     }
 

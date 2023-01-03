@@ -64,13 +64,13 @@ void Camera::SetView(WorldObject* obj, bool update_far_sight_field /*= true*/)
 
     if (!m_owner.IsInMap(obj))
     {
-        sLog.outError("Camera::SetView, viewpoint is not in map with camera's owner");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Camera::SetView, viewpoint is not in map with camera's owner");
         return;
     }
 
     if (!obj->isType(TypeMask(TYPEMASK_DYNAMICOBJECT | TYPEMASK_UNIT)))
     {
-        sLog.outError("Camera::SetView, viewpoint type is not available for client");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Camera::SetView, viewpoint type is not available for client");
         return;
     }
 
@@ -87,7 +87,12 @@ void Camera::SetView(WorldObject* obj, bool update_far_sight_field /*= true*/)
     m_source->GetViewPoint().Attach(this);
 
     if (update_far_sight_field)
-        m_owner.SetGuidValue(PLAYER_FARSIGHT, (m_source == &m_owner ? ObjectGuid() : m_source->GetObjectGuid()));
+    {
+        if (m_source != &m_owner)
+            m_owner.UpdateVisibilityOf(m_source, m_source);
+
+        m_owner.ScheduleCameraUpdate(m_source == &m_owner ? ObjectGuid() : m_source->GetObjectGuid());
+    }
 
     UpdateForCurrentViewPoint();
 }
@@ -165,5 +170,5 @@ void Camera::UpdateVisibilityForOwner()
 ViewPoint::~ViewPoint()
 {
     if (!m_cameras.empty())
-        sLog.outError("ViewPoint destructor called, but some cameras referenced to it");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ViewPoint destructor called, but some cameras referenced to it");
 }

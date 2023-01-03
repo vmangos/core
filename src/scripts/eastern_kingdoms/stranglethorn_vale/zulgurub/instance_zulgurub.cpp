@@ -24,9 +24,6 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "zulgurub.h"
 
-#define ZG_LOG sLog.outDebug
-//#define ZG_LOG sLog.outError(
-
 #define BOSS_GRILEK                     15082
 #define BOSS_HAZZARAH                   15083
 #define BOSS_RENATAKI                   15084
@@ -327,7 +324,7 @@ void instance_zulgurub::Create()
 
 void instance_zulgurub::OnCreatureDeath(Creature * pCreature)
 {
-    ZG_LOG("OnCreatureDeath %u", pCreature->GetEntry());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OnCreatureDeath %u", pCreature->GetEntry());
     if (pCreature->GetEntry() >= 15082 && pCreature->GetEntry() <= 15085)
         SetData(TYPE_RANDOM_BOSS, DONE);
 
@@ -345,7 +342,7 @@ uint32 instance_zulgurub::GenerateRandomBoss()
     uint32 weekmod = ((dayCount - (dayCount % 14)) / 14) % 3;
     uint32 bossId = 15082 + weekmod;
     randomBossEntry = bossId;
-    ZG_LOG("GenerateRandomBoss %u -> %u", weekmod, bossId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "GenerateRandomBoss %u -> %u", weekmod, bossId);
     return bossId;
 }
 
@@ -501,7 +498,7 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
     case TABLET_HAZZARAH1:
     case TABLET_HAZZARAH2:
             if (randomBoss == BOSS_HAZZARAH)
-                pPlayer->SEND_GOSSIP_MENU(7675, pGo->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(7671, pGo->GetGUID());
             else
                 pPlayer->SEND_GOSSIP_MENU(7670, pGo->GetGUID());
             break;
@@ -515,7 +512,7 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
     case TABLET_WUSHOOLAY1:
     case TABLET_WUSHOOLAY2:
             if (randomBoss == BOSS_WUSHOOLAY)
-                pPlayer->SEND_GOSSIP_MENU(7682, pGo->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(7675, pGo->GetGUID());
             else
                 pPlayer->SEND_GOSSIP_MENU(7674, pGo->GetGUID());
             break;

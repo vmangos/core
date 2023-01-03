@@ -184,10 +184,10 @@ float const BG_AB_BuffPositions[BG_AB_NODES_MAX][4] = {
 class BattleGroundABScore : public BattleGroundScore
 {
     public:
-        BattleGroundABScore(): BasesAssaulted(0), BasesDefended(0) {};
+        BattleGroundABScore(): basesAssaulted(0), basesDefended(0) {};
         virtual ~BattleGroundABScore() {};
-        uint32 BasesAssaulted;
-        uint32 BasesDefended;
+        uint32 basesAssaulted;
+        uint32 basesDefended;
 };
 
 class BattleGroundAB : public BattleGround
@@ -199,23 +199,23 @@ class BattleGroundAB : public BattleGround
         ~BattleGroundAB();
 
         void Update(uint32 diff);
-        void AddPlayer(Player* plr);
+        void AddPlayer(Player* player);
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
-        void RemovePlayer(Player* plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player* Source, uint32 Trigger);
+        void RemovePlayer(Player* player, ObjectGuid guid);
+        void HandleAreaTrigger(Player* source, uint32 trigger);
         virtual bool SetupBattleGround();
         virtual void Reset();
         void EndBattleGround(Team winner);
         virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
         /* Scorekeeping */
-        virtual void UpdatePlayerScore(Player* Source, uint32 type, uint32 value);
+        virtual void UpdatePlayerScore(Player* source, uint32 type, uint32 value);
 
         virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
 
         /* Nodes occupying */
-        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
+        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* targetGo);
 
     private:
         /* Gameobject spawning/despawning */
@@ -235,14 +235,14 @@ class BattleGroundAB : public BattleGround
             2: horde contested
             3: ally occupied
             4: horde occupied     */
-        uint8               m_Nodes[BG_AB_NODES_MAX];
+        uint8               m_nodes[BG_AB_NODES_MAX];
         uint8               m_prevNodes[BG_AB_NODES_MAX];   // used for performant wordlstate-updating
-        uint32              m_NodeTimers[BG_AB_NODES_MAX];
+        uint32              m_nodeTimers[BG_AB_NODES_MAX];
         uint32              m_lastTick[BG_TEAMS_COUNT];
-        uint32              m_HonorScoreTics[BG_TEAMS_COUNT];
-        uint32              m_ReputationScoreTics[BG_TEAMS_COUNT];
-        bool                m_IsInformedNearVictory;
-        uint32              m_HonorTics;
-        uint32              m_ReputationTics;
+        uint32              m_honorScoreTics[BG_TEAMS_COUNT];
+        uint32              m_reputationScoreTics[BG_TEAMS_COUNT];
+        bool                m_isInformedNearVictory;
+        uint32              m_honorTics;
+        uint32              m_reputationTics;
 };
 #endif

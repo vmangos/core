@@ -156,90 +156,6 @@ void ElementalInvasion::ResetThings()
 }
 
 /*
-* Leprithus (rare) & Rotten Ghouls spawn at night
-*/
-
-void Leprithus::Update()
-{
-    auto event = GetLeprithusState();
-
-    if (event == LEPRITHUS_EVENT_ONGOING)
-    {
-        if (!sGameEventMgr.IsActiveEvent(LEPRITHUS_EVENT_ONGOING))
-            sGameEventMgr.StartEvent(LEPRITHUS_EVENT_ONGOING, true);
-    }
-    else if (sGameEventMgr.IsActiveEvent(LEPRITHUS_EVENT_ONGOING))
-        sGameEventMgr.StopEvent(LEPRITHUS_EVENT_ONGOING, true);
-}
-
-void Leprithus::Enable()
-{
-    
-}
-
-void Leprithus::Disable()
-{
-    if (sGameEventMgr.IsActiveEvent(LEPRITHUS_EVENT_ONGOING))
-        sGameEventMgr.StopEvent(LEPRITHUS_EVENT_ONGOING, true);
-}
-
-LeprithusEventState Leprithus::GetLeprithusState()
-{
-    time_t rawtime;
-    time(&rawtime);
-
-    struct tm* timeinfo;
-    timeinfo = localtime(&rawtime);
-
-    if (timeinfo->tm_hour >= 22 || timeinfo->tm_hour <= 9)
-        return LEPRITHUS_EVENT_ONGOING;
-
-    return LEPRITHUS_EVENT_NONE;    
-}
-
-/*
-* Moonbrook graveyard vultures(Fleshrippers) spawn at daylight
-*/
-
-void Moonbrook::Update()
-{
-    auto event = GetMoonbrookState();
-
-    if (event == MOONBROOK_EVENT_ONGOING)
-    {
-        if (!sGameEventMgr.IsActiveEvent(MOONBROOK_EVENT_ONGOING))
-            sGameEventMgr.StartEvent(MOONBROOK_EVENT_ONGOING, true);
-    }
-    else if (sGameEventMgr.IsActiveEvent(MOONBROOK_EVENT_ONGOING))
-        sGameEventMgr.StopEvent(MOONBROOK_EVENT_ONGOING, true);
-}
-
-void Moonbrook::Enable()
-{
-    
-}
-
-void Moonbrook::Disable()
-{
-    if (sGameEventMgr.IsActiveEvent(MOONBROOK_EVENT_ONGOING))
-        sGameEventMgr.StopEvent(MOONBROOK_EVENT_ONGOING, true);
-}
-
-MoonbrookEventState Moonbrook::GetMoonbrookState()
-{
-    time_t rawtime;
-    time(&rawtime);
-
-    struct tm* timeinfo;
-    timeinfo = localtime(&rawtime);
-
-    if (timeinfo->tm_hour < 21 && timeinfo->tm_hour > 9)
-        return MOONBROOK_EVENT_ONGOING;
-
-    return MOONBROOK_EVENT_NONE;    
-}
-
-/*
 * Dragons of Nightmare
 */
 
@@ -249,7 +165,7 @@ void DragonsOfNightmare::Update()
     // Get Dragon GUIDs, these should always be available if the unit exists
     if (!LoadDragons(dragonGUIDs))
     {
-        sLog.outError("[Dragons of Nightmare] Only %u nightmare dragons exist in the database, there should be 4", dragonGUIDs.size());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Dragons of Nightmare] Only %u nightmare dragons exist in the database, there should be 4", dragonGUIDs.size());
         return;
     }
 
@@ -323,7 +239,7 @@ void DragonsOfNightmare::CheckSingleVariable(uint32 idx, uint32& value)
 
     if (!variableExists)
     {
-        sLog.outError("GameEventMgr: [Dragons of Nightmare] variable does not exist! Setting default.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] variable does not exist! Setting default.");
         sObjectMgr.SetSavedVariable(idx, value, true);
     }
     else
@@ -340,7 +256,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
 
         if (!cData)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature data %u not found!", guid.GetCounter());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature data %u not found!", guid.GetCounter());
             continue;
         }
 
@@ -351,7 +267,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
 
         if (!map)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] instance %u of map %u not found!", instanceId, cData->position.mapId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] instance %u of map %u not found!", instanceId, cData->position.mapId);
             continue;
         }
 
@@ -359,7 +275,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
 
         if (!pCreature)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature %u not found!", guid.GetCounter());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature %u not found!", guid.GetCounter());
             continue;
         }
 
@@ -379,7 +295,7 @@ bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid>& dragonGUIDs)
 
         if (dCreatureGuid.IsEmpty())
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature %u not found in world!", entry);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature %u not found in world!", entry);
             return false;
         }
 
@@ -720,7 +636,7 @@ void ScourgeInvasionEvent::LogNextZoneTime()
     }
 
     time_t newtimeToNextAttack = timer - now;
-    sLog.outBasic("[Scourge Invasion Event] Next invasion zone %d is in %d minutes.", zoneid, uint32(newtimeToNextAttack / 60));
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] Next invasion zone %d is in %d minutes.", zoneid, uint32(newtimeToNextAttack / 60));
 }
 
 uint32 ScourgeInvasionEvent::GetZoneTime(uint32 zoneId)
@@ -939,7 +855,7 @@ Map* ScourgeInvasionEvent::GetMap(uint32 mapId, Position const& invZone)
     uint32 instId = sMapMgr.GetContinentInstanceId(mapId, invZone.x, invZone.y);
     Map* pMap = sMapMgr.FindMap(mapId, instId);
     if (!pMap)
-        sLog.outError("ScourgeInvasionEvent::GetMap found no map with mapId %d, x: %d, y: %d.", mapId, invZone.x, invZone.y);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::GetMap found no map with mapId %d, x: %d, y: %d.", mapId, invZone.x, invZone.y);
     return pMap;
 }
 
@@ -982,13 +898,13 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId,
         sObjectMgr.SetSavedVariable(VARIABLE_SI_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT) + 1, true);
         sObjectMgr.SetSavedVariable(VARIABLE_SI_LAST_ATTACK_ZONE, zoneId, true);
 
-        sLog.outBasic("[Scourge Invasion Event] The Scourge has been defeated in %d, next attack starting in %d minutes.", zoneId, uint32(timeToNextAttack / 60));
-        sLog.outBasic("[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT));
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] The Scourge has been defeated in %d, next attack starting in %d minutes.", zoneId, uint32(timeToNextAttack / 60));
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT));
 
         if (pMouth)
             pMouth->AI()->OnScriptEventHappened(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
         else
-            sLog.outError("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found.", zone->mouthGuid);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found.", zone->mouthGuid);
     }
 }
 
@@ -1033,7 +949,7 @@ bool ScourgeInvasionEvent::OnEnable(uint32 zoneId, uint32 attackTimeVar)
         else
         {
             if (!oldZone)
-                sLog.outError("ScourgeInvasionEvent::OnEnable starting new invasion as oldZone could not be found.");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::OnEnable starting new invasion as oldZone could not be found.");
             StartNewInvasionIfTime(attackTimeVar, zoneId);
         }
     }
@@ -1050,7 +966,7 @@ void ScourgeInvasionEvent::StartNewCityAttackIfTime(uint32 timeVariable, uint32 
 
     uint32 zoneId = zoneID;
 
-    sLog.outBasic("[Scourge Invasion Event] Starting new City attack in zone %d.", zoneId);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] Starting new City attack in zone %d.", zoneId);
 
     CityAttack* zone = GetCityZone(zoneId);
 
@@ -1065,14 +981,14 @@ void ScourgeInvasionEvent::StartNewCityAttackIfTime(uint32 timeVariable, uint32 
     // on next update instead
     if (!mapPtr)
     {
-        sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to access required map (%d). Retrying next update.", zone->map);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::StartNewCityAttackIfTime unable to access required map (%d). Retrying next update.", zone->map);
         return;
     }
 
     if (mapPtr && SummonPallid(mapPtr, zone, zone->pallid[SpawnLocationID], SpawnLocationID))
-        sLog.outBasic("[Scourge Invasion Event] Pallid Horror summoned in zone %d.", zoneId);
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] Pallid Horror summoned in zone %d.", zoneId);
     else
-        sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to spawn pallid in %d.", zone->map);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::StartNewCityAttackIfTime unable to spawn pallid in %d.", zone->map);
 }
 
 // Will initialize an invasion in a new, random, zone if the cooldown is up. If somehow the maps for the
@@ -1100,7 +1016,7 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
     if (GetActiveZones() > 1 && sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT) > 0)
         return;
 
-    sLog.outBasic("[Scourge Invasion Event] Starting new invasion in %d.", zoneId);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] Starting new invasion in %d.", zoneId);
 
     InvasionZone* zone = GetInvasionZone(zoneId);
 
@@ -1111,14 +1027,14 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
 
     if (!mapPtr)
     {
-        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update.", zone->map);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update.", zone->map);
         return;
     }
 
     if (mapPtr && SummonMouth(mapPtr, zone, zone->mouth[0]))
         sObjectMgr.SetSavedVariable(zone->remainingVar, zone->necroAmount, true);
     else
-        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to spawn mouth in %d.", zone->map);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::StartNewInvasionIfTime unable to spawn mouth in %d.", zone->map);
 }
 
 // Will return false if a required map was not available. In all other cases returns true.
@@ -1126,10 +1042,10 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
 {
     // Dont have a save variable to know which necropolises had already been destroyed, so we
     // just summon the same amount, but not necessarily the same necropolises
-    sLog.outBasic("[Scourge Invasion Event] Resuming Scourge invasion in zone %d", zoneId);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] Resuming Scourge invasion in zone %d", zoneId);
     InvasionZone* zone = GetInvasionZone(zoneId);
     if (!zone) {
-        sLog.outError("ScourgeInvasionEvent::ResumeInvasion somehow magically could not find InvasionZone object for zoneId: %d.", zoneId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::ResumeInvasion somehow magically could not find InvasionZone object for zoneId: %d.", zoneId);
         return false;
     }
     
@@ -1140,7 +1056,7 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     {
         if (!GetMap(zone->map, zone->mouth[0]))
         {
-            sLog.outError("ScourgeInvasionEvent::ResumeInvasion map %d not accessible. Retry next update.", zone->map);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::ResumeInvasion map %d not accessible. Retry next update.", zone->map);
             return false;
         }
     }
@@ -1148,7 +1064,7 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     Map* mapPtr = GetMap(zone->map, zone->mouth[0]);
     if (!mapPtr)
     {
-        sLog.outError("ScourgeInvasionEvent::ResumeInvasion failed getting map, even after making sure they were loaded....");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::ResumeInvasion failed getting map, even after making sure they were loaded....");
         return false;
     }
 
@@ -1180,7 +1096,7 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, Position po
     }
     else
     {
-        sLog.outError("ScourgeInvasionEvent::SummonPallid failed summoning Pallid Horror.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::SummonPallid failed summoning Pallid Horror.");
         return false;
     }
 
@@ -1202,7 +1118,7 @@ bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, Position p
     }
     else
     {
-        sLog.outError("ScourgeInvasionEvent::SummonMouth failed summoning Mouth of Kel'Thuzad.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::SummonMouth failed summoning Mouth of Kel'Thuzad.");
         return false;
     }
 
@@ -1227,7 +1143,7 @@ bool ScourgeInvasionEvent::isActiveZone(uint32 zoneId)
             Map* mapPtr = GetMap(invasionPoint.map, invasionPoint.mouth[0]);
             if (!mapPtr)
             {
-                sLog.outError("ScourgeInvasionEvent::isValidZoneId no map for zone %d.", invasionPoint.map);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::isValidZoneId no map for zone %d.", invasionPoint.map);
                 continue;
             }
 
@@ -1247,7 +1163,7 @@ uint32 ScourgeInvasionEvent::GetActiveZones()
         Map* mapPtr = GetMap(invasionPoint.map, invasionPoint.mouth[0]);
         if (!mapPtr)
         {
-            sLog.outError("ScourgeInvasionEvent::GetActiveZones no map for zone %d.", invasionPoint.map);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::GetActiveZones no map for zone %d.", invasionPoint.map);
             continue;
         }
         
@@ -1265,7 +1181,7 @@ ScourgeInvasionEvent::CityAttack* ScourgeInvasionEvent::GetCityZone(uint32 zoneI
         if (attackPoint.zoneId == zoneId)
             return &attackPoint;
     }
-    sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d.", zoneId);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::GetZone unknown zoneid: %d.", zoneId);
     return nullptr;
 }
 
@@ -1276,7 +1192,7 @@ ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetInvasionZone(uint32
         if (invasionPoint.zoneId == zoneId)
             return &invasionPoint;
     }
-    sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d.", zoneId);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::GetZone unknown zoneid: %d.", zoneId);
     return nullptr;
 }
 
@@ -1510,7 +1426,7 @@ void WarEffortEvent::Update()
         // case WAR_EFFORT_STAGE_COMPLETE: handled above
         default:
         {
-            sLog.outError("[WarEffortEvent] Stuck in invalid stage %u", stage);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[WarEffortEvent] Stuck in invalid stage %u", stage);
             break;
         }
     }
@@ -1680,7 +1596,7 @@ void WarEffortEvent::UpdateStageEvents()
             EnableAndStartEvent(iter);
         else
         {
-            sLog.outError("[WarEffortEvent] Event %u is already active for stage %u, but not defined in overall event list",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[WarEffortEvent] Event %u is already active for stage %u, but not defined in overall event list",
                 iter, stage);
         }
     }
@@ -1760,13 +1676,11 @@ void WarEffortEvent::UpdateHiveColossusEvents()
 void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
 {
     auto invasion = new ElementalInvasion();
-    auto leprithus = new Leprithus();
-    auto moonbrook = new Moonbrook();
     auto nightmare = new DragonsOfNightmare();
     auto darkmoon = new DarkmoonFaire();
     auto fireworks = new FireworksShow();
     auto goblets = new ToastingGoblets();
     auto scourge_invasion = new ScourgeInvasionEvent();
     auto war_effort = new WarEffortEvent();
-    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, fireworks, goblets, scourge_invasion, war_effort };
+    eventList = { invasion, nightmare, darkmoon, fireworks, goblets, scourge_invasion, war_effort };
 }

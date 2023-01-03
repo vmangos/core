@@ -6,8 +6,6 @@
 #include "Player.h"
 #include "GameObject.h"
 
-#define SAVE_LOAD_LOG sLog.outDebug
-
 //Optional uiWithRestoreTime. If not defined, autoCloseTime will be used (if not 0 by default in *_template)
 void ScriptedInstance::DoUseDoorOrButton(uint64 uiGuid, uint32 uiWithRestoreTime, bool bUseAlternativeState)
 {
@@ -26,7 +24,7 @@ void ScriptedInstance::DoUseDoorOrButton(uint64 uiGuid, uint32 uiWithRestoreTime
                 pGo->ResetDoorOrButton();
         }
         else
-            sLog.outError("Script call DoUseDoorOrButton, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script call DoUseDoorOrButton, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
     }
 }
 
@@ -62,7 +60,7 @@ void ScriptedInstance::DoOpenDoor(uint64 uiGuid)
                 pGo->UseDoorOrButton(0, false);
         }
         else
-            sLog.outError("Script call DoOpenDoor, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script call DoOpenDoor, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
     }
 }
 
@@ -78,7 +76,7 @@ void ScriptedInstance::DoResetDoor(uint64 uiGuid)
         if (pGo->GetGoType() == GAMEOBJECT_TYPE_DOOR || pGo->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
             pGo->ResetDoorOrButton();
         else
-            sLog.outError("Script call DoResetDoor, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script call DoResetDoor, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
     }
 }
 
@@ -95,7 +93,7 @@ void ScriptedInstance::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
         }
     }
     else
-        sLog.outDebug("DoUpdateWorldState attempt send data but no players in map.");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DoUpdateWorldState attempt send data but no players in map.");
 }
 
 std::string ScriptedInstance::GenSaveData(uint32* encounters, uint32 maxIndex)
@@ -109,18 +107,18 @@ std::string ScriptedInstance::GenSaveData(uint32* encounters, uint32 maxIndex)
         first = false;
         saveStream << encounters[i];
     }
-    SAVE_LOAD_LOG("Sauvegarde : `%s`", saveStream.str().c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sauvegarde : `%s`", saveStream.str().c_str());
     return saveStream.str();
 }
 
 void ScriptedInstance::LoadSaveData(char const* pStr, uint32* encounters, uint32 maxIndex)
 {
-    SAVE_LOAD_LOG("Chargement : `%s`", pStr);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Chargement : `%s`", pStr);
     std::istringstream loadStream(pStr);
     for (uint32 i = 0; i <= maxIndex; ++i)
     {
         loadStream >> encounters[i];
-        SAVE_LOAD_LOG("* %u = %u", i, encounters[i]);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "* %u = %u", i, encounters[i]);
     }
 }
 
@@ -148,7 +146,7 @@ GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
         return instance->GetGameObject(find->second);
 
     // Output log, possible reason is not added GO to map, or not yet loaded;
-    sLog.outError("Script requested gameobject with entry %u, but no gameobject of this entry was created yet, or it was not stored by script for map %u.", uiEntry, instance->GetId());
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script requested gameobject with entry %u, but no gameobject of this entry was created yet, or it was not stored by script for map %u.", uiEntry, instance->GetId());
 
     return nullptr;
 }
@@ -162,7 +160,7 @@ Creature* ScriptedInstance::GetSingleCreatureFromStorage(uint32 uiEntry, bool bS
 
     // Output log, possible reason is not added GO to map, or not yet loaded;
     if (!bSkipDebugLog)
-        sLog.outError("Script requested creature with entry %u, but no npc of this entry was created yet, or it was not stored by script for map %u.", uiEntry, instance->GetId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script requested creature with entry %u, but no npc of this entry was created yet, or it was not stored by script for map %u.", uiEntry, instance->GetId());
 
     return nullptr;
 }
@@ -266,7 +264,7 @@ void DialogueHelper::StartNextDialogueText(int32 iTextEntry)
 
     if (!bFound)
     {
-        sLog.outError("Script call DialogueHelper::StartNextDialogueText, but textEntry %i is not in provided dialogue (on map id %u)", iTextEntry, m_pInstance ? m_pInstance->instance->GetId() : 0);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script call DialogueHelper::StartNextDialogueText, but textEntry %i is not in provided dialogue (on map id %u)", iTextEntry, m_pInstance ? m_pInstance->instance->GetId() : 0);
         return;
     }
 

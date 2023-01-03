@@ -40,11 +40,15 @@ public:
         m_cloneGuid = pClone ? pClone->GetObjectGuid() : ObjectGuid();
         m_updateTimer.Reset(2000);
     }
-    bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) override
+    PartyBotAI(Player* pLeader, uint32 mapId, uint32 instanceId, float x, float y, float z, float o)
+        : CombatBotBaseAI(), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o)
     {
-        return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o, sObjectAccessor.FindPlayer(m_cloneGuid));
+        m_role = ROLE_INVALID;
+        m_leaderGuid = pLeader->GetObjectGuid();
+        m_updateTimer.Reset(2000);
     }
 
+    bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) final;
     void OnPlayerLogin() final;
     void UpdateAI(uint32 const diff) final;
     void OnPacketReceived(WorldPacket const* packet) final;

@@ -46,7 +46,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
 
     if (opcode >= NUM_MSG_TYPES)
     {
-        sLog.outError("SESSION: received nonexistent opcode 0x%.4X", opcode);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received nonexistent opcode 0x%.4X", opcode);
         return -1;
     }
 
@@ -69,7 +69,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             case CMSG_AUTH_SESSION:
                 if (m_Session)
                 {
-                    sLog.outError("WorldSocket::ProcessIncoming: Player send CMSG_AUTH_SESSION again");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::ProcessIncoming: Player send CMSG_AUTH_SESSION again");
                     return -1;
                 }
 
@@ -89,7 +89,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 }
                 else
                 {
-                    sLog.outError("WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
                     return -1;
                 }
             }
@@ -97,17 +97,17 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     }
     catch (ByteBufferException &)
     {
-        sLog.outError("WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i.",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i.",
                       opcode, GetRemoteAddress().c_str(), m_Session ? m_Session->GetAccountId() : -1);
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
         {
-            DEBUG_LOG("Dumping error-causing packet:");
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Dumping error-causing packet:");
             new_pct->hexlike();
         }
 
         if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
         {
-            DETAIL_LOG("Disconnecting session [account id %i / address %s] for badly formatted packet.",
+            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Disconnecting session [account id %i / address %s] for badly formatted packet.",
                        m_Session ? m_Session->GetAccountId() : -1, GetRemoteAddress().c_str());
 
             return -1;
@@ -128,7 +128,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     uint32 BuiltNumberClient;
     uint32 id, security;
     LocaleConstant locale;
-    std::string account, os;
+    std::string account, os, platform;
     BigNumber v, s, g, N, K;
     WorldPacket packet, SendAddonPacked;
 
@@ -140,7 +140,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> clientSeed;
     recvPacket.read(digest, 20);
 
-    DEBUG_LOG("WorldSocket::HandleAuthSession: client %u, serverId %u, account %s, clientseed %u",
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WorldSocket::HandleAuthSession: client %u, serverId %u, account %s, clientseed %u",
               BuiltNumberClient,
               serverId,
               account.c_str(),
@@ -154,7 +154,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        sLog.outError("WorldSocket::HandleAuthSession: Sent Auth Response (version mismatch).");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Sent Auth Response (version mismatch).");
         return -1;
     }
 
@@ -163,7 +163,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     LoginDatabase.escape_string(safe_account);
     // No SQL injection, username escaped.
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT a.`id`, aa.`gmLevel`, a.`sessionkey`, a.`last_ip`, a.`locked`, a.`v`, a.`s`, a.`mutetime`, a.`locale`, a.`os`, a.`flags`, "
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.`id`, aa.`gmLevel`, a.`sessionkey`, a.`last_ip`, a.`locked`, a.`v`, a.`s`, a.`mutetime`, a.`locale`, a.`os`, a.`platform`, a.`flags`, "
         "ab.`unbandate` > UNIX_TIMESTAMP() OR ab.`unbandate` = ab.`bandate` FROM `account` a LEFT JOIN `account_access` aa ON a.`id` = aa.`id` AND aa.`RealmID` IN (-1, %u) "
         "LEFT JOIN `account_banned` ab ON a.`id` = ab.`id` AND ab.`active` = 1 WHERE a.`username` = '%s' ORDER BY aa.`RealmID` DESC LIMIT 1", realmID, safe_account.c_str());
 
@@ -175,7 +175,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        sLog.outError("WorldSocket::HandleAuthSession: Sent Auth Response (unknown account).");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Sent Auth Response (unknown account).");
         return -1;
     }
 
@@ -190,7 +190,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     char const* sStr = s.AsHexStr();                        //Must be freed by OPENSSL_free()
     char const* vStr = v.AsHexStr();                        //Must be freed by OPENSSL_free()
 
-    DEBUG_LOG("WorldSocket::HandleAuthSession: (s,v) check s: %s v: %s",
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WorldSocket::HandleAuthSession: (s,v) check s: %s v: %s",
               sStr,
               vStr);
 
@@ -207,7 +207,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
             SendPacket(packet);
 
             delete result;
-            BASIC_LOG("WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs).");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs).");
             return -1;
         }
     }
@@ -230,9 +230,10 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     locale = LocaleConstant(fields[8].GetUInt8());
     if (locale >= MAX_LOCALE)
         locale = LOCALE_enUS;
-    os = fields[9].GetString();
-    uint32 accFlags = fields[10].GetUInt32();
-    bool isBanned = fields[11].GetBool();
+    os = fields[9].GetCppString();
+    platform = fields[10].GetCppString();
+    uint32 accFlags = fields[11].GetUInt32();
+    bool isBanned = fields[12].GetBool();
     delete result;
 
     
@@ -242,7 +243,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         packet << uint8(AUTH_BANNED);
         SendPacket(packet);
 
-        sLog.outError("WorldSocket::HandleAuthSession: Sent Auth Response (Account banned).");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Sent Auth Response (Account banned).");
         return -1;
     }
 
@@ -256,7 +257,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        BASIC_LOG("WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
         return -1;
     }
 
@@ -280,13 +281,13 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        sLog.outError("WorldSocket::HandleAuthSession: Sent Auth Response (authentification failed).");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Sent Auth Response (authentification failed).");
         return -1;
     }
 
     std::string address = GetRemoteAddress();
 
-    DEBUG_LOG("WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
               account.c_str(),
               address.c_str());
 
@@ -298,13 +299,24 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     stmt.PExecute(address.c_str(), account.c_str());
 
     ClientOSType clientOs;
-    if (os == "niW")
+    if (os == "Win")
         clientOs = CLIENT_OS_WIN;
-    else if (os == "XSO")
+    else if (os == "OSX")
         clientOs = CLIENT_OS_MAC;
     else
     {
-        sLog.outError("WorldSocket::HandleAuthSession: Unrecognized OS '%s' for account '%s' from %s", os.c_str(), account.c_str(), address.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Unrecognized OS '%s' for account '%s' from %s", os.c_str(), account.c_str(), address.c_str());
+        return -1;
+    }
+
+    ClientPlatformType clientPlatform;
+    if (platform == "x86")
+        clientPlatform = CLIENT_PLATFORM_X86;
+    else if (platform == "PPC" && clientOs == CLIENT_OS_MAC)
+        clientPlatform = CLIENT_PLATFORM_PPC;
+    else
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Unrecognized Platform '%s' for account '%s' from %s", platform.c_str(), account.c_str(), address.c_str());
         return -1;
     }
 
@@ -318,6 +330,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     m_Session->SetGameBuild(BuiltNumberClient);
     m_Session->SetAccountFlags(accFlags);
     m_Session->SetOS(clientOs);
+    m_Session->SetPlatform(clientPlatform);
+    m_Session->LoadGlobalAccountData();
     m_Session->LoadTutorialsData();
     m_Session->InitWarden(&K);
 
@@ -367,7 +381,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
                 if (m_Session && m_Session->GetSecurity() == SEC_PLAYER)
                 {
-                    sLog.outError("WorldSocket::HandlePing: Player kicked for "
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandlePing: Player kicked for "
                                   "overspeeded pings address = %s",
                                   GetRemoteAddress().c_str());
 
@@ -391,7 +405,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
         if (!m_Session)
 #endif
         {
-            sLog.outError("WorldSocket::HandlePing: peer sent CMSG_PING, "
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandlePing: peer sent CMSG_PING, "
                           "but is not authenticated or got recently kicked,"
                           " address = %s",
                           GetRemoteAddress().c_str());

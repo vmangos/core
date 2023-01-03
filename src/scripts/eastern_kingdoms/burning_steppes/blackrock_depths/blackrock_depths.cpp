@@ -63,7 +63,9 @@ bool GOHello_go_shadowforge_brazier(Player* pPlayer, GameObject* pGo)
 enum
 {
     //4 or 6 in total? 1+2+1 / 2+2+2 / 3+3. Depending on this, code should be changed.
-    MAX_MOB_AMOUNT      = 8
+    MAX_MOB_AMOUNT      = 8,
+
+    SPELL_GRIMSTONE_TELEPORT = 6422,
 };
 
 uint32 RingMob[] =
@@ -147,7 +149,7 @@ struct npc_grimstoneAI : public npc_escortAI
         if (GameObject* pGo = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(id)))
             pGo->SetGoState(GOState(state));
 
-        sLog.outDebug("npc_grimstone, arena gate update state.");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "npc_grimstone, arena gate update state.");
     }
 
     //TODO: move them to center
@@ -190,7 +192,7 @@ struct npc_grimstoneAI : public npc_escortAI
             Player *challenger = m_creature->GetMap()->GetPlayer(m_pInstance->GetData64(DATA_ARENA_CHALLENGER));
             if (!challenger)
             {
-                sLog.outError("[Blackrock Depths] Ring of Law challenger player not found!");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Blackrock Depths] Ring of Law challenger player not found!");
                 return;
             }
 
@@ -297,7 +299,7 @@ struct npc_grimstoneAI : public npc_escortAI
 
                     if (m_pInstance->GetData(DATA_THELDREN) == IN_PROGRESS)
                         m_pInstance->SetData(DATA_THELDREN, DONE);
-                    sLog.outDebug("npc_grimstone: event reached end and set complete.");
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "npc_grimstone: event reached end and set complete.");
                 }
                 break;
         }
@@ -394,6 +396,7 @@ struct npc_grimstoneAI : public npc_escortAI
                     case 3:
                         DoGate(DATA_ARENA1, GO_STATE_ACTIVE);
                         Event_Timer = 3000;
+                        DoCastSpellIfCan(m_creature, SPELL_GRIMSTONE_TELEPORT);
                         break;
                     case 4:
                         CanWalk = true;
@@ -436,14 +439,17 @@ struct npc_grimstoneAI : public npc_escortAI
                         break;
                     case 11:
                         DoGate(DATA_ARENA2, GO_STATE_ACTIVE);
-                        Event_Timer = 5000;
+                        Event_Timer = 3000;
                         break;
                     case 12:
+                        DoCastSpellIfCan(m_creature, SPELL_GRIMSTONE_TELEPORT);
+                        Event_Timer = 2000;
+                    case 13:
                         m_creature->SetVisibility(VISIBILITY_OFF);
                         SummonRingBoss();
                         Event_Timer = 0;
                         break;
-                    case 13:
+                    case 14:
                         //if quest, complete
                         DoGate(DATA_ARENA2, GO_STATE_READY);
                         DoGate(DATA_ARENA3, GO_STATE_ACTIVE);
@@ -493,9 +499,13 @@ struct npc_grimstoneAI : public npc_escortAI
             if (!RingBossGUID)
             {
                 m_pInstance->SetData(TYPE_RING_OF_LAW, NOT_STARTED);
+                
+                for (uint64& guid : RingMobGUID)
+                    if (Creature* mob = m_creature->GetMap()->GetCreature(guid))
+                        mob->ForcedDespawn();                     
 
-                Reset();
                 m_creature->ForcedDespawn();
+                Reset();
             }
         }
         

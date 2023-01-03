@@ -16,7 +16,6 @@ enum
     SPELL_KILL_UROK_ADD     = 16452,
     SPELL_DESTROY_SPEAR     = 16557,
     SPELL_DESTROY_SPEAR2    = 16558,
-    SPELL_STRIKE            = 14516,
     SPELL_BLOODLUST         = 6742,
     SPELL_SLOW              = 13747,
     SPELL_ARCANE_BOLT       = 15979
@@ -206,9 +205,7 @@ struct urokUnderlingAI : public ScriptedAI
     void Reset() override
     {
         timer=0;
-        abilityReset();
     }
-    virtual void abilityReset(){}
     uint32 timer;
     uint64 guidMound;
     void JustDied(Unit* pKiller) override
@@ -290,22 +287,13 @@ struct urokEnforcerAI : public urokUnderlingAI
 {
     urokEnforcerAI(Creature* pCreature) : urokUnderlingAI(pCreature)
     {
-        abilityReset();
     }
-    void abilityReset() override
-    {
-        m_uiStrike_Timer = 1000;
-    }
-    uint32 m_uiStrike_Timer;
+
     void abilityCombatUpdate(uint32 uiDiff) override
     {
-        if (m_uiStrike_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE ) == CAST_OK)
-                m_uiStrike_Timer = urand(10000, 18000);
-        }
-        else
-            m_uiStrike_Timer -= uiDiff;
+        if (!m_CreatureSpells.empty())
+            UpdateSpellsList(uiDiff);
+
         DoMeleeAttackIfReady();
     }
 };

@@ -38,7 +38,7 @@ protected:
 
     virtual int handle_timeout(const ACE_Time_Value &current_time, const void *act = 0)
     {
-        sLog.outBasic("Resuming acceptor");
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Resuming acceptor");
         this->reactor()->cancel_timer(this, 1);
         return this->reactor()->register_handler(this, ACE_Event_Handler::ACCEPT_MASK);
     }
@@ -48,7 +48,7 @@ protected:
 #if defined(ENFILE) && defined(EMFILE)
         if (errno == ENFILE || errno == EMFILE)
         {
-            sLog.outError("Out of file descriptors, suspending incoming connections for 10 seconds");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Out of file descriptors, suspending incoming connections for 10 seconds");
             this->reactor()->remove_handler(this, ACE_Event_Handler::ACCEPT_MASK | ACE_Event_Handler::DONT_CALL);
             this->reactor()->schedule_timer(this, NULL, ACE_Time_Value(10));
         }
@@ -167,7 +167,7 @@ protected:
 
     virtual int svc()
     {
-        DEBUG_LOG("Network Thread Starting");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Network Thread Starting");
 
         WorldDatabase.ThreadStart();
 
@@ -204,7 +204,7 @@ protected:
 
         WorldDatabase.ThreadEnd();
 
-        DEBUG_LOG("Network Thread Exitting");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Network Thread Exitting");
 
         return 0;
     }
@@ -261,11 +261,11 @@ int MangosSocketMgr<SocketType>::StartReactiveIO(ACE_UINT16 port, const char* ad
     if (StartThreadsIfNeeded() == -1)
         return -1;
 
-    BASIC_LOG("Max allowed socket connections %d", ACE::max_handles());
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Max allowed socket connections %d", ACE::max_handles());
 
     if (m_SockOutUBuff <= 0)
     {
-        sLog.outError("Network.OutUBuff is wrong in your config file");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Network.OutUBuff is wrong in your config file");
         return -1;
     }
 
@@ -275,7 +275,7 @@ int MangosSocketMgr<SocketType>::StartReactiveIO(ACE_UINT16 port, const char* ad
 
     if (m_Acceptor->open(listen_addr, m_NetThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
     {
-        sLog.outError("Failed to open acceptor, check if the port is free");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to open acceptor, check if the port is free");
         return -1;
     }
 
@@ -330,7 +330,7 @@ int MangosSocketMgr<SocketType>::OnSocketOpen(SocketType* sock)
     {
         if (sock->peer().set_option(SOL_SOCKET, SO_SNDBUF, (void*)&m_SockOutKBuff, sizeof(int)) == -1 && errno != ENOTSUP)
         {
-            sLog.outError("MangosSocketMgr<SocketType>::OnSocketOpen set_option SO_SNDBUF");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocketMgr<SocketType>::OnSocketOpen set_option SO_SNDBUF");
             return -1;
         }
     }
@@ -342,7 +342,7 @@ int MangosSocketMgr<SocketType>::OnSocketOpen(SocketType* sock)
     {
         if (sock->peer().set_option(ACE_IPPROTO_TCP, TCP_NODELAY, (void*)&ndoption, sizeof(int)) == -1)
         {
-            sLog.outError("MangosSocketMgr<SocketType>::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror(errno));
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocketMgr<SocketType>::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror(errno));
             return -1;
         }
     }

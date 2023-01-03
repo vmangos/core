@@ -54,8 +54,12 @@ template<class T>
 bool ConfusedMovementGenerator<T>::Update(T &unit, uint32 const& diff)
 {
     // ignore in case other no reaction state
-    if (unit.HasUnitState((UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_CAN_NOT_MOVE) & ~UNIT_STAT_CONFUSED))
+    if (unit.HasUnitState((UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) & ~UNIT_STAT_CONFUSED))
         return true;
+
+    if (Player* pPlayer = unit.ToPlayer())
+        if (pPlayer->IsBeingTeleported())
+            return true;
 
     if (!unit.movespline->Finalized())
         return true;

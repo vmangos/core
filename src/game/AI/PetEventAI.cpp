@@ -56,7 +56,7 @@ void PetEventAI::MoveInLineOfSight(Unit* pWho)
     if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature))
     {
         float const attackRadius = m_creature->GetAttackDistance(pWho);
-        if (m_creature->IsWithinDistInMap(pWho, attackRadius, true, false) && m_creature->IsHostileTo(pWho) &&
+        if (m_creature->IsWithinDistInMap(pWho, attackRadius, true, SizeFactor::None) && m_creature->IsHostileTo(pWho) &&
             pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             AttackStart(pWho);
     }
@@ -121,39 +121,27 @@ void PetEventAI::AttackedBy(Unit* pAttacker)
     }
 }
 
-bool PetEventAI::FindTargetForAttack()
+Unit* PetEventAI::FindTargetForAttack() const
 {
     if (Unit* pTaunter = m_creature->GetTauntTarget())
-    {
-        AttackStart(pTaunter);
-        return true;
-    }
+        return pTaunter;
 
-    // Check if any of the Pet's attackers are valid targets.
-    Unit::AttackerSet attackers = m_creature->GetAttackers();
-    for (const auto& itr : attackers)
-    {
-        if (itr->IsInMap(m_creature) && m_creature->IsValidAttackTarget(itr) && !itr->HasAuraPetShouldAvoidBreaking())
-        {
-            AttackStart(itr);
-            return true;
-        }
-    }
+    // Check for valid targets on threat list.
+    if (!m_creature->GetThreatManager().isThreatListEmpty())
+        if (Unit* pTarget = m_creature->GetThreatManager().getHostileTarget())
+            if (!pTarget->HasAuraPetShouldAvoidBreaking())
+                return pTarget;
 
     Unit const* pOwner = m_creature->GetCharmerOrOwner();
-
     if (!pOwner)
-        return false;
+        return nullptr;
 
     // Pet has no attackers, check for anyone attacking Owner.
     if (Unit* const pTarget = pOwner->GetAttackerForHelper())
     {
         // Prevent pets from breaking CC effects
         if (!pTarget->HasAuraPetShouldAvoidBreaking())
-        {
-            AttackStart(pTarget);
-            return true;
-        } 
+            return pTarget;
         else
         {
             // Main target is CC-ed, so pick another attacker.
@@ -161,14 +149,11 @@ bool PetEventAI::FindTargetForAttack()
             for (const auto& itr : owner_attackers)
             {
                 if (itr->IsInMap(m_creature) && m_creature->IsValidAttackTarget(itr) && !itr->HasAuraPetShouldAvoidBreaking())
-                {
-                    AttackStart(itr);
-                    return true;
-                }
+                    return itr;
             }
         }
     }
-    return false;
+    return nullptr;
 }
 
 void PetEventAI::UpdateAI(uint32 const uiDiff)
@@ -179,18 +164,16 @@ void PetEventAI::UpdateAI(uint32 const uiDiff)
 
     Unit const* pOwner = m_creature->GetCharmerOrOwner();
     bool const hasAliveOwner = pOwner && pOwner->IsAlive() && m_creature->GetCharmInfo();
-    bool bHasVictim = m_creature->GetVictim();
 
-    if (!bHasVictim && (m_creature->IsInCombat() || (hasAliveOwner && pOwner->IsInCombat())))
-    {
-        if (FindTargetForAttack())
-            bHasVictim = m_creature->GetVictim();
-    }
+    if (m_creature->IsInCombat() || (hasAliveOwner && pOwner->IsInCombat()))
+        if (Unit* pVictim = FindTargetForAttack())
+            if (pVictim != m_creature->GetVictim())
+                AttackStart(pVictim);
 
     if (!m_bEmptyList)
-        UpdateEventsOn_UpdateAI(uiDiff, bHasVictim);
+        UpdateEventsOn_UpdateAI(uiDiff, m_creature->GetVictim());
 
-    if (bHasVictim)
+    if (m_creature->GetVictim())
     {
         if (!m_CreatureSpells.empty())
             UpdateSpellsList(uiDiff);
@@ -205,7 +188,7 @@ void PetEventAI::UpdateAI(uint32 const uiDiff)
         if (hasAliveOwner && m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW) && !m_creature->HasUnitState(UNIT_STAT_FOLLOW))
         {
             m_creature->GetMotionMaster()->MoveFollow(m_creature->GetCharmerOrOwner(), PET_FOLLOW_DIST,
-                                                      m_creature->IsPet() && static_cast<Pet*>(m_creature)->getPetType() == MINI_PET ? MINI_PET_FOLLOW_ANGLE : PET_FOLLOW_ANGLE);
+                                                      m_creature->IsPet() ? static_cast<Pet*>(m_creature)->GetFollowAngle() : PET_FOLLOW_ANGLE);
             if (m_creature->GetCharmInfo())
                 m_creature->GetCharmInfo()->SetIsReturning(true);
         }     

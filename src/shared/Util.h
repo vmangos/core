@@ -148,6 +148,15 @@ inline float round_float(float value)
     return floor(value);
 }
 
+inline float round_float_chance(float value)
+{
+    float const remainder = value - floor(value);
+    if (remainder && roll_chance_f(remainder * 100.0f))
+        return ceil(value);
+
+    return floor(value);
+}
+
 inline void ApplyModUInt32Var(uint32& var, int32 val, bool apply)
 {
     int32 cur = var;
@@ -414,5 +423,13 @@ int32 dither(float v);
 
 void SetByteValue(uint32& variable, uint8 offset, uint8 value);
 void SetUInt16Value(uint32& variable, uint8 offset, uint16 value);
+
+inline uint32 BatchifyTimer(uint32 timer, uint32 interval)
+{
+    uint32 value = timer / interval;
+    if (timer % interval)
+        value++;
+    return value * interval;
+}
 
 #endif

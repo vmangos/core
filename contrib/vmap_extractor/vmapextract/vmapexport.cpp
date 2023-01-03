@@ -64,7 +64,6 @@ typedef struct
 } map_id;
 
 map_id* map_ids;
-uint16* LiqType = 0;
 uint32 map_count;
 char output_path[128] = ".";
 char input_path[1024] = ".";
@@ -104,28 +103,6 @@ void strToLower(char* str)
         *str = tolower(*str);
         ++str;
     }
-}
-
-// copied from contrib/extractor/System.cpp
-void ReadLiquidTypeTableDBC()
-{
-    printf("Read LiquidType.dbc file...");
-    DBCFile dbc("DBFilesClient\\LiquidType.dbc");
-    if (!dbc.open())
-    {
-        printf("Fatal error: Invalid LiquidType.dbc file format!\n");
-        exit(1);
-    }
-
-    size_t LiqType_count = dbc.getRecordCount();
-    size_t LiqType_maxid = dbc.getRecord(LiqType_count - 1).getUInt(0);
-    LiqType = new uint16[LiqType_maxid + 1];
-    memset(LiqType, 0xff, (LiqType_maxid + 1) * sizeof(uint16));
-
-    for (uint32 x = 0; x < LiqType_count; ++x)
-        LiqType[dbc.getRecord(x).getUInt(0)] = dbc.getRecord(x).getUInt(3);
-
-    printf("Done! (%u LiqTypes loaded)\n", (unsigned int)LiqType_count);
 }
 
 bool ExtractWmo()
@@ -479,7 +456,6 @@ int main(int argc, char** argv)
         printf("FATAL ERROR: None MPQ archive found by path '%s'. Use -d option with proper path.\n", input_path);
         return 1;
     }
-    ReadLiquidTypeTableDBC();
 
     // extract data
     if (success)
@@ -522,6 +498,5 @@ int main(int argc, char** argv)
     }
 
     printf("Extract for %s. Work complete. No errors.\n", szRawVMAPMagic);
-    delete [] LiqType;
     return 0;
 }

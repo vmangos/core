@@ -35,9 +35,9 @@ using namespace Spells;
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
     uint8 bagIndex, slot;
-    uint8 spell_count;                                      // number of spells at item, not used
+    uint8 spellSlot; // the position of the spell id on the item template
 
-    recvPacket >> bagIndex >> slot >> spell_count;
+    recvPacket >> bagIndex >> slot >> spellSlot;
 
     // TODO: add targets.read() check
     Player* pUser = _player;
@@ -57,10 +57,17 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    DETAIL_LOG("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, spell_count: %u , Item: %u, data length = %i", bagIndex, slot, spell_count, pItem->GetEntry(), (uint32)recvPacket.size());
-
     ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
+    {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
+        return;
+    }
+
+    if (spellSlot >= MAX_ITEM_PROTO_SPELLS ||
+        proto->Spells[spellSlot].SpellId == 0 ||
+        proto->Spells[spellSlot].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
     {
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
@@ -141,18 +148,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         // free gray item after use fail
         pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
 
-        // search spell for spell error
-        uint32 spellid = 0;
-        for (const auto& itr : proto->Spells)
-        {
-            if (itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
-            {
-                spellid = itr.SpellId;
-                break;
-            }
-        }
-
         // send spell error
+        uint32 spellid = proto->Spells[spellSlot].SpellId;
         if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid))
             Spell::SendCastResult(_player, spellInfo, itemCastCheckResult);
         return;
@@ -163,13 +160,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
-    DETAIL_LOG("WORLD: CMSG_OPEN_ITEM packet, data length = %i", (uint32)recvPacket.size());
-
     uint8 bagIndex, slot;
-
     recvPacket >> bagIndex >> slot;
-
-    DETAIL_LOG("bagIndex: %u, slot: %u", bagIndex, slot);
 
     Player* pUser = _player;
 
@@ -212,7 +204,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         if (!lockInfo)
         {
             pUser->SendEquipError(EQUIP_ERR_ITEM_LOCKED, pItem, nullptr);
-            sLog.outError("WORLD::OpenItem: item [guid = %u] has an unknown lockId: %u!", pItem->GetGUIDLow() , lockId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD::OpenItem: item [guid = %u] has an unknown lockId: %u!", pItem->GetGUIDLow() , lockId);
             return;
         }
 
@@ -244,7 +236,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         }
         else
         {
-            sLog.outError("Wrapped item %u don't have record in character_gifts table and will deleted", pItem->GetGUIDLow());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Wrapped item %u don't have record in character_gifts table and will deleted", pItem->GetGUIDLow());
             pUser->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
             return;
         }
@@ -261,10 +253,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
-
     recv_data >> guid;
-
-    DEBUG_LOG("WORLD: Recvd CMSG_GAMEOBJ_USE Message guid: %s", guid.GetString().c_str());
 
     // ignore for remote control state
     if (!_player->IsSelfMover())
@@ -301,9 +290,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     uint32 spellId;
     recvPacket >> spellId;
 
-    DEBUG_LOG("WORLD: got cast spell packet, spellId - %u, data length = %i",
-              spellId, (uint32)recvPacket.size());
-
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
     if (!spellInfo)
@@ -317,7 +303,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         // not have spell in spellbook or spell passive and not casted by client
         if (!_player->HasActiveSpell(spellId) || spellInfo->IsPassiveSpell())
         {
-            sLog.outError("World: Player %u casts spell %u which he shouldn't have", _player->GetGUIDLow(), spellId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "World: Player %u casts spell %u which he shouldn't have", _player->GetGUIDLow(), spellId);
             //cheater? kick? ban?
             recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
             return;
@@ -368,10 +354,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             DoLootRelease(lootGuid);
     }
 
-    _player->m_castingSpell = spellId;
-    if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-        _player->m_castingSpell = _player->GetComboPoints();
-
     Spell* spell = new Spell(_player, spellInfo, false, ObjectGuid(), nullptr, targets.getUnitTarget());
 
     // Spell has been down-ranked, remember what client wanted to cast.
@@ -413,7 +395,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     if (!spellInfo)
         return;
 
-    if (spellInfo->Attributes & SPELL_ATTR_CANT_CANCEL)
+    if (spellInfo->Attributes & SPELL_ATTR_NO_AURA_CANCEL)
         return;
 
     if (spellInfo->IsPassiveSpell())
@@ -539,8 +521,6 @@ void WorldSession::HandleCancelChanneling(WorldPacket& recv_data)
 
 void WorldSession::HandleSelfResOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: CMSG_SELF_RES");                  // empty opcode
-
     if (_player->GetUInt32Value(PLAYER_SELF_RES_SPELL))
     {
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL));

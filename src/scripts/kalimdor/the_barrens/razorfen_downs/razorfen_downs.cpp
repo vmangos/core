@@ -96,6 +96,14 @@ struct npc_belnistraszAI : public npc_escortAI
         m_uiFrostNovaTimer = 6000;
     }
 
+    void JustDied(Unit* unit) override
+    {
+        m_uiRitualPhase = 0;
+        m_uiRitualTimer = 1000;
+        m_bAggro = false;
+        npc_escortAI::JustDied(unit);
+    }
+
     void AttackedBy(Unit* pAttacker) override
     {
         if (HasEscortState(STATE_ESCORT_PAUSED))

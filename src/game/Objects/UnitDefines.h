@@ -62,7 +62,8 @@ enum MovementChangeType
 #define ATTACK_DISPLAY_DELAY 200
 
 // For this time difference is computed regen value
-#define REGEN_TIME_FULL     2000
+#define REGEN_TIME_PLAYER_FULL     2000
+#define REGEN_TIME_CREATURE_FULL   5000
 
 #define UNIT_PVP_COMBAT_TIMER 5500
 
@@ -496,6 +497,22 @@ enum CommandStates
     COMMAND_DISMISS = 3
 };
 
+inline char const* CommandStateToString(uint32 commandState)
+{
+    switch (commandState)
+    {
+        case COMMAND_STAY:
+            return "Stay";
+        case COMMAND_FOLLOW:
+            return "Follow";
+        case COMMAND_ATTACK:
+            return "Attack";
+        case COMMAND_DISMISS:
+            return "Dismiss";
+    }
+    return "UNKNOWN";
+}
+
 enum ActionBarIndex
 {
     ACTION_BAR_INDEX_START = 0,
@@ -550,7 +567,6 @@ enum UnitDebugFlags
     DEBUG_DR                    = 0x10,
     DEBUG_CHEAT                 = 0x20,
     DEBUG_PROCS                 = 0x40,
-    DEBUG_SPELLS_DAMAGE         = 0x80,
 };
 
 

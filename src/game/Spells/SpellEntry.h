@@ -32,6 +32,7 @@ class Spell;
 class Unit;
 class WorldObject;
 class SpellEntry;
+class SpellCaster;
 
 namespace Spells
 {
@@ -168,6 +169,7 @@ namespace Spells
         }
     }
 
+    bool IsAutocastable(uint32 spellId);
     bool IsPassiveSpell(uint32 spellId);
     bool IsPositiveSpell(uint32 spellId);
     bool IsPositiveSpell(uint32 spellId, Unit* caster, Unit* victim);
@@ -435,6 +437,19 @@ namespace Spells
             case SPELL_EFFECT_WEAPON_DAMAGE:
             case SPELL_EFFECT_POWER_BURN:
             case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                return true;
+        }
+
+        return false;
+    }
+
+    inline bool IsThreatEffect(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            case SPELL_EFFECT_THREAT:
+            case SPELL_EFFECT_THREAT_ALL:
+            case SPELL_EFFECT_ATTACK_ME:
                 return true;
         }
 
@@ -732,12 +747,12 @@ class SpellEntry
 
         bool IsNextMeleeSwingSpell() const
         {
-            return Attributes & (SPELL_ATTR_ON_NEXT_SWING_1 | SPELL_ATTR_ON_NEXT_SWING_2);
+            return Attributes & (SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE | SPELL_ATTR_ON_NEXT_SWING);
         }
 
         bool IsRangedSpell() const
         {
-            return Attributes & SPELL_ATTR_RANGED;
+            return Attributes & SPELL_ATTR_USES_RANGED_SLOT;
         }
 
         bool IsSealSpell() const
@@ -775,7 +790,7 @@ class SpellEntry
 
         bool CanTargetDeadTarget() const
         {
-            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);
         }
 
         bool CanTargetAliveState(bool alive) const
@@ -783,7 +798,7 @@ class SpellEntry
             if (HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD))
                 return !alive;
 
-            return alive || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+            return alive || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);
         }
 
         bool IsDeathPersistentSpell() const
@@ -793,7 +808,7 @@ class SpellEntry
 
         bool IsNonCombatSpell() const
         {
-            return (Attributes & SPELL_ATTR_CANT_USED_IN_COMBAT) != 0;
+            return (Attributes & SPELL_ATTR_NOT_IN_COMBAT_ONLY_PEACEFUL) != 0;
         }
 
         bool IsPositiveSpell() const
@@ -892,9 +907,14 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_CROWD_CONTROL;
         }
 
+        bool IsAutocastable() const
+        {
+            return !(HasAttribute(SPELL_ATTR_EX_NO_AUTOCAST_AI) || HasAttribute(SPELL_ATTR_PASSIVE));
+        }
+
         bool IsAutoRepeatRangedSpell() const
         {
-            return (Attributes & SPELL_ATTR_RANGED) && (AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG);
+            return (Attributes & SPELL_ATTR_USES_RANGED_SLOT) && (AttributesEx2 & SPELL_ATTR_EX2_AUTO_REPEAT);
         }
 
         bool IsSpellRequiresRangedAP() const
@@ -904,12 +924,12 @@ class SpellEntry
 
         bool IsChanneledSpell() const
         {
-            return (AttributesEx & (SPELL_ATTR_EX_CHANNELED_1 | SPELL_ATTR_EX_CHANNELED_2));
+            return (AttributesEx & (SPELL_ATTR_EX_IS_CHANNELED | SPELL_ATTR_EX_IS_SELF_CHANNELED));
         }
 
         bool NeedsComboPoints() const
         {
-            return (AttributesEx & (SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS | SPELL_ATTR_EX_REQ_COMBO_POINTS));
+            return (AttributesEx & (SPELL_ATTR_EX_FINISHING_MOVE_DAMAGE | SPELL_ATTR_EX_FINISHING_MOVE_DURATION));
         }
 
         bool IsTotemSummonSpell() const
@@ -945,6 +965,16 @@ class SpellEntry
             return false;
         }
 
+        bool HasDirectThreatIncreaseEffect() const
+        {
+            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                if (Spells::IsThreatEffect(Effect[i]) && EffectBasePoints[i] > 0)
+                    return true;
+            }
+            return false;
+        }
+
         bool IsNeedFaceTarget() const
         {
             return ((Custom & SPELL_CUSTOM_FACE_TARGET) || (rangeIndex == SPELL_RANGE_IDX_COMBAT));
@@ -952,13 +982,18 @@ class SpellEntry
 
         bool IsNeedCastSpellAtFormApply(ShapeshiftForm form) const
         {
-            if (!(Attributes & (SPELL_ATTR_PASSIVE | SPELL_ATTR_HIDDEN_CLIENTSIDE)) || !form)
+            if (!(Attributes & (SPELL_ATTR_PASSIVE | SPELL_ATTR_DO_NOT_DISPLAY)) || !form)
                 return false;
 
-            // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!
+            // passive spells with SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED are already active without shapeshift, do no recast!
             // Feline Swiftness Passive 2a not have 0x1 mask in Stance field in spell data as expected
             return ((Stances & (1 << (form - 1)) || (Id == 24864 && form == FORM_CAT)) &&
-                !HasAttribute(SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
+                !HasAttribute(SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED));
+        }
+
+        inline bool IsNeedCastSpellAtOutdoor() const
+        {
+            return (HasAttribute(SPELL_ATTR_ONLY_OUTDOORS) && HasAttribute(SPELL_ATTR_PASSIVE));
         }
 
         // Spell effects require a specific power type on the target
@@ -988,7 +1023,7 @@ class SpellEntry
         bool IsRemovedOnShapeLostSpell() const
         {
             return (Stances || Id == 24864) &&
-                !(AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) &&
+                !(AttributesEx2 & SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) &&
                 !(Attributes & SPELL_ATTR_NOT_SHAPESHIFT);
         }
 
@@ -1032,7 +1067,7 @@ class SpellEntry
         int32 GetDuration() const;
         int32 GetMaxDuration() const;
         int32 CalculateDuration(WorldObject const* caster = nullptr) const;
-        uint32 GetCastTime(Spell* spell = nullptr) const;
+        uint32 GetCastTime(SpellCaster const* caster, Spell* spell = nullptr) const;
         uint32 GetCastTimeForBonus(DamageEffectType damagetype) const;
         uint16 GetAuraMaxTicks() const;
         WeaponAttackType GetWeaponAttackType() const;

@@ -31,7 +31,6 @@ extern SQLStorage sCreatureDisplayInfoAddonStorage;
 extern SQLStorage sGameObjectDisplayInfoAddonStorage;
 extern SQLStorage sEquipmentStorage;
 extern SQLStorage sPageTextStore;
-extern SQLStorage sItemStorage;
 extern SQLStorage sMapStorage;
 extern SQLStorage sConditionStorage;
 extern SQLStorage sAreaStorage;
