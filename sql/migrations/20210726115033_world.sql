@@ -1565,6 +1565,6 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 -- End of migration.
 END IF;
 END??
-delimiter ; 
+delimiter ;
 CALL add_migration();
 DROP PROCEDURE IF EXISTS add_migration;
