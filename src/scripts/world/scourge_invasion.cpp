@@ -341,6 +341,35 @@ GameObjectAI* GetAI_go_scourge_invasion_circle(GameObject* gameobject)
     return new go_scourge_invasion_circle(gameobject);
 }
 
+struct go_scourge_invasion_spawner : public GameObjectAI
+{
+    go_scourge_invasion_spawner(GameObject* gobj) : GameObjectAI(gobj)
+    {
+    }
+
+    bool OnUse(Unit* pUnit) override
+    {
+        if (!me->isSpawned())
+            return false;
+
+        me->CastSpell(nullptr, SPELL_DND_SUMMON_CRYSTAL_MINION_FINDER, false);
+        me->Despawn();
+        uint32 respawnTime = me->GetRespawnDelay();
+        if (!respawnTime)
+            respawnTime = me->GetGOData()->GetRandomRespawnTime();
+
+        me->SetRespawnTime(respawnTime);
+        me->UpdateObjectVisibility();
+
+        return true;
+    }
+};
+
+GameObjectAI* GetAI_go_scourge_invasion_spawner(GameObject* gameobject)
+{
+    return new go_scourge_invasion_spawner(gameobject);
+}
+
 /*
 Argent Emissary
 Notes: NPC thats tells what is going on and shows what locations are under attack.
@@ -506,5 +535,10 @@ void AddSC_scourge_invasion()
     newscript = new Script;
     newscript->Name = "go_scourge_invasion_circle";
     newscript->GOGetAI = &GetAI_go_scourge_invasion_circle;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_scourge_invasion_spawner";
+    newscript->GOGetAI = &GetAI_go_scourge_invasion_spawner;
     newscript->RegisterSelf();
 }

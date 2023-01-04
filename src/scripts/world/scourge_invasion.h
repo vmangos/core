@@ -70,6 +70,8 @@ enum ScourgeInvasionSpells
 
     // Camp - Minion spawning system
     SPELL_FIND_CAMP_TYPE                            = 28203, // casted by Scourge Invasion Minion, finder on Shards.
+    SPELL_DND_SUMMON_CRYSTAL_MINION_FINDER          = 28227, // casted by Minion Spawner, finder on use.
+
 
     // Scourge Invasion Minion, spawner, Ghost/Ghoul
     SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL         = 27883,
@@ -165,7 +167,6 @@ enum ScourgeInvasionSpells
         SPELL_PH_CRYSTAL_CORPSE_DESPAWN                     = 28020,
         SPELL_PH_CRYSTAL_CORPSE_TIMER                       = 28018,    // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
         SPELL_PH_CYSTAL_BAZOOKA                             = 27849,
-        SPELL_DND_SUMMON_CRYSTAL_MINION_FINDER              = 28227,
         SPELL_CREATE_MINION_TRAP_GHOUL_SKELETON             = 28194,
         SPELL_CREATE_MINION_TRAP_GHOST_GHOUL                = 28195,
         SPELL_CREATE_MINION_TRAP_GHOST_SKELETON             = 28196,

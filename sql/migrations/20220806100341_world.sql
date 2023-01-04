@@ -70,10 +70,10 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` IN (181154, 181373, 181374, 181215, 181223, 181172);
     INSERT INTO `gameobject_template`(`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES
         (181111, 9, 6, 5811, 'Minion Spawner, ghost/ghoul', 0, 0, 1, 0, 0, 0, 27883, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-        (181112, 9, 6, 5811, 'Buttress Spawner', 0, 0, 1, 0, 0, 0, 28024, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+        (181112, 9, 6, 5811, 'Buttress Spawner', 0, 0, 1, 0, 0, 0, 28024, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
         (181155, 9, 6, 5811, 'Minion Spawner, ghost/skeleton', 0, 0, 1, 0, 0, 0, 28186, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
         (181156, 9, 6, 5811, 'Minion Spawner, ghoul/skeleton', 0, 0, 1, 0, 0, 0, 28187, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-        (181163, 9, 6, 327, 'Minion Spawner, finder', 0, 0, 1, 0, 0, 0, 28227, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+        (181163, 9, 6, 327, 'Minion Spawner, finder', 0, 0, 1, 0, 0, 0, 28227, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_scourge_invasion_spawner');
         -- (181214, 9, 6, 327, 'Necropolis critter spawner', 0, 0, 1, 0, 0, 0, 27866, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
     -- If a spawn spell has not EffectImplicitTargetA = 1, then it will not trigger the spawn effect wich removes the spawn flag and it will stay unattackable.
@@ -9595,9 +9595,9 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     -- Minion Spawner, finder
     -- Server Side and charges = 1
-    UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181163;
+    -- UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181163;
     -- Buttress Spawner: Server Side
-    UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181112;
+    -- UPDATE `gameobject_template` SET `data4`=1, `data8`=1 WHERE `entry`=181112;
 
 
 -- End of migration.
