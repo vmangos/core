@@ -47,8 +47,8 @@ enum ObjectiveStates
     OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE,     // Slider moves from middle (grey) to red
     OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE,    // Slider moves from blue to red
     OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE,    // Slider moves from red to blue
-    OBJECTIVESTATE_ALLIANCE,                    // Slider is a max blue
-    OBJECTIVESTATE_HORDE,                       // Slider is a max red
+    OBJECTIVESTATE_ALLIANCE,                    // Slider is at max blue
+    OBJECTIVESTATE_HORDE,                       // Slider is at max red
 };
 
 #define OTHER_TEAM(a) (a == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE)
