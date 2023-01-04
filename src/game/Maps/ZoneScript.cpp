@@ -71,6 +71,8 @@ void OPvPCapturePoint::SendChangePhase()
     if (!m_capturePoint)
         return;
 
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
+
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_valuePct);
 }
 
@@ -355,16 +357,26 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     if (m_value < -m_minValue) // Red.
     {
-        if (m_value < -m_maxValue)
+        if (m_value <= -m_maxValue)
+        {
             m_value = -m_maxValue;
-        m_state = OBJECTIVESTATE_HORDE;
+            m_state = OBJECTIVESTATE_HORDE;
+        }
+        else
+            m_state = OBJECTIVESTATE_HORDE_CHALLENGE;
+
         m_team = TEAM_HORDE;
     }
     else if (m_value > m_minValue) // Blue.
     {
-        if (m_value > m_maxValue)
+        if (m_value >= m_maxValue)
+        {
             m_value = m_maxValue;
-        m_state = OBJECTIVESTATE_ALLIANCE;
+            m_state = OBJECTIVESTATE_ALLIANCE;
+        }
+        else
+            m_state = OBJECTIVESTATE_ALLIANCE_CHALLENGE;
+
         m_team = TEAM_ALLIANCE;
     }
     else if (oldValue * m_value <= 0) // Grey, go through mid point.
@@ -389,6 +401,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     m_valuePct = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
     m_factDiff = (m_activePlayers[0].size() - m_activePlayers[1].size());
+
 
     if (m_oldState != m_state)
     {

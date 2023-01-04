@@ -90,6 +90,10 @@ enum EP_Summons
     EP_CGT_BUFFER,
     EP_EWT_BUFFER,
     EP_NPT_BUFFER,
+    EP_PWT_FLARE,
+    EP_CGT_FLARE,
+    EP_EWT_FLARE,
+    EP_NPT_FLARE,
     EP_CGT_SPIRITOFVICTORY,
 };
 
@@ -125,8 +129,11 @@ enum EP_BroadCastTexts
 
 enum EP_Sounds
 {
-    SOUND_PVPWARNINGHORDELONG       = 8457, // This is played by Horde Tower Buffer on capturing a Tower. 
-    SOUND_PVPFLAGCAPTUREDALLIANCE   = 8173  // This is played by Horde Alliance Tower Buffer on capturing a Tower. 
+    SOUND_PVPFLAGCAPTUREDALLIANCE   = 8173, // 17794 Creature
+    SOUND_PVPFLAGCAPTUREDHORDE      = 8213, // 17795 Creature
+    SOUND_TUGOFWAR_VICTORY_HORDE    = 9283, // 17795 Creature
+    SOUND_PVPVICTORYHORDE           = 8454, // 182106 GameObject
+    SOUND_PVPVICTORYALLIANCE        = 8455, // 182106 GameObject
 };
 
 enum EP_Spells
@@ -169,6 +176,19 @@ enum EP_Towers
     EP_CGT,                 // plaguelands 02
     EP_TOWER_NUM,
     EP_FLAG_NUM     = 8
+};
+
+enum EP_Flares
+{
+    EP_FLARE_CGT_A = 0,
+    EP_FLARE_CGT_H,
+    EP_FLARE_EWT_A,
+    EP_FLARE_EWT_H,
+    EP_FLARE_NPT_A,
+    EP_FLARE_NPT_H,
+    EP_FLARE_PWT_A,
+    EP_FLARE_PWT_H,
+    EP_FLARE_NUM = 8
 };
 
 enum EP_Buffers
@@ -267,6 +287,18 @@ const go_type EPTowerFlags[EP_FLAG_NUM] =
     { GOBJECT_TOWER_BANNER, 0, 2992.63f, -3022.95f, 125.593f, 3.03684f, 0.0f, 0.0f, 0.998629f, 0.0523532f },
     { GOBJECT_TOWER_BANNER, 0, 3148.17f, -4365.51f, 145.029f, 1.53589f, 0.0f, 0.0f, 0.694658f, 0.71934f },
     { GOBJECT_TOWER_BANNER, 0, 3188.76f, -4358.5f, 144.555f, 1.97222f, 0.0f, 0.0f, 0.833885f, 0.551938f }
+};
+
+const go_type EPTowerFlares[EP_FLARE_NUM] =
+{
+    { GOBJECT_FLAG_FLARE_ALLIANCE, 0, 1855.66f, -3725.0f, 197.044f, 1.53589f, 0.0f, 0.0f, 0.694658f, 0.71934f },    // Flag Flaref, Alliance" in Crown Guard Tower.
+    { GOBJECT_FLAG_FLARE_HORDE, 0, 1853.12f, -3722.62f, 197.406f, 0.628317f, 0.0f, 0.0f, 0.309016f, 0.951057f },    // Flag Flaref, Horde" in Crown Guard Tower.
+    { GOBJECT_FLAG_FLARE_ALLIANCE, 0, 2563.26f, -4795.15f, 145.852f, 1.81514f, 0.0f, 0.0f, 0.788011f, 0.615662f },  // Flag Flaref, Alliance" in Eastwall Tower.
+    { GOBJECT_FLAG_FLARE_HORDE, 0, 2565.27f, -4797.59f, 147.846f, 3.05433f, 0.0f, 0.0f, 0.999048f, 0.0436193f },    // Flag Flaref, Horde" in Eastwall Tower.
+    { GOBJECT_FLAG_FLARE_ALLIANCE, 0, 3171.86f, -4377.2f, 174.898f, 0.174532f, 0.0f, 0.0f, 0.0871553f, 0.996195f }, // Flag Flaref, Alliance" in Northpass Tower.
+    { GOBJECT_FLAG_FLARE_HORDE, 0, 3169.76f, -4375.13f, 175.458f, 2.70526f, 0.0f, 0.0f, 0.976295f, 0.216442f },     // Flag Flaref, Horde" in Northpass Tower.
+    { GOBJECT_FLAG_FLARE_ALLIANCE, 0, 2971.41f, -3038.36f, 157.492f, 5.35816f, 0.0f, 0.0f, -0.446198f, 0.894935f }, // Flag Flaref, Alliance" in Plaguewood.
+    { GOBJECT_FLAG_FLARE_HORDE, 0, 2973.17f, -3037.19f, 156.443f, 1.97222f, 0.0f, 0.0f, 0.833885f, 0.551938f }      // Flag Flaref, Horde" in Plaguewood.
 };
 
 const go_type EP_NPT_LordaeronShrine[4] =

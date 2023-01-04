@@ -40,13 +40,15 @@ uint8 const CapturePointArtKit[3] = {2, 1, 21};
 
 enum ObjectiveStates
 {
-    OBJECTIVESTATE_NEUTRAL = 0,
-    OBJECTIVESTATE_ALLIANCE,
-    OBJECTIVESTATE_HORDE,
-    OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE,
-    OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE,
-    OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE,
-    OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE,
+    OBJECTIVESTATE_NEUTRAL = 0,                 // Slider is centered (grey)
+    OBJECTIVESTATE_ALLIANCE_CHALLENGE,          // Slider reached blue and moves on towards blue
+    OBJECTIVESTATE_HORDE_CHALLENGE,             // Slider reached red and moves on towards red
+    OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE,  // Slider moves from middle (grey) to blue
+    OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE,     // Slider moves from middle (grey) to red
+    OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE,    // Slider moves from blue to red
+    OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE,    // Slider moves from red to blue
+    OBJECTIVESTATE_ALLIANCE,                    // Slider is a max blue
+    OBJECTIVESTATE_HORDE,                       // Slider is a max red
 };
 
 #define OTHER_TEAM(a) (a == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE)
