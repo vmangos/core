@@ -9,9 +9,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20230104112356');
 -- Add your query below.
 
-
-UPDATE `gameobject_template` SET `script_name`='go_curing_shrine' WHERE  `entry` IN (181682, 181955);
-
+UPDATE `gameobject_template` SET `faction`=114 WHERE `entry` IN (181853, 181852);
 
 -- End of migration.
 END IF;

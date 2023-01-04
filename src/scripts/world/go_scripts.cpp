@@ -397,29 +397,6 @@ GameObjectAI* GetAI_go_lunar_festival_firecracker(GameObject* gameobject)
     return new go_lunar_festival_firecracker(gameobject);
 }
 
-struct go_curing_shrine : public GameObjectAI
-{
-    go_curing_shrine(GameObject* gobj) : GameObjectAI(gobj)
-    {
-    }
-
-    bool OnUse(Unit* pUnit) override
-    {
-        if (!me->isSpawned())
-            return false;
-
-        me->CastSpell(pUnit, 30238, false);
-        me->ResetDoorOrButton();
-
-        return true;
-    }
-};
-
-GameObjectAI* GetAI_go_curing_shrine(GameObject* gameobject)
-{
-    return new go_curing_shrine(gameobject);
-}
-
 void AddSC_go_scripts()
 {
     Script* newscript;
@@ -462,10 +439,5 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_firework_rocket";
     newscript->GOGetAI = &GetAI_go_firework_rocket;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_curing_shrine";
-    newscript->GOGetAI = &GetAI_go_curing_shrine;
     newscript->RegisterSelf();
 }

@@ -206,7 +206,9 @@ enum EP_Gobjects
     GOBJECT_CURING_SHRINE_HORDE                                 = 181955,
     GOBJECT_HORDE_BANNER_AURA                                   = 180101,
     GOBJECT_HORDE_BANNER_AURA_LARGE                             = 180422,
-    GOBJECT_ALLIANCE_BANNER_AURA_LARGE                          = 180421
+    GOBJECT_ALLIANCE_BANNER_AURA_LARGE                          = 180421,
+    GOBJECT_FLAG_FLARE_ALLIANCE                                 = 181852,
+    GOBJECT_FLAG_FLARE_HORDE                                    = 181853
 };
 
 uint32 const EP_AllianceBuffs[4] = { SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_1, SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_2, SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_3, SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_4 };
