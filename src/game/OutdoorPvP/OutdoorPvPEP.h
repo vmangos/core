@@ -22,60 +22,46 @@
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
-enum EP_EastwallTowerWorldStates
+enum EP_WorldStates 
 {
-    EP_EWT_A    = 2354, // EWT blue on map
-    EP_EWT_H    = 2356, // EWT red on map
-    EP_EWT_N_A  = 2359, // ally conquested
-    EP_EWT_N_H  = 2360,
-    EP_EWT_N    = 2361
-};
+    EASTWALL_TOWER_ALLIANCE                 = 2354, // Blue Tower icon on map
+    EASTWALL_TOWER_HORDE                    = 2356, // Red Tower icon on map
+    EASTWALL_TOWER_ALLIANCE_PROGRESSING     = 2357, // Blue Tower icon on map
+    EASTWALL_TOWER_HORDE_PROGRESSING        = 2358, // Red Tower icon on map
+    EASTWALL_TOWER_ALLIANCE_CONTESTED       = 2359, // Grey Tower icon on map
+    EASTWALL_TOWER_HORDE_CONTESTED          = 2360, // Grey Tower icon on map
+    EASTWALL_TOWER_NEUTRAL                  = 2361, // Grey Tower icon on map
 
-enum EP_NorthpassTowerWorldStates
-{
-    EP_NPT_N    = 2352,
-    EP_NPT_N_A  = 2362,
-    EP_NPT_N_H  = 2363,
-    EP_NPT_A    = 2372, // NPT blue on map
-    EP_NPT_H    = 2373  // NPT red on map
-};
+    NORTHPASS_TOWER_ALLIANCE                = 2372, // Blue Tower icon on map
+    NORTHPASS_TOWER_HORDE                   = 2373, // Red Tower icon on map
+    NORTHPASS_TOWER_ALLIANCE_PROGRESSING    = 2364, // Blue Tower icon on map
+    NORTHPASS_TOWER_HORDE_PROGRESSING       = 2365, // Red Tower icon on map
+    NORTHPASS_TOWER_ALLIANCE_CONTESTED      = 2362, // Grey Tower icon on map
+    NORTHPASS_TOWER_HORDE_CONTESTED         = 2363, // Grey Tower icon on map
+    NORTHPASS_TOWER_NEUTRAL                 = 2352, // Grey Tower icon on map
 
-enum EP_PlagewoodTowerWorldStates
-{
-    EP_PWT_N_A  = 2366,
-    EP_PWT_N_H  = 2353, // 2367 not present! use neutral!
-    EP_PWT_A    = 2370, // PWT blue on map
-    EP_PWT_H    = 2371, // PWT red on map
-    EP_PWT_N    = 2353
-};
+    PLAGUEWOOD_TOWER_ALLIANCE               = 2370, // Blue Tower icon on map
+    PLAGUEWOOD_TOWER_HORDE                  = 2371, // Red Tower icon on map
+    PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING   = 2368, // Blue Tower icon on map
+    PLAGUEWOOD_TOWER_HORDE_PROGRESSING      = 2369, // Red Tower icon on map
+    PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED     = 2366, // Grey Tower icon on map
+    PLAGUEWOOD_TOWER_HORDE_CONTESTED        = 2353, // WORLDSTATE 2367 is not working client side ".debug send worldstate 2367 1"
+    PLAGUEWOOD_TOWER_NEUTRAL                = 2353, // Grey Tower icon on map
 
-enum EP_CrownGuardTowerWorldStates
-{
-    EP_CGT_N_A  = 2374,
-    EP_CGT_N_H  = 2375,
-    EP_CGT_A    = 2378,
-    EP_CGT_H    = 2379, // GCT blue on map
-    EP_CGT_N    = 2355
-};
+    CROWN_GUARD_TOWER_ALLIANCE              = 2378, // Blue Tower icon on map
+    CROWN_GUARD_TOWER_HORDE                 = 2379, // Red Tower icon on map
+    CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING  = 2376, // Blue Tower icon on map
+    CROWN_GUARD_TOWER_HORDE_PROGRESSING     = 2377, // Red Tower icon on map
+    CROWN_GUARD_TOWER_ALLIANCE_CONTESTED    = 2374, // Grey Tower icon on map
+    CROWN_GUARD_TOWER_HORDE_CONTESTED       = 2375, // Grey Tower icon on map
+    CROWN_GUARD_TOWER_NEUTRAL               = 2355, // Grey Tower icon on map
 
-enum EP_WorldStates
-{
     EP_UI_TOWER_SLIDER_DISPLAY  = 2426,
     EP_UI_TOWER_SLIDER_POS      = 2427,
     EP_UI_TOWER_SLIDER_N        = 2428,
 
-    EP_UI_TOWER_COUNT_A         = 2327,
-    EP_UI_TOWER_COUNT_H         = 2328,
-
-    // Tower colors on Map
-    unk1 = 2358, // EFT horde
-    unk2 = 2357, // EFT alliance
-    unk3 = 2364, // NPT alliance
-    unk4 = 2365, // NPT horde
-    unk5 = 2368, // PWT alliance
-    unk6 = 2369, // PWT horde
-    unk7 = 2376, // CGT Alliance
-    unk8 = 2377  // CGT horde
+    EP_UI_TOWER_COUNT_ALLIANCE  = 2327,
+    EP_UI_TOWER_COUNT_HORDE     = 2328,
 };
 
 enum EP_Summons
@@ -205,13 +191,13 @@ enum EP_Buffers
 
 enum EP_TowerStates
 {
-    EP_TS_N = 1,
-    EP_TS_N_A = 2,
-    EP_TS_N_H = 4,
-    EP_TS_A_P = 8,
-    EP_TS_H_P = 16,
-    EP_TS_A = 32,
-    EP_TS_H = 64
+    TOWERSTATE_NEUTRAL                  = 1,
+    TOWERSTATE_ALLIANCE_CONTESTED       = 2,
+    TOWERSTATE_HORDE_CONTESTED          = 4,
+    TOWERSTATE_ALLIANCE_PROGRESSING     = 8,
+    TOWERSTATE_HORDE_PROGRESSING        = 16,
+    TOWERSTATE_ALLIANCE                 = 32,
+    TOWERSTATE_HORDE                    = 64
 };
 
 enum EP_Gobjects

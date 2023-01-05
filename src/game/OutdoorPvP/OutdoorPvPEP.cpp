@@ -29,7 +29,7 @@
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
 OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP *pvp)
-    : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_UnitsSummonedSide(0)
+    : OPvPCapturePoint(pvp), m_TowerState(TOWERSTATE_NEUTRAL), m_UnitsSummonedSide(0)
 {
     SetCapturePointData(EPCapturePoints[EP_EWT].entry, EPCapturePoints[EP_EWT].map, EPCapturePoints[EP_EWT].x, EPCapturePoints[EP_EWT].y, EPCapturePoints[EP_EWT].z, EPCapturePoints[EP_EWT].o, EPCapturePoints[EP_EWT].rot0, EPCapturePoints[EP_EWT].rot1, EPCapturePoints[EP_EWT].rot2, EPCapturePoints[EP_EWT].rot3);
     AddObject(EP_EWT_FLAG1, EPTowerFlags[EP_EWT_FLAG1].entry, EPTowerFlags[EP_EWT_FLAG1].map, EPTowerFlags[EP_EWT_FLAG1].x, EPTowerFlags[EP_EWT_FLAG1].y, EPTowerFlags[EP_EWT_FLAG1].z, EPTowerFlags[EP_EWT_FLAG1].o, EPTowerFlags[EP_EWT_FLAG1].rot0, EPTowerFlags[EP_EWT_FLAG1].rot1, EPTowerFlags[EP_EWT_FLAG1].rot2, EPTowerFlags[EP_EWT_FLAG1].rot3);
@@ -50,13 +50,13 @@ void OPvPCapturePointEP_EWT::ChangeState()
 
     uint32 artkit = 21;
     uint32 animation = 2;
-    uint32 sound = NULL;
+    uint32 sound = 0;
 
     switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         {
-            m_TowerState = EP_TS_A;
+            m_TowerState = TOWERSTATE_ALLIANCE;
             sound = SOUND_PVPVICTORYALLIANCE;
 
             DelCreature(EP_EWT_FLARE);
@@ -68,7 +68,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
         }
         case OBJECTIVESTATE_HORDE:
         {
-            m_TowerState = EP_TS_H;
+            m_TowerState = TOWERSTATE_HORDE;
             sound = SOUND_PVPVICTORYHORDE;
 
             DelCreature(EP_EWT_FLARE);
@@ -78,9 +78,9 @@ void OPvPCapturePointEP_EWT::ChangeState()
 
             break;
         }
-        case OBJECTIVESTATE_ALLIANCE_CHALLENGE:
+        case OBJECTIVESTATE_ALLIANCE_PROGRESSING:
         {
-            m_TowerState = EP_TS_A;
+            m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
             artkit = 2;
             animation = 1;
             sound = SOUND_PVPFLAGCAPTUREDALLIANCE;
@@ -95,13 +95,13 @@ void OPvPCapturePointEP_EWT::ChangeState()
             if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_A, EP_Zone);
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_ALLIANCE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_ALLIANCE_PROGRESSING");
 
             break;
         }
-        case OBJECTIVESTATE_HORDE_CHALLENGE:
+        case OBJECTIVESTATE_HORDE_PROGRESSING:
         {
-            m_TowerState = EP_TS_H;
+            m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
             artkit = 1;
             animation = 0;
             sound = SOUND_PVPFLAGCAPTUREDHORDE;
@@ -116,32 +116,30 @@ void OPvPCapturePointEP_EWT::ChangeState()
             if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_H, EP_Zone);
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_HORDE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_HORDE_PROGRESSING");
 
             break;
         }
         case OBJECTIVESTATE_NEUTRAL:
         {
-            m_TowerState = EP_TS_N;
+            m_TowerState = TOWERSTATE_NEUTRAL;
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_NEUTRAL");
 
             break;
         }
-        case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
-        case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
+        case OBJECTIVESTATE_ALLIANCE_CONTESTED:
         {
-            m_TowerState = EP_TS_N_A;
+            m_TowerState = TOWERSTATE_ALLIANCE_CONTESTED;
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE or OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_ALLIANCE_CONTESTED");
 
             break;
         }
-        case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
-        case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
+        case OBJECTIVESTATE_HORDE_CONTESTED:
         {
-            m_TowerState = EP_TS_N_H;
+            m_TowerState = TOWERSTATE_HORDE_CONTESTED;
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE or OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_EWT] OBJECTIVESTATE_HORDE_CONTESTED");
 
             break;
         }
@@ -153,14 +151,6 @@ void OPvPCapturePointEP_EWT::ChangeState()
         {
             pBanner1->PlayDirectSound(sound);
         }
-        if (GameObject* pBanner2 = m_PvP->GetGameObject(m_Objects[EP_EWT_FLAG1]))
-        {
-            pBanner2->PlayDirectSound(sound);
-        }
-        if (GameObject* pBanner3 = m_PvP->GetGameObject(m_Objects[EP_EWT_FLAG2]))
-        {
-            pBanner3->PlayDirectSound(sound);
-        }
     }
     else
     {
@@ -169,7 +159,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
             if (sound)
                 pCreature->PlayDirectSound(sound);
 
-            ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
+            pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, false);
         }
         if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
         {
@@ -189,34 +179,35 @@ void OPvPCapturePointEP_EWT::ChangeState()
     }
 
     UpdateTowerState();
-
-    // Complete quest objective.
-    if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
-        SendObjectiveComplete(EP_EWT_CM, 0);
 }
 
 void OPvPCapturePointEP_EWT::SendChangePhase()
 {
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
 {
-    data << EP_EWT_A << uint32(bool(m_TowerState & EP_TS_A));
-    data << EP_EWT_H << uint32(bool(m_TowerState & EP_TS_H));
-    data << EP_EWT_N_A << uint32(bool(m_TowerState & EP_TS_N_A));
-    data << EP_EWT_N_H << uint32(bool(m_TowerState & EP_TS_N_H));
-    data << EP_EWT_N << uint32(bool(m_TowerState & EP_TS_N));
-    return 5;
+    data << EASTWALL_TOWER_ALLIANCE << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    data << EASTWALL_TOWER_HORDE << uint32(bool(m_TowerState & TOWERSTATE_HORDE));
+    data << EASTWALL_TOWER_ALLIANCE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    data << EASTWALL_TOWER_HORDE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    data << EASTWALL_TOWER_ALLIANCE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    data << EASTWALL_TOWER_HORDE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    data << EASTWALL_TOWER_NEUTRAL << uint32(bool(m_TowerState & TOWERSTATE_NEUTRAL));
+    return 7;
 }
 
 void OPvPCapturePointEP_EWT::UpdateTowerState()
 {
-    m_PvP->SendUpdateWorldState(EP_EWT_A , bool(m_TowerState & EP_TS_A));
-    m_PvP->SendUpdateWorldState(EP_EWT_H , bool(m_TowerState & EP_TS_H));
-    m_PvP->SendUpdateWorldState(EP_EWT_N_A , bool(m_TowerState & EP_TS_N_A));
-    m_PvP->SendUpdateWorldState(EP_EWT_N_H , bool(m_TowerState & EP_TS_N_H));
-    m_PvP->SendUpdateWorldState(EP_EWT_N, bool(m_TowerState & EP_TS_N));
+    m_PvP->SendUpdateWorldState(EASTWALL_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    m_PvP->SendUpdateWorldState(EASTWALL_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    m_PvP->SendUpdateWorldState(EASTWALL_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    m_PvP->SendUpdateWorldState(EASTWALL_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    m_PvP->SendUpdateWorldState(EASTWALL_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    m_PvP->SendUpdateWorldState(EASTWALL_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    m_PvP->SendUpdateWorldState(EASTWALL_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
 }
 
 bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* pPlayer)
@@ -278,7 +269,7 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
 }
 
 OPvPCapturePointEP_NPT::OPvPCapturePointEP_NPT(OutdoorPvP *pvp)
-    : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_SummonedShrineSide(0)
+    : OPvPCapturePoint(pvp), m_TowerState(TOWERSTATE_NEUTRAL), m_SummonedShrineSide(0)
 {
     SetCapturePointData(EPCapturePoints[EP_NPT].entry, EPCapturePoints[EP_NPT].map, EPCapturePoints[EP_NPT].x, EPCapturePoints[EP_NPT].y, EPCapturePoints[EP_NPT].z, EPCapturePoints[EP_NPT].o, EPCapturePoints[EP_NPT].rot0, EPCapturePoints[EP_NPT].rot1, EPCapturePoints[EP_NPT].rot2, EPCapturePoints[EP_NPT].rot3);
     AddObject(EP_NPT_FLAG1, EPTowerFlags[EP_NPT_FLAG1].entry, EPTowerFlags[EP_NPT_FLAG1].map, EPTowerFlags[EP_NPT_FLAG1].x, EPTowerFlags[EP_NPT_FLAG1].y, EPTowerFlags[EP_NPT_FLAG1].z, EPTowerFlags[EP_NPT_FLAG1].o, EPTowerFlags[EP_NPT_FLAG1].rot0, EPTowerFlags[EP_NPT_FLAG1].rot1, EPTowerFlags[EP_NPT_FLAG1].rot2, EPTowerFlags[EP_NPT_FLAG1].rot3);
@@ -299,13 +290,13 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
     uint32 artkit = 21;
     uint32 animation = 2;
-    uint32 sound = NULL;
+    uint32 sound = 0;
 
     switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         {
-            m_TowerState = EP_TS_A;
+            m_TowerState = TOWERSTATE_ALLIANCE;
             sound = SOUND_PVPVICTORYALLIANCE;
 
             DelCreature(EP_NPT_FLARE);
@@ -317,7 +308,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
         }
         case OBJECTIVESTATE_HORDE:
         {
-            m_TowerState = EP_TS_H;
+            m_TowerState = TOWERSTATE_HORDE;
             sound = SOUND_PVPVICTORYHORDE;
 
             DelCreature(EP_NPT_FLARE);
@@ -327,9 +318,9 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
             break;
         }
-        case OBJECTIVESTATE_ALLIANCE_CHALLENGE:
+        case OBJECTIVESTATE_ALLIANCE_PROGRESSING:
         {
-            m_TowerState = EP_TS_A;
+            m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
             artkit = 2;
             animation = 1;
             sound = SOUND_PVPFLAGCAPTUREDALLIANCE;
@@ -344,13 +335,13 @@ void OPvPCapturePointEP_NPT::ChangeState()
             if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_A, EP_Zone);
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_ALLIANCE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_ALLIANCE_PROGRESSING");
 
             break;
         }
-        case OBJECTIVESTATE_HORDE_CHALLENGE:
+        case OBJECTIVESTATE_HORDE_PROGRESSING:
         {
-            m_TowerState = EP_TS_H;
+            m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
             artkit = 1;
             animation = 0;
             sound = SOUND_PVPFLAGCAPTUREDHORDE;
@@ -365,13 +356,13 @@ void OPvPCapturePointEP_NPT::ChangeState()
             if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_H, EP_Zone);
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_HORDE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_HORDE_PROGRESSING");
 
             break;
         }
         case OBJECTIVESTATE_NEUTRAL:
         {
-            m_TowerState = EP_TS_N;
+            m_TowerState = TOWERSTATE_NEUTRAL;
             m_SummonedShrineSide = 0;
             DelObject(EP_NPT_CURING_SHRINE);
             DelObject(EP_NPT_BANNER_AURA);
@@ -380,37 +371,25 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
             break;
         }
-        case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
+        case OBJECTIVESTATE_ALLIANCE_CONTESTED:
         {
-            m_TowerState = EP_TS_N_A;
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE");
-
-            break;
-        }
-        case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
-        {
-            m_TowerState = EP_TS_N_A;
+            m_TowerState = TOWERSTATE_ALLIANCE_CONTESTED;
             m_SummonedShrineSide = 0;
             DelObject(EP_NPT_CURING_SHRINE);
             DelObject(EP_NPT_BANNER_AURA);
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE");
+
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_ALLIANCE_CONTESTED");
 
             break;
         }
-        case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
+        case OBJECTIVESTATE_HORDE_CONTESTED:
         {
-            m_TowerState = EP_TS_N_H;
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE");
-
-            break;
-        }
-        case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
-        {
-            m_TowerState = EP_TS_N_H;
+            m_TowerState = TOWERSTATE_HORDE_CONTESTED;
             m_SummonedShrineSide = 0;
             DelObject(EP_NPT_CURING_SHRINE);
             DelObject(EP_NPT_BANNER_AURA);
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE");
+
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_NPT] OBJECTIVESTATE_HORDE_CONTESTED");
 
             break;
         }
@@ -422,14 +401,6 @@ void OPvPCapturePointEP_NPT::ChangeState()
         {
             pBanner1->PlayDirectSound(sound);
         }
-        if (GameObject* pBanner2 = m_PvP->GetGameObject(m_Objects[EP_NPT_FLAG1]))
-        {
-            pBanner2->PlayDirectSound(sound);
-        }
-        if (GameObject* pBanner3 = m_PvP->GetGameObject(m_Objects[EP_NPT_FLAG2]))
-        {
-            pBanner3->PlayDirectSound(sound);
-        }
     }
     else
     {
@@ -438,7 +409,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
             if (sound)
                 pCreature->PlayDirectSound(sound);
 
-            ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
+            pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, false);
         }
         if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
         {
@@ -458,34 +429,35 @@ void OPvPCapturePointEP_NPT::ChangeState()
     }
 
     UpdateTowerState();
-
-    // Complete quest objective.
-    if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
-        SendObjectiveComplete(EP_NPT_CM, 0);
 }
 
 void OPvPCapturePointEP_NPT::SendChangePhase()
 {
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
 {
-    data << EP_NPT_A << uint32(bool(m_TowerState & EP_TS_A));
-    data << EP_NPT_H << uint32(bool(m_TowerState & EP_TS_H));
-    data << EP_NPT_N_A << uint32(bool(m_TowerState & EP_TS_N_A));
-    data << EP_NPT_N_H << uint32(bool(m_TowerState & EP_TS_N_H));
-    data << EP_NPT_N << uint32(bool(m_TowerState & EP_TS_N));
-    return 5;
+    data << NORTHPASS_TOWER_ALLIANCE << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    data << NORTHPASS_TOWER_HORDE << uint32(bool(m_TowerState & TOWERSTATE_HORDE));
+    data << NORTHPASS_TOWER_ALLIANCE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    data << NORTHPASS_TOWER_HORDE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    data << NORTHPASS_TOWER_ALLIANCE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    data << NORTHPASS_TOWER_HORDE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    data << NORTHPASS_TOWER_NEUTRAL << uint32(bool(m_TowerState & TOWERSTATE_NEUTRAL));
+    return 7;
 }
 
 void OPvPCapturePointEP_NPT::UpdateTowerState()
 {
-    m_PvP->SendUpdateWorldState(EP_NPT_A , bool(m_TowerState & EP_TS_A));
-    m_PvP->SendUpdateWorldState(EP_NPT_H , bool(m_TowerState & EP_TS_H));
-    m_PvP->SendUpdateWorldState(EP_NPT_N_A , bool(m_TowerState & EP_TS_N_A));
-    m_PvP->SendUpdateWorldState(EP_NPT_N_H , bool(m_TowerState & EP_TS_N_H));
-    m_PvP->SendUpdateWorldState(EP_NPT_N , bool(m_TowerState & EP_TS_N));
+    m_PvP->SendUpdateWorldState(NORTHPASS_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    m_PvP->SendUpdateWorldState(NORTHPASS_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    m_PvP->SendUpdateWorldState(NORTHPASS_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    m_PvP->SendUpdateWorldState(NORTHPASS_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    m_PvP->SendUpdateWorldState(NORTHPASS_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    m_PvP->SendUpdateWorldState(NORTHPASS_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    m_PvP->SendUpdateWorldState(NORTHPASS_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
 }
 
 bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* pPlayer)
@@ -524,7 +496,7 @@ void OPvPCapturePointEP_NPT::SummonCuringShrine(uint32 team)
 }
 
 OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP *pvp)
-    : OPvPCapturePoint(pvp), m_SpiritOfVictorySpawned(0), m_TowerState(EP_TS_N), m_GraveyardSide(TEAM_NONE), m_SummonedBannerSide(0)
+    : OPvPCapturePoint(pvp), m_SpiritOfVictorySpawned(0), m_TowerState(TOWERSTATE_NEUTRAL), m_GraveyardSide(TEAM_NONE), m_SummonedBannerSide(0)
 {
     UnLinkGraveYard();
     SetCapturePointData(EPCapturePoints[EP_CGT].entry, EPCapturePoints[EP_CGT].map, EPCapturePoints[EP_CGT].x, EPCapturePoints[EP_CGT].y, EPCapturePoints[EP_CGT].z, EPCapturePoints[EP_CGT].o, EPCapturePoints[EP_CGT].rot0, EPCapturePoints[EP_CGT].rot1, EPCapturePoints[EP_CGT].rot2, EPCapturePoints[EP_CGT].rot3);
@@ -546,13 +518,13 @@ void OPvPCapturePointEP_CGT::ChangeState()
 
     uint32 artkit = 21;
     uint32 animation = 2;
-    uint32 sound = NULL;
+    uint32 sound = 0;
 
     switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         {
-            m_TowerState = EP_TS_A;
+            m_TowerState = TOWERSTATE_ALLIANCE;
             sound = SOUND_PVPVICTORYALLIANCE;
 
             DelCreature(EP_CGT_FLARE);
@@ -564,7 +536,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
         }
         case OBJECTIVESTATE_HORDE:
         {
-            m_TowerState = EP_TS_H;
+            m_TowerState = TOWERSTATE_HORDE;
             sound = SOUND_PVPVICTORYHORDE;
 
             DelCreature(EP_CGT_FLARE);
@@ -574,9 +546,9 @@ void OPvPCapturePointEP_CGT::ChangeState()
 
             break;
         }
-        case OBJECTIVESTATE_ALLIANCE_CHALLENGE:
+        case OBJECTIVESTATE_ALLIANCE_PROGRESSING:
         {
-            m_TowerState = EP_TS_A;
+            m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
             artkit = 2;
             animation = 1;
             sound = SOUND_PVPFLAGCAPTUREDALLIANCE;
@@ -593,13 +565,13 @@ void OPvPCapturePointEP_CGT::ChangeState()
             if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_A, EP_Zone);
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_ALLIANCE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_ALLIANCE_PROGRESSING");
 
             break;
         }
-        case OBJECTIVESTATE_HORDE_CHALLENGE:
+        case OBJECTIVESTATE_HORDE_PROGRESSING:
         {
-            m_TowerState = EP_TS_H;
+            m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
             artkit = 1;
             animation = 0;
             sound = SOUND_PVPFLAGCAPTUREDHORDE;
@@ -616,7 +588,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_H, EP_Zone);
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_HORDE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_HORDE_PROGRESSING");
 
             break;
         }
@@ -627,49 +599,35 @@ void OPvPCapturePointEP_CGT::ChangeState()
             m_SummonedBannerSide = 0;
             DelObject(EP_CGT_BANNER_AURA);
             UnLinkGraveYard();
-            m_TowerState = EP_TS_N;
+            m_TowerState = TOWERSTATE_NEUTRAL;
 
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_NEUTRAL");
 
             break;
         }
-        case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
-        {
-            m_TowerState = EP_TS_N_A;
-
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE");
-
-            break;
-        }
-        case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
+        case OBJECTIVESTATE_ALLIANCE_CONTESTED:
         {
             DelCreature(EP_CGT_SPIRITOFVICTORY);
             m_SpiritOfVictorySpawned = 0;
             m_SummonedBannerSide = 0;
             DelObject(EP_CGT_BANNER_AURA);
             UnLinkGraveYard();
-            m_TowerState = EP_TS_N_A;
+            m_TowerState = TOWERSTATE_ALLIANCE_CONTESTED;
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE");
-
-            break;
-        }
-        case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
-        {
-            m_TowerState = EP_TS_N_H;
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_ALLIANCE_CONTESTED");
 
             break;
         }
-        case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
+        case OBJECTIVESTATE_HORDE_CONTESTED:
         {
             DelCreature(EP_CGT_SPIRITOFVICTORY);
             m_SpiritOfVictorySpawned = 0;
             m_SummonedBannerSide = 0;
             DelObject(EP_CGT_BANNER_AURA);
             UnLinkGraveYard();
-            m_TowerState = EP_TS_N_H;
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE");
+            m_TowerState = TOWERSTATE_HORDE_CONTESTED;
+
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_CGT] OBJECTIVESTATE_HORDE_CONTESTED");
 
             break;
         }
@@ -681,14 +639,6 @@ void OPvPCapturePointEP_CGT::ChangeState()
         {
             pBanner1->PlayDirectSound(sound);
         }
-        if (GameObject* pBanner2 = m_PvP->GetGameObject(m_Objects[EP_CGT_FLAG1]))
-        {
-            pBanner2->PlayDirectSound(sound);
-        }
-        if (GameObject* pBanner3 = m_PvP->GetGameObject(m_Objects[EP_CGT_FLAG2]))
-        {
-            pBanner3->PlayDirectSound(sound);
-        }
     }
     else
     {
@@ -697,7 +647,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             if (sound)
                 pCreature->PlayDirectSound(sound);
 
-            ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
+            pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, false);
         }
         if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
         {
@@ -717,34 +667,35 @@ void OPvPCapturePointEP_CGT::ChangeState()
     }
 
     UpdateTowerState();
-
-    // Complete quest objective.
-    if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
-        SendObjectiveComplete(EP_CGT_CM, 0);
 }
 
 void OPvPCapturePointEP_CGT::SendChangePhase()
 {
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
 {
-    data << EP_CGT_A << uint32(bool(m_TowerState & EP_TS_A));
-    data << EP_CGT_H << uint32(bool(m_TowerState & EP_TS_H));
-    data << EP_CGT_N_A << uint32(bool(m_TowerState & EP_TS_N_A));
-    data << EP_CGT_N_H << uint32(bool(m_TowerState & EP_TS_N_H));
-    data << EP_CGT_N << uint32(bool(m_TowerState & EP_TS_N));
-    return 5;
+    data << CROWN_GUARD_TOWER_ALLIANCE << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    data << CROWN_GUARD_TOWER_HORDE << uint32(bool(m_TowerState & TOWERSTATE_HORDE));
+    data << CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    data << CROWN_GUARD_TOWER_HORDE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    data << CROWN_GUARD_TOWER_ALLIANCE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    data << CROWN_GUARD_TOWER_HORDE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    data << CROWN_GUARD_TOWER_NEUTRAL << uint32(bool(m_TowerState & TOWERSTATE_NEUTRAL));
+    return 7;
 }
 
 void OPvPCapturePointEP_CGT::UpdateTowerState()
 {
-    m_PvP->SendUpdateWorldState(EP_CGT_A , bool(m_TowerState & EP_TS_A));
-    m_PvP->SendUpdateWorldState(EP_CGT_H , bool(m_TowerState & EP_TS_H));
-    m_PvP->SendUpdateWorldState(EP_CGT_N_A , bool(m_TowerState & EP_TS_N_A));
-    m_PvP->SendUpdateWorldState(EP_CGT_N_H , bool(m_TowerState & EP_TS_N_H));
-    m_PvP->SendUpdateWorldState(EP_CGT_N , bool(m_TowerState & EP_TS_N));
+    m_PvP->SendUpdateWorldState(CROWN_GUARD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    m_PvP->SendUpdateWorldState(CROWN_GUARD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    m_PvP->SendUpdateWorldState(CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    m_PvP->SendUpdateWorldState(CROWN_GUARD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    m_PvP->SendUpdateWorldState(CROWN_GUARD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    m_PvP->SendUpdateWorldState(CROWN_GUARD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    m_PvP->SendUpdateWorldState(CROWN_GUARD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
 }
 
 bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* pPlayer)
@@ -806,7 +757,6 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
 
         if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_SPIRITOFVICTORY]))
         {
-            pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
             pCreature->RemoveAllAuras();
             pCreature->AddAura(team == ALLIANCE ? SPELL_SPIRIT_PARTICLES_SUPER_BIG_DND : SPELL_SPIRIT_PARTICLES_RED_SUPER_BIG_DND);
             pCreature->GetMotionMaster()->Clear(false, true);
@@ -816,7 +766,7 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
 }
 
 OPvPCapturePointEP_PWT::OPvPCapturePointEP_PWT(OutdoorPvP *pvp)
-    : OPvPCapturePoint(pvp), m_FlightMasterSpawned(0), m_TowerState(EP_TS_N)
+    : OPvPCapturePoint(pvp), m_FlightMasterSpawned(0), m_TowerState(TOWERSTATE_NEUTRAL)
 {
     SetCapturePointData(EPCapturePoints[EP_PWT].entry, EPCapturePoints[EP_PWT].map, EPCapturePoints[EP_PWT].x, EPCapturePoints[EP_PWT].y, EPCapturePoints[EP_PWT].z, EPCapturePoints[EP_PWT].o, EPCapturePoints[EP_PWT].rot0, EPCapturePoints[EP_PWT].rot1, EPCapturePoints[EP_PWT].rot2, EPCapturePoints[EP_PWT].rot3);
     AddObject(EP_PWT_FLAG1, EPTowerFlags[EP_PWT_FLAG1].entry, EPTowerFlags[EP_PWT_FLAG1].map, EPTowerFlags[EP_PWT_FLAG1].x, EPTowerFlags[EP_PWT_FLAG1].y, EPTowerFlags[EP_PWT_FLAG1].z, EPTowerFlags[EP_PWT_FLAG1].o, EPTowerFlags[EP_PWT_FLAG1].rot0, EPTowerFlags[EP_PWT_FLAG1].rot1, EPTowerFlags[EP_PWT_FLAG1].rot2, EPTowerFlags[EP_PWT_FLAG1].rot3);
@@ -837,13 +787,13 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
     uint32 artkit = 21;
     uint32 animation = 2;
-    uint32 sound = NULL;
+    uint32 sound = 0;
 
     switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         {
-            m_TowerState = EP_TS_A;
+            m_TowerState = TOWERSTATE_ALLIANCE;
             sound = SOUND_PVPVICTORYALLIANCE;
 
             DelCreature(EP_PWT_FLARE);
@@ -855,7 +805,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
         }
         case OBJECTIVESTATE_HORDE:
         {
-            m_TowerState = EP_TS_H;
+            m_TowerState = TOWERSTATE_HORDE;
             sound = SOUND_PVPVICTORYHORDE;
 
             DelCreature(EP_PWT_FLARE);
@@ -865,9 +815,9 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
             break;
         }
-        case OBJECTIVESTATE_ALLIANCE_CHALLENGE:
+        case OBJECTIVESTATE_ALLIANCE_PROGRESSING:
         {
-            m_TowerState = EP_TS_A;
+            m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
             artkit = 2;
             animation = 1;
             sound = SOUND_PVPFLAGCAPTUREDALLIANCE;
@@ -882,13 +832,13 @@ void OPvPCapturePointEP_PWT::ChangeState()
             if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_A, EP_Zone);
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_ALLIANCE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_ALLIANCE_PROGRESSING");
 
             break;
         }
-        case OBJECTIVESTATE_HORDE_CHALLENGE:
+        case OBJECTIVESTATE_HORDE_PROGRESSING:
         {
-            m_TowerState = EP_TS_H;
+            m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
             artkit = 1;
             animation = 0;
             sound = SOUND_PVPFLAGCAPTUREDHORDE;
@@ -903,13 +853,13 @@ void OPvPCapturePointEP_PWT::ChangeState()
             if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_H, EP_Zone);
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_HORDE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_HORDE_PROGRESSING");
 
             break;
         }
         case OBJECTIVESTATE_NEUTRAL:
         {
-            m_TowerState = EP_TS_N;
+            m_TowerState = TOWERSTATE_NEUTRAL;
             DelCreature(EP_PWT_FLIGHTMASTER);
             m_FlightMasterSpawned = 0;
 
@@ -917,39 +867,23 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
             break;
         }
-        case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
+        case OBJECTIVESTATE_ALLIANCE_CONTESTED:
         {
-            m_TowerState = EP_TS_N_A;
-
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE");
-
-            break;
-        }
-        case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
-        {
-            m_TowerState = EP_TS_N_A;
             DelCreature(EP_PWT_FLIGHTMASTER);
             m_FlightMasterSpawned = 0;
+            m_TowerState = TOWERSTATE_ALLIANCE_CONTESTED;
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE");
-
-            break;
-        }
-        case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
-        {
-            m_TowerState = EP_TS_N_H;
-
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_ALLIANCE_CONTESTED");
 
             break;
         }
-        case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
+        case OBJECTIVESTATE_HORDE_CONTESTED:
         {
-            m_TowerState = EP_TS_N_H;
             DelCreature(EP_PWT_FLIGHTMASTER);
             m_FlightMasterSpawned = 0;
+            m_TowerState = TOWERSTATE_HORDE_CONTESTED;
 
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE");
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePointEP_PWT] OBJECTIVESTATE_HORDE_CONTESTED");
 
             break;
         }
@@ -961,14 +895,6 @@ void OPvPCapturePointEP_PWT::ChangeState()
         {
             pBanner1->PlayDirectSound(sound);
         }
-        if (GameObject* pBanner2 = m_PvP->GetGameObject(m_Objects[EP_PWT_FLAG1]))
-        {
-            pBanner2->PlayDirectSound(sound);
-        }
-        if (GameObject* pBanner3 = m_PvP->GetGameObject(m_Objects[EP_PWT_FLAG2]))
-        {
-            pBanner3->PlayDirectSound(sound);
-        }
     }
     else
     {
@@ -977,7 +903,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
             if (sound)
                 pCreature->PlayDirectSound(sound);
 
-            ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
+            pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, false);
         }
         if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
         {
@@ -997,34 +923,35 @@ void OPvPCapturePointEP_PWT::ChangeState()
     }
 
     UpdateTowerState();
-
-    // Complete quest objective.
-    if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
-        SendObjectiveComplete(EP_PWT_CM, 0);
 }
 
 void OPvPCapturePointEP_PWT::SendChangePhase()
 {
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
 {
-    data << EP_PWT_A << uint32(bool(m_TowerState & EP_TS_A));
-    data << EP_PWT_H << uint32(bool(m_TowerState & EP_TS_H));
-    data << EP_PWT_N_A << uint32(bool(m_TowerState & EP_TS_N_A));
-    data << EP_PWT_N_H << uint32(bool(m_TowerState & EP_TS_N_H));
-    data << EP_PWT_N << uint32(bool(m_TowerState & EP_TS_N));
-    return 5;
+    data << PLAGUEWOOD_TOWER_ALLIANCE << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    data << PLAGUEWOOD_TOWER_HORDE << uint32(bool(m_TowerState & TOWERSTATE_HORDE));
+    data << PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    data << PLAGUEWOOD_TOWER_HORDE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    data << PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    data << PLAGUEWOOD_TOWER_HORDE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    data << PLAGUEWOOD_TOWER_NEUTRAL << uint32(bool(m_TowerState & TOWERSTATE_NEUTRAL));
+    return 7;
 }
 
 void OPvPCapturePointEP_PWT::UpdateTowerState()
 {
-    m_PvP->SendUpdateWorldState(EP_PWT_A , bool(m_TowerState & EP_TS_A));
-    m_PvP->SendUpdateWorldState(EP_PWT_H , bool(m_TowerState & EP_TS_H));
-    m_PvP->SendUpdateWorldState(EP_PWT_N_A , bool(m_TowerState & EP_TS_N_A));
-    m_PvP->SendUpdateWorldState(EP_PWT_N_H , bool(m_TowerState & EP_TS_N_H));
-    m_PvP->SendUpdateWorldState(EP_PWT_N , bool(m_TowerState & EP_TS_N));
+    m_PvP->SendUpdateWorldState(PLAGUEWOOD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    m_PvP->SendUpdateWorldState(PLAGUEWOOD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    m_PvP->SendUpdateWorldState(PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    m_PvP->SendUpdateWorldState(PLAGUEWOOD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    m_PvP->SendUpdateWorldState(PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    m_PvP->SendUpdateWorldState(PLAGUEWOOD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    m_PvP->SendUpdateWorldState(PLAGUEWOOD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
 }
 
 bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* pPlayer)
@@ -1095,8 +1022,8 @@ void OutdoorPvPEP::Update(uint32 diff)
                 ++m_AllianceTowersControlled;
             else if (i == HORDE)
                 ++m_HordeTowersControlled;
-            SendUpdateWorldState(EP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
-            SendUpdateWorldState(EP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
+            SendUpdateWorldState(EP_UI_TOWER_COUNT_ALLIANCE, m_AllianceTowersControlled);
+            SendUpdateWorldState(EP_UI_TOWER_COUNT_HORDE, m_HordeTowersControlled);
             BuffTeams();
         }
 
@@ -1140,22 +1067,6 @@ void OutdoorPvPEP::OnPlayerLeave(Player* pPlayer)
     OutdoorPvP::OnPlayerLeave(pPlayer);
 }
 
-void OutdoorPvPEP::TowerBuff(Creature* pCreature)
-{
-    std::list<Player*> players;
-    pCreature->GetAlivePlayerListInRange(pCreature, players, VISIBILITY_DISTANCE_NORMAL);
-    for (const auto& pTarget : players)
-    {
-        if (!pTarget->IsFriendlyTo(pCreature))
-            continue;
-
-        if (pTarget->HasStealthAura())
-            continue;
-
-        pTarget->CastSpell(pTarget, SPELL_TOWER_CAPTURE_DND, true);
-    }
-}
-
 void OutdoorPvPEP::BuffTeams()
 {
     for (const auto pPlayer : m_players[0])
@@ -1182,8 +1093,8 @@ void OutdoorPvPEP::BuffTeams()
 
 uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
 {
-    data << EP_UI_TOWER_COUNT_A << m_AllianceTowersControlled;
-    data << EP_UI_TOWER_COUNT_H << m_HordeTowersControlled;
+    data << EP_UI_TOWER_COUNT_ALLIANCE << m_AllianceTowersControlled;
+    data << EP_UI_TOWER_COUNT_HORDE << m_HordeTowersControlled;
     data << EP_UI_TOWER_SLIDER_DISPLAY << uint32(0);
     data << EP_UI_TOWER_SLIDER_POS << uint32(50);
     data << EP_UI_TOWER_SLIDER_N << uint32(100);
@@ -1195,35 +1106,43 @@ uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
 
 void OutdoorPvPEP::SendRemoveWorldStates(Player* pPlayer)
 {
-    pPlayer->SendUpdateWorldState(EP_UI_TOWER_COUNT_A, 0);
-    pPlayer->SendUpdateWorldState(EP_UI_TOWER_COUNT_H, 0);
+    pPlayer->SendUpdateWorldState(EP_UI_TOWER_COUNT_ALLIANCE, 0);
+    pPlayer->SendUpdateWorldState(EP_UI_TOWER_COUNT_HORDE, 0);
     pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, 0);
     pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, 0);
 
-    pPlayer->SendUpdateWorldState(EP_EWT_A, 0);
-    pPlayer->SendUpdateWorldState(EP_EWT_H, 0);
-    pPlayer->SendUpdateWorldState(EP_EWT_N, 0);
-    pPlayer->SendUpdateWorldState(EP_EWT_N_A, 0);
-    pPlayer->SendUpdateWorldState(EP_EWT_N_H, 0);
+    pPlayer->SendUpdateWorldState(EASTWALL_TOWER_ALLIANCE, 0);
+    pPlayer->SendUpdateWorldState(EASTWALL_TOWER_HORDE, 0);
+    pPlayer->SendUpdateWorldState(EASTWALL_TOWER_ALLIANCE_PROGRESSING, 0);
+    pPlayer->SendUpdateWorldState(EASTWALL_TOWER_HORDE_PROGRESSING, 0);
+    pPlayer->SendUpdateWorldState(EASTWALL_TOWER_ALLIANCE_CONTESTED, 0);
+    pPlayer->SendUpdateWorldState(EASTWALL_TOWER_HORDE_CONTESTED, 0);
+    pPlayer->SendUpdateWorldState(EASTWALL_TOWER_NEUTRAL, 0);
 
-    pPlayer->SendUpdateWorldState(EP_PWT_A, 0);
-    pPlayer->SendUpdateWorldState(EP_PWT_H, 0);
-    pPlayer->SendUpdateWorldState(EP_PWT_N, 0);
-    pPlayer->SendUpdateWorldState(EP_PWT_N_A, 0);
-    pPlayer->SendUpdateWorldState(EP_PWT_N_H, 0);
+    pPlayer->SendUpdateWorldState(NORTHPASS_TOWER_ALLIANCE, 0);
+    pPlayer->SendUpdateWorldState(NORTHPASS_TOWER_HORDE, 0);
+    pPlayer->SendUpdateWorldState(NORTHPASS_TOWER_ALLIANCE_PROGRESSING, 0);
+    pPlayer->SendUpdateWorldState(NORTHPASS_TOWER_HORDE_PROGRESSING, 0);
+    pPlayer->SendUpdateWorldState(NORTHPASS_TOWER_ALLIANCE_CONTESTED, 0);
+    pPlayer->SendUpdateWorldState(NORTHPASS_TOWER_HORDE_CONTESTED, 0);
+    pPlayer->SendUpdateWorldState(NORTHPASS_TOWER_NEUTRAL, 0);
 
-    pPlayer->SendUpdateWorldState(EP_NPT_A, 0);
-    pPlayer->SendUpdateWorldState(EP_NPT_H, 0);
-    pPlayer->SendUpdateWorldState(EP_NPT_N, 0);
-    pPlayer->SendUpdateWorldState(EP_NPT_N_A, 0);
-    pPlayer->SendUpdateWorldState(EP_NPT_N_H, 0);
+    pPlayer->SendUpdateWorldState(PLAGUEWOOD_TOWER_ALLIANCE, 0);
+    pPlayer->SendUpdateWorldState(PLAGUEWOOD_TOWER_HORDE, 0);
+    pPlayer->SendUpdateWorldState(PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING, 0);
+    pPlayer->SendUpdateWorldState(PLAGUEWOOD_TOWER_HORDE_PROGRESSING, 0);
+    pPlayer->SendUpdateWorldState(PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED, 0);
+    pPlayer->SendUpdateWorldState(PLAGUEWOOD_TOWER_HORDE_CONTESTED, 0);
+    pPlayer->SendUpdateWorldState(PLAGUEWOOD_TOWER_NEUTRAL, 0);
 
-    pPlayer->SendUpdateWorldState(EP_CGT_A, 0);
-    pPlayer->SendUpdateWorldState(EP_CGT_H, 0);
-    pPlayer->SendUpdateWorldState(EP_CGT_N, 0);
-    pPlayer->SendUpdateWorldState(EP_CGT_N_A, 0);
-    pPlayer->SendUpdateWorldState(EP_CGT_N_H, 0);
+    pPlayer->SendUpdateWorldState(CROWN_GUARD_TOWER_ALLIANCE, 0);
+    pPlayer->SendUpdateWorldState(CROWN_GUARD_TOWER_HORDE, 0);
+    pPlayer->SendUpdateWorldState(CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING, 0);
+    pPlayer->SendUpdateWorldState(CROWN_GUARD_TOWER_HORDE_PROGRESSING, 0);
+    pPlayer->SendUpdateWorldState(CROWN_GUARD_TOWER_ALLIANCE_CONTESTED, 0);
+    pPlayer->SendUpdateWorldState(CROWN_GUARD_TOWER_HORDE_CONTESTED, 0);
+    pPlayer->SendUpdateWorldState(CROWN_GUARD_TOWER_NEUTRAL, 0);
 }
 
 class OutdoorPvP_eastern_plaguelands : public ZoneScript_Script

@@ -30,9 +30,9 @@
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp):
-    m_capturePointGUID(0), m_capturePoint(nullptr), m_maxValue(0), m_minValue(0), m_maxSpeed(0),
-    m_value(0), m_team(TEAM_NEUTRAL), m_oldState(OBJECTIVESTATE_NEUTRAL),
-    m_state(OBJECTIVESTATE_NEUTRAL), m_neutralValuePct(0), m_valuePct(50), m_factDiff(0), m_PvP(pvp)
+    m_capturePointGUID(0), m_capturePoint(nullptr), m_maxValue(0.0f), m_minValue(0.0f), m_maxSpeed(0.0f),
+    m_value(0.0f), m_team(TEAM_NEUTRAL), m_oldState(OBJECTIVESTATE_NEUTRAL),
+    m_state(OBJECTIVESTATE_NEUTRAL), m_neutralValuePct(0), m_valuePct(0), m_factDiff(0), m_PvP(pvp)
 {
 }
 
@@ -75,8 +75,6 @@ void OPvPCapturePoint::SendChangePhase()
 {
     if (!m_capturePoint)
         return;
-
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_valuePct);
 }
@@ -334,10 +332,9 @@ bool OPvPCapturePoint::Update(uint32 diff)
     uint32 Challenger = 0;
     float maxDiff = m_maxSpeed * diff;
 
-    if (fact_diff < 0)
+    if (fact_diff < 0.0f)
     {
-        // Horde is in majority, but it's already Horde-controlled -> no change.
-        if (m_state == OBJECTIVESTATE_HORDE && m_value <= -m_maxValue)
+        if (m_value <= -m_maxValue)
             return false;
 
         if (fact_diff < -maxDiff)
@@ -345,10 +342,10 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
         Challenger = HORDE;
     }
-    else
+    else if (fact_diff > 0.0f)
     {
-        // Alliance is in majority, but it's already Alliance-controlled -> no change.
-        if (m_state == OBJECTIVESTATE_ALLIANCE && m_value >= m_maxValue)
+        //if ((m_state == OBJECTIVESTATE_ALLIANCE || m_state == OBJECTIVESTATE_ALLIANCE_PROGRESSING) && m_value >= m_maxValue)
+        if (m_value >= m_maxValue)
             return false;
 
         if (fact_diff > maxDiff)
@@ -366,53 +363,56 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     m_value += fact_diff;
 
-    if (m_value < -m_minValue) // Red.
+    // RED
+    if (m_value <= -m_minValue) // m_value is in the red bar, between -240 (-m_minValue) and -1200 (-m_maxValue).
     {
-        if (m_value <= -m_maxValue)
+        if (m_value <= -m_maxValue) // m_value at max red -1200 (-m_maxValue).
         {
             m_value = -m_maxValue;
             m_state = OBJECTIVESTATE_HORDE;
         }
         else
-            m_state = OBJECTIVESTATE_HORDE_CHALLENGE;
+        {
+            if (m_state != OBJECTIVESTATE_HORDE_PROGRESSING && Challenger == HORDE)
+                m_state = OBJECTIVESTATE_HORDE_PROGRESSING;
+        }
 
         m_team = TEAM_HORDE;
     }
-    else if (m_value > m_minValue) // Blue.
+    // BLUE
+    else if (m_value >= m_minValue) // m_value is in the blue bar, between 240 (m_minValue) and 1200 (m_maxValue).
     {
-        if (m_value >= m_maxValue)
+        if (m_value >= m_maxValue) // m_value at max blue 1200 (m_maxValue).
         {
             m_value = m_maxValue;
             m_state = OBJECTIVESTATE_ALLIANCE;
         }
         else
-            m_state = OBJECTIVESTATE_ALLIANCE_CHALLENGE;
+        {
+            if (m_state != OBJECTIVESTATE_ALLIANCE_PROGRESSING && Challenger == ALLIANCE)
+                m_state = OBJECTIVESTATE_ALLIANCE_PROGRESSING;
+        }
 
         m_team = TEAM_ALLIANCE;
     }
-    else if (oldValue * m_value <= 0) // Grey, go through mid point.
+    // GREY
+    else if (m_value > -m_minValue && m_value < m_minValue) // m_value higher than -240 (begin of the red bar) and lower than 240 (begin of the blue bar).
     {
-        // If challenger is ally, then N->A challenge.
         if (Challenger == ALLIANCE)
-            m_state = OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
-        // If challenger is horde, then N->H challenge.
+            m_state = OBJECTIVESTATE_ALLIANCE_CONTESTED;
         else if (Challenger == HORDE)
-            m_state = OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
-        m_team = TEAM_NEUTRAL;
-    }
-    else // Grey, did not go through mid point.
-    {
-        // Old phase and current are on the same side, so one team challenges the other.
-        if (Challenger == ALLIANCE && (m_oldState == OBJECTIVESTATE_HORDE || m_oldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE))
-            m_state = OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
-        else if (Challenger == HORDE && (m_oldState == OBJECTIVESTATE_ALLIANCE || m_oldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE))
-            m_state = OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE;
+            m_state = OBJECTIVESTATE_HORDE_CONTESTED;
+
+        if (Challenger == 0 && m_value == 0.0f) // m_value exactly in the middle.
+        {
+            m_state = OBJECTIVESTATE_NEUTRAL;
+        }
+
         m_team = TEAM_NEUTRAL;
     }
 
     m_valuePct = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
     m_factDiff = (m_activePlayers[0].size() - m_activePlayers[1].size());
-
 
     if (m_oldState != m_state)
     {
@@ -436,27 +436,6 @@ void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
             if (Player* pPlayer = GetMap()->GetPlayer(guid))
                 pPlayer->SendUpdateWorldState(field, value);
     }
-}
-
-void OPvPCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
-{
-    uint32 team;
-    switch (m_state)
-    {
-        case OBJECTIVESTATE_ALLIANCE:
-            team = 0;
-            break;
-        case OBJECTIVESTATE_HORDE:
-            team = 1;
-            break;
-        default:
-            return;
-    }
-
-    // Send to all players present in the area.
-    for (auto const& guid : m_activePlayers[team])
-        if (Player* pPlayer = GetMap()->GetPlayer(guid))
-            pPlayer->KilledMonsterCredit(id, guid);
 }
 
 void OutdoorPvP::HandleKill(Player* killer, Unit* killed)
