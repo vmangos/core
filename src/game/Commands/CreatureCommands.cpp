@@ -172,6 +172,11 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
     PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(pTarget->AI()->IsMeleeAttackEnabled()));
     MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
     PSendSysMessage(LANG_NPC_MOTION_TYPE, MotionMaster::GetMovementGeneratorTypeName(moveType), moveType);
+    if (pTarget->IsTemporarySummon())
+    {
+        TempSummonType despawnType = static_cast<TemporarySummon*>(pTarget)->GetDespawnType();
+        PSendSysMessage("Despawn Type: %s (%u)", TempSummonTypeToString(despawnType), despawnType);
+    }
     pTarget->AI()->GetAIInformation(*this);
 
     return true;
