@@ -374,10 +374,9 @@ bool OPvPCapturePoint::Update(uint32 diff)
             m_value = -m_maxValue;
             m_state = OBJECTIVESTATE_HORDE;
         }
-        else
+        else // m_value is below max red -1200 (-m_maxValue).
         {
-            if (m_state != OBJECTIVESTATE_HORDE_PROGRESSING && Challenger == HORDE)
-                m_state = OBJECTIVESTATE_HORDE_PROGRESSING;
+            m_state = OBJECTIVESTATE_HORDE_PROGRESSING;
         }
 
         m_team = TEAM_HORDE;
@@ -390,10 +389,9 @@ bool OPvPCapturePoint::Update(uint32 diff)
             m_value = m_maxValue;
             m_state = OBJECTIVESTATE_ALLIANCE;
         }
-        else
+        else // m_value is below max blue 1200 (-m_maxValue).
         {
-            if (m_state != OBJECTIVESTATE_ALLIANCE_PROGRESSING && Challenger == ALLIANCE)
-                m_state = OBJECTIVESTATE_ALLIANCE_PROGRESSING;
+            m_state = OBJECTIVESTATE_ALLIANCE_PROGRESSING;
         }
 
         m_team = TEAM_ALLIANCE;

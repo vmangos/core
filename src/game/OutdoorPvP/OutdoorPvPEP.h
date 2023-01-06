@@ -120,6 +120,22 @@ enum EP_Sounds
     SOUND_TUGOFWAR_VICTORY_HORDE    = 9283, // 17795 Creature
     SOUND_PVPVICTORYHORDE           = 8454, // 182106 GameObject
     SOUND_PVPVICTORYALLIANCE        = 8455, // 182106 GameObject
+    SOUND_PVPWARNINGALLIANCE        = 8332, // 182106 GameObject
+    SOUND_PVPWARNINGHORDE           = 8333, // 182106 GameObject
+};
+
+enum EP_Artkit
+{
+    ARTKIT_NEUTRAL      = 21,
+    ARTKIT_ALLIANCE     = 2,
+    ARTKIT_HORDE        = 1
+};
+
+enum EP_Animation
+{
+    ANIMATION_NEUTRAL   = 2,
+    ANIMATION_ALLIANCE  = 1,
+    ANIMATION_HORDE     = 0
 };
 
 enum EP_Spells
@@ -349,11 +365,13 @@ class OPvPCapturePointEP_EWT : public OPvPCapturePoint
 
         void UpdateTowerState();
 
+        void UpdateBannerArt(uint32 artkit, uint32 animation);
+
+        void PlaySound(uint32 sound);
+
     protected:
 
         uint32 m_TowerState;
-
-        uint32 m_UnitsSummonedSide;
 };
 
 class OPvPCapturePointEP_NPT : public OPvPCapturePoint
@@ -380,11 +398,13 @@ class OPvPCapturePointEP_NPT : public OPvPCapturePoint
 
         void UpdateTowerState();
 
+        void UpdateBannerArt(uint32 artkit, uint32 animation);
+
+        void PlaySound(uint32 sound);
+
     protected:
 
         uint32 m_TowerState;
-
-        uint32 m_SummonedShrineSide;
 };
 
 class OPvPCapturePointEP_CGT : public OPvPCapturePoint
@@ -417,15 +437,13 @@ class OPvPCapturePointEP_CGT : public OPvPCapturePoint
 
         void UpdateTowerState();
 
+        void UpdateBannerArt(uint32 artkit, uint32 animation);
+
+        void PlaySound(uint32 sound);
+
     protected:
 
         uint32 m_TowerState;
-
-        uint32 m_SpiritOfVictorySpawned;
-
-        Team m_GraveyardSide;
-
-        uint32 m_SummonedBannerSide;
 };
 
 class OPvPCapturePointEP_PWT : public OPvPCapturePoint
@@ -452,9 +470,11 @@ class OPvPCapturePointEP_PWT : public OPvPCapturePoint
 
         void UpdateTowerState();
 
-    protected:
+        void UpdateBannerArt(uint32 artkit, uint32 animation);
 
-        uint32 m_FlightMasterSpawned;
+        void PlaySound(uint32 sound);
+
+    protected:
 
         uint32 m_TowerState;
 };
