@@ -344,7 +344,6 @@ bool OPvPCapturePoint::Update(uint32 diff)
     }
     else if (fact_diff > 0.0f)
     {
-        //if ((m_state == OBJECTIVESTATE_ALLIANCE || m_state == OBJECTIVESTATE_ALLIANCE_PROGRESSING) && m_value >= m_maxValue)
         if (m_value >= m_maxValue)
             return false;
 
@@ -352,6 +351,10 @@ bool OPvPCapturePoint::Update(uint32 diff)
             fact_diff = maxDiff;
 
         Challenger = ALLIANCE;
+    }
+    else // 0.0f?
+    {
+        Challenger = TEAM_NONE;
     }
 
     uint32 OldValuePct = m_valuePct;
@@ -402,11 +405,8 @@ bool OPvPCapturePoint::Update(uint32 diff)
             m_state = OBJECTIVESTATE_ALLIANCE_CONTESTED;
         else if (Challenger == HORDE)
             m_state = OBJECTIVESTATE_HORDE_CONTESTED;
-
-        if (Challenger == 0 && m_value == 0.0f) // m_value exactly in the middle.
-        {
+        else // TEAM_NONE
             m_state = OBJECTIVESTATE_NEUTRAL;
-        }
 
         m_team = TEAM_NEUTRAL;
     }

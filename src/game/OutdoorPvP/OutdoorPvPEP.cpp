@@ -184,7 +184,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
 void OPvPCapturePointEP_EWT::SendChangePhase()
 {
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
+    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
@@ -434,7 +434,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
 void OPvPCapturePointEP_NPT::SendChangePhase()
 {
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
+    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
@@ -672,7 +672,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
 void OPvPCapturePointEP_CGT::SendChangePhase()
 {
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
+    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
@@ -928,7 +928,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
 void OPvPCapturePointEP_PWT::SendChangePhase()
 {
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
+    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)

@@ -18,7 +18,7 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 DELETE FROM `creature_movement_scripts` WHERE `id`=1803913;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1803913, 0, 0, 15, 24221, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of Victory - Cast Spell Teleport Spawn-out'),
-(1803913, 0, 0, 18, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of Victory - Despawn');
+(1803913, 0, 0, 18, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of Victory - Despawn');
 
 UPDATE `creature_template` SET `spawn_spell_id`=17321 WHERE `entry`=18039;
 
