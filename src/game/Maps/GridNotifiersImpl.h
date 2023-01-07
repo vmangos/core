@@ -59,7 +59,7 @@ inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType& m)
 inline void CallAIMoveLOS(Creature* c, Unit* moving)
 {
     // Creature AI reaction
-    if (!c->HasUnitState(UNIT_STAT_LOST_CONTROL | UNIT_STAT_IGNORE_MOVE_LOS) && !c->IsInEvadeMode() && c->AI())
+    if (!c->HasUnitState(UNIT_STAT_LOST_CONTROL | UNIT_STAT_NO_SEARCH_FOR_OTHERS) && !c->IsInEvadeMode() && c->AI())
     {
         bool alert = false;
         if (moving->IsVisibleForOrDetect(c, c, true, false, &alert))

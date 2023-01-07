@@ -605,3 +605,20 @@ void SetUInt16Value(uint32& variable, uint8 offset, uint16 value)
         variable |= uint32(uint32(value) << (offset * 16));
     }
 }
+
+std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc)
+{
+    std::string names;
+    for (uint32 i = 0; i < 32; i++)
+    {
+        uint32 flag = 1 << i;
+        if (flags & flag)
+        {
+            if (!names.empty())
+                names += ", ";
+
+            names += getNameFunc(flag);
+        }
+    }
+    return names;
+}

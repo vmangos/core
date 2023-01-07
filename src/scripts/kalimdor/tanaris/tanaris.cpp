@@ -187,8 +187,9 @@ struct npc_toogaAI : public FollowerAI
         m_uiCheckSpeechTimer = urand(30000, 60000);
         m_uiPostEventTimer = 1000;
         m_uiPhasePostEvent = 0;
-
         m_tortaGuid.Clear();
+
+        m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
     }
 
     void MoveInLineOfSight(Unit* pWho) override

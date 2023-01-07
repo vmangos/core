@@ -511,6 +511,23 @@ bool ChatHandler::HandleUnitUpdateFieldsInfoCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleUnitShowStateCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Unit state flags for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage(FlagsToString(pTarget->GetUnitState(), UnitStateToString).c_str());
+
+    return true;
+}
+
 bool ChatHandler::HandleFreezeCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();
