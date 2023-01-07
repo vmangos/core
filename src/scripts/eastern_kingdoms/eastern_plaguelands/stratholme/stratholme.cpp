@@ -650,6 +650,7 @@ struct npc_couloir_trigger1AI : public ScriptedAI
         CorridorEnded = false;
         ScourgeStarted = false;
         m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* who) override
