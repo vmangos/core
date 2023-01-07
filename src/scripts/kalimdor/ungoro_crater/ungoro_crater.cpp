@@ -175,7 +175,7 @@ struct npc_ringoAI : public FollowerAI
         m_uiEndEventProgress = 0;
         m_uiEndEventTimer = 1000;
         pSpraggle = nullptr;
-        m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void JustRespawned() override

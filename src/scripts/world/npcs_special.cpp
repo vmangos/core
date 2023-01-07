@@ -568,7 +568,7 @@ struct npc_tonk_mineAI : public ScriptedAI
     {
         m_uiArmTimer = 3000;
         m_bArmed = false;
-        m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void Aggro(Unit* pWho) override {}
@@ -1808,7 +1808,7 @@ struct npc_goblin_land_mineAI : ScriptedAI
     void Reset() override
     {
         SetCombatMovement(false);
-        m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* pWho) override

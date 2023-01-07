@@ -197,7 +197,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         for (uint64 & guid : DeathPostGUIDs)
             guid = 0;
 
-        m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void AttackedBy(Unit* /*Attacker*/) override { }

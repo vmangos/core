@@ -77,7 +77,7 @@ struct boss_vectusAI : public ScriptedAI
         m_uiFrenzy_Timer        = 0;
         _fullAggroDone          = false;
 
-        m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* pWho) override

@@ -988,7 +988,7 @@ struct npc_solakar_triggerAI : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* who) override

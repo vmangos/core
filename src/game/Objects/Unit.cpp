@@ -4897,16 +4897,19 @@ void Unit::SetFactionTemplateId(uint32 faction)
         else
             AddUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS);
 
-        if (pFaction->hostileMask ||
-            pFaction->HasFactionFlag(FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_LOW_PRIO |
-                                     FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_MED_PRIO |
-                                     FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_HIG_PRIO | 
-                                     FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_LOW_PRIO | 
-                                     FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_MED_PRIO |
-                                     FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_HIG_PRIO))
-            ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
-        else
-            AddUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        if (!HasUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS))
+        {
+            if (pFaction->hostileMask ||
+                pFaction->HasFactionFlag(FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_LOW_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_MED_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_HIG_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_LOW_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_MED_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_HIG_PRIO))
+                ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+            else
+                AddUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        }
     }
 }
 

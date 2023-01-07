@@ -76,8 +76,8 @@ CreatureEventAI::CreatureEventAI(Creature* c) : BasicAI(c)
                 continue;
 #endif
 
-            if (i.event_type == EVENT_T_OOC_LOS && c->HasUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS))
-                c->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+            if (i.event_type == EVENT_T_OOC_LOS)
+                c->EnableMoveInLosEvent();
 
             m_CreatureEventAIList.push_back(CreatureEventAIHolder(i));
         }

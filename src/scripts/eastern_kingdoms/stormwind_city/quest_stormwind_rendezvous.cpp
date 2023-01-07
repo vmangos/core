@@ -55,7 +55,7 @@ void npc_reginald_windsorAI::ResetCreature()
     for (uint64 & guid : DragsGUIDs)
         guid = 0;
 
-    m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+    m_creature->EnableMoveInLosEvent();
 }
 
 void npc_reginald_windsorAI::JustDied(Unit* /*pKiller*/)

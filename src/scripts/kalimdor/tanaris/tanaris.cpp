@@ -189,7 +189,7 @@ struct npc_toogaAI : public FollowerAI
         m_uiPhasePostEvent = 0;
         m_tortaGuid.Clear();
 
-        m_creature->ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* pWho) override
