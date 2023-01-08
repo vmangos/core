@@ -21,7 +21,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 (1803913, 0, 0, 18, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of Victory - Despawn');
 
 UPDATE `creature_template` SET `spawn_spell_id`=17321 WHERE `entry`=18039;
-
+UPDATE `creature_template` SET `auras`='16577' WHERE `entry`=10821;
 
 -- End of migration.
 END IF;
