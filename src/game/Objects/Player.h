@@ -1196,7 +1196,7 @@ class Player final: public Unit
         bool BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, uint8 bag, uint8 slot);
         void OnReceivedItem(Item* item);
 
-        float GetReputationPriceDiscount(Creature const* pCreature) const;
+        float GetReputationPriceDiscount(Creature const* pCreature, bool taxi = false) const;
 
         Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
         TradeData* GetTradeData() const { return m_trade; }
