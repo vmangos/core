@@ -1820,7 +1820,6 @@ class Player final: public Unit
 
         uint32 m_lastFallTime;
         float  m_lastFallZ;
-        uint32 m_bNextRelocationsIgnored;
 
         // Recall position
         uint32 m_recallMap;
@@ -1920,9 +1919,6 @@ class Player final: public Unit
         Unit* GetMover() const { return m_mover; }
         bool IsSelfMover() const { return m_mover == this; } // normal case for player not controlling other unit
         bool HasSelfMovementControl() const;
-        bool IsNextRelocationIgnored() const { return m_bNextRelocationsIgnored ? true : false; }
-        void SetNextRelocationsIgnoredCount(uint32 count) { m_bNextRelocationsIgnored = count; }
-        void DoIgnoreRelocation() { if (m_bNextRelocationsIgnored) --m_bNextRelocationsIgnored; }
         bool IsOutdoorOnTransport() const;
 
         ObjectGuid const& GetFarSightGuid() const { return GetGuidValue(PLAYER_FARSIGHT); }

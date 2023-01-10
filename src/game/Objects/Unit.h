@@ -1422,6 +1422,7 @@ class Unit : public SpellCaster
         // spline for end point with targeted move gen)
         std::mutex asyncMovesplineLock;
 
+        void HandleInterruptsOnMovement(bool positionChanged);
         void OnRelocated();
         void ProcessRelocationVisibilityUpdates();
         bool m_needUpdateVisibility;
