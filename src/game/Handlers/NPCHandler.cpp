@@ -119,7 +119,7 @@ static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell
 
     data << uint32(tSpell->spell);
     data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
-    data << uint32(floor(tSpell->spellCost * fDiscountMod));
+    data << uint32(tSpell->spellCost * fDiscountMod + 0.5f);
 
     data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
     // primary prof. learn confirmation dialog
@@ -318,7 +318,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
     SpellEntry const* proto = sSpellMgr.GetSpellEntry(trainer_spell->spell);
 
     // Apply reputation discount.
-    uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
+    uint32 nSpellCost = uint32(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit) + 0.5f);
 
     // Check money requirement.
     if (_player->GetMoney() < nSpellCost)

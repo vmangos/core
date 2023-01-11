@@ -475,6 +475,13 @@ class Creature : public Unit
         void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonPos.x; fY = m_summonPos.y; fZ = m_summonPos.z; fOrient = m_summonPos.o; }
 
         void SetNoXP() { AddUnitState(UNIT_STAT_NO_KILL_REWARD); }
+        void EnableMoveInLosEvent()
+        {
+            if (HasUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS))
+                ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+            if (!HasUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS))
+                AddUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS);
+        }
 
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
         void ClearTemporaryFaction();

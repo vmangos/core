@@ -1174,7 +1174,7 @@ class Unit : public SpellCaster
         ObjectGuid m_possessorGuid; // Guid of unit possessing this one
     public:
         uint32 GetFactionTemplateId() const final { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
-        void SetFactionTemplateId(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction); }
+        void SetFactionTemplateId(uint32 faction);
         void RestoreFaction();
         virtual Team GetTeam() const;
 
@@ -1422,6 +1422,7 @@ class Unit : public SpellCaster
         // spline for end point with targeted move gen)
         std::mutex asyncMovesplineLock;
 
+        void HandleInterruptsOnMovement(bool positionChanged);
         void OnRelocated();
         void ProcessRelocationVisibilityUpdates();
         bool m_needUpdateVisibility;

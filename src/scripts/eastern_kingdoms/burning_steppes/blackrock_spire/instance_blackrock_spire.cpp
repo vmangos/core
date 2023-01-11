@@ -988,6 +988,7 @@ struct npc_solakar_triggerAI : public ScriptedAI
 
     void Reset() override
     {
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* who) override

@@ -432,4 +432,8 @@ inline uint32 BatchifyTimer(uint32 timer, uint32 interval)
     return value * interval;
 }
 
+typedef char const*(*ValueToStringFunc) (uint32 value);
+
+std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc);
+
 #endif

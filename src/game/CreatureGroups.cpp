@@ -175,26 +175,30 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
     m_respawnGuard = true;
     if (member->IsInWorld() && member->GetRespawnTime() > time(nullptr))
     {
-        if (memberEntry && memberEntry->memberFlags & OPTION_FORMATION_MOVE)
+        BattleGround* bg = member->GetMap()->IsBattleGround() ? ((BattleGroundMap*)member->GetMap())->GetBG() : nullptr;
+        if (!bg || bg->CanBeSpawned(member))
         {
-            if (Unit* leader = member->GetMap()->GetUnit(GetOriginalLeaderGuid()))
+            if (memberEntry && memberEntry->memberFlags & OPTION_FORMATION_MOVE)
             {
-                float x, y, z;
-                if (leader->IsAlive() || leader->GetTypeId() != TYPEID_UNIT)
-                    leader->GetPosition(x, y, z);
-                else
-                    leader->ToCreature()->GetRespawnCoord(x, y, z);
+                if (Unit* leader = member->GetMap()->GetUnit(GetOriginalLeaderGuid()))
+                {
+                    float x, y, z;
+                    if (leader->IsAlive() || leader->GetTypeId() != TYPEID_UNIT)
+                        leader->GetPosition(x, y, z);
+                    else
+                        leader->ToCreature()->GetRespawnCoord(x, y, z);
 
-                float tmpx = x;
-                float tmpy = y;
-                memberEntry->ComputeRelativePosition(leader->GetOrientation(), x, y);
-                x += tmpx;
-                y += tmpy;
-                member->UpdateGroundPositionZ(x, y, z);
-                member->NearTeleportTo(x, y, z, leader->GetAngle(x, y) + M_PI);
+                    float tmpx = x;
+                    float tmpy = y;
+                    memberEntry->ComputeRelativePosition(leader->GetOrientation(), x, y);
+                    x += tmpx;
+                    y += tmpy;
+                    member->UpdateGroundPositionZ(x, y, z);
+                    member->NearTeleportTo(x, y, z, leader->GetAngle(x, y) + M_PI);
+                }
             }
+            member->Respawn();
         }
-        member->Respawn();
     }
     m_respawnGuard = false;
 }

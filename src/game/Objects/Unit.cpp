@@ -4883,6 +4883,35 @@ void Unit::SetCharm(Unit* pet)
     SetCharmGuid(pet ? pet->GetObjectGuid() : ObjectGuid());
 }
 
+void Unit::SetFactionTemplateId(uint32 faction)
+{
+    SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction);
+
+    if (FactionTemplateEntry const* pFaction = sObjectMgr.GetFactionTemplateEntry(faction))
+    {
+        if (pFaction->hostileMask ||
+            pFaction->HasFactionFlag(FACTION_TEMPLATE_BROADCAST_TO_ENEMIES_LOW_PRIO |
+                                     FACTION_TEMPLATE_BROADCAST_TO_ENEMIES_MED_PRIO |
+                                     FACTION_TEMPLATE_BROADCAST_TO_ENEMIES_HIG_PRIO))
+            ClearUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS);
+        else
+            AddUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS);
+
+        if (!HasUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS))
+        {
+            if (pFaction->hostileMask ||
+                pFaction->HasFactionFlag(FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_LOW_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_MED_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_HIG_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_LOW_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_MED_PRIO |
+                    FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_HIG_PRIO))
+                ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+            else
+                AddUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+        }
+    }
+}
 
 void Unit::RestoreFaction()
 {
@@ -9769,6 +9798,9 @@ private:
 
 void Unit::ScheduleAINotify(uint32 delay)
 {
+    if (HasUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS))
+        return;
+
     if (!delay)
     {
         // Instant
@@ -9778,6 +9810,25 @@ void Unit::ScheduleAINotify(uint32 delay)
     }
     if (!IsAINotifyScheduled())
         m_Events.AddEvent(new RelocationNotifyEvent(*this), m_Events.CalculateTime(delay));
+}
+
+void Unit::HandleInterruptsOnMovement(bool positionChanged)
+{
+    if (positionChanged)
+    {
+        // Interrupt spell cast at move
+        InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+        InterruptSpellsWithChannelFlags(AURA_INTERRUPT_MOVING_CANCELS);
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
+        
+        HandleEmoteState(0);
+    }
+    else
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_TURNING_CANCELS);
+
+    // Fix bug after 1.11 where client doesn't send stand state update while casting.
+    // Test case: Begin eating or drinking, then start casting Hearthstone and run.
+    SetStandState(UNIT_STAND_STATE_STAND);
 }
 
 void Unit::OnRelocated()

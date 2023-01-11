@@ -568,6 +568,7 @@ struct npc_tonk_mineAI : public ScriptedAI
     {
         m_uiArmTimer = 3000;
         m_bArmed = false;
+        m_creature->EnableMoveInLosEvent();
     }
 
     void Aggro(Unit* pWho) override {}
@@ -1087,7 +1088,7 @@ struct npc_cannonball_runnerAI : ScriptedPetAI
         if (m_creature->GetOwner())
             m_creature->SetOrientation(m_creature->GetOwner()->GetOrientation());
 
-        m_creature->AddUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT);
+        SetCombatMovement(false);
 
         npc_cannonball_runnerAI::Reset();
     }
@@ -1807,6 +1808,7 @@ struct npc_goblin_land_mineAI : ScriptedAI
     void Reset() override
     {
         SetCombatMovement(false);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* pWho) override

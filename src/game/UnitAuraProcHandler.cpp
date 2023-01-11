@@ -586,6 +586,9 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                 case 12292:
                 case 18765:
                 {
+                    if (!pVictim)
+                        return SPELL_AURA_PROC_FAILED;
+
                     // Prevent chain of triggered spell from same triggered spell
                     if (procSpell && (procSpell->Id == 26654 || procSpell->Id == 12723))
                         return SPELL_AURA_PROC_FAILED;

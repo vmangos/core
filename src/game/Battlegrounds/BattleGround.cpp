@@ -1215,6 +1215,20 @@ void BattleGround::DoorOpen(ObjectGuid guid)
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround: Door %s not found! - doors will be closed.", guid.GetString().c_str());
 }
 
+bool BattleGround::CanBeSpawned(Creature* creature) const
+{
+    std::vector<BattleGroundEventIdx> const& eventsVector = sBattleGroundMgr.GetCreatureEventsVector(creature->GetGUIDLow());
+    ASSERT(eventsVector.size());
+    if (eventsVector[0].event1 == BG_EVENT_NONE)
+        return true;
+    for (const auto& i : eventsVector)
+    {
+        if (!IsActiveEvent(i.event1, i.event2))
+            return false;
+    }
+    return true;
+}
+
 void BattleGround::OnObjectDBLoad(Creature* creature)
 {
     std::vector<BattleGroundEventIdx> const& eventsVector = sBattleGroundMgr.GetCreatureEventsVector(creature->GetGUIDLow());
