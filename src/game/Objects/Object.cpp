@@ -1872,26 +1872,29 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         rand_x = x;
         rand_y = y;
         rand_z = z;
-        if (map->GetWalkRandomPosition(GetTransport(), rand_x, rand_y, rand_z, distance, moveAllowed))
+        if (GenericTransport* transport = GetTransport())
         {
-            // Giant type creatures walk underwater
-            if ((isType(TYPEMASK_UNIT) && !ToUnit()->CanSwim()) ||
-                (IsCreature() && ToCreature()->GetCreatureInfo()->type == CREATURE_TYPE_GIANT))
+            if (map->GetWalkRandomPosition(transport, rand_x, rand_y, rand_z, distance, moveAllowed))
+            {
+                // Giant type creatures walk underwater
+                if ((isType(TYPEMASK_UNIT) && !ToUnit()->CanSwim()) ||
+                    (IsCreature() && ToCreature()->GetCreatureInfo()->type == CREATURE_TYPE_GIANT))
+                    return true;
+                // La position renvoyee par le pathfinding est tout au fond de l'eau. On randomise ca un peu ...
+                float ground = 0.0f;
+                float waterSurface = GetTerrain()->GetWaterLevel(x, y, z, &ground);
+                if (waterSurface == VMAP_INVALID_HEIGHT_VALUE)
+                    return true;
+                if (ground > waterSurface) // Possible ?
+                    return true;
+                rand_z += rand_norm_f() * distance / 2.0f;
+                if (rand_z < ground)
+                    rand_z = ground;
+                // Ici 'is_air_ok' = false, donc on reste SOUS l'eau.
+                if (rand_z > waterSurface)
+                    rand_z = waterSurface;
                 return true;
-            // La position renvoyee par le pathfinding est tout au fond de l'eau. On randomise ca un peu ...
-            float ground = 0.0f;
-            float waterSurface = GetTerrain()->GetWaterLevel(x, y, z, &ground);
-            if (waterSurface == VMAP_INVALID_HEIGHT_VALUE)
-                return true;
-            if (ground > waterSurface) // Possible ?
-                return true;
-            rand_z += rand_norm_f() * distance / 2.0f;
-            if (rand_z < ground)
-                rand_z = ground;
-            // Ici 'is_air_ok' = false, donc on reste SOUS l'eau.
-            if (rand_z > waterSurface)
-                rand_z = waterSurface;
-            return true;
+            }
         }
         rand_x = x;
         rand_y = y;
