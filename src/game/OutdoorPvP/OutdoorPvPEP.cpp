@@ -31,9 +31,9 @@
 OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP* pvp)
     : OPvPCapturePoint(pvp), m_TowerState(TOWERSTATE_NEUTRAL)
 {
-    SetCapturePointData(EPCapturePoints[EASTWALL_TOWER].entry, EPCapturePoints[EASTWALL_TOWER].map, EPCapturePoints[EASTWALL_TOWER].x, EPCapturePoints[EASTWALL_TOWER].y, EPCapturePoints[EASTWALL_TOWER].z, EPCapturePoints[EASTWALL_TOWER].o, EPCapturePoints[EASTWALL_TOWER].rot0, EPCapturePoints[EASTWALL_TOWER].rot1, EPCapturePoints[EASTWALL_TOWER].rot2, EPCapturePoints[EASTWALL_TOWER].rot3);
-    AddObject(EASTWALL_TOWER_BANNER_1, EPTowerFlags[EASTWALL_TOWER_BANNER_1].entry, EPTowerFlags[EASTWALL_TOWER_BANNER_1].map, EPTowerFlags[EASTWALL_TOWER_BANNER_1].x, EPTowerFlags[EASTWALL_TOWER_BANNER_1].y, EPTowerFlags[EASTWALL_TOWER_BANNER_1].z, EPTowerFlags[EASTWALL_TOWER_BANNER_1].o, EPTowerFlags[EASTWALL_TOWER_BANNER_1].rot0, EPTowerFlags[EASTWALL_TOWER_BANNER_1].rot1, EPTowerFlags[EASTWALL_TOWER_BANNER_1].rot2, EPTowerFlags[EASTWALL_TOWER_BANNER_1].rot3);
-    AddObject(EASTWALL_TOWER_BANNER_2, EPTowerFlags[EASTWALL_TOWER_BANNER_2].entry, EPTowerFlags[EASTWALL_TOWER_BANNER_2].map, EPTowerFlags[EASTWALL_TOWER_BANNER_2].x, EPTowerFlags[EASTWALL_TOWER_BANNER_2].y, EPTowerFlags[EASTWALL_TOWER_BANNER_2].z, EPTowerFlags[EASTWALL_TOWER_BANNER_2].o, EPTowerFlags[EASTWALL_TOWER_BANNER_2].rot0, EPTowerFlags[EASTWALL_TOWER_BANNER_2].rot1, EPTowerFlags[EASTWALL_TOWER_BANNER_2].rot2, EPTowerFlags[EASTWALL_TOWER_BANNER_2].rot3);
+    SetCapturePointData(EP_CapturePoints[EASTWALL_TOWER].entry, EP_CapturePoints[EASTWALL_TOWER].map, EP_CapturePoints[EASTWALL_TOWER].x, EP_CapturePoints[EASTWALL_TOWER].y, EP_CapturePoints[EASTWALL_TOWER].z, EP_CapturePoints[EASTWALL_TOWER].o, EP_CapturePoints[EASTWALL_TOWER].rot0, EP_CapturePoints[EASTWALL_TOWER].rot1, EP_CapturePoints[EASTWALL_TOWER].rot2, EP_CapturePoints[EASTWALL_TOWER].rot3);
+    AddObject(EASTWALL_TOWER_BANNER_1, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].entry, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].map, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].x, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].y, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].z, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].o, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].rot0, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].rot1, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].rot2, EP_TowerFlags[EASTWALL_TOWER_BANNER_1].rot3);
+    AddObject(EASTWALL_TOWER_BANNER_2, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].entry, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].map, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].x, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].y, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].z, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].o, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].rot0, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].rot1, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].rot2, EP_TowerFlags[EASTWALL_TOWER_BANNER_2].rot3);
     ChangeState();
 }
 
@@ -58,7 +58,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
         {
             m_TowerState = TOWERSTATE_ALLIANCE;
             PlaySound(SOUND_PVPVICTORYALLIANCE);
-            AddObject(EASTWALL_TOWER_FLAG_FLARE, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].entry, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].map, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].x, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].y, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].z, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].o, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].rot0, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].rot1, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].rot2, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].rot3);
+            AddObject(EASTWALL_TOWER_FLAG_FLARE, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].entry, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].map, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].x, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].y, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].z, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].o, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].rot0, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].rot1, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].rot2, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_ALLIANCE].rot3);
 
             break;
         }
@@ -66,7 +66,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
         {
             m_TowerState = TOWERSTATE_HORDE;
             PlaySound(SOUND_PVPVICTORYHORDE);
-            AddObject(EASTWALL_TOWER_FLAG_FLARE, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].entry, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].map, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].x, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].y, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].z, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].o, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].rot0, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].rot1, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].rot2, EPTowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].rot3);
+            AddObject(EASTWALL_TOWER_FLAG_FLARE, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].entry, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].map, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].x, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].y, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].z, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].o, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].rot0, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].rot1, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].rot2, EP_TowerFlares[FLAG_FLARE_EASTWALL_TOWER_HORDE].rot3);
 
             break;
         }
@@ -84,12 +84,12 @@ void OPvPCapturePointEP_EWT::ChangeState()
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDALLIANCE);
                 SummonSquadAtEastWallTower(ALLIANCE);
-                AddCreature(EASTWALL_TOWER_BUFFER, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].entry, ALLIANCE, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].map, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].x, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].y, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].z, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].o);
+                AddCreature(EASTWALL_TOWER_BUFFER, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].entry, ALLIANCE, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].map, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].x, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].y, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].z, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_ALLIANCE].o);
 
                 ((OutdoorPvPEP*)m_PvP)->EP_Controls[EASTWALL_TOWER] = ALLIANCE;
 
                 if (m_oldState != m_state)
-                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_A, EP_Zone);
+                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EASTWALL_TOWER_ALLIANCE, EP_Zone);
             }
             break;
         }
@@ -107,12 +107,12 @@ void OPvPCapturePointEP_EWT::ChangeState()
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDHORDE);
                 SummonSquadAtEastWallTower(HORDE);
-                AddCreature(EASTWALL_TOWER_BUFFER, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].entry, HORDE, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].map, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].x, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].y, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].z, EPBufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].o);
+                AddCreature(EASTWALL_TOWER_BUFFER, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].entry, HORDE, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].map, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].x, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].y, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].z, EP_BufferNPCs[TOWER_BUFFER_EASTWALL_TOWER_HORDE].o);
 
                 ((OutdoorPvPEP*)m_PvP)->EP_Controls[EASTWALL_TOWER] = HORDE;
 
                 if (m_oldState != m_state)
-                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_H, EP_Zone);
+                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EASTWALL_TOWER_HORDE, EP_Zone);
             }
             break;
         }
@@ -153,7 +153,6 @@ void OPvPCapturePointEP_EWT::ChangeState()
 void OPvPCapturePointEP_EWT::SendChangePhase()
 {
     SendUpdateWorldState(WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
-    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
@@ -222,11 +221,6 @@ bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* pPlayer)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(pPlayer))
     {
-        /*
-        pPlayer->SendUpdateWorldState(WS_EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        pPlayer->SendUpdateWorldState(WS_EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        pPlayer->SendUpdateWorldState(WS_WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
-        */
         return true;
     }
     return false;
@@ -239,7 +233,7 @@ void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player* pPlayer)
 
 void OPvPCapturePointEP_EWT::RemoveSquad()
 {
-    for (uint8 i = 0; i < EP_EWT_NUM_CREATURES; ++i)
+    for (uint8 i = 0; i < EP_SummonsNum; ++i)
     {
         DelCreature(i);
     }
@@ -253,7 +247,7 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
     else
         ct = EP_EWT_Summons_H;
     
-    for (uint8 i = 0; i < EP_EWT_NUM_CREATURES; ++i)
+    for (uint8 i = 0; i < EP_SummonsNum; ++i)
     {
         DelCreature(i);
     
@@ -283,9 +277,9 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
 OPvPCapturePointEP_NPT::OPvPCapturePointEP_NPT(OutdoorPvP *pvp)
     : OPvPCapturePoint(pvp), m_TowerState(TOWERSTATE_NEUTRAL)
 {
-    SetCapturePointData(EPCapturePoints[NORTHPASS_TOWER].entry, EPCapturePoints[NORTHPASS_TOWER].map, EPCapturePoints[NORTHPASS_TOWER].x, EPCapturePoints[NORTHPASS_TOWER].y, EPCapturePoints[NORTHPASS_TOWER].z, EPCapturePoints[NORTHPASS_TOWER].o, EPCapturePoints[NORTHPASS_TOWER].rot0, EPCapturePoints[NORTHPASS_TOWER].rot1, EPCapturePoints[NORTHPASS_TOWER].rot2, EPCapturePoints[NORTHPASS_TOWER].rot3);
-    AddObject(NORTHPASS_TOWER_BANNER_1, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].entry, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].map, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].x, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].y, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].z, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].o, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].rot0, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].rot1, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].rot2, EPTowerFlags[NORTHPASS_TOWER_BANNER_1].rot3);
-    AddObject(NORTHPASS_TOWER_BANNER_2, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].entry, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].map, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].x, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].y, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].z, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].o, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].rot0, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].rot1, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].rot2, EPTowerFlags[NORTHPASS_TOWER_BANNER_2].rot3);
+    SetCapturePointData(EP_CapturePoints[NORTHPASS_TOWER].entry, EP_CapturePoints[NORTHPASS_TOWER].map, EP_CapturePoints[NORTHPASS_TOWER].x, EP_CapturePoints[NORTHPASS_TOWER].y, EP_CapturePoints[NORTHPASS_TOWER].z, EP_CapturePoints[NORTHPASS_TOWER].o, EP_CapturePoints[NORTHPASS_TOWER].rot0, EP_CapturePoints[NORTHPASS_TOWER].rot1, EP_CapturePoints[NORTHPASS_TOWER].rot2, EP_CapturePoints[NORTHPASS_TOWER].rot3);
+    AddObject(NORTHPASS_TOWER_BANNER_1, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].entry, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].map, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].x, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].y, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].z, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].o, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].rot0, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].rot1, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].rot2, EP_TowerFlags[NORTHPASS_TOWER_BANNER_1].rot3);
+    AddObject(NORTHPASS_TOWER_BANNER_2, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].entry, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].map, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].x, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].y, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].z, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].o, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].rot0, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].rot1, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].rot2, EP_TowerFlags[NORTHPASS_TOWER_BANNER_2].rot3);
     ChangeState();
 }
 
@@ -313,7 +307,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
             m_TowerState = TOWERSTATE_ALLIANCE;
             PlaySound(SOUND_PVPVICTORYALLIANCE);
             SummonCuringShrine(ALLIANCE);
-            AddObject(NORTHPASS_TOWER_FLAG_FLARE, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].entry, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].map, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].x, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].y, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].z, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].o, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].rot0, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].rot1, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].rot2, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].rot3);
+            AddObject(NORTHPASS_TOWER_FLAG_FLARE, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].entry, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].map, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].x, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].y, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].z, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].o, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].rot0, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].rot1, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].rot2, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_ALLIANCE].rot3);
 
             break;
         }
@@ -322,7 +316,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
             m_TowerState = TOWERSTATE_HORDE;
             PlaySound(SOUND_PVPVICTORYHORDE);
             SummonCuringShrine(HORDE);
-            AddObject(NORTHPASS_TOWER_FLAG_FLARE, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].entry, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].map, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].x, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].y, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].z, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].o, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].rot0, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].rot1, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].rot2, EPTowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].rot3);
+            AddObject(NORTHPASS_TOWER_FLAG_FLARE, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].entry, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].map, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].x, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].y, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].z, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].o, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].rot0, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].rot1, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].rot2, EP_TowerFlares[FLAG_FLARE_NORTHPASS_TOWER_HORDE].rot3);
 
             break;
         }
@@ -340,12 +334,12 @@ void OPvPCapturePointEP_NPT::ChangeState()
             {
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDALLIANCE);
-                AddCreature(NORTHPASS_TOWER_BUFFER, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].entry, ALLIANCE, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].map, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].x, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].y, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].z, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].o);
+                AddCreature(NORTHPASS_TOWER_BUFFER, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].entry, ALLIANCE, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].map, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].x, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].y, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].z, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_ALLIANCE].o);
 
                 ((OutdoorPvPEP*)m_PvP)->EP_Controls[NORTHPASS_TOWER] = ALLIANCE;
 
                 if (m_oldState != m_state)
-                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_A, EP_Zone);
+                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_NORTHPASS_TOWER_ALLIANCE, EP_Zone);
             }
             break;
         }
@@ -363,12 +357,12 @@ void OPvPCapturePointEP_NPT::ChangeState()
             {
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDHORDE);
-                AddCreature(NORTHPASS_TOWER_BUFFER, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].entry, HORDE, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].map, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].x, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].y, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].z, EPBufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].o);
+                AddCreature(NORTHPASS_TOWER_BUFFER, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].entry, HORDE, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].map, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].x, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].y, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].z, EP_BufferNPCs[TOWER_BUFFER_NORTHPASS_TOWER_HORDE].o);
 
                 ((OutdoorPvPEP*)m_PvP)->EP_Controls[NORTHPASS_TOWER] = HORDE;
 
                 if (m_oldState != m_state)
-                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_H, EP_Zone);
+                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_NORTHPASS_TOWER_HORDE, EP_Zone);
             }
             break;
         }
@@ -474,11 +468,6 @@ bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* pPlayer)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(pPlayer))
     {
-        /*
-        pPlayer->SendUpdateWorldState(WS_EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        pPlayer->SendUpdateWorldState(WS_EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        pPlayer->SendUpdateWorldState(WS_WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
-        */
         return true;
     }
     return false;
@@ -503,9 +492,9 @@ OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP *pvp)
     : OPvPCapturePoint(pvp), m_TowerState(TOWERSTATE_NEUTRAL)
 {
     UnLinkGraveYard();
-    SetCapturePointData(EPCapturePoints[CROWN_GUARD_TOWER].entry, EPCapturePoints[CROWN_GUARD_TOWER].map, EPCapturePoints[CROWN_GUARD_TOWER].x, EPCapturePoints[CROWN_GUARD_TOWER].y, EPCapturePoints[CROWN_GUARD_TOWER].z, EPCapturePoints[CROWN_GUARD_TOWER].o, EPCapturePoints[CROWN_GUARD_TOWER].rot0, EPCapturePoints[CROWN_GUARD_TOWER].rot1, EPCapturePoints[CROWN_GUARD_TOWER].rot2, EPCapturePoints[CROWN_GUARD_TOWER].rot3);
-    AddObject(CROWN_GUARD_TOWER_BANNER_1, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].entry, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].map, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].x, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].y, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].z, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].o, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].rot0, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].rot1, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].rot2, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_1].rot3);
-    AddObject(CROWN_GUARD_TOWER_BANNER_2, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].entry, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].map, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].x, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].y, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].z, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].o, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].rot0, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].rot1, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].rot2, EPTowerFlags[CROWN_GUARD_TOWER_BANNER_2].rot3);
+    SetCapturePointData(EP_CapturePoints[CROWN_GUARD_TOWER].entry, EP_CapturePoints[CROWN_GUARD_TOWER].map, EP_CapturePoints[CROWN_GUARD_TOWER].x, EP_CapturePoints[CROWN_GUARD_TOWER].y, EP_CapturePoints[CROWN_GUARD_TOWER].z, EP_CapturePoints[CROWN_GUARD_TOWER].o, EP_CapturePoints[CROWN_GUARD_TOWER].rot0, EP_CapturePoints[CROWN_GUARD_TOWER].rot1, EP_CapturePoints[CROWN_GUARD_TOWER].rot2, EP_CapturePoints[CROWN_GUARD_TOWER].rot3);
+    AddObject(CROWN_GUARD_TOWER_BANNER_1, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].entry, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].map, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].x, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].y, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].z, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].o, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].rot0, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].rot1, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].rot2, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_1].rot3);
+    AddObject(CROWN_GUARD_TOWER_BANNER_2, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].entry, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].map, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].x, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].y, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].z, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].o, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].rot0, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].rot1, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].rot2, EP_TowerFlags[CROWN_GUARD_TOWER_BANNER_2].rot3);
     ChangeState();
 }
 
@@ -534,7 +523,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             PlaySound(SOUND_PVPVICTORYALLIANCE);
             LinkGraveYard(ALLIANCE);
             SummonBannerAura(ALLIANCE);
-            AddObject(CROWN_GUARD_TOWER_FLAG_FLARE, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].entry, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].map, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].x, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].y, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].z, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].o, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].rot0, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].rot1, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].rot2, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].rot3);
+            AddObject(CROWN_GUARD_TOWER_FLAG_FLARE, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].entry, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].map, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].x, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].y, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].z, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].o, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].rot0, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].rot1, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].rot2, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_ALLIANCE].rot3);
 
             break;
         }
@@ -544,7 +533,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             PlaySound(SOUND_PVPVICTORYHORDE);
             LinkGraveYard(HORDE);
             SummonBannerAura(HORDE);
-            AddObject(CROWN_GUARD_TOWER_FLAG_FLARE, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].entry, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].map, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].x, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].y, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].z, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].o, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].rot0, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].rot1, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].rot2, EPTowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].rot3);
+            AddObject(CROWN_GUARD_TOWER_FLAG_FLARE, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].entry, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].map, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].x, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].y, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].z, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].o, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].rot0, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].rot1, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].rot2, EP_TowerFlares[FLAG_FLARE_CROWN_GUARD_TOWER_HORDE].rot3);
 
             break;
         }
@@ -564,12 +553,12 @@ void OPvPCapturePointEP_CGT::ChangeState()
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDALLIANCE);
                 SummonSpiritOfVictory(ALLIANCE);
-                AddCreature(CROWN_GUARD_TOWER_BUFFER, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].entry, ALLIANCE, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].map, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].x, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].y, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].z, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].o);
+                AddCreature(CROWN_GUARD_TOWER_BUFFER, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].entry, ALLIANCE, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].map, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].x, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].y, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].z, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_ALLIANCE].o);
 
                 ((OutdoorPvPEP*)m_PvP)->EP_Controls[CROWN_GUARD_TOWER] = ALLIANCE;
 
                 if (m_oldState != m_state)
-                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_A, EP_Zone);
+                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_CROWN_GUARD_TOWER_ALLIANCE, EP_Zone);
             }
             break;
         }
@@ -589,12 +578,12 @@ void OPvPCapturePointEP_CGT::ChangeState()
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDHORDE);
                 SummonSpiritOfVictory(HORDE);
-                AddCreature(CROWN_GUARD_TOWER_BUFFER, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].entry, HORDE, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].map, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].x, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].y, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].z, EPBufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].o);
+                AddCreature(CROWN_GUARD_TOWER_BUFFER, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].entry, HORDE, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].map, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].x, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].y, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].z, EP_BufferNPCs[TOWER_BUFFER_CROWN_GUARD_TOWER_HORDE].o);
 
                 ((OutdoorPvPEP*)m_PvP)->EP_Controls[CROWN_GUARD_TOWER] = HORDE;
 
                 if (m_oldState != m_state)
-                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_H, EP_Zone);
+                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_CROWN_GUARD_TOWER_HORDE, EP_Zone);
             }
             break;
         }
@@ -632,7 +621,6 @@ void OPvPCapturePointEP_CGT::ChangeState()
 void OPvPCapturePointEP_CGT::SendChangePhase()
 {
     SendUpdateWorldState(WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
-    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
@@ -701,11 +689,6 @@ bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* pPlayer)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(pPlayer))
     {
-        /*
-        pPlayer->SendUpdateWorldState(WS_EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        pPlayer->SendUpdateWorldState(WS_EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        pPlayer->SendUpdateWorldState(WS_WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
-        */
         return true;
     }
     return false;
@@ -754,9 +737,9 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
 OPvPCapturePointEP_PWT::OPvPCapturePointEP_PWT(OutdoorPvP *pvp)
     : OPvPCapturePoint(pvp), m_TowerState(TOWERSTATE_NEUTRAL)
 {
-    SetCapturePointData(EPCapturePoints[PLAGUEWOOD_TOWER].entry, EPCapturePoints[PLAGUEWOOD_TOWER].map, EPCapturePoints[PLAGUEWOOD_TOWER].x, EPCapturePoints[PLAGUEWOOD_TOWER].y, EPCapturePoints[PLAGUEWOOD_TOWER].z, EPCapturePoints[PLAGUEWOOD_TOWER].o, EPCapturePoints[PLAGUEWOOD_TOWER].rot0, EPCapturePoints[PLAGUEWOOD_TOWER].rot1, EPCapturePoints[PLAGUEWOOD_TOWER].rot2, EPCapturePoints[PLAGUEWOOD_TOWER].rot3);
-    AddObject(PLAGUEWOOD_TOWER_BANNER_1, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].entry, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].map, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].x, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].y, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].z, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].o, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].rot0, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].rot1, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].rot2, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_1].rot3);
-    AddObject(PLAGUEWOOD_TOWER_BANNER_2, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].entry, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].map, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].x, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].y, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].z, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].o, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].rot0, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].rot1, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].rot2, EPTowerFlags[PLAGUEWOOD_TOWER_BANNER_2].rot3);
+    SetCapturePointData(EP_CapturePoints[PLAGUEWOOD_TOWER].entry, EP_CapturePoints[PLAGUEWOOD_TOWER].map, EP_CapturePoints[PLAGUEWOOD_TOWER].x, EP_CapturePoints[PLAGUEWOOD_TOWER].y, EP_CapturePoints[PLAGUEWOOD_TOWER].z, EP_CapturePoints[PLAGUEWOOD_TOWER].o, EP_CapturePoints[PLAGUEWOOD_TOWER].rot0, EP_CapturePoints[PLAGUEWOOD_TOWER].rot1, EP_CapturePoints[PLAGUEWOOD_TOWER].rot2, EP_CapturePoints[PLAGUEWOOD_TOWER].rot3);
+    AddObject(PLAGUEWOOD_TOWER_BANNER_1, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].entry, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].map, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].x, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].y, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].z, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].o, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].rot0, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].rot1, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].rot2, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_1].rot3);
+    AddObject(PLAGUEWOOD_TOWER_BANNER_2, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].entry, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].map, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].x, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].y, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].z, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].o, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].rot0, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].rot1, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].rot2, EP_TowerFlags[PLAGUEWOOD_TOWER_BANNER_2].rot3);
     ChangeState();
 }
 
@@ -783,7 +766,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
             m_TowerState = TOWERSTATE_ALLIANCE;
             PlaySound(SOUND_PVPVICTORYALLIANCE);
             SummonFlightMaster(ALLIANCE);
-            AddObject(PLAGUEWOOD_TOWER_FLAG_FLARE, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].entry, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].map, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].x, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].y, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].z, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].o, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].rot0, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].rot1, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].rot2, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].rot3);
+            AddObject(PLAGUEWOOD_TOWER_FLAG_FLARE, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].entry, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].map, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].x, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].y, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].z, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].o, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].rot0, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].rot1, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].rot2, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_ALLIANCE].rot3);
 
             break;
         }
@@ -792,7 +775,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
             m_TowerState = TOWERSTATE_HORDE;
             PlaySound(SOUND_PVPVICTORYHORDE);
             SummonFlightMaster(HORDE);
-            AddObject(PLAGUEWOOD_TOWER_FLAG_FLARE, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].entry, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].map, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].x, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].y, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].z, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].o, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].rot0, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].rot1, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].rot2, EPTowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].rot3);
+            AddObject(PLAGUEWOOD_TOWER_FLAG_FLARE, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].entry, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].map, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].x, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].y, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].z, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].o, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].rot0, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].rot1, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].rot2, EP_TowerFlares[FLAG_FLARE_PLAGUEWOOD_TOWER_HORDE].rot3);
 
             break;
         }
@@ -810,7 +793,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
             {
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDALLIANCE);
-                AddCreature(PLAGUEWOOD_TOWER_BUFFER, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].entry, ALLIANCE, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].map, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].x, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].y, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].z, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].o);
+                AddCreature(PLAGUEWOOD_TOWER_BUFFER, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].entry, ALLIANCE, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].map, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].x, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].y, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].z, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_ALLIANCE].o);
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[PLAGUEWOOD_TOWER_BUFFER]))
                 {
                     pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, false);
@@ -818,7 +801,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
                 ((OutdoorPvPEP*)m_PvP)->EP_Controls[PLAGUEWOOD_TOWER] = ALLIANCE;
 
                 if (m_oldState != m_state)
-                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_A, EP_Zone);
+                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_PLAGUEWOOD_TOWER_ALLIANCE, EP_Zone);
             }
             break;
         }
@@ -836,7 +819,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
             {
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDHORDE);
-                AddCreature(PLAGUEWOOD_TOWER_BUFFER, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].entry, HORDE, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].map, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].x, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].y, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].z, EPBufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].o);
+                AddCreature(PLAGUEWOOD_TOWER_BUFFER, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].entry, HORDE, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].map, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].x, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].y, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].z, EP_BufferNPCs[TOWER_BUFFER_PLAGUEWOOD_TOWER_HORDE].o);
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[PLAGUEWOOD_TOWER_BUFFER]))
                 {
                     pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, false);
@@ -844,7 +827,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
                 ((OutdoorPvPEP*)m_PvP)->EP_Controls[PLAGUEWOOD_TOWER] = HORDE;
 
                 if (m_oldState != m_state)
-                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_H, EP_Zone);
+                    ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_PLAGUEWOOD_TOWER_HORDE, EP_Zone);
             }
             break;
         }
@@ -877,7 +860,6 @@ void OPvPCapturePointEP_PWT::ChangeState()
 void OPvPCapturePointEP_PWT::SendChangePhase()
 {
     SendUpdateWorldState(WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
-    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[OPvPCapturePoint] Update: m_value = %f / -m_maxValue = %f / -m_minValue = %f / m_maxValue = %f / m_minValue = %f", m_value, -m_maxValue, -m_minValue, m_maxValue, m_minValue);
 }
 
 uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
@@ -946,11 +928,6 @@ bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* pPlayer)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(pPlayer))
     {
-        /*
-        pPlayer->SendUpdateWorldState(WS_EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        pPlayer->SendUpdateWorldState(WS_EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        pPlayer->SendUpdateWorldState(WS_WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
-        */
         return true;
     }
     return false;
@@ -983,7 +960,7 @@ OutdoorPvPEP::OutdoorPvPEP()
 
 bool OutdoorPvPEP::SetupZoneScript()
 {
-    for (uint32 i : EPBuffZones)
+    for (uint32 i : EP_BuffZones)
         RegisterZone(i);
 
     AddCapturePoint(new OPvPCapturePointEP_EWT(this));
@@ -1011,9 +988,9 @@ void OutdoorPvPEP::Update(uint32 diff)
         }
 
         if (m_AllianceTowersControlled == 4)
-            GetMap()->SendDefenseMessage(BCT_EP_ALL_TAKEN_A, EP_Zone);
+            GetMap()->SendDefenseMessage(BCT_ALL_ALLIANCE, EP_Zone);
         else if (m_HordeTowersControlled == 4)
-            GetMap()->SendDefenseMessage(BCT_EP_ALL_TAKEN_H, EP_Zone);
+            GetMap()->SendDefenseMessage(BCT_ALL_HORDE, EP_Zone);
     }
     OutdoorPvP::Update(diff);
 }

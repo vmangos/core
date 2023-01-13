@@ -319,7 +319,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     for (auto const& player : players)
     {
-        if (player->IsOutdoorPvPActive() && !IsInsideObjective(player))
+        if (player->IsInWorld() && player->IsOutdoorPvPActive() && !IsInsideObjective(player))
         {
             if (m_activePlayers[player->GetTeamId()].insert(player->GetObjectGuid()).second)
                 HandlePlayerEnter(player);

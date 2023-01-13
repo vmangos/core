@@ -66,28 +66,28 @@ enum WorldStates
 
 enum BroadCastTexts
 {
-    BCT_EP_PWT_TAKEN_A      = 13629, // |cffffff00The Plaguewood Tower has been taken by the Alliance!| r
-    BCT_EP_NPT_TAKEN_A      = 13630, // |cffffff00Northpass Tower has been taken by the Alliance!| r
-    BCT_EP_EWT_TAKEN_A      = 13631, // |cffffff00Eastwall Tower has been taken by the Alliance!| r
-    BCT_EP_CGT_TAKEN_A      = 13632, // |cffffff00Crown Guard Tower has been taken by the Alliance!| r
-    BCT_EP_CGT_TAKEN_H      = 13633, // |cffffff00Crown Guard Tower has been taken by the Horde!| r
-    BCT_EP_PWT_TAKEN_H      = 13634, // |cffffff00The Plaguewood Tower has been taken by the Horde!| r
-    BCT_EP_NPT_TAKEN_H      = 13635, // |cffffff00Northpass Tower has been taken by the Horde!| r
-    BCT_EP_EWT_TAKEN_H      = 13636, // |cffffff00Eastwall Tower has been taken by the Horde!| r
-    BCT_EP_ALL_TAKEN_H      = 13637, // |cffff0000All four towers are now in control of the Horde!| r
-    BCT_EP_ALL_TAKEN_A      = 13638, // |cff33ccffAll four towers are now in control of the Alliance!| r
-    BCT_EP_EWT_SPAWN_SAY    = 14746  // The Northpass tower needs our aid!  Once again, let us charge and do proud or liege!
+    BCT_PLAGUEWOOD_TOWER_ALLIANCE       = 13629, // |cffffff00The Plaguewood Tower has been taken by the Alliance!| r
+    BCT_NORTHPASS_TOWER_ALLIANCE        = 13630, // |cffffff00Northpass Tower has been taken by the Alliance!| r
+    BCT_EASTWALL_TOWER_ALLIANCE         = 13631, // |cffffff00Eastwall Tower has been taken by the Alliance!| r
+    BCT_CROWN_GUARD_TOWER_ALLIANCE      = 13632, // |cffffff00Crown Guard Tower has been taken by the Alliance!| r
+    BCT_CROWN_GUARD_TOWER_HORDE         = 13633, // |cffffff00Crown Guard Tower has been taken by the Horde!| r
+    BCT_PLAGUEWOOD_TOWER_HORDE          = 13634, // |cffffff00The Plaguewood Tower has been taken by the Horde!| r
+    BCT_NORTHPASS_TOWER_HORDE           = 13635, // |cffffff00Northpass Tower has been taken by the Horde!| r
+    BCT_EASTWALL_TOWER_HORDE            = 13636, // |cffffff00Eastwall Tower has been taken by the Horde!| r
+    BCT_ALL_HORDE                       = 13637, // |cffff0000All four towers are now in control of the Horde!| r
+    BCT_ALL_ALLIANCE                    = 13638, // |cff33ccffAll four towers are now in control of the Alliance!| r
+    BCT_EASTWALL_TOWER_SAY              = 14746  // The Northpass tower needs our aid!  Once again, let us charge and do proud or liege!
 };
 
 enum Sounds
 {
-    SOUND_PVPFLAGCAPTUREDALLIANCE   = 8173, // 17794 Creature
-    SOUND_PVPFLAGCAPTUREDHORDE      = 8213, // 17795 Creature
-    SOUND_TUGOFWAR_VICTORY_HORDE    = 9283, // 17795 Creature
-    SOUND_PVPVICTORYHORDE           = 8454, // 182106 GameObject
-    SOUND_PVPVICTORYALLIANCE        = 8455, // 182106 GameObject
-    SOUND_PVPWARNINGALLIANCE        = 8332, // 182106 GameObject
-    SOUND_PVPWARNINGHORDE           = 8333  // 182106 GameObject
+    SOUND_PVPFLAGCAPTUREDALLIANCE       = 8173, // Played by 17794 Creature
+    SOUND_PVPFLAGCAPTUREDHORDE          = 8213, // Played by 17795 Creature
+    SOUND_TUGOFWAR_VICTORY_HORDE        = 9283, // Played by 17795 Creature
+    SOUND_PVPVICTORYHORDE               = 8454, // Played by 182106 GameObject
+    SOUND_PVPVICTORYALLIANCE            = 8455, // Played by 182106 GameObject
+    SOUND_PVPWARNINGALLIANCE            = 8332, // Played by 182106 GameObject
+    SOUND_PVPWARNINGHORDE               = 8333  // Played by 182106 GameObject
 };
 
 enum Artkit
@@ -126,18 +126,18 @@ enum Tower_Spells
 
 enum NPCs
 {
-    NPC_SPIRIT_OF_VICTORY                   = 18039,
-    NPC_WILLIAM_KIELAR                      = 17209,
-    NPC_TOWER_BUFFER_ALLIANCE               = 17794,
-    NPC_TOWER_BUFFER_HORDE                  = 17795,
-    NPC_LORDAERON_COMMANDER                 = 17635,
-    NPC_LORDAERON_SOLDIER                   = 17647,
-    NPC_LORDAERON_VETERAN                   = 17995,
-    NPC_LORDAERON_FIGHTER                   = 17996,
-    NPC_EASTWALL_CAPTURE_QUEST_DOODAD       = 17690, // <TXT>Eastwall Capture Quest Doodad
-    NPC_CROWN_GUARD_CAPTURE_QUEST_DOODAD    = 17689, // <TXT>Crown Guard Capture Quest Doodad
-    NPC_NORTHPASS_CAPTURE_QUEST_DOODAD      = 17696, // <TXT>Northpass Capture Quest Doodad
-    NPC_PLAGUEWOOD_CAPTURE_QUEST_DOODAD     = 17698  // <TXT>Plaguewood Capture Quest Doodad
+    NPC_SPIRIT_OF_VICTORY                       = 18039,
+    NPC_WILLIAM_KIELAR                          = 17209,
+    NPC_TOWER_BUFFER_ALLIANCE                   = 17794,
+    NPC_TOWER_BUFFER_HORDE                      = 17795,
+    NPC_LORDAERON_COMMANDER                     = 17635,
+    NPC_LORDAERON_SOLDIER                       = 17647,
+    NPC_LORDAERON_VETERAN                       = 17995,
+    NPC_LORDAERON_FIGHTER                       = 17996,
+    NPC_EASTWALL_CAPTURE_QUEST_DOODAD           = 17690, // <TXT>Eastwall Capture Quest Doodad
+    NPC_CROWN_GUARD_CAPTURE_QUEST_DOODAD        = 17689, // <TXT>Crown Guard Capture Quest Doodad
+    NPC_NORTHPASS_CAPTURE_QUEST_DOODAD          = 17696, // <TXT>Northpass Capture Quest Doodad
+    NPC_PLAGUEWOOD_CAPTURE_QUEST_DOODAD         = 17698  // <TXT>Plaguewood Capture Quest Doodad
 };
 
 enum GameObjects
@@ -246,15 +246,15 @@ uint32 const TFV_area = 2258; // The Fungal Vale.
 
 uint32 const EP_GraveYardId = 927;
 
-uint8 const EPBuffZonesNum = 3;
+uint8 const EP_BuffZonesNum = 3;
 
-uint32 const EPBuffZones[EPBuffZonesNum] = { 139, 2017, 2057 };
+uint32 const EP_BuffZones[EP_BuffZonesNum] = { 139, 2017, 2057 };
 
-uint8 const EP_EWT_NUM_CREATURES = 5;
+uint8 const EP_SummonsNum = 5;
 
 // All positions below are sniffed.
 
-const creature_type EPBufferNPCs[8] =
+const creature_type EP_BufferNPCs[8] =
 {
     { NPC_TOWER_BUFFER_ALLIANCE, 469, 0, 1860.59f, -3730.8f, 197.854f, 2.54818f },
     { NPC_TOWER_BUFFER_ALLIANCE, 469, 0, 2574.12f, -4795.33f, 145.871f, 5.11381f },
@@ -266,7 +266,7 @@ const creature_type EPBufferNPCs[8] =
     { NPC_TOWER_BUFFER_HORDE, 67, 0, 3180.48f, -4379.07f, 174.995f, 2.74017f }
 };
 
-const go_type EPCapturePoints[TOWER_NUMBER] =
+const go_type EP_CapturePoints[TOWER_NUMBER] =
 {
     { GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS03, 0, 2574.51f, -4794.89f, 144.704f, -1.45003f, -0.097056f, 0.095578f, -0.656229f, 0.742165f },
     { GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS01, 0, 3181.08f, -4379.36f, 174.123f, -2.03472f, -0.065392f, 0.119494f, -0.842275f, 0.521553f },
@@ -274,7 +274,7 @@ const go_type EPCapturePoints[TOWER_NUMBER] =
     { GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS02, 0, 1860.85f, -3731.23f, 196.716f, -2.53214f, 0.033967f, -0.131914f, 0.944741f, -0.298177f }
 };
 
-const go_type EPTowerFlags[BANNER_NUMBER] =
+const go_type EP_TowerFlags[BANNER_NUMBER] =
 {
     { GOBJECT_TOWER_BANNER, 0, 1838.42f, -3703.56f, 167.713f, 0.890117f, 0.0f, 0.0f, 0.43051f, 0.902586f },
     { GOBJECT_TOWER_BANNER, 0, 1877.6f, -3716.76f, 167.188f, 1.74533f, 0.0f, 0.0f, 0.766044f, 0.642789f },
@@ -286,7 +286,7 @@ const go_type EPTowerFlags[BANNER_NUMBER] =
     { GOBJECT_TOWER_BANNER, 0, 3188.76f, -4358.5f, 144.555f, 1.97222f, 0.0f, 0.0f, 0.833885f, 0.551938f }
 };
 
-const go_type EPTowerFlares[FLAG_FLARE_NUMBER] =
+const go_type EP_TowerFlares[FLAG_FLARE_NUMBER] =
 {
     { GOBJECT_FLAG_FLARE_ALLIANCE, 0, 1855.66f, -3725.0f, 197.044f, 1.53589f, 0.0f, 0.0f, 0.694658f, 0.71934f },    // Flag Flare, Alliance" in Crown Guard Tower.
     { GOBJECT_FLAG_FLARE_HORDE, 0, 1853.12f, -3722.62f, 197.406f, 0.628317f, 0.0f, 0.0f, 0.309016f, 0.951057f },    // Flag Flare, Horde" in Crown Guard Tower.
@@ -312,7 +312,7 @@ const go_type EP_CGT_BannerAuraGraveYard[2] =
     { GOBJECT_BANNER_AURA_LARGE_ALLIANCE, 0, 1985.47f, -3653.88f, 120.172f, 1.46608f, 0.0f, 0.0f, 0.66913f, 0.743145f }
 };
 
-const creature_type EP_EWT_Summons_A[EP_EWT_NUM_CREATURES] =
+const creature_type EP_EWT_Summons_A[EP_SummonsNum] =
 {
     { NPC_LORDAERON_COMMANDER, 469, 0, 2532.85f, -4764.92f, 103.617f, 2.35619f },
     { NPC_LORDAERON_SOLDIER, 469, 0, 2533.33f, -4769.31f, 104.396f, 2.37365f },
@@ -321,7 +321,7 @@ const creature_type EP_EWT_Summons_A[EP_EWT_NUM_CREATURES] =
     { NPC_LORDAERON_SOLDIER, 469, 0, 2542.57f, -4770.22f, 106.145f, 2.42601f }
 };
 
-const creature_type EP_EWT_Summons_H[EP_EWT_NUM_CREATURES] =
+const creature_type EP_EWT_Summons_H[EP_SummonsNum] =
 {
     { NPC_LORDAERON_VETERAN, 67, 0, 2532.85f, -4764.92f, 103.617f, 2.35619f },
     { NPC_LORDAERON_FIGHTER, 67, 0, 2533.33f, -4769.31f, 104.396f, 2.37365f },
