@@ -50,12 +50,17 @@ bool OPvPCapturePoint::HandlePlayerEnter(Player* plr)
         /* IMPORTANT!
         EP_UI_TOWER_SLIDER_POS: Should always be sent last and only when the value (m_valuePct) has been updated.
                                 
-            Alliance [100] <---------[50]---------> [0] Horde
+            ------------------------------------------------------------
+                              (m_minValue)(-m_minValue)
+                  (m_maxValue)     [240]    [-240]     (-m_maxValue)
+            Alliance [1200]<=========|===[0]===|=========>[-1200] Horde
+                              Blue       Grey      Red
+            ------------------------------------------------------------
             
             The Client does auto handle the direction indicator:
-            If the previous value was 50 and the new value 51 , the indicator points to the left (Alliance).
-            If the previous value was 50 and the new value 49 , the indicator points to the right (Horde).
-            If the previous value was 50 and the new value 50 , the indicator gets deleted (Possibly if the number of horde players and alliance players are the same, or Slider is at 0/100).
+            If the previous value was 0 and the new value 1 , the indicator points to the left (Alliance).
+            If the previous value was 0 and the new value -1 , the indicator points to the right (Horde).
+            If the previous value was 0 and the new value 0 , the indicator gets deleted (Possibly if the number of horde players and alliance players are the same, or Slider is at 0/100).
             If any other UI element gets updated (SendUpdateWorldState) after the Slider it gets also deleted.
             The reason for this is client-specific and has nothing to do with the core.
         */
@@ -364,6 +369,14 @@ bool OPvPCapturePoint::Update(uint32 diff)
     m_oldState = m_state;
 
     m_value += fact_diff;
+
+    /*  The Slider
+    ------------------------------------------------------------
+                      (m_minValue)(-m_minValue)
+          (m_maxValue)     [240]    [-240]     (-m_maxValue)
+    Alliance [1200]<=========|===[0]===|=========>[-1200] Horde
+                      Blue       Grey      Red
+    ------------------------------------------------------------*/
 
     // RED
     if (m_value <= -m_minValue) // m_value is in the red bar, between -240 (-m_minValue) and -1200 (-m_maxValue).
