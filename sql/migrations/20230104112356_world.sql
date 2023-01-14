@@ -23,6 +23,89 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 UPDATE `creature_template` SET `spawn_spell_id`=17321, `flags_extra`=33554496 WHERE `entry`=18039;
 UPDATE `creature_template` SET `auras`='16577' WHERE `entry`=10821;
 
+-- 17635: Source or Target Is In Zone or Area 2271
+UPDATE `conditions` SET `value1`=2271, `flags`=0 WHERE `condition_entry`=17635;
+
+-- Events list for Lordaeron Commander
+DELETE FROM `creature_ai_events` WHERE `creature_id`=17635;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1763501, 17635, 17635, 11, 6, 100, 0, 0, 0, 0, 0, 1763501, 0, 0, 'Lordaeron Commander - Just Spawned');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1763503, 17635, 0, 29, 0, 100, 1, 2, 37, 0, 0, 1763503, 0, 0, 'Lordaeron Commander - Last Waypoint');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1763505, 17635, 0, 30, 5, 100, 1, 0, 0, 0, 0, 1763502, 0, 0, 'Lordaeron Commander - Leave Combat & On Waypoints');
+
+DELETE FROM `generic_scripts` WHERE `id`=1763501;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1763501, 0, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Increment Phase'),
+(1763501, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14746, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Say'),
+(1763501, 8, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 176350, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Start Waypoints'),
+(1763501, 5, 0, 24, 2410, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Mount up'),
+(1763501, 5, 0, 68, 1764701, 2, 17647, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Mount up all Lordaeron Soldier'),
+(1763501, 5, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Toggle run');
+
+DELETE FROM `generic_scripts` WHERE `id`=1763502;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1763502, 5, 0, 24, 2410, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Mount up'),
+(1763502, 5, 0, 68, 1764701, 2, 17647, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Mount up all Lordaeron Soldier'),
+(1763502, 5, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Toggle run');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1763501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1763501, 0, 1, 20, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Set Movement Type'),
+(1763501, 0, 2, 39, 1763501, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Start Script');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1763502;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1763502, 0, 0, 39, 1763502, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Start Script');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1763503;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1763503, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Set Walk'),
+(1763503, 0, 0, 67, 1, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Set Random Movement'),
+(1763503, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Leave Creature Group'),
+(1763503, 0, 0, 68, 1764702, 2, 17647, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Execute this Script for all Lordaeron Soldier'),
+(1763503, 0, 0, 24, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Dismount'),
+(1763503, 0, 0, 34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Save Home Position'),
+(1763503, 0, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Increment Phase');
+
+-- Events list for Lordaeron Veteran
+DELETE FROM `creature_ai_events` WHERE `creature_id`=17995;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1799501, 17995, 17635, 11, 6, 100, 0, 0, 0, 0, 0, 1799501, 0, 0, 'Lordaeron Veteran - Just Spawned');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1799503, 17995, 0, 29, 0, 100, 1, 2, 37, 0, 0, 1799503, 0, 0, 'Lordaeron Veteran - Last Waypoint');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1799505, 17995, 0, 30, 5, 100, 1, 0, 0, 0, 0, 1799502, 0, 0, 'Lordaeron Veteran - Leave Combat & On Waypoints');
+
+DELETE FROM `generic_scripts` WHERE `id`=1799501;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1799501, 0, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Increment Phase'),
+(1799501, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14746, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Say'),
+(1799501, 8, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 176350, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Start Waypoints'),
+(1799501, 5, 0, 24, 2410, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Mount up'),
+(1799501, 5, 0, 68, 1799601, 2, 17996, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Mount up all Lordaeron Fighter'),
+(1799501, 5, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Toggle run');
+
+DELETE FROM `generic_scripts` WHERE `id`=1799502;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1799502, 5, 0, 24, 2410, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Mount up'),
+(1799502, 5, 0, 68, 1799601, 2, 17996, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Mount up all Lordaeron Fighter'),
+(1799502, 5, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Toggle run');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1799501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1799501, 0, 1, 20, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Set Movement Type'),
+(1799501, 0, 2, 39, 1799501, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Start Script');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1799502;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1799502, 0, 0, 39, 1799502, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Start Script');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1799503;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1799503, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Set Walk'),
+(1799503, 0, 0, 67, 1, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Set Random Movement'),
+(1799503, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Leave Creature Group'),
+(1799503, 0, 0, 68, 1799602, 2, 17996, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Execute this Script for all Lordaeron Fighter'),
+(1799503, 0, 0, 24, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Dismount'),
+(1799503, 0, 0, 34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Save Home Position'),
+(1799503, 0, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Increment Phase');
+
 
 -- End of migration.
 END IF;

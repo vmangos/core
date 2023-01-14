@@ -213,7 +213,7 @@ void OPvPCapturePointEP_EWT::PlaySound(uint32 sound)
 
     if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
     {
-        pBanner1->PlayDistanceSound(sound);
+        pBanner1->PlayDirectSound(sound);
     }
 }
 
@@ -460,7 +460,7 @@ void OPvPCapturePointEP_NPT::PlaySound(uint32 sound)
 
     if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
     {
-        pBanner1->PlayDistanceSound(sound);
+        pBanner1->PlayDirectSound(sound);
     }
 }
 
@@ -681,7 +681,7 @@ void OPvPCapturePointEP_CGT::PlaySound(uint32 sound)
 
     if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
     {
-        pBanner1->PlayDistanceSound(sound);
+        pBanner1->PlayDirectSound(sound);
     }
 }
 
@@ -920,7 +920,7 @@ void OPvPCapturePointEP_PWT::PlaySound(uint32 sound)
 
     if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
     {
-        pBanner1->PlayDistanceSound(sound);
+        pBanner1->PlayDirectSound(sound);
     }
 }
 
