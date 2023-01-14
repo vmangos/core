@@ -168,6 +168,7 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case GO_IDOL_OF_HAKKAR:
                 m_uiIdolHakkarGUID = pGo->GetGUID();
+                pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
                 break;
             case GO_ATALAI_STATUE_1:
                 m_luiAtalaiStatueGUIDs[0] = pGo->GetGUID();
@@ -290,6 +291,19 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case NPC_SHADE_OF_ERANIKUS:
                 pCreature->SetStandState(UNIT_STAND_STATE_STAND);
+                break;
+        }
+    }
+
+    void OnCreatureDeath(Creature* pCreature)
+    {
+        switch (pCreature->GetEntry())
+        {
+            case NPC_ATALARION:
+                if (GameObject* idol = instance->GetGameObject(m_uiIdolHakkarGUID))
+                {
+                    idol->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                }
                 break;
         }
     }
