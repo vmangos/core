@@ -295,7 +295,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature* pCreature)
+    void OnCreatureDeath(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
