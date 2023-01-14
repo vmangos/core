@@ -79,7 +79,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPWARNINGALLIANCE);
             }
-            else if (m_oldState == OBJECTIVESTATE_ALLIANCE_CONTESTED || m_oldState == OBJECTIVESTATE_HORDE_CONTESTED)
+            else if (m_oldState <= OBJECTIVESTATE_HORDE_CONTESTED) // m_oldState was grey.
             {
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDALLIANCE);
@@ -102,7 +102,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPWARNINGHORDE);
             }
-            else if (m_oldState == OBJECTIVESTATE_HORDE_CONTESTED || m_oldState == OBJECTIVESTATE_ALLIANCE_CONTESTED)
+            else if (m_oldState <= OBJECTIVESTATE_HORDE_CONTESTED) // m_oldState was grey.
             {
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDHORDE);
@@ -213,7 +213,7 @@ void OPvPCapturePointEP_EWT::PlaySound(uint32 sound)
 
     if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
     {
-        pBanner1->PlayDirectSound(sound);
+        pBanner1->PlayDistanceSound(sound);
     }
 }
 
@@ -330,7 +330,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPWARNINGALLIANCE);
             }
-            else if (m_oldState == OBJECTIVESTATE_ALLIANCE_CONTESTED || m_oldState == OBJECTIVESTATE_HORDE_CONTESTED)
+            else if (m_oldState <= OBJECTIVESTATE_HORDE_CONTESTED) // m_oldState was grey.
             {
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDALLIANCE);
@@ -353,7 +353,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPWARNINGHORDE);
             }
-            else if (m_oldState == OBJECTIVESTATE_HORDE_CONTESTED || m_oldState == OBJECTIVESTATE_ALLIANCE_CONTESTED)
+            else if (m_oldState <= OBJECTIVESTATE_HORDE_CONTESTED) // m_oldState was grey.
             {
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDHORDE);
@@ -460,7 +460,7 @@ void OPvPCapturePointEP_NPT::PlaySound(uint32 sound)
 
     if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
     {
-        pBanner1->PlayDirectSound(sound);
+        pBanner1->PlayDistanceSound(sound);
     }
 }
 
@@ -548,7 +548,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPWARNINGALLIANCE);
             }
-            else if (m_oldState == OBJECTIVESTATE_ALLIANCE_CONTESTED || m_oldState == OBJECTIVESTATE_HORDE_CONTESTED)
+            else if (m_oldState <= OBJECTIVESTATE_HORDE_CONTESTED) // m_oldState was grey.
             {
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDALLIANCE);
@@ -573,7 +573,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPWARNINGHORDE);
             }
-            else if (m_oldState == OBJECTIVESTATE_HORDE_CONTESTED || m_oldState == OBJECTIVESTATE_ALLIANCE_CONTESTED)
+            else if (m_oldState <= OBJECTIVESTATE_HORDE_CONTESTED) // m_oldState was grey.
             {
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDHORDE);
@@ -681,7 +681,7 @@ void OPvPCapturePointEP_CGT::PlaySound(uint32 sound)
 
     if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
     {
-        pBanner1->PlayDirectSound(sound);
+        pBanner1->PlayDistanceSound(sound);
     }
 }
 
@@ -789,7 +789,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPWARNINGALLIANCE);
             }
-            else if (m_oldState == OBJECTIVESTATE_ALLIANCE_CONTESTED || m_oldState == OBJECTIVESTATE_HORDE_CONTESTED)
+            else if (m_oldState <= OBJECTIVESTATE_HORDE_CONTESTED) // m_oldState was grey.
             {
                 m_TowerState = TOWERSTATE_ALLIANCE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDALLIANCE);
@@ -815,7 +815,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPWARNINGHORDE);
             }
-            else if (m_oldState == OBJECTIVESTATE_HORDE_CONTESTED || m_oldState == OBJECTIVESTATE_ALLIANCE_CONTESTED)
+            else if (m_oldState <= OBJECTIVESTATE_HORDE_CONTESTED) // m_oldState was grey.
             {
                 m_TowerState = TOWERSTATE_HORDE_PROGRESSING;
                 PlaySound(SOUND_PVPFLAGCAPTUREDHORDE);
@@ -920,7 +920,7 @@ void OPvPCapturePointEP_PWT::PlaySound(uint32 sound)
 
     if (GameObject* pBanner1 = m_PvP->GetGameObject(m_capturePoint->GetObjectGuid()))
     {
-        pBanner1->PlayDirectSound(sound);
+        pBanner1->PlayDistanceSound(sound);
     }
 }
 
