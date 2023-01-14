@@ -359,7 +359,6 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     uint32 OldValuePct = m_valuePct;
     uint32 OldFactDiff = m_factDiff;
-    float oldValue = m_value;
     TeamId oldTeam = m_team;
 
     m_oldState = m_state;

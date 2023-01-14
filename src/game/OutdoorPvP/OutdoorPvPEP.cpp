@@ -261,7 +261,7 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
                 asActiveObject = true;
         }
     
-        AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 1000000, asActiveObject);
+        AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 0, asActiveObject);
     
         if (ct[i].entry == NPC_LORDAERON_SOLDIER || ct[i].entry == NPC_LORDAERON_FIGHTER)
         {
