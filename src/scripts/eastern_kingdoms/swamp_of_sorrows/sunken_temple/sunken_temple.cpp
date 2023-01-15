@@ -180,11 +180,11 @@ struct go_atalai_lightAI: public GameObjectAI
     {
         ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData();
 
-        if (!pInstance || pInstance->GetData(TYPE_ATALARION) == DONE)
+        if (!pInstance || pInstance->GetData(TYPE_SECRET_CIRCLE) == DONE)
             return false;
 
         pInstance->SetData64(me->GetEntry(), me->GetGUID());
-        pInstance->SetData(TYPE_ATALARION, IN_PROGRESS);
+        pInstance->SetData(TYPE_SECRET_CIRCLE, IN_PROGRESS);
 
         return true;
     }

@@ -151,7 +151,7 @@ struct instance_sunken_temple : public ScriptedInstance
 
         // Check if all statues are active
         if (m_uiStatueCounter == 6)
-            SetData(TYPE_ATALARION, DONE);
+            SetData(TYPE_SECRET_CIRCLE, DONE);
 
         return true;
     }
@@ -312,7 +312,7 @@ struct instance_sunken_temple : public ScriptedInstance
     {
         switch (uiType)
         {
-            case TYPE_ATALARION:
+            case TYPE_SECRET_CIRCLE:
                 if (uiData == DONE)
                 {
                     DoSpawnAtalarionIfCan();
@@ -557,7 +557,7 @@ struct instance_sunken_temple : public ScriptedInstance
     {
         switch (uiType)
         {
-            case TYPE_ATALARION:
+            case TYPE_SECRET_CIRCLE:
                 return m_auiEncounter[0];
             case TYPE_PROTECTORS:
                 return m_auiEncounter[1];

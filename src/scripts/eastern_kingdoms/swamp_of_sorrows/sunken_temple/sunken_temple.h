@@ -31,7 +31,7 @@ enum
     TYPE_PROTECTORS_OBS   = 2,
     TYPE_JAMMALAN_OBS     = 3,
 
-    TYPE_ATALARION        = 4,
+    TYPE_SECRET_CIRCLE    = 4,
     TYPE_PROTECTORS       = 5,
     TYPE_JAMMALAN         = 6,
     TYPE_MALFURION        = 7,
