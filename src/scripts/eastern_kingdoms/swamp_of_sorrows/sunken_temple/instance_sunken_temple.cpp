@@ -137,10 +137,11 @@ struct instance_sunken_temple : public ScriptedInstance
             DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
     }
 
-    bool ProcessStatueEvent(GameObject* pStatue)
+    void ProcessStatueEvent()
     {
+        GameObject* pStatue = instance->GetGameObject(m_uiAtalaiStatueGUID);
         if (!pStatue)
-            return false;
+            return;
 
         bool activationSuccess = false;
         uint32 objectEnrty = pStatue->GetEntry();
@@ -161,11 +162,38 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             }
         }
+
         // Check if all statues are activated
         if (m_uiStatueCounter == MAX_STATUES)
+        {
             SetData(TYPE_SECRET_CIRCLE, DONE);
+            return;
+        }
 
-        return activationSuccess;
+        if (activationSuccess)
+            return;
+
+        // If the wrong statue was activated, then trigger trap
+        // We don't know actually which trap goes to which statue so we need to search for each
+        Creature* pAtalarion = instance->GetCreature(GetData64(NPC_ATALARION));
+        if (!pAtalarion)
+            return;
+
+        switch (urand(0, 2))
+        {
+        case 0:
+            if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_1, INTERACTION_DISTANCE))
+                pTrap->Use(pAtalarion);
+            break;
+        case 1:
+            if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_2, INTERACTION_DISTANCE))
+                pTrap->Use(pAtalarion);
+            break;
+        case 2:
+            if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_3, INTERACTION_DISTANCE))
+                pTrap->Use(pAtalarion);
+            break;
+        }
     }
 
     void OnObjectCreate(GameObject* pGo) override
@@ -325,6 +353,7 @@ struct instance_sunken_temple : public ScriptedInstance
         switch (uiType)
         {
             case TYPE_SECRET_CIRCLE:
+                m_auiEncounter[0] = uiData;
                 if (uiData == DONE)
                 {
                     HandleStatueEventDone();
@@ -332,38 +361,8 @@ struct instance_sunken_temple : public ScriptedInstance
                 }
                 else if (uiData == IN_PROGRESS)
                 {
-                    Creature* pAtalarion = instance->GetCreature(GetData64(NPC_ATALARION));
-                    if (!pAtalarion)
-                        break;
-
-                    GameObject* pStatue = instance->GetGameObject(m_uiAtalaiStatueGUID);
-                    if (!pStatue)
-                        break;
-
-                    // Check if correct statue was activated
-                    bool success = ProcessStatueEvent(pStatue);
-                    if (!success)
-                    {
-                        // If the wrong statue was activated, then trigger trap
-                        // We don't know actually which trap goes to which statue so we need to search for each
-                        switch (urand(0, 2))
-                        {
-                            case 0:
-                                if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_1, INTERACTION_DISTANCE))
-                                    pTrap->Use(pAtalarion);
-                                break;
-                            case 1:
-                                if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_2, INTERACTION_DISTANCE))
-                                    pTrap->Use(pAtalarion);
-                                break;
-                            case 2:
-                                if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_3, INTERACTION_DISTANCE))
-                                    pTrap->Use(pAtalarion);
-                                break;
-                        }
-                    }
+                    ProcessStatueEvent();
                 }
-                m_auiEncounter[0] = uiData;
                 break;
             case TYPE_PROTECTORS:
                 m_auiEncounter[1] = uiData;
