@@ -5214,7 +5214,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                         if (!pTarget->IsFriendlyTo(m_casterUnit))
                             continue;
 
-                        if (pTarget->HasStealthAura())
+                        if (!pTarget->IsOutdoorPvPActive())
                             continue;
 
                         pTarget->CastSpell(pTarget, 31929, true);
