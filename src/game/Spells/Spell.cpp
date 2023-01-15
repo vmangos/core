@@ -870,6 +870,11 @@ void Spell::prepareDataForTriggerSystem()
                     m_procVictim = PROC_FLAG_TAKE_HARMFUL_ABILITY;
                 }
             }
+
+            // Hunter trap spells - Entrapment
+            if (m_spellInfo->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_FIRE_TRAP_EFFECTS, CF_HUNTER_FREEZING_TRAP_EFFECT, CF_HUNTER_FROST_TRAP_AURA>())
+                m_procAttacker |= PROC_FLAG_ON_TRAP_ACTIVATION;
+
             break;
         }
     }
@@ -1180,10 +1185,12 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         return;
 
     // Get original caster (if exist) and calculate damage/healing from him data
-    SpellCaster* pRealCaster = GetAffectiveCasterObject();
-    SpellCaster* pCaster = pRealCaster ? pRealCaster : m_caster;
-    Unit* pUnitCaster = pCaster->ToUnit();
-    Unit* pRealUnitCaster = ToUnit(pRealCaster);
+    SpellCaster* pCaster = GetAffectiveCasterObject();
+    if (!pCaster)
+        pCaster = m_caster;
+    Unit* pRealUnitCaster = m_originalCaster ? m_originalCaster : m_casterUnit;
+    // prefer unit owner in case of hunter trap, but with fallback (used for procs only)
+    SpellCaster* pRealCaster = pRealUnitCaster ? pRealUnitCaster : m_caster;
 
     SpellMissInfo missInfo = target->missCondition;
     // Need init unitTarget by default unit (can changed in code on reflect)
@@ -1371,8 +1378,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 }
             }
 
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget, 
-                pRealCaster && !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_CASTER_PROCS) ? procAttacker : PROC_FLAG_NONE,
+            pRealCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget,
+               !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_CASTER_PROCS) ? procAttacker : PROC_FLAG_NONE,
                 m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_TARGET_PROCS) ? PROC_FLAG_NONE : procVictim,
                 procEx,
                 addhealth,
@@ -1383,10 +1390,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         int32 gain = pCaster->DealHeal(unitTarget, addhealth, m_spellInfo, crit);
 
-        float classThreatModifier = pUnitCaster && pUnitCaster->GetClass() == CLASS_PALADIN ? 0.25f : 0.5f;
-
         if (pRealUnitCaster)
+        {
+            float classThreatModifier = pRealUnitCaster->GetClass() == CLASS_PALADIN ? 0.25f : 0.5f;
             unitTarget->GetHostileRefManager().threatAssist(pRealUnitCaster, float(gain) * classThreatModifier * sSpellMgr.GetSpellThreatMultiplier(m_spellInfo), m_spellInfo);
+        }
     }
     // Do damage and triggers
     else if (m_damage && unitTarget->IsAlive())
@@ -1459,8 +1467,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (m_canTrigger)
         {
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget,
-                pRealCaster && !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_CASTER_PROCS) ? procAttacker : PROC_FLAG_NONE,
+            pRealCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget,
+               !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_CASTER_PROCS) ? procAttacker : PROC_FLAG_NONE,
                 m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_TARGET_PROCS) ? PROC_FLAG_NONE : procVictim,
                 procEx,
                 damageInfo.damage,
@@ -1572,8 +1580,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             }
         }
 
-        pCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget,
-            pRealCaster && !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_CASTER_PROCS) ? procAttacker : PROC_FLAG_NONE,
+        pRealCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget,
+           !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_CASTER_PROCS) ? procAttacker : PROC_FLAG_NONE,
             m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_TARGET_PROCS) ? PROC_FLAG_NONE : procVictim,
             procEx,
             dmg,

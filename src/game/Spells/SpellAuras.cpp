@@ -1505,16 +1505,17 @@ void Aura::TriggerSpell()
             }
             case 16191:                                     // Mana Tide
             {
-            triggerTarget->CastCustomSpell(triggerTarget, trigger_spell_id, dither(m_modifier.m_amount), {}, {}, true, nullptr, this);
+                triggerTarget->CastCustomSpell(triggerTarget, trigger_spell_id, dither(m_modifier.m_amount), {}, {}, true, nullptr, this);
                 return;
             }
-            //Frost Trap Aura
+            // Frost Trap Aura
             case 13810:
             {
                 Unit* caster = GetCaster();
                 if (!caster)
                     return;
-                // Pour le talent hunt 'Piege' par exemple (chances de stun)
+
+                // Talent 'Entrapment' for example (chance to root)
                 caster->ProcDamageAndSpell(ProcSystemArguments(target, PROC_FLAG_ON_TRAP_ACTIVATION, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, BASE_ATTACK, GetSpellProto()));
                 return;
             }
