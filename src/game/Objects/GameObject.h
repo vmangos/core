@@ -230,6 +230,7 @@ class GameObject : public SpellCaster
         float GetStationaryY() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.y; return 0.f; }
         float GetStationaryZ() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.z; return 0.f; }
         float GetStationaryO() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.o; return GetOrientation(); }
+        void GetClosestChairSlotPosition(float userX, float userY, float& outX, float& outY) const;
 
         GameObjectData const*  GetGOData() const;
 

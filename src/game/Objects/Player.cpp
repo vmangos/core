@@ -6380,7 +6380,8 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
 
     if (positionChanged || old_r != orientation)
     {
-        HandleInterruptsOnMovement(positionChanged);
+        if (!teleport)
+            HandleInterruptsOnMovement(positionChanged);
 
         // move and update visible state if need
         m->PlayerRelocation(this, x, y, z, orientation);

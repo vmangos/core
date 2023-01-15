@@ -694,13 +694,24 @@ struct GameObjectInfo
     {
         switch (type)
         {
-            // TODO: find out how the client calculates the maximal usage distance to spellless working
-            // gameobjects like mailboxes - 10.0 is a just an abitrary chosen number
-            case GAMEOBJECT_TYPE_MAILBOX:
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+            case GAMEOBJECT_TYPE_TEXT:
+            case GAMEOBJECT_TYPE_FLAGSTAND:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+            case GAMEOBJECT_TYPE_FLAGDROP:
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+            case GAMEOBJECT_TYPE_MINI_GAME:
+#endif
+                return 5.55556f;
+            case GAMEOBJECT_TYPE_BINDER:
                 return 10.0f;
-            case GAMEOBJECT_TYPE_FISHINGHOLE:
+            case GAMEOBJECT_TYPE_CHAIR: // 100.0f set in constructor, but there's a special can-use-now check for chair
+                return 3.0f;
             case GAMEOBJECT_TYPE_FISHINGNODE:
-                return 20.0f + CONTACT_DISTANCE; // max spell range;
+                return 100.0f;
+            case GAMEOBJECT_TYPE_AREADAMAGE:
+                return 0.0f;
         }
 
         return INTERACTION_DISTANCE;
