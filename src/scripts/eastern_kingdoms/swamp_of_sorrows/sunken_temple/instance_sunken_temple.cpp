@@ -168,7 +168,18 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case GO_IDOL_OF_HAKKAR:
                 m_uiIdolHakkarGUID = pGo->GetGUID();
-                pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                if (m_auiEncounter[0] == DONE)
+                {
+                    // When server restarts and circle stones have been activated before,
+                    // remove non-interact flag. There should rather be a check if Atal'alarion was
+                    // killed already, but currently this is not persisted.
+                    pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                }
+                else
+                {
+                    // disabled until Atal'alarion was killed
+                    pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                }
                 break;
             case GO_ATALAI_STATUE_1:
                 m_luiAtalaiStatueGUIDs[0] = pGo->GetGUID();
