@@ -27,9 +27,16 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "sunken_temple.h"
 
-// This is also the needed order for activation: S, N, SW, SE, NW, NE
-//static uint32 const m_aAtalaiStatueEvents[MAX_STATUES] = {EVENT_ID_STATUE_1, EVENT_ID_STATUE_2, EVENT_ID_STATUE_3, EVENT_ID_STATUE_4, EVENT_ID_STATUE_5, EVENT_ID_STATUE_6};
-static uint64 const m_aAtalaiStatueEvents[6] = {GO_ATALAI_STATUE_1, GO_ATALAI_STATUE_2, GO_ATALAI_STATUE_3, GO_ATALAI_STATUE_4, GO_ATALAI_STATUE_5, GO_ATALAI_STATUE_6};
+// This is also the needed order for activation
+static uint64 const m_aAtalaiStatueEvents[MAX_STATUES] =
+{
+    GO_ATALAI_STATUE_1, // S
+    GO_ATALAI_STATUE_2, // N
+    GO_ATALAI_STATUE_3, // SW
+    GO_ATALAI_STATUE_4, // SE
+    GO_ATALAI_STATUE_5, // NW
+    GO_ATALAI_STATUE_6  // NE
+};
 
 struct SummonLocations
 {
@@ -130,34 +137,35 @@ struct instance_sunken_temple : public ScriptedInstance
             DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
     }
 
-    bool ProcessStatueEvent(uint32 uiStatueEntry)
+    bool ProcessStatueEvent(GameObject* pStatue)
     {
-        if (!uiStatueEntry)
+        if (!pStatue)
             return false;
 
-        bool bEventStatus = false;
+        bool activationSuccess = false;
+        uint32 objectEnrty = pStatue->GetEntry();
 
         // Check if the statues are activated correctly
         // Increase the counter when the correct statue is activated
-        for (uint8 i = 0; i < 6; ++i)
+        for (uint8 i = 0; i < MAX_STATUES; ++i)
         {
-            if (uiStatueEntry == m_aAtalaiStatueEvents[i] && m_uiStatueCounter == i)
+            if (objectEnrty == m_aAtalaiStatueEvents[i] && m_uiStatueCounter == i)
             {
-                // Right Statue activated
+                // Correct statue activated
                 ++m_uiStatueCounter;
-                bEventStatus = true;
+                activationSuccess = true;
+                pStatue->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                // Show green light
+                if (GameObject* pLight = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_LIGHT, INTERACTION_DISTANCE))
+                    DoRespawnGameObject(pLight->GetGUID(), HOUR * IN_MILLISECONDS);
                 break;
             }
         }
-
-        if (!bEventStatus)
-            return false;
-
-        // Check if all statues are active
-        if (m_uiStatueCounter == 6)
+        // Check if all statues are activated
+        if (m_uiStatueCounter == MAX_STATUES)
             SetData(TYPE_SECRET_CIRCLE, DONE);
 
-        return true;
+        return activationSuccess;
     }
 
     void OnObjectCreate(GameObject* pGo) override
@@ -324,27 +332,18 @@ struct instance_sunken_temple : public ScriptedInstance
                 }
                 else if (uiData == IN_PROGRESS)
                 {
-                    GameObject* pStatue = instance->GetGameObject(m_uiAtalaiStatueGUID);
-                    if (!pStatue)
-                        break;
                     Creature* pAtalarion = instance->GetCreature(GetData64(NPC_ATALARION));
                     if (!pAtalarion)
                         break;
 
-                    // Send the GO entry to process
-                    if (ProcessStatueEvent(pStatue->GetEntry()))
-                    {
-                        pStatue->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                        // Activate the green light if the correct statue is activated
-                        if (GameObject* pLight = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_LIGHT, INTERACTION_DISTANCE))
-                            DoRespawnGameObject(pLight->GetGUID(), HOUR * IN_MILLISECONDS);
-                    }
-                    else
-                    {
-                        Creature* pAtalarion = instance->GetCreature(GetData64(NPC_ATALARION));
-                        if (!pAtalarion)
-                            break;
+                    GameObject* pStatue = instance->GetGameObject(m_uiAtalaiStatueGUID);
+                    if (!pStatue)
+                        break;
 
+                    // Check if correct statue was activated
+                    bool success = ProcessStatueEvent(pStatue);
+                    if (success)
+                    {
                         // If the wrong statue was activated, then trigger trap
                         // We don't know actually which trap goes to which statue so we need to search for each
                         switch (urand(0, 2))
@@ -635,9 +634,6 @@ struct instance_sunken_temple : public ScriptedInstance
         {
             if (i == IN_PROGRESS)
                 i = NOT_STARTED;
-            // Here a bit custom, to have proper mechanics for the statue events
-            /*if (m_auiEncounter[i] != DONE)
-                m_auiEncounter[i] = NOT_STARTED;*/
         }
 
         OUT_LOAD_INST_DATA_COMPLETE;
