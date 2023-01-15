@@ -163,12 +163,12 @@ struct instance_sunken_temple : public ScriptedInstance
         {
             case GO_JAMMALAN_BARRIER:
                 m_uiJammalanBarrierGUID = pGo->GetGUID();
-                if (m_auiEncounter[1] == DONE)
+                if (GetData(TYPE_PROTECTORS) == DONE)
                     pGo->SetGoState(GO_STATE_ACTIVE);
                 break;
             case GO_IDOL_OF_HAKKAR:
                 m_uiIdolHakkarGUID = pGo->GetGUID();
-                if (m_auiEncounter[0] == DONE)
+                if (GetData(TYPE_SECRET_CIRCLE) == DONE)
                 {
                     // When server restarts and circle stones have been activated before,
                     // remove non-interact flag. There should rather be a check if Atal'alarion was
@@ -239,7 +239,7 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case NPC_ATALARION:
                 m_uiAtalarionGUID = pCreature->GetGUID();
-                if (m_auiEncounter[0] != SPECIAL)
+                if (GetData(TYPE_SECRET_CIRCLE) != SPECIAL)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -249,7 +249,7 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case NPC_SHADE_OF_ERANIKUS:
                 m_uiShadeEranikusGUID = pCreature->GetGUID();
-                if (m_auiEncounter[2] != DONE)      // TYPE_JAMMALAN
+                if (GetData(TYPE_JAMMALAN) != DONE)
                 {
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
@@ -259,7 +259,7 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case NPC_DREAMSCYTH:
                 m_uiDreamscythGUID = pCreature->GetGUID();
-                if (m_auiEncounter[2] != DONE)      // TYPE_JAMMALAN
+                if (GetData(TYPE_JAMMALAN) != DONE)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -270,7 +270,7 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case NPC_WEAVER:
                 m_uiWeaverGUID = pCreature->GetGUID();
-                if (m_auiEncounter[2] != DONE)      // TYPE_JAMMALAN
+                if (GetData(TYPE_JAMMALAN) != DONE)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
