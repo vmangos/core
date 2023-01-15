@@ -69,6 +69,8 @@ struct instance_sunken_temple : public ScriptedInstance
     uint64 m_luiAtalaiStatueGUIDs[6];
     uint64 m_luiBigLightGUIDs[6];
 
+    bool m_restoreCircleState;
+
     void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
@@ -94,6 +96,7 @@ struct instance_sunken_temple : public ScriptedInstance
         m_uiAtalaiStatueGUID = 0;
 
         RemoveTimer = 5000;
+        m_restoreCircleState = true;
     }
 
     void DoSpawnAtalarionIfCan()
@@ -169,18 +172,7 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case GO_IDOL_OF_HAKKAR:
                 m_uiIdolHakkarGUID = pGo->GetGUID();
-                if (GetData(TYPE_SECRET_CIRCLE) == DONE)
-                {
-                    // When server restarts and circle stones have been activated before,
-                    // remove non-interact flag. There should rather be a check if Atal'alarion was
-                    // killed already, but currently this is not persisted.
-                    pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                }
-                else
-                {
-                    // disabled until Atal'alarion was killed
-                    pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                }
+                pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
                 break;
             case GO_ATALAI_STATUE_1:
                 m_luiAtalaiStatueGUIDs[0] = pGo->GetGUID();
@@ -607,6 +599,23 @@ struct instance_sunken_temple : public ScriptedInstance
         }
         else
             RemoveTimer -= uiDiff;
+
+        // check if need to restore state after server crash
+        if (m_restoreCircleState)
+        {
+            m_restoreCircleState = false;
+            if (GetData(TYPE_SECRET_CIRCLE) == DONE)
+            {
+                HandleStatueEventDone();
+                // When server restarts and circle stones have been activated before,
+                // remove non-interact flag. There should rather be a check if Atal'alarion was
+                // killed already, but currently this is not persisted.
+                if (GameObject* idol = instance->GetGameObject(m_uiIdolHakkarGUID))
+                {
+                    idol->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                }
+            }
+        }
     }
 
     void Load(char const* chrIn) override
