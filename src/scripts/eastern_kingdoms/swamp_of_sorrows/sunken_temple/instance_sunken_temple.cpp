@@ -103,25 +103,26 @@ struct instance_sunken_temple : public ScriptedInstance
         if (!pAtalarion)
             return;
 
-        //Player* pPlayer = GetPlayerInMap();
-        //if (!pPlayer)
-        //return;
-        /*Map::PlayerList const& players = instance->GetPlayers();
-        if (players.isEmpty())
-            return;*/
-
         DoScriptText(SAY_ATALALARION_SPAWN, pAtalarion);
         pAtalarion->SetVisibility(VISIBILITY_ON);
         pAtalarion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         pAtalarion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         pAtalarion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+    }
 
+    void HandleStatueEventDone()
+    {
         // Spawn the idol of Hakkar
         DoRespawnGameObject(m_uiIdolHakkarGUID, HOUR * IN_MILLISECONDS);
 
+        // Disable interacting with circle stones
+        for (uint64 guid : m_luiAtalaiStatueGUIDs)
+        {
+            if (GameObject* pGob = instance->GetGameObject(guid))
+                pGob->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+        }
+
         // Spawn the big green lights
-        //for (GUIDList::const_iterator itr = m_luiBigLightGUIDs.begin(); itr != m_luiBigLightGUIDs.end(); ++itr)
-        //DoRespawnGameObject(*itr, 30*MINUTE);
         for (uint64 guid : m_luiBigLightGUIDs)
             DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
     }
@@ -326,12 +327,8 @@ struct instance_sunken_temple : public ScriptedInstance
             case TYPE_SECRET_CIRCLE:
                 if (uiData == DONE)
                 {
+                    HandleStatueEventDone();
                     DoSpawnAtalarionIfCan();
-                    for (uint64 guid : m_luiAtalaiStatueGUIDs)
-                    {
-                        if (GameObject* pGob = instance->GetGameObject(guid))
-                            pGob->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                    }
                 }
                 else if (uiData == IN_PROGRESS)
                 {
