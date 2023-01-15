@@ -342,7 +342,7 @@ struct instance_sunken_temple : public ScriptedInstance
 
                     // Check if correct statue was activated
                     bool success = ProcessStatueEvent(pStatue);
-                    if (success)
+                    if (!success)
                     {
                         // If the wrong statue was activated, then trigger trap
                         // We don't know actually which trap goes to which statue so we need to search for each
