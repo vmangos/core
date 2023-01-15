@@ -22,6 +22,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 
 UPDATE `creature_template` SET `spawn_spell_id`=17321, `flags_extra`=33554496 WHERE `entry`=18039;
 UPDATE `creature_template` SET `auras`='16577' WHERE `entry`=10821;
+UPDATE `creature_template` SET `speed_walk`=3.2, `speed_run`=4.28571, `unit_flags`=256, `type`=6, `flags_extra`=66, `mechanic_immune_mask`=8388624 WHERE `entry`=17660;
 
 -- 17635: Source or Target Is In Zone or Area 2271
 UPDATE `conditions` SET `value1`=2271, `flags`=0 WHERE `condition_entry`=17635;
