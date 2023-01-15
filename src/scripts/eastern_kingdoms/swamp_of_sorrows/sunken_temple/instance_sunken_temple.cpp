@@ -53,13 +53,9 @@ struct instance_sunken_temple : public ScriptedInstance
     uint32 m_auiEncounter[SUNKENTEMPLE_MAX_ENCOUNTER];
     std::string strInstData;
 
-    uint64 m_luiProtectorGUIDs[6];                      // Jammalan door handling
-    uint8 m_uiStatueCounter;                            // Atalarion Statue Event
-    uint8 m_uiCurrentStatueVar;
-    uint8 m_uiFlameCounter;                             // Avatar of Hakkar Event
-    uint32 m_uiAltarTimer;
-    bool m_bIsFirstHakkarWave;
-    bool m_bCanSummonBloodkeeper;
+    uint64 m_luiProtectorGUIDs[6];  // Jammalan door handling
+    uint8 m_uiStatueCounter;        // Atalarion Statue Event
+    uint8 m_uiCurrentStatueVar;     // Avatar of Hakkar Event
     uint64 m_uiShadeHakkarGUID;
     uint64 m_uiAtalarionGUID;
     uint64 m_uiJammalanBarrierGUID;
@@ -69,7 +65,6 @@ struct instance_sunken_temple : public ScriptedInstance
     uint64 m_uiDreamscythGUID;
     uint64 m_uiWeaverGUID;
     uint64 m_uiAvatarHakkarGUID;
-    uint64 m_uiAtalaiStatueGUID;
 
     uint32 RemoveTimer;
 
@@ -87,10 +82,6 @@ struct instance_sunken_temple : public ScriptedInstance
 
         m_uiStatueCounter = 0;
         m_uiCurrentStatueVar = 0;
-        m_uiAltarTimer = 0;
-        m_uiFlameCounter = 0;
-        m_bCanSummonBloodkeeper = false;
-        m_bIsFirstHakkarWave = false;
         m_uiShadeHakkarGUID = 0;
         m_uiAtalarionGUID = 0;
         m_uiJammalanBarrierGUID = 0;
@@ -100,7 +91,6 @@ struct instance_sunken_temple : public ScriptedInstance
         m_uiDreamscythGUID = 0;
         m_uiWeaverGUID = 0;
         m_uiAvatarHakkarGUID = 0;
-        m_uiAtalaiStatueGUID = 0;
 
         RemoveTimer = 5000;
         m_restoreCircleState = true;
@@ -137,9 +127,9 @@ struct instance_sunken_temple : public ScriptedInstance
             DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
     }
 
-    void ProcessStatueEvent()
+    void ProcessStatueUsed(uint64 statueGuid)
     {
-        GameObject* pStatue = instance->GetGameObject(m_uiAtalaiStatueGUID);
+        GameObject* pStatue = instance->GetGameObject(statueGuid);
         if (!pStatue)
             return;
 
@@ -179,21 +169,8 @@ struct instance_sunken_temple : public ScriptedInstance
         if (!pAtalarion)
             return;
 
-        switch (urand(0, 2))
-        {
-        case 0:
-            if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_1, INTERACTION_DISTANCE))
-                pTrap->Use(pAtalarion);
-            break;
-        case 1:
-            if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_2, INTERACTION_DISTANCE))
-                pTrap->Use(pAtalarion);
-            break;
-        case 2:
-            if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, GO_ATALAI_TRAP_3, INTERACTION_DISTANCE))
-                pTrap->Use(pAtalarion);
-            break;
-        }
+        if (GameObject* pTrap = GetClosestGameObjectWithEntry(pStatue, PickRandomValue(GO_ATALAI_TRAP_1, GO_ATALAI_TRAP_2, GO_ATALAI_TRAP_3), INTERACTION_DISTANCE))
+            pTrap->Use(pAtalarion);
     }
 
     void OnObjectCreate(GameObject* pGo) override
@@ -359,10 +336,6 @@ struct instance_sunken_temple : public ScriptedInstance
                     HandleStatueEventDone();
                     DoSpawnAtalarionIfCan();
                 }
-                else if (uiData == IN_PROGRESS)
-                {
-                    ProcessStatueEvent();
-                }
                 break;
             case TYPE_PROTECTORS:
                 m_auiEncounter[1] = uiData;
@@ -492,9 +465,6 @@ struct instance_sunken_temple : public ScriptedInstance
                     mobsEntries.clear();
                 }
                 break;
-            case TYPE_ETERNAL_FLAME:
-                m_uiFlameCounter = uiData;
-                break;
         }
 
         if (uiData == DONE)
@@ -526,22 +496,22 @@ struct instance_sunken_temple : public ScriptedInstance
                 m_uiAvatarHakkarGUID = uiData;
                 break;
             case GO_ATALAI_STATUE_1:
-                m_uiAtalaiStatueGUID = uiData;
+                ProcessStatueUsed(uiData);
                 break;
             case GO_ATALAI_STATUE_2:
-                m_uiAtalaiStatueGUID = uiData;
+                ProcessStatueUsed(uiData);
                 break;
             case GO_ATALAI_STATUE_3:
-                m_uiAtalaiStatueGUID = uiData;
+                ProcessStatueUsed(uiData);
                 break;
             case GO_ATALAI_STATUE_4:
-                m_uiAtalaiStatueGUID = uiData;
+                ProcessStatueUsed(uiData);
                 break;
             case GO_ATALAI_STATUE_5:
-                m_uiAtalaiStatueGUID = uiData;
+                ProcessStatueUsed(uiData);
                 break;
             case GO_ATALAI_STATUE_6:
-                m_uiAtalaiStatueGUID = uiData;
+                ProcessStatueUsed(uiData);
                 break;
         }
     }
@@ -567,8 +537,6 @@ struct instance_sunken_temple : public ScriptedInstance
                 return m_auiEncounter[4];
             case TYPE_ERANIKUS:
                 return m_auiEncounter[5];
-            case TYPE_ETERNAL_FLAME:
-                return m_uiFlameCounter;
             default:
                 return 0;
         }

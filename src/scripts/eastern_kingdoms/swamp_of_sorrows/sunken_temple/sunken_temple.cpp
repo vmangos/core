@@ -183,8 +183,8 @@ struct go_atalai_lightAI: public GameObjectAI
         if (!pInstance || pInstance->GetData(TYPE_SECRET_CIRCLE) == DONE)
             return false;
 
-        pInstance->SetData64(me->GetEntry(), me->GetGUID());
         pInstance->SetData(TYPE_SECRET_CIRCLE, IN_PROGRESS);
+        pInstance->SetData64(me->GetEntry(), me->GetGUID());
 
         return true;
     }
