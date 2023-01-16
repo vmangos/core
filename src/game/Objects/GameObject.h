@@ -214,7 +214,7 @@ class GameObject : public SpellCaster
 
         // Nostalrius
         bool IsUseRequirementMet() const;
-        bool PlayerCanUse(Player* pl);
+        bool PlayerCanUse(Player* pPlayer);
         void SetOwnerGroupId(uint32 groupId) { m_playerGroupId = groupId; }
 
         // Gestion des GameObjectAI

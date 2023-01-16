@@ -2173,23 +2173,24 @@ bool GameObject::IsUseRequirementMet() const
     return true;
 }
 
-bool GameObject::PlayerCanUse(Player* pl)
+bool GameObject::PlayerCanUse(Player* pPlayer)
 {
-    if (pl->IsGameMaster())
+    if (pPlayer->IsGameMaster())
         return true;
-
+    
     if (!IsVisible())
         return false;
 
-    GameObjectInfo const* inf = GetGOInfo();
-    if (!inf)
+    GameObjectInfo const* pInfo = GetGOInfo();
+    if (!pInfo)
         return false;
-    switch (inf->type)
+
+    switch (pInfo->type)
     {
         case GAMEOBJECT_TYPE_DOOR:
         {
             // Check lockId
-            uint32 lockId = inf->GetLockId();
+            uint32 lockId = pInfo->GetLockId();
             if (lockId != 0)
             {
                 LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
@@ -2204,7 +2205,7 @@ bool GameObject::PlayerCanUse(Player* pl)
                         {
                             if (lockInfo->Index[j])
                             {
-                                if (!pl->HasItemCount(lockInfo->Index[j], 1))
+                                if (!pPlayer->HasItemCount(lockInfo->Index[j], 1))
                                     return false;
                             }
                             break;
@@ -2212,6 +2213,15 @@ bool GameObject::PlayerCanUse(Player* pl)
                     }
                 }
             }
+            break;
+        }
+        case GAMEOBJECT_TYPE_CHAIR:
+        {
+            float x, y;
+            GetClosestChairSlotPosition(pPlayer->GetPositionX(), pPlayer->GetPositionY(), x, y);
+            if (pPlayer->GetDistance(x, y, GetPositionZ(), SizeFactor::None) > MAX_SITCHAIRUSE_DISTANCE)
+                return false;
+            break;
         }
     }
 
@@ -2511,13 +2521,6 @@ void GameObject::GetClosestChairSlotPosition(float userX, float userY, float& ou
 
 bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
 {
-    if (GetGoType() == GAMEOBJECT_TYPE_CHAIR)
-    {
-        float x, y;
-        GetClosestChairSlotPosition(pos.x, pos.y, x, y);
-        return Geometry::GetDistance3D(pos.x, pos.y, pos.z, x, y, GetPositionZ()) <= radius;
-    }
-
     if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
     {
         float scale = GetObjectScale();

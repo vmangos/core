@@ -706,8 +706,7 @@ struct GameObjectInfo
                 return 5.55556f;
             case GAMEOBJECT_TYPE_BINDER:
                 return 10.0f;
-            case GAMEOBJECT_TYPE_CHAIR: // 100.0f set in constructor, but there's a special can-use-now check for chair
-                return 3.0f;
+            case GAMEOBJECT_TYPE_CHAIR: // for sitting its 3 yards
             case GAMEOBJECT_TYPE_FISHINGNODE:
                 return 100.0f;
             case GAMEOBJECT_TYPE_AREADAMAGE:
@@ -728,6 +727,8 @@ struct GameObjectInfo
         }
     }
 };
+
+#define MAX_SITCHAIRUSE_DISTANCE 3.0f
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
 #if defined(__GNUC__)
