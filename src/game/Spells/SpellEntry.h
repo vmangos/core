@@ -785,17 +785,20 @@ class SpellEntry
 
         bool IsDeathOnlySpell() const
         {
-            return (AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD) || (Id == 2584);
+            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || 
+                   (Targets & (TARGET_FLAG_PVP_CORPSE | TARGET_FLAG_UNIT_CORPSE | TARGET_FLAG_CORPSE)) ||
+                   (Id == 2584);
         }
 
         bool CanTargetDeadTarget() const
         {
-            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);
+            return HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET) ||
+                   IsDeathOnlySpell();
         }
 
         bool CanTargetAliveState(bool alive) const
         {
-            if (HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD))
+            if (IsDeathOnlySpell())
                 return !alive;
 
             return alive || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);
