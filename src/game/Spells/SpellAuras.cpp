@@ -1748,8 +1748,10 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     {
                         // root to self part of (root_target->charge->root_self sequence
                         if (Unit* caster = GetCaster())
+                        {
                             caster->CastSpell(caster, 13138, true, nullptr, this);
-                        GetHolder()->SetAuraDuration(0); // Remove aura (else stays for ever, and casts at login)
+                            caster->RemoveAurasDueToSpell(13139);  // Remove aura (else stays for ever, and casts at login)
+                        }
                         return;
                     }
                     case 13910: // Force Create Elemental Totem
