@@ -55,7 +55,6 @@ struct instance_sunken_temple : public ScriptedInstance
 
     uint64 m_luiProtectorGUIDs[6];  // Jammalan door handling
     uint8 m_uiStatueCounter;        // Atalarion Statue Event
-    uint8 m_uiCurrentStatueVar;     // Avatar of Hakkar Event
     uint64 m_uiShadeHakkarGUID;
     uint64 m_uiAtalarionGUID;
     uint64 m_uiJammalanBarrierGUID;
@@ -81,7 +80,6 @@ struct instance_sunken_temple : public ScriptedInstance
         memset(&m_luiBigLightGUIDs, 0, sizeof(m_luiBigLightGUIDs));
 
         m_uiStatueCounter = 0;
-        m_uiCurrentStatueVar = 0;
         m_uiShadeHakkarGUID = 0;
         m_uiAtalarionGUID = 0;
         m_uiJammalanBarrierGUID = 0;
@@ -129,6 +127,12 @@ struct instance_sunken_temple : public ScriptedInstance
 
     void ProcessStatueUsed(uint64 statueGuid)
     {
+        if (GetData(TYPE_SECRET_CIRCLE) == DONE)
+            return;
+
+        if (GetData(TYPE_SECRET_CIRCLE) != IN_PROGRESS)
+            SetData(TYPE_SECRET_CIRCLE, IN_PROGRESS);
+
         GameObject* pStatue = instance->GetGameObject(statueGuid);
         if (!pStatue)
             return;
@@ -496,20 +500,10 @@ struct instance_sunken_temple : public ScriptedInstance
                 m_uiAvatarHakkarGUID = uiData;
                 break;
             case GO_ATALAI_STATUE_1:
-                ProcessStatueUsed(uiData);
-                break;
             case GO_ATALAI_STATUE_2:
-                ProcessStatueUsed(uiData);
-                break;
             case GO_ATALAI_STATUE_3:
-                ProcessStatueUsed(uiData);
-                break;
             case GO_ATALAI_STATUE_4:
-                ProcessStatueUsed(uiData);
-                break;
             case GO_ATALAI_STATUE_5:
-                ProcessStatueUsed(uiData);
-                break;
             case GO_ATALAI_STATUE_6:
                 ProcessStatueUsed(uiData);
                 break;
@@ -612,6 +606,30 @@ InstanceData* GetInstance_instance_sunken_temple(Map* pMap)
     return new instance_sunken_temple(pMap);
 }
 
+/*######
+## go_atalai_light
+######*/
+
+struct go_atalai_lightAI : public GameObjectAI
+{
+    go_atalai_lightAI(GameObject* pGo) : GameObjectAI(pGo) {}
+
+    bool OnUse(Unit* pUser) override
+    {
+        if (ScriptedInstance* pInstance = (instance_sunken_temple*)me->GetInstanceData())
+        {
+            pInstance->SetData64(me->GetEntry(), me->GetGUID());
+            return true;
+        }
+        return false;
+    }
+};
+
+GameObjectAI* GetAIgo_atalai_light(GameObject* pGo)
+{
+    return new go_atalai_lightAI(pGo);
+}
+
 void AddSC_instance_sunken_temple()
 {
     Script* pNewScript;
@@ -619,5 +637,10 @@ void AddSC_instance_sunken_temple()
     pNewScript = new Script;
     pNewScript->Name = "instance_sunken_temple";
     pNewScript->GetInstanceData = &GetInstance_instance_sunken_temple;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "go_atalai_light";
+    pNewScript->GOGetAI = &GetAIgo_atalai_light;
     pNewScript->RegisterSelf();
 }
