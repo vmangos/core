@@ -249,7 +249,7 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case NPC_ATALARION:
                 m_uiAtalarionGUID = pCreature->GetGUID();
-                if (GetData(TYPE_SECRET_CIRCLE) != SPECIAL)
+                if (GetData(TYPE_SECRET_CIRCLE) != SPECIAL && GetData(TYPE_SECRET_CIRCLE) != DONE)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -567,12 +567,17 @@ struct instance_sunken_temple : public ScriptedInstance
             if (GetData(TYPE_SECRET_CIRCLE) == DONE)
             {
                 HandleStatueEventDone();
-                // When server restarts and circle stones have been activated before,
-                // remove non-interact flag. There should rather be a check if Atal'alarion was
-                // killed already, but currently this is not persisted.
-                if (GameObject* idol = instance->GetGameObject(m_uiIdolHakkarGUID))
+                if (Creature* pAtalarion = instance->GetCreature(m_uiAtalarionGUID))
                 {
-                    idol->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                    if (!pAtalarion->IsAlive())
+                    {
+                        // Atal'ai Statue circle secret done and Atal'alarion killed
+                        // -> activate Idol of Hakkar
+                        if (GameObject* idol = instance->GetGameObject(m_uiIdolHakkarGUID))
+                        {
+                            idol->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                        }
+                    }
                 }
             }
         }
@@ -616,7 +621,7 @@ struct go_atalai_lightAI : public GameObjectAI
 
     bool OnUse(Unit* pUser) override
     {
-        if (ScriptedInstance* pInstance = (instance_sunken_temple*)me->GetInstanceData())
+        if (ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData())
         {
             pInstance->SetData64(me->GetEntry(), me->GetGUID());
             return true;
