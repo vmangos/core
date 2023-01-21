@@ -1764,7 +1764,10 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
             //   NPCs are in combat.
             if (pRealUnitCaster)
             {
-                if (unit->IsInCombat())
+                // Test cases:
+                // Blessing of Wisdom flags you for PvP, but does not put you in combat.
+                // Beast Lore neither flags you for PvP, nor puts you in combat.
+                if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT))
                 {
                     if (!IsTriggeredByAura() && !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT))
                     {
@@ -1772,7 +1775,8 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                         unit->GetHostileRefManager().threatAssist(pRealUnitCaster, 0.0f, m_spellInfo);
                     }
                 }
-                else if (unit->IsPvP() && unit->IsPlayer())
+                else if (unit->IsPvP() && unit->IsCharmerOrOwnerPlayerOrPlayerItself() &&
+                         IsFriendlyTarget(m_spellInfo->EffectImplicitTargetA[GetFirstEffectIndexInMask(effectMask)]))
                 {
                     if (Player* pPlayer = pRealUnitCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
                         pPlayer->UpdatePvP(true);
