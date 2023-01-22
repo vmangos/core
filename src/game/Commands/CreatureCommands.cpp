@@ -1298,8 +1298,17 @@ bool ChatHandler::HandleNpcMoveHelperCommand(char* args, bool save)
     }
 
     if (save)
+    {
+        if (CreatureData* pData = const_cast<CreatureData*>(sObjectMgr.GetCreatureData(lowguid)))
+        {
+            pData->position.x = x;
+            pData->position.y = y;
+            pData->position.z = z;
+            pData->position.o = o;
+        }
         WorldDatabase.PExecuteLog("UPDATE `creature` SET `position_x` = %f, `position_y` = %f, `position_z` = %f, `orientation` = %f WHERE `guid` = %u", x, y, z, o, lowguid);
-    
+    }
+
     PSendSysMessage(LANG_COMMAND_CREATUREMOVED);
     return true;
 }
