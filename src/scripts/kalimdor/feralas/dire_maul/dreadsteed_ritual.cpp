@@ -44,9 +44,7 @@ enum
 
     SAY_HEL_NURATH          = -1780201,
     SAY_IMP_DESPAWN         = -1780202,
-    SAY_DREAD_GUARD_DESPAWN = -1780203,
-
-    MAX_TARGETS = 40
+    SAY_DREAD_GUARD_DESPAWN = -1780203
 };
 
 struct EventLocations
@@ -757,25 +755,16 @@ struct go_ritual_nodeAI: public GameObjectAI
             {
                 if (instance_dire_maul* instance = (instance_dire_maul*)me->GetInstanceData())
                 {
-                    if (spell == SPELL_CANDLE_AURA)
+                    if (GameObject* candleAura = instance->GetGameObject(instance->GetData64(GO_RITUAL_CANDLE_AURA)))
                     {
-                        for (int i = 0; i < MAX_TARGETS; i++)
+                        if (Unit* target = instance->GetMap()->GetPlayer(instance->GetData64(DATA_DREADSTEED_RITUAL_PLAYER)))
                         {
-                            if (Creature* trigger = me->FindNearestCreature(NPC_XOROTHIAN_IMP, 40.0f))
-                            {
-                                if (!trigger->HasAura(spell))
-                                    trigger->AddAura(spell);
-                            }
-
-                            if (Creature* trigger = me->FindNearestCreature(NPC_DREAD_GUARD, 40.0f))
-                            {
-                                if (!trigger->HasAura(spell))
-                                    trigger->AddAura(spell);
-                            }
+                            if (spell == SPELL_CANDLE_AURA)
+                                candleAura->CastSpell(target, spell, true);
+                            else
+                                me->CastSpell(target, spell, true);
                         }
                     }
-                    else
-                        me->CastSpell(me, spell, true);
                 }
 
                 timer = refreshTime/*5000*/;
