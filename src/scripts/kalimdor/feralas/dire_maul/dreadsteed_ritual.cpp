@@ -759,10 +759,15 @@ struct go_ritual_nodeAI: public GameObjectAI
                     {
                         if (Unit* target = instance->GetMap()->GetPlayer(instance->GetData64(DATA_DREADSTEED_RITUAL_PLAYER)))
                         {
-                            if (spell == SPELL_CANDLE_AURA)
-                                candleAura->CastSpell(target, spell, true);
-                            else
-                                me->CastSpell(target, spell, true);
+                            std::list<Creature*> targets;
+                            GetCreatureListWithEntryInGrid(targets, me, NPC_XOROTHIAN_IMP, 40.0f);
+                            GetCreatureListWithEntryInGrid(targets, me, NPC_DREAD_GUARD, 40.0f);
+
+                            for (auto* candle_target : targets)
+                            {
+                                if (candle_target && !candle_target->HasAura(spell))
+                                    candle_target->AddAura(spell);
+                            }
                         }
                     }
                 }
