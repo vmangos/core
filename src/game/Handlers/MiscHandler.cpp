@@ -380,7 +380,8 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket& /*recv_data*/)
         GetPlayer()->SetRooted(false);
 
         //! Stand Up
-        GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
+        if (GetPlayer()->GetStandState() == UNIT_STAND_STATE_SIT)
+            GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
 
         //! DISABLE_ROTATE
         GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
