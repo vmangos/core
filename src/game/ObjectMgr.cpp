@@ -2158,13 +2158,13 @@ CreatureClassLevelStats const* ObjectMgr::GetCreatureClassLevelStats(uint32 unit
 void ObjectMgr::LoadCreatures(bool reload)
 {
     uint32 count = 0;
-    //                                                                          0                  1                2                 3                 4      5
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `creature`.`id2`, `creature`.`id3`, `creature`.`id4`, `map`,"
-    //                      6             7             8             9              10                  11                  12
+    //                                                                          0                  1                2                 3                 4                 5      6
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `creature`.`id2`, `creature`.`id3`, `creature`.`id4`, `creature`.`id5`, `map`,"
+    //                      7             8             9             10             11                  12                  13
                           "`position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, "
-    //                      13                14              15               16
+    //                      14                15              16               17
                           "`health_percent`, `mana_percent`, `movement_type`, `event`,"
-    //                                      17                                     18            19             20                           21                      22
+    //                                      18                                     19            20             21                           22                      23
                           "`pool_creature`.`pool_entry`, `pool_creature_template`.`pool_entry`, `spawn_flags`, `visibility_mod`, `creature`.`patch_min`, `creature`.`patch_max`  "
                           "FROM `creature` "
                           "LEFT OUTER JOIN `game_event_creature` ON `creature`.`guid` = `game_event_creature`.`guid` "
@@ -2190,12 +2190,12 @@ void ObjectMgr::LoadCreatures(bool reload)
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 first_entry  = fields[ 1].GetUInt32();
-        float curhealth     = fields[13].GetFloat();
-        float curmana       = fields[14].GetFloat();
-        uint32 spawnFlags   = fields[19].GetUInt32();
+        float curhealth     = fields[14].GetFloat();
+        float curmana       = fields[15].GetFloat();
+        uint32 spawnFlags   = fields[20].GetUInt32();
         bool is_dead        = spawnFlags & SPAWN_FLAG_DEAD;
-        uint8 patch_min     = fields[21].GetUInt8();
-        uint8 patch_max     = fields[22].GetUInt8();
+        uint8 patch_min     = fields[22].GetUInt8();
+        uint8 patch_max     = fields[23].GetUInt8();
         bool existsInPatch  = true;
 
         if (!first_entry)
@@ -2272,23 +2272,24 @@ void ObjectMgr::LoadCreatures(bool reload)
         data.creature_id[1]     = fields[ 2].GetUInt32();
         data.creature_id[2]     = fields[ 3].GetUInt32();
         data.creature_id[3]     = fields[ 4].GetUInt32();
-        data.position.mapId     = fields[ 5].GetUInt16();
-        data.position.x         = fields[ 6].GetFloat();
-        data.position.y         = fields[ 7].GetFloat();
-        data.position.z         = fields[8].GetFloat();
-        data.position.o         = fields[9].GetFloat();
-        data.spawntimesecsmin   = fields[10].GetUInt32();
-        data.spawntimesecsmax   = fields[11].GetUInt32();
-        data.wander_distance    = fields[12].GetFloat();
+        data.creature_id[4]     = fields[ 5].GetUInt32();
+        data.position.mapId     = fields[ 6].GetUInt16();
+        data.position.x         = fields[ 7].GetFloat();
+        data.position.y         = fields[ 8].GetFloat();
+        data.position.z         = fields[ 9].GetFloat();
+        data.position.o         = fields[10].GetFloat();
+        data.spawntimesecsmin   = fields[11].GetUInt32();
+        data.spawntimesecsmax   = fields[12].GetUInt32();
+        data.wander_distance    = fields[13].GetFloat();
         data.health_percent     = curhealth;
         data.mana_percent       = curmana;
-        data.movement_type      = fields[15].GetUInt8();
+        data.movement_type      = fields[16].GetUInt8();
         data.spawn_flags        = spawnFlags;
-        data.visibility_mod     = fields[20].GetFloat();
+        data.visibility_mod     = fields[21].GetFloat();
         data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.position.mapId, data.position.x, data.position.y);
-        int16 gameEvent         = fields[16].GetInt16();
-        int16 GuidPoolId        = fields[17].GetInt16();
-        int16 EntryPoolId       = fields[18].GetInt16();
+        int16 gameEvent         = fields[17].GetInt16();
+        int16 GuidPoolId        = fields[18].GetInt16();
+        int16 EntryPoolId       = fields[19].GetInt16();
 
         MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.position.mapId);
         if (!mapEntry)

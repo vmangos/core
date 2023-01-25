@@ -1520,6 +1520,7 @@ void Creature::SaveToDB(uint32 mapid)
        << data.creature_id[1] << ","
        << data.creature_id[2] << ","
        << data.creature_id[3] << ","
+       << data.creature_id[4] << ","
        << mapid << ","
        << data.position.x << ","
        << data.position.y << ","

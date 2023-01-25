@@ -1121,7 +1121,7 @@ bool ChatHandler::HandleNpcAddEntryCommand(char* args)
     std::sort(creatureIds.begin(), creatureIds.begin()+count);
     pData->creature_id = creatureIds;
 
-    WorldDatabase.PExecute("UPDATE `creature` SET `id`=%u, `id2`=%u, `id3`=%u, `id4`=%u WHERE `guid`=%u", creatureIds[0], creatureIds[1], creatureIds[2], creatureIds[3], pCreature->GetGUIDLow());
+    WorldDatabase.PExecute("UPDATE `creature` SET `id`=%u, `id2`=%u, `id3`=%u, `id4`=%u, `id5`=%u WHERE `guid`=%u", creatureIds[0], creatureIds[1], creatureIds[2], creatureIds[3], creatureIds[4], pCreature->GetGUIDLow());
     PSendSysMessage("Creature entry %u added to guid %u.", uiCreatureId, pCreature->GetGUIDLow());
     return true;
 }
