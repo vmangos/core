@@ -374,7 +374,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket& /*recv_data*/)
     SendPacket(&data);
 
     // not remove flags if can't free move - its not set in Logout request code.
-    if (GetPlayer()->CanFreeMove() || GetPlayer()->IsFeigningDeath())
+    if (GetPlayer()->CanFreeMove())
     {
         //!we can move again
         GetPlayer()->SetRooted(false);
@@ -383,6 +383,11 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket& /*recv_data*/)
         GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
 
         //! DISABLE_ROTATE
+        GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+    }
+    else if (GetPlayer()->IsFeigningDeath() && !GetPlayer()->HasAuraType(SPELL_AURA_MOD_STUN))
+    {
+        GetPlayer()->SetRooted(false);
         GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 }
