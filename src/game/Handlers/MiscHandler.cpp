@@ -313,7 +313,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
 
     uint8 reason = 0;
 
-    if (GetPlayer()->IsInCombat() || GetPlayer()->IsFeigningDeath())
+    if (GetPlayer()->IsInCombat())
         reason = 1;
     else if (GetPlayer()->m_movementInfo.HasMovementFlag(MovementFlags(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)))
         reason = 3;                      // is jumping or falling
@@ -344,7 +344,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
     }
 
     // not set flags if player can't free move to prevent lost state at logout cancel
-    if (GetPlayer()->CanFreeMove())
+    if (GetPlayer()->CanFreeMove() || GetPlayer()->IsFeigningDeath())
     {
         if (GetPlayer()->GetStandState() == UNIT_STAND_STATE_STAND &&
            !GetPlayer()->IsMounted() &&
@@ -374,7 +374,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket& /*recv_data*/)
     SendPacket(&data);
 
     // not remove flags if can't free move - its not set in Logout request code.
-    if (GetPlayer()->CanFreeMove())
+    if (GetPlayer()->CanFreeMove() || GetPlayer()->IsFeigningDeath())
     {
         //!we can move again
         GetPlayer()->SetRooted(false);
