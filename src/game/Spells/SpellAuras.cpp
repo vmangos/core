@@ -6121,10 +6121,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
 
-            // heal for caster damage, warlock's health funnel already cost hps
-            if (target != pCaster && spellProto->SpellVisual == 163 &&
-                !(spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
-                spellProto->IsFitToFamilyMask<CF_WARLOCK_HEALTH_FUNNEL>()))
+            // heal for caster damage
+            if (target != pCaster && spellProto->SpellVisual == 163)
             {
                 uint32 dmg = spellProto->manaPerSecond;
                 if (pCaster->GetHealth() <= dmg && pCaster->GetTypeId() == TYPEID_PLAYER)
