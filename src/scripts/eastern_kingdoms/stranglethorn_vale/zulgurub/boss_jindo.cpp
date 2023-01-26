@@ -367,7 +367,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
         PlayerMCGuid = 0;
         CheckTimer = 0;
 
-        m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance : imminuty to AoE
+        m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance : immunity to AoE
         m_creature->AddUnitState(UNIT_STAT_ROOT);
         SetCombatMovement(false);
     }
