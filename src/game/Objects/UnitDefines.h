@@ -112,6 +112,32 @@ enum UnitStandStateType
 
 #define MAX_UNIT_STAND_STATE             9
 
+static char const* UnitStandStateToString(uint32 state)
+{
+    switch (state)
+    {
+        case UNIT_STAND_STATE_STAND:
+            return "Stand";
+        case UNIT_STAND_STATE_SIT:
+            return "Sit";
+        case UNIT_STAND_STATE_SIT_CHAIR:
+            return "Sit Chair";
+        case UNIT_STAND_STATE_SLEEP:
+            return "Sleep";
+        case UNIT_STAND_STATE_SIT_LOW_CHAIR:
+            return "Sit Low Chair";
+        case UNIT_STAND_STATE_SIT_MEDIUM_CHAIR:
+            return "Sit Medium Chair";
+        case UNIT_STAND_STATE_SIT_HIGH_CHAIR:
+            return "Sit High Chair";
+        case UNIT_STAND_STATE_DEAD:
+            return "Dead";
+        case UNIT_STAND_STATE_KNEEL:
+            return "Kneel";
+    }
+    return "UNKNOWN";
+}
+
 // byte flags value (UNIT_FIELD_BYTES_1,3)
 // These flags seem to be related to visibility
 // In wotlk+ they are moved to UNIT_FIELD_BYTES_1,2
@@ -132,6 +158,20 @@ enum SheathState
 };
 
 #define MAX_SHEATH_STATE    3
+
+static char const* SheathStateToString(uint32 state)
+{
+    switch (state)
+    {
+        case SHEATH_STATE_UNARMED:
+            return "Unarmed";
+        case SHEATH_STATE_MELEE:
+            return "Melee";
+        case SHEATH_STATE_RANGED:
+            return "Ranged";
+    }
+    return "UNKNOWN";
+}
 
 // byte flags value (UNIT_FIELD_BYTES_2,1)
 enum UnitBytes2_Flags
@@ -354,7 +394,7 @@ enum UnitState
                                 UNIT_STAT_DISTRACTED,
 
     // stay or scripted movement for effect( = in player case you can't move by client command)
-    UNIT_STAT_NO_FREE_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_FEIGN_DEATH |
+    UNIT_STAT_NO_FREE_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED |
                                 UNIT_STAT_TAXI_FLIGHT |
                                 UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
 
@@ -542,7 +582,7 @@ enum ReactStates
     REACT_AGGRESSIVE = 2
 };
 
-inline char const* ReactStateToString(uint32 reactState)
+static char const* ReactStateToString(uint32 reactState)
 {
     switch (reactState)
     {
@@ -564,7 +604,7 @@ enum CommandStates
     COMMAND_DISMISS = 3
 };
 
-inline char const* CommandStateToString(uint32 commandState)
+static char const* CommandStateToString(uint32 commandState)
 {
     switch (commandState)
     {

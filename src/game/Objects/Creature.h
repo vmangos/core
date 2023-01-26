@@ -479,6 +479,8 @@ class Creature : public Unit
         {
             if (HasUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS))
                 ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+            if (HasUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS))
+                ClearUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS);
             if (!HasUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS))
                 AddUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS);
         }

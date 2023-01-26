@@ -305,7 +305,7 @@ struct DurabilityQualityEntry
 struct EmotesEntry
 {
     uint32  Id;                                             // 0        m_ID
-    //char*   Name;                                         // 1        m_EmoteSlashCommand
+    char*   Name;                                           // 1        m_EmoteSlashCommand
     //uint32  AnimationId;                                  // 2        m_AnimID
     uint32  Flags;                                          // 3        m_EmoteFlags
     uint32  EmoteType;                                      // 4        m_EmoteSpecProc (determine how emote are shown)
