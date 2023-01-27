@@ -3567,7 +3567,19 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         ReSetTimer();
 
         if (!m_IsTriggeredSpell && m_casterUnit)
-            m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ACTION_CANCELS, m_spellInfo->Id, false, !ShouldRemoveStealthAuras(), m_spellInfo->HasAttribute(SPELL_ATTR_EX2_ALLOW_WHILE_INVISIBLE));
+        {
+            uint32 interruptFlags = AURA_INTERRUPT_ACTION_CANCELS;
+
+            // Remove Invisibility Option on interacting with BG banners.
+            // Comment from Classic Wowhead (originally on Thottbot)
+            // By Amarillis on 2006/06/11 (Patch 1.10.2)
+            // Some basics for these potions
+            // - Drink this potion before trying to run past mobs in instance. Do not perform any interactions/cast any spells/try and switch any Arathi Basin flags etc or youw ill appear.
+            if (m_targets.getGOTarget())
+                interruptFlags |= AURA_INTERRUPT_LOOTING_CANCELS;
+
+            m_casterUnit->RemoveAurasWithInterruptFlags(interruptFlags, m_spellInfo->Id, false, !ShouldRemoveStealthAuras(), m_spellInfo->HasAttribute(SPELL_ATTR_EX2_ALLOW_WHILE_INVISIBLE));
+        }
 
         OnSpellLaunch();
 
