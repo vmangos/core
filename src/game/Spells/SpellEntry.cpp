@@ -457,6 +457,10 @@ uint32 SpellEntry::GetCastTime(SpellCaster const* caster, Spell* spell) const
         if (spell->IsTriggeredSpellWithRedundentData())
             return 0;
 
+        // chance on hit procs should be instant
+        if (spell->IsTriggered() && spell->IsCastByItem())
+            return 0;
+
         // spell targeted to non-trading trade slot item instant at trade success apply
         if (spell->GetCaster()->GetTypeId() == TYPEID_PLAYER)
             if (TradeData* my_trade = ((Player*)(spell->GetCaster()))->GetTradeData())
