@@ -63,6 +63,8 @@ uint16 GetConsoleColor()
 }
 }
 
+extern char const* g_mainLogFileName;
+
 Log::Log() :
     m_includeTime(false), m_logsTimestamp(GetTimestampStr()), m_defaultColor(GetConsoleColor())
 {
@@ -108,7 +110,7 @@ Log::Log() :
         m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
     }
 
-    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", "Server.log", log_file_timestamp, true);
+    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", g_mainLogFileName, log_file_timestamp, true);
     logFiles[LOG_WORLDPACKET] = openLogFile("LogFile.World", "world_packets.log", log_file_timestamp, true);
     logFiles[LOG_CHAT] = openLogFile("LogFile.Chat", "Chat.log", log_file_timestamp, false);
     logFiles[LOG_BG] = openLogFile("BgLogFile", "Bg.log", log_file_timestamp, false);
