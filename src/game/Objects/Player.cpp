@@ -6380,8 +6380,7 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
 
     if (positionChanged || old_r != orientation)
     {
-        if (!teleport) // sitting on chair teleports you, dont make player stand up
-            HandleInterruptsOnMovement(positionChanged);
+        HandleInterruptsOnMovement(positionChanged);
 
         // move and update visible state if need
         m->PlayerRelocation(this, x, y, z, orientation);

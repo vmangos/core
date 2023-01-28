@@ -9828,7 +9828,8 @@ void Unit::HandleInterruptsOnMovement(bool positionChanged)
 
     // Fix bug after 1.11 where client doesn't send stand state update while casting.
     // Test case: Begin eating or drinking, then start casting Hearthstone and run.
-    SetStandState(UNIT_STAND_STATE_STAND);
+    if (HasUnitMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN)) // sitting on chair teleports you, so we need to check flags
+        SetStandState(UNIT_STAND_STATE_STAND);
 }
 
 void Unit::OnRelocated()
