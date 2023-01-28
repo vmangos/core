@@ -272,7 +272,7 @@ struct EquipmentInfo
     uint32  equipentry[3];
 };
 
-#define MAX_CREATURE_IDS_PER_SPAWN 4
+#define MAX_CREATURE_IDS_PER_SPAWN 5
 
 // from `creature` table
 struct CreatureData
