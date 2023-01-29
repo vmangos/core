@@ -17,6 +17,20 @@
  */
 
 #include "DatabaseEnv.h"
+#include "Log.h"
+
+bool SqlStmtFieldData::toBool() const { MANGOS_ASSERT(m_type == FIELD_BOOL); return m_binaryData.boolean; }
+uint8 SqlStmtFieldData::toUint8() const { MANGOS_ASSERT(m_type == FIELD_UI8); return m_binaryData.ui8; }
+int8 SqlStmtFieldData::toInt8() const { MANGOS_ASSERT(m_type == FIELD_I8); return m_binaryData.i8; }
+uint16 SqlStmtFieldData::toUint16() const { MANGOS_ASSERT(m_type == FIELD_UI16); return m_binaryData.ui16; }
+int16 SqlStmtFieldData::toInt16() const { MANGOS_ASSERT(m_type == FIELD_I16); return m_binaryData.i16; }
+uint32 SqlStmtFieldData::toUint32() const { MANGOS_ASSERT(m_type == FIELD_UI32); return m_binaryData.ui32; }
+int32 SqlStmtFieldData::toInt32() const { MANGOS_ASSERT(m_type == FIELD_I32); return m_binaryData.i32; }
+uint64 SqlStmtFieldData::toUint64() const { MANGOS_ASSERT(m_type == FIELD_UI64); return m_binaryData.ui64; }
+int64 SqlStmtFieldData::toInt64() const { MANGOS_ASSERT(m_type == FIELD_I64); return m_binaryData.i64; }
+float SqlStmtFieldData::toFloat() const { MANGOS_ASSERT(m_type == FIELD_FLOAT); return m_binaryData.f; }
+double SqlStmtFieldData::toDouble() const { MANGOS_ASSERT(m_type == FIELD_DOUBLE); return m_binaryData.d; }
+char const* SqlStmtFieldData::toStr() const { MANGOS_ASSERT(m_type == FIELD_STRING); return m_szStringData.c_str(); }
 
 SqlStmtParameters::SqlStmtParameters(int nParams)
 {

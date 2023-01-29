@@ -210,7 +210,7 @@ class ChatHandler
         bool HandleDebugExp(char*);
         bool HandleVideoTurn(char*);
         bool HandleDebugLootTableCommand(char*);
-        bool HandleDebugItemEnchantCommand(int lootid, unsigned int simCount);
+        bool HandleDebugItemEnchantCommand(int lootid, uint32 simCount);
         bool HandleServiceDeleteCharacters(char* args);
 
         bool HandleSpamerMute(char* args);

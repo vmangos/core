@@ -28,6 +28,7 @@
 #include "Policies/SingletonImp.h"
 #include "Util.h"
 #include "World.h"
+#include "Log.h"
 
 #include <ace/OS_NS_dirent.h>
 

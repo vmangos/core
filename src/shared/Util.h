@@ -24,8 +24,6 @@
 
 #include "Common.h"
 #include "Duration.h"
-#include "Errors.h"
-#include "Log.h" // Zerix: Again, here we are asking for MANGOS_ASSERT to work. What's up?
 
 #include <string>
 #include <vector>

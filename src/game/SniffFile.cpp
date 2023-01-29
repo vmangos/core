@@ -15,6 +15,7 @@
  */
 
 #include "SniffFile.h"
+#include "Log.h"
 
 SniffFile::SniffFile(FILE* pFile) : m_file(pFile)
 {

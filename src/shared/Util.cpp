@@ -21,6 +21,7 @@
 
 #include "Util.h"
 #include "Timer.h"
+#include "Log.h"
 
 #include "utf8cpp/utf8.h"
 #include "mersennetwister/MersenneTwister.h"

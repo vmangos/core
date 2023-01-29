@@ -23,6 +23,7 @@
 #define _OBJECT_H
 
 #include "Common.h"
+#include "Log.h"
 #include "ByteBuffer.h"
 #include "UpdateFields.h"
 #include "UpdateData.h"
