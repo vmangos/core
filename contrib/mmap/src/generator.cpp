@@ -213,6 +213,8 @@ int finish(const char* message, int returnValue)
     return returnValue;
 }
 
+char const* g_mainLogFileName = "MoveMapGen.log";
+
 int main(int argc, char** argv)
 {
     int mapId = -1;

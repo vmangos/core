@@ -57,7 +57,6 @@ target_link_libraries(vmap_assembler
                     vmap
                     g3dlite
                     ${ACE_LIBRARIES}
-                    shared
                     framework
 )
 
