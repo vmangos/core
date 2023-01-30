@@ -32,6 +32,7 @@
 #include "WaypointManager.h"
 #include "WaypointMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
+#include "MoveSpline.h"
 
 #include <fstream>
 
@@ -172,6 +173,8 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
     PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(pTarget->AI()->IsMeleeAttackEnabled()));
     MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
     PSendSysMessage(LANG_NPC_MOTION_TYPE, MotionMaster::GetMovementGeneratorTypeName(moveType), moveType);
+    if (!pTarget->movespline->Finalized())
+        PSendSysMessage("Spline Origin: %s", pTarget->movespline->GetMovementOrigin());
     if (pTarget->IsTemporarySummon())
     {
         TempSummonType despawnType = static_cast<TemporarySummon*>(pTarget)->GetDespawnType();
