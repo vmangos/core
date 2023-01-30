@@ -21713,7 +21713,7 @@ void Player::LootMoney(int32 money, Loot* loot)
 {
     WorldObject const* target = loot->GetLootTarget();
     sLog.Player(GetSession(), LOG_LOOTS, LOG_LVL_BASIC, "%s gets %ug%us%uc [loot from %s]",
-             GetShortDescription().c_str(), money / 100000, (money / 100) % 100, money % 100, target ? target->GetGuidStr().c_str() : "NULL");
+             GetShortDescription().c_str(), money / GOLD, (money % GOLD) / SILVER, (money % GOLD) % SILVER, target ? target->GetGuidStr().c_str() : "NULL");
     LogModifyMoney(money, "Loot", target ? target->GetObjectGuid() : ObjectGuid());
 }
 
