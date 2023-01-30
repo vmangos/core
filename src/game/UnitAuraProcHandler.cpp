@@ -985,7 +985,10 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                 case 26169:
                 {
                     // heal amount
-                    basepoints[0] = int32(damage * 10 / 100);
+                    basepoints[0] = int32(damage * 0.1f);
+                    if (!basepoints[0])
+                        return SPELL_AURA_PROC_FAILED;
+
                     target = this;
                     triggered_spell_id = 26170;
                     break;
