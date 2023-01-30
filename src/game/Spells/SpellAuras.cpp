@@ -3202,10 +3202,15 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
 
         if (Creature* pCreature = pTarget->ToCreature())
         {
+            bool canAttack; // never attack if we needed to switch AI but couldn't
             if (pCreature->AI() && pCreature->AI()->SwitchAiAtControl())
-                pCreature->AIM_Initialize();
+                canAttack = pCreature->AIM_Initialize();
+            else
+                canAttack = true;
 
-            pCreature->AttackedBy(pCaster);
+            if (canAttack && m_removeMode != AURA_REMOVE_BY_DEATH &&
+                pCaster->IsValidAttackTarget(pCreature))
+                pCreature->AttackedBy(pCaster);
 
             // remove pvp flag on charm end if creature is not pvp flagged by default
             if (pCreature->IsPvP() && !pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_PVP))
@@ -3465,6 +3470,10 @@ void Aura::HandleModCharm(bool apply, bool Real)
             caster->SetCharm(nullptr);
             if (caster->IsPlayer())
                 static_cast<Player*>(caster)->RemovePetActionBar();
+
+            // Clear threat generated when charm ends.
+            if (pCreatureTarget)
+                pCreatureTarget->RemoveAttackersThreat(caster);
         }
 
         target->UpdateControl();
@@ -3506,10 +3515,14 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         if (pCreatureTarget)
         {
+            bool canAttack; // never attack if we needed to switch AI but couldn't
             if (pCreatureTarget->AI() && pCreatureTarget->AI()->SwitchAiAtControl())
-                pCreatureTarget->AIM_Initialize();
+                canAttack = pCreatureTarget->AIM_Initialize();
+            else
+                canAttack = true;
 
-            if (caster)
+            if (canAttack && m_removeMode != AURA_REMOVE_BY_DEATH &&
+                caster && caster->IsValidAttackTarget(pCreatureTarget))
                 pCreatureTarget->AttackedBy(caster);
         }
         else if (pPlayerTarget)

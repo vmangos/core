@@ -640,6 +640,13 @@ void Creature::Update(uint32 update_diff, uint32 diff)
     update_diff *= sWorld.GetTimeRate();
     diff *= sWorld.GetTimeRate();
 
+    // AI was locked and switch was delayed to next update.
+    if (HasCreatureState(CSTATE_INIT_AI_ON_UPDATE))
+    {
+        ClearCreatureState(CSTATE_INIT_AI_ON_UPDATE);
+        AIM_Initialize();
+    }
+
     switch (m_deathState)
     {
         case JUST_ALIVED:
@@ -1112,6 +1119,7 @@ bool Creature::AIM_Initialize()
     if (m_AI_locked)
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "AIM_Initialize: failed to init, locked.");
+        AddCreatureState(CSTATE_INIT_AI_ON_UPDATE);
         return false;
     }
 
