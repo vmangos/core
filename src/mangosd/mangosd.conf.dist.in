@@ -823,7 +823,7 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #
 #    MinHonorKills
 #        Min kills that players must obtain to enter in weekly honor calculation
-#        Default: 15
+#        Default: 0 (auto select based on patch)
 #
 #    MaintenanceDay
 #        The day of the week on which server maintenance is performed ( currently used for Honor distribution )
@@ -1045,7 +1045,7 @@ ShowHealthValues = 0
 MaxPlayerLevel = 60
 StartPlayerLevel = 1
 StartPlayerMoney = 0
-MinHonorKills = 15
+MinHonorKills = 0
 MaintenanceDay = 3
 InstantLogout = 1
 ForceLogoutDelay = 0
