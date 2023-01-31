@@ -515,6 +515,9 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
     else
         SetPvP(false);
 
+    if (CanAssistPlayers())
+        EnableMoveInLosEvent();
+
     InitializeReactState();
 
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
