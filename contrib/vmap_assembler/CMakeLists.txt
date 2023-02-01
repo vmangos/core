@@ -42,10 +42,11 @@ add_library(vmap
 SET_TARGET_PROPERTIES (vmap PROPERTIES FOLDER "Game Libs")
 
 if(UNIX)
+  find_package(Threads)
   find_package(ZLIB REQUIRED)
   if(ZLIB_FOUND)
     include_directories(${ZLIB_INCLUDE_DIRS})
-    target_link_libraries(vmap g3dlite ${ZLIB_LIBRARIES})
+    target_link_libraries(vmap g3dlite ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
   endif(ZLIB_FOUND)
 else()
   target_link_libraries(vmap g3dlite zlib)
