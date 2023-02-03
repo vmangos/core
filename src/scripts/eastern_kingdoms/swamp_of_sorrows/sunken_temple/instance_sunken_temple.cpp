@@ -560,7 +560,7 @@ struct instance_sunken_temple : public ScriptedInstance
         else
             RemoveTimer -= uiDiff;
 
-        // check if need to restore state after server crash
+        // Check if need to restore state after server crash
         if (m_restoreCircleState)
         {
             m_restoreCircleState = false;
@@ -569,13 +569,12 @@ struct instance_sunken_temple : public ScriptedInstance
                 HandleStatueEventDone();
                 if (Creature* pAtalarion = instance->GetCreature(m_uiAtalarionGUID))
                 {
+                    // Idol of Hakkar should be interactable when Atal'alarion was killed
                     if (!pAtalarion->IsAlive())
                     {
-                        // Atal'ai Statue circle secret done and Atal'alarion killed
-                        // -> activate Idol of Hakkar
-                        if (GameObject* idol = instance->GetGameObject(m_uiIdolHakkarGUID))
+                        if (GameObject* pIdol = instance->GetGameObject(m_uiIdolHakkarGUID))
                         {
-                            idol->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                            pIdol->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
                         }
                     }
                 }
