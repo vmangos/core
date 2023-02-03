@@ -85,7 +85,7 @@ struct boss_drakkisathAI : public ScriptedAI
         // Confliguration
         if (m_uiConfligurationTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CONFLIGURATION, 0, m_creature->GetVictim()->GetGUID()) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CONFLIGURATION) == CAST_OK)
                 m_uiConfligurationTimer = 18000;
         }
         else

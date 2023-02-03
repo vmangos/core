@@ -256,7 +256,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
     }
-    if (GetGOInfo()->IsInfiniteGameObject())
+    else if (GetGOInfo()->IsInfiniteGameObject())
     {
         SetVisibilityModifier(MAX_VISIBILITY_DISTANCE);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))

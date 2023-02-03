@@ -906,15 +906,13 @@ struct giant_eye_tentacleAI : public cthunPortalTentacle
         if (BeamTimer < diff) {
             // Rough check against common auras that prevent the creature from casting,
             // before getting a random target etc
-            if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, CANNOT_CAST_SPELL_MASK)) {
-                if (Player* target = SelectRandomAliveNotStomach(m_pInstance)) {
-                    // need to check if we can cast before doing so, because if we update target
-                    // after initiating the cast, the cast animation dissapear for some reason
-                    if (CanCastSpell(target, sSpellMgr.GetSpellEntry(SPELL_GREEN_EYE_BEAM), false) == CanCastResult::CAST_OK) {
+            if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, CANNOT_CAST_SPELL_MASK))
+            {
+                if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
+                {
+                    if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) == SpellCastResult::SPELL_CAST_OK)
+                    {
                         beamTargetGuid = target->GetObjectGuid();
-                        m_creature->SetTargetGuid(target->GetObjectGuid());
-                        m_creature->SetFacingToObject(target);
-                        m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
                         isCasting = true;
                         BeamTimer = GIANT_EYE_BEAM_COOLDOWN;
                     }

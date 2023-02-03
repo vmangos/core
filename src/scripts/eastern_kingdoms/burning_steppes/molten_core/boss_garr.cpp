@@ -223,7 +223,7 @@ struct mob_fireswornAI : ScriptedAI
                 {
                     if (m_creature->GetDistance2d(pGarr) > 45.0f)
                     {
-                        CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_SEPARATION_ANXIETY);
+                        SpellCastResult result = DoCastSpellIfCan(m_creature, SPELL_SEPARATION_ANXIETY);
 
                         if (result == CAST_OK)
                             m_uiAnxietyTimer = 5000;

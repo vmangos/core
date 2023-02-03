@@ -38,18 +38,7 @@ class SpellEntry;
 class ChatHandler;
 struct Loot;
 
-enum CanCastResult
-{
-    CAST_OK                     = 0,
-    CAST_FAIL_IS_CASTING        = 1,
-    CAST_FAIL_OTHER             = 2,
-    CAST_FAIL_TOO_FAR           = 3,
-    CAST_FAIL_TOO_CLOSE         = 4,
-    CAST_FAIL_POWER             = 5,
-    CAST_FAIL_STATE             = 6,
-    CAST_FAIL_TARGET_AURA       = 7,
-    CAST_FAIL_NOT_IN_LOS        = 8
-};
+#define CAST_OK SPELL_CAST_OK
 
 struct CreatureAISpellsEntry : CreatureSpellsEntry
 {
@@ -191,10 +180,7 @@ class CreatureAI
         ///== Helper functions =============================
 
         // Attempts to cast a spell and returns the result.
-        CanCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0, ObjectGuid uiOriginalCasterGUID = ObjectGuid());
-
-        // Helper functions for cast spell
-        virtual CanCastResult CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered);
+        SpellCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0);
 
         // TrinityCore
         void DoCast(Unit* victim, uint32 spellId, bool triggered = false);
