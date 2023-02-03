@@ -596,12 +596,24 @@ DebuffLimit = 0
 #        Log all trades where money exceeds the specified value in copper
 #        Default: 10000
 #
+#    LogsDB.GM
+#        Enable or disable database gm logs.
+#        Default: 0
+#
 #    LogsDB.Chat
 #        Enable or disable database chat logs.
 #        Default: 0
 #
 #    LogsDB.Characters
 #        Enable or disable database character logs.
+#        Default: 0
+#
+#    LogsDB.LevelUp
+#        Enable or disable database levelup logs.
+#        Default: 0
+#
+#    LogsDB.Loot
+#        Enable or disable database loot logs.
 #        Default: 0
 #
 #    LogsDB.Trades
@@ -662,11 +674,17 @@ CharLogDump = 0
 
 GmLogPerAccount = 0
 
+LogsDB.GM                   = 0
 LogsDB.Chat                 = 0
 LogsDB.Characters           = 0
+LogsDB.LevelUp              = 0
+LogsDB.Loot                 = 0
 LogsDB.Trades               = 0
 LogsDB.Transactions         = 0
 LogsDB.Battlegrounds        = 0
+Smartlog.Death              = 0
+Smartlog.LongCombat         = 0
+Smartlog.LongCombatDuration = 1800
 
 PerformanceLog.SlowWorldUpdate          = 100
 PerformanceLog.SlowMapSystemUpdate      = 100

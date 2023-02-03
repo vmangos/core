@@ -660,7 +660,7 @@ void BattleGround::EndBattleGround(Team winner)
                 static SqlStatementID insLogBg;
                 SqlStatement logStmt = LogsDatabase.CreateStatement(insLogBg,
                         "INSERT INTO `logs_battleground` ("
-                        "`bgid`, `bgtype, `bgduration`, `bgteamcount`, `playerGuid`, "
+                        "`bgid`, `bgtype`, `bgduration`, `bgteamcount`, `playerGuid`, "
                         "`team`, `deaths`, `honorBonus`, `honorableKills`) VALUES"
                         "(?, ?, ?, ?, ?, ?, ?, ?, ?)");
 

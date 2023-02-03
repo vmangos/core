@@ -116,6 +116,14 @@ enum Color
     COLOR_COUNT
 };
 
+constexpr Color g_logColors[] = {
+    RED,    // error
+    RESET,  // minimal
+    RESET,  // basic
+    YELLOW, // detail
+    BLUE    // debug
+};
+
 enum LogType
 {
     LOG_BASIC,
@@ -186,6 +194,8 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
     private:
         void OutConsole(LogType logType, LogLevel logLevel, std::string const& str) const;
         void OutFile(LogType logType, LogLevel logLevel, std::string const& str) const;
+        void PlayerLogHeaderToConsole(uint32 accountId, WorldSession const* session, LogType logType, char const* subType);
+        void PlayerLogHeaderToFile(uint32 accountId, WorldSession const* session, LogType logType, char const* subType);
 
         void SetColor(FILE* where, Color color) const;
         void ResetColor(FILE* where) const;

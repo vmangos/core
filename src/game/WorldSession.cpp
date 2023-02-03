@@ -1084,7 +1084,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
         sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, detector, oss.str().c_str());
     }
     
-    sLog.Player(this, LOG_ANTICHEAT, LOG_LVL_MINIMAL, "[%s] Player %s, Cheat %s, Penalty: %s",
+    sLog.Player(this, LOG_ANTICHEAT, detector, LOG_LVL_MINIMAL, "[%s] Player %s, Cheat %s, Penalty: %s",
         detector, playerDesc.c_str(), reason, action);
 }
 

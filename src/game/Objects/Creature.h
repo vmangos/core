@@ -393,7 +393,6 @@ class Creature : public Unit
         }
         void LogDeath(Unit* pKiller) const;
         void LogLongCombat() const;
-        void LogScriptInfo(std::ostringstream &data) const;
         // Smartlog end
 
         Unit* SelectAttackingTarget(AttackingTarget target, uint32 position, uint32 spellId, uint32 selectFlags = SELECT_FLAG_NO_TOTEM) const;

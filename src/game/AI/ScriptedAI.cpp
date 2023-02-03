@@ -269,13 +269,7 @@ void ScriptedAI::EnterEvadeIfOutOfHomeArea()
         return;
 
     if (m_creature->GetAreaId() != m_uiHomeArea)
-    {
-        std::ostringstream log;
-        log << "Home area left, evading.";
-        m_creature->LogScriptInfo(log);
-
         EnterEvadeMode();
-    }
 }
 
 void Scripted_NoMovementAI::AttackStart(Unit* pWho)

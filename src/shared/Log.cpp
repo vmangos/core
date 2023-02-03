@@ -35,14 +35,6 @@
 
 INSTANTIATE_SINGLETON_1(Log);
 
-static constexpr Color logColors[] = {
-    RED,    // error
-    RESET,  // minimal
-    RESET,  // basic
-    YELLOW, // detail
-    BLUE    // debug
-};
-
 namespace
 {
 uint16 GetConsoleColor()
@@ -133,7 +125,6 @@ Log::Log() :
     m_consoleLevel = LogLevel(sConfig.GetIntDefault("LogLevel.Console", 2));
     m_fileLevel = LogLevel(sConfig.GetIntDefault("LogLevel.File", 2));
     m_dbLevel = LogLevel(sConfig.GetIntDefault("LogLevel.DB", 2));
-
 
     // Smartlog data
     InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
@@ -380,30 +371,59 @@ std::string Log::GetTimestampStr()
     return std::string(buf);
 }
 
-void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
+#define LOG_TO_FILE_HELPER(logLevel,logType,format,ap) \
+if (logFiles[logType] && m_fileLevel >= logLevel)                             \
+{                                                                             \
+    if (logType != LOG_DBERRFIX)                                              \
+    {                                                                         \
+        outTimestamp(logFiles[logType]);                                      \
+        if (logLevel == LOG_LVL_ERROR)                                        \
+            fputs("ERROR: ", logFiles[logType]);                              \
+    }                                                                         \
+    va_start(ap, format);                                                     \
+    vfprintf(logFiles[logType], format, ap);                                  \
+    fputs("\n", logFiles[logType]);                                           \
+    fflush(logFiles[logType]);                                                \
+    va_end(ap);                                                               \
+}                                                                             \
+
+#define LOG_TO_CONSOLE_HELPER(logLevel,logType,format,ap) \
+if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= logLevel) \
+{                                                                             \
+    auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;           \
+    SetColor(where, g_logColors[logLevel]);                                   \
+    if (m_includeTime)                                                        \
+        outTime(where);                                                       \
+    if (logLevel == LOG_LVL_ERROR)                                            \
+        fprintf(where, "ERROR: ");                                            \
+                                                                              \
+    va_start(ap, format);                                                     \
+    vutf8printf(where, format, &ap);                                          \
+    va_end(ap);                                                               \
+                                                                              \
+    ResetColor(where);                                                        \
+    fprintf(where, "\n");                                                     \
+    fflush(where);                                                            \
+                                                                              \
+    if (logType != LOG_BASIC)                                                 \
+    LOG_TO_FILE_HELPER(logLevel, LOG_BASIC, format, ap);                      \
+}                                                                             \
+
+void Log::Out(LogType logType, LogLevel logLevel, char const* format, ...)
 {
     ASSERT(logType >= 0 && logType < LOG_TYPE_MAX&& logLevel >= 0 && logLevel <= LOG_LVL_DEBUG);
 
-    if (!str)
+    if (!format)
         return;
 
     // neither console nor file gets this?  we're done
     if (m_consoleLevel < logLevel && !(logFiles[logType] && m_fileLevel >= logLevel))
         return;
 
-    // make buffer
-    char buff[4096];
-    memset(buff, 0, sizeof(buff));
-
     va_list ap;
-    va_start(ap, str);
-    vsnprintf(buff, sizeof(buff)-1, str, ap);
-    va_end(ap);
 
-    std::string const log(buff);
-
-    OutConsole(logType, logLevel, log);
-    OutFile(logType, logLevel, log);
+    LOG_TO_CONSOLE_HELPER(logLevel, logType, format, ap);
+    LOG_TO_FILE_HELPER(logLevel, logType, format, ap);
 }
 
 void Log::OutConsole(LogType logType, LogLevel logLevel, std::string const& log) const
@@ -417,7 +437,7 @@ void Log::OutConsole(LogType logType, LogLevel logLevel, std::string const& log)
 
     auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;
 
-    SetColor(where, logColors[logLevel]);
+    SetColor(where, g_logColors[logLevel]);
 
     if (m_includeTime)
         outTime(where);
