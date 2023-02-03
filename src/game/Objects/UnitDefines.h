@@ -664,19 +664,6 @@ enum AddAuraFlags
     ADD_AURA_PERMANENT = 0x08,
 };
 
-
-enum UnitDebugFlags
-{
-    DEBUG_SPELL_COMPUTE_RESISTS = 0x01,
-    DEBUG_PACKETS_RECV          = 0x02,
-    DEBUG_PACKETS_SEND          = 0x04,
-    DEBUG_AI                    = 0x08,
-    DEBUG_DR                    = 0x10,
-    DEBUG_CHEAT                 = 0x20,
-    DEBUG_PROCS                 = 0x40,
-};
-
-
 enum TeleportToOptions
 {
     TELE_TO_GM_MODE             = 0x01,

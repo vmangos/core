@@ -34,43 +34,43 @@ SniffFile::~SniffFile()
         fclose(m_file);
 }
 
-void SniffFile::WriteHeader(FILE* pFile)
+void SniffFile::WriteHeader()
 {
     // Write header
-    fwrite("PKT", 1, 3, pFile);
+    fwrite("PKT", 1, 3, m_file);
     uint16 sniffVersion = 0x201;
-    fwrite(&sniffVersion, sizeof(uint16), 1, pFile);
+    fwrite(&sniffVersion, sizeof(uint16), 1, m_file);
     uint16 gameBuild = SUPPORTED_CLIENT_BUILD;
-    fwrite(&gameBuild, sizeof(uint16), 1, pFile);
+    fwrite(&gameBuild, sizeof(uint16), 1, m_file);
     uint8 zero = 0;
     for (int i = 0; i < 40; i++)
-        fwrite(&zero, 1, 1, pFile);
+        fwrite(&zero, 1, 1, m_file);
 }
 
-void SniffFile::WritePacket(FILE* pFile, LoggedPacket const& packet)
+void SniffFile::WritePacket(WorldPacket const& packet, bool isClientPacket, time_t timestamp)
 {
-    uint8 direction = packet.isClientPacket ? 0x00 : 0xff;
-    fwrite(&direction, 1, 1, pFile);
-    uint32 unixTime = packet.timestamp;
-    fwrite(&unixTime, sizeof(uint32), 1, pFile);
-    uint32 msTime = packet.data.GetPacketTime();
-    fwrite(&msTime, sizeof(uint32), 1, pFile);
+    uint8 direction = isClientPacket ? 0x00 : 0xff;
+    fwrite(&direction, 1, 1, m_file);
+    uint32 unixTime = timestamp;
+    fwrite(&unixTime, sizeof(uint32), 1, m_file);
+    uint32 msTime = packet.GetPacketTime();
+    fwrite(&msTime, sizeof(uint32), 1, m_file);
 
-    if (packet.isClientPacket)
+    if (isClientPacket)
     {
-        uint32 packetSize = packet.data.size() + sizeof(uint32);
-        fwrite(&packetSize, sizeof(uint32), 1, pFile);
-        uint32 opcode = packet.data.GetOpcode();
-        fwrite(&opcode, sizeof(uint32), 1, pFile);
+        uint32 packetSize = packet.size() + sizeof(uint32);
+        fwrite(&packetSize, sizeof(uint32), 1, m_file);
+        uint32 opcode = packet.GetOpcode();
+        fwrite(&opcode, sizeof(uint32), 1, m_file);
     }
     else
     {
-        uint32 packetSize = packet.data.size() + sizeof(uint16);
-        fwrite(&packetSize, sizeof(uint32), 1, pFile);
-        uint16 opcode = packet.data.GetOpcode();
-        fwrite(&opcode, sizeof(uint16), 1, pFile);
-    } 
+        uint32 packetSize = packet.size() + sizeof(uint16);
+        fwrite(&packetSize, sizeof(uint32), 1, m_file);
+        uint16 opcode = packet.GetOpcode();
+        fwrite(&opcode, sizeof(uint16), 1, m_file);
+    }
 
-    if (packet.data.size())
-        fwrite(packet.data.contents(), sizeof(uint8), packet.data.size(), pFile);
+    if (packet.size())
+        fwrite(packet.contents(), sizeof(uint8), packet.size(), m_file);
 }

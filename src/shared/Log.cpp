@@ -111,7 +111,6 @@ Log::Log() :
     }
 
     logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", g_mainLogFileName, log_file_timestamp, true);
-    logFiles[LOG_WORLDPACKET] = openLogFile("LogFile.World", "world_packets.log", log_file_timestamp, true);
     logFiles[LOG_CHAT] = openLogFile("LogFile.Chat", "Chat.log", log_file_timestamp, false);
     logFiles[LOG_BG] = openLogFile("BgLogFile", "Bg.log", log_file_timestamp, false);
     logFiles[LOG_CHAR] = openLogFile("LogFile.Char", "Char.log", log_file_timestamp, false);
@@ -457,33 +456,6 @@ void Log::OutFile(LogType logType, LogLevel logLevel, std::string const& str) co
     fputs(str.c_str(), logFiles[logType]);
     fputs("\n", logFiles[logType]);
     fflush(logFiles[logType]);
-}
-
-void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
-    char const* opcodeName, ByteBuffer const* packet,
-    bool incoming)
-{
-    if (!logFiles[LOG_WORLDPACKET])
-        return;
-
-    outTimestamp(logFiles[LOG_WORLDPACKET]);
-
-    fprintf(logFiles[LOG_WORLDPACKET],
-        "\n%s:\nSOCKET: %p\nLENGTH: %zu\nOPCODE: %s (0x%.4X)\nDATA:\n",
-        incoming ? "CLIENT" : "SERVER", socketHandle, packet->size(),
-        opcodeName, opcode);
-
-    size_t p = 0;
-    while (p < packet->size())
-    {
-        for (size_t j = 0; j < 16 && p < packet->size(); ++j)
-            fprintf(logFiles[LOG_WORLDPACKET], "%.2X ", (*packet)[p++]);
-
-        fprintf(logFiles[LOG_WORLDPACKET], "\n");
-    }
-
-    fprintf(logFiles[LOG_WORLDPACKET], "\n\n");
-    fflush(logFiles[LOG_WORLDPACKET]);
 }
 
 bool Log::IsSmartLog(uint32 entry, uint32 guid) const

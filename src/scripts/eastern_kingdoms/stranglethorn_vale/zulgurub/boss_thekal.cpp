@@ -230,7 +230,6 @@ struct zg_rez_add : public ScriptedAI
 
 void DoRessurectUnit(Unit* unit, Unit* victim)
 {
-    DEBUG_UNIT(unit, DEBUG_AI, "Rez %s", unit->GetName());
     float x, y, z, o;
     unit->GetPosition(x, y, z);
     o = unit->GetOrientation();
@@ -317,7 +316,6 @@ struct boss_thekalAI : public zg_rez_add
         if (PhaseTwo)
         {
             DoScriptText(SAY_DEATH, m_creature);
-            DEBUG_UNIT(m_creature, DEBUG_AI, "Thekal is dead for real");
 
             if (m_pInstance)
             {
@@ -334,7 +332,6 @@ struct boss_thekalAI : public zg_rez_add
         else
         {
             // Mettre tout le monde en combat.
-            DEBUG_UNIT(m_creature, DEBUG_AI, "Thekal fake death. Put map in combat.");
             Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
             for (const auto& player : players)
                 if (player.getSource()->GetDistance(m_creature) < 200.0f)
@@ -386,7 +383,6 @@ struct boss_thekalAI : public zg_rez_add
 
     void DoSetInPhaseTwo()
     {
-        DEBUG_UNIT(m_creature, DEBUG_AI, "Thekal : set P2.");
         PhaseTwo = true;
         DoCastSpellIfCan(m_creature, SPELL_TIGER_FORM);
         m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 2.00f);

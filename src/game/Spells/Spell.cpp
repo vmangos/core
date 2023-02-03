@@ -1790,9 +1790,6 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
     m_diminishGroup = m_spellInfo->GetDiminishingReturnsGroup(m_triggeredByAuraSpell);
     m_diminishLevel = unit->GetDiminishing(m_diminishGroup);
 
-    if (pRealUnitCaster)
-        DEBUG_UNIT(pRealUnitCaster, DEBUG_DR, "[%u] Groupe DR : %u. Niveau : %u.", m_spellInfo->Id, m_diminishGroup, m_diminishLevel);
-
     // Apply additional spell effects to target
     CastPreCastSpells(unit);
 

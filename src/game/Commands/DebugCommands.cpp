@@ -2201,28 +2201,6 @@ bool ChatHandler::HandleDebugMonsterChatCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugUnitCommand(char* args)
-{
-    Unit* target = GetSelectedUnit();
-    if (!target)
-        return false;
-    uint32 flags = 0;
-    if (ExtractUInt32(&args, flags))
-        target->SetDebugger(m_session->GetPlayer()->GetObjectGuid(), flags);
-
-    PSendSysMessage("Debugs on target [%s]%s", target->GetName(), (target->GetDebuggerGuid() == m_session->GetPlayer()->GetObjectGuid()) ? " ATTACHE" : "");
-#define HANDLE_DEBUG(flag, nom) PSendSysMessage("[%s] %6u \"" nom "\"", (target->GetDebugFlags() & flag) ? "ON" : "OFF", flag);
-    HANDLE_DEBUG(DEBUG_SPELL_COMPUTE_RESISTS, "Spell Resist Calculations");
-    HANDLE_DEBUG(DEBUG_PACKETS_RECV, "Packet received by the server");
-    HANDLE_DEBUG(DEBUG_PACKETS_SEND, "Packets send by the server");
-    HANDLE_DEBUG(DEBUG_AI, "Various AI debug");
-    HANDLE_DEBUG(DEBUG_DR, "Diminishing returns");
-    HANDLE_DEBUG(DEBUG_CHEAT, "Anticheat");
-    HANDLE_DEBUG(DEBUG_PROCS, "Proc system");
-
-    return true;
-}
-
 bool ChatHandler::HandleDebugTimeCommand(char* args)
 {
     float rate = 1.0f;

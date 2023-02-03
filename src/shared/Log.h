@@ -119,7 +119,6 @@ enum Color
 enum LogType
 {
     LOG_BASIC,
-    LOG_WORLDPACKET,
     LOG_CHAT,
     LOG_BG,
     LOG_CHAR,
@@ -166,10 +165,6 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         void OutWardenPlayer(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(uint32 accountId, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
-
-        void outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
-                                char const* opcodeName,
-                                ByteBuffer const* packet, bool incoming);
 
         bool IsSmartLog(uint32 entry, uint32 guid) const;
 

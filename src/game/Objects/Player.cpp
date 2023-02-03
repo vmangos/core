@@ -22329,7 +22329,6 @@ bool PlayerLogFormatted(uint32 accountId, WorldSession const* session, LogType l
     static char const* type_strings[] =
     {
         "Basic",
-        "WorldPacket",
         "Chat",
         "BG",
         "Character",
