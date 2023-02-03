@@ -22485,9 +22485,9 @@ static void PlayerLogToDB(uint32 accountId, WorldSession const* session, LogType
 #define LOG_TO_DB_HELPER(logLevel,logType,subType,session,accountId,format,ap) \
 if (IsPlayerLoggingEnabledToDB(logType, logLevel))                            \
 {                                                                             \
-    char* buff = new char[1024];                                              \
+    char* buff = new char[512];                                               \
     va_start(ap, format);                                                     \
-    vsnprintf(buff, 1024, format, ap);                                        \
+    vsnprintf(buff, 512, format, ap);                                         \
     va_end(ap);                                                               \
     PlayerLogToDB(accountId, session, logType, subType, buff);                \
     delete[] buff;                                                            \
