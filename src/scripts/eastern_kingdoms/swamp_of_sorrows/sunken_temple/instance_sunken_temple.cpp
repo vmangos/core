@@ -125,7 +125,7 @@ struct instance_sunken_temple : public ScriptedInstance
             DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
     }
 
-    void ProcessStatueUsed(uint64 statueGuid)
+    void ProcessStatueUsed(uint32 statueEntry)
     {
         if (GetData(TYPE_SECRET_CIRCLE) == DONE)
             return;
@@ -133,18 +133,42 @@ struct instance_sunken_temple : public ScriptedInstance
         if (GetData(TYPE_SECRET_CIRCLE) != IN_PROGRESS)
             SetData(TYPE_SECRET_CIRCLE, IN_PROGRESS);
 
+        uint64 statueGuid = 0;
+        switch (statueEntry) {
+            case GO_ATALAI_STATUE_1:
+                statueGuid = m_luiAtalaiStatueGUIDs[0];
+                break;
+            case GO_ATALAI_STATUE_2:
+                statueGuid = m_luiAtalaiStatueGUIDs[1];
+                break;
+            case GO_ATALAI_STATUE_3:
+                statueGuid = m_luiAtalaiStatueGUIDs[2];
+                break;
+            case GO_ATALAI_STATUE_4:
+                statueGuid = m_luiAtalaiStatueGUIDs[3];
+                break;
+            case GO_ATALAI_STATUE_5:
+                statueGuid = m_luiAtalaiStatueGUIDs[4];
+                break;
+            case GO_ATALAI_STATUE_6:
+                statueGuid = m_luiAtalaiStatueGUIDs[5];
+                break;
+        }
+
+        if (!statueGuid)
+            return;
+
         GameObject* pStatue = instance->GetGameObject(statueGuid);
         if (!pStatue)
             return;
 
         bool activationSuccess = false;
-        uint32 objectEnrty = pStatue->GetEntry();
 
         // Check if the statues are activated correctly
         // Increase the counter when the correct statue is activated
         for (uint8 i = 0; i < MAX_STATUES; ++i)
         {
-            if (objectEnrty == m_aAtalaiStatueEvents[i] && m_uiStatueCounter == i)
+            if (statueEntry == m_aAtalaiStatueEvents[i] && m_uiStatueCounter == i)
             {
                 // Correct statue activated
                 ++m_uiStatueCounter;
@@ -321,9 +345,9 @@ struct instance_sunken_temple : public ScriptedInstance
         switch (pCreature->GetEntry())
         {
             case NPC_ATALARION:
-                if (GameObject* idol = instance->GetGameObject(m_uiIdolHakkarGUID))
+                if (GameObject* pIdol = instance->GetGameObject(m_uiIdolHakkarGUID))
                 {
-                    idol->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                    pIdol->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
                 }
                 break;
         }
@@ -505,7 +529,7 @@ struct instance_sunken_temple : public ScriptedInstance
             case GO_ATALAI_STATUE_4:
             case GO_ATALAI_STATUE_5:
             case GO_ATALAI_STATUE_6:
-                ProcessStatueUsed(uiData);
+                ProcessStatueUsed(uiType);
                 break;
         }
     }
@@ -610,30 +634,6 @@ InstanceData* GetInstance_instance_sunken_temple(Map* pMap)
     return new instance_sunken_temple(pMap);
 }
 
-/*######
-## go_atalai_light
-######*/
-
-struct go_atalai_lightAI : public GameObjectAI
-{
-    go_atalai_lightAI(GameObject* pGo) : GameObjectAI(pGo) {}
-
-    bool OnUse(Unit* pUser) override
-    {
-        if (ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData())
-        {
-            pInstance->SetData64(me->GetEntry(), me->GetGUID());
-            return true;
-        }
-        return false;
-    }
-};
-
-GameObjectAI* GetAIgo_atalai_light(GameObject* pGo)
-{
-    return new go_atalai_lightAI(pGo);
-}
-
 void AddSC_instance_sunken_temple()
 {
     Script* pNewScript;
@@ -641,10 +641,5 @@ void AddSC_instance_sunken_temple()
     pNewScript = new Script;
     pNewScript->Name = "instance_sunken_temple";
     pNewScript->GetInstanceData = &GetInstance_instance_sunken_temple;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "go_atalai_light";
-    pNewScript->GOGetAI = &GetAIgo_atalai_light;
     pNewScript->RegisterSelf();
 }
