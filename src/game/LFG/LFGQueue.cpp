@@ -396,18 +396,19 @@ void LFGQueue::RemovePlayerFromQueue(ObjectGuid playerGuid, PlayerLeaveMethod le
         if (leaveMethod == PLAYER_CLIENT_LEAVE)
         {
             sWorld.GetMessager().AddMessage([playerGuid](World* world)
-            {
-                Player* player = sObjectMgr.GetPlayer(playerGuid);
-
-                if (player && player->GetSession())
                 {
-                    WorldPacket data;
-                    LFGMgr::BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_LEAVE_QUEUE);
-                    player->GetSession()->SendPacket(&data);
-                }
+                    if (Player* player = sObjectMgr.GetPlayer(playerGuid))
+                    {
+                        if (player->GetSession())
+                        {
+                            WorldPacket data;
+                            LFGMgr::BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_LEAVE_QUEUE);
+                            player->GetSession()->SendPacket(&data);
+                        }
 
-                player->SetLFGAreaId(0);
-            });
+                        player->SetLFGAreaId(0);
+                    }
+                });
         }
 
         m_queuedPlayers.erase(itr);
