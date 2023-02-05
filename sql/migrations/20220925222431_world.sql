@@ -12,7 +12,8 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `
 (34, 358, 67, 0, 10), -- Set Mulgore, Red Cloud Mesa GY for Brambleblade Ravine, Kodo Rock, Campe Narache
 (34, 637, 67, 0, 10),
 (34, 221, 67, 0, 10),
-(709, 637, 67, 0, 3), -- Set Durotar, Valley of Trials for Spirit Rock, The Den, Hidden Path, Burning Blade Coven until patch 1.6
+(709, 363, 67, 0, 3), -- Set Durotar, Valley of Trials for Valley of Trials, Spirit Rock, The Den, Hidden Path, Burning Blade Coven until patch 1.6
+(709, 637, 67, 0, 3),
 (709, 364, 67, 0, 3),
 (709, 638, 67, 0, 3),
 (709, 365, 67, 0, 3),
@@ -31,9 +32,6 @@ DELETE FROM `game_graveyard_zone` WHERE `id`=229 AND `ghost_zone`=406;
 
 -- Remove invalid Horde-only Wetlands graveyard for Loch Modan
 DELETE FROM `game_graveyard_zone` WHERE `id`=7 AND `faction`=67 AND `ghost_zone`=38;
-
--- Set Durotar, Valley of Trials for Valley of Trials until patch 1.6
-UPDATE `game_graveyard_zone` SET `patch_max`=3 WHERE `id`=709 AND `ghost_zone`=363;
 
 -- End of migration.
 END IF;
