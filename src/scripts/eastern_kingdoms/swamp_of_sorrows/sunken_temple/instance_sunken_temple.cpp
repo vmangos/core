@@ -28,7 +28,7 @@ EndScriptData */
 #include "sunken_temple.h"
 
 // This is also the needed order for activation
-static uint64 const m_aAtalaiStatueEvents[MAX_STATUES] =
+static uint32 const m_atalaiStatueEntries[MAX_STATUES] =
 {
     GO_ATALAI_STATUE_1, // S
     GO_ATALAI_STATUE_2, // N
@@ -168,7 +168,7 @@ struct instance_sunken_temple : public ScriptedInstance
         // Increase the counter when the correct statue is activated
         for (uint8 i = 0; i < MAX_STATUES; ++i)
         {
-            if (statueEntry == m_aAtalaiStatueEvents[i] && m_uiStatueCounter == i)
+            if (statueEntry == m_atalaiStatueEntries[i] && m_uiStatueCounter == i)
             {
                 // Correct statue activated
                 ++m_uiStatueCounter;

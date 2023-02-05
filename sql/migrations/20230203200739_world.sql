@@ -26,12 +26,12 @@ UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` IN (148830, 1488
 -- Atal'ai gameobjects had field data2 already occupied with ids, using those for linking the event script:
 DELETE FROM `event_scripts` WHERE `id` IN (3094,3095,3097,3098,3099,3100);
 INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(3094, 0, 0, 38, 148830, 27898, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
-(3095, 0, 0, 38, 148831, 27899, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
-(3097, 0, 0, 38, 148832, 28111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
-(3098, 0, 0, 38, 148833, 28112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
-(3099, 0, 0, 38, 148834, 28113, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
-(3100, 0, 0, 38, 148835, 28114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle');
+(3094, 0, 0, 38, 148830, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
+(3095, 0, 0, 38, 148831, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
+(3097, 0, 0, 38, 148832, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
+(3098, 0, 0, 38, 148833, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
+(3099, 0, 0, 38, 148834, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle'),
+(3100, 0, 0, 38, 148835, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Atal\'ai Statue - process secret circle');
 
 -- End of migration.
 END IF;
