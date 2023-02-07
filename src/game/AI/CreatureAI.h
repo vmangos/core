@@ -27,6 +27,7 @@
 #include "Dynamic/FactoryHolder.h"
 #include "ObjectGuid.h"
 #include "CreatureDefines.h"
+#include "SpellDefines.h"
 
 class WorldObject;
 class GameObject;
