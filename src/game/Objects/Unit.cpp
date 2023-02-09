@@ -8659,7 +8659,7 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag,
     }
 }
 
-void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, ProcSystemArguments& data, ProcTriggeredList& triggeredList)
+void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, ProcSystemArguments const& data, ProcTriggeredList& triggeredList)
 {
     // Fill triggeredList list
     for (const auto& itr : GetSpellAuraHolderMap())
@@ -8679,7 +8679,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, ProcSystemArgumen
 
         // prevent delayed procs from removing auras applied after the proc happened
         // fixes Frostbite being removed by the Frostbolt that applied it
-        if (isVictim && itr.second->GetAuraApplyTime() >= data.procTime)
+        if (isVictim && itr.second->GetAuraApplyTime() >= data.procTime && pTarget->GetObjectGuid() == itr.second->GetCasterGuid())
             continue;
 
         // Aura that applies a modifier with charges. Gere? otherwise.
