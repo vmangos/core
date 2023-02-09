@@ -3411,6 +3411,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         if (Player* pPlayerCaster = caster->ToPlayer())
         {
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
             pPlayerCaster->CharmSpellInitialize();
             target->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
@@ -3423,6 +3424,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
                 pPlayerCaster->SendDirectMessage(&newDataPacket);
             }
         }
+        else
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
     }
     else
     {
@@ -3515,6 +3518,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         if (pCreatureTarget)
         {
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
             bool canAttack; // never attack if we needed to switch AI but couldn't
             if (pCreatureTarget->AI() && pCreatureTarget->AI()->SwitchAiAtControl())
                 canAttack = pCreatureTarget->AIM_Initialize();
@@ -3527,6 +3532,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         else if (pPlayerTarget)
         {
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
             pPlayerTarget->RemoveTemporaryAI();
 
             // Charmed players are seen as hostile and not in the group for other clients, restore
