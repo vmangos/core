@@ -304,6 +304,7 @@ struct ProcSystemArguments
 
     std::list<SpellModifier*> appliedSpellModifiers; // don't dereference pointers
     bool isSpellTriggeredByAuraOrItem;
+    time_t procTime;
 
     explicit ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_ = BASE_ATTACK,
         SpellEntry const* procSpell_ = nullptr, Spell const* spell = nullptr);

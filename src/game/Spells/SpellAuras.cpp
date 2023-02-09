@@ -3954,6 +3954,8 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
     }
     else
     {
+        if (GetId() == 12494)
+            printf("unfreeze %s\n", GetTarget()->GetName());
         // Frost root aura -> freeze/unfreeze target
         if (GetSpellProto()->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_FROST)
         {

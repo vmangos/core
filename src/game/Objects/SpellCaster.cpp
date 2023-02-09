@@ -218,7 +218,7 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
 ProcSystemArguments::ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_,
     SpellEntry const* procSpell_, Spell const* spell)
     : pVictim(pVictim_), procFlagsAttacker(procFlagsAttacker_), procFlagsVictim(procFlagsVictim_), procExtra(procExtra_), amount(amount_),
-    attType(attType_), procSpell(procSpell_), isSpellTriggeredByAuraOrItem(spell && (spell->IsTriggeredByAura() || spell->IsTriggered() && spell->IsCastByItem()))
+    attType(attType_), procSpell(procSpell_), isSpellTriggeredByAuraOrItem(spell && (spell->IsTriggeredByAura() || spell->IsTriggered() && spell->IsCastByItem())), procTime(sWorld.GetGameTime())
 {
     if (spell)
         appliedSpellModifiers = spell->m_appliedMods;
@@ -288,23 +288,14 @@ void SpellCaster::ProcDamageAndSpell_real(ProcSystemArguments& data)
     // Not much to do if no flags are set.
     if (data.procFlagsAttacker)
         if (Unit* pUnit = ToUnit())
-            pUnit->ProcDamageAndSpellFor(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAuraOrItem);
+            pUnit->ProcDamageAndSpellFor(false, data.pVictim, data, procTriggered);
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
     if (data.pVictim && data.pVictim->IsAlive() && data.procFlagsVictim)
     {
-        // http://blue.cardplace.com/cache/wow-paladin/1069149.htm
-        // "Charges will not generate off auto attacks or npc attacks by trying"
-        // "to sit down and force a crit. However, ability crits from physical"
-        // "abilities such as Sinister Strike, Hamstring, Auto-shot, Aimed shot,"
-        // "etc will generate a charge if you're sitting."
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, !data.procSpell && !data.pVictim->IsStandingUp() ? data.procExtra & ~PROC_EX_CRITICAL_HIT : data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAuraOrItem);
-#else
-        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAuraOrItem);
-#endif
-    
+        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data, procTriggered);
+
         // Standing up on damage taken must happen after proc checks.
         if (Player* pVictimPlayer = data.pVictim->ToPlayer())
             if (pVictimPlayer->IsStandUpScheduled())

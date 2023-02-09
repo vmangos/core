@@ -8659,13 +8659,13 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag,
     }
 }
 
-void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const* procSpell, uint32 damage, ProcTriggeredList& triggeredList, std::list<SpellModifier*> const& appliedSpellModifiers, bool isSpellTriggeredByAuraOrItem)
+void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, ProcSystemArguments& data, ProcTriggeredList& triggeredList)
 {
     // Fill triggeredList list
     for (const auto& itr : GetSpellAuraHolderMap())
     {
         // Can not proc on self.
-        if (procSpell && procSpell->Id == itr.first)
+        if (data.procSpell && data.procSpell->Id == itr.first)
             continue;
 
         // skip deleted auras (possible at recursive triggered call
@@ -8677,6 +8677,11 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
            !IsSpellReady(itr.second->GetId()))
             continue;
 
+        // prevent delayed procs from removing auras applied after the proc happened
+        // fixes Frostbite being removed by the Frostbolt that applied it
+        if (isVictim && itr.second->GetAuraApplyTime() >= data.procTime)
+            continue;
+
         // Aura that applies a modifier with charges. Gere? otherwise.
         bool hasmodifier = false;
         for (int i = 0; i < 3; ++i)
@@ -8685,7 +8690,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
             {
                 if (SpellModifier* auraMod = itr.second->GetAuraByEffectIndex(SpellEffectIndex(i))->GetSpellModifier())
                 {
-                    if (auraMod->charges > 0 || (std::find(appliedSpellModifiers.begin(), appliedSpellModifiers.end(), auraMod) != appliedSpellModifiers.end()))
+                    if (auraMod->charges > 0 || (std::find(data.appliedSpellModifiers.begin(), data.appliedSpellModifiers.end(), auraMod) != data.appliedSpellModifiers.end()))
                     {
                         hasmodifier = true;
                         break;
@@ -8696,8 +8701,19 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
         if (hasmodifier)
             continue;
 
+        uint32 procFlag = isVictim ? data.procFlagsVictim : data.procFlagsAttacker;
+
         SpellProcEventEntry const* spellProcEvent = nullptr;
-        auto result = IsTriggeredAtSpellProcEvent(pTarget, itr.second, procSpell, procFlag, procExtra, attType, isVictim, spellProcEvent, isSpellTriggeredByAuraOrItem);
+        // http://blue.cardplace.com/cache/wow-paladin/1069149.htm
+        // "Charges will not generate off auto attacks or npc attacks by trying"
+        // "to sit down and force a crit. However, ability crits from physical"
+        // "abilities such as Sinister Strike, Hamstring, Auto-shot, Aimed shot,"
+        // "etc will generate a charge if you're sitting."
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        auto result = IsTriggeredAtSpellProcEvent(pTarget, itr.second, data.procSpell, procFlag, isVictim && !data.procSpell && !data.pVictim->IsStandingUp() ? data.procExtra & ~PROC_EX_CRITICAL_HIT : data.procExtra, data.attType, isVictim, spellProcEvent, data.isSpellTriggeredByAuraOrItem);
+#else
+        auto result = IsTriggeredAtSpellProcEvent(pTarget, itr.second, data.procSpell, procFlag, data.procExtra, data.attType, isVictim, spellProcEvent, data.isSpellTriggeredByAuraOrItem);
+#endif
         if (result != SPELL_PROC_TRIGGER_OK)
         {
             if (result == SPELL_PROC_TRIGGER_ROLL_FAILED &&
