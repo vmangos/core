@@ -2111,12 +2111,22 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 {
                     if (Player* pPlayer = ToPlayer(target))
                     {
+                        // these are delayed to avoid crash when using
+                        // perfume while you already have cologne or vice versa
                         if (apply)
                         {
-                            pPlayer->CastSpell(pPlayer, 26802, true, nullptr, nullptr, GetCasterGuid()); // Detect Amore
+                            pPlayer->m_Events.AddLambdaEventAtOffset([pPlayer]()
+                            {
+                                pPlayer->CastSpell(pPlayer, 26802, true); // Detect Amore
+                            }, 1);
                         }
                         else
-                            pPlayer->RemoveAurasDueToSpell(26802);
+                        {
+                            pPlayer->m_Events.AddLambdaEventAtOffset([pPlayer]()
+                            {
+                                pPlayer->RemoveAurasDueToSpell(26802);
+                            }, 1);
+                        }
                     }
                     return;
                 }
