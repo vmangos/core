@@ -513,12 +513,12 @@ class Map : public GridRefManager<NGridType>
 
         template <typename T> void InsertObject(ObjectGuid const& guid, T* ptr)
         {
-            std::unique_lock<std::shared_timed_mutex> lock(m_objectsStore_lock);
+            std::lock_guard<std::shared_timed_mutex> lock(m_objectsStore_lock);
             m_objectsStore.insert<T>(guid, ptr);
         }
         template <typename T> void EraseObject(ObjectGuid const& guid)
         {
-            std::unique_lock<std::shared_timed_mutex> lock(m_objectsStore_lock);
+            std::lock_guard<std::shared_timed_mutex> lock(m_objectsStore_lock);
             m_objectsStore.erase<T>(guid, (T*)nullptr);
         }
         template <typename T> T* GetObject(ObjectGuid const& guid)
