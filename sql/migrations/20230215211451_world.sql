@@ -104,11 +104,11 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Yenniku (2530)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(2530, 4016 /*Zanzil's Mixture*/, 43, 1, 1);
+(2530, 4016 /*Zanzil's Mixture*/, -43, 1, 1);
 
 -- Maury "Club Foot" Wilkins (2535)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(2535, 4016 /*Zanzil's Mixture*/, 26, 1, 1);
+(2535, 4016 /*Zanzil's Mixture*/, -26, 1, 1);
 
 -- Chucky "Ten Thumbs" (2537)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -116,7 +116,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Dagun the Ravenous (2937)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(2937, 3358 /*Khadgar's Whisker*/, 100, 1, 1);
+(2937, 3358 /*Khadgar's Whisker*/, 5, 1, 1);
 
 -- Windfury Matriarch (2965)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -126,7 +126,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Ghost Howl (3056)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(3056, 6716 /*Schematic: EZ-Thro Dynamite*/, 50, 1, 1);
+(3056, 6716 /*Schematic: EZ-Thro Dynamite*/, 0.02, 1, 1);
 
 -- Dustwind Storm Witch (3118)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -170,12 +170,12 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Mutanus the Devourer (3654)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(3654, 1795 /*Rawhide Belt*/, 100, 1, 1),
+(3654, 1795 /*Rawhide Belt*/, 1, 1, 1),
 (3654, 9812 /*Fortified Cloak*/, 2.33888, 1, 1);
 
 -- Lord Pythas (3670)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(3670, 15506 /*Grunt's AnkleWraps*/, 100, 1, 1);
+(3670, 15506 /*Grunt's AnkleWraps*/, 1, 1, 1);
 
 -- Lady Anacondra (3671)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -220,10 +220,10 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Archmage Arugal (4275)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(4275, 1758 /*Reinforced Chain Gloves*/, 20, 1, 1),
+(4275, 1758 /*Reinforced Chain Gloves*/, 0.12, 1, 1),
 (4275, 1826 /*Rock Maul*/, 0.309191, 1, 1),
-(4275, 3385 /*Lesser Mana Potion*/, 51.5189, 2, 2),
-(4275, 9794 /*Ivycloth Cloak*/, 20, 1, 1);
+(4275, 3385 /*Lesser Mana Potion*/, 51.5189, 1, 4),
+(4275, 9794 /*Ivycloth Cloak*/, 0.12, 1, 1);
 
 -- Commander Springvale (4278)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -240,11 +240,11 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Strashaz Serpent Guard (4366)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(4366, 10308 /*Scroll of Intellect IV*/, 25, 1, 1);
+(4366, 10308 /*Scroll of Intellect IV*/, 5, 1, 1);
 
 -- Strashaz Siren (4371)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(4371, 10305 /*Scroll of Protection IV*/, 20, 1, 1);
+(4371, 10305 /*Scroll of Protection IV*/, 5, 1, 1);
 
 -- Darkfang Lurker (4411)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -256,7 +256,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Death Speaker Jargba (4428)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(4428, 5007 /*Band of Thorns*/, 50, 1, 1);
+(4428, 5007 /*Band of Thorns*/, 1, 1, 1);
 
 -- Frostmaw (4504)
 INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`) VALUES
@@ -274,7 +274,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Shade of Eranikus (5709)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(5709, 10148 /*Mighty Cloak*/, 20, 1, 1);
+(5709, 10148 /*Mighty Cloak*/, 1, 1, 1);
 
 -- Hukku (5715)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -302,7 +302,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Revelosh (6910)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(6910, 2289 /*Scroll of Strength II*/, 25, 1, 1);
+(6910, 2289 /*Scroll of Strength II*/, 0.12, 1, 1);
 
 -- Witch Doctor Zum'rah (7271)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -316,10 +316,6 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 -- Zul'Farrak Zombie (7286)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
 (7286, 3869 /*Plans: Shadow Crescent Axe*/, 0.00594948, 1, 1);
-
--- Foreman Silixiz (7287)
-INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(7287, 8072 /*Silixiz's Tower Key*/, 100, 1, 1);
 
 -- Grubbis (7361)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -350,7 +346,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Hedrum the Creeper (9032)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(9032, 10108 /*Wanderer's Cloak*/, 25, 1, 1);
+(9032, 10108 /*Wanderer's Cloak*/, 0.14, 1, 1);
 
 -- Ambassador Flamelash (9156)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -375,7 +371,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Hurley Blackbreath (9537)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(9537, 3975 /*Smooth Leather Shoulderpads*/, 25, 1, 1);
+(9537, 3975 /*Smooth Leather Shoulderpads*/, 0.13, 1, 1);
 
 -- Ribbly Screwspigot (9543)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -421,8 +417,8 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 (10363, 10382 /*Commander's Leggings*/, 1.13746, 1, 1);
 
 -- Skeletal Berserker (10391)
-INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(10391, 12840 /*Minion's Scourgestone*/, 44.6389, 1, 1);
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`, `condition_id`) VALUES
+(10391, 12840 /*Minion's Scourgestone*/, 50, 1, 1, 17);
 
 -- Crimson Guardsman (10418)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -430,13 +426,13 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- The Beast (10430)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(10430, 15943 /*Imbued Shield*/, 20, 1, 1);
+(10430, 15943 /*Imbued Shield*/, 0.14, 1, 1);
 
 -- Magistrate Barthilas (10435)
-INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(10435, 3990 /*Crested Buckler*/, 20, 1, 1),
-(10435, 3997 /*Laminated Scale Pants*/, 20, 1, 1),
-(10435, 20400 /*Pumpkin Bag*/, 20, 1, 1);
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`, `condition_id`) VALUES
+(10435, 3990 /*Crested Buckler*/, 20, 1, 1, 0),
+(10435, 3997 /*Laminated Scale Pants*/, 20, 1, 1, 0),
+(10435, 20400 /*Pumpkin Bag*/, 20, 1, 1, 108);
 
 -- Baroness Anastari (10436)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -465,7 +461,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Goraluk Anvilcrack (10899)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(10899, 8952 /*Roasted Quail*/, 50, 1, 1);
+(10899, 8952 /*Roasted Quail*/, 0.6, 1, 1);
 
 -- Alterac Ram (10990)
 INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`) VALUES
@@ -480,7 +476,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Gurubashi Headhunter (11351)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(11351, 14557 /*The Lion Horn of Stormwind*/, 11.1111, 1, 1);
+(11351, 14557 /*The Lion Horn of Stormwind*/, 0.02, 1, 1);
 
 -- Magister Kalendris (11487)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -509,8 +505,8 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Razorlash (12258)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(12258, 14446 /*Venomshroud Belt*/, 50, 1, 1),
-(12258, 14662 /*Keeper's Hooves*/, 50, 1, 1);
+(12258, 14446 /*Venomshroud Belt*/, 1, 1, 1),
+(12258, 14662 /*Keeper's Hooves*/, 1, 1, 1);
 
 -- Lord Kazzak (12397)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
@@ -589,15 +585,6 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
 (15111, 15757 /*Pattern: Wicked Leather Pants*/, 0.00550995, 1, 1);
 
--- Obsidian Eradicator (15262)
-INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(15262, 16202 /*Lesser Eternal Essence*/, 14.2857, 1, 1),
-(15262, 16204 /*Illusion Dust*/, 28.5714, 1, 1);
-
--- Obsidian Nullifier (15312)
-INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(15312, 16202 /*Lesser Eternal Essence*/, 22.2222, 1, 1);
-
 -- Ossirian the Unscarred (15339)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
 (15339, 20884 /*Qiraji Magisterial Ring*/, 9.57583, 1, 1);
@@ -641,7 +628,7 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `m
 
 -- Deathknight Vindicator (16451)
 INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `mincountOrRef`, `maxcount`) VALUES
-(16451, 22708 /*Fate of Ramaladni*/, 0.123153, 1, 1);
+(16451, 22708 /*Fate of Ramaladni*/, -0.123153, 1, 1);
 
 
 -- End of migration.
