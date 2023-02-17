@@ -121,20 +121,7 @@ Creature* ScriptedAI::DoSpawnCreature(uint32 id, float dist, uint32 type, uint32
 
 void ScriptedAI::DoResetThreat()
 {
-    if (!m_creature->CanHaveThreatList() || m_creature->GetThreatManager().isThreatListEmpty())
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoResetThreat called for creature that either cannot have threat list or has empty threat list (m_creature entry = %d)", m_creature->GetEntry());
-        return;
-    }
-
-    ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-    for (const auto itr : tList)
-    {
-        Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid());
-
-        if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
-            m_creature->GetThreatManager().modifyThreatPercent(pUnit, -100);
-    }
+    m_creature->DoResetThreat();
 }
 
 void ScriptedAI::DoTeleportPlayer(Unit* pUnit, float fX, float fY, float fZ, float fO)

@@ -10497,6 +10497,25 @@ void Unit::RemoveAttackersThreat(Unit* owner)
     }
 }
 
+void Unit::DoResetThreat()
+{
+    if (!CanHaveThreatList() || GetThreatManager().isThreatListEmpty())
+    {
+        if (IsCreature())
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoResetThreat called for creature that either cannot have threat list or has empty threat list (entry = %d)", GetEntry());
+        return;
+    }
+
+    ThreatList const& tList = GetThreatManager().getThreatList();
+    for (const auto itr : tList)
+    {
+        Unit* pUnit = GetMap()->GetUnit(itr->getUnitGuid());
+
+        if (pUnit && GetThreatManager().getThreat(pUnit))
+            GetThreatManager().modifyThreatPercent(pUnit, -100);
+    }
+}
+
 bool Unit::HasAuraPetShouldAvoidBreaking(Unit* excludeCasterChannel) const
 {
     // World of Warcraft Client Patch 1.8.0 (2005-10-11)
