@@ -131,6 +131,64 @@ enum MovementFlags
     MOVEFLAG_MASK_XZ = MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD | MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT
 };
 
+static char const* MoveFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case MOVEFLAG_NONE:
+            return "None";
+        case MOVEFLAG_FORWARD:
+            return "Forward";
+        case MOVEFLAG_BACKWARD:
+            return "Backward";
+        case MOVEFLAG_STRAFE_LEFT:
+            return "Strafe Left";
+        case MOVEFLAG_STRAFE_RIGHT:
+            return "Strafe Right";
+        case MOVEFLAG_TURN_LEFT:
+            return "Turn Left";
+        case MOVEFLAG_TURN_RIGHT:
+            return "Turn Right";
+        case MOVEFLAG_PITCH_UP:
+            return "Pitch Up";
+        case MOVEFLAG_PITCH_DOWN:
+            return "Pitch Down";
+        case MOVEFLAG_WALK_MODE:
+            return "Walk Mode";
+        case MOVEFLAG_LEVITATING:
+            return "Levitating";
+        case MOVEFLAG_FIXED_Z:
+            return "Fixed Z";
+        case MOVEFLAG_ROOT:
+            return "Root";
+        case MOVEFLAG_JUMPING:
+            return "Jumping";
+        case MOVEFLAG_FALLINGFAR:
+            return "Falling Far";
+        case MOVEFLAG_SWIMMING:
+            return "Swimming";
+        case MOVEFLAG_SPLINE_ENABLED:
+            return "Spline Enabled";
+        case MOVEFLAG_CAN_FLY:
+            return "Can Fly";
+        case MOVEFLAG_FLYING:
+            return "Flying";
+        case MOVEFLAG_ONTRANSPORT:
+            return "On Transport";
+        case MOVEFLAG_SPLINE_ELEVATION:
+            return "Spline Elevation";
+        case MOVEFLAG_WATERWALKING:
+            return "Water Walking";
+        case MOVEFLAG_SAFE_FALL:
+            return "Safe Fall";
+        case MOVEFLAG_HOVER:
+            return "Hover";
+        case MOVEFLAG_INTERNAL:
+            return "Internal";
+    }
+    return "UNKNOWN";
+}
+
 // used in SMSG_MONSTER_MOVE
 enum SplineFlags
 {

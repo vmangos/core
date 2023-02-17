@@ -718,7 +718,22 @@ class ChatHandler
         bool HandleUnitSpeedInfoCommand(char* args);
         bool HandleUnitStatInfoCommand(char* args);
         bool HandleUnitUpdateFieldsInfoCommand(char* args);
-        bool HandleUnitShowStateCommand(char* args);
+        bool HandleUnitFactionInfoCommand(char* args);
+        bool HandleUnitShowRaceCommand(char* args);
+        bool HandleUnitShowClassCommand(char* args);
+        bool HandleUnitShowGenderCommand(char* args);
+        bool HandleUnitShowPowerTypeCommand(char* args);
+        bool HandleUnitShowFormCommand(char* args);
+        bool HandleUnitShowVisFlagsCommand(char* args);
+        bool HandleUnitShowMiscFlagsCommand(char* args);
+        bool HandleUnitShowUnitStateCommand(char* args);
+        bool HandleUnitShowUnitFlagsCommand(char* args);
+        bool HandleUnitShowNPCFlagsCommand(char* args);
+        bool HandleUnitShowEmoteStateCommand(char* args);
+        bool HandleUnitShowStandStateCommand(char* args);
+        bool HandleUnitShowSheathStateCommand(char* args);
+        bool HandleUnitShowMoveFlagsCommand(char* args);
+        bool HandleUnitShowCreateSpellCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);

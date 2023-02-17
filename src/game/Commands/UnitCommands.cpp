@@ -511,7 +511,262 @@ bool ChatHandler::HandleUnitUpdateFieldsInfoCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleUnitShowStateCommand(char* args)
+bool ChatHandler::HandleUnitFactionInfoCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    FactionTemplateEntry const* pFactionTemplate = pTarget->GetFactionTemplateEntry();
+    if (!pFactionTemplate)
+    {
+        PSendSysMessage("%s uses invalid faction template %u.", pTarget->GetName(), pTarget->GetFactionTemplateId());
+        return true;
+    }
+
+    FactionEntry const* pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction);
+
+    PSendSysMessage("Faction info for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("Faction Id: %s (%u)", pFaction->name[0].c_str(), pFaction->ID);
+    PSendSysMessage("Faction Template Id: %u", pFactionTemplate->ID);
+    PSendSysMessage("Faction Template Flags: %s", FlagsToString(pFactionTemplate->factionFlags, FactionTemplateFlagToString).c_str());
+    PSendSysMessage("Own Mask: %s", FlagsToString(pFactionTemplate->ourMask, FactionMaskToString).c_str());
+    
+    PSendSysMessage("Hostile Mask: %s", FlagsToString(pFactionTemplate->hostileMask, FactionMaskToString).c_str());
+    
+    std::string enemies;
+    for (uint32 i = 0; i < 4; i++)
+    {
+        if (pFactionTemplate->enemyFaction[i])
+        {
+            if (FactionEntry const* pEnemyFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->enemyFaction[i]))
+            {
+                if (!enemies.empty())
+                    enemies += ", ";
+                enemies += pEnemyFaction->name[0] + " (" + std::to_string(pEnemyFaction->ID) + ")";
+            }
+        }
+    }
+    if (!enemies.empty())
+        PSendSysMessage("Enemies: %s", enemies.c_str());
+
+    PSendSysMessage("Friendly Mask: %s", FlagsToString(pFactionTemplate->friendlyMask, FactionMaskToString).c_str());
+
+    std::string friends;
+    for (uint32 i = 0; i < 4; i++)
+    {
+        if (pFactionTemplate->friendFaction[i])
+        {
+            if (FactionEntry const* pFriendFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->friendFaction[i]))
+            {
+                if (!friends.empty())
+                    friends += ", ";
+                friends += pFriendFaction->name[0] + " (" + std::to_string(pFriendFaction->ID) + ")";
+            }
+        }
+    }
+    if (!friends.empty())
+        PSendSysMessage("Friends: %s", friends.c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowRaceCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 raceId = pTarget->GetRace();
+    ChrRacesEntry const* pRaceEntry = sChrRacesStore.LookupEntry(raceId);
+
+    PSendSysMessage("Race for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", pRaceEntry ? pRaceEntry->name[0] : "Unknown", raceId);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowClassCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 classId = pTarget->GetClass();
+    ChrClassesEntry const* pClassEntry = sChrClassesStore.LookupEntry(classId);
+
+    PSendSysMessage("Class for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", pClassEntry ? pClassEntry->name[0] : "Unknown", classId);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowGenderCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 gender = pTarget->GetGender();
+
+    PSendSysMessage("Gender for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", GenderToString(gender), gender);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowPowerTypeCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 powerType = pTarget->GetPowerType();
+
+    PSendSysMessage("Power type for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", PowerToString(powerType), powerType);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowFormCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 form = pTarget->GetShapeshiftForm();
+    SpellShapeshiftFormEntry const* pFormEntry = sSpellShapeshiftFormStore.LookupEntry(form);
+
+    PSendSysMessage("Form for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", pFormEntry ? pFormEntry->Name[0] : "Unknown", form);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowVisFlagsCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Vis flags for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage(FlagsToString(pTarget->GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_VIS_FLAG), UnitVisFlagToString).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowMiscFlagsCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Misc flags for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage(FlagsToString(pTarget->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS), UnitBytes2FlagsToString).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowEmoteStateCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 emoteState = pTarget->GetUInt32Value(UNIT_NPC_EMOTESTATE);
+    EmotesEntry const* pEmoteEntry = sEmotesStore.LookupEntry(emoteState);
+
+    PSendSysMessage("Emote state for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", pEmoteEntry ? pEmoteEntry->Name : "Unknown", emoteState);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowStandStateCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 standState = pTarget->GetStandState();
+
+    PSendSysMessage("Stand state for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", UnitStandStateToString(standState), standState);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowSheathStateCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 sheathState = pTarget->GetSheath();
+
+    PSendSysMessage("Sheath state for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", SheathStateToString(sheathState), sheathState);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowUnitStateCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();
 
@@ -524,6 +779,77 @@ bool ChatHandler::HandleUnitShowStateCommand(char* args)
 
     PSendSysMessage("Unit state flags for %s:", pTarget->GetObjectGuid().GetString().c_str());
     PSendSysMessage(FlagsToString(pTarget->GetUnitState(), UnitStateToString).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowUnitFlagsCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Unit flags for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage(FlagsToString(pTarget->GetUInt32Value(UNIT_FIELD_FLAGS), UnitFlagToString).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowNPCFlagsCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("NPC flags for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage(FlagsToString(pTarget->GetUInt32Value(UNIT_NPC_FLAGS), NPCFlagToString).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowMoveFlagsCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Move flags for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage(FlagsToString(pTarget->GetUnitMovementFlags(), MoveFlagToString).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowCreateSpellCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 createdBySpell = pTarget->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+    SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(createdBySpell);
+
+    PSendSysMessage("Create spell for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%s (%u)", pSpellEntry ? pSpellEntry->SpellName[0].c_str() : "Unknown", createdBySpell);
 
     return true;
 }

@@ -149,6 +149,20 @@ enum UnitVisFlags
     UNIT_VIS_FLAGS_ALL         = 0xFF
 };
 
+static char const* UnitVisFlagToString(uint32 state)
+{
+    switch (state)
+    {
+        case UNIT_VIS_FLAGS_GHOST:
+            return "Ghost";
+        case UNIT_VIS_FLAGS_CREEP:
+            return "Creep";
+        case UNIT_VIS_FLAGS_UNTRACKABLE:
+            return "Untrackable";
+    }
+    return "UNKNOWN";
+}
+
 // byte value (UNIT_FIELD_BYTES_2,0)
 enum SheathState
 {
@@ -185,6 +199,30 @@ enum UnitBytes2_Flags
     UNIT_BYTE2_FLAG_UNK6        = 0x40,
     UNIT_BYTE2_FLAG_UNK7        = 0x80
 };
+
+static char const* UnitBytes2FlagsToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case UNIT_BYTE2_FLAG_PVP:
+            return "PvP";
+        case UNIT_BYTE2_FLAG_UNK1:
+            return "Unk1";
+        case UNIT_BYTE2_FLAG_FFA_PVP:
+            return "FFA PvP";
+        case UNIT_BYTE2_FLAG_UNK3:
+            return "Unk3";
+        case UNIT_BYTE2_FLAG_AURAS:
+            return "Auras";
+        case UNIT_BYTE2_FLAG_UNK5:
+            return "Unk5";
+        case UNIT_BYTE2_FLAG_UNK6:
+            return "Unk6";
+        case UNIT_BYTE2_FLAG_UNK7:
+            return "Unk7";
+    }
+    return "UNKNOWN";
+}
 
 #define CREATURE_MAX_SPELLS     4
 
@@ -533,6 +571,80 @@ enum UnitFlags
     UNIT_FLAG_UNK_28                = 0x10000000,
 };
 
+static char const* UnitFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case UNIT_FLAG_NONE:
+            return "None";
+        case UNIT_FLAG_UNK_0:
+            return "Unk0";
+        case UNIT_FLAG_SPAWNING:
+            return "Spawning";
+        case UNIT_FLAG_DISABLE_MOVE:
+            return "Disable Move";
+        case UNIT_FLAG_PLAYER_CONTROLLED:
+            return "Player Controlled";
+        case UNIT_FLAG_PET_RENAME:
+            return "Pet Rename";
+        case UNIT_FLAG_PET_ABANDON:
+            return "Pet Abandon";
+        case UNIT_FLAG_UNK_6:
+            return "Unk6";
+        case UNIT_FLAG_NOT_ATTACKABLE_1:
+            return "Not Attackable 1";
+        case UNIT_FLAG_IMMUNE_TO_PLAYER:
+            return "Immune To Player";
+        case UNIT_FLAG_IMMUNE_TO_NPC:
+            return "Immune To NPC";
+        case UNIT_FLAG_LOOTING:
+            return "Looting";
+        case UNIT_FLAG_PET_IN_COMBAT:
+            return "Pet In Combat";
+        case UNIT_FLAG_PVP:
+            return "PvP";
+        case UNIT_FLAG_SILENCED:
+            return "Silenced";
+        case UNIT_FLAG_UNK_14:
+            return "Unk14";
+        case UNIT_FLAG_USE_SWIM_ANIMATION:
+            return "Use Swim Animation";
+        case UNIT_FLAG_NON_ATTACKABLE_2:
+            return "Non Attackable 2";
+        case UNIT_FLAG_PACIFIED:
+            return "Pacified";
+        case UNIT_FLAG_STUNNED:
+            return "Stunned";
+        case UNIT_FLAG_IN_COMBAT:
+            return "In Combat";
+        case UNIT_FLAG_TAXI_FLIGHT:
+            return "Taxi Flight";
+        case UNIT_FLAG_DISARMED:
+            return "Disarmed";
+        case UNIT_FLAG_CONFUSED:
+            return "Confused";
+        case UNIT_FLAG_FLEEING:
+            return "Fleeing";
+        case UNIT_FLAG_POSSESSED:
+            return "Possessed";
+        case UNIT_FLAG_NOT_SELECTABLE:
+            return "Not Selectable";
+        case UNIT_FLAG_SKINNABLE:
+            return "Skinnable";
+        case UNIT_FLAG_AURAS_VISIBLE:
+            return "Auras Visible";
+        case UNIT_FLAG_UNK_28:
+            return "Unk28";
+        case UNIT_FLAG_PREVENT_ANIM:
+            return "Prvent Anim";
+        case UNIT_FLAG_SHEATHE:
+            return "Sheathe";
+        case UNIT_FLAG_IMMUNE:
+            return "Immune";
+    }
+    return "UNKNOWN";
+}
+
 /// Non Player Character flags
 enum NPCFlags
 {
@@ -552,8 +664,47 @@ enum NPCFlags
     UNIT_NPC_FLAG_AUCTIONEER            = 0x00001000,       // 100%
     UNIT_NPC_FLAG_STABLEMASTER          = 0x00002000,       // 100%
     UNIT_NPC_FLAG_REPAIR                = 0x00004000,       // 100%
-    UNIT_NPC_FLAG_OUTDOORPVP            = 0x20000000,       // custom flag for outdoor pvp creatures || Custom flag
 };
+
+static char const* NPCFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case UNIT_NPC_FLAG_NONE:
+            return "None";
+        case UNIT_NPC_FLAG_GOSSIP:
+            return "Gossip";
+        case UNIT_NPC_FLAG_QUESTGIVER:
+            return "Quest Giver";
+        case UNIT_NPC_FLAG_VENDOR:
+            return "Vendor";
+        case UNIT_NPC_FLAG_FLIGHTMASTER:
+            return "Flight Master";
+        case UNIT_NPC_FLAG_TRAINER:
+            return "Trainer";
+        case UNIT_NPC_FLAG_SPIRITHEALER:
+            return "Spirit Healer";
+        case UNIT_NPC_FLAG_SPIRITGUIDE:
+            return "Spirit Guide";
+        case UNIT_NPC_FLAG_INNKEEPER:
+            return "Innkeeper";
+        case UNIT_NPC_FLAG_BANKER:
+            return "Banker";
+        case UNIT_NPC_FLAG_PETITIONER:
+            return "Petitioner";
+        case UNIT_NPC_FLAG_TABARDDESIGNER:
+            return "Tabard Designer";
+        case UNIT_NPC_FLAG_BATTLEMASTER:
+            return "Battlemaster";
+        case UNIT_NPC_FLAG_AUCTIONEER:
+            return "Auctioneer";
+        case UNIT_NPC_FLAG_STABLEMASTER:
+            return "Stable Master";
+        case UNIT_NPC_FLAG_REPAIR:
+            return "Repair";
+    }
+    return "UNKNOWN";
+}
 
 enum AutoAttackCheckResult
 {

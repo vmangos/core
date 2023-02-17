@@ -38,6 +38,20 @@ enum Gender
     GENDER_NONE                        = 2
 };
 
+static char const* GenderToString(uint32 gender)
+{
+    switch (gender)
+    {
+        case GENDER_MALE:
+            return "Male";
+        case GENDER_FEMALE:
+            return "Female";
+        case GENDER_NONE:
+            return "None";
+    }
+    return "UNKNOWN";
+}
+
 // Race value is index in ChrRaces.dbc
 enum Races
 {
@@ -154,6 +168,26 @@ enum Powers
 };
 
 #define MAX_POWERS                        5                 // not count POWER_RUNES for now
+
+static char const* PowerToString(uint32 power)
+{
+    switch (power)
+    {
+        case POWER_MANA:
+            return "Mana";
+        case POWER_RAGE:
+            return "Rage";
+        case POWER_FOCUS:
+            return "Focus";
+        case POWER_ENERGY:
+            return "Energy";
+        case POWER_HAPPINESS:
+            return "Happiness";
+        case POWER_HEALTH:
+            return "Health";
+    }
+    return "UNKNOWN";
+}
 
 enum ItemQualities
 {

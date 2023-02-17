@@ -609,7 +609,7 @@ struct SpellShapeshiftFormEntry
 {
     uint32 ID;                                              // 0        m_ID
     //uint32 buttonPosition;                                // 1        m_bonusActionBar
-    //char*  Name[8];                                       // 2-9      m_name_lang
+    char*  Name[8];                                         // 2-9      m_name_lang
     //uint32 NameFlags;                                     // 10 string flags
     uint32 flags1;                                          // 11       m_flags
     int32  creatureType;                                    // 12       m_creatureType <=0 humanoid, other normal creature types

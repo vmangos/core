@@ -609,6 +609,9 @@ void SetUInt16Value(uint32& variable, uint8 offset, uint16 value)
 
 std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc)
 {
+    if (!flags)
+        return "None";
+
     std::string names;
     for (uint32 i = 0; i < 32; i++)
     {
