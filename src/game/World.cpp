@@ -266,20 +266,20 @@ void World::AddSession_(WorldSession* s)
 
     m_sessions[s->GetAccountId()] = s;
 
-    uint32 Sessions = GetActiveAndQueuedSessionCount();
-    uint32 pLimit = GetPlayerAmountLimit();
-    uint32 QueueSize = GetQueuedSessionCount();             //number of players in the queue
+    uint32 activeSessions = GetActiveSessionCount();
+    uint32 playerLimit = GetPlayerAmountLimit();
+    uint32 queuedSessions = GetQueuedSessionCount();             //number of players in the queue
 
     //so we don't count the user trying to
     //login as a session and queue the socket that we are using
-    if (decrease_session)
-        --Sessions;
+    if (decrease_session && activeSessions)
+        --activeSessions;
 
-    if (pLimit > 0 && Sessions >= pLimit && !CanSkipQueue(s))
+    if (playerLimit > 0 && activeSessions >= playerLimit && !CanSkipQueue(s))
     {
         AddQueuedSession(s);
         UpdateMaxSessionCounters();
-        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "PlayerQueue: Account id %u is in Queue Position (%u).", s->GetAccountId(), ++QueueSize);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "PlayerQueue: Account id %u is in Queue Position (%u).", s->GetAccountId(), ++queuedSessions);
         return;
     }
 
@@ -294,10 +294,10 @@ void World::AddSession_(WorldSession* s)
     UpdateMaxSessionCounters();
 
     // Updates the population
-    if (pLimit > 0)
+    if (playerLimit > 0)
     {
         float popu = float(GetActiveSessionCount());        // updated number of users on the server
-        popu /= pLimit;
+        popu /= playerLimit;
         popu *= 2;
 
         static SqlStatementID id;
@@ -368,11 +368,11 @@ bool World::RemoveQueuedSession(WorldSession* sess)
         --sessions;
 
     uint32 loggedInSessions = uint32(m_sessions.size() - m_QueuedSessions.size());
-    if (loggedInSessions >= getConfig(CONFIG_UINT32_PLAYER_HARD_LIMIT))
+    if (loggedInSessions > getConfig(CONFIG_UINT32_PLAYER_HARD_LIMIT))
         return found;
-
+    
     // accept first in queue
-    if ((!m_playerLimit || (int32)sessions < m_playerLimit) && !m_QueuedSessions.empty())
+    if ((!m_playerLimit || (int32)sessions <= m_playerLimit) && !m_QueuedSessions.empty())
     {
         WorldSession* pop_sess = m_QueuedSessions.front();
         pop_sess->SetInQueue(false);
