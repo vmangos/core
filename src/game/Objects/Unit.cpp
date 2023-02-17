@@ -694,8 +694,8 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             }
             if (damagetype != DOT)
             {
-                SetInCombatWithVictim(pVictim);
                 pVictim->SetInCombatWithAggressor(this);
+                SetInCombatWithVictim(pVictim);
             }
         }
         return 0;
@@ -729,8 +729,8 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     if ((pVictim != this) && (damagetype != DOT || (spellProto && spellProto->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))) &&
        (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)) && (!spell || !spell->IsTriggeredByProc()))
     {
-        SetInCombatWithVictim(pVictim);
         pVictim->SetInCombatWithAggressor(this);
+        SetInCombatWithVictim(pVictim);
     }
 
     if (pVictim->IsCreature())
@@ -5964,19 +5964,18 @@ void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint
 
     if (!touchOnly)
     {
-        if (pVictim->IsCharmerOrOwnerPlayerOrPlayerItself() && (combatTimer < UNIT_PVP_COMBAT_TIMER))
-            combatTimer = UNIT_PVP_COMBAT_TIMER;
+        SetInCombatState(pVictim->IsCharmerOrOwnerPlayerOrPlayerItself() && (combatTimer < UNIT_PVP_COMBAT_TIMER) ? UNIT_PVP_COMBAT_TIMER : combatTimer, pVictim);
 
-        SetInCombatState(combatTimer, pVictim);
-
-        if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
+        // pet owner should not enter combat on spell missile launching
+        if (!combatTimer)
         {
-            if (pOwner->IsTargetableBy(pVictim) && !pOwner->IsFeigningDeathSuccessfully())
+            if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
             {
-                pVictim->AddThreat(pOwner);
-                pVictim->SetInCombatWithAggressor(pOwner, false);
+                if (pOwner->IsTargetableBy(pVictim) && !pOwner->IsFeigningDeathSuccessfully())
+                    pVictim->AddThreat(pOwner);
+                
+                pOwner->SetInCombatWithVictim(pVictim, false, combatTimer >= UNIT_PVP_COMBAT_TIMER ? combatTimer : UNIT_PVP_COMBAT_TIMER);
             }
-            pOwner->SetInCombatWithVictim(pVictim, false, combatTimer >= UNIT_PVP_COMBAT_TIMER ? combatTimer : UNIT_PVP_COMBAT_TIMER);
         }
     }
 }
@@ -8974,13 +8973,8 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
             // you should remain in combat with pet's victim
             if (Pet* pPet = GetPet())
             { 
-                if (pPet->IsInCombat())
-                {
-                    if (Unit* pVictim = pPet->GetVictim())
-                    {
-                        SetInCombatWithVictim(pVictim, false, 6000);
-                    }
-                }
+                if (pPet->IsInCombat() && pPet->GetVictim())
+                    SetInCombatWithVictim(pPet->GetVictim(), false, 6000);
             }
         }
 
