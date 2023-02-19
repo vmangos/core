@@ -5583,3 +5583,44 @@ bool ChatHandler::HandleGroupSummonCommand(char* args)
     PSendSysMessage("Sent summon request to all group members.");
     return true;
 }
+
+bool ChatHandler::HandleListExploredAreasCommand(char* args)
+{
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Listing explored areas by %s", pPlayer->GetName());
+    for (auto itr = sAreaStorage.begin<AreaEntry>(); itr < sAreaStorage.end<AreaEntry>(); ++itr)
+    {
+        std::string name = itr->Name;
+        sObjectMgr.GetAreaLocaleString(itr->Id, GetSessionDbLocaleIndex(), &name);
+
+        if (!itr->ExploreFlag || itr->ExploreFlag == 0xffff)
+            continue;;
+
+        int offset = itr->ExploreFlag / 32;
+        if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
+            continue;
+
+        uint32 val = (uint32)(1 << (itr->ExploreFlag % 32));
+        uint32 currFields = pPlayer->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + offset);
+        if (currFields & val)
+        {
+            int locale = GetSessionDbLocaleIndex() + 1;
+            // send area in "id - [name]" format
+            std::ostringstream ss;
+            if (m_session)
+                ss << itr->Id << " - |cffffffff|Harea:" << itr->Id << "|h[" << name << " " << localeNames[locale] << "]|h|r";
+            else
+                ss << itr->Id << " - " << name << " " << localeNames[locale];
+
+            SendSysMessage(ss.str().c_str());
+        }
+    }
+    return true;
+}

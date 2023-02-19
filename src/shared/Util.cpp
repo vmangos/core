@@ -21,6 +21,7 @@
 
 #include "Util.h"
 #include "Timer.h"
+#include "Log.h"
 
 #include "utf8cpp/utf8.h"
 #include "mersennetwister/MersenneTwister.h"
@@ -604,4 +605,24 @@ void SetUInt16Value(uint32& variable, uint8 offset, uint16 value)
         variable &= ~uint32(uint32(0xFFFF) << (offset * 16));
         variable |= uint32(uint32(value) << (offset * 16));
     }
+}
+
+std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc)
+{
+    if (!flags)
+        return "None";
+
+    std::string names;
+    for (uint32 i = 0; i < 32; i++)
+    {
+        uint32 flag = 1 << i;
+        if (flags & flag)
+        {
+            if (!names.empty())
+                names += ", ";
+
+            names += getNameFunc(flag);
+        }
+    }
+    return names;
 }

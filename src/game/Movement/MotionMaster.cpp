@@ -381,7 +381,12 @@ void MotionMaster::MoveTargetedHome()
     }
     else if (m_owner->IsCreature() && ((Creature*)m_owner)->GetCharmerOrOwnerGuid())
     {
-        if (Unit* target = ((Creature*)m_owner)->GetCharmerOrOwner())
+        if (m_owner->GetCharmInfo() && m_owner->GetCharmInfo()->IsAtStay())
+        {
+            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s is at stay", m_owner->GetGuidStr().c_str());
+            MoveIdle();
+        }
+        else if (Unit* target = ((Creature*)m_owner)->GetCharmerOrOwner())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
             Mutate(new FollowMovementGenerator<Creature>(*target, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE));

@@ -27,6 +27,7 @@
 #include "RealmList.h"
 #include "AuthCodes.h"
 #include "Util.h"                                           // for Tokens typedef
+#include "Log.h"
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
 
@@ -55,7 +56,7 @@ RealmBuildInfo const* FindBuildInfo(uint16 build)
         return &ExpectedRealmdClientBuilds[0];
 
     // continue from 1 with explicit equal check
-    for (int i = 1; ExpectedRealmdClientBuilds[i].build; ++i)
+    for (int i = 1; i < ExpectedRealmdClientBuilds.size(); ++i)
         if (build == ExpectedRealmdClientBuilds[i].build)
             return &ExpectedRealmdClientBuilds[i];
 
@@ -189,7 +190,6 @@ void RealmList::LoadAllowedClients()
         "SELECT `major_version`, `minor_version`, `bugfix_version`, `hotfix_version`, `build`, `os`, `platform`, `integrity_hash` "
         "FROM `allowed_clients`");
 
-    ///- Circle through results and add them to the realm map
     if (result)
     {
         do

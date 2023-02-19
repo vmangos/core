@@ -723,15 +723,17 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                 // RAID ally-horde - Faction
                 else if (index == UNIT_FIELD_FACTIONTEMPLATE)
                 {
-                    Player* owner = ((Unit*)this)->GetCharmerOrOwnerPlayerOrPlayerItself();
+                    Unit const* owner = ((Unit*)this)->GetCharmerOrOwner();
+                    if (!owner)
+                        owner = ToPlayer();
                     bool forceFriendly = false;
-                    if (owner)
+                    if (owner && owner->IsPlayer())
                     {
                         FactionTemplateEntry const* ft1,* ft2;
                         ft1 = owner->GetFactionTemplateEntry();
                         ft2 = target->GetFactionTemplateEntry();
-                        if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && owner->IsInSameRaidWith(target))
-                            if (owner->IsInInterFactionMode() && target->IsInInterFactionMode())
+                        if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && static_cast<Player const*>(owner)->IsInSameRaidWith(target))
+                            if (static_cast<Player const*>(owner)->IsInInterFactionMode() && target->IsInInterFactionMode())
                                 forceFriendly = true;
                     }
                     uint32 faction = m_uint32Values[index];

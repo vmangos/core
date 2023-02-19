@@ -141,6 +141,8 @@ class OPvPCapturePoint
         bool SetCapturePointData(uint32 entry, uint32 mapId, float x, float y, float z, float o = 0,
             float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
 
+        Map* GetMap() const;
+
     protected:
 
         bool AddObject(uint32 type, uint32 entry, uint32 mapId, float x, float y, float z, float o,
@@ -153,7 +155,7 @@ class OPvPCapturePoint
         bool DelCapturePoint();
 
         // active players in the area of the objective, 0 - alliance, 1 - horde
-        PlayerSet m_activePlayers[2];
+        ObjectGuidSet m_activePlayers[2];
 
         // total shift needed to capture the objective
         float m_maxValue;

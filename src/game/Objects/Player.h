@@ -1063,7 +1063,6 @@ class Player final: public Unit
         InventoryResult _CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
         void ApplyEquipCooldown(Item* pItem);
         bool CheckAmmoCompatibility(ItemPrototype const* ammo_proto) const;
-        void SetVirtualItemSlot(uint8 i, Item* item);
         void QuickEquipItem(uint16 pos, Item* pItem);
         void VisualizeItem(uint8 slot, Item* pItem);
         void SetVisibleItemSlot(uint8 slot, Item* pItem);
@@ -1084,7 +1083,6 @@ class Player final: public Unit
     public:
         Item* AddItem(uint32 itemId, uint32 count = 1);
         void InterruptSpellsWithCastItem(Item* item);
-        void SetSheath(SheathState sheathed) override;     // overwrite Unit version
         uint8 FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const;
         uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item* skipItem = nullptr) const;
         Item* GetItemByGuid(ObjectGuid guid) const;
@@ -1196,7 +1194,7 @@ class Player final: public Unit
         bool BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, uint8 bag, uint8 slot);
         void OnReceivedItem(Item* item);
 
-        float GetReputationPriceDiscount(Creature const* pCreature) const;
+        float GetReputationPriceDiscount(Creature const* pCreature, bool taxi = false) const;
 
         Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
         TradeData* GetTradeData() const { return m_trade; }
@@ -1470,7 +1468,7 @@ class Player final: public Unit
         void RemovePetActionBar();
 
         // Take possession of a new spawned creature
-        Creature* SummonPossessedMinion(uint32 creatureId, uint32 spellId, float x, float y, float z, float ang);
+        Creature* SummonPossessedMinion(uint32 creatureId, uint32 spellId, float x, float y, float z, float ang, uint32 duration);
         void UnsummonPossessedMinion();
 
         uint32 m_stableSlots;
@@ -1820,7 +1818,6 @@ class Player final: public Unit
 
         uint32 m_lastFallTime;
         float  m_lastFallZ;
-        uint32 m_bNextRelocationsIgnored;
 
         // Recall position
         uint32 m_recallMap;
@@ -1920,9 +1917,6 @@ class Player final: public Unit
         Unit* GetMover() const { return m_mover; }
         bool IsSelfMover() const { return m_mover == this; } // normal case for player not controlling other unit
         bool HasSelfMovementControl() const;
-        bool IsNextRelocationIgnored() const { return m_bNextRelocationsIgnored ? true : false; }
-        void SetNextRelocationsIgnoredCount(uint32 count) { m_bNextRelocationsIgnored = count; }
-        void DoIgnoreRelocation() { if (m_bNextRelocationsIgnored) --m_bNextRelocationsIgnored; }
         bool IsOutdoorOnTransport() const;
 
         ObjectGuid const& GetFarSightGuid() const { return GetGuidValue(PLAYER_FARSIGHT); }

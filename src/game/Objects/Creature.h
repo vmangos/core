@@ -393,7 +393,6 @@ class Creature : public Unit
         }
         void LogDeath(Unit* pKiller) const;
         void LogLongCombat() const;
-        void LogScriptInfo(std::ostringstream &data) const;
         // Smartlog end
 
         Unit* SelectAttackingTarget(AttackingTarget target, uint32 position, uint32 spellId, uint32 selectFlags = SELECT_FLAG_NO_TOTEM) const;
@@ -475,6 +474,15 @@ class Creature : public Unit
         void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonPos.x; fY = m_summonPos.y; fZ = m_summonPos.z; fOrient = m_summonPos.o; }
 
         void SetNoXP() { AddUnitState(UNIT_STAT_NO_KILL_REWARD); }
+        void EnableMoveInLosEvent()
+        {
+            if (HasUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS))
+                ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
+            if (HasUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS))
+                ClearUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS);
+            if (!HasUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS))
+                AddUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS);
+        }
 
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
         void ClearTemporaryFaction();

@@ -23,7 +23,6 @@
 #define _BYTEBUFFER_H
 
 #include "Common.h"
-#include "Log.h"
 #include "Utilities/ByteConverter.h"
 
 class ByteBufferException
@@ -35,11 +34,7 @@ class ByteBufferException
             PrintPosError();
         }
 
-        void PrintPosError() const
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: " SIZEFMTD ") value with size: " SIZEFMTD,
-                (add ? "put" : "get"), pos, size, esize);
-        }
+        void PrintPosError() const;
     private:
         bool add;
         size_t pos;
@@ -400,18 +395,7 @@ class ByteBuffer
             return append((uint8 const*)src, cnt * sizeof(T));
         }
 
-        void append(uint8 const* src, size_t cnt)
-        {
-            if (!cnt)
-                return;
-
-            MANGOS_ASSERT(size() < 10000000);
-
-            if (_storage.size() < _wpos + cnt)
-                _storage.resize(_wpos + cnt);
-            memcpy(&_storage[_wpos], src, cnt);
-            _wpos += cnt;
-        }
+        void append(uint8 const* src, size_t cnt);
 
         void append(ByteBuffer const& buffer)
         {
@@ -455,78 +439,7 @@ class ByteBuffer
             memcpy(&_storage[pos], src, cnt);
         }
 
-        void print_storage() const
-        {
-            if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
-                return;
-
-            std::ostringstream ss;
-            ss <<  "STORAGE_SIZE: " << size() << "\n";
-
-            if (sLog.IsIncludeTime())
-                ss << "         ";
-
-            for (size_t i = 0; i < size(); ++i)
-                ss << uint32(read<uint8>(i)) << " - ";
-
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, ss.str().c_str());
-        }
-
-        void textlike() const
-        {
-            if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
-                return;
-
-            std::ostringstream ss;
-            ss <<  "STORAGE_SIZE: " << size() << "\n";
-
-            if (sLog.IsIncludeTime())
-                ss << "         ";
-
-            for (size_t i = 0; i < size(); ++i)
-                ss << read<uint8>(i);
-
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, ss.str().c_str());
-        }
-
-        void hexlike() const
-        {
-            if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
-                return;
-
-            std::ostringstream ss;
-            ss <<  "STORAGE_SIZE: " << size() << "\n";
-
-            if (sLog.IsIncludeTime())
-                ss << "         ";
-
-            size_t j = 1, k = 1;
-
-            for (size_t i = 0; i < size(); ++i)
-            {
-                if ((i == (j * 8)) && ((i != (k * 16))))
-                {
-                    ss << "| ";
-                    ++j;
-                }
-                else if (i == (k * 16))
-                {
-                    ss << "\n";
-
-                    if (sLog.IsIncludeTime())
-                        ss << "         ";
-
-                    ++k;
-                    ++j;
-                }
-
-                char buf[4];
-                snprintf(buf, 4, "%02X", read<uint8>(i));
-                ss << buf << " ";
-
-            }
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, ss.str().c_str());
-        }
+        void hexlike() const;
 
     private:
         // limited for internal use because can "append" any unexpected type (like pointer and etc) with hard detection problem

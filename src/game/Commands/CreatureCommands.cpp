@@ -32,6 +32,7 @@
 #include "WaypointManager.h"
 #include "WaypointMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
+#include "MoveSpline.h"
 
 #include <fstream>
 
@@ -172,6 +173,13 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
     PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(pTarget->AI()->IsMeleeAttackEnabled()));
     MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
     PSendSysMessage(LANG_NPC_MOTION_TYPE, MotionMaster::GetMovementGeneratorTypeName(moveType), moveType);
+    if (!pTarget->movespline->Finalized())
+        PSendSysMessage("Spline Origin: %s", pTarget->movespline->GetMovementOrigin());
+    if (pTarget->IsTemporarySummon())
+    {
+        TempSummonType despawnType = static_cast<TemporarySummon*>(pTarget)->GetDespawnType();
+        PSendSysMessage("Despawn Type: %s (%u)", TempSummonTypeToString(despawnType), despawnType);
+    }
     pTarget->AI()->GetAIInformation(*this);
 
     return true;
@@ -291,8 +299,11 @@ bool ChatHandler::HandleNpcSpawnSetDisplayIdCommand(char* args)
     pCreature->SetDisplayId(displayId);
     pCreature->SetNativeDisplayId(displayId);
 
-    if (pCreature->GetCreatureAddon())
+    if (CreatureDataAddon const* pAddonEntry = pCreature->GetCreatureAddon())
+    {
+        const_cast<CreatureDataAddon*>(pAddonEntry)->display_id = displayId;
         WorldDatabase.PExecuteLog("UPDATE `creature_addon` SET `display_id`=%u WHERE `guid`=%u", displayId, pCreature->GetDBTableGUIDLow());
+    }
     else
         WorldDatabase.PExecuteLog("REPLACE INTO `creature_addon` (`guid`, `display_id`) VALUES (%u, %u)", pCreature->GetDBTableGUIDLow(), displayId);
 
@@ -324,6 +335,187 @@ bool ChatHandler::HandleNpcSetDisplayIdCommand(char* args)
     pCreature->SetNativeDisplayId(displayId);
 
     PSendSysMessage("Display Id updated to %u.", displayId);
+    return true;
+}
+
+bool ChatHandler::HandleNpcSpawnSetEmoteStateCommand(char* args)
+{
+    uint32 emoteId;
+    if (!ExtractUInt32(&args, emoteId))
+        return false;
+
+    EmotesEntry const* pEmoteEntry = nullptr;
+    if (emoteId)
+    {
+        pEmoteEntry = sEmotesStore.LookupEntry(emoteId);
+        if (!pEmoteEntry)
+        {
+            PSendSysMessage("Emote Id %u does not exist.", emoteId);
+            return false;
+        }
+    }
+
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature || pCreature->IsPet())
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pCreature->SetUInt32Value(UNIT_NPC_EMOTESTATE, emoteId);
+
+    if (CreatureDataAddon const* pAddonEntry = pCreature->GetCreatureAddon())
+    {
+        const_cast<CreatureDataAddon*>(pAddonEntry)->emote_state = emoteId;
+        WorldDatabase.PExecuteLog("UPDATE `creature_addon` SET `emote_state`=%u WHERE `guid`=%u", emoteId, pCreature->GetDBTableGUIDLow());
+    }
+    else
+        WorldDatabase.PExecuteLog("REPLACE INTO `creature_addon` (`guid`, `emote_state`) VALUES (%u, %u)", pCreature->GetDBTableGUIDLow(), emoteId);
+
+    PSendSysMessage("Emote state for guid %u updated to %s (%u).", pCreature->GetDBTableGUIDLow(), pEmoteEntry ? pEmoteEntry->Name : "None", emoteId);
+    return true;
+}
+
+bool ChatHandler::HandleNpcSpawnSetStandStateCommand(char* args)
+{
+    uint32 standState;
+    if (!ExtractUInt32(&args, standState))
+        return false;
+
+    if (standState >= MAX_UNIT_STAND_STATE)
+    {
+        PSendSysMessage("Invalid stand state %u.", standState);
+        return false;
+    }
+
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature || pCreature->IsPet())
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pCreature->SetStandState(standState);
+
+    if (CreatureDataAddon const* pAddonEntry = pCreature->GetCreatureAddon())
+    {
+        const_cast<CreatureDataAddon*>(pAddonEntry)->stand_state = standState;
+        WorldDatabase.PExecuteLog("UPDATE `creature_addon` SET `stand_state`=%u WHERE `guid`=%u", standState, pCreature->GetDBTableGUIDLow());
+    }
+    else
+        WorldDatabase.PExecuteLog("REPLACE INTO `creature_addon` (`guid`, `stand_state`) VALUES (%u, %u)", pCreature->GetDBTableGUIDLow(), standState);
+
+    PSendSysMessage("Stand state for guid %u updated to %s (%u).", pCreature->GetDBTableGUIDLow(), UnitStandStateToString(standState), standState);
+    return true;
+}
+
+bool ChatHandler::HandleNpcSpawnSetSheathStateCommand(char* args)
+{
+    uint32 sheathState;
+    if (!ExtractUInt32(&args, sheathState))
+        return false;
+
+    if (sheathState >= MAX_SHEATH_STATE)
+    {
+        PSendSysMessage("Invalid sheath state %u.", sheathState);
+        return false;
+    }
+
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature || pCreature->IsPet())
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pCreature->SetSheath(SheathState(sheathState));
+
+    if (CreatureDataAddon const* pAddonEntry = pCreature->GetCreatureAddon())
+    {
+        const_cast<CreatureDataAddon*>(pAddonEntry)->sheath_state = sheathState;
+        WorldDatabase.PExecuteLog("UPDATE `creature_addon` SET `sheath_state`=%u WHERE `guid`=%u", sheathState, pCreature->GetDBTableGUIDLow());
+    }
+    else
+        WorldDatabase.PExecuteLog("REPLACE INTO `creature_addon` (`guid`, `sheath_state`) VALUES (%u, %u)", pCreature->GetDBTableGUIDLow(), sheathState);
+
+    PSendSysMessage("Sheath state for guid %u updated to %s (%u).", pCreature->GetDBTableGUIDLow(), SheathStateToString(sheathState), sheathState);
+    return true;
+}
+
+bool ChatHandler::HandleNpcSpawnSetAurasCommand(char* args)
+{
+    Tokens auras = StrSplit(args, " ");
+    for (auto const& token : auras)
+    {
+        if (!isNumeric(token))
+        {
+            PSendSysMessage("Invalid symbol %s. Expected list of spells separated by spaces.", token.c_str());
+            return false;
+        }
+
+        uint32 spellId = atoi(token.c_str());
+        if (!sSpellMgr.GetSpellEntry(spellId))
+        {
+            PSendSysMessage("Aura %u does not exist.", spellId);
+            return false;
+        }
+    }
+
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature || pCreature->IsPet())
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (auto const& token : auras)
+        HandleAuraHelper(atoi(token.c_str()), 0, pCreature);
+
+    if (CreatureDataAddon const* pAddonEntry = pCreature->GetCreatureAddon())
+    {
+        delete const_cast<CreatureDataAddon*>(pAddonEntry)->auras;
+        const_cast<CreatureDataAddon*>(pAddonEntry)->auras = new uint32[auras.size()+1];
+        for (int i = 0; i < auras.size(); i++)
+            const_cast<uint32*>(const_cast<CreatureDataAddon*>(pAddonEntry)->auras)[i] = atoi(auras[i].c_str());
+        const_cast<uint32*>(const_cast<CreatureDataAddon*>(pAddonEntry)->auras)[auras.size()] = 0;
+        WorldDatabase.PExecuteLog("UPDATE `creature_addon` SET `auras`='%s' WHERE `guid`=%u", args, pCreature->GetDBTableGUIDLow());
+    }
+    else
+        WorldDatabase.PExecuteLog("REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES (%u, '%s')", pCreature->GetDBTableGUIDLow(), args);
+
+    PSendSysMessage("Auras for guid %u updated to '%s'.", pCreature->GetDBTableGUIDLow(), args);
     return true;
 }
 
@@ -398,7 +590,7 @@ bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleNpcSetDeathStateCommand(char* args)
+bool ChatHandler::HandleNpcSpawnSetDeathStateCommand(char* args)
 {
     bool value;
     if (!ExtractOnOff(&args, value))
@@ -539,7 +731,7 @@ bool ChatHandler::HandleNpcSetWanderDistCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleNpcSpawnSpawnTimeCommand(char* args)
+bool ChatHandler::HandleNpcSpawnSetRespawnTimeCommand(char* args)
 {
     uint32 timeMin;
     if (!ExtractUInt32(&args, timeMin))
@@ -572,7 +764,7 @@ bool ChatHandler::HandleNpcSpawnSpawnTimeCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleNpcSetSpawnTimeCommand(char* args)
+bool ChatHandler::HandleNpcSetRespawnTimeCommand(char* args)
 {
     uint32 stime;
     if (!ExtractUInt32(&args, stime))
@@ -932,7 +1124,7 @@ bool ChatHandler::HandleNpcAddEntryCommand(char* args)
     std::sort(creatureIds.begin(), creatureIds.begin()+count);
     pData->creature_id = creatureIds;
 
-    WorldDatabase.PExecute("UPDATE `creature` SET `id`=%u, `id2`=%u, `id3`=%u, `id4`=%u WHERE `guid`=%u", creatureIds[0], creatureIds[1], creatureIds[2], creatureIds[3], pCreature->GetGUIDLow());
+    WorldDatabase.PExecute("UPDATE `creature` SET `id`=%u, `id2`=%u, `id3`=%u, `id4`=%u, `id5`=%u WHERE `guid`=%u", creatureIds[0], creatureIds[1], creatureIds[2], creatureIds[3], creatureIds[4], pCreature->GetGUIDLow());
     PSendSysMessage("Creature entry %u added to guid %u.", uiCreatureId, pCreature->GetGUIDLow());
     return true;
 }
@@ -1109,8 +1301,17 @@ bool ChatHandler::HandleNpcMoveHelperCommand(char* args, bool save)
     }
 
     if (save)
+    {
+        if (CreatureData* pData = const_cast<CreatureData*>(sObjectMgr.GetCreatureData(lowguid)))
+        {
+            pData->position.x = x;
+            pData->position.y = y;
+            pData->position.z = z;
+            pData->position.o = o;
+        }
         WorldDatabase.PExecuteLog("UPDATE `creature` SET `position_x` = %f, `position_y` = %f, `position_z` = %f, `orientation` = %f WHERE `guid` = %u", x, y, z, o, lowguid);
-    
+    }
+
     PSendSysMessage(LANG_COMMAND_CREATUREMOVED);
     return true;
 }

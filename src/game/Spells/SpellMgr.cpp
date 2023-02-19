@@ -1044,6 +1044,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x1)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x400000))) ||
                         ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x1)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x400000))))
                     return false;
+
+                // Arcane Missiles
+                if (spellInfo_1->IsFitToFamilyMask(1 << CF_MAGE_ARCANE_MISSILES_CHANNEL) && spellInfo_2->IsFitToFamilyMask(1 << CF_MAGE_ARCANE_MISSILES_CHANNEL))
+                    return false;
             }
             // Detect Invisibility and Mana Shield (multi-family check)
             if (spellInfo_2->Id == 132 && spellInfo_1->SpellIconID == 209 && spellInfo_1->SpellVisual == 968)
@@ -1226,7 +1230,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             // Exception :
             spellInfo_1->SpellIconID != 516 && // Improved Sprint
             // World of Warcraft Client Patch 1.8.0 (2005-10-11)
-            // - Sayge?s buffs at the Darkmoon Faire are now exclusive to one another.
+            // - Sayge's buffs at the Darkmoon Faire are now exclusive to one another.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
             !(spellInfo_1->SpellIconID == 1595 && spellInfo_1->SpellVisual == 7042 && spellInfo_2->SpellIconID == 1595 && spellInfo_2->SpellVisual == 7042) &&
 #endif

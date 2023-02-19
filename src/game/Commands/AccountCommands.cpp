@@ -1218,3 +1218,42 @@ bool ChatHandler::HandleUnmuteCommand(char* args)
     PSendSysMessage(LANG_YOU_ENABLE_CHAT, nameLink.c_str());
     return true;
 }
+
+bool ChatHandler::HandleSniffCommand(char* args)
+{
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (!pPlayer->GetSession()->IsConnected())
+    {
+        SendSysMessage("Player is disconnected.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (value)
+    {
+        pPlayer->GetSession()->StartSniffing();
+        PSendSysMessage("Enabled packet dump for %s.", pPlayer->GetName());
+    }
+    else
+    {
+        pPlayer->GetSession()->StopSniffing();
+        PSendSysMessage("Disabled packet dump for %s.", pPlayer->GetName());
+    }
+
+    return true;
+}

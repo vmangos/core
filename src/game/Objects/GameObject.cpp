@@ -47,6 +47,7 @@
 #include <G3D/Box.h>
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
+#include "Geometry.h"
 
 bool QuaternionData::isUnit() const
 {
@@ -255,7 +256,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
     }
-    if (GetGOInfo()->IsInfiniteGameObject())
+    else if (GetGOInfo()->IsInfiniteGameObject())
     {
         SetVisibilityModifier(MAX_VISIBILITY_DISTANCE);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
@@ -1511,55 +1512,11 @@ void GameObject::Use(Unit* user)
             if (!user->IsWithinLOSInMap(this, false))
                 return;
 
-            Player* player = (Player*)user;
-
             // a chair may have n slots. we have to calculate their positions and teleport the player to the nearest one
-
-            // check if the db is sane
-            if (info->chair.slots > 0)
-            {
-                float lowestDist = DEFAULT_VISIBILITY_DISTANCE;
-
-                float x_lowest = GetPositionX();
-                float y_lowest = GetPositionY();
-
-                // the object orientation + 1/2 pi
-                // every slot will be on that straight line
-                float orthogonalOrientation = GetOrientation() + M_PI_F * 0.5f;
-                // find nearest slot
-                for (uint32 i = 0; i < info->chair.slots; ++i)
-                {
-                    // the distance between this slot and the center of the go - imagine a 1D space
-                    float relativeDistance = (info->size * i) - (info->size * (info->chair.slots - 1) / 2.0f);
-
-                    float x_i = GetPositionX() + relativeDistance * cos(orthogonalOrientation);
-                    float y_i = GetPositionY() + relativeDistance * sin(orthogonalOrientation);
-
-                    // calculate the distance between the player and this slot
-                    float thisDistance = player->GetDistance2d(x_i, y_i);
-
-                    /* debug code. It will spawn a npc on each slot to visualize them.
-                    Creature* helper = player->SummonCreature(14496, x_i, y_i, GetPositionZ(), GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10000);
-                    std::ostringstream output;
-                    output << i << ": thisDist: " << thisDistance;
-                    helper->MonsterSay(output.str().c_str(), LANG_UNIVERSAL);
-                    */
-
-                    if (thisDistance <= lowestDist)
-                    {
-                        lowestDist = thisDistance;
-                        x_lowest = x_i;
-                        y_lowest = y_i;
-                    }
-                }
-                player->TeleportTo(GetMapId(), x_lowest, y_lowest, GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-            }
-            else
-            {
-                // fallback, will always work
-                player->TeleportTo(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-            }
-            player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR + info->chair.height);
+            float slotX, slotY;
+            GetClosestChairSlotPosition(user->GetPositionX(), user->GetPositionY(), slotX, slotY);
+            user->NearTeleportTo(slotX, slotY, GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+            user->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR + info->chair.height);
             return;
         }
         case GAMEOBJECT_TYPE_SPELL_FOCUS:                   // 8
@@ -2216,23 +2173,24 @@ bool GameObject::IsUseRequirementMet() const
     return true;
 }
 
-bool GameObject::PlayerCanUse(Player* pl)
+bool GameObject::PlayerCanUse(Player* pPlayer)
 {
-    if (pl->IsGameMaster())
+    if (pPlayer->IsGameMaster())
         return true;
-
+    
     if (!IsVisible())
         return false;
 
-    GameObjectInfo const* inf = GetGOInfo();
-    if (!inf)
+    GameObjectInfo const* pInfo = GetGOInfo();
+    if (!pInfo)
         return false;
-    switch (inf->type)
+
+    switch (pInfo->type)
     {
         case GAMEOBJECT_TYPE_DOOR:
         {
             // Check lockId
-            uint32 lockId = inf->GetLockId();
+            uint32 lockId = pInfo->GetLockId();
             if (lockId != 0)
             {
                 LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
@@ -2247,7 +2205,7 @@ bool GameObject::PlayerCanUse(Player* pl)
                         {
                             if (lockInfo->Index[j])
                             {
-                                if (!pl->HasItemCount(lockInfo->Index[j], 1))
+                                if (!pPlayer->HasItemCount(lockInfo->Index[j], 1))
                                     return false;
                             }
                             break;
@@ -2255,6 +2213,15 @@ bool GameObject::PlayerCanUse(Player* pl)
                     }
                 }
             }
+            break;
+        }
+        case GAMEOBJECT_TYPE_CHAIR:
+        {
+            float x, y;
+            GetClosestChairSlotPosition(pPlayer->GetPositionX(), pPlayer->GetPositionY(), x, y);
+            if (pPlayer->GetDistance(x, y, GetPositionZ(), SizeFactor::None) > MAX_SITCHAIRUSE_DISTANCE)
+                return false;
+            break;
         }
     }
 
@@ -2495,13 +2462,61 @@ bool GameObject::IsAtInteractDistance(Player const* player, uint32 maxRange) con
         }
 
         if (GetGoType() == GAMEOBJECT_TYPE_SPELL_FOCUS)
-            return maxRange * maxRange >= GetDistance3dToCenter(player);
+            return maxRange >= GetDistance3dToCenter(player);
 
         if (sGameObjectDisplayInfoStore.LookupEntry(GetGOInfo()->displayId))
             return IsAtInteractDistance(player->GetPosition(), maxRange);
     }
 
     return IsAtInteractDistance(player->GetPosition(), GetGOInfo()->GetInteractionDistance());
+}
+
+void GameObject::GetClosestChairSlotPosition(float userX, float userY, float& outX, float& outY) const
+{
+    // check if the db is sane
+    if (GetGOInfo()->chair.slots > 0)
+    {
+        float lowestDist = DEFAULT_VISIBILITY_DISTANCE;
+
+        float x_lowest = GetPositionX();
+        float y_lowest = GetPositionY();
+
+        // the object orientation + 1/2 pi
+        // every slot will be on that straight line
+        float orthogonalOrientation = GetOrientation() + M_PI_F * 0.5f;
+        // find nearest slot
+        for (uint32 i = 0; i < GetGOInfo()->chair.slots; ++i)
+        {
+            // the distance between this slot and the center of the go - imagine a 1D space
+            float relativeDistance = (GetGOInfo()->size * i) - (GetGOInfo()->size * (GetGOInfo()->chair.slots - 1) / 2.0f);
+
+            float x_i = GetPositionX() + relativeDistance * cos(orthogonalOrientation);
+            float y_i = GetPositionY() + relativeDistance * sin(orthogonalOrientation);
+
+            // calculate the distance between the user and this slot
+            float thisDistance = Geometry::GetDistance2D(userX, userY, x_i, y_i);
+
+            /* debug code. It will spawn a npc on each slot to visualize them.
+            Creature* helper = SummonCreature(14496, x_i, y_i, GetPositionZ(), GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10000);
+            std::ostringstream output;
+            output << i << ": thisDist: " << thisDistance;
+            helper->MonsterSay(output.str().c_str(), LANG_UNIVERSAL);
+            */
+
+            if (thisDistance <= lowestDist)
+            {
+                lowestDist = thisDistance;
+                x_lowest = x_i;
+                y_lowest = y_i;
+            }
+        }
+        outX = x_lowest;
+        outY = y_lowest;
+        return;
+    }
+
+    outX = GetPositionX();
+    outY = GetPositionY();
 }
 
 bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
@@ -2525,7 +2540,7 @@ bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
             .contains({ pos.x, pos.y, pos.z });
     }
 
-    return GetDistance3dToCenter(pos) <= (radius * radius);
+    return GetDistance3dToCenter(pos) <= radius;
 }
 
 SpellEntry const* GameObject::GetSpellForLock(Player const* player) const

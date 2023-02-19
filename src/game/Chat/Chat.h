@@ -181,6 +181,7 @@ class ChatHandler
         bool HandleAnticheatCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
         bool HandleViewLogCommand(char*);
+        bool HandleSniffCommand(char*);
 
         //Cheats
         bool HandleCheatStatusCommand(char *);
@@ -203,14 +204,13 @@ class ChatHandler
         //Custom
         bool HandleSendSpellVisualCommand(char *);
         bool HandleSendSpellImpactCommand(char *);
-        bool HandleDebugUnitCommand(char *);
         bool HandleDebugTimeCommand(char *);
         bool HandleDebugMoveFlagsCommand(char *);
         bool HandleDebugMoveSplineCommand(char *);
         bool HandleDebugExp(char*);
         bool HandleVideoTurn(char*);
         bool HandleDebugLootTableCommand(char*);
-        bool HandleDebugItemEnchantCommand(int lootid, unsigned int simCount);
+        bool HandleDebugItemEnchantCommand(int lootid, uint32 simCount);
         bool HandleServiceDeleteCharacters(char* args);
 
         bool HandleSpamerMute(char* args);
@@ -581,6 +581,7 @@ class ChatHandler
 
         bool HandleListAurasCommand(char* args);
         bool HandleListCreatureCommand(char* args);
+        bool HandleListExploredAreasCommand(char* args);
         bool HandleListItemCommand(char* args);
         bool HandleListObjectCommand(char* args);
         bool HandleListTalentsCommand(char* args);
@@ -691,15 +692,19 @@ class ChatHandler
         bool HandleNpcMoveHelperCommand(char* args, bool save);
         bool HandleNpcPlayEmoteCommand(char* args);
         bool HandleNpcSayCommand(char* args);
-        bool HandleNpcSetDeathStateCommand(char* args);
+        bool HandleNpcSpawnSetDeathStateCommand(char* args);
         bool HandleNpcSetDisplayIdCommand(char* args);
         bool HandleNpcSpawnSetDisplayIdCommand(char* args);
+        bool HandleNpcSpawnSetEmoteStateCommand(char* args);
+        bool HandleNpcSpawnSetStandStateCommand(char* args);
+        bool HandleNpcSpawnSetSheathStateCommand(char* args);
         bool HandleNpcSetMoveTypeCommand(char* args);
         bool HandleNpcSpawnSetMoveTypeCommand(char* args);
         bool HandleNpcSpawnWanderDistCommand(char* args);
         bool HandleNpcSetWanderDistCommand(char* args);
-        bool HandleNpcSetSpawnTimeCommand(char* args);
-        bool HandleNpcSpawnSpawnTimeCommand(char* args);
+        bool HandleNpcSetRespawnTimeCommand(char* args);
+        bool HandleNpcSpawnSetRespawnTimeCommand(char* args);
+        bool HandleNpcSpawnSetAurasCommand(char* args);
         bool HandleNpcSetReactStateCommand(char* args);
         bool HandleNpcTameCommand(char* args);
         bool HandleNpcTextEmoteCommand(char* args);
@@ -713,6 +718,22 @@ class ChatHandler
         bool HandleUnitSpeedInfoCommand(char* args);
         bool HandleUnitStatInfoCommand(char* args);
         bool HandleUnitUpdateFieldsInfoCommand(char* args);
+        bool HandleUnitFactionInfoCommand(char* args);
+        bool HandleUnitShowRaceCommand(char* args);
+        bool HandleUnitShowClassCommand(char* args);
+        bool HandleUnitShowGenderCommand(char* args);
+        bool HandleUnitShowPowerTypeCommand(char* args);
+        bool HandleUnitShowFormCommand(char* args);
+        bool HandleUnitShowVisFlagsCommand(char* args);
+        bool HandleUnitShowMiscFlagsCommand(char* args);
+        bool HandleUnitShowUnitStateCommand(char* args);
+        bool HandleUnitShowUnitFlagsCommand(char* args);
+        bool HandleUnitShowNPCFlagsCommand(char* args);
+        bool HandleUnitShowEmoteStateCommand(char* args);
+        bool HandleUnitShowStandStateCommand(char* args);
+        bool HandleUnitShowSheathStateCommand(char* args);
+        bool HandleUnitShowMoveFlagsCommand(char* args);
+        bool HandleUnitShowCreateSpellCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);

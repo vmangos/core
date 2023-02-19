@@ -3768,7 +3768,7 @@ void Spell::EffectSummonPossessed(SpellEffectIndex effIdx)
 
     uint32 creatureEntry = m_spellInfo->EffectMiscValue[effIdx];
 
-    Creature* pMinion = pCaster->SummonPossessedMinion(creatureEntry, m_spellInfo->Id, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster->GetOrientation());
+    Creature* pMinion = pCaster->SummonPossessedMinion(creatureEntry, m_spellInfo->Id, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster->GetOrientation(), m_spellInfo->GetDuration());
     if (!pMinion)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectSummonPossessed: creature entry %u for spell %u could not be summoned.", creatureEntry, m_spellInfo->Id);
@@ -5551,11 +5551,15 @@ void Spell::EffectSanctuary(SpellEffectIndex effIdx)
     bool noGuards = true;
 
     unitTarget->InterruptSpellsCastedOnMe(true);
-    unitTarget->CombatStop();
+    unitTarget->InterruptAttacksOnMe(0.0f, guardCheck);
+    unitTarget->m_lastSanctuaryTime = WorldTimer::getMSTime();
 
     // Flask of Petrification does not cause mobs to stop attacking.
-    if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX2_RETAIN_ITEM_CAST))
+    if (m_spellInfo->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_VANISH>())
     {
+        // Vanish allows to remove all threat and cast regular stealth so other spells can be used
+        unitTarget->CombatStop();
+
         HostileReference* pReference = unitTarget->GetHostileRefManager().getFirst();
         while (pReference)
         {
@@ -5570,22 +5574,12 @@ void Spell::EffectSanctuary(SpellEffectIndex effIdx)
 
             pReference = pNextRef;
         }
-    }
-    
-    unitTarget->m_lastSanctuaryTime = WorldTimer::getMSTime();
 
-    // Vanish allows to remove all threat and cast regular stealth so other spells can be used
-    if (m_spellInfo->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_VANISH>())
-    {
-        unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-        unitTarget->InterruptAttacksOnMe(0.0f, guardCheck);
-
-        if (Player* pPlayer = m_caster->ToPlayer())
-        {
-            if (noGuards)
-                pPlayer->SetCannotBeDetectedTimer(1000);
-        }
+        if (noGuards && unitTarget->IsPlayer())
+            static_cast<Player*>(unitTarget)->SetCannotBeDetectedTimer(1000);
     }
+    else
+        unitTarget->DoResetThreat();
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
 }

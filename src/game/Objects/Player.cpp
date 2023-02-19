@@ -391,7 +391,7 @@ uint32 PlayerTaxi::GetCurrentTaxiCost() const
 
     sObjectMgr.GetTaxiPath(m_TaxiDestinations[0], m_TaxiDestinations[1], path, cost);
 
-    return (uint32)ceil(cost * m_discount);
+    return uint32(cost * m_discount + 0.5f);
 }
 
 std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi)
@@ -550,7 +550,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 Player::Player(WorldSession* session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this), m_saveDisabled(false),
     m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_repopAtGraveyardPending(false),
-    m_honorMgr(this), m_bNextRelocationsIgnored(0), m_personalXpRate(-1.0f), m_isStandUpScheduled(false), m_foodEmoteTimer(0)
+    m_honorMgr(this), m_personalXpRate(-1.0f), m_isStandUpScheduled(false), m_foodEmoteTimer(0)
 {
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
@@ -5266,7 +5266,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod)
             uint32 dmultiplier = dcost->multiplier[ItemSubClassToDurabilityMultiplierId(ditemProto->Class, ditemProto->SubClass)];
             uint32 costs = uint32(LostDurability * dmultiplier * dQualitymodEntry->quality_mod);
 
-            costs = uint32(costs * discountMod);
+            costs = uint32(costs * discountMod + 0.5f);
 
             if (costs == 0)                                 //fix for ITEM_QUALITY_ARTIFACT
                 costs = 1;
@@ -6380,12 +6380,7 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
 
     if (positionChanged || old_r != orientation)
     {
-        if (positionChanged)
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
-        else
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_TURNING_CANCELS);
-
-        RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
+        HandleInterruptsOnMovement(positionChanged);
 
         // move and update visible state if need
         m->PlayerRelocation(this, x, y, z, orientation);
@@ -6396,15 +6391,15 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
         y = GetPositionY();
         z = GetPositionZ();
 
-        // group update
-        if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
-            SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
-
-        if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-            GetSession()->SendCancelTrade();   // will close both side trade windows
-
         if (positionChanged)
         {
+            // group update
+            if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
+                SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
+
+            if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
+                GetSession()->SendCancelTrade();   // will close both side trade windows
+
             if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
             {
                 if (!m_areaCheckTimer)
@@ -8603,46 +8598,6 @@ void Player::SendPetSkillWipeConfirm() const
 /*********************************************************/
 /***                    STORAGE SYSTEM                 ***/
 /*********************************************************/
-
-void Player::SetVirtualItemSlot(uint8 i, Item* item)
-{
-    MANGOS_ASSERT(i < 3);
-    if (i < 2 && item)
-    {
-        if (!item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
-            return;
-    }
-}
-
-void Player::SetSheath(SheathState sheathed)
-{
-    switch (sheathed)
-    {
-        case SHEATH_STATE_UNARMED:                          // no prepared weapon
-            SetVirtualItemSlot(0, nullptr);
-            SetVirtualItemSlot(1, nullptr);
-            SetVirtualItemSlot(2, nullptr);
-            break;
-        case SHEATH_STATE_MELEE:                            // prepared melee weapon
-        {
-            SetVirtualItemSlot(0, GetWeaponForAttack(BASE_ATTACK, true, true));
-            SetVirtualItemSlot(1, GetWeaponForAttack(OFF_ATTACK, true, true));
-            SetVirtualItemSlot(2, nullptr);
-        };
-        break;
-        case SHEATH_STATE_RANGED:                           // prepared ranged weapon
-            SetVirtualItemSlot(0, nullptr);
-            SetVirtualItemSlot(1, nullptr);
-            SetVirtualItemSlot(2, GetWeaponForAttack(RANGED_ATTACK, true, true));
-            break;
-        default:
-            SetVirtualItemSlot(0, nullptr);
-            SetVirtualItemSlot(1, nullptr);
-            SetVirtualItemSlot(2, nullptr);
-            break;
-    }
-    Unit::SetSheath(sheathed);                              // this must visualize Sheath changing for other players...
-}
 
 uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const
 {
@@ -15535,12 +15490,6 @@ float Player::GetMaxLootDistance(Unit const* pUnit) const
 
 void Player::_LoadAuras(QueryResult* result, uint32 timediff)
 {
-    //RemoveAllAuras(); -- some spells casted before aura load, for example in LoadSkills, aura list explicitly cleaned early
-
-    // all aura related fields
-    for (int i = UNIT_FIELD_AURA; i <= UNIT_FIELD_AURASTATE; ++i)
-        SetUInt32Value(i, 0);
-
     //QueryResult* result = CharacterDatabase.PQuery("SELECT caster_guid, item_guid, spell, stacks, charges, base_points0, base_points1, base_points2, periodic_time0, periodic_time1, periodic_time2, max_duration, duration, effect_index_mask FROM character_aura WHERE guid = '%u'",GetGUIDLow());
 
     if (result)
@@ -17678,13 +17627,13 @@ void Player::RemovePetActionBar()
 }
 
 // This will create a new creature and set the current unit as the controller of that new creature
-Creature* Player::SummonPossessedMinion(uint32 creatureId, uint32 spellId, float x, float y, float z, float ang)
+Creature* Player::SummonPossessedMinion(uint32 creatureId, uint32 spellId, float x, float y, float z, float ang, uint32 duration)
 {
     // Possess is a unique advertised charm, another advertised charm already exists: we should get rid of it first
     if (!GetCharmGuid().IsEmpty())
         return nullptr;
 
-    Creature* pCreature = SummonCreature(creatureId, x, y, z, ang, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000, false, 0, nullptr, GetTransport());
+    Creature* pCreature = SummonCreature(creatureId, x, y, z, ang, TEMPSUMMON_TIMED_DEATH_AND_DEAD_DESPAWN, duration, false, 0, nullptr, GetTransport());
 
     if (!pCreature)
         return nullptr;
@@ -18086,7 +18035,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     // 0 element current node
     m_taxi.AddTaxiDestination(sourcenode);
 
-    float discount = npc ? GetReputationPriceDiscount(npc) : 1.0f;
+    float discount = npc ? GetReputationPriceDiscount(npc, true) : 1.0f;
     m_taxi.SetDiscount(discount);
 
     // fill destinations path tail
@@ -18102,7 +18051,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
     }
     lastPath = sourcepath;
-    sourceCost = (uint32)ceil(sourceCost * discount);
+    sourceCost = uint32(sourceCost * discount + 0.5f);
     totalcost += sourceCost;
 
     // multiple path
@@ -18121,7 +18070,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
                 m_taxi.ClearTaxiDestinations();
                 return false;
             }
-            totalcost += (uint32)ceil(nextCost * discount);
+            totalcost += uint32(nextCost * discount + 0.5f);
 
             // find a transition
             uint32 inNode = 0;
@@ -18531,7 +18480,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     uint32 price  = pProto->BuyPrice * count;
 
     // reputation discount
-    price = uint32(floor(price * GetReputationPriceDiscount(pCreature)));
+    price = uint32(price * GetReputationPriceDiscount(pCreature) + 0.5f);
 
     if (GetMoney() < price)
     {
@@ -19492,7 +19441,7 @@ BattleGroundBracketId Player::GetBattleGroundBracketIdFromLevel(BattleGroundType
     return BattleGroundBracketId(bracket_id);
 }
 
-float Player::GetReputationPriceDiscount(Creature const* pCreature) const
+float Player::GetReputationPriceDiscount(Creature const* pCreature, bool taxi) const
 {
     uint32 factionId = pCreature->GetFactionId();
     if (!factionId)
@@ -19519,8 +19468,15 @@ float Player::GetReputationPriceDiscount(Creature const* pCreature) const
         case 729: // Frostwolf Clan
         {
             // honor rank >= 3
-            if (m_honorMgr.GetRank().visualRank >= 3)
+            if (!taxi && m_honorMgr.GetRank().visualRank >= 3)
                 mod -= 0.1f;
+            
+            if (taxi && m_honorMgr.GetRank().visualRank >= 2)
+            {
+                mod -= 0.05f;
+                if (m_honorMgr.GetRank().visualRank >= 4)
+                    mod -= 0.05f;
+            }
             break;
         }
     }
@@ -21717,7 +21673,7 @@ void Player::LootMoney(int32 money, Loot* loot)
 {
     WorldObject const* target = loot->GetLootTarget();
     sLog.Player(GetSession(), LOG_LOOTS, LOG_LVL_BASIC, "%s gets %ug%us%uc [loot from %s]",
-             GetShortDescription().c_str(), money / 100000, (money / 100) % 100, money % 100, target ? target->GetGuidStr().c_str() : "NULL");
+             GetShortDescription().c_str(), money / GOLD, (money % GOLD) / SILVER, (money % GOLD) % SILVER, target ? target->GetGuidStr().c_str() : "NULL");
     LogModifyMoney(money, "Loot", target ? target->GetObjectGuid() : ObjectGuid());
 }
 
@@ -22317,74 +22273,146 @@ void Player::CastHighestStealthRank()
     CastSpell(nullptr, stealthSpellEntry, true);
 }
 
-namespace
+static char const* type_strings[] =
 {
-bool PlayerLogFormatted(uint32 accountId, WorldSession const* session, LogType logType, char const* subType, LogLevel logLevel, const std::string& text, std::string& out)
+    "Basic",
+    "Chat",
+    "BG",
+    "Character",
+    "Honor",
+    "RA",
+    "DBError",
+    "DBErrorFix",
+    "Loot",
+    "LevelUp",
+    "Performance",
+    "MoneyTrade",
+    "GM",
+    "GMCritical",
+    "Anticheat"
+};
+
+static_assert(sizeof(type_strings) / sizeof(type_strings[0]) == LOG_TYPE_MAX, "type_strings must be updated");
+
+void Log::PlayerLogHeaderToConsole(uint32 accountId, WorldSession const* session, LogType logType, char const* subType)
 {
-    if (logType >= LOG_TYPE_MAX || logType < 0)
+    printf("[%s] ", type_strings[logType]);
+    if (subType)
+        printf("(%s) ", subType);
+
+    if (session)
+    {
+        if (auto const player = session->GetPlayer())
+        {
+            printf("(acc %u, ip %s, guid %u, name %s, map %u, pos %g %g %g) ",
+                accountId,
+                session->GetRemoteAddress().c_str(),
+                player->GetGUIDLow(),
+                player->GetName(),
+                player->GetMapId(),
+                player->GetPositionX(),
+                player->GetPositionY(),
+                player->GetPositionZ());
+        }
+        else
+        {
+            printf("(acc %u, ip %s) ",
+                accountId,
+                session->GetRemoteAddress().c_str());
+        }
+    }
+    else
+    {
+        printf("(acc %u) ",
+            accountId);
+    }
+}
+
+void Log::PlayerLogHeaderToFile(uint32 accountId, WorldSession const* session, LogType logType, char const* subType)
+{
+    fprintf(logFiles[logType], "[%s] ", type_strings[logType]);
+    if (subType)
+        fprintf(logFiles[logType], "(%s) ", subType);
+
+    if (session)
+    {
+        if (auto const player = session->GetPlayer())
+        {
+            fprintf(logFiles[logType], "(acc %u, ip %s, guid %u, name %s, map %u, pos %g %g %g) ",
+                accountId,
+                session->GetRemoteAddress().c_str(),
+                player->GetGUIDLow(),
+                player->GetName(),
+                player->GetMapId(),
+                player->GetPositionX(),
+                player->GetPositionY(),
+                player->GetPositionZ());
+        }
+        else
+        {
+            fprintf(logFiles[logType], "(acc %u, ip %s) ",
+                accountId,
+                session->GetRemoteAddress().c_str());
+        }
+    }
+    else
+    {
+        fprintf(logFiles[logType], "(acc %u) ",
+            accountId);
+    }
+}
+
+static bool IsPlayerLoggingEnabledToDB(LogType logType, LogLevel logLevel)
+{
+    if (logLevel > sLog.GetDbLevel())
         return false;
 
-    std::stringstream log;
+    switch (logType)
+    {
+        case LOG_CHAT:
+            return sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHAT);
+        case LOG_BG:
+            return sWorld.getConfig(CONFIG_BOOL_LOGSDB_BATTLEGROUNDS);
+        case LOG_CHAR:
+            return sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHARACTERS);
+        case LOG_LOOTS:
+            return sWorld.getConfig(CONFIG_BOOL_LOGSDB_LOOT);
+        case LOG_LEVELUP:
+            return sWorld.getConfig(CONFIG_BOOL_LOGSDB_LEVELUP);
+        case LOG_MONEY_TRADES:
+            return sWorld.getConfig(CONFIG_BOOL_LOGSDB_TRADES);
+        case LOG_GM:
+        case LOG_GM_CRITICAL:
+            return sWorld.getConfig(CONFIG_BOOL_LOGSDB_GM);
+    }
 
+    return false;
+}
+
+static void PlayerLogToDB(uint32 accountId, WorldSession const* session, LogType logType, char const* subType, char const* text)
+{
     static SqlStatementID insertLog;
 
     SqlStatement stmt = LogsDatabase.CreateStatement(insertLog, "INSERT INTO `logs_player` (`type`, `subtype`, `account`, `ip`, `guid`, `name`, `map`, `pos_x`, `pos_y`, `pos_z`, `text`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    static char const* type_strings[] =
-    {
-        "Basic",
-        "WorldPacket",
-        "Chat",
-        "BG",
-        "Character",
-        "Honor",
-        "RA",
-        "DBError",
-        "DBErrorFix",
-        "Loot",
-        "LevelUp",
-        "Performance",
-        "MoneyTrade",
-        "GM",
-        "GMCritical",
-        "Anticheat"
-    };
-
-    static_assert(sizeof(type_strings) / sizeof(type_strings[0]) == LOG_TYPE_MAX, "type_strings must be updated");
-
-    log << "[" << type_strings[logType] << "]";
     stmt.addString(type_strings[logType]);
     
     if (subType)
-    {
-        log << " (" << subType << ")";
         stmt.addString(subType);
-    }
     else
         stmt.addNull();
-
-    log << " (acct " << accountId;
 
     stmt.addUInt32(accountId);
 
     if (session)
     {
-        log << ", ip " << session->GetRemoteAddress();
-
         stmt.addString(session->GetRemoteAddress());
 
         if (auto const player = session->GetPlayer())
         {
-            log << ", guid " << player->GetGUIDLow();
             stmt.addUInt32(player->GetGUIDLow());
-
-            log << ", name " << player->GetName();
             stmt.addString(player->GetName());
-
-            log << ", map " << player->GetMapId();
             stmt.addUInt32(player->GetMapId());
-
-            log << ", pos " << player->GetPositionX() << ", " << player->GetPositionY() << ", " << player->GetPositionZ();
             stmt.addFloat(player->GetPositionX());
             stmt.addFloat(player->GetPositionY());
             stmt.addFloat(player->GetPositionZ());
@@ -22410,117 +22438,117 @@ bool PlayerLogFormatted(uint32 accountId, WorldSession const* session, LogType l
         stmt.addNull();
     }
 
-    log << ")";
-
-    if (!text.empty())
-        log << ": " << text;
-
-    out = log.str();
-
-    // TODO: additional settings for database logging
-    if (logLevel > sLog.GetDbLevel() ||
-        (logType == LOG_CHAT && !sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHAT)) ||
-        (logType == LOG_MONEY_TRADES && !sWorld.getConfig(CONFIG_BOOL_LOGSDB_TRADES)) ||
-        (logType == LOG_CHAR && !sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHARACTERS)) ||
-        (logType == LOG_BG && !sWorld.getConfig(CONFIG_BOOL_LOGSDB_BATTLEGROUNDS)))
-    {
-    }
-    else
-    {
-        stmt.addString(text);
-        stmt.Execute();
-    }
-
-    return true;
+    stmt.addString(text);
+    stmt.Execute();
 }
-}
+
+#define LOG_TO_DB_HELPER(logLevel,logType,subType,session,accountId,format,ap) \
+if (IsPlayerLoggingEnabledToDB(logType, logLevel))                            \
+{                                                                             \
+    char* buff = new char[512];                                               \
+    va_start(ap, format);                                                     \
+    vsnprintf(buff, 512, format, ap);                                         \
+    va_end(ap);                                                               \
+    PlayerLogToDB(accountId, session, logType, subType, buff);                \
+    delete[] buff;                                                            \
+}                                                                             \
+
+#define LOG_TO_FILE_HELPER(logLevel,logType,subType,session,accountId,format,ap) \
+if (logFiles[logType] && m_fileLevel >= logLevel)                             \
+{                                                                             \
+    outTimestamp(logFiles[logType]);                                          \
+    if (logLevel == LOG_LVL_ERROR)                                            \
+        fputs("ERROR: ", logFiles[logType]);                                  \
+    PlayerLogHeaderToFile(accountId, session, logType, subType);              \
+    va_start(ap, format);                                                     \
+    vfprintf(logFiles[logType], format, ap);                                  \
+    fputs("\n", logFiles[logType]);                                           \
+    fflush(logFiles[logType]);                                                \
+    va_end(ap);                                                               \
+}                                                                             \
+
+#define LOG_TO_CONSOLE_HELPER(logLevel,logType,subType,session,accountId,format,ap) \
+if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= logLevel) \
+{                                                                             \
+    auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;           \
+    SetColor(where, g_logColors[logLevel]);                                   \
+    if (m_includeTime)                                                        \
+        outTime(where);                                                       \
+    if (logLevel == LOG_LVL_ERROR)                                            \
+        fprintf(where, "ERROR: ");                                            \
+    PlayerLogHeaderToConsole(accountId, session, logType, subType);           \
+                                                                              \
+    va_start(ap, format);                                                     \
+    vutf8printf(where, format, &ap);                                          \
+    va_end(ap);                                                               \
+                                                                              \
+    ResetColor(where);                                                        \
+    fprintf(where, "\n");                                                     \
+    fflush(where);                                                            \
+}                                                                             \
 
 void Log::Player(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...)
 {
-    char buff[4096];
+    if (logType >= LOG_TYPE_MAX || logType < 0)
+        return;
+
     va_list ap;
-    va_start(ap, format);
-    vsnprintf(buff, sizeof(buff), format, ap);
-    va_end(ap);
 
-    std::string log;
-
-    if (PlayerLogFormatted(session->GetAccountId(), session, logType, nullptr, logLevel, buff, log))
-    {
-        // Player logs should never go to the console
-        OutFile(logType, logLevel, log);
-    }
+    LOG_TO_DB_HELPER(logLevel, logType, nullptr, session, session->GetAccountId(), format, ap);
+    LOG_TO_FILE_HELPER(logLevel, logType, nullptr, session, session->GetAccountId(), format, ap);
+    // Player logs should never go to the console
 }
 
 void Log::OutWardenPlayer(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...)
 {
-    char buff[4096];
-    va_list ap;
-    va_start(ap, format);
-    vsnprintf(buff, sizeof(buff), format, ap);
-    va_end(ap);
+    if (logType >= LOG_TYPE_MAX || logType < 0)
+        return;
 
-    std::string log;
+    va_list ap;
+
+    LOG_TO_DB_HELPER(logLevel, logType, "Warden", session, session->GetAccountId(), format, ap);
 
     if (m_wardenDebug && logLevel > LOG_LVL_MINIMAL)
         logLevel = LOG_LVL_MINIMAL;
 
-    if (PlayerLogFormatted(session->GetAccountId(), session, logType, "Warden", logLevel, buff, log))
-    {
-        OutConsole(logType, logLevel, log);
-        OutFile(logType, logLevel, log);
-    }
+    LOG_TO_FILE_HELPER(logLevel, logType, "Warden", session, session->GetAccountId(), format, ap);
+    LOG_TO_CONSOLE_HELPER(logLevel, logType, "Warden", session, session->GetAccountId(), format, ap);
 }
 
 void Log::Player(WorldSession const* session, LogType logType, char const* subType, LogLevel logLevel, char const* format, ...)
 {
-    char buff[4096];
+    if (logType >= LOG_TYPE_MAX || logType < 0)
+        return;
+
     va_list ap;
-    va_start(ap, format);
-    vsnprintf(buff, sizeof(buff), format, ap);
-    va_end(ap);
 
-    std::string log;
-
-    if (PlayerLogFormatted(session->GetAccountId(), session, logType, subType, logLevel, buff, log))
-    {
-        // Player logs should never go to the console
-        OutFile(logType, logLevel, log);
-    }
+    LOG_TO_DB_HELPER(logLevel, logType, subType, session, session->GetAccountId(), format, ap);
+    LOG_TO_FILE_HELPER(logLevel, logType, subType, session, session->GetAccountId(), format, ap);
+    // Player logs should never go to the console
 }
 
 void Log:: Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...)
 {
-    char buff[4096];
+    if (logType >= LOG_TYPE_MAX || logType < 0)
+        return;
+
     va_list ap;
-    va_start(ap, format);
-    vsnprintf(buff, sizeof(buff), format, ap);
-    va_end(ap);
 
-    std::string log;
-
-    if (PlayerLogFormatted(accountId, nullptr, logType, nullptr, logLevel, buff, log))
-    {
-        // Player logs should never go to the console
-        OutFile(logType, logLevel, log);
-    }
+    LOG_TO_DB_HELPER(logLevel, logType, nullptr, nullptr, accountId, format, ap);
+    LOG_TO_FILE_HELPER(logLevel, logType, nullptr, nullptr, accountId, format, ap);
+    // Player logs should never go to the console
 }
 
 void Log::Player(uint32 accountId, LogType logType, char const* subType, LogLevel logLevel, char const* format, ...)
 {
-    char buff[4096];
+    if (logType >= LOG_TYPE_MAX || logType < 0)
+        return;
+
     va_list ap;
-    va_start(ap, format);
-    vsnprintf(buff, sizeof(buff), format, ap);
-    va_end(ap);
 
-    std::string log;
-
-    if (PlayerLogFormatted(accountId, nullptr, logType, subType, logLevel, buff, log))
-    {
-        // Player logs should never go to the console
-        OutFile(logType, logLevel, log);
-    }
+    LOG_TO_DB_HELPER(logLevel, logType, subType, nullptr, accountId, format, ap);
+    LOG_TO_FILE_HELPER(logLevel, logType, subType, nullptr, accountId, format, ap);
+    // Player logs should never go to the console
 }
 
 void Player::ClearTemporaryWarWithFactions()

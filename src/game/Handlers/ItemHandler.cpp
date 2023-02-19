@@ -841,7 +841,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
                 ++count;
 
                 // reputation discount
-                uint32 price = uint32(floor(pProto->BuyPrice * discountMod));
+                uint32 price = uint32(pProto->BuyPrice * discountMod + 0.5f);
 
                 data << uint32(count);
                 data << uint32(crItem->item);

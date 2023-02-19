@@ -265,7 +265,7 @@ struct boss_faerlinaAI : public ScriptedAI
             }
             else 
             {
-                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POSIONBOLT_VOLLEY) == CanCastResult::CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POSIONBOLT_VOLLEY) == SpellCastResult::SPELL_CAST_OK)
                 {
                     m_uiPoisonBoltVolleyTimer = POSIONBOLT_VOLLEY_CD();
                 }
@@ -279,7 +279,7 @@ struct boss_faerlinaAI : public ScriptedAI
         {
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
-                if (DoCastSpellIfCan(pTarget, SPELL_RAINOFFIRE) == CanCastResult::CAST_OK)
+                if (DoCastSpellIfCan(pTarget, SPELL_RAINOFFIRE) == SpellCastResult::SPELL_CAST_OK)
                 {
                     m_uiRainOfFireTimer = RAINOFFIRE_CD();
                 }
@@ -295,7 +295,7 @@ struct boss_faerlinaAI : public ScriptedAI
             // but then it only prevents the enrage for the duration of the debuff.
             if (!m_creature->HasAura(SPELL_WIDOWS_EMBRACE))
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CanCastResult::CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == SpellCastResult::SPELL_CAST_OK)
                 {
                     m_uiEnrageTimer = 60000;
                     DoScriptText(urand(SAY_ENRAGE1, SAY_ENRAGE3), m_creature);

@@ -37,7 +37,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "<object not loaded>");
+            printf("<object not loaded>");
     #endif
             return false;
         }
@@ -45,7 +45,7 @@ namespace VMAP
         if (time == G3D::inf())
         {
     #ifdef VMAP_DEBUG
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Ray does not hit '%s'", name.c_str());
+            printf("Ray does not hit '%s'", name.c_str());
     #endif
             return false;
         }
@@ -58,7 +58,7 @@ namespace VMAP
         {
             distance *= iScale;
             pMaxDist = distance;
-            //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "LoS HIT ! Flags 0x%x (%s)", flags, name.c_str());
+            //printf("LoS HIT ! Flags 0x%x (%s)", flags, name.c_str());
         }
         return hit;
     }
@@ -68,7 +68,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "<object not loaded>");
+            printf("<object not loaded>");
     #endif
             return;
         }
@@ -102,7 +102,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "<object not loaded>");
+            printf("<object not loaded>");
     #endif
             return false;
         }
@@ -127,7 +127,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "<object not loaded>");
+            printf("<object not loaded>");
     #endif
             return false;
         }
@@ -184,7 +184,7 @@ namespace VMAP
         if (!check)
         {
             if (ferror(rf))
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error reading ModelSpawn!");
+                printf("Error reading ModelSpawn!");
             return false;
         }
         check += fread(&spawn.adtId, sizeof(uint16), 1, rf);
@@ -203,19 +203,19 @@ namespace VMAP
         check += fread(&nameLen, sizeof(uint32), 1, rf);
         if (check != uint32(has_bound ? 17 : 11))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error reading ModelSpawn!");
+            printf("Error reading ModelSpawn!");
             return false;
         }
         char nameBuff[500];
         if (nameLen > 500) // file names should never be that long, must be file error
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error reading ModelSpawn, file name too long!");
+            printf("Error reading ModelSpawn, file name too long!");
             return false;
         }
         check = fread(nameBuff, sizeof(char), nameLen, rf);
         if (check != nameLen)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error reading name string of ModelSpawn!");
+            printf("Error reading name string of ModelSpawn!");
             return false;
         }
         spawn.name = std::string(nameBuff, nameLen);
