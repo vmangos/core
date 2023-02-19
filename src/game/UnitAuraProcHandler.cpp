@@ -231,7 +231,7 @@ inline bool SpellCanTrigger(SpellEntry const* spellProto, SpellEntry const* proc
     return (procSpell && procSpell->SpellFamilyName == spellProto->SpellFamilyName && procSpell->SpellFamilyFlags & spellProto->EffectItemType[eff_idx]);
 }
 
-SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent, bool isSpellTriggeredByAura) const
+SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent, bool isSpellTriggeredByAuraOrItem) const
 {
     SpellEntry const* spellProto = holder->GetSpellProto();
     /*
@@ -464,7 +464,7 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
         }
     }
 
-    if (isSpellTriggeredByAura && procSpell &&
+    if (isSpellTriggeredByAuraOrItem && procSpell &&
         !procSpell->HasAttribute(SPELL_ATTR_EX3_NOT_A_PROC) &&
         !spellProto->HasAttribute(SPELL_ATTR_EX3_CAN_PROC_FROM_PROCS))
         return SPELL_PROC_TRIGGER_FAILED;
@@ -985,7 +985,10 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                 case 26169:
                 {
                     // heal amount
-                    basepoints[0] = int32(damage * 10 / 100);
+                    basepoints[0] = int32(damage * 0.1f);
+                    if (!basepoints[0])
+                        return SPELL_AURA_PROC_FAILED;
+
                     target = this;
                     triggered_spell_id = 26170;
                     break;

@@ -26,7 +26,7 @@
 
 #include "ByteBuffer.h"
 #include "World.h"
-
+#include "Log.h"
 #include <openssl/sha.h>
 
 #include <functional>

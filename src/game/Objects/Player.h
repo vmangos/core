@@ -1063,7 +1063,6 @@ class Player final: public Unit
         InventoryResult _CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
         void ApplyEquipCooldown(Item* pItem);
         bool CheckAmmoCompatibility(ItemPrototype const* ammo_proto) const;
-        void SetVirtualItemSlot(uint8 i, Item* item);
         void QuickEquipItem(uint16 pos, Item* pItem);
         void VisualizeItem(uint8 slot, Item* pItem);
         void SetVisibleItemSlot(uint8 slot, Item* pItem);
@@ -1084,7 +1083,6 @@ class Player final: public Unit
     public:
         Item* AddItem(uint32 itemId, uint32 count = 1);
         void InterruptSpellsWithCastItem(Item* item);
-        void SetSheath(SheathState sheathed) override;     // overwrite Unit version
         uint8 FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const;
         uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item* skipItem = nullptr) const;
         Item* GetItemByGuid(ObjectGuid guid) const;

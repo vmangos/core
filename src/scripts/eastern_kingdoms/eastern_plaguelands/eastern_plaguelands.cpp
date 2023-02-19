@@ -32,9 +32,9 @@ EndContentData */
 
 enum ErisHavenfireData
 {
-    NPC_PAYSANT_0           = 14484,        // BLESSE
-    NPC_PAYSANT_1           = 14485,        // CONTAMINE
-    NPC_GUERRIER            = 14486,
+    NPC_PEASANT_0           = 14484,        // Injured
+    NPC_PEASANT_1           = 14485,        // Plagued
+    NPC_WARRIOR             = 14486,
     NPC_ARCHER              = 14489,
     NPC_CLEANER             = 14503,
 
@@ -48,7 +48,7 @@ enum ErisHavenfireData
     DEATH_POST_SPAWNS_COUNT = 14,
 
     SPELL_SEETHING_PLAGUE        = 23072,
-    SPELL_SHOOT                  = 22121,
+    SPELL_SHOOT                  = 23073,
     SPELL_ENTER_THE_LIGHT        = 23107,
     SPELL_BLESSING_OF_NORDRASSIL = 23108,
     SPELL_CONJURE_PEASANT        = 23119,
@@ -72,48 +72,40 @@ enum ErisHavenfireData
 
     QUEST_BALANCE_OF_LIGHT  = 7622,
 
-    POINT_DEBUT_COMBAT      = 0,
-    POINT_FIN_EVENT         = 1,
+    POINT_START_COMBAT      = 0,
+    POINT_END_EVENT         = 1,
 
-    PaysantsSpawn           = 0,
-    PaysantsDest            = 1,
-    GuerrierPop0            = 2,
-    GuerrierPop1            = 3,
-    GuerrierPop2            = 4,
-    ArcherPop0              = 5,
-    ArcherPop1              = ArcherPop0 + 1,
-    ArcherPop2              = ArcherPop1 + 1,
-    ArcherPop3              = ArcherPop2 + 1,
-    ArcherPop4              = ArcherPop3 + 1,
-    ArcherPop5              = ArcherPop4 + 1,
-    ArcherPop6              = ArcherPop5 + 1,
-    ArcherPop7              = ArcherPop6 + 1,
-    Fin                     = ArcherPop7 + 1
+    POS_PEASANT_SPAWN       = 0,
+    POS_PEASANT_DEST        = 1,
+    POS_WARRIOR_SPAWN0      = 2,
+    POS_WARRIOR_SPAWN1      = 3,
+    POS_WARRIOR_SPAWN2      = 4,
+    POS_ARCHER_SPAWN0       = 5,
+    POS_ARCHER_SPAWN1       = POS_ARCHER_SPAWN0 + 1,
+    POS_ARCHER_SPAWN2       = POS_ARCHER_SPAWN1 + 1,
+    POS_ARCHER_SPAWN3       = POS_ARCHER_SPAWN2 + 1,
+    POS_ARCHER_SPAWN4       = POS_ARCHER_SPAWN3 + 1,
+    POS_ARCHER_SPAWN5       = POS_ARCHER_SPAWN4 + 1,
+    POS_ARCHER_SPAWN6       = POS_ARCHER_SPAWN5 + 1,
+    POS_ARCHER_SPAWN7       = POS_ARCHER_SPAWN6 + 1,
+    POS_END                 = POS_ARCHER_SPAWN7 + 1
 };
 
-struct ErisHavenfireMove
+static Position ErisHavenfireEvent[] =
 {
-    float X;
-    float Y;
-    float Z;
-    float O;
-};
-
-static ErisHavenfireMove ErisHavenfireEvent[] =
-{
-    {3358.1096f, -3049.8063f, 166.226f, 1.87f},     // Depart
-    {3327.0f, -2970.0f, 161.0f, 0.0f},          // Arrive
-    {3366.0f, -3045.0f, 166.0f, 3.3f},          // Guerrier 0
-    {3345.0f, -3054.0f, 167.0f, 0.4f},          // Guerrier 1
-    {3364.0f, -3057.0f, 166.0f, 2.0f},          // Guerrier 2
-    {3327.076f, -3017.9831f, 171.5497f, 5.777f},        // Archer 0
-    {3313.686f, -3038.0459f, 168.5863f, 0.072f},        // Archer 1
-    {3333.0f, -3052.0f, 175.0f, 0.61f},                 // Archer 2
-    {3380.0f, -3040.0f, 174.0f, 3.3885f},               // Archer 3
-    {3381.0f, -3060.0f, 184.0f, 2.5991f},               // Archer 4
-    {3371.4809f, -3070.0302f, 175.166f, 1.952f},        // Archer 5
-    {3347.1079f, -3071.3110f, 177.910f, 1.356f},        // Archer 6
-    {3358.7299f, -3075.9846f, 174.794f, 1.575f}         // Archer 7
+    {3358.1096f, -3049.8063f, 166.226f, 1.87f},  // Depart
+    {3327.0f, -2970.0f, 161.0f, 0.0f},           // Arrive
+    {3366.0f, -3045.0f, 166.0f, 3.3f},           // Warrior 0
+    {3345.0f, -3054.0f, 167.0f, 0.4f},           // Warrior 1
+    {3364.0f, -3057.0f, 166.0f, 2.0f},           // Warrior 2
+    {3327.076f, -3017.9831f, 171.5497f, 5.777f}, // Archer 0
+    {3313.686f, -3038.0459f, 168.5863f, 0.072f}, // Archer 1
+    {3333.0f, -3052.0f, 175.0f, 0.61f},          // Archer 2
+    {3380.0f, -3040.0f, 174.0f, 3.3885f},        // Archer 3
+    {3381.0f, -3060.0f, 184.0f, 2.5991f},        // Archer 4
+    {3371.4809f, -3070.0302f, 175.166f, 1.952f}, // Archer 5
+    {3347.1079f, -3071.3110f, 177.910f, 1.356f}, // Archer 6
+    {3358.7299f, -3075.9846f, 174.794f, 1.575f}  // Archer 7
 };
 
 struct DeathPostSpawn
@@ -157,44 +149,44 @@ struct npc_eris_havenfireAI : public ScriptedAI
         m_creature->SetCreatureSummonLimit(200);
     }
 
-    uint32 Vague;
-    uint32 Timer[2];
-    uint32 BuffTimer;
-    uint32 TimerArcher[8];
-    uint32 VillagerDiedCount;
-    uint32 VillagerSurvivedCount;
-    uint64 PlayerGUID;
-    uint64 ArchersGUIDs[8];
-    uint64 VillagerGUIDs[50];
-    uint64 DeathPostGUIDs[DEATH_POST_SPAWNS_COUNT];
+    uint32 m_wave;
+    uint32 m_waveTimer[2];
+    uint32 m_buffTimer;
+    uint32 m_archerTimer[8];
+    uint32 m_villagerDiedCount;
+    uint32 m_villagerSurvivedCount;
+    uint64 m_playerGUID;
+    uint64 m_archerGUIDs[8];
+    uint64 m_villagerGUIDs[50];
+    uint64 m_deathPostGUIDs[DEATH_POST_SPAWNS_COUNT];
 
-    bool BeginQuete;
-    bool CleanerSpawn;
+    bool m_questStarted;
+    bool m_cleanerSpawn;
 
     Player* GetPlayer()
     {
-        return me->GetMap()->GetPlayer(PlayerGUID);
+        return me->GetMap()->GetPlayer(m_playerGUID);
     }
 
     void Reset() override
     {
-        Vague = 0;
-        VillagerDiedCount = 0;
-        VillagerSurvivedCount = 0;
-        BeginQuete = false;
-        CleanerSpawn = false;
+        m_wave = 0;
+        m_villagerDiedCount = 0;
+        m_villagerSurvivedCount = 0;
+        m_questStarted = false;
+        m_cleanerSpawn = false;
 
-        Timer[0] = 10000;
-        Timer[1] = 110000;
-        BuffTimer = 100000;
+        m_waveTimer[0] = 10000;
+        m_waveTimer[1] = 110000;
+        m_buffTimer = 100000;
         for (int i = 0; i < 8; i++)
         {
-            TimerArcher[i] = 5000;
-            ArchersGUIDs[i] = 0;
+            m_archerTimer[i] = 5000;
+            m_archerGUIDs[i] = 0;
         }
-        for (uint64 & guid : VillagerGUIDs)
+        for (uint64 & guid : m_villagerGUIDs)
             guid = 0;
-        for (uint64 & guid : DeathPostGUIDs)
+        for (uint64 & guid : m_deathPostGUIDs)
             guid = 0;
 
         m_creature->EnableMoveInLosEvent();
@@ -204,17 +196,17 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && !CleanerSpawn && BeginQuete)
+        if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && !m_cleanerSpawn && m_questStarted)
         {
-            if (who->GetGUID() != PlayerGUID || who->IsPet())
+            if (who->GetGUID() != m_playerGUID || who->IsPet())
             {   
-                if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
+                if (Creature* pCleaner = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
                 {
-                    Crea->SetInCombatWith(who);
-                    Crea->GetMotionMaster()->MoveChase(who);
-                    BeginQuete = false;
-                    CleanerSpawn = true;
-                    EchecEvent(GetPlayer(), false);
+                    pCleaner->SetInCombatWith(who);
+                    pCleaner->GetMotionMaster()->MoveChase(who);
+                    m_questStarted = false;
+                    m_cleanerSpawn = true;
+                    FailEvent(GetPlayer(), false);
                 }
             }
         }
@@ -227,8 +219,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
         std::vector<uint32> mobsEntries;
         std::vector<uint32>::iterator entriesIt;
-        mobsEntries.push_back(NPC_PAYSANT_0);
-        mobsEntries.push_back(NPC_PAYSANT_1);
+        mobsEntries.push_back(NPC_PEASANT_0);
+        mobsEntries.push_back(NPC_PEASANT_1);
 
         for (entriesIt = mobsEntries.begin(); entriesIt != mobsEntries.end(); ++entriesIt)
         {
@@ -245,6 +237,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         }
 
         if (Player* player = GetPlayer())
+        {
             if (player->IsAlive())
             {
                 summoned->AddThreat(player, 50.0f);
@@ -259,7 +252,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                         summoned->SendMeleeAttackStart(victim);
                 }
             }
-
+        }
         mobsEntries.clear();
     }
 
@@ -267,9 +260,9 @@ struct npc_eris_havenfireAI : public ScriptedAI
     {
         std::vector<uint32> mobsEntries;
         std::vector<uint32>::iterator entriesIt;
-        mobsEntries.push_back(NPC_PAYSANT_0);
-        mobsEntries.push_back(NPC_PAYSANT_1);
-        mobsEntries.push_back(NPC_GUERRIER);
+        mobsEntries.push_back(NPC_PEASANT_0);
+        mobsEntries.push_back(NPC_PEASANT_1);
+        mobsEntries.push_back(NPC_WARRIOR);
         mobsEntries.push_back(NPC_ARCHER);
 
         for (entriesIt = mobsEntries.begin(); entriesIt != mobsEntries.end(); ++entriesIt)
@@ -287,7 +280,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         }
         mobsEntries.clear();
 
-        for (auto& guid : DeathPostGUIDs)
+        for (auto& guid : m_deathPostGUIDs)
         {
             if (GameObject* pGo = me->GetMap()->GetGameObject(guid))
                 pGo->Delete();
@@ -297,32 +290,32 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
     void JustSummoned(Creature* summoned) override
     {
-        int Var = 0;
+        int j = 0;
 
         switch (summoned->GetEntry())
         {
             case NPC_ARCHER:
                 summoned->SetSheath(SHEATH_STATE_RANGED);
-                while (ArchersGUIDs[Var] && Var < 7)
-                    ++Var;
+                while (m_archerGUIDs[j] && j < 7)
+                    ++j;
 
-                ArchersGUIDs[Var] = summoned->GetGUID();
+                m_archerGUIDs[j] = summoned->GetGUID();
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 summoned->AddUnitState(UNIT_STAT_ROOT);
                 break;
-            case NPC_GUERRIER:
+            case NPC_WARRIOR:
                 SetAttackOnPeasantOrPlayer(summoned);
                 break;
-            case NPC_PAYSANT_1:
+            case NPC_PEASANT_1:
                 summoned->CastSpell(summoned, SPELL_SEETHING_PLAGUE, true);
             // no break
-            case NPC_PAYSANT_0:
-                while (VillagerGUIDs[Var] && Var < 49)
-                    ++Var;
+            case NPC_PEASANT_0:
+                while (m_villagerGUIDs[j] && j < 49)
+                    ++j;
 
-                if (Var < 50)
-                    VillagerGUIDs[Var] = summoned->GetGUID();
+                if (j < 50)
+                    m_villagerGUIDs[j] = summoned->GetGUID();
 
                 if (Player* player = GetPlayer())
                     summoned->SetFactionTemplateId(player->GetFactionTemplateId());
@@ -336,9 +329,9 @@ struct npc_eris_havenfireAI : public ScriptedAI
         if (uiMotionType != POINT_MOTION_TYPE || !pSummoned)
             return;
 
-        if ((pSummoned->GetEntry() == NPC_PAYSANT_0 || pSummoned->GetEntry() == NPC_PAYSANT_1) && uiPointId == POINT_FIN_EVENT)
+        if ((pSummoned->GetEntry() == NPC_PEASANT_0 || pSummoned->GetEntry() == NPC_PEASANT_1) && uiPointId == POINT_END_EVENT)
         {
-            ++VillagerSurvivedCount;
+            ++m_villagerSurvivedCount;
             switch (rand() % 15)
             {
                 case 0:
@@ -355,18 +348,18 @@ struct npc_eris_havenfireAI : public ScriptedAI
                     break;
             }
 
-            int Var = 0;
-            while (VillagerGUIDs[Var] != pSummoned->GetGUID() && Var < 49)
-                ++Var;
+            int j = 0;
+            while (m_villagerGUIDs[j] != pSummoned->GetGUID() && j < 49)
+                ++j;
 
-            if (Var < 50)
-                VillagerGUIDs[Var] = 0;
+            if (j < 50)
+                m_villagerGUIDs[j] = 0;
 
             pSummoned->ForcedDespawn();
 
-            if (VillagerSurvivedCount >= 50)
+            if (m_villagerSurvivedCount >= 50)
                 if (Player* player = GetPlayer())
-                    SituationFinale(player);
+                    CompleteEvent(player);
         }
     }
 
@@ -375,29 +368,29 @@ struct npc_eris_havenfireAI : public ScriptedAI
         if (!pSummoned)
             return;
 
-        if (pSummoned->GetEntry() == NPC_PAYSANT_0 || pSummoned->GetEntry() == NPC_PAYSANT_1)
+        if (pSummoned->GetEntry() == NPC_PEASANT_0 || pSummoned->GetEntry() == NPC_PEASANT_1)
         {
-            if (VillagerDiedCount < DEATH_POST_SPAWNS_COUNT)
+            if (m_villagerDiedCount < DEATH_POST_SPAWNS_COUNT)
             {
-                const auto& spawn = deathPostSpawnPositions[VillagerDiedCount];
+                const auto& spawn = deathPostSpawnPositions[m_villagerDiedCount];
                 if (GameObject* pGo = m_creature->SummonGameObject(spawn.entry, spawn.x, spawn.y, spawn.z, spawn.o, spawn.rot0, spawn.rot1, spawn.rot2, spawn.rot3, 1200000, false))
-                    DeathPostGUIDs[VillagerDiedCount] = pGo->GetGUID();
+                    m_deathPostGUIDs[m_villagerDiedCount] = pGo->GetGUID();
             }
-            ++VillagerDiedCount;
+            ++m_villagerDiedCount;
         }
 
-        if (VillagerDiedCount >= 15)
-            EchecEvent(GetPlayer(), true);
+        if (m_villagerDiedCount >= 15)
+            FailEvent(GetPlayer(), true);
 
-        int Var = 0;
-        while (VillagerGUIDs[Var] != pSummoned->GetGUID() && Var < 49)
-            ++Var;
+        int j = 0;
+        while (m_villagerGUIDs[j] != pSummoned->GetGUID() && j < 49)
+            ++j;
 
-        if (Var < 50)
-            VillagerGUIDs[Var] = 0;
+        if (j < 50)
+            m_villagerGUIDs[j] = 0;
     }
 
-    void EchecEvent(Player* pPlayer, bool npcDespawn)
+    void FailEvent(Player* pPlayer, bool npcDespawn)
     {
         if (pPlayer && pPlayer->GetQuestStatus(QUEST_BALANCE_OF_LIGHT) == QUEST_STATUS_INCOMPLETE)
             pPlayer->FailQuest(QUEST_BALANCE_OF_LIGHT);
@@ -420,71 +413,71 @@ struct npc_eris_havenfireAI : public ScriptedAI
             Reset();
     }
 
-    void DebutEvent(Player* pPlayer)
+    void BeginEvent(Player* pPlayer)
     {
         if (!pPlayer)
             return;
 
-        Vague = 0;
-        VillagerDiedCount = 0;
-        VillagerSurvivedCount = 0;
-        CleanerSpawn = false;
-        BeginQuete = true;
-        PlayerGUID = pPlayer->GetGUID();
+        m_wave = 0;
+        m_villagerDiedCount = 0;
+        m_villagerSurvivedCount = 0;
+        m_cleanerSpawn = false;
+        m_questStarted = true;
+        m_playerGUID = pPlayer->GetGUID();
 
-        Timer[0] = 10000;
-        Timer[1] = 100000;
-        BuffTimer = 95000;
+        m_waveTimer[0] = 10000;
+        m_waveTimer[1] = 100000;
+        m_buffTimer = 95000;
         for (int i = 0; i < 8; i++)
         {
-            TimerArcher[i] = 5000;
-            ArchersGUIDs[i] = 0;
+            m_archerTimer[i] = 5000;
+            m_archerGUIDs[i] = 0;
         }
-        for (uint64 & guid : VillagerGUIDs)
+        for (uint64 & guid : m_villagerGUIDs)
             guid = 0;
 
-        for (int i = ArcherPop0; i < Fin; i++)
-            m_creature->SummonCreature(NPC_ARCHER, ErisHavenfireEvent[i].X, ErisHavenfireEvent[i].Y, ErisHavenfireEvent[i].Z, ErisHavenfireEvent[i].O, TEMPSUMMON_DEAD_DESPAWN, 0);
+        for (int i = POS_ARCHER_SPAWN0; i < POS_END; i++)
+            m_creature->SummonCreature(NPC_ARCHER, ErisHavenfireEvent[i].x, ErisHavenfireEvent[i].y, ErisHavenfireEvent[i].z, ErisHavenfireEvent[i].o, TEMPSUMMON_DEAD_DESPAWN, 0);
 
         if (!m_creature->FindNearestGameObject(GO_LIGHT, 100.0f))
             m_creature->SummonGameObject(GO_LIGHT, 3327.0f, -2970.0f, 160.034f, 5.2135f, 0, 0, 0, 0, 0);
     }
 
-    void NewVague(bool Paysants)
+    void NewWave(bool peasants)
     {
-        int Entry = NPC_GUERRIER;
-        int Nombre = GenererVagueNombre(Paysants);
-        int Rand = urand(1, 4);
-        bool Yell = false;
+        int entry = NPC_WARRIOR;
+        int count = GenerateWaveNumber(peasants);
+        int rnd = urand(1, 4);
+        bool yell = false;
 
-        for (int i = 0; i < Nombre; i++)
+        for (int i = 0; i < count; i++)
         {
             float X = 0.0f;
             float Y = 0.0f;
             float Z = 0.0f;
-            if (Paysants)
+            if (peasants)
             {
-                Entry = i >= Rand ? NPC_PAYSANT_0 : NPC_PAYSANT_1;
-                m_creature->GetRandomPoint(ErisHavenfireEvent[PaysantsSpawn].X, ErisHavenfireEvent[PaysantsSpawn].Y, ErisHavenfireEvent[PaysantsSpawn].Z, 6.0f, X, Y, Z);
-                if (Creature* Cre = m_creature->SummonCreature(Entry, X, Y, Z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
+                entry = i >= rnd ? NPC_PEASANT_0 : NPC_PEASANT_1;
+                m_creature->GetRandomPoint(ErisHavenfireEvent[POS_PEASANT_SPAWN].x, ErisHavenfireEvent[POS_PEASANT_SPAWN].y, ErisHavenfireEvent[POS_PEASANT_SPAWN].z, 6.0f, X, Y, Z);
+                if (Creature* pPeasant = m_creature->SummonCreature(entry, X, Y, Z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
                 {
-                    if (!Yell)
+                    if (!yell)
                     {
-                        ++Vague;
-                        Yell = true;
+                        ++m_wave;
+                        yell = true;
                         switch (urand(0,3))
                         {
                             case 0:
-                                DoScriptText(SAY_PEASANT_SPAWN_1, Cre);
+                                DoScriptText(SAY_PEASANT_SPAWN_1, pPeasant);
                                 break;
                             case 1:
-                                DoScriptText(SAY_PEASANT_SPAWN_2, Cre);
+                                DoScriptText(SAY_PEASANT_SPAWN_2, pPeasant);
                                 break;
                             case 2:
-                                DoScriptText(SAY_PEASANT_SPAWN_3, Cre);
+                                DoScriptText(SAY_PEASANT_SPAWN_3, pPeasant);
                                 break;
                             case 3:
-                                DoScriptText(SAY_PEASANT_SPAWN_4, Cre);
+                                DoScriptText(SAY_PEASANT_SPAWN_4, pPeasant);
                                 break;
                         }
                     }
@@ -492,34 +485,34 @@ struct npc_eris_havenfireAI : public ScriptedAI
             }
             else
             {
-                int Alea = urand(2, 4);
-                m_creature->GetRandomPoint(ErisHavenfireEvent[Alea].X, ErisHavenfireEvent[Alea].Y, ErisHavenfireEvent[Alea].Z, 5.0f, X, Y, Z);
-                m_creature->SummonCreature(NPC_GUERRIER, X, Y, Z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                int warriorPos = urand(2, 4);
+                m_creature->GetRandomPoint(ErisHavenfireEvent[warriorPos].x, ErisHavenfireEvent[warriorPos].y, ErisHavenfireEvent[warriorPos].z, 5.0f, X, Y, Z);
+                m_creature->SummonCreature(NPC_WARRIOR, X, Y, Z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
             }
         }
     }
 
-    int GenererVagueNombre(bool Paysants)
+    int GenerateWaveNumber(bool peasants)
     {
-        if (Vague > 4 && Paysants)
+        if (m_wave > 4 && peasants)
             return 0;
 
-        int Nombre = 0;
-        if (Paysants)
+        int count = 0;
+        if (peasants)
         {
-            Nombre = 12;
-            if (Vague == 3)
-                Nombre = 13;
-            else if (Vague == 4)
-                Nombre = 16;
+            count = 12;
+            if (m_wave == 3)
+                count = 13;
+            else if (m_wave == 4)
+                count = 16;
         }
         else
-            Nombre = urand(2, 6);
+            count = urand(2, 6);
 
-        return Nombre;
+        return count;
     }
 
-    void SituationFinale(Player* pPlayer)
+    void CompleteEvent(Player* pPlayer)
     {
         if (!pPlayer)
             return;
@@ -539,145 +532,89 @@ struct npc_eris_havenfireAI : public ScriptedAI
         Reset();
     }
 
-    bool IsPlayerInterfering()
-    {
-        Player* questPlayer = GetPlayer();
-        if (!questPlayer)
-            return false;
-
-        Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
-        uint32 myArea = m_creature->GetAreaId();
-        if (!pl.isEmpty() && myArea && BeginQuete)
-        {
-            for (const auto& it : pl)
-            {
-                Player* currPlayer =  it.getSource();
-                if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
-                {
-                    if (currPlayer->IsGameMaster())
-                        continue;
-
-                    if (currPlayer->IsAlive() && questPlayer != currPlayer)
-                        return true;
-                }
-            }
-            return false;
-        }
-        else
-            return false;
-    }
-
-    void Cleaning()
-    {
-        Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
-        uint32 myArea = m_creature->GetAreaId();
-        if (!pl.isEmpty() && myArea && !CleanerSpawn)
-        {
-            if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
-            {
-                CleanerSpawn = true;
-                BeginQuete = false;
-                Player* player = GetPlayer();
-                EchecEvent(player, false);
-
-                for (const auto& it : pl)
-                {
-                    Player* currPlayer =  it.getSource();
-                    if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
-                        if (player && player != currPlayer && currPlayer->IsAlive() && !currPlayer->IsGameMaster())
-                            Crea->AddThreat(currPlayer, 1000.0f);
-                }
-            }
-        }
-    }
-
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (!BeginQuete || CleanerSpawn)
+        if (!m_questStarted || m_cleanerSpawn)
             return;
 
-        if (IsPlayerInterfering())
-        {
-            Cleaning();
-            return;
-        }
         // Always keep player in combat
         if (Player* playerForQuest = GetPlayer())
             playerForQuest->SetCombatTimer(1500);
 
         for (int i = 0; i < 2; i++)
         {
-            if (Timer[i] < uiDiff)
+            if (m_waveTimer[i] < uiDiff)
             {
                 if (i == 0)
                 {
-                    NewVague(true);
-                    Timer[i] = 80000;
+                    NewWave(true);
+                    m_waveTimer[i] = 80000;
                 }
                 else
                 {
-                    Timer[i] = urand(10000, 14000);
+                    m_waveTimer[i] = urand(10000, 14000);
                     if ((rand() % 7) > 0) // 85% chance
-                        NewVague(false);
+                        NewWave(false);
 
                 }
             }
-            else Timer[i] -= uiDiff;
+            else
+                m_waveTimer[i] -= uiDiff;
         }
 
-        if (BuffTimer < uiDiff)
+        if (m_buffTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_BLESSING_OF_NORDRASSIL) == CAST_OK)
             {
                 if (Player* player = GetPlayer())
                     DoScriptText(SAY_ERIS_HEAL, m_creature, player);
-                BuffTimer = urand(75000, 90000);
+                m_buffTimer = urand(75000, 90000);
             }
         }
         else
-            BuffTimer -= uiDiff;
+            m_buffTimer -= uiDiff;
 
         for (int i = 0; i < 8; i++)
         {
-            if (TimerArcher[i] < uiDiff)
+            if (m_archerTimer[i] < uiDiff)
             {
-                if (ArchersGUIDs[i])
+                if (m_archerGUIDs[i])
                 {
-                    if (Creature* Crea = m_creature->GetMap()->GetCreature(ArchersGUIDs[i]))
+                    if (Creature* pArcher = m_creature->GetMap()->GetCreature(m_archerGUIDs[i]))
                     {
-                        int Var = 0;
-                        int var = 0;
-                        int Damage = urand(50, 100);
+                        int j = 0;
+                        int count = 0;
                         uint64 GUIDs[50];
 
                         for (uint64 & guid : GUIDs)
                             guid = 0;
 
-                        while (Var < 50)
+                        while (j < 50)
                         {
-                            if (VillagerGUIDs[Var])
+                            if (m_villagerGUIDs[j])
                             {
-                                Unit* Villagois = m_creature->GetMap()->GetCreature(VillagerGUIDs[Var]);
-                                if (Villagois && Villagois->IsAlive())
+                                Unit* pVillager = m_creature->GetMap()->GetCreature(m_villagerGUIDs[j]);
+                                if (pVillager && pVillager->IsAlive())
                                 {
-                                    GUIDs[var] = VillagerGUIDs[Var];
-                                    ++var;
+                                    GUIDs[count] = m_villagerGUIDs[j];
+                                    ++count;
                                 }
                             }
-                            ++Var;
+                            ++j;
                         }
 
-                        if (var < 1)
+                        if (count < 1)
                             continue;
 
-                        Unit* Target = m_creature->GetMap()->GetCreature(GUIDs[urand(0, var - 1)]);
-                        if (Target)
-                            Crea->CastCustomSpell(Target, SPELL_SHOOT, Damage, {}, {}, true);
-                        TimerArcher[i] = urand(3000, 4400);
+                        if (Unit* pTarget = m_creature->GetMap()->GetCreature(GUIDs[urand(0, count - 1)]))
+                            pArcher->CastSpell(pTarget, SPELL_SHOOT, true);
+
+                        m_archerTimer[i] = urand(3000, 4400);
                     }
                 }
             }
-            else TimerArcher[i] -= uiDiff;
+            else
+                m_archerTimer[i] -= uiDiff;
         }
     }
 };
@@ -689,7 +626,8 @@ bool QuestAccept_npc_eris_havenfire(Player* pPlayer, Creature* pCreature, Quest 
 
     if (pQuest->GetQuestId() == QUEST_BALANCE_OF_LIGHT)
         if (npc_eris_havenfireAI* pErisEventAI = dynamic_cast<npc_eris_havenfireAI*>(pCreature->AI()))
-            pErisEventAI->DebutEvent(pPlayer);
+            pErisEventAI->BeginEvent(pPlayer);
+
     return true;
 }
 
@@ -711,21 +649,21 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
     float cX;
     float cY;
     float cZ;
-    bool DeplacementRequis;
+    bool m_needToMove;
 
     uint32 m_uiSayPeasantTimer;
 
     void Reset() override
     {
         if (X == 0.0f && Y == 0.0f && Z == 0.0f)
-            m_creature->GetRandomPoint(ErisHavenfireEvent[PaysantsDest].X, ErisHavenfireEvent[PaysantsDest].Y, ErisHavenfireEvent[PaysantsDest].Z, 5.0f, X, Y, Z);
+            m_creature->GetRandomPoint(ErisHavenfireEvent[POS_PEASANT_DEST].x, ErisHavenfireEvent[POS_PEASANT_DEST].y, ErisHavenfireEvent[POS_PEASANT_DEST].z, 5.0f, X, Y, Z);
         cX = 3347.801025f + float(urand(0, 12));
         cY = -3048.161865f + float(urand(0, 12));
         cZ = 163.679321f;
         X = 3324.0f + float(urand(0, 6));
         Y = -2973.0f + float(urand(0, 6));
         Z = 161.0f;
-        DeplacementRequis = true;
+        m_needToMove = true;
         SetCombatMovement(false);
 
         m_uiSayPeasantTimer = urand(10000, 30000);
@@ -755,14 +693,14 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
             if (npc_eris_havenfireAI* pErisEventAI = dynamic_cast<npc_eris_havenfireAI*>(eris->AI()))
             {
-                if (pCasterPlayer->GetGUID() != pErisEventAI->PlayerGUID && pErisEventAI->BeginQuete && !pErisEventAI->CleanerSpawn)
+                if (pCasterPlayer->GetGUID() != pErisEventAI->m_playerGUID && pErisEventAI->m_questStarted && !pErisEventAI->m_cleanerSpawn)
                 {
                     if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
                     {
                         Crea->AI()->AttackStart(pCasterPlayer);
-                        pErisEventAI->BeginQuete = false;
-                        pErisEventAI->CleanerSpawn = true;
-                        pErisEventAI->EchecEvent(pErisEventAI->GetPlayer(), false);
+                        pErisEventAI->m_questStarted = false;
+                        pErisEventAI->m_cleanerSpawn = true;
+                        pErisEventAI->FailEvent(pErisEventAI->GetPlayer(), false);
                     }
                 }
             }
@@ -776,11 +714,11 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         if (uiType != POINT_MOTION_TYPE)
             return;
 
-        if (uiPointId == POINT_DEBUT_COMBAT)
+        if (uiPointId == POINT_START_COMBAT)
         {
-            float Vitesse = m_creature->GetEntry() == NPC_PAYSANT_0 ? 1.0f : 1.7f;
+            float Vitesse = m_creature->GetEntry() == NPC_PEASANT_0 ? 1.0f : 1.7f;
             m_creature->SetWalk(true);
-            m_creature->GetMotionMaster()->MovePoint(POINT_FIN_EVENT, X, Y, Z, MOVE_PATHFINDING, Vitesse);
+            m_creature->GetMotionMaster()->MovePoint(POINT_END_EVENT, X, Y, Z, MOVE_PATHFINDING, Vitesse);
             cX = 0.0f;
             cY = 0.0f;
             cZ = 0.0f;
@@ -789,12 +727,12 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (DeplacementRequis)
+        if (m_needToMove)
         {
-            float Vitesse = m_creature->GetEntry() == NPC_PAYSANT_0 ? 1.0f : 1.7f;
+            float Vitesse = m_creature->GetEntry() == NPC_PEASANT_0 ? 1.0f : 1.7f;
             m_creature->SetWalk(true);
-            m_creature->GetMotionMaster()->MovePoint(POINT_DEBUT_COMBAT, cX, cY, cZ, MOVE_PATHFINDING, Vitesse);
-            DeplacementRequis = false;
+            m_creature->GetMotionMaster()->MovePoint(POINT_START_COMBAT, cX, cY, cZ, MOVE_PATHFINDING, Vitesse);
+            m_needToMove = false;
         }
 
         if (!m_creature->IsWalking())
@@ -1486,24 +1424,24 @@ struct go_darrowshire_triggerAI : public GameObjectAI
                                 if (Crea->IsAlive() && !Crea->IsInCombat() && Crea->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
                                 {
                                     int point = 0;
-                                    int Rand = 0;
+                                    int rnd = 0;
                                     point = urand(0, 3);
                                     switch (point)
                                     {
                                         case 0:
-                                            Rand = 5;
+                                            rnd = 5;
                                             break;
                                         case 1:
-                                            Rand = 7;
+                                            rnd = 7;
                                             break;
                                         case 2:
-                                            Rand = 4;
+                                            rnd = 4;
                                             break;
                                         case 3:
-                                            Rand = 6;
+                                            rnd = 6;
                                             break;
                                     }
-                                    Crea->GetMotionMaster()->MovePoint(point, DarrowshireEvent[Rand].X, DarrowshireEvent[Rand].Y, DarrowshireEvent[Rand].Z, MOVE_PATHFINDING, 5.0f);
+                                    Crea->GetMotionMaster()->MovePoint(point, DarrowshireEvent[rnd].X, DarrowshireEvent[rnd].Y, DarrowshireEvent[rnd].Z, MOVE_PATHFINDING, 5.0f);
                                 }
                             }
                         }
@@ -1524,12 +1462,12 @@ struct go_darrowshire_triggerAI : public GameObjectAI
             {
                 case 0: // spawn first defenders
                 {
-                    if (Creature* Cre = me->SummonCreature(NPC_DARROWSHIRE_DEFENDER, DarrowshireEvent[7].X, DarrowshireEvent[7].Y, DarrowshireEvent[7].Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
+                    if (Creature* pDefender = me->SummonCreature(NPC_DARROWSHIRE_DEFENDER, DarrowshireEvent[7].X, DarrowshireEvent[7].Y, DarrowshireEvent[7].Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                     {
-                        DoScriptText(SAY_DEFENDER_YELL, Cre);
-                        Cre->SetWalk(false);
-                        Cre->SetHomePosition(DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, DarrowshireEvent[4].O);
-                        Cre->GetMotionMaster()->MovePoint(0, DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, MOVE_PATHFINDING, 3.0f);
+                        DoScriptText(SAY_DEFENDER_YELL, pDefender);
+                        pDefender->SetWalk(false);
+                        pDefender->SetHomePosition(DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, DarrowshireEvent[4].O);
+                        pDefender->GetMotionMaster()->MovePoint(0, DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, MOVE_PATHFINDING, 3.0f);
                         m_phaseTimer = urand(120000, 180000);
                         m_phaseStep = 1;
                     }

@@ -218,7 +218,7 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
 ProcSystemArguments::ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_,
     SpellEntry const* procSpell_, Spell const* spell)
     : pVictim(pVictim_), procFlagsAttacker(procFlagsAttacker_), procFlagsVictim(procFlagsVictim_), procExtra(procExtra_), amount(amount_),
-    attType(attType_), procSpell(procSpell_), isSpellTriggeredByAura(spell && spell->IsTriggeredByAura())
+    attType(attType_), procSpell(procSpell_), isSpellTriggeredByAuraOrItem(spell && (spell->IsTriggeredByAura() || spell->IsTriggered() && spell->IsCastByItem())), procTime(sWorld.GetGameTime())
 {
     if (spell)
         appliedSpellModifiers = spell->m_appliedMods;
@@ -288,23 +288,14 @@ void SpellCaster::ProcDamageAndSpell_real(ProcSystemArguments& data)
     // Not much to do if no flags are set.
     if (data.procFlagsAttacker)
         if (Unit* pUnit = ToUnit())
-            pUnit->ProcDamageAndSpellFor(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
+            pUnit->ProcDamageAndSpellFor(false, data.pVictim, data, procTriggered);
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
     if (data.pVictim && data.pVictim->IsAlive() && data.procFlagsVictim)
     {
-        // http://blue.cardplace.com/cache/wow-paladin/1069149.htm
-        // "Charges will not generate off auto attacks or npc attacks by trying"
-        // "to sit down and force a crit. However, ability crits from physical"
-        // "abilities such as Sinister Strike, Hamstring, Auto-shot, Aimed shot,"
-        // "etc will generate a charge if you're sitting."
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, !data.procSpell && !data.pVictim->IsStandingUp() ? data.procExtra & ~PROC_EX_CRITICAL_HIT : data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
-#else
-        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
-#endif
-    
+        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data, procTriggered);
+
         // Standing up on damage taken must happen after proc checks.
         if (Player* pVictimPlayer = data.pVictim->ToPlayer())
             if (pVictimPlayer->IsStandUpScheduled())
@@ -521,27 +512,22 @@ int32 SpellCaster::MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, S
     else
         modHitChance = 94 - (leveldif - 2) * lchance;
 
-    //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "%s [%u] : Binary [%s]. Base hit chance %f, level diff: %d", spell->SpellName[2].c_str(), spell->Id, spell->IsBinary() ? "YES" : "NO", modHitChance, leveldif);
-
     // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
     if (Unit* pUnit = ToUnit())
     {
         if (Player* modOwner = pUnit->GetSpellModOwner())
         {
             modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, modHitChance, spellPtr);
-            //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELLMOD_RESIST_MISS_CHANCE : %f", modHitChance);
         }
     }
     
     // Chance hit from victim SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE auras
     modHitChance += pVictim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE, schoolMask);
-    //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE (+ %i) : %f", pVictim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE, schoolMask), modHitChance);
-
+    
     // Reduce spell hit chance for Area of effect spells from victim SPELL_AURA_MOD_AOE_AVOIDANCE aura
     if (spell->IsAreaOfEffectSpell())
     {
         modHitChance -= pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_AOE_AVOIDANCE);
-        //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_AOE_AVOIDANCE (- %i) : %f", pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_AOE_AVOIDANCE), modHitChance);
     }
 
     // Chance resist mechanic for spell (effect resistance handled later)
@@ -550,24 +536,20 @@ int32 SpellCaster::MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, S
         resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic);
     // Apply mod
     modHitChance -= resist_mech;
-    //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_MECHANIC_RESISTANCE (- %i) : %f", resist_mech, modHitChance);
-
+    
     // Chance resist debuff
     modHitChance -= pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(spell->Dispel));
-    //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_DEBUFF_RESISTANCE (- %i) : %f", pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(spell->Dispel)), modHitChance);
-
+    
     // Increase hit chance from attacker SPELL_AURA_MOD_SPELL_HIT_CHANCE and attacker ratings
     if (Unit* pUnit = ToUnit())
         modHitChance += int32(pUnit->m_modSpellHitChance);
-    //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_SPELL_HIT_CHANCE (+ %i) : %f", int32(m_modSpellHitChance), modHitChance);
-
+    
     // Nostalrius: sorts binaires.
     if (spell->IsBinary())
     {
         // Get base victim resistance for school
         float resistModHitChance = GetSpellResistChance(pVictim, schoolMask, false);
         modHitChance *= (1 - resistModHitChance);
-        //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "x %f : HitChance = %f", (1 - resistModHitChance), modHitChance);
     }
 
     int32 HitChance = modHitChance * 100;

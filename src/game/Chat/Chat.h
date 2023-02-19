@@ -181,6 +181,7 @@ class ChatHandler
         bool HandleAnticheatCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
         bool HandleViewLogCommand(char*);
+        bool HandleSniffCommand(char*);
 
         //Cheats
         bool HandleCheatStatusCommand(char *);
@@ -203,14 +204,13 @@ class ChatHandler
         //Custom
         bool HandleSendSpellVisualCommand(char *);
         bool HandleSendSpellImpactCommand(char *);
-        bool HandleDebugUnitCommand(char *);
         bool HandleDebugTimeCommand(char *);
         bool HandleDebugMoveFlagsCommand(char *);
         bool HandleDebugMoveSplineCommand(char *);
         bool HandleDebugExp(char*);
         bool HandleVideoTurn(char*);
         bool HandleDebugLootTableCommand(char*);
-        bool HandleDebugItemEnchantCommand(int lootid, unsigned int simCount);
+        bool HandleDebugItemEnchantCommand(int lootid, uint32 simCount);
         bool HandleServiceDeleteCharacters(char* args);
 
         bool HandleSpamerMute(char* args);
@@ -718,7 +718,22 @@ class ChatHandler
         bool HandleUnitSpeedInfoCommand(char* args);
         bool HandleUnitStatInfoCommand(char* args);
         bool HandleUnitUpdateFieldsInfoCommand(char* args);
-        bool HandleUnitShowStateCommand(char* args);
+        bool HandleUnitFactionInfoCommand(char* args);
+        bool HandleUnitShowRaceCommand(char* args);
+        bool HandleUnitShowClassCommand(char* args);
+        bool HandleUnitShowGenderCommand(char* args);
+        bool HandleUnitShowPowerTypeCommand(char* args);
+        bool HandleUnitShowFormCommand(char* args);
+        bool HandleUnitShowVisFlagsCommand(char* args);
+        bool HandleUnitShowMiscFlagsCommand(char* args);
+        bool HandleUnitShowUnitStateCommand(char* args);
+        bool HandleUnitShowUnitFlagsCommand(char* args);
+        bool HandleUnitShowNPCFlagsCommand(char* args);
+        bool HandleUnitShowEmoteStateCommand(char* args);
+        bool HandleUnitShowStandStateCommand(char* args);
+        bool HandleUnitShowSheathStateCommand(char* args);
+        bool HandleUnitShowMoveFlagsCommand(char* args);
+        bool HandleUnitShowCreateSpellCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);

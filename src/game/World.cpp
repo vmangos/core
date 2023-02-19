@@ -266,20 +266,20 @@ void World::AddSession_(WorldSession* s)
 
     m_sessions[s->GetAccountId()] = s;
 
-    uint32 Sessions = GetActiveAndQueuedSessionCount();
-    uint32 pLimit = GetPlayerAmountLimit();
-    uint32 QueueSize = GetQueuedSessionCount();             //number of players in the queue
+    uint32 activeSessions = GetActiveSessionCount();
+    uint32 playerLimit = GetPlayerAmountLimit();
+    uint32 queuedSessions = GetQueuedSessionCount();             //number of players in the queue
 
     //so we don't count the user trying to
     //login as a session and queue the socket that we are using
-    if (decrease_session)
-        --Sessions;
+    if (decrease_session && activeSessions)
+        --activeSessions;
 
-    if (pLimit > 0 && Sessions >= pLimit && !CanSkipQueue(s))
+    if (playerLimit > 0 && activeSessions >= playerLimit && !CanSkipQueue(s))
     {
         AddQueuedSession(s);
         UpdateMaxSessionCounters();
-        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "PlayerQueue: Account id %u is in Queue Position (%u).", s->GetAccountId(), ++QueueSize);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "PlayerQueue: Account id %u is in Queue Position (%u).", s->GetAccountId(), ++queuedSessions);
         return;
     }
 
@@ -294,10 +294,10 @@ void World::AddSession_(WorldSession* s)
     UpdateMaxSessionCounters();
 
     // Updates the population
-    if (pLimit > 0)
+    if (playerLimit > 0)
     {
         float popu = float(GetActiveSessionCount());        // updated number of users on the server
-        popu /= pLimit;
+        popu /= playerLimit;
         popu *= 2;
 
         static SqlStatementID id;
@@ -368,11 +368,11 @@ bool World::RemoveQueuedSession(WorldSession* sess)
         --sessions;
 
     uint32 loggedInSessions = uint32(m_sessions.size() - m_QueuedSessions.size());
-    if (loggedInSessions >= getConfig(CONFIG_UINT32_PLAYER_HARD_LIMIT))
+    if (loggedInSessions > getConfig(CONFIG_UINT32_PLAYER_HARD_LIMIT))
         return found;
-
+    
     // accept first in queue
-    if ((!m_playerLimit || (int32)sessions < m_playerLimit) && !m_QueuedSessions.empty())
+    if ((!m_playerLimit || (int32)sessions <= m_playerLimit) && !m_QueuedSessions.empty())
     {
         WorldSession* pop_sess = m_QueuedSessions.front();
         pop_sess->SetInQueue(false);
@@ -584,7 +584,17 @@ void World::LoadConfigSettings(bool reload)
         setConfigMinMax(CONFIG_UINT32_MAX_PLAYER_LEVEL, "MaxPlayerLevel", PLAYER_MAX_LEVEL, 1, PLAYER_STRONG_MAX_LEVEL);
     setConfigMinMax(CONFIG_UINT32_START_PLAYER_LEVEL, "StartPlayerLevel", 1, 1, getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
     setConfigMinMax(CONFIG_UINT32_START_PLAYER_MONEY, "StartPlayerMoney", 0, 0, MAX_MONEY_AMOUNT);
-    setConfigMin(CONFIG_UINT32_MIN_HONOR_KILLS, "MinHonorKills", MIN_HONOR_KILLS, 1);
+    setConfig(CONFIG_UINT32_MIN_HONOR_KILLS, "MinHonorKills", 0);
+
+    // If min honor kills is at 0, decide based on patch.
+    if (getConfig(CONFIG_UINT32_MIN_HONOR_KILLS) == 0)
+    {
+        if (GetWowPatch() >= WOW_PATCH_110)
+            setConfig(CONFIG_UINT32_MIN_HONOR_KILLS, MIN_HONOR_KILLS_POST_1_10);
+        else
+            setConfig(CONFIG_UINT32_MIN_HONOR_KILLS, MIN_HONOR_KILLS_PRE_1_10);
+    }
+
     setConfigMinMax(CONFIG_UINT32_MAINTENANCE_DAY, "MaintenanceDay", 4, 0, 6);
     setConfig(CONFIG_BOOL_AUTO_HONOR_RESTART, "AutoHonorRestart", true);
     setConfig(CONFIG_BOOL_ALL_TAXI_PATHS, "AllFlightPaths", false);
@@ -929,6 +939,7 @@ void World::LoadConfigSettings(bool reload)
     setConfigMinMax(CONFIG_UINT32_SPELL_EFFECT_DELAY, "Spell.EffectDelay", 400, 0, 1000);
     setConfigMinMax(CONFIG_UINT32_SPELL_PROC_DELAY, "Spell.ProcDelay", 400, 0, 1000);
     setConfigMinMax(CONFIG_UINT32_DEBUFF_LIMIT, "DebuffLimit", 0, 0, 40);
+
     // If max debuff slots is at 0, decide based on patch.
     if (getConfig(CONFIG_UINT32_DEBUFF_LIMIT) == 0)
     {
@@ -979,14 +990,16 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_YELLRANGE_QUADRATICSCALE_MAXLEVEL, "YellRange.QuadraticScale.MaxLevel", 0);
     setConfig(CONFIG_UINT32_YELLRANGE_MIN, "YellRange.Min", 0);
 
-    setConfig(CONFIG_BOOL_LOGSDB_BATTLEGROUNDS, "LogsDB.Battlegrounds", 0);
-    setConfig(CONFIG_BOOL_LOGSDB_CHARACTERS, "LogsDB.Characters", 1);
-    setConfig(CONFIG_BOOL_LOGSDB_CHAT, "LogsDB.Chat", 1);
-    setConfig(CONFIG_BOOL_LOGSDB_TRADES, "LogsDB.Trades", 1);
-    setConfig(CONFIG_BOOL_LOGSDB_TRANSACTIONS, "LogsDB.Transactions", 0);
-    setConfig(CONFIG_BOOL_SMARTLOG_DEATH, "Smartlog.Death", 1);
-    setConfig(CONFIG_BOOL_SMARTLOG_LONGCOMBAT, "Smartlog.LongCombat", 1);
-    setConfig(CONFIG_BOOL_SMARTLOG_SCRIPTINFO, "Smartlog.ScriptInfo", 1);
+    setConfig(CONFIG_BOOL_LOGSDB_BATTLEGROUNDS, "LogsDB.Battlegrounds", false);
+    setConfig(CONFIG_BOOL_LOGSDB_CHARACTERS, "LogsDB.Characters", false);
+    setConfig(CONFIG_BOOL_LOGSDB_LEVELUP, "LogsDB.LevelUp", false);
+    setConfig(CONFIG_BOOL_LOGSDB_GM, "LogsDB.GM", false);
+    setConfig(CONFIG_BOOL_LOGSDB_CHAT, "LogsDB.Chat", false);
+    setConfig(CONFIG_BOOL_LOGSDB_LOOT, "LogsDB.Loot", false);
+    setConfig(CONFIG_BOOL_LOGSDB_TRADES, "LogsDB.Trades", false);
+    setConfig(CONFIG_BOOL_LOGSDB_TRANSACTIONS, "LogsDB.Transactions", false);
+    setConfig(CONFIG_BOOL_SMARTLOG_DEATH, "Smartlog.Death", false);
+    setConfig(CONFIG_BOOL_SMARTLOG_LONGCOMBAT, "Smartlog.LongCombat", false);
     setConfig(CONFIG_UINT32_LONGCOMBAT, "Smartlog.LongCombatDuration", 30 * MINUTE);
 
     setConfig(CONFIG_UINT32_ITEM_INSTANTSAVE_QUALITY, "Item.InstantSaveQuality", ITEM_QUALITY_ARTIFACT);

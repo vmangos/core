@@ -102,7 +102,7 @@ public:
         // slowing poison timer
         if (m_slowingPoisonTimer < uiDiff)
         {
-            CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLOWING_POISON, CF_AURA_NOT_PRESENT);
+            SpellCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLOWING_POISON, CF_AURA_NOT_PRESENT);
             if (castResult == CAST_OK)
                 m_slowingPoisonTimer = urand(8400, 15300);
         }
@@ -112,7 +112,7 @@ public:
         // backstab timer
         if (m_backstabTimer < uiDiff)
         {
-            CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKSTAB);
+            SpellCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKSTAB);
             if (castResult == CAST_OK)
                 m_backstabTimer = urand(2100, 5600);
         }
@@ -262,7 +262,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             return;
 
         // calls a friend
-        CanCastResult castResult = DoCastSpellIfCan(m_creature, SPELL_CALL_FRIENDS);
+        SpellCastResult castResult = DoCastSpellIfCan(m_creature, SPELL_CALL_FRIENDS);
         // He says this phrase only during the event
         if (HasEscortState(STATE_ESCORT_ESCORTING) && (castResult == CAST_OK))
             DoScriptText(SAY_PROGRESS_1_TAP, m_creature);
@@ -360,7 +360,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             // Pummel timer
             if (m_pummelTimer < uiDiff)
             {
-                CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL);
+                SpellCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL);
                 if (castResult == CAST_OK)
                     m_pummelTimer = urand(7300, 15000);
             }

@@ -348,7 +348,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { "unitstate",      SEC_GAMEMASTER,     false, &ChatHandler::HandleUnitStatCommand,                 "", nullptr },
         { "control",        SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugControlCommand,             "", nullptr },
         { "monster",        SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugMonsterChatCommand,         "", nullptr },
-        { "target",         SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugUnitCommand,                "", nullptr },
         { "time",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleDebugTimeCommand,                "", nullptr },
         { "moveflags",      SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugMoveFlagsCommand,           "", nullptr },
         { "movespline",     SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugMoveSplineCommand,          "", nullptr },
@@ -696,7 +695,21 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand unitShowCommandTable[] =
     {
-        { "state",          SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowStateCommand,       "", nullptr },
+        { "race",           SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowRaceCommand,        "", nullptr },
+        { "class",          SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowClassCommand,       "", nullptr },
+        { "gender",         SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowGenderCommand,      "", nullptr },
+        { "powertype",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowPowerTypeCommand,   "", nullptr },
+        { "form",           SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowFormCommand,        "", nullptr },
+        { "visflags",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowVisFlagsCommand,    "", nullptr },
+        { "miscflags",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowMiscFlagsCommand,   "", nullptr },
+        { "emotestate",     SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowEmoteStateCommand,  "", nullptr },
+        { "standstate",     SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowStandStateCommand,  "", nullptr },
+        { "sheathstate",    SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowSheathStateCommand, "", nullptr },
+        { "unitstate",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowUnitStateCommand,   "", nullptr },
+        { "unitflags",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowUnitFlagsCommand,   "", nullptr },
+        { "npcflags",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowNPCFlagsCommand,    "", nullptr },
+        { "moveflags",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowMoveFlagsCommand,   "", nullptr },
+        { "createspell",    SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowCreateSpellCommand, "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
@@ -707,6 +720,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "speedinfo",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitSpeedInfoCommand,       "", nullptr },
         { "statinfo",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitStatInfoCommand,        "", nullptr },
         { "ufinfo",         SEC_DEVELOPER,      false, &ChatHandler::HandleUnitUpdateFieldsInfoCommand,"", nullptr },
+        { "factioninfo",    SEC_MODERATOR,      false, &ChatHandler::HandleUnitFactionInfoCommand,     "", nullptr },
         { "show",           SEC_MODERATOR,      false, nullptr,                                        "", unitShowCommandTable },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
@@ -1261,6 +1275,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "pet",            SEC_GAMEMASTER,     true, nullptr,                                         "", petCommandTable},
         { "channel",        SEC_MODERATOR,      false, nullptr,                                        "", channelCommandTable},
         { "log",            SEC_GAMEMASTER,     true,  &ChatHandler::HandleViewLogCommand,             "", nullptr },
+        { "sniff",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleSniffCommand,               "", nullptr },
         { "spamer",         SEC_MODERATOR,      true, nullptr,                                         "", spamerCommandTable },
         { "antispam",       SEC_TICKETMASTER,   true, nullptr,                                         "", AntiSpamCommandTable },
         { "gold",           SEC_BASIC_ADMIN,    true, nullptr,                                         "", goldCommandTable },

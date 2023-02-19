@@ -93,7 +93,9 @@ bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 mapId, float 
         return false;
     }
 
-    Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
+    Map* map = GetMap();
+    if (map->GetId() != mapId)
+        map = const_cast<Map*>(sMapMgr.FindMap(mapId, sMapMgr.GetContinentInstanceId(mapId, x, y)));
     if (!map)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid Map id %u in OPvPCapturePoint::AddObject!", mapId);
@@ -120,7 +122,9 @@ bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 team, uint3
         return false;
     }
 
-    Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
+    Map* map = GetMap();
+    if (map->GetId() != mapId)
+        map = const_cast<Map*>(sMapMgr.FindMap(mapId, sMapMgr.GetContinentInstanceId(mapId, x, y)));
     if (!map)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid Map id %u in OPvPCapturePoint::AddCreature!", mapId);
@@ -157,7 +161,9 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 mapId, float x, 
         return false;
     }
 
-    Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
+    Map* map = GetMap(); 
+    if (map->GetId() != mapId)
+        map = const_cast<Map*>(sMapMgr.FindMap(mapId, sMapMgr.GetContinentInstanceId(mapId, x, y)));
     if (!map)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid Map id %u in OPvPCapturePoint::SetCapturePointData!", mapId);

@@ -205,11 +205,8 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 #endif                                                  // !_DEBUG
 
     //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s]Send packet : %u|0x%x (%s)", GetPlayerName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-    if (Player* player = GetPlayer())
-    {
-        DEBUG_UNIT_IF(packet->GetOpcode() != SMSG_MESSAGECHAT && packet->GetOpcode() != SMSG_WARDEN_DATA, player,
-            DEBUG_PACKETS_SEND, "[%s] Send packet : %u/0x%x (%s)", player->GetName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-    }
+    if (m_sniffFile)
+        m_sniffFile->WritePacket(*packet, false, time(nullptr));
 
     if (m_socket->SendPacket(*packet) == -1)
         m_socket->CloseSocket();
@@ -218,7 +215,10 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 /// Add an incoming packet to the queue
 void WorldSession::QueuePacket(WorldPacket* newPacket)
 {
-    if (_player && IsMovementOpcode(newPacket->GetOpcode()))
+    if (m_sniffFile)
+        m_sniffFile->WritePacket(*newPacket, true, time(nullptr));
+
+    if (_player && MovementAnticheat::IsLoggedOpcode(newPacket->GetOpcode()))
         GetCheatData()->LogMovementPacket(true, *newPacket);
 
     OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
@@ -467,6 +467,7 @@ void WorldSession::ClearIncomingPacketsByType(PacketProcessing type)
 void WorldSession::SetDisconnectedSession()
 {
     m_connected = false;
+    StopSniffing();
     sWorld.SetSessionDisconnected(this);
 }
 
@@ -977,11 +978,7 @@ void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* pac
     if (_player)
         _player->SetCanDelayTeleport(true);
 
-
     //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s] Recvd packet : %u/0x%x (%s)", GetUsername().c_str(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-    if (Player* player = GetPlayer())
-        DEBUG_UNIT(player, DEBUG_PACKETS_RECV, "[%s] Recvd packet : %u/0x%x (%s)", player->GetName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-
     (this->*opHandle.handler)(*packet);
 
     if (_player)
@@ -1087,7 +1084,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
         sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, detector, oss.str().c_str());
     }
     
-    sLog.Player(this, LOG_ANTICHEAT, LOG_LVL_MINIMAL, "[%s] Player %s, Cheat %s, Penalty: %s",
+    sLog.Player(this, LOG_ANTICHEAT, detector, LOG_LVL_MINIMAL, "[%s] Player %s, Cheat %s, Penalty: %s",
         detector, playerDesc.c_str(), reason, action);
 }
 
