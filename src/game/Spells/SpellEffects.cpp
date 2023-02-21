@@ -2755,6 +2755,15 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype, LockType lockType)
                         gameObjTarget->UseDoorOrButton(0, true);
                     return;
                 }
+                else if (gameObjTarget->GetEntry() == 178559) // Larva Spewer
+                {
+                    // Alternative state = destroyed
+                    gameObjTarget->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                    // Save state
+                    if (gameObjTarget->GetInstanceData())
+                        gameObjTarget->GetInstanceData()->SetData(0 /*TYPE_LARVA_SPEWER*/, 3 /*DONE*/);
+                    return;
+                }
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::SendLoot unhandled locktype %u for GameObject trap (entry %u) for spell %u.", lockType, gameObjTarget->GetEntry(), m_spellInfo->Id);
                 return;
             default:
