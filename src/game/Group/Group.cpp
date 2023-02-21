@@ -516,7 +516,7 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
     }
     // if group before remove <= 2 disband it
     else
-        Disband(true);
+        Disband(true, guid);
 
     return m_memberSlots.size();
 }
@@ -535,9 +535,10 @@ void Group::ChangeLeader(ObjectGuid guid)
     SendUpdate();
 }
 
-void Group::Disband(bool hideDestroy)
+void Group::Disband(bool hideDestroy, ObjectGuid initiator)
 {
     Player* player;
+    Player* remainingPlayer = nullptr;
 
     for (const auto& itr : m_memberSlots)
     {
@@ -590,7 +591,11 @@ void Group::Disband(bool hideDestroy)
                 player->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
         }
 
-        _homebindIfInstance(player);
+        // only the person who initiated the disband should be kicked from instance, as he left by choice
+        if (initiator.IsEmpty() || initiator == player->GetObjectGuid())
+            _homebindIfInstance(player);
+        else
+            remainingPlayer = player;
     }
 
     if (IsInLFG())
@@ -612,6 +617,22 @@ void Group::Disband(bool hideDestroy)
         CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `group_id`='%u'", m_Id);
         CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `group_id`='%u'", m_Id);
         CharacterDatabase.CommitTransaction();
+
+        // transfer instance save to last player in dungeon
+        if (remainingPlayer)
+        {
+            BoundInstancesMap::iterator itr = m_boundInstances.find(remainingPlayer->GetMapId());
+            if (itr != m_boundInstances.end() && !itr->second.perm &&
+                !remainingPlayer->GetBoundInstance(remainingPlayer->GetMapId()))
+            {
+                remainingPlayer->BindToInstance(itr->second.state, itr->second.perm, false);
+                CharacterDatabase.PExecute("DELETE FROM `group_instance` WHERE `leader_guid` = '%u' AND `instance` = '%u'",
+                    GetLeaderGuid().GetCounter(), itr->second.state->GetInstanceId());
+                itr->second.state->RemoveGroup(this);               // save can become invalid
+                m_boundInstances.erase(itr);
+            }
+        }
+
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, nullptr);
     }
 
