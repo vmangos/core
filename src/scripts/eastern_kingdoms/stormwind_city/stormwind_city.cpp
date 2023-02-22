@@ -143,7 +143,7 @@ float aThugResetPosition[][3] = {
 struct npc_dashel_stonefistAI : public ScriptedAI
 {
     // old town thugs
-    Creature* m_thugs[2];
+    ObjectGuid m_thugs[2];
     // current event phase
     uint32 m_eventPhase;
     // check if an event has been started.
@@ -185,18 +185,17 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 player->GroupEventFailHappens(QUEST_MISSING_DIPLO_PT8);
 
             // remove thugs
-            for (const auto& pThug : m_thugs)
+            for (const auto& guid : m_thugs)
             {
-                if (pThug && pThug->IsAlive())
-                {
-                    static_cast<TemporarySummon*>(pThug)->UnSummon();
-                }
+                if (Creature* pThug = m_creature->GetMap()->GetCreature(guid))
+                    if (pThug->IsAlive())
+                        static_cast<TemporarySummon*>(pThug)->UnSummon();
             }
         }
 
-        // zero init required to prevent crash
-        for (auto& pThug : m_thugs)
-            pThug = nullptr;
+        // clear thug guids
+        for (auto& guid : m_thugs)
+            guid.Clear();
 
         m_questFightStarted = false;
         m_eventPhase = MDQP_NONE;
@@ -231,10 +230,13 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                     pMotionMaster->MoveTargetedHome();
 
                 // check if thugs are alive
-                for (const auto& pThug : m_thugs)
+                for (const auto& guid : m_thugs)
                 {
-                    if (pThug && pThug->IsAlive())
+                    if (Creature* pThug = m_creature->GetMap()->GetCreature(guid))
                     {
+                        if (!pThug->IsAlive())
+                            continue;
+
                         pThug->RemoveAllAuras();
                         pThug->DeleteThreatList();
                         pThug->CombatStop();
@@ -259,10 +261,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
     {
         switch (m_eventPhase)
         {
-        default: // MDQP_NONE
-            ScriptedAI::UpdateAI(uiDiff);
-            break;
-        case MDQP_SAY1: // Occurs only if thugs are alive
+            case MDQP_SAY1: // Occurs only if thugs are alive
             {
                 if (m_nextPhaseDelayTimer < uiDiff)
                 {
@@ -274,16 +273,16 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 }
                 else
                     m_nextPhaseDelayTimer -= uiDiff;
-            } break;
-        case MDQP_SAY2: // Occurs only if thugs are alive
+                break;
+            }
+            case MDQP_SAY2: // Occurs only if thugs are alive
             {
                 if (m_nextPhaseDelayTimer < uiDiff)
                 {
                     // recheck for safety, thugs can be killed by gm command, etc.
-                    if (m_thugs[0] && m_thugs[0]->IsAlive())
-                    {
-                        DoScriptText(SAY_PROGRESS_4_THU, m_thugs[0]);
-                    }
+                    if (Creature* pThug = m_creature->GetMap()->GetCreature(m_thugs[0]))
+                        if (pThug->IsAlive())
+                            DoScriptText(SAY_PROGRESS_4_THU, pThug);
 
                     // switch phase
                     m_nextPhaseDelayTimer = 1500;
@@ -291,16 +290,16 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 }
                 else
                     m_nextPhaseDelayTimer -= uiDiff;
-            } break;
-        case MDQP_SAY3: // Occurs only if thugs are alive
+                break;
+            }
+            case MDQP_SAY3: // Occurs only if thugs are alive
             {
                 if (m_nextPhaseDelayTimer < uiDiff)
                 {
                     // recheck for safety, thugs can be killed by gm command, etc.
-                    if (m_thugs[1] && m_thugs[1]->IsAlive())
-                    {
-                        DoScriptText(SAY_PROGRESS_5_THU, m_thugs[1]);
-                    }
+                    if (Creature* pThug = m_creature->GetMap()->GetCreature(m_thugs[1]))
+                        if (pThug->IsAlive())
+                            DoScriptText(SAY_PROGRESS_5_THU, pThug);
 
                     // switch phase
                     m_nextPhaseDelayTimer = 1000;
@@ -308,8 +307,9 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 }
                 else
                     m_nextPhaseDelayTimer -= uiDiff;
-            } break;
-        case MDQP_THUG_WALK_AWAY_1: // Occurs only if thugs are alive
+                break;
+            }
+            case MDQP_THUG_WALK_AWAY_1: // Occurs only if thugs are alive
             {
                 if (m_nextPhaseDelayTimer < uiDiff)
                 {
@@ -320,8 +320,9 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 }
                 else
                     m_nextPhaseDelayTimer -= uiDiff;
-            } break;
-        case MDQP_THUG_WALK_AWAY_2: // Occurs only if thugs are alive
+                break;
+            }
+            case MDQP_THUG_WALK_AWAY_2: // Occurs only if thugs are alive
             {
                 if (m_nextPhaseDelayTimer < uiDiff)
                 {
@@ -333,8 +334,9 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 }
                 else
                     m_nextPhaseDelayTimer -= uiDiff;
-            } break;
-        case MDQP_QUEST_COMPLETE:
+                break;
+            }
+            case MDQP_QUEST_COMPLETE:
             {
                 if (m_nextPhaseDelayTimer < uiDiff)
                 {
@@ -347,7 +349,11 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 }
                 else
                     m_nextPhaseDelayTimer -= uiDiff;
-            } break;
+                break;
+            }
+            default: // MDQP_NONE
+                ScriptedAI::UpdateAI(uiDiff);
+                break;
         }
     }
 
@@ -356,10 +362,13 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         if (thug >= 2)
             return;
 
-        if (m_thugs[thug] && m_thugs[thug]->IsAlive())
+        if (Creature* pThug = m_creature->GetMap()->GetCreature(m_thugs[thug]))
         {
-            m_thugs[thug]->GetMotionMaster()->MovePoint(0, aThugResetPosition[thug][0], aThugResetPosition[thug][1], aThugResetPosition[thug][2], MOVE_WALK_MODE);
-            m_thugs[thug]->ForcedDespawn(3000);
+            if (pThug->IsAlive())
+            {
+                pThug->GetMotionMaster()->MovePoint(0, aThugResetPosition[thug][0], aThugResetPosition[thug][1], aThugResetPosition[thug][2], MOVE_WALK_MODE);
+                pThug->DespawnOrUnsummon(3000);
+            }
         }
     }
 
@@ -382,13 +391,11 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         if (m_dialogStarted || m_questFightStarted)
         {
             // remove thugs
-            for (auto& pThug : m_thugs)
+            for (auto& guid : m_thugs)
             {
-                if (pThug)
-                {
+                if (Creature* pThug = m_creature->GetMap()->GetCreature(guid))
                     static_cast<TemporarySummon*>(pThug)->UnSummon();
-                    pThug = nullptr;
-                }
+                guid.Clear();
             }
         }
     }
@@ -398,19 +405,19 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         // If the thug died for whatever reason, clear the pointer. Otherwise, if
         // combat is extended, the thug may despawn and we'll access a dangling
         // pointer
-        for (auto& pThug : m_thugs)
+        for (auto& guid : m_thugs)
         {
-            if (pThug == creature)
-                pThug = nullptr;
+            if (guid == creature->GetObjectGuid())
+                guid.Clear();
         }
     }
 
     void SummonedCreatureDespawn(Creature* creature) override
     {
-        for (auto& pThug : m_thugs)
+        for (auto& guid : m_thugs)
         {
-            if (pThug == creature)
-                pThug = nullptr;
+            if (guid == creature->GetObjectGuid())
+                guid.Clear();
         }
     }
 };
@@ -435,19 +442,22 @@ bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, Ques
             dashelStonefistAI->m_playerGuid = pPlayer->GetObjectGuid();
 
             // spawn thugs and make them focus player.
-            dashelStonefistAI->m_thugs[0] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8676.075195f, 443.744019f, 99.632210f, 3.981758f, TEMPSUMMON_DEAD_DESPAWN);
+            Creature* pThug1 = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8676.075195f, 443.744019f, 99.632210f, 3.981758f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30000);
 
-            if (!dashelStonefistAI->m_thugs[0] || !dashelStonefistAI->m_thugs[0]->AI())
+            if (!pThug1 || !pThug1->AI())
                 return false;
 
-            dashelStonefistAI->m_thugs[0]->AI()->AttackStart(pPlayer);
-            dashelStonefistAI->m_thugs[0]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            dashelStonefistAI->m_thugs[0] = pThug1->GetObjectGuid();
+
+            pThug1->AI()->AttackStart(pPlayer);
+            pThug1->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
             // thug 2
-            if (dashelStonefistAI->m_thugs[1] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8685.416992f, 443.130829f, 99.526917f, 5.759635f, TEMPSUMMON_DEAD_DESPAWN))
+            if (Creature* pThug2 = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8685.416992f, 443.130829f, 99.526917f, 5.759635f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30000))
             {
-                dashelStonefistAI->m_thugs[1]->AI()->AttackStart(pPlayer);
-                dashelStonefistAI->m_thugs[1]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                dashelStonefistAI->m_thugs[1] = pThug2->GetObjectGuid();
+                pThug2->AI()->AttackStart(pPlayer);
+                pThug2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             }
             // start quest fight.
             dashelStonefistAI->startQuestFight();
