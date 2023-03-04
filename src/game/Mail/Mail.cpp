@@ -129,6 +129,16 @@ MailDraft::MailDraft(std::string subject, std::string text) : m_mailTemplateId(0
 
 }
 
+MailDraft& MailDraft::SetSubjectAndBodyId(std::string subject, uint32 itemTextId)
+{
+    m_subject = subject;
+
+    MANGOS_ASSERT(!m_bodyId);
+    m_bodyId = itemTextId;
+
+    return *this;
+}
+
 MailDraft& MailDraft::SetSubjectAndBody(std::string subject, std::string text)
 {
     m_subject = subject;

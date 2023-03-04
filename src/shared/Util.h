@@ -24,8 +24,6 @@
 
 #include "Common.h"
 #include "Duration.h"
-#include "Errors.h"
-#include "Log.h" // Zerix: Again, here we are asking for MANGOS_ASSERT to work. What's up?
 
 #include <string>
 #include <vector>
@@ -431,5 +429,9 @@ inline uint32 BatchifyTimer(uint32 timer, uint32 interval)
         value++;
     return value * interval;
 }
+
+typedef char const*(*ValueToStringFunc) (uint32 value);
+
+std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc);
 
 #endif

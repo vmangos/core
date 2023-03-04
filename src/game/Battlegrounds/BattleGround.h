@@ -452,14 +452,17 @@ class BattleGround
         // a player activates the cell of the creature)
         void OnObjectDBLoad(Creature* /*creature*/);
         void OnObjectDBLoad(GameObject* /*obj*/);
+        bool CanBeSpawned(Creature* /*creature*/) const;
+
         // (de-)spawns creatures and gameobjects from an event
         void SpawnEvent(uint8 event1, uint8 event2, bool spawn, bool forcedDespawn, uint32 delay = 0);
         void SetSpawnEventMode(uint8 event1, uint8 event2, BattleGroundCreatureSpawnMode mode);
-        bool IsActiveEvent(uint8 event1, uint8 event2)
+        bool IsActiveEvent(uint8 event1, uint8 event2) const
         {
-            if (m_activeEvents.find(event1) == m_activeEvents.end())
+            auto itr = m_activeEvents.find(event1);
+            if (itr == m_activeEvents.end())
                 return false;
-            return m_activeEvents[event1] == event2;
+            return itr->second == event2;
         }
         void ActivateEventWithoutSpawn(uint8 event1, uint8 event2)
         {

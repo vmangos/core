@@ -280,7 +280,6 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
         return;
     // All these cases will be handled at next sync update
     if (!i_target.isValid() || !i_target->IsInWorld() || !owner.IsAlive() || owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_POSSESSED)
-            || (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && owner.HasUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT))
             || static_cast<D*>(this)->_lostTarget(owner)
             || owner.IsNoMovementSpellCasted())
         return;
@@ -303,12 +302,6 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         return true;
 
     if (owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_POSSESSED))
-    {
-        _clearUnitStateMove(owner);
-        return true;
-    }
-
-    if (owner.HasUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT))
     {
         _clearUnitStateMove(owner);
         return true;

@@ -285,6 +285,8 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         bWokenUp = false;
         bWakingUp = false;
         bAwake = false;
+
+        m_creature->EnableMoveInLosEvent();
     }
     
     void EnterEvadeMode() override

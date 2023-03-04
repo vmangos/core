@@ -71,6 +71,36 @@ enum TempSummonType
     TEMPSUMMON_TIMED_DEATH_AND_DEAD_DESPAWN   = 11, // dies after a specified time (in or out of combat) and despawns when creature disappears
 };
 
+inline char const* TempSummonTypeToString(uint32 summonType)
+{
+    switch (summonType)
+    {
+        case TEMPSUMMON_TIMED_OR_DEAD_DESPAWN:
+            return "Timed or Dead Despawn";
+        case TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN:
+            return "Timed or Corpse Despawn";
+        case TEMPSUMMON_TIMED_DESPAWN:
+            return "Timed Despawn";
+        case TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT:
+            return "Timed Despawn Out of Combat";
+        case TEMPSUMMON_CORPSE_DESPAWN:
+            return "Corpse Despawn";
+        case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
+            return "Corpse Timed Despawn";
+        case TEMPSUMMON_DEAD_DESPAWN:
+            return "Dead Despawn";
+        case TEMPSUMMON_MANUAL_DESPAWN:
+            return "Manual Despawn";
+        case TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN:
+            return "Timed Combat or Dead Despawn";
+        case TEMPSUMMON_TIMED_COMBAT_OR_CORPSE_DESPAWN:
+            return "Timed Combat or Corpse Despawn";
+        case TEMPSUMMON_TIMED_DEATH_AND_DEAD_DESPAWN:
+            return "Timed Death and Dead Despawn";
+    }
+    return "UNKNOWN";
+}
+
 inline bool IsRespawnableTempSummonType(TempSummonType type)
 {
     switch (type)

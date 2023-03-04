@@ -119,7 +119,8 @@ public:
     uint32 HandlePositionTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return 0; }
     uint32 HandleFlagTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return 0; }
     bool HandleSplineDone(Player* /*pPlayer*/, MovementInfo const& /*movementInfo*/, uint32 /*splineId*/) { return true; }
-    void LogMovementPacket(bool /*isClientPacket*/, WorldPacket& /*packet*/) {}
+    void LogMovementPacket(bool /*isClientPacket*/, WorldPacket const& /*packet*/) {}
+    static bool IsLoggedOpcode(uint16 /*opcode*/) { return false; }
 };
 #endif
 

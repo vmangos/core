@@ -38,6 +38,12 @@
 
 INSTANTIATE_SINGLETON_1(MassMailMgr);
 
+MassMailMgr::MassMail::MassMail(MailDraft* mailProto, MailSender sender)
+    : m_protoMail(mailProto), m_sender(sender)
+{
+    MANGOS_ASSERT(mailProto);
+}
+
 void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender const& sender, uint32 raceMask)
 {
     if (RACEMASK_ALL_PLAYABLE & ~raceMask)                  // have races not included in mask

@@ -36,6 +36,15 @@ class SpellCaster;
 
 namespace Spells
 {
+    inline SpellEffectIndex GetFirstEffectIndexInMask(uint32 mask)
+    {
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            if (mask & (1 << i))
+                return SpellEffectIndex(i);
+
+        return EFFECT_INDEX_0;
+    }
+
     SpellSpecific GetSpellSpecific(uint32 spellId);
 
     // Diminishing Returns interaction with spells
@@ -173,6 +182,37 @@ namespace Spells
     bool IsPassiveSpell(uint32 spellId);
     bool IsPositiveSpell(uint32 spellId);
     bool IsPositiveSpell(uint32 spellId, Unit* caster, Unit* victim);
+
+    // spell target filter is TARGET_HELPFUL, TARGET_PARTY or TARGET_GROUP in cmangos
+    inline bool IsFriendlyTarget(uint32 target)
+    {
+        switch (target)
+        {
+            case TARGET_UNIT_CASTER:
+            case TARGET_UNIT_FRIEND_NEAR_CASTER:
+            case TARGET_UNIT_CASTER_PET:
+            case TARGET_PLAYER_FRIEND_NYI:
+            case TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE:
+            case TARGET_UNIT_FRIEND:
+            case TARGET_UNIT_CASTER_MASTER:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DYNOBJ_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_UNIT_PARTY:
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_UNIT_FRIEND_CHAIN_HEAL:
+            case TARGET_ENUM_UNITS_RAID_WITHIN_CASTER_RANGE:
+            case TARGET_UNIT_RAID:
+            case TARGET_UNIT_RAID_NEAR_CASTER:
+            case TARGET_ENUM_UNITS_FRIEND_IN_CONE:
+            case TARGET_UNIT_RAID_AND_CLASS:
+            case TARGET_PLAYER_RAID_NYI:
+                return true;
+        }
+        return false;
+    }
 
     inline bool IsPositiveTarget(uint32 targetA, uint32 targetB)
     {
@@ -785,17 +825,20 @@ class SpellEntry
 
         bool IsDeathOnlySpell() const
         {
-            return (AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD) || (Id == 2584);
+            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || 
+                   (Targets & (TARGET_FLAG_PVP_CORPSE | TARGET_FLAG_UNIT_CORPSE | TARGET_FLAG_CORPSE)) ||
+                   (Id == 2584);
         }
 
         bool CanTargetDeadTarget() const
         {
-            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);
+            return HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET) ||
+                   IsDeathOnlySpell();
         }
 
         bool CanTargetAliveState(bool alive) const
         {
-            if (HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD))
+            if (IsDeathOnlySpell())
                 return !alive;
 
             return alive || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);

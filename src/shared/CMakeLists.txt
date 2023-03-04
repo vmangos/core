@@ -66,6 +66,7 @@ set (shared_SRCS
     Multithreading/Messager.h
     SRP6/SRP6.h
     nonstd/optional.hpp
+    ByteBuffer.cpp
     Common.cpp
     DelayExecutor.cpp
     Log.cpp

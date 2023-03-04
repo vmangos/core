@@ -24,7 +24,7 @@
 
 NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c)
 {
-    c->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
+    c->AddUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
     m_bMeleeAttack = false;
     m_bCombatMovement = false;
 }

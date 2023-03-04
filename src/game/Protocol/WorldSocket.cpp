@@ -55,11 +55,6 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
 
     new_pct->FillPacketTime(WorldTimer::getMSTime());
 
-    // Dump received packet.
-    sLog.outWorldPacketDump(get_handle(), new_pct->GetOpcode(),
-                            LookupOpcodeName(new_pct->GetOpcode()), new_pct,
-                            true);
-
     try
     {
         switch (opcode)

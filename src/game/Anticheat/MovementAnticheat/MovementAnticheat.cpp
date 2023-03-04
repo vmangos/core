@@ -265,7 +265,100 @@ void MovementAnticheat::AddMessageToPacketLog(std::string message)
     LogMovementPacket(false, data);
 }
 
-void MovementAnticheat::LogMovementPacket(bool isClientPacket, WorldPacket& packet)
+bool MovementAnticheat::IsLoggedOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case CMSG_WORLD_TELEPORT:
+        case CMSG_TELEPORT_TO_UNIT:
+        case CMSG_REPOP_REQUEST:
+        case CMSG_RESURRECT_RESPONSE:
+        case CMSG_RECLAIM_CORPSE:
+        case MSG_MOVE_START_FORWARD:
+        case MSG_MOVE_START_BACKWARD:
+        case MSG_MOVE_STOP:
+        case MSG_MOVE_START_STRAFE_LEFT:
+        case MSG_MOVE_START_STRAFE_RIGHT:
+        case MSG_MOVE_STOP_STRAFE:
+        case MSG_MOVE_JUMP:
+        case MSG_MOVE_START_TURN_LEFT:
+        case MSG_MOVE_START_TURN_RIGHT:
+        case MSG_MOVE_STOP_TURN:
+        case MSG_MOVE_START_PITCH_UP:
+        case MSG_MOVE_START_PITCH_DOWN:
+        case MSG_MOVE_STOP_PITCH:
+        case MSG_MOVE_SET_RUN_MODE:
+        case MSG_MOVE_SET_WALK_MODE:
+        case MSG_MOVE_TOGGLE_LOGGING:
+        case MSG_MOVE_TELEPORT:
+        case MSG_MOVE_TELEPORT_CHEAT:
+        case MSG_MOVE_TELEPORT_ACK:
+        case MSG_MOVE_TOGGLE_FALL_LOGGING:
+        case MSG_MOVE_FALL_LAND:
+        case MSG_MOVE_START_SWIM:
+        case MSG_MOVE_STOP_SWIM:
+        case MSG_MOVE_SET_RUN_SPEED_CHEAT:
+        case MSG_MOVE_SET_RUN_SPEED:
+        case MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT:
+        case MSG_MOVE_SET_RUN_BACK_SPEED:
+        case MSG_MOVE_SET_WALK_SPEED_CHEAT:
+        case MSG_MOVE_SET_WALK_SPEED:
+        case MSG_MOVE_SET_SWIM_SPEED_CHEAT:
+        case MSG_MOVE_SET_SWIM_SPEED:
+        case MSG_MOVE_SET_SWIM_BACK_SPEED_CHEAT:
+        case MSG_MOVE_SET_SWIM_BACK_SPEED:
+        case MSG_MOVE_SET_ALL_SPEED_CHEAT:
+        case MSG_MOVE_SET_TURN_RATE_CHEAT:
+        case MSG_MOVE_SET_TURN_RATE:
+        case MSG_MOVE_TOGGLE_COLLISION_CHEAT:
+        case MSG_MOVE_SET_FACING:
+        case MSG_MOVE_SET_PITCH:
+        case MSG_MOVE_WORLDPORT_ACK:
+        case SMSG_MOVE_WATER_WALK:
+        case SMSG_MOVE_LAND_WALK:
+        case MSG_MOVE_SET_RAW_POSITION_ACK:
+        case CMSG_MOVE_SET_RAW_POSITION:
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_MOVE_ROOT_ACK:
+        case CMSG_FORCE_MOVE_UNROOT_ACK:
+        case MSG_MOVE_ROOT:
+        case MSG_MOVE_UNROOT:
+        case MSG_MOVE_HEARTBEAT:
+        case SMSG_MOVE_KNOCK_BACK:
+        case CMSG_MOVE_KNOCK_BACK_ACK:
+        case MSG_MOVE_KNOCK_BACK:
+        case SMSG_MOVE_FEATHER_FALL:
+        case SMSG_MOVE_NORMAL_FALL:
+        case SMSG_MOVE_SET_HOVER:
+        case SMSG_MOVE_UNSET_HOVER:
+        case CMSG_MOVE_HOVER_ACK:
+        case MSG_MOVE_HOVER:
+        case MSG_MOVE_TOGGLE_GRAVITY_CHEAT:
+        case MSG_MOVE_FEATHER_FALL:
+        case MSG_MOVE_WATER_WALK:
+        case CMSG_MOVE_SPLINE_DONE:
+        case CMSG_MOVE_FALL_RESET:
+        case CMSG_MOVE_TIME_SKIPPED:
+        case CMSG_MOVE_FEATHER_FALL_ACK:
+        case CMSG_MOVE_WATER_WALK_ACK:
+        case CMSG_SET_ACTIVE_MOVER:
+        case CMSG_MOVE_NOT_ACTIVE_MOVER:
+        case CMSG_MOVE_START_SWIM_CHEAT:
+        case CMSG_MOVE_STOP_SWIM_CHEAT:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        case MSG_MOVE_TIME_SKIPPED:
+#endif
+            return true;
+    }
+    return false;
+}
+
+void MovementAnticheat::LogMovementPacket(bool isClientPacket, WorldPacket const& packet)
 {
     if (uint32 maxLogSize = sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE))
     {
@@ -1060,8 +1153,6 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 
             if (realDistance2D_sq > (allowedDY + allowedDX) * 1.1f)
                 m_overspeedDistance += sqrt(realDistance2D_sq) - sqrt(allowedDY + allowedDX);
-
-            DEBUG_UNIT(me, DEBUG_CHEAT, "[Opcode:%u:0x%x] Flags 0x%x [DT=%u:DR=%.2f]", opcode, opcode, movementInfo.moveFlags, movementInfo.ctime - GetLastMovementInfo().ctime, interpolDist);
         }
         // Simple calculation for transports
         else if (!movementInfo.t_guid.IsEmpty() && (movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT) &&
