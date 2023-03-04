@@ -3681,8 +3681,10 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
     {
         if (target->IsTaxiFlying())
             return;
+
         // Stun/roots effects apply at charge end
         bool inCharge = target->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHARGE_MOTION_TYPE;
+
         // Frost stun aura -> freeze/unfreeze target
         if (GetSpellProto()->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_FROST)
             target->ModifyAuraState(AURA_STATE_FROZEN, apply);
@@ -3707,11 +3709,8 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
                 targetPlayer->GetSession()->DoLootRelease(lootGuid);
         }
 
-        if (!target->movespline->Finalized() || target->GetTypeId() == TYPEID_UNIT)
-            if (!inCharge)
-                target->StopMoving();
-
-        target->SetRooted(true);
+        if (!inCharge)
+            target->SetRooted(true);
     }
     else
     {

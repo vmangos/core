@@ -2452,7 +2452,7 @@ Visibility.ForceActiveObjects      = 1
 #    PvP.PoolSizePerFaction
 #         Defines the size of the active PvP pools of players per faction that's used to calculate standing on each
 #         honor maintenance restart. It's mathematically impossible to reach Rank 14 in low population servers, hence
-#         the need to "fake" the PvP pool.
+#         the need to "fake" the PvP pool. The minimum value is 167 for R14 to be achievable.
 #         Default: 0 (the real pool size will be used)
 #                  X (the real pool size will be overriden with X)
 #

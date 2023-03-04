@@ -319,7 +319,7 @@ void BattleGroundAB::_NodeOccupied(uint8 node, Team team)
     uint8 capturedNodes = 0;
     for (uint8 i = 0; i < BG_AB_NODES_MAX; ++i)
     {
-        if (m_nodes[node] == GetTeamIndexByTeamId(team) + BG_AB_NODE_TYPE_OCCUPIED && !m_nodeTimers[i])
+        if (m_nodes[i] == GetTeamIndexByTeamId(team) + BG_AB_NODE_TYPE_OCCUPIED && !m_nodeTimers[i])
             ++capturedNodes;
     }
     if (capturedNodes >= 5)
