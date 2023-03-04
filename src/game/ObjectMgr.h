@@ -491,10 +491,10 @@ enum PermVariables
     EVENT_IND_WATER = 3,
 
     // Stranglethorn Fishing Extravaganza support
-    VAR_TOURNAMENT  = 30021,    // last quest completion time
-    VAR_TOURN_GOES  = 30022,    // tournament was started already
-    VAR_TOURN_OVER  = 30023,    // tournament is over
-    VAR_TOURN_WINNER = 30056,   // for gosssip menu condition
+    VAR_STV_FISHING_PREV_WIN_TIME         = 30021, // last master angler quest completion time
+    VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN  = 30022, // announce tournament start
+    VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN = 30023, // announce tournament over
+    VAR_STV_FISHING_HAS_WINNER            = 30056, // used for gosssip menu condition
 
     // War Effort shared contributions
     VAR_WE_ALLIANCE_COPPER          = 30024,

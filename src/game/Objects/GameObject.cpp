@@ -380,6 +380,22 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                     }
                     return;
                 }
+                case GAMEOBJECT_TYPE_CHEST:
+                {
+                    if (m_goInfo->chest.chestRestockTime)
+                    {
+                        if (m_cooldownTime <= time(nullptr))
+                        {
+                            m_cooldownTime = 0;
+                            m_lootState = GO_READY;
+                            ForceValuesUpdateAtIndex(GAMEOBJECT_DYN_FLAGS);
+                        }
+
+                        return;
+                    }
+                    m_lootState = GO_READY;
+                    break;
+                }
                 default:
                     m_lootState = GO_READY;                 // for other GO is same switched without delay to GO_READY
                     break;
@@ -581,26 +597,42 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         }
         case GO_JUST_DEACTIVATED:
         {
-            // if Gameobject should cast spell, then this, but some GOs (type = 10) should be destroyed
-            if (GetGoType() == GAMEOBJECT_TYPE_GOOBER)
+            switch (GetGoType())
             {
-                uint32 spellId = GetGOInfo()->goober.spellId;
-
-                if (spellId)
+                // if Gameobject should cast spell, then this, but some GOs (type = 10) should be destroyed
+                case GAMEOBJECT_TYPE_GOOBER:
                 {
-                    // TODO find out why this is here, because m_UniqueUsers is empty for GAMEOBJECT_TYPE_GOOBER
-                    for (const auto& guid : m_UniqueUsers)
+                    uint32 spellId = GetGOInfo()->goober.spellId;
+
+                    if (spellId)
                     {
-                        if (Player* owner = GetMap()->GetPlayer(guid))
-                            owner->CastSpell(owner, spellId, false, nullptr, nullptr, GetObjectGuid());
+                        // TODO find out why this is here, because m_UniqueUsers is empty for GAMEOBJECT_TYPE_GOOBER
+                        for (const auto& guid : m_UniqueUsers)
+                        {
+                            if (Player* owner = GetMap()->GetPlayer(guid))
+                                owner->CastSpell(owner, spellId, false, nullptr, nullptr, GetObjectGuid());
+                        }
+
+                        ClearAllUsesData();
                     }
 
-                    ClearAllUsesData();
+                    SetGoState(GO_STATE_READY);
+
+                    //any return here in case battleground traps
+                    break;
                 }
-
-                SetGoState(GO_STATE_READY);
-
-                //any return here in case battleground traps
+                case GAMEOBJECT_TYPE_CHEST:
+                {
+                    // consumable confirmed to override chest restock
+                    if (!m_goInfo->chest.consumable && m_goInfo->chest.chestRestockTime)
+                    {
+                        m_cooldownTime = time(nullptr) + m_goInfo->chest.chestRestockTime;
+                        SetLootState(GO_NOT_READY);
+                        ForceValuesUpdateAtIndex(GAMEOBJECT_DYN_FLAGS);
+                        return;
+                    }
+                    break;
+                }
             }
 
             if (GetOwnerGuid() || (!m_spawnedByDefault && !GetGOData()))

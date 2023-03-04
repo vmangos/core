@@ -113,6 +113,7 @@ enum BellHourlySoundFX
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
+    LIGHTHOUSEFOGHORN  = 7197  // Lighthouses (TODO: not implememted yet)
 };
 
 enum BellHourlySoundZones
@@ -139,8 +140,7 @@ enum BellHourlyMisc
 {
     GAME_EVENT_HOURLY_BELLS = 78,
     EVENT_RING_BELL = 1,
-    EVENT_RESET = 2,
-    EVENT_TIME = 3
+    EVENT_TIME = 2
 };
 
 struct go_bells : public GameObjectAI
@@ -213,10 +213,14 @@ struct go_bells : public GameObjectAI
                     time(&rawtime);
                     struct tm * timeinfo = localtime(&rawtime);
                     uint8 _rings = (timeinfo->tm_hour) % 12;
-                    if (_rings == 0) // 00:00 and 12:00
+                    _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
+
+                    // Dwarf hourly horn should only play a single time, each time the next hour begins.
+                    if (_soundId == BELLTOLLDWARFGNOME)
                     {
-                        _rings = 12;
+                        _rings = 1;
                     }
+
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
                         m_events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
