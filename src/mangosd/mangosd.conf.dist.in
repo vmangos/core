@@ -1171,7 +1171,7 @@ AllowTwoSide.AddFriend = 0
 #
 #    MaxCreatureSummonLimit
 #       Game objects (and other creatures) won't be able to summon more creatures than this limit
-#       Default: 200
+#       Default: 100
 #
 #    Rate.Creature.Aggro
 #        Aggro radius percent or off.
@@ -1269,7 +1269,7 @@ Rate.Creature.Aggro = 1
 MaxCreaturesAttackRadius = 40
 MaxPlayersStealthDetectRange = 30
 MaxCreaturesStealthDetectRange = 30
-MaxCreatureSummonLimit = 200
+MaxCreatureSummonLimit = 100
 CreatureFamilyFleeAssistanceRadius = 30
 CreatureFamilyAssistanceRadius = 10
 CreatureFamilyAssistanceDelay = 1500

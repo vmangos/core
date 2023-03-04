@@ -2638,9 +2638,11 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
                 if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
                 {
-                    // Search all GO's with entry, within range of m_destN. Pick nearest first.
-                    GetGameObjectListWithEntryInGrid(tempTargetGOList, m_casterUnit, i_spellST->second.targetEntry, radius);
-                    tempTargetGOList.sort(ObjectDistanceOrder(m_casterUnit));
+                    // search all GO's with entry, within range of m_destN
+                    MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, x, y, z, radius);
+                    MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
+                    Cell::VisitGridObjects(m_caster, checker, radius);
+                    tempTargetGOList.sort(TargetDistanceOrderNear(m_caster));
                 }
             }
 
