@@ -259,14 +259,22 @@ class ByteBuffer
 
         ByteBuffer& operator>>(std::string& value)
         {
-            value.clear();
-            while (rpos() < size())                         // prevent crash at wrong string format in packet
+            // prevent crash at wrong string format in packet
+            if (_rpos < size())
             {
-                char c = read<char>();
-                if (c == 0)
-                    break;
-                value += c;
+                size_t startPos = _rpos;
+
+                while (_storage[_rpos] != '\0')
+                {
+                    _rpos++;
+
+                    if (_rpos + sizeof(char) > size())
+                        throw ByteBufferException(false, _rpos, sizeof(char), size());
+                }
+                value.assign((char*)(&_storage[startPos]), _rpos - startPos);
+                _rpos++;
             }
+            
             return *this;
         }
 
