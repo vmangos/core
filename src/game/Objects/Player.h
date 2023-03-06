@@ -2320,9 +2320,9 @@ class Player final: public Unit
         uint8 GetChatTag() const;
 
         float GetYellRange() const;
-        void Say(std::string const& text, uint32 const language) const;
-        void Yell(std::string const& text, uint32 const language) const;
-        void TextEmote(std::string const& text) const;
+        void Say(char const* text, uint32 const language) const;
+        void Yell(char const* text, uint32 const language) const;
+        void TextEmote(char const* text) const;
 
         /*********************************************************/
         /***                   FACTION SYSTEM                  ***/

@@ -132,7 +132,7 @@ bool Guild::Create(Player* leader, std::string gname)
     {
         if (a->filterMessage(gname))
         {
-            sWorld.LogChat(lSession, "Guild", "Attempt to create guild with spam name" + gname);
+            sWorld.LogChat(lSession, "Guild", "Attempt to create guild with spam name");
             return false;
         }
     }
@@ -583,7 +583,7 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
     return members.empty();
 }
 
-void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint32 language)
+void Guild::BroadcastToGuild(WorldSession* session, char const* msg, uint32 language)
 {
     if (!session)
         return;
@@ -593,7 +593,7 @@ void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint
         return;
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg.c_str(), Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg, Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
 
     for (const auto& member : members)
     {
@@ -607,7 +607,7 @@ void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint
     }
 }
 
-void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, uint32 language)
+void Guild::BroadcastToOfficers(WorldSession* session, char const* msg, uint32 language)
 {
     if (!session)
         return;
@@ -617,7 +617,7 @@ void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, u
         return;
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg.c_str(), Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg, Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
 
     for (const auto& member : members)
     {

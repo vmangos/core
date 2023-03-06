@@ -107,7 +107,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
     {
         if (a->filterMessage(name))
         {
-            sWorld.LogChat(this, "Guild", "Attempt to create guild petition with spam name" + name);
+            sWorld.LogChat(this, "Guild", "Attempt to create guild petition with spam name");
             SendGuildCommandResult(GUILD_CREATE_S, name, ERR_GUILD_NAME_INVALID);
             return;
         }

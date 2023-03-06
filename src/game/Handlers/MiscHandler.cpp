@@ -1086,8 +1086,12 @@ void WorldSession::HandleTeleportToUnitOpcode(WorldPacket& recv_data)
 {
     std::string playerName;
     recv_data >> playerName;
-    playerName = ".goname " + playerName;
-    ProcessChatMessageAfterSecurityCheck(playerName, LANG_UNIVERSAL, CHAT_MSG_SYSTEM);
+    if (playerName.length() > MAX_PLAYER_NAME)
+        return;
+
+    char txt[21] = {};
+    sprintf(txt, ".goname %s", playerName.c_str());
+    ProcessChatMessageAfterSecurityCheck(txt, LANG_UNIVERSAL, CHAT_MSG_SYSTEM);
 }
 
 void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)

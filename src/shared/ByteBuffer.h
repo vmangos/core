@@ -338,6 +338,33 @@ class ByteBuffer
             _rpos += len;
         }
 
+        // returns pointer to string inside the packet without copy while checking for null terminator
+        char* ReadCString()
+        {
+            if (_rpos + sizeof(char) > size())
+                throw ByteBufferException(false, _rpos, sizeof(char), size());
+
+            char* txt = (char*)(&_storage[_rpos]);
+
+            while (_storage[_rpos] != '\0')
+            {
+                _rpos++;
+
+                if (_rpos + sizeof(char) > size())
+                    throw ByteBufferException(false, _rpos, sizeof(char), size());
+            }
+
+            _rpos++;
+            return txt;
+        }
+
+        void ReadCString(char*& txt, size_t& txtLen)
+        {
+            size_t oldPos = _rpos;
+            txt = ReadCString();
+            txtLen = (_rpos - oldPos) - 1; // dont count null terminator
+        }
+
         uint64 readPackGUID()
         {
             uint64 guid = 0;
