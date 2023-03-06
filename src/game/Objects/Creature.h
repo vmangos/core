@@ -340,7 +340,7 @@ class Creature : public Unit
         bool IsVisibleInGridForPlayer(Player const* pl) const override;
 
         void RemoveCorpse();
-        bool IsDeadByDefault() const;
+        bool IsDeadByDefault() const { return m_isDeadByDefault; }
 
         void ForcedDespawn(uint32 msTimeToDespawn = 0, uint32 secsTimeToRespawn = 0);
         void DespawnOrUnsummon(uint32 msTimeToDespawn = 0, uint32 secsTimeToRespawn = 0);
@@ -607,6 +607,7 @@ class Creature : public Unit
         uint32 m_equipmentId;
         uint32 m_mountId;                                   // display Id to mount
 
+        bool m_isDeadByDefault;
         bool m_AI_locked;
         uint16 m_creatureStateFlags;
         uint32 m_temporaryFactionFlags;                     // used for real faction changes (not auras etc)

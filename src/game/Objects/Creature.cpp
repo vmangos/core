@@ -203,7 +203,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_creatureGroup(nullptr),
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f), m_reactState(REACT_DEFENSIVE),
     m_lastLeashExtensionTime(nullptr), m_playerDamageTaken(0), m_nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_mountId(0),
+    m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_mountId(0), m_isDeadByDefault(false),
     m_reputationId(-1), m_gossipMenuId(0), m_castingTargetGuid(0)
 {
     m_regenTimer = 200;
@@ -293,13 +293,6 @@ void Creature::RemoveCorpse()
     float x, y, z, o;
     GetRespawnCoord(x, y, z, &o);
     GetMap()->CreatureRelocation(this, x, y, z, o);
-}
-
-bool Creature::IsDeadByDefault() const
-{
-    if (CreatureData const* pData = sObjectMgr.GetCreatureData(GetGUIDLow()))
-        return pData->spawn_flags & SPAWN_FLAG_DEAD;
-    return false;
 }
 
 /**
@@ -1826,6 +1819,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
 
     // checked at creature_template loading
     m_defaultMovementType = MovementGeneratorType(data->movement_type);
+    m_isDeadByDefault = (data->spawn_flags & SPAWN_FLAG_DEAD) != 0;
 
     // Creature Linking, Initial load is handled like respawn
     if (m_isCreatureLinkingTrigger && IsAlive())
