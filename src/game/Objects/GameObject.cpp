@@ -248,8 +248,6 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
         SetFlag(GAMEOBJECT_FLAGS, (GO_FLAG_TRANSPORT | GO_FLAG_NODESPAWN));
     }
 
-    SetName(goinfo->name);
-
     if (GetGOInfo()->IsLargeGameObject())
     {
         SetVisibilityModifier(VISIBILITY_DISTANCE_LARGE);
@@ -1045,11 +1043,6 @@ void GameObject::DeleteFromDB() const
     WorldDatabase.PExecuteLog("DELETE FROM gameobject WHERE guid = '%u'", GetGUIDLow());
     WorldDatabase.PExecuteLog("DELETE FROM game_event_gameobject WHERE guid = '%u'", GetGUIDLow());
     WorldDatabase.PExecuteLog("DELETE FROM gameobject_battleground WHERE guid = '%u'", GetGUIDLow());
-}
-
-GameObjectInfo const* GameObject::GetGOInfo() const
-{
-    return m_goInfo;
 }
 
 /*********************************************************/
@@ -2059,7 +2052,7 @@ char const* GameObject::GetNameForLocaleIdx(int32 loc_idx) const
         }
     }
 
-    return GetName();
+    return GameObject::GetName();
 }
 
 void GameObject::UpdateRotationFields(float rotation2 /*=0.0f*/, float rotation3 /*=0.0f*/)

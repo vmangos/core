@@ -367,7 +367,6 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
         LoadEquipment(cinfo->equipment_id, true);
     }
 
-    SetName(normalInfo->name);                              // at normal entry always
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 #else
@@ -3315,7 +3314,7 @@ char const* Creature::GetNameForLocaleIdx(int32 loc_idx) const
         }
     }
 
-    return GetName();
+    return Creature::GetName();
 }
 
 void Creature::SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags)

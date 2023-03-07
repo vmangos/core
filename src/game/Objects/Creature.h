@@ -114,6 +114,7 @@ class Creature : public Unit
         bool HasStaticDBSpawnData() const;                  // listed in `creature` table and have fixed in DB guid
         uint32 GetDBTableGUIDLow() const;
 
+        virtual char const* GetName() const override { return GetCreatureInfo()->name; }
         char const* GetSubName() const { return GetCreatureInfo()->subname; }
 
         void Update(uint32 update_diff, uint32 time) override;  // overwrite Unit::Update

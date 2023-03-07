@@ -750,9 +750,7 @@ class WorldObject : public Object
 
         InstanceData* GetInstanceData() const;
 
-        char const* GetName() const { return m_name.c_str(); }
-        void SetName(std::string const& newname) { m_name=newname; }
-
+        virtual char const* GetName() const = 0;
         virtual char const* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
         virtual uint8 GetGender() const { return 0; } // used in chat builder
 
@@ -998,7 +996,6 @@ class WorldObject : public Object
     protected:
         explicit WorldObject();
 
-        std::string m_name;
         ZoneScript* m_zoneScript;
         bool m_isActiveObject;
         // Extra visibility distance for this unit, only used if it is an active object.

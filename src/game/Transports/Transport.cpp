@@ -88,8 +88,6 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
 
     SetGoAnimProgress(animprogress);
 
-    SetName(goinfo->name);
-
     sObjectAccessor.AddObject(this);
     return true;
 }
