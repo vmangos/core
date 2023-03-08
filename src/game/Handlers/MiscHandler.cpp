@@ -879,18 +879,16 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
         return;
     }
 
-    ByteBuffer dest;
+    std::vector<uint8> dest;
     dest.resize(decompressedSize);
 
     uint32 currentPosition = recv_data.rpos();
     uLongf realSize = decompressedSize;
-    uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + currentPosition), recv_data.size() - currentPosition);
+    uncompress(const_cast<uint8*>(dest.data()), &realSize, const_cast<uint8*>(recv_data.contents() + currentPosition), recv_data.size() - currentPosition);
 
     recv_data.rpos(recv_data.wpos());                       // uncompress read (recv_data.size() - recv_data.rpos())
 
-    std::string adata;
-    dest >> adata;
-
+    std::string adata((char*)dest.data(), dest.size());
     SetAccountData(AccountDataType(type), adata);
 }
 
