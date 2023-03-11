@@ -440,7 +440,7 @@ enum FoulwealdTotemMoundData
 
     GO_KARANG_S_BANNER = 178205,
     GO_KARANG_LIGHT    = 178207,
-    GO_MOUND           = 300131,
+    GO_MOUND           = 178206,
 
     SPELL_CORRUPTED_STRENGTH        = 6821,
     SPELL_DESTROY_KARANG_S_BANNER_1 = 20786,
