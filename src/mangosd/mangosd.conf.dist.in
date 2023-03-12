@@ -985,6 +985,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        More mails increase server load but speedup mass mail process. Normal tick length: 50 msecs, so 20 ticks in sec and 200 mails in sec by default.
 #        Default: 10
 #
+#    Mail.ReturnedMail.PerTick
+#        Max amount of mail deleted or returned each tick from mails that has expired.
+#        More mails increase server load but can prevent a bottleneck where expired mails aren't handled until server restart. Normal tick length: 30 minutes.
+#        Default: 5
+#
 #    PetUnsummonAtMount
 #        Permanent pet will be unsummoned at player mount
 #        Default: 0 - not unsummon
@@ -1090,6 +1095,7 @@ MaxGroupXPDistance = 74
 MailDeliveryDelay = 3600
 Mails.COD.ForceTag.MaxLevel = 0
 MassMailer.SendPerTick = 10
+Mail.ReturnedMail.PerTick = 5
 PetUnsummonAtMount = 0
 PetDefaultLoyalty = 1
 PlayerCommands = 1
