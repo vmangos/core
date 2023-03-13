@@ -638,6 +638,7 @@ class Creature : public Unit
         uint32 m_playerDamageTaken;
         uint32 m_nonPlayerDamageTaken;
         
+        uint32 m_callForHelpTimer;
         float m_callForHelpDist;
         float m_leashDistance;
         float m_detectionDistance;
