@@ -141,9 +141,6 @@ Unit* PetEventAI::FindTargetForAttack() const
             return pAttacker;
     }
 
-    if (!m_creature->GetAttackers().empty())
-        return *(m_creature->GetAttackers().begin());
-
     Unit const* pOwner = m_creature->GetCharmerOrOwner();
     if (!pOwner)
         return nullptr;
