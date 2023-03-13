@@ -636,6 +636,8 @@ void World::LoadConfigSettings(bool reload)
 
     setConfigMin(CONFIG_UINT32_MASS_MAILER_SEND_PER_TICK, "MassMailer.SendPerTick", 10, 1);
 
+    setConfigMin(CONFIG_UINT32_RETURNED_MAIL_PR_TICK, "Mail.ReturnedMail.PerTick", 5, 1);
+
     setConfig(CONFIG_UINT32_BANLIST_RELOAD_TIMER, "BanListReloadTimer", 60);
     setConfigPos(CONFIG_UINT32_UPTIME_UPDATE, "UpdateUptimeInterval", 10);
     if (reload)
