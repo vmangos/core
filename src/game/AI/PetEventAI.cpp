@@ -126,11 +126,23 @@ Unit* PetEventAI::FindTargetForAttack() const
     if (Unit* pTaunter = m_creature->GetTauntTarget())
         return pTaunter;
 
-    // Check for valid targets on threat list.
-    if (!m_creature->GetThreatManager().isThreatListEmpty())
-        if (Unit* pTarget = m_creature->GetThreatManager().getHostileTarget())
-            if (!pTarget->HasAuraPetShouldAvoidBreaking())
-                return pTarget;
+    if (m_creature->CanHaveThreatList())
+    {
+        // Check for valid targets on threat list.
+        if (!m_creature->GetThreatManager().isThreatListEmpty())
+            if (Unit* pTarget = m_creature->GetThreatManager().getHostileTarget())
+                if (!pTarget->HasAuraPetShouldAvoidBreaking())
+                    return pTarget;
+    }
+    else if (!m_creature->GetAttackers().empty())
+    {
+        Unit* pAttacker = *(m_creature->GetAttackers().begin());
+        if (pAttacker->IsInCombat() && m_creature->IsValidAttackTarget(pAttacker))
+            return pAttacker;
+    }
+
+    if (!m_creature->GetAttackers().empty())
+        return *(m_creature->GetAttackers().begin());
 
     Unit const* pOwner = m_creature->GetCharmerOrOwner();
     if (!pOwner)
