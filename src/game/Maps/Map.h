@@ -639,15 +639,15 @@ class Map : public GridRefManager<NGridType>
         bool                    _processingSendObjUpdates = false;
         uint32                  _objUpdatesThreads = 0;
         mutable std::mutex      i_objectsToClientUpdate_lock;
-        std::set<Object *>      i_objectsToClientUpdate;
+        std::unordered_set<Object *> i_objectsToClientUpdate;
 
         bool                    _processingUnitsRelocation = false;
         uint32                  _unitRelocationThreads = 0;
         mutable std::mutex      i_unitsRelocated_lock;
-        std::set<Unit* >        i_unitsRelocated;
+        std::unordered_set<Unit* > i_unitsRelocated;
 
         mutable std::mutex      unitsMvtUpdate_lock;
-        std::set<Unit*>         unitsMvtUpdate;
+        std::unordered_set<Unit*> unitsMvtUpdate;
 
         mutable MapMutexType    _corpseRemovalLock;
         typedef std::list<std::pair<Corpse*, ObjectGuid>> CorpseRemoveList;

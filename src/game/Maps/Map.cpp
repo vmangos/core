@@ -827,7 +827,7 @@ inline void Map::UpdateCells(uint32 map_diff)
 
     if (IsContinent() && m_motionThreads->status() == ThreadPool::Status::READY && !unitsMvtUpdate.empty())
     {
-        for (std::set<Unit*>::iterator it = unitsMvtUpdate.begin(); it != unitsMvtUpdate.end(); it++)
+        for (std::unordered_set<Unit*>::iterator it = unitsMvtUpdate.begin(); it != unitsMvtUpdate.end(); it++)
             m_motionThreads << [it,diff](){
                  if ((*it)->IsInWorld())
                     (*it)->GetMotionMaster()->UpdateMotionAsync(diff);
@@ -2798,9 +2798,9 @@ void Map::SendObjectUpdates()
     ASSERT(step > 0);
     ASSERT(threads >= 1);
 
-    std::vector<std::set<Object*>::iterator> t;
+    std::vector<std::unordered_set<Object*>::iterator> t;
     t.reserve(i_objectsToClientUpdate.size()); //t will not contain end!
-    for (std::set<Object*>::iterator it = i_objectsToClientUpdate.begin(); it != i_objectsToClientUpdate.end(); it++)
+    for (std::unordered_set<Object*>::iterator it = i_objectsToClientUpdate.begin(); it != i_objectsToClientUpdate.end(); it++)
         t.push_back(it);
     std::atomic<int> ait(0);
     uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_TIMEOUT);
@@ -2868,9 +2868,9 @@ void Map::UpdateVisibilityForRelocations()
     
     ASSERT(step > 0);
 
-    std::vector<std::set<Unit*>::iterator> t;
+    std::vector<std::unordered_set<Unit*>::iterator> t;
     t.reserve(i_unitsRelocated.size());
-    for (std::set<Unit*>::iterator it = i_unitsRelocated.begin(); it != i_unitsRelocated.end(); it++)
+    for (std::unordered_set<Unit*>::iterator it = i_unitsRelocated.begin(); it != i_unitsRelocated.end(); it++)
         t.emplace_back(it);
     std::atomic<int> ait(0);
     uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_TIMEOUT);
