@@ -18,46 +18,46 @@ DELETE FROM `creature_equip_template` WHERE `entry` IN (988001, 988002, 988003, 
 DELETE FROM `creature_template` WHERE `entry`=987800;
 DELETE FROM `generic_scripts` WHERE `id`=180327;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(180327, 0, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 1 Use 1'),
-(180327, 0, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 1 Use 2'),
-(180327, 0, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 1 Use 3'),
-(180327, 0, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 1 Use 4'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 1'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 2'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 3'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 4'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 5'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 6'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 7'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 8'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 9'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 10'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 11'),
-(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 2 Use 12'),
-(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 3 Use 1'),
-(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 3 Use 2'),
-(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 3 Use 3'),
-(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 3 Use 4'),
-(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 3 Use 5'),
-(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Wave 3 Use 6');
+(180327, 0, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 1 Use 1'),
+(180327, 0, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 1 Use 2'),
+(180327, 0, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 1 Use 3'),
+(180327, 0, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 1 Use 4'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 1'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 2'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 3'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 4'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 5'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 6'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 7'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 8'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 9'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 10'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 11'),
+(180327, 1, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 2 Use 12'),
+(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 3 Use 1'),
+(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 3 Use 2'),
+(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 3 Use 3'),
+(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 3 Use 4'),
+(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 3 Use 5'),
+(180327, 2, 0, 13, 0, 0, 0, 0, 180252, 100, 27, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Wave 3 Use 6');
 DELETE FROM `gameobject_scripts` WHERE `id`=21608;
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(21608, 3, 0, 39, 180327, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Script'),
+(21608, 3, 0, 39, 180327, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Script'),
 (21608, 5, 0, 9, 396315, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Respawn Portal'),
 (21608, 15, 0, 10, 15083, 900000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -11901.3, -1906.52, 65.36, 0.9, 0, 'Brazier of Madness - Summon Creature Hazza\'rah');
 DELETE FROM `gameobject_scripts` WHERE `id`=21609;
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(21609, 3, 0, 39, 180327, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Script'),
+(21609, 3, 0, 39, 180327, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Script'),
 (21609, 5, 0, 9, 396315, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Respawn Portal'),
 (21609, 15, 0, 10, 15084, 900000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -11901.3, -1906.52, 65.36, 0.9, 0, 'Brazier of Madness - Summon Creature Renataki');
 DELETE FROM `gameobject_scripts` WHERE `id`=21610;
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(21610, 3, 0, 39, 180327, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Script'),
+(21610, 3, 0, 39, 180327, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Script'),
 (21610, 5, 0, 9, 396315, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Respawn Portal'),
 (21610, 15, 0, 10, 15085, 900000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -11901.3, -1906.52, 65.36, 0.9, 0, 'Brazier of Madness - Summon Creature Wushoolay');
 DELETE FROM `gameobject_scripts` WHERE `id`=28704;
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(28704, 3, 0, 39, 180327, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Active Troll Hero Lightning Script'),
+(28704, 3, 0, 39, 180327, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Activate Troll Hero Lightning Script'),
 (28704, 5, 0, 9, 396315, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brazier of Madness - Respawn Portal'),
 (28704, 15, 0, 10, 15082, 900000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -11901.3, -1906.52, 65.36, 0.9, 0, 'Brazier of Madness - Summon Creature Gri\'lek');
 
