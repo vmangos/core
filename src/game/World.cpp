@@ -2092,6 +2092,41 @@ private:
     int32 i_textId;
     va_list* i_args;
 };
+class WorldBroadcastTextBuilder
+{
+public:
+    typedef std::vector<WorldPacket*> WorldPacketList;
+    explicit WorldBroadcastTextBuilder(uint32 textId) : i_textId(textId) {}
+    void operator()(WorldPacketList& data_list, uint32 loc_idx)
+    {
+        char const* text = sObjectMgr.GetBroadcastText(i_textId, loc_idx);
+        do_helper(data_list, (char*)text);
+    }
+private:
+    char* lineFromMessage(char*& pos)
+    {
+        char* start = strtok(pos, "\n");
+        pos = nullptr;
+        return start;
+    }
+    void do_helper(WorldPacketList& data_list, char* text)
+    {
+        char* pos = text;
+
+        while (char* line = lineFromMessage(pos))
+        {
+            WorldPacket* data = new WorldPacket();
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            ChatHandler::BuildChatPacket(*data, CHAT_MSG_BG_SYSTEM_NEUTRAL, line);
+#else
+            ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, line);
+#endif
+            data_list.push_back(data);
+        }
+    }
+
+    uint32 i_textId;
+};
 }                                                           // namespace MaNGOS
 
 /// Send a System Message to all players (except self if mentioned)
@@ -2113,6 +2148,21 @@ void World::SendWorldText(int32 string_id, ...)
     }
 
     va_end(ap);
+}
+
+void World::SendBroadcastTextToWorld(uint32 textId)
+{
+    MaNGOS::WorldBroadcastTextBuilder wt_builder(textId);
+    MaNGOS::LocalizedPacketListDo<MaNGOS::WorldBroadcastTextBuilder> wt_do(wt_builder);
+    for (const auto& itr : m_sessions)
+    {
+        if (WorldSession* session = itr.second)
+        {
+            Player* player = session->GetPlayer();
+            if (player && player->IsInWorld())
+                wt_do(player);
+        }
+    }
 }
 
 void World::SendGMTicketText(char const* text)
