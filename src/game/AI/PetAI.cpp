@@ -134,8 +134,6 @@ void PetAI::UpdateAI(uint32 const diff)
     // part of it must run during eyes of the Beast to update melee hits
     bool playerControlled = m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
 
-    Unit* owner = m_creature->GetCharmerOrOwner();
-
     if (m_updateAlliesTimer <= diff)
         // UpdateAllies self set update timer
         UpdateAllies();
@@ -179,6 +177,7 @@ void PetAI::UpdateAI(uint32 const diff)
     // Autocast (casted only in combat or persistent spells in any state)
     if (!m_creature->IsNonMeleeSpellCasted(false))
     {
+        Unit* owner = m_creature->GetCharmerOrOwner();
         typedef std::vector<std::pair<Unit*, Spell*> > TargetSpellList;
         TargetSpellList targetSpellStore;
 
@@ -468,7 +467,7 @@ void PetAI::OwnerAttacked(Unit* target)
     // will not make the pet attack that target too. Tested on classic.
     // Defensive pet should not engage until it or its owner is damaged by
     // the enemy, and Aggressive pet aggroes based on proximity.
-    if (!m_creature->IsInCombat() && m_creature->GetOwnerGuid().IsPlayer())
+    if (!m_creature->IsInCombat() && m_creature->GetCharmerOrOwnerGuid().IsPlayer())
         return;
 
     if (!m_creature->IsValidAttackTarget(target))
@@ -669,7 +668,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
         {
             // If data is owner's GUIDLow then we've reached follow point,
             // otherwise we're probably chasing a creature
-            if (m_creature->GetCharmerOrOwner() && m_creature->GetCharmInfo() && data == m_creature->GetCharmerOrOwner()->GetGUIDLow() && m_creature->GetCharmInfo()->IsReturning())
+            if (m_creature->GetCharmInfo() && m_creature->GetCharmInfo()->IsReturning() && data == m_creature->GetCharmerOrOwnerGuid().GetCounter())
             {
                 ClearCharmInfoFlags();
                 m_creature->GetCharmInfo()->SetIsFollowing(true);
@@ -708,6 +707,10 @@ bool PetAI::CanAttack(Unit* target)
 
     // Passive - passive pets can attack if told to
     if (m_creature->HasReactState(REACT_PASSIVE))
+        return m_creature->GetCharmInfo()->IsCommandAttack();
+
+    // Player's pet should not attack PvP flagged target unless told to
+    if (!m_creature->IsPvP() && target->IsPvP() && m_creature->GetCharmerOrOwnerGuid().IsPlayer())
         return m_creature->GetCharmInfo()->IsCommandAttack();
 
     // CC - mobs under crowd control can be attacked if owner commanded
