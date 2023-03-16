@@ -52,6 +52,7 @@ enum HeiganData
     EMOTE_RETURN            = -1533137, // need find correct bct id!
 
     SPELL_ERUPTION          = 29371,
+    SPELL_PLAGUE_WAVE       = 30243,
 
     //Spells by boss
     SPELL_DECREPIT_FEVER    = 29998,
@@ -60,7 +61,7 @@ enum HeiganData
     SPELL_MANABURN          = 29310,
 
     NPC_PLAGUE_FISSURE      = 533001,
-    NPC_PLAGUE_CLOUD        = 533002
+    NPC_PLAGUE_WAVE         = 17293
 };
 
 enum Events
@@ -280,12 +281,12 @@ struct boss_heiganAI : public ScriptedAI
         ++eruptionPhase;
     }
 
-    void SummmonPlagueCloud(float x, float y, float z, float o)
+    void SummmonPlagueWave(float x, float y, float z, float o)
     {
-        if (Creature* pCloud = m_creature->SummonCreature(NPC_PLAGUE_CLOUD, x, y, z, o,
+        if (Creature* pCloud = m_creature->SummonCreature(NPC_PLAGUE_WAVE, x, y, z, o,
             TEMPSUMMON_TIMED_DESPAWN, 45000))
         {
-            pCloud->CastSpell((Unit*)nullptr, SPELL_PLAGUE_CLOUD, true);
+            pCloud->CastSpell(pCloud, SPELL_PLAGUE_WAVE, true);
         }
     }
 
@@ -315,7 +316,7 @@ struct boss_heiganAI : public ScriptedAI
         // the regular ones
         for (const auto& eyeStalkPossition : eyeStalkPossitions)
         {
-            SummmonPlagueCloud(eyeStalkPossition[0], eyeStalkPossition[1], eyeStalkPossition[2], eyeStalkPossition[3]);
+            SummmonPlagueWave(eyeStalkPossition[0], eyeStalkPossition[1], eyeStalkPossition[2], eyeStalkPossition[3]);
         }
 
         DoScriptText(SAY_CHANNELING, m_creature);
