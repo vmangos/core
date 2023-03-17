@@ -45,7 +45,7 @@ UPDATE `pool_gameobject` SET `description`='Gold Vein / Mithril Deposit / Truesi
 DELETE FROM `gameobject` WHERE  `guid` IN (27331, 27332, 27333, 27335, 27336, 27337, 27339, 27340, 27341, 27343, 27344, 27345);
 DELETE FROM `pool_gameobject` WHERE  `guid` IN (27331, 27332, 27333, 27335, 27336, 27337, 27339, 27340, 27341, 27343, 27344, 27345);
 
-UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Searing George' WHERE `description` = 4030;
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Searing George' WHERE `pool_entry` = 4030;
 
 DELETE FROM `pool_gameobject` WHERE  `guid`=26371;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
