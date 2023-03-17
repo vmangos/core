@@ -281,17 +281,14 @@ CreatureAI* GetAI_boss_cannon_master_willey(Creature* pCreature)
 
 enum
 {
-    NPC_CANNONBALL    = 160018,
+    GO_CANNONBALL    = 176211,
     SPELL_CANNON_FIRE = 17278
 };
 
 bool GO_scarlet_cannon(Player* pPlayer, GameObject* pGo)
 {
-    if (Creature* pCannonBall = pPlayer->SummonCreature(NPC_CANNONBALL, 3534.661f, -2966.512f, 125.001f, 0.592f, TEMPSUMMON_TIMED_DESPAWN, 5000)) // Trigger Cannonball
-    {
-        pCannonBall->CastSpell(pCannonBall, SPELL_CANNON_FIRE, false);
-        pCannonBall->ForcedDespawn(200);
-    }
+    if (GameObject* pCannonBall = pPlayer->SummonGameObject(GO_CANNONBALL, 3534.3f, -2966.74f, 125.001f, 0.279252f, 0, 0, 0.139173f, 0.990268f, 1))
+        pCannonBall->Use(pPlayer);
     return false;
 };
 

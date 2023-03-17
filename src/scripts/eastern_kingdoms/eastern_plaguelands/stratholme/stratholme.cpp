@@ -794,84 +794,6 @@ CreatureAI* GetAI_npc_couloir_trigger3(Creature* pCreature)
     return new npc_couloir_trigger3AI(pCreature);
 }
 
-struct npc_Scourge_TriggerAI : public ScriptedAI
-{
-    npc_Scourge_TriggerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 m_uiScourgeTimer;
-    bool ScourgeStarted;
-
-    void Reset() override
-    {
-        m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS); // 15 - 30 mn urand(1000000, 1800000);
-        ScourgeStarted = false;
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !ScourgeStarted)
-            ScourgeStarted = true;
-    }
-
-    void JustSummoned(Creature* pSummoned) override
-    {
-        pSummoned->SetInCombatWithZone();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (ScourgeStarted)
-        {
-            if (m_uiScourgeTimer < uiDiff)
-            {
-                m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS);
-
-                if (Creature* Crea = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_DATHROHAN)))
-                {
-                    if (Crea->IsAlive() && !Crea->IsInCombat())
-                    {
-                        //"The scourge has broken into our bastion!"
-                        Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
-                    }
-                    else
-                        return;
-                }                
-
-                for (uint8 i = 0; i < 4; ++i)
-                {
-                    switch (urand(0, 1))
-                    {
-                        case 0:
-                            m_creature->SummonCreature(NPC_BERSERK,
-                                                       m_creature->GetPositionX() + float(urand(0, 5)), m_creature->GetPositionY() - float(urand(0, 5)), m_creature->GetPositionZ(), 0,
-                                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_uiScourgeTimer);
-                            break;
-                        case 1:
-                            m_creature->SummonCreature(NPC_GUARDIAN,
-                                                       m_creature->GetPositionX() + float(urand(0, 5)), m_creature->GetPositionY() - float(urand(0, 5)), m_creature->GetPositionZ(), 0,
-                                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_uiScourgeTimer);
-                            break;
-                    }
-                }
-
-            }
-            else
-                m_uiScourgeTimer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_Scourge_Trigger(Creature* pCreature)
-{
-    return new npc_Scourge_TriggerAI(pCreature);
-}
-
 /*######
 ## SUPPLY CRATE
 ######*/
@@ -974,10 +896,5 @@ void AddSC_stratholme()
     newscript = new Script;
     newscript->Name = "go_supply_crate";
     newscript->GOGetAI = &GetAIgo_supply_crate;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_scourge_trigger";
-    newscript->GetAI = &GetAI_npc_Scourge_Trigger;
     newscript->RegisterSelf();
 }

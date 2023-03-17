@@ -25,6 +25,7 @@
 #include "InstanceData.h"
 #include "HardcodedEvents.h"
 #include "World.h"
+#include "CreatureGroups.h"
 
 char const* conditionSourceToStr[] =
 {
@@ -106,6 +107,8 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_WORLDOBJECT, //  54
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  55
     CONDITION_REQ_TARGET_WORLDOBJECT, //  56
+    CONDITION_REQ_SOURCE_CREATURE,    //  57
+    CONDITION_REQ_SOURCE_CREATURE,    //  58
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -609,6 +612,32 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                     return (bool)target->FindNearestFriendlyPlayer(m_value2);
             }
             return false;
+        }
+        case CONDITION_CREATURE_GROUP_MEMBER:
+        {
+            CreatureGroup const* pGroup = source->ToCreature()->GetCreatureGroup();
+            if (!pGroup)
+                return false;
+            return !m_value1 || pGroup->GetOriginalLeaderGuid().GetCounter() == m_value1;
+        }
+        case CONDITION_CREATURE_GROUP_DEAD:
+        {
+            CreatureGroup const* pGroup = static_cast<Creature const*>(source)->GetCreatureGroup();
+            if (!pGroup)
+                return true;
+
+            if (pGroup->GetLeaderGuid() != source->GetObjectGuid())
+                if (Creature* pLeader = source->GetMap()->GetCreature(pGroup->GetLeaderGuid()))
+                    if (pLeader->IsAlive())
+                        return false;
+
+            for (auto const& itr : pGroup->GetMembers())
+                if (itr.first != source->GetObjectGuid())
+                    if (Creature* pMember = source->GetMap()->GetCreature(itr.first))
+                        if (pMember->IsAlive())
+                            return false;
+
+            return true;
         }
     }
     return false;
@@ -1248,6 +1277,18 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
+        case CONDITION_CREATURE_GROUP_MEMBER:
+        {
+            if (m_value1)
+            {
+                if (!sObjectMgr.IsExistingCreatureGuid(m_value1))
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CONDITION_CREATURE_GROUP_MEMBER (entry %u, type %d) uses non-existent guid %u in value1, skipped", m_entry, m_condition, m_value1);
+                    return false;
+                }
+            }
+            break;
+        }
         case CONDITION_NONE:
         case CONDITION_INSTANCE_SCRIPT:
         case CONDITION_ACTIVE_HOLIDAY:
@@ -1264,6 +1305,7 @@ bool ConditionEntry::IsValid()
         case CONDITION_CANT_PATH_TO_VICTIM:
         case CONDITION_IS_PLAYER:
         case CONDITION_OBJECT_IS_SPAWNED:
+        case CONDITION_CREATURE_GROUP_DEAD:
             break;
         default:
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);

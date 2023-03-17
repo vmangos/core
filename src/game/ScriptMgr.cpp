@@ -1154,14 +1154,13 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 }
                 break;
             }
-            case SCRIPT_COMMAND_LOAD_GAMEOBJECT:
+            case SCRIPT_COMMAND_LOAD_GAMEOBJECT_SPAWN:
             {
-                GameObjectData const* data = sObjectMgr.GetGOData(tmp.GetGOGuid());
-                if (!data)
+                if (!sObjectMgr.GetGOData(tmp.GetGOGuid()))
                 {
                     if (!sObjectMgr.IsExistingGameObjectGuid(tmp.GetGOGuid()))
                     {
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_LOAD_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_LOAD_GAMEOBJECT_SPAWN for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
                         continue;
                     }
                     else
@@ -1190,6 +1189,25 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                         tablename, tmp.setGoState.state, tmp.id);
                     continue;
                 }
+                break;
+            }
+            case SCRIPT_COMMAND_LOAD_CREATURE_SPAWN:
+            {
+                if (!sObjectMgr.GetCreatureData(tmp.loadCreature.dbGuid))
+                {
+                    if (!sObjectMgr.IsExistingCreatureGuid(tmp.loadCreature.dbGuid))
+                    {
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` using invalid creature guid in datalong (%u) in SCRIPT_COMMAND_LOAD_CREATURE_SPAWN for script id %u",
+                            tablename, tmp.loadCreature.dbGuid, tmp.id);
+                        continue;
+                    }
+                    else
+                    {
+                        DisableScriptAction(tmp);
+                        break;
+                    }
+                }
+                
                 break;
             }
         }
