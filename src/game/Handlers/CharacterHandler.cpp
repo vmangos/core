@@ -44,6 +44,7 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 #include "PlayerBotMgr.h"
+#include "AccountMgr.h"
 
 class LoginQueryHolder : public SqlQueryHolder
 {
@@ -583,6 +584,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         SendPacket(&data);
 
         guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetObjectGuid(), pCurrChar->GetName());
+    }
+
+    if (char const* warning = sAccountMgr.GetWarningText(GetAccountId()))
+    {
+        ChatHandler(pCurrChar).PSendSysMessage(LANG_ACCOUNT_WARNED, warning);
+        SendNotification("WARNING: %s", warning);
     }
 
     if (!pCurrChar->IsAlive())
