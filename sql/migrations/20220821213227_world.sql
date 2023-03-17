@@ -9,6 +9,24 @@ INSERT INTO `migrations` VALUES ('20220821213227');
 -- Add your query below.
 
 
+-- SQL Error (1062): Duplicate entry '100001' for key 'PRIMARY'
+UPDATE `gameobject` SET `guid`=600001 WHERE `guid`=100001;
+UPDATE `quest_end_scripts` SET `target_param1`=600001 WHERE `target_param1`=100001;
+UPDATE `gameobject` SET `guid`=600002 WHERE `guid`=100002;
+UPDATE `quest_end_scripts` SET `target_param1`=600002 WHERE `target_param1`=100002;
+UPDATE `gameobject` SET `guid`=600003 WHERE `guid`=100003;
+UPDATE `quest_end_scripts` SET `target_param1`=600003 WHERE `target_param1`=100003;
+UPDATE `gameobject` SET `guid`=600004 WHERE `guid`=100004;
+UPDATE `quest_end_scripts` SET `target_param1`=600004 WHERE `target_param1`=100004;
+UPDATE `gameobject` SET `guid`=600005 WHERE `guid`=100005;
+UPDATE `quest_end_scripts` SET `target_param1`=600005 WHERE `target_param1`=100005;
+UPDATE `gameobject` SET `guid`=600006 WHERE `guid`=100006;
+UPDATE `quest_end_scripts` SET `target_param1`=600006 WHERE `target_param1`=100006;
+UPDATE `gameobject` SET `guid`=600007 WHERE `guid`=100007;
+UPDATE `quest_end_scripts` SET `target_param1`=600007 WHERE `target_param1`=100007;
+UPDATE `gameobject` SET `guid`=600008 WHERE `guid`=100008;
+UPDATE `quest_end_scripts` SET `target_param1`=600008 WHERE `target_param1`=100008;
+
 -- Searing George
 -- Gold Vein / Mithril Deposit / Dark Iron Deposit
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1338, 1350, 1293));
