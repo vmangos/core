@@ -1,3 +1,4 @@
+SET NAMES utf8;
 DROP PROCEDURE IF EXISTS add_migration;
 delimiter ??
 CREATE PROCEDURE `add_migration`()
@@ -8,6 +9,8 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20230317162803');
 -- Add your query below.
 
+
+SET NAMES utf8;
 
 -- Google Translate locales. (French)
 UPDATE `mangos_string` SET `content_loc2`='La commande %s a des sous-commandes :' WHERE `entry`=8;
