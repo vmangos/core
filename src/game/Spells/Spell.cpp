@@ -6245,6 +6245,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
                 break;
             }
+            case SPELL_EFFECT_SEND_EVENT:
+            {
+                // Quest The Blackwood Corrupted - Don't allow cast if event already started.
+                if (m_spellInfo->Id == 16072 && m_caster->GetMap()->GetScriptedMapEvent(3938))
+                    return SPELL_FAILED_NOT_READY;
+                break;
+            }
             case SPELL_EFFECT_SCHOOL_DAMAGE:
             {
                 // Conflagrate
