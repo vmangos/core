@@ -112,9 +112,8 @@ UPDATE `creature` SET `patch_min`='4' WHERE  `guid`=17650;
 
 -- Set min patch for Badlands, Graveyard NE GY
 UPDATE `game_graveyard_zone` SET `patch_min`='10' WHERE  `id`=8;
--- Add Badlands and Uldaman to Loch Modan, Thelsamar GY
-INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`) VALUES ('6', '3', '0', '0');
-INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`) VALUES ('6', '1337', '0', '0');
+-- Add Uldaman to Kargath, Badlands GY
+INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`) VALUES ('103', '1337', '0', '0');
 -- Set Badlands, Graveyard NE GY Spirit Healer to patch 1.12
 UPDATE `creature` SET `patch_min`='10' WHERE  `guid`=40593;
 
