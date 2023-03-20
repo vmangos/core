@@ -12,7 +12,7 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `
 (34, 358, 67, 0, 10), -- Set Mulgore, Red Cloud Mesa GY for Brambleblade Ravine, Kodo Rock, Campe Narache
 (34, 637, 67, 0, 10),
 (34, 221, 67, 0, 10),
-(709, 637, 67, 0, 3), -- Set Durotar, Valley of Trials for Spirit Rock, The Den, Hidden Path, Burning Blade Coven until patch 1.6
+(709, 639, 67, 0, 3), -- Set Durotar, Valley of Trials for Spirit Rock, The Den, Hidden Path, Burning Blade Coven until patch 1.6
 (709, 364, 67, 0, 3),
 (709, 638, 67, 0, 3),
 (709, 365, 67, 0, 3),
