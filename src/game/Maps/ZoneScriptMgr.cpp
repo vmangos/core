@@ -16,6 +16,7 @@
  */
 
 #include "ZoneScriptMgr.h"
+#include "Log.h"
 #include "Policies/SingletonImp.h"
 
 INSTANTIATE_SINGLETON_1(ZoneScriptMgr);
@@ -52,13 +53,13 @@ void ZoneScriptMgr::InitMapZoneScripts(uint32 mapId, Map* pMap)
         pScript = itr->GetZoneScript();
         if (!pScript)
         {
-            sLog.outError("Could not initialize ZoneScript object. Got nullptr pointer from script.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not initialize ZoneScript object. Got nullptr pointer from script.");
             continue;
         }
         pScript->SetMap(pMap);
         if (!pScript->SetupZoneScript())
         {
-            sLog.outError("Could not initialize ZoneScript object. SetupZoneScript failed.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not initialize ZoneScript object. SetupZoneScript failed.");
             delete pScript;
             continue;
         }
@@ -66,7 +67,7 @@ void ZoneScriptMgr::InitMapZoneScripts(uint32 mapId, Map* pMap)
         ++counter;
     }
 
-    sLog.outString("ZoneScriptMgr : %u scripts on the map %u.", counter, mapId);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ZoneScriptMgr : %u scripts on the map %u.", counter, mapId);
 }
 
 void ZoneScriptMgr::AddZone(uint32 zoneid, ZoneScript *handle)
@@ -84,7 +85,7 @@ void ZoneScriptMgr::HandlePlayerEnterZone(Player* plr, uint32 zoneid)
         return;
 
     itr->second->OnPlayerEnter(plr);
-    //DEBUG_LOG("Player %u entered ZoneScript", plr->GetGUIDLow());
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %u entered ZoneScript", plr->GetGUIDLow());
 }
 
 void ZoneScriptMgr::HandlePlayerLeaveZone(Player* plr, uint32 zoneid)
@@ -98,7 +99,7 @@ void ZoneScriptMgr::HandlePlayerLeaveZone(Player* plr, uint32 zoneid)
         return;
 
     itr->second->OnPlayerLeave(plr);
-    //DEBUG_LOG("Player %u left ZoneScript", plr->GetGUIDLow());
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %u left ZoneScript", plr->GetGUIDLow());
 }
 
 ZoneScript * ZoneScriptMgr::GetZoneScriptToZoneId(uint32 zoneid)
@@ -107,7 +108,7 @@ ZoneScript * ZoneScriptMgr::GetZoneScriptToZoneId(uint32 zoneid)
     if (itr == m_ZoneScriptsMap.end())
     {
         // no handle for this zone, return
-        //DETAIL_LOG("Pas de script pour la zone %u", zoneid);
+        //sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Pas de script pour la zone %u", zoneid);
         return nullptr;
     }
     return itr->second;

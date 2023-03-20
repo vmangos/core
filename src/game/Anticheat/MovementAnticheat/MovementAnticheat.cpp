@@ -45,6 +45,8 @@ const char* GetMovementCheatName(CheatType flagId)
             return "FlyHackSwim";
         case CHEAT_TYPE_NO_FALL_TIME:
             return "NoFallTime";
+        case CHEAT_TYPE_BAD_FALL_RESET:
+            return "BadFallReset";
         case CHEAT_TYPE_TELEPORT:
             return "TeleportHack";
         case CHEAT_TYPE_TELEPORT_TRANSPORT:
@@ -132,11 +134,8 @@ uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
     // Log data
     if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_DATA) && pPlayer && pPlayer->IsInWorld())
     {
-        LogsDatabase.PExecute("INSERT INTO logs_movement "
-            "(account, guid, posx, posy, posz, map, desyncMs, desyncDist, cheats) VALUES "
-            "(%u,      %u,   %f,   %f,   %f,   %u,  %i,       %f,         '%s');",
-            m_session->GetAccountId(), pPlayer->GetGUIDLow(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(),
-            pPlayer->GetMapId(), m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_BASIC, "DesyncMs %d DesyncDist %f Cheats %s",
+            m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
     }
 
     if ((result & (CHEAT_ACTION_KICK | CHEAT_ACTION_BAN_ACCOUNT | CHEAT_ACTION_BAN_IP_ACCOUNT)) && !m_packetLog.empty())
@@ -239,6 +238,7 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     AddPenaltyForCheat(true, CHEAT_TYPE_PVE_FLYHACK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_UNREACHABLE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FLY_HACK_SWIM, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_NO_FALL_TIME, CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_BAD_FALL_RESET, CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FAKE_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_PENALTY);
@@ -265,7 +265,100 @@ void MovementAnticheat::AddMessageToPacketLog(std::string message)
     LogMovementPacket(false, data);
 }
 
-void MovementAnticheat::LogMovementPacket(bool isClientPacket, WorldPacket& packet)
+bool MovementAnticheat::IsLoggedOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case CMSG_WORLD_TELEPORT:
+        case CMSG_TELEPORT_TO_UNIT:
+        case CMSG_REPOP_REQUEST:
+        case CMSG_RESURRECT_RESPONSE:
+        case CMSG_RECLAIM_CORPSE:
+        case MSG_MOVE_START_FORWARD:
+        case MSG_MOVE_START_BACKWARD:
+        case MSG_MOVE_STOP:
+        case MSG_MOVE_START_STRAFE_LEFT:
+        case MSG_MOVE_START_STRAFE_RIGHT:
+        case MSG_MOVE_STOP_STRAFE:
+        case MSG_MOVE_JUMP:
+        case MSG_MOVE_START_TURN_LEFT:
+        case MSG_MOVE_START_TURN_RIGHT:
+        case MSG_MOVE_STOP_TURN:
+        case MSG_MOVE_START_PITCH_UP:
+        case MSG_MOVE_START_PITCH_DOWN:
+        case MSG_MOVE_STOP_PITCH:
+        case MSG_MOVE_SET_RUN_MODE:
+        case MSG_MOVE_SET_WALK_MODE:
+        case MSG_MOVE_TOGGLE_LOGGING:
+        case MSG_MOVE_TELEPORT:
+        case MSG_MOVE_TELEPORT_CHEAT:
+        case MSG_MOVE_TELEPORT_ACK:
+        case MSG_MOVE_TOGGLE_FALL_LOGGING:
+        case MSG_MOVE_FALL_LAND:
+        case MSG_MOVE_START_SWIM:
+        case MSG_MOVE_STOP_SWIM:
+        case MSG_MOVE_SET_RUN_SPEED_CHEAT:
+        case MSG_MOVE_SET_RUN_SPEED:
+        case MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT:
+        case MSG_MOVE_SET_RUN_BACK_SPEED:
+        case MSG_MOVE_SET_WALK_SPEED_CHEAT:
+        case MSG_MOVE_SET_WALK_SPEED:
+        case MSG_MOVE_SET_SWIM_SPEED_CHEAT:
+        case MSG_MOVE_SET_SWIM_SPEED:
+        case MSG_MOVE_SET_SWIM_BACK_SPEED_CHEAT:
+        case MSG_MOVE_SET_SWIM_BACK_SPEED:
+        case MSG_MOVE_SET_ALL_SPEED_CHEAT:
+        case MSG_MOVE_SET_TURN_RATE_CHEAT:
+        case MSG_MOVE_SET_TURN_RATE:
+        case MSG_MOVE_TOGGLE_COLLISION_CHEAT:
+        case MSG_MOVE_SET_FACING:
+        case MSG_MOVE_SET_PITCH:
+        case MSG_MOVE_WORLDPORT_ACK:
+        case SMSG_MOVE_WATER_WALK:
+        case SMSG_MOVE_LAND_WALK:
+        case MSG_MOVE_SET_RAW_POSITION_ACK:
+        case CMSG_MOVE_SET_RAW_POSITION:
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_MOVE_ROOT_ACK:
+        case CMSG_FORCE_MOVE_UNROOT_ACK:
+        case MSG_MOVE_ROOT:
+        case MSG_MOVE_UNROOT:
+        case MSG_MOVE_HEARTBEAT:
+        case SMSG_MOVE_KNOCK_BACK:
+        case CMSG_MOVE_KNOCK_BACK_ACK:
+        case MSG_MOVE_KNOCK_BACK:
+        case SMSG_MOVE_FEATHER_FALL:
+        case SMSG_MOVE_NORMAL_FALL:
+        case SMSG_MOVE_SET_HOVER:
+        case SMSG_MOVE_UNSET_HOVER:
+        case CMSG_MOVE_HOVER_ACK:
+        case MSG_MOVE_HOVER:
+        case MSG_MOVE_TOGGLE_GRAVITY_CHEAT:
+        case MSG_MOVE_FEATHER_FALL:
+        case MSG_MOVE_WATER_WALK:
+        case CMSG_MOVE_SPLINE_DONE:
+        case CMSG_MOVE_FALL_RESET:
+        case CMSG_MOVE_TIME_SKIPPED:
+        case CMSG_MOVE_FEATHER_FALL_ACK:
+        case CMSG_MOVE_WATER_WALK_ACK:
+        case CMSG_SET_ACTIVE_MOVER:
+        case CMSG_MOVE_NOT_ACTIVE_MOVER:
+        case CMSG_MOVE_START_SWIM_CHEAT:
+        case CMSG_MOVE_STOP_SWIM_CHEAT:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        case MSG_MOVE_TIME_SKIPPED:
+#endif
+            return true;
+    }
+    return false;
+}
+
+void MovementAnticheat::LogMovementPacket(bool isClientPacket, WorldPacket const& packet)
 {
     if (uint32 maxLogSize = sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE))
     {
@@ -327,14 +420,6 @@ void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
 
-    GetLastMovementInfo().jump.startClientTime = WorldTimer::getMSTime() - GetLastMovementInfo().stime + GetLastMovementInfo().ctime;
-    GetLastMovementInfo().jump.start.x = me->GetPositionX();
-    GetLastMovementInfo().jump.start.y = me->GetPositionY();
-    GetLastMovementInfo().jump.start.z = me->GetPositionZ();
-    GetLastMovementInfo().jump.cosAngle = cos;
-    GetLastMovementInfo().jump.sinAngle = sin;
-    GetLastMovementInfo().jump.xyspeed = speedxy;
-    GetLastMovementInfo().moveFlags = MOVEFLAG_JUMPING | (GetLastMovementInfo().moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN);
     m_knockBack = true;
 }
 
@@ -406,6 +491,32 @@ UnitMoveType MovementAnticheat::GetMoveTypeForMovementInfo(MovementInfo const& m
     return type;
 }
 
+
+bool IsAnyMoveAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case MSG_MOVE_TELEPORT_ACK:
+        case MSG_MOVE_WORLDPORT_ACK:
+        case MSG_MOVE_SET_RAW_POSITION_ACK:
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_MOVE_ROOT_ACK:
+        case CMSG_FORCE_MOVE_UNROOT_ACK:
+        case CMSG_MOVE_KNOCK_BACK_ACK:
+        case CMSG_MOVE_HOVER_ACK:
+        case CMSG_MOVE_FEATHER_FALL_ACK:
+        case CMSG_MOVE_WATER_WALK_ACK:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+            return true;
+    }
+
+    return false;
+}
+
 bool IsFlagAckOpcode(uint16 opcode)
 {
     switch (opcode)
@@ -415,6 +526,22 @@ bool IsFlagAckOpcode(uint16 opcode)
         case CMSG_MOVE_WATER_WALK_ACK:
         case CMSG_MOVE_HOVER_ACK:
         case CMSG_MOVE_FEATHER_FALL_ACK:
+            return true;
+    }
+
+    return false;
+}
+
+bool IsSpeedAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
             return true;
     }
 
@@ -513,64 +640,24 @@ bool ShouldRejectMovement(uint32 cheatFlags)
     return false;
 }
 
-bool ShouldAcceptCorpseMovement(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
+void MovementAnticheat::OnDeath()
 {
-    // Server controlled movement.
-    if (!pPlayer->movespline->Finalized())
-        return true;
-
-    // A few opcodes can happen soon after death.
-    if (pPlayer->GetDeathTimer() > (CORPSE_REPOP_TIME - (10 * IN_MILLISECONDS)))
-    {
-        if (IsStopOpcode(opcode))
-            return true;
-
-        if (IsFallEndOpcode(opcode))
-            return true;
-
-        if (IsFlagAckOpcode(opcode))
-            return true;
-
-        if ((opcode == MSG_MOVE_HEARTBEAT) &&
-            movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
-            return true;
-    }
-
-    return false;
+    m_deathTime = WorldTimer::getMSTime();
 }
 
-bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
+uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)) ||
         !pPlayer->movespline->Finalized())
-        return true;
+        return 0;
     
     if (pPlayer != me)
         InitNewPlayer(pPlayer);
 
     if (opcode == CMSG_MOVE_FEATHER_FALL_ACK)
         GetLastMovementInfo().jump.startClientTime = movementInfo.jump.startClientTime = movementInfo.ctime;
-    
-    // Do not accept position changes if player is dead and has not released spirit.
-    if (me->GetDeathState() == CORPSE)
-    {
-        ResetJumpCounters();
-        m_knockBack = false;
 
-        if (ShouldAcceptCorpseMovement(pPlayer, movementInfo, opcode))
-            return true;
-        
-        if (IsFlagAckOpcode(opcode))
-        {
-            me->m_movementInfo.moveFlags = movementInfo.moveFlags;
-            me->m_movementInfo.CorrectData(me);
-        }
-        me->RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
-        me->SendHeartBeat(true);
-        return false;
-    }
-    
     uint32 cheatFlags = 0x0;
 #define APPEND_CHEAT(t) cheatFlags |= (1 << t)
 #define HAS_CHEAT(t) (cheatFlags & (1 << t))
@@ -588,7 +675,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
         APPEND_CHEAT(CHEAT_TYPE_JUMP_SPEED_CHANGE);
 #endif
 
-    if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (me->GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
+    if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (me->GetSpeed(GetMoveTypeForMovementInfo(GetLastMovementInfo())) + 0.0001f))
         APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP);
 
     if (CheckMultiJump(opcode))
@@ -619,6 +706,10 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     if (CheckNoFallTime(movementInfo, opcode))
         APPEND_CHEAT(CHEAT_TYPE_NO_FALL_TIME);
 
+    if (opcode == CMSG_MOVE_FALL_RESET &&
+        CheckFallReset(movementInfo))
+        APPEND_CHEAT(CHEAT_TYPE_BAD_FALL_RESET);
+
     // Distance computation related. No need to do it if teleport detected.
     if (!teleportDetected)
     {
@@ -632,9 +723,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
 
     AddCheats(cheatFlags);
 
-    bool const sendHeartbeat = ShouldRejectMovement(cheatFlags);
-
-    if (sendHeartbeat)
+    if (ShouldRejectMovement(cheatFlags))
     {
         // Movement flags get verified first. Don't undo them if they passed.
         if (IsFlagAckOpcode(opcode))
@@ -643,52 +732,52 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
             me->m_movementInfo.CorrectData(me);
         }     
         
-        if (sendHeartbeat)
+        if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&
+            sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
         {
-            if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&
-                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
-            {
-                UnitMoveType moveType = GetMoveTypeForMovementInfo(GetLastMovementInfo());
-                float speedRate = me->GetSpeed(moveType) / baseMoveSpeed[moveType];
-                MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
-            }
+            UnitMoveType moveType = GetMoveTypeForMovementInfo(GetLastMovementInfo());
+            float speedRate = me->GetSpeed(moveType) / baseMoveSpeed[moveType];
+            MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
+        }
 
-            if (HAS_CHEAT(CHEAT_TYPE_NO_FALL_TIME) &&
-                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
-            {
-                // Teleport to ground height in this case.
-                float const x = GetLastMovementInfo().pos.x;
-                float const y = GetLastMovementInfo().pos.y;
-                float const z = me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + 5;
-                GetLastMovementInfo().RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
-                GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses extrapolation.
-                me->TeleportPositionRelocation(x, y, z, 0);
-            }
+        if (HAS_CHEAT(CHEAT_TYPE_NO_FALL_TIME) &&
+            sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
+        {
+            // Teleport to ground height in this case.
+            float const x = GetLastMovementInfo().pos.x;
+            float const y = GetLastMovementInfo().pos.y;
+            float const z = me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + 5;
+            GetLastMovementInfo().RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
+            GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses extrapolation.
+            me->TeleportPositionRelocation(x, y, z, 0);
+        }
 
-            me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
-            me->SendHeartBeat(true);
+        me->ResolvePendingMovementChanges(true, true);
+        me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
+        if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+            ResetJumpCounters();
+        me->SendHeartBeat(true);
 
-            if (HAS_CHEAT(CHEAT_TYPE_FAKE_TRANSPORT) &&
-                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_REJECT))
-            {
-                // Force logout player to sync transport positions.
-                m_session->LogoutRequest(time(nullptr) - 20);
-            }
-        } 
+        if (HAS_CHEAT(CHEAT_TYPE_FAKE_TRANSPORT) &&
+            sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_REJECT))
+        {
+            // Force logout player to sync transport positions.
+            m_session->LogoutRequest(time(nullptr) - 20);
+        }
 
-        return false;
+        return WorldTimer::getMSTime() + 100 + std::min(1000u, sWorld.GetCurrentDiff() + m_session->GetLatency());
     }
 
-    return true;
+    return 0;
 #undef APPEND_CHEAT
 #undef HAS_CHEAT
 }
 
-bool MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
+uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
-        return true;
+        return 0;
     
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
@@ -779,16 +868,19 @@ bool MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
 
     AddCheats(cheatFlags);
 
-    if (ShouldRejectMovement(cheatFlags))
+    if (ShouldRejectMovement(cheatFlags) &&
+        me->movespline->Finalized() &&
+       !me->IsBeingTeleported())
     {
         me->RemoveUnitMovementFlag(removeMoveFlags);
+        me->ResolvePendingMovementChanges(true, true);
         me->SendHeartBeat(true);
-        return false;
+        return WorldTimer::getMSTime() + 100 + std::min(1000u, sWorld.GetCurrentDiff() + m_session->GetLatency());
     }
     else if (removeMoveFlags)
         movementInfo.RemoveMovementFlag(removeMoveFlags);
 
-    return true;
+    return 0;
 }
 
 bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId)
@@ -799,8 +891,8 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
     if (splineId == m_lastSplineId)
     {
         AddMessageToPacketLog("HandleSplineDone: spline id == last spline id == " + std::to_string(splineId));
-        sLog.outInfo("HandleSplineDone: Player %s from account id %u sent spline done opcode for spline id %u twice",
-            me->GetName(), m_session->GetAccountId(), splineId);
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_MINIMAL, "HandleSplineDone: Player sent spline done opcode for spline id %u twice",
+            splineId);
         return false;
     }
 
@@ -810,8 +902,8 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
     if (distance > 10.0f)
     {
         AddMessageToPacketLog("HandleSplineDone: distance to spline destination is " + std::to_string(distance));
-        sLog.outInfo("HandleSplineDone: Player %s from account id %u sent spline done opcode with position that is %g yards away from destination",
-            me->GetName(), m_session->GetAccountId(), distance);
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_MINIMAL, "HandleSplineDone: Player sent spline done opcode with position that is %g yards away from destination",
+            distance);
         return false;
     }
 
@@ -869,6 +961,20 @@ bool MovementAnticheat::CheckNoFallTime(MovementInfo const& movementInfo, uint16
        (movementInfo.stime - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
        (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
        (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY);
+}
+
+bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED))
+        return false;
+
+    if (GetLastMovementInfo().ctime)
+    {
+        if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+            return true;
+    }
+    
+    return movementInfo.fallTime != 0 || movementInfo.jump.zspeed != 0.0f;
 }
 
 uint32 MovementAnticheat::CheckTimeDesync(MovementInfo const& movementInfo)
@@ -929,7 +1035,7 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
        (GetLastMovementInfo().moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (movementInfo.moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (me->HasFlag(UNIT_FIELD_FLAGS, NO_WALL_CLIMB_CHECK_UNIT_FLAGS)) ||
-        IsInKnockBack() || me->IsTaxiFlying())
+        IsInKnockBack() || me->IsTaxiFlying() || !GetLastMovementInfo().ctime)
         return false;
     
     float const deltaXY = GetDistance2D(GetLastMovementInfo().pos, movementInfo.pos);
@@ -1011,6 +1117,8 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 {
     if ((opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
         (opcode == CMSG_MOVE_SPLINE_DONE) ||
+        IsInKnockBack() ||
+        !GetLastMovementInfo().ctime ||
         me->IsTaxiFlying() || 
         me->IsBeingTeleported())
         return 0;
@@ -1045,8 +1153,6 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 
             if (realDistance2D_sq > (allowedDY + allowedDX) * 1.1f)
                 m_overspeedDistance += sqrt(realDistance2D_sq) - sqrt(allowedDY + allowedDX);
-
-            DEBUG_UNIT(me, DEBUG_CHEAT, "[Opcode:%u:0x%x] Flags 0x%x [DT=%u:DR=%.2f]", opcode, opcode, movementInfo.moveFlags, movementInfo.ctime - GetLastMovementInfo().ctime, interpolDist);
         }
         // Simple calculation for transports
         else if (!movementInfo.t_guid.IsEmpty() && (movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT) &&
@@ -1066,7 +1172,7 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
     }
 
     // Client should send heartbeats every 500ms
-    if (clientTimeDiff > 1000 && GetLastMovementInfo().ctime && GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING)
+    if ((clientTimeDiff > 1000) && (GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING))
         APPEND_CHEAT(CHEAT_TYPE_SKIPPED_HEARTBEATS);
 
     return cheatFlags;

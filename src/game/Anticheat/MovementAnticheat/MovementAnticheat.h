@@ -26,6 +26,7 @@ enum CheatType
     CHEAT_TYPE_PVE_FLYHACK,
     CHEAT_TYPE_FLY_HACK_SWIM,
     CHEAT_TYPE_NO_FALL_TIME,
+    CHEAT_TYPE_BAD_FALL_RESET,
     CHEAT_TYPE_TELEPORT,
     CHEAT_TYPE_TELEPORT_TRANSPORT,
     CHEAT_TYPE_FAKE_TRANSPORT,
@@ -70,10 +71,11 @@ class MovementAnticheat
         uint32 Finalize(Player* pPlayer, std::stringstream& reason);
 
         // Public methods called from the movement handler upon received a packet.
-        bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
-        bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
+        uint32 HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
+        uint32 HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         bool HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId);
-        void LogMovementPacket(bool isClientPacket, WorldPacket& packet);
+        void LogMovementPacket(bool isClientPacket, WorldPacket const& packet);
+        static bool IsLoggedOpcode(uint16 opcode);
 
         bool IsInKnockBack() const { return m_knockBack; }
 
@@ -82,6 +84,7 @@ class MovementAnticheat
         void OnExplore(AreaEntry const* pArea);
         void OnWrongAckData();
         void OnFailedToAckChange();
+        void OnDeath();
 
 private:
         bool CheckTeleport(MovementInfo const& movementInfo) const;
@@ -90,6 +93,7 @@ private:
         bool CheckMultiJump(uint16 opcode);
         bool CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const;
         bool CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode);
+        bool CheckFallReset(MovementInfo const& movementInfo) const;
         bool CheckFakeTransport(MovementInfo const& movementInfo);
         bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
@@ -103,6 +107,7 @@ private:
 
         bool m_knockBack = false;
         uint32 m_lastSplineId = 0;
+        uint32 m_deathTime = 0;
 
         // Multi jump
         uint32 m_jumpCount = 0;

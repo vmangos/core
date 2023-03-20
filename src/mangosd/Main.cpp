@@ -62,7 +62,7 @@ uint32 realmID;                                             ///< Id of the realm
 /// Print out the usage string for this program on the console.
 void usage(const char *prog)
 {
-    sLog.outString("Usage: \n %s [<options>]\n"
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Usage: \n %s [<options>]\n"
         "    -v, --version            print version and exist\n\r"
         "    -c config_file           use config_file as configuration file\n\r"
         #ifdef WIN32
@@ -77,6 +77,8 @@ void usage(const char *prog)
         #endif
         ,prog);
 }
+
+char const* g_mainLogFileName = "Server.log";
 
 /// Launch the mangos server
 extern int main(int argc, char **argv)
@@ -120,7 +122,7 @@ extern int main(int argc, char **argv)
 #endif
                 else
                 {
-                    sLog.outError("Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
                     usage(argv[0]);
                     Log::WaitBeforeContinueIfNeed();
                     return 1;
@@ -128,12 +130,12 @@ extern int main(int argc, char **argv)
                 break;
             }
             case ':':
-                sLog.outError("Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
             default:
-                sLog.outError("Runtime-Error: bad format of commandline arguments");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: bad format of commandline arguments");
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
@@ -145,11 +147,11 @@ extern int main(int argc, char **argv)
     {
         case 'i':
             if (WinServiceInstall())
-                sLog.outString("Installing service");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Installing service");
             return 1;
         case 'u':
             if (WinServiceUninstall())
-                sLog.outString("Uninstalling service");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Uninstalling service");
             return 1;
         case 'r':
             WinServiceRun();
@@ -159,7 +161,7 @@ extern int main(int argc, char **argv)
 
     if (!sConfig.SetSource(cfg_file))
     {
-        sLog.outError("Could not find configuration file %s.", cfg_file);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find configuration file %s.", cfg_file);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
@@ -176,9 +178,9 @@ extern int main(int argc, char **argv)
     }
 #endif
 
-    sLog.outString("Core revision: %s [world-daemon]", _FULLVERSION);
-    sLog.outString( "<Ctrl-C> to stop." );
-    sLog.outString("\n\n"
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [world-daemon]", _FULLVERSION);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "<Ctrl-C> to stop." );
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "\n\n"
         "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
         "MM   MM         MM   MM MMM MMM MM  MM MMM MMM\n"
         "MMM MMM         MMM  MM MMM MMM MM  MM MMM\n"
@@ -190,23 +192,23 @@ extern int main(int argc, char **argv)
         "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM\n"
         "        MM  MMM http://getmangos.com\n"
         "        MMMMMM\n\n");
-    sLog.outString("VMaNGOS : https://github.com/vmangos");
-    sLog.outString("Using configuration file %s.", cfg_file);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "VMaNGOS : https://github.com/vmangos");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s.", cfg_file);
 
 #define STR(s) #s
 #define XSTR(s) STR(s)
 
-    sLog.outInfo("Alloc library: " MANGOS_ALLOC_LIB "");
-    sLog.outInfo("Core Revision: " _FULLVERSION);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Alloc library: " MANGOS_ALLOC_LIB "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core Revision: " _FULLVERSION);
 
-    DETAIL_LOG("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
     if (SSLeay() < 0x009080bfL )
     {
-        DETAIL_LOG("WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
-        DETAIL_LOG("WARNING: Minimal required version [OpenSSL 0.9.8k]");
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
 
-    DETAIL_LOG("Using ACE: %s", ACE_VERSION);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using ACE: %s", ACE_VERSION);
 
     ///- Set progress bars show mode
     BarGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));

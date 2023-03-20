@@ -501,6 +501,8 @@ struct ItemPrototype
 
     // values assigned by core
     mutable int32 SourceQuestLevel = -1;                    // minimum level of quest that rewards this item
+    mutable uint32 SourceQuestRaces = 0;                    // allowed races of quest that rewards this item
+    mutable uint32 SourceQuestClasses = 0;                  // allowed classes of quest that rewards this item
     mutable bool Discovered = false;                        // has item been discovered by players
 
     // helpers
@@ -532,6 +534,7 @@ struct ItemPrototype
     bool IsWeapon() const { return Class == ITEM_CLASS_WEAPON; }
     bool IsRangedWeapon() const { return IsWeapon() && (InventoryType == INVTYPE_RANGED || InventoryType == INVTYPE_THROWN || InventoryType == INVTYPE_RANGEDRIGHT); }
     bool HasSignature() const { return GetMaxStackSize() == 1 && Class != ITEM_CLASS_CONSUMABLE && Class != ITEM_CLASS_QUEST && (Flags & ITEM_FLAG_NO_CREATOR) == 0 && ItemId != 6948; /*Hearthstone*/ }
+    bool HasItemFlag(uint32 flag) const { return Flags & flag; }
     bool HasExtraFlag(uint32 flag) const { return ExtraFlags & flag; }
 
     uint32 GetProficiencySkill() const;

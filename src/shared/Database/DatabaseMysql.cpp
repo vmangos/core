@@ -23,6 +23,7 @@
 
 #include <errmsg.h>
 #include <mysqld_error.h>
+#include "Log.h"
 #include "Util.h"
 #include "Policies/SingletonImp.h"
 #include "Platform/Define.h"
@@ -51,7 +52,7 @@ DatabaseMysql::DatabaseMysql()
 
         if (!mysql_thread_safe())
         {
-            sLog.outError("FATAL ERROR: Used MySQL library isn't thread-safe.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FATAL ERROR: Used MySQL library isn't thread-safe.");
             Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
@@ -83,7 +84,7 @@ bool MySQLConnection::OpenConnection(bool reconnect)
     MYSQL* mysqlInit = mysql_init(nullptr);
     if (!mysqlInit)
     {
-        sLog.outError("Could not initialize Mysql connection");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not initialize Mysql connection");
         return false;
     }
 
@@ -100,10 +101,10 @@ bool MySQLConnection::OpenConnection(bool reconnect)
 
     if (mMysql)
     {
-        DETAIL_LOG("Connected to MySQL database at %s",
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Connected to MySQL database at %s",
             m_host.c_str());
-        DETAIL_LOG("MySQL client library: %s", mysql_get_client_info());
-        DETAIL_LOG("MySQL server ver: %s ", mysql_get_server_info(mMysql));
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MySQL client library: %s", mysql_get_client_info());
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MySQL server ver: %s ", mysql_get_server_info(mMysql));
 
         /*----------SET AUTOCOMMIT ON---------*/
         // It seems mysql 5.0.x have enabled this feature
@@ -117,9 +118,9 @@ bool MySQLConnection::OpenConnection(bool reconnect)
         // LEAVE 'AUTOCOMMIT' MODE ALWAYS ENABLED!!!
         // W/O IT EVEN 'SELECT' QUERIES WOULD REQUIRE TO BE WRAPPED INTO 'START TRANSACTION'<>'COMMIT' CLAUSES!!!
         if (!mysql_autocommit(mMysql, 1))
-            DETAIL_LOG("AUTOCOMMIT SUCCESSFULLY SET TO 1");
+            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "AUTOCOMMIT SUCCESSFULLY SET TO 1");
         else
-            DETAIL_LOG("AUTOCOMMIT NOT SET TO 1");
+            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "AUTOCOMMIT NOT SET TO 1");
         /*-------------------------------------*/
 
         // set connection properties to UTF8 to properly handle locales for different
@@ -131,7 +132,7 @@ bool MySQLConnection::OpenConnection(bool reconnect)
     }
     else
     {
-        sLog.outError("Could not connect to MySQL database at %s: %s\n",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not connect to MySQL database at %s: %s\n",
             m_host.c_str(), mysql_error(mysqlInit));
         mysql_close(mysqlInit);
         return false;
@@ -140,12 +141,12 @@ bool MySQLConnection::OpenConnection(bool reconnect)
 
 bool MySQLConnection::Reconnect()
 {
-    sLog.outString("Reconnection attempt to database %s (on %s)", m_database.c_str(), m_host.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Reconnection attempt to database %s (on %s)", m_database.c_str(), m_host.c_str());
 
     if (OpenConnection(true))
     {
         FreePreparedStatements(); // We need to prepare everything again!
-        sLog.outString("Successfully reconnected to %s @%s:%u.",
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Successfully reconnected to %s @%s:%u.",
             m_database.c_str(), m_host.c_str(), m_port);
 
         return true;
@@ -179,15 +180,15 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
         // Outdated table or database structure - terminate core
         case ER_BAD_FIELD_ERROR:
         case ER_NO_SUCH_TABLE:
-            sLog.outErrorDb("Your database structure is not up to date. Please make sure you have executed all the queries in the sql/updates folders.");
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Your database structure is not up to date. Please make sure you have executed all the queries in the sql/updates folders.");
             ASSERT(false);
             return false;
         case ER_PARSE_ERROR:
-            sLog.outErrorDb("Error while parsing SQL. Core fix required.");
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Error while parsing SQL. Core fix required.");
             ASSERT(false);
             return false;
         default:
-            sLog.outErrorDb("Unhandled MySQL errno %u. Unexpected behaviour possible.", errNo);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Unhandled MySQL errno %u. Unexpected behaviour possible.", errNo);
             return false;
     }
 }
@@ -206,8 +207,8 @@ bool MySQLConnection::_Query(char const* sql, MYSQL_RES** pResult, MYSQL_FIELD**
     {
         uint32 lErrno = mysql_errno(mMysql);
 
-        sLog.outErrorDb("SQL: %s", sql);
-        sLog.outErrorDb("[%u] %s", lErrno, mysql_error(mMysql));
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "[%u] %s", lErrno, mysql_error(mMysql));
 
         if (HandleMySQLError(lErrno)) // If error is handled, just try again
             return _Query(sql, pResult, pFields, pRowCount, pFieldCount);
@@ -283,8 +284,8 @@ bool MySQLConnection::Execute(char const* sql)
     {
         uint32 lErrno = mysql_errno(mMysql);
 
-        sLog.outErrorDb("SQL: %s", sql);
-        sLog.outErrorDb("[%u] %s", lErrno, mysql_error(mMysql));
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "[%u] %s", lErrno, mysql_error(mMysql));
 
         if (HandleMySQLError(lErrno)) // If error is handled, just try again
             return Execute(sql);
@@ -302,8 +303,8 @@ bool MySQLConnection::_TransactionCmd(char const* sql)
 {
     if (mysql_query(mMysql, sql))
     {
-        sLog.outError("SQL: %s", sql);
-        sLog.outError("SQL ERROR: %s", mysql_error(mMysql));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: %s", sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_error(mMysql));
         return false;
     }
     else
@@ -366,15 +367,15 @@ bool MySqlPreparedStatement::prepare()
     m_stmt = mysql_stmt_init(m_pMySQLConn);
     if (!m_stmt)
     {
-        sLog.outError("SQL: mysql_stmt_init()() failed ");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: mysql_stmt_init()() failed ");
         return false;
     }
 
     //prepare statement
     if (mysql_stmt_prepare(m_stmt, m_szFmt.c_str(), m_szFmt.length()))
     {
-        sLog.outError("SQL: mysql_stmt_prepare() failed for '%s'", m_szFmt.c_str());
-        sLog.outError("SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: mysql_stmt_prepare() failed for '%s'", m_szFmt.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
         return false;
     }
 
@@ -386,8 +387,8 @@ bool MySqlPreparedStatement::prepare()
     //if we do not have result metadata
     if (!m_pResultMetadata && strnicmp(m_szFmt.c_str(), "select", 6) == 0)
     {
-        sLog.outError("SQL: no meta information for '%s'", m_szFmt.c_str());
-        sLog.outError("SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: no meta information for '%s'", m_szFmt.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
         return false;
     }
 
@@ -445,8 +446,8 @@ void MySqlPreparedStatement::bind(SqlStmtParameters const& holder)
     //bind input arguments
     if (mysql_stmt_bind_param(m_stmt, m_pInputArgs))
     {
-        sLog.outError("SQL ERROR: mysql_stmt_bind_param() failed\n");
-        sLog.outError("SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: mysql_stmt_bind_param() failed\n");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
     }
 }
 
@@ -494,8 +495,8 @@ bool MySqlPreparedStatement::execute()
 
     if(mysql_stmt_execute(m_stmt))
     {
-        sLog.outError("SQL: cannot execute '%s'", m_szFmt.c_str());
-        sLog.outError("SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: cannot execute '%s'", m_szFmt.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
         return false;
     }
 

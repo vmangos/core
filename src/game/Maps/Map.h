@@ -495,6 +495,8 @@ class Map : public GridRefManager<NGridType>
         void IncrementSummonCountForObject(uint64 guid);
         void DecrementSummonCountForObject(uint64 guid);
         Creature* SummonCreature(uint32 entry, float x, float y, float z, float ang, TempSummonType spwtype = TEMPSUMMON_DEAD_DESPAWN, uint32 despwtime = 25000, bool asActiveObject = false);
+        Creature* LoadCreatureSpawn(uint32 dbGuid, bool delaySpawn = false);
+        Creature* LoadCreatureSpawnWithGroup(uint32 leaderDbGuid, bool delaySpawn = false);
 
         Player* GetPlayer(ObjectGuid guid);
         GameObject* GetGameObject(ObjectGuid const& guid) { return GetObject<GameObject>(guid); }
@@ -511,12 +513,12 @@ class Map : public GridRefManager<NGridType>
 
         template <typename T> void InsertObject(ObjectGuid const& guid, T* ptr)
         {
-            std::unique_lock<std::shared_timed_mutex> lock(m_objectsStore_lock);
+            std::lock_guard<std::shared_timed_mutex> lock(m_objectsStore_lock);
             m_objectsStore.insert<T>(guid, ptr);
         }
         template <typename T> void EraseObject(ObjectGuid const& guid)
         {
-            std::unique_lock<std::shared_timed_mutex> lock(m_objectsStore_lock);
+            std::lock_guard<std::shared_timed_mutex> lock(m_objectsStore_lock);
             m_objectsStore.erase<T>(guid, (T*)nullptr);
         }
         template <typename T> T* GetObject(ObjectGuid const& guid)
@@ -636,16 +638,16 @@ class Map : public GridRefManager<NGridType>
 
         bool                    _processingSendObjUpdates = false;
         uint32                  _objUpdatesThreads = 0;
-        mutable std::mutex              i_objectsToClientUpdate_lock;
-        std::set<Object *>      i_objectsToClientUpdate;
+        mutable std::mutex      i_objectsToClientUpdate_lock;
+        std::unordered_set<Object *> i_objectsToClientUpdate;
 
         bool                    _processingUnitsRelocation = false;
         uint32                  _unitRelocationThreads = 0;
-        mutable std::mutex    i_unitsRelocated_lock;
-        std::set<Unit* >        i_unitsRelocated;
+        mutable std::mutex      i_unitsRelocated_lock;
+        std::unordered_set<Unit* > i_unitsRelocated;
 
-        mutable std::mutex    unitsMvtUpdate_lock;
-        std::set<Unit*>         unitsMvtUpdate;
+        mutable std::mutex      unitsMvtUpdate_lock;
+        std::unordered_set<Unit*> unitsMvtUpdate;
 
         mutable MapMutexType    _corpseRemovalLock;
         typedef std::list<std::pair<Corpse*, ObjectGuid>> CorpseRemoveList;
@@ -850,6 +852,8 @@ class Map : public GridRefManager<NGridType>
         bool ScriptCommand_ResetDoorOrButton(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SetCommandState(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_PlayCustomAnim(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_StartScriptOnGroup(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_LoadCreatureSpawn(ScriptInfo const& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         ScriptCommandFunction const m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -944,6 +948,8 @@ class Map : public GridRefManager<NGridType>
             &Map::ScriptCommand_ResetDoorOrButton,      // 87
             &Map::ScriptCommand_SetCommandState,        // 88
             &Map::ScriptCommand_PlayCustomAnim,         // 89
+            &Map::ScriptCommand_StartScriptOnGroup,     // 90
+            &Map::ScriptCommand_LoadCreatureSpawn,      // 91
         };
 
     public:

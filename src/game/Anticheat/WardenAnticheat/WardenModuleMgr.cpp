@@ -28,6 +28,7 @@
 #include "Policies/SingletonImp.h"
 #include "Util.h"
 #include "World.h"
+#include "Log.h"
 
 #include <ace/OS_NS_dirent.h>
 
@@ -85,7 +86,7 @@ WardenModuleMgr::WardenModuleMgr()
         }
         catch (const std::runtime_error & e)
         {
-            sLog.outError("Failed to load %s - %s\n", mod.c_str(), e.what());
+            sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to load %s - %s\n", mod.c_str(), e.what());
             continue;
         }
     }

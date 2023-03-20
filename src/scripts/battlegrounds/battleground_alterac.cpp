@@ -2638,7 +2638,7 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
                         break;
 
                     default:
-                        sLog.outInfo("[Alterac] QuestComplete_npc_AVBlood_collector called with quest %u reqItem=%u unknown !", pQuest->GetQuestId(), pQuest->ReqItemId[0]);
+                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Alterac] QuestComplete_npc_AVBlood_collector called with quest %u reqItem=%u unknown !", pQuest->GetQuestId(), pQuest->ReqItemId[0]);
                         return false;
                 }
             }
@@ -5141,6 +5141,7 @@ class npc_av_trigger_for_questAI: public ScriptedAI
         }
         void Reset() override
         {
+            m_creature->EnableMoveInLosEvent();
         }
         void MoveInLineOfSight(Unit* who) override
         {

@@ -20,6 +20,7 @@
  */
 
 #include "Util.h"
+#include "Log.h"
 #include "DatabaseEnv.h"
 #include "Config/Config.h"
 #include "Database/SqlOperations.h"
@@ -72,7 +73,7 @@ SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
         if(!pStmt->prepare())
         {
             //MANGOS_ASSERT(false && "Unable to prepare SQL statement");
-            sLog.outError("Can't prepare %s, statement not executed!", fmt.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't prepare %s, statement not executed!", fmt.c_str());
             return nullptr;
         }
 
@@ -321,7 +322,7 @@ bool Database::PExecuteLog(char const* format,...)
 
     if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format);
         return false;
     }
 
@@ -345,7 +346,7 @@ bool Database::PExecuteLog(char const* format,...)
         else
         {
             // The file could not be opened
-            sLog.outError("SQL-Logging is disabled - Log file for the SQL commands could not be openend: %s",fName);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL-Logging is disabled - Log file for the SQL commands could not be openend: %s",fName);
         }
     }
 
@@ -364,7 +365,7 @@ QueryResult* Database::PQuery(char const* format,...)
 
     if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format);
         return nullptr;
     }
 
@@ -383,7 +384,7 @@ QueryNamedResult* Database::PQueryNamed(char const* format,...)
 
     if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format);
         return nullptr;
     }
 
@@ -427,7 +428,7 @@ bool Database::PExecute(char const* format,...)
 
     if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format);
         return false;
     }
 
@@ -447,7 +448,7 @@ bool Database::DirectPExecute(char const* format,...)
 
     if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format);
         return false;
     }
 
@@ -598,20 +599,20 @@ bool Database::CheckRequiredMigrations(char const** migrations)
 
     if (!missingMigrations.empty())
     {
-        sLog.outErrorDb("Database `%s` is missing the following migrations:", dbName.c_str());
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Database `%s` is missing the following migrations:", dbName.c_str());
 
         for (std::set<std::string>::const_iterator it = missingMigrations.begin(); it != missingMigrations.end(); it++)
-            sLog.outErrorDb("\t%s", (*it).c_str());
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "\t%s", (*it).c_str());
 
         return false;
     }
 
     if (!appliedMigrations.empty())
     {
-        sLog.outErrorDb("WARNING! Database `%s` has the following extra migrations:", dbName.c_str());
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "WARNING! Database `%s` has the following extra migrations:", dbName.c_str());
 
         for (std::set<std::string>::const_iterator it = appliedMigrations.begin(); it != appliedMigrations.end(); it++)
-            sLog.outErrorDb("\t%s", (*it).c_str());
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "\t%s", (*it).c_str());
     }
 
     return true;

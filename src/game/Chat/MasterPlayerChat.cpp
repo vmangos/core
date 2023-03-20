@@ -38,20 +38,20 @@ void MasterPlayer::UpdateSpeakTime()
 }
 
 
-void MasterPlayer::Whisper(std::string const& text, uint32 language, MasterPlayer* receiver)
+void MasterPlayer::Whisper(char const* text, uint32 language, MasterPlayer* receiver)
 {
     if (language != LANG_ADDON)                             // if not addon data
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, text, Language(language), GetChatTag(), GetObjectGuid(), GetName());
     receiver->GetSession()->SendPacket(&data);
 
     // not send confirmation for addon messages
     if (language != LANG_ADDON)
     {
         data.clear();
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, text.c_str(), Language(language), receiver->GetChatTag(), receiver->GetObjectGuid());
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, text, Language(language), receiver->GetChatTag(), receiver->GetObjectGuid());
         GetSession()->SendPacket(&data);
     }
 

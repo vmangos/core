@@ -41,6 +41,7 @@ class BattleGround;
 class DungeonPersistentState;
 class Field;
 class Unit;
+struct LFGGroupQueueInfo;
 
 #define MAX_GROUP_SIZE 5
 #define MAX_RAID_SIZE 40
@@ -221,7 +222,7 @@ class Group
         void   SetLooterGuid(ObjectGuid guid) { m_looterGuid = guid; }
         void   UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed = false);
         void   SetLootThreshold(ItemQualities threshold) { m_lootThreshold = threshold; }
-        void   Disband(bool hideDestroy=false);
+        void   Disband(bool hideDestroy = false, ObjectGuid initiator = ObjectGuid());
 
         // properties accessories
         uint32 GetId() const { return m_Id; }
@@ -343,10 +344,10 @@ class Group
 
         void SetLFGAreaId(uint32 areaId) { m_LFGAreaId = areaId; }
         uint32 GetLFGAreaId()            { return m_LFGAreaId;   }
-        bool isInLFG()                   { return (m_LFGAreaId > 0) ? true : false; }
+        bool IsInLFG()                   { return (m_LFGAreaId > 0) ? true : false; }
 
         void CalculateLFGRoles(LFGGroupQueueInfo& data);
-        bool FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, ClassRoles requiredRole, uint32& InitRoles, uint32& DpsCount, std::list<ObjectGuid>& processed);
+        bool FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, LfgRoles requiredRole, uint32& InitRoles, uint32& DpsCount, std::list<ObjectGuid>& processed);
 
         /*********************************************************/
         /***                   LOOT SYSTEM                     ***/

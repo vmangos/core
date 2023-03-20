@@ -227,6 +227,14 @@ bool ChatHandler::HandleAccountCharactersCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleAccountClearDataCommand(char* args)
+{
+    CharacterDatabase.PExecute("DELETE FROM `account_data` WHERE `account`=%u", GetAccountId());
+    CharacterDatabase.PExecute("DELETE FROM `character_account_data` WHERE `guid` IN (SELECT `guid` FROM `characters` WHERE `account`=%u)", GetAccountId());
+    SendSysMessage("Saved account data cleared.");
+    return true;
+}
+
 /// Create an account
 bool ChatHandler::HandleAccountCreateCommand(char* args)
 {
@@ -449,8 +457,9 @@ bool ChatHandler::HandleAddCharacterNoteCommand(char* args)
 
 bool ChatHandler::HandleWarnCharacterCommand(char* args)
 {
+    Player* pPlayer;
     ObjectGuid playerGuid;
-    if (!ExtractPlayerTarget(&args, nullptr, &playerGuid))
+    if (!ExtractPlayerTarget(&args, &pPlayer, &playerGuid))
     {
         PSendSysMessage(LANG_PLAYER_NOT_FOUND);
         SetSentErrorMessage(true);
@@ -469,6 +478,9 @@ bool ChatHandler::HandleWarnCharacterCommand(char* args)
         reason = "<no reason given>";
 
     sWorld.WarnAccount(playerData->uiAccount, authorName, reason, "WARN");
+    sAccountMgr.WarnAccount(playerData->uiAccount, reason);
+    if (pPlayer)
+        ChatHandler(pPlayer).PSendSysMessage(LANG_ACCOUNT_WARNED, reason);
 
     PSendSysMessage("Account #%u (character %s) has been warned for \"%s\"", playerData->uiAccount, playerData->sName.c_str(), reason);
     return true;
@@ -1208,5 +1220,44 @@ bool ChatHandler::HandleUnmuteCommand(char* args)
     std::string nameLink = playerLink(target_name);
 
     PSendSysMessage(LANG_YOU_ENABLE_CHAT, nameLink.c_str());
+    return true;
+}
+
+bool ChatHandler::HandleSniffCommand(char* args)
+{
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (!pPlayer->GetSession()->IsConnected())
+    {
+        SendSysMessage("Player is disconnected.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (value)
+    {
+        pPlayer->GetSession()->StartSniffing();
+        PSendSysMessage("Enabled packet dump for %s.", pPlayer->GetName());
+    }
+    else
+    {
+        pPlayer->GetSession()->StopSniffing();
+        PSendSysMessage("Disabled packet dump for %s.", pPlayer->GetName());
+    }
+
     return true;
 }

@@ -119,13 +119,13 @@ void BattleGroundWS::RespawnFlag(Team team, bool captured)
 {
     if (team == ALLIANCE)
     {
-        DEBUG_LOG("Respawn Alliance flag");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Respawn Alliance flag");
         m_flagState[BG_TEAM_ALLIANCE] = BG_WS_FLAG_STATE_ON_BASE;
         SpawnEvent(WS_EVENT_FLAG_A, 0, true, true);
     }
     else
     {
-        DEBUG_LOG("Respawn Horde flag");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Respawn Horde flag");
         m_flagState[BG_TEAM_HORDE] = BG_WS_FLAG_STATE_ON_BASE;
         SpawnEvent(WS_EVENT_FLAG_H, 0, true, true);
     }
@@ -157,7 +157,7 @@ void BattleGroundWS::RespawnFlagAfterDrop(Team team)
     if (obj)
         obj->Delete();
     else
-        sLog.outError("Unknown dropped flag bg: %s", GetDroppedFlagGuid(team).GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unknown dropped flag bg: %s", GetDroppedFlagGuid(team).GetString().c_str());
 
     ClearDroppedFlagGuid(team);
     ForceFlagAreaTrigger(team);
@@ -438,7 +438,7 @@ void BattleGroundWS::RemovePlayer(Player* player, ObjectGuid guid)
     {
         if (!player)
         {
-            sLog.outError("BattleGroundWS: Removing offline player who has the FLAG!!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundWS: Removing offline player who has the FLAG!!");
             ClearAllianceFlagPicker();
             RespawnFlag(ALLIANCE, false);
         }
@@ -449,7 +449,7 @@ void BattleGroundWS::RemovePlayer(Player* player, ObjectGuid guid)
     {
         if (!player)
         {
-            sLog.outError("BattleGroundWS: Removing offline player who has the FLAG!!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundWS: Removing offline player who has the FLAG!!");
             ClearHordeFlagPicker();
             RespawnFlag(HORDE, false);
         }
@@ -519,7 +519,7 @@ void BattleGroundWS::HandleAreaTrigger(Player* source, uint32 trigger)
           case 4629:                                          // unk4
               break; */
         default:
-            sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
             source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }

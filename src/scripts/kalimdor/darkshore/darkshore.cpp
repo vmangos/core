@@ -70,6 +70,7 @@ struct npc_kerlonianAI : public FollowerAI
     void Reset() override
     {
         m_uiFallAsleepTimer = urand(10000, 45000);
+        m_creature->EnableMoveInLosEvent();
     }
 
     void JustRespawned() override
@@ -358,7 +359,10 @@ struct npc_threshwackonatorAI : public FollowerAI
         Reset();
     }
 
-    void Reset() override {}
+    void Reset() override
+    {
+        m_creature->EnableMoveInLosEvent();
+    }
 
     void MoveInLineOfSight(Unit* pWho) override
     {
@@ -556,6 +560,7 @@ struct npc_volcorAI : public npc_escortAI
             StealthDialogueStep = 0;
             StealthDialogueTimer = 0;
         }
+        m_creature->EnableMoveInLosEvent();
     }
 
     uint16 StealthDialogueStep;
@@ -998,6 +1003,7 @@ struct npc_murkdeepAI : public ScriptedAI
 
         m_creature->SetVisibility(VISIBILITY_OFF);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
     }
 
     ObjectGuid m_playerGuid;
@@ -1159,8 +1165,9 @@ struct npc_murkdeepAI : public ScriptedAI
                         break;
                     case 3:
                         DoSummon();
-                        m_creature->SetVisibility(VISIBILITY_ON);
                         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                        m_creature->SetVisibility(VISIBILITY_ON);
 
                         Player* player = GetPlayer();
                         if (player)

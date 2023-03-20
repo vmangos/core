@@ -31,7 +31,7 @@ void ScriptedPetAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->CanFly() && m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
         return;
 
-    if (m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho), true, false) && m_creature->IsWithinLOSInMap(pWho))
+    if (m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho), true, SizeFactor::None) && m_creature->IsWithinLOSInMap(pWho))
     {
         //pWho->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
         AttackStart(pWho);
@@ -70,7 +70,7 @@ void ScriptedPetAI::ResetPetCombat()
 
     m_creature->AttackStop();
 
-    DEBUG_LOG("ScriptedPetAI reset pet combat and stop attack.");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ScriptedPetAI reset pet combat and stop attack.");
     Reset();
 }
 

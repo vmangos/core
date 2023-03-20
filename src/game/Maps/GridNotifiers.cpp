@@ -93,12 +93,6 @@ VisibleNotifier::Notify()
                 if (targetPlayer->m_broadcaster)
                     targetPlayer->m_broadcaster->RemoveListener(&player);
         }
-        else if ((*itr).IsCreature() && player.IsInCombat() && !player.GetMap()->IsDungeon())
-        {
-            // Make sure mobs who become out of range leave combat before grid unload.
-            if (Creature* targetCreature = player.GetMap()->GetCreature(*itr))
-                player.BeforeVisibilityDestroy(targetCreature);
-        }
 
         player.m_visibleGUIDs.erase(*itr);
 

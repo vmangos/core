@@ -24,9 +24,6 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "zulgurub.h"
 
-#define ZG_LOG sLog.outDebug
-//#define ZG_LOG sLog.outError(
-
 #define BOSS_GRILEK                     15082
 #define BOSS_HAZZARAH                   15083
 #define BOSS_RENATAKI                   15084
@@ -327,7 +324,7 @@ void instance_zulgurub::Create()
 
 void instance_zulgurub::OnCreatureDeath(Creature * pCreature)
 {
-    ZG_LOG("OnCreatureDeath %u", pCreature->GetEntry());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OnCreatureDeath %u", pCreature->GetEntry());
     if (pCreature->GetEntry() >= 15082 && pCreature->GetEntry() <= 15085)
         SetData(TYPE_RANDOM_BOSS, DONE);
 
@@ -345,7 +342,7 @@ uint32 instance_zulgurub::GenerateRandomBoss()
     uint32 weekmod = ((dayCount - (dayCount % 14)) / 14) % 3;
     uint32 bossId = 15082 + weekmod;
     randomBossEntry = bossId;
-    ZG_LOG("GenerateRandomBoss %u -> %u", weekmod, bossId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "GenerateRandomBoss %u -> %u", weekmod, bossId);
     return bossId;
 }
 
@@ -381,69 +378,6 @@ Unit* instance_zulgurub::Thekal_GetUnitThatCanRez()
 InstanceData* GetInstanceData_instance_zulgurub(Map* pMap)
 {
     return new instance_zulgurub(pMap);
-}
-
-struct npc_brazierAI: public ScriptedAI
-{
-    npc_brazierAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 Timer;
-    uint32 Var;
-
-    void Reset() override
-    {
-        Timer = 0;
-        Var = 0;
-    }
-
-    void UseGo(int Nombre)
-    {
-        int var = 0;
-        while (var < Nombre)
-        {
-            std::list<GameObject*> GOListe;
-            GetGameObjectListWithEntryInGrid(GOListe, m_creature, 180252, 100.0f);
-            std::list<GameObject*>::iterator itr = GOListe.begin();
-            if (itr == GOListe.end())
-                return;
-
-            std::advance(itr, rand() % GOListe.size());
-            if (GameObject* GO = *itr)
-            {
-                GO->Use(m_creature);
-                GOListe.erase(itr);
-                var++;
-            }
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (Var > 24)
-            m_creature->ForcedDespawn();
-
-        if (Timer < uiDiff)
-        {
-            if (Var > 3)
-                UseGo(4);
-            else if (Var < 10)
-                UseGo(12);
-            else
-                UseGo(6);
-            Timer = 1000;
-            Var++;
-            return;
-        }
-        else Timer -= uiDiff;
-    }
-};
-
-CreatureAI* GetAI_npc_brazier(Creature* pCreature)
-{
-    return new npc_brazierAI(pCreature);
 }
 
 enum
@@ -562,11 +496,6 @@ void AddSC_instance_zulgurub()
     newscript = new Script;
     newscript->Name = "go_table_madness";
     newscript->pGOHello = &OnGossipHello_go_table_madness;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_brazier";
-    newscript->GetAI = &GetAI_npc_brazier;
     newscript->RegisterSelf();
 
     newscript = new Script;

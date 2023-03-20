@@ -2542,8 +2542,8 @@ bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
 
                     // skip passives
                     if (pNewSpell->HasAttribute(SPELL_ATTR_PASSIVE) ||
-                        pNewSpell->HasAttribute(SPELL_ATTR_HIDDEN_CLIENTSIDE) ||
-                        pNewSpell->HasAttribute(SPELL_ATTR_EX2_DISPLAY_IN_STANCE_BAR))
+                        pNewSpell->HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY) ||
+                        pNewSpell->HasAttribute(SPELL_ATTR_EX2_USE_SHAPESHIFT_BAR))
                         continue;
                 } 
 
@@ -3074,7 +3074,7 @@ bool ChatHandler::HandleAddItemCommand(char* args)
     if (!plTarget)
         plTarget = pl;
 
-    DETAIL_LOG(GetMangosString(LANG_ADDITEM), itemId, count);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_ADDITEM), itemId, count);
 
     if (!sObjectMgr.GetItemPrototype(itemId))
     {
@@ -3179,7 +3179,7 @@ bool ChatHandler::HandleDeleteItemCommand(char* args)
         return false;
     }
 
-    DETAIL_LOG(GetMangosString(LANG_REMOVEITEM), itemId, count);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_REMOVEITEM), itemId, count);
 
     if (player)
     {
@@ -3305,7 +3305,7 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
     if (!plTarget)
         plTarget = pl;
 
-    DETAIL_LOG(GetMangosString(LANG_ADDITEMSET), itemsetId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_ADDITEMSET), itemsetId);
 
     bool found = false;
     for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
@@ -3581,7 +3581,7 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
     ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(player->GetClass());
     if (!cEntry)
     {
-        sLog.outError("Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
         return false;
     }
 
@@ -4293,7 +4293,7 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
     {
         int32 newmoney = int32(moneyuser) + addmoney;
 
-        DETAIL_LOG(GetMangosString(LANG_CURRENT_MONEY), moneyuser, addmoney, newmoney);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_CURRENT_MONEY), moneyuser, addmoney, newmoney);
         if (newmoney <= 0)
         {
             PSendSysMessage(LANG_YOU_TAKE_ALL_MONEY, GetNameLink(chr).c_str());
@@ -4325,7 +4325,7 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
             chr->LogModifyMoney(addmoney, "GM", m_session->GetPlayer()->GetObjectGuid());
     }
 
-    DETAIL_LOG(GetMangosString(LANG_NEW_MONEY), moneyuser, addmoney, chr->GetMoney());
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_NEW_MONEY), moneyuser, addmoney, chr->GetMoney());
 
     return true;
 }
@@ -4573,7 +4573,7 @@ bool ChatHandler::HandleModifyEnergyCommand(char* args)
     chr->SetMaxPower(POWER_ENERGY, energym);
     chr->SetPower(POWER_ENERGY, energy);
 
-    DETAIL_LOG(GetMangosString(LANG_CURRENT_ENERGY), chr->GetMaxPower(POWER_ENERGY));
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_CURRENT_ENERGY), chr->GetMaxPower(POWER_ENERGY));
 
     return true;
 }
@@ -5335,7 +5335,7 @@ bool ChatHandler::HandleServiceDeleteCharacters(char* args)
         delete result;
     }
 
-    sLog.outString("Service: Removed %u characters", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Service: Removed %u characters", count);
     return true;
 }
 
@@ -5581,5 +5581,46 @@ bool ChatHandler::HandleGroupSummonCommand(char* args)
     }
 
     PSendSysMessage("Sent summon request to all group members.");
+    return true;
+}
+
+bool ChatHandler::HandleListExploredAreasCommand(char* args)
+{
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Listing explored areas by %s", pPlayer->GetName());
+    for (auto itr = sAreaStorage.begin<AreaEntry>(); itr < sAreaStorage.end<AreaEntry>(); ++itr)
+    {
+        std::string name = itr->Name;
+        sObjectMgr.GetAreaLocaleString(itr->Id, GetSessionDbLocaleIndex(), &name);
+
+        if (!itr->ExploreFlag || itr->ExploreFlag == 0xffff)
+            continue;;
+
+        int offset = itr->ExploreFlag / 32;
+        if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
+            continue;
+
+        uint32 val = (uint32)(1 << (itr->ExploreFlag % 32));
+        uint32 currFields = pPlayer->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + offset);
+        if (currFields & val)
+        {
+            int locale = GetSessionDbLocaleIndex() + 1;
+            // send area in "id - [name]" format
+            std::ostringstream ss;
+            if (m_session)
+                ss << itr->Id << " - |cffffffff|Harea:" << itr->Id << "|h[" << name << " " << localeNames[locale] << "]|h|r";
+            else
+                ss << itr->Id << " - " << name << " " << localeNames[locale];
+
+            SendSysMessage(ss.str().c_str());
+        }
+    }
     return true;
 }

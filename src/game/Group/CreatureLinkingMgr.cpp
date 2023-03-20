@@ -69,7 +69,7 @@ void CreatureLinkingMgr::LoadFromDB()
     m_eventGuidTriggers.clear();
 
     // Load `creature_linking_template`
-    sLog.outString("> Loading table `creature_linking_template`");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "> Loading table `creature_linking_template`");
     uint32 count = 0;
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `map`, `master_entry`, `flag`, `search_range` FROM `creature_linking_template`"));
     if (!result)
@@ -77,8 +77,8 @@ void CreatureLinkingMgr::LoadFromDB()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Table creature_linking_template is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Table creature_linking_template is empty.");
     }
     else
     {
@@ -109,12 +109,12 @@ void CreatureLinkingMgr::LoadFromDB()
             m_eventTriggers.insert(tmp.masterId);
         } while (result->NextRow());
 
-        sLog.outString();
-        sLog.outString(">> Loaded creature linking for %u creature-entries", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded creature linking for %u creature-entries", count);
     }
 
     // Load `creature_linking`
-    sLog.outString("> Loading table `creature_linking`");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "> Loading table `creature_linking`");
     count = 0;
     result.reset(WorldDatabase.Query("SELECT `guid`, `master_guid`, `flag` FROM `creature_linking`"));
     if (!result)
@@ -122,8 +122,8 @@ void CreatureLinkingMgr::LoadFromDB()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Table creature_linking is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Table creature_linking is empty.");
         return;
     }
 
@@ -154,8 +154,8 @@ void CreatureLinkingMgr::LoadFromDB()
         m_eventGuidTriggers.insert(tmp.masterId);
     } while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded creature linking for %u creature-Guids", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded creature linking for %u creature-Guids", count);
 }
 
 /** This function is used to check if a DB-Entry is valid
@@ -177,18 +177,18 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
         if (!pInfo)
         {
             if (!sObjectMgr.IsExistingCreatureId(slaveEntry))
-                sLog.outErrorDb("`creature_linking_template` has a non existing slave_entry (slave: %u, master %u), skipped.", slaveEntry, pTmp->masterId);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking_template` has a non existing slave_entry (slave: %u, master %u), skipped.", slaveEntry, pTmp->masterId);
             return false;
         }
         if (!pMasterInfo)
         {
             if (!sObjectMgr.IsExistingCreatureId(pTmp->masterId))
-                sLog.outErrorDb("`creature_linking_template` has a non existing master_entry (slave: %u, master %u), skipped", slaveEntry, pTmp->masterId);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking_template` has a non existing master_entry (slave: %u, master %u), skipped", slaveEntry, pTmp->masterId);
             return false;
         }
         if (pTmp->mapId && !sMapStorage.LookupEntry<MapEntry>(pTmp->mapId))
         {
-            sLog.outErrorDb("`creature_linking_template` has a non existing map %u (slave %u, master %u), skipped", pTmp->mapId, slaveEntry, pTmp->masterId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking_template` has a non existing map %u (slave %u, master %u), skipped", pTmp->mapId, slaveEntry, pTmp->masterId);
             return false;
         }
     }
@@ -200,32 +200,32 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
         if (!slaveData)
         {
             if (!sObjectMgr.IsExistingCreatureGuid(slaveEntry))
-                sLog.outErrorDb("`creature_linking` has a non existing slave (guid: %u, master_guid %u), skipped", slaveEntry, pTmp->masterId);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking` has a non existing slave (guid: %u, master_guid %u), skipped", slaveEntry, pTmp->masterId);
             return false;
         }
         if (!masterData)
         {
             if (!sObjectMgr.IsExistingCreatureGuid(pTmp->masterId))
-                sLog.outErrorDb("`creature_linking` has a non existing master (guid: %u,, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking` has a non existing master (guid: %u,, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
             return false;
         }
         if (slaveData->position.mapId != masterData->position.mapId)
         {
-            sLog.outErrorDb("`creature_linking` has a slave and master on different maps (guid: %u, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking` has a slave and master on different maps (guid: %u, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
             return false;
         }
     }
 
     if (pTmp->linkingFlag & ~(LINKING_FLAG_INVALID - 1) || pTmp->linkingFlag == 0)
     {
-        sLog.outErrorDb("`creature_linking%s` has invalid flag, (entry: %u, map: %u, flags: %u), skipped", byEntry ? "_template" : "", slaveEntry, pTmp->mapId, pTmp->linkingFlag);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking%s` has invalid flag, (entry: %u, map: %u, flags: %u), skipped", byEntry ? "_template" : "", slaveEntry, pTmp->mapId, pTmp->linkingFlag);
         return false;
     }
 
     // Additional checks, depending on flags
     if (pTmp->linkingFlag & FLAG_DESPAWN_ON_RESPAWN && slaveEntry == pTmp->masterId)
     {
-        sLog.outErrorDb("`creature_linking%s` has pointless FLAG_DESPAWN_ON_RESPAWN for self, (entry: %u, map: %u), skipped", byEntry ? "_template" : "", slaveEntry, pTmp->mapId);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking%s` has pointless FLAG_DESPAWN_ON_RESPAWN for self, (entry: %u, map: %u), skipped", byEntry ? "_template" : "", slaveEntry, pTmp->mapId);
         return false;
     }
 
@@ -237,13 +237,13 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
             QueryResult* result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id=%u AND map=%u LIMIT 2", pTmp->masterId, pTmp->mapId);
             if (!result)
             {
-                sLog.outErrorDb("`creature_linking_template` has FLAG_FOLLOW, but no master, (entry: %u, map: %u, master: %u)", slaveEntry, pTmp->mapId, pTmp->masterId);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking_template` has FLAG_FOLLOW, but no master, (entry: %u, map: %u, master: %u)", slaveEntry, pTmp->mapId, pTmp->masterId);
                 return false;
             }
 
             if (result->GetRowCount() > 1)
             {
-                sLog.outErrorDb("`creature_linking_template` has FLAG_FOLLOW, but non unique master, (entry: %u, map: %u, master: %u)", slaveEntry, pTmp->mapId, pTmp->masterId);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking_template` has FLAG_FOLLOW, but non unique master, (entry: %u, map: %u, master: %u)", slaveEntry, pTmp->mapId, pTmp->masterId);
                 delete result;
                 return false;
             }
@@ -448,9 +448,12 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
                 BossGuidMapBounds finds = m_masterGuid.equal_range(pInfo->masterId);
                 for (BossGuidMap::const_iterator itr = finds.first; itr != finds.second; ++itr)
                 {
-                    pMaster = pSource->GetMap()->GetCreature(itr->second);
-                    if (pMaster && IsSlaveInRangeOfBoss(pSource, pMaster, pInfo->searchRange))
+                    Creature* master = pSource->GetMap()->GetCreature(itr->second);
+                    if (master && IsSlaveInRangeOfMaster(pSource, master, pInfo->searchRange))
+                    {
+                        pMaster = master;
                         break;
+                    }
                 }
             }
             else                                            // guid case
@@ -508,7 +511,7 @@ void CreatureLinkingHolder::ProcessSlaveGuidList(CreatureLinkingEvent eventType,
             continue;
 
         // Handle single slave
-        if (IsSlaveInRangeOfBoss(pSlave, pSource, searchRange))
+        if (IsSlaveInRangeOfMaster(pSlave, pSource, searchRange))
             ProcessSlave(eventType, pSource, flag, pSlave, pEnemy);
     }
 }
@@ -602,13 +605,13 @@ void CreatureLinkingHolder::SetFollowing(Creature* pWho, Creature* pWhom) const
 }
 
 // Function to check if a slave belongs to a boss by range-issue
-bool CreatureLinkingHolder::IsSlaveInRangeOfBoss(Creature const* pSlave, Creature const* pBoss, uint16 searchRange) const
+bool CreatureLinkingHolder::IsSlaveInRangeOfMaster(Creature const* pSlave, Creature const* pBoss, uint16 searchRange) const
 {
     float sX, sY, sZ;
     pSlave->GetRespawnCoord(sX, sY, sZ);
-    return IsSlaveInRangeOfBoss(pBoss, sX, sY, searchRange);
+    return IsSlaveInRangeOfMaster(pBoss, sX, sY, searchRange);
 }
-bool CreatureLinkingHolder::IsSlaveInRangeOfBoss(Creature const* pBoss, float sX, float sY, uint16 searchRange) const
+bool CreatureLinkingHolder::IsSlaveInRangeOfMaster(Creature const* pBoss, float sX, float sY, uint16 searchRange) const
 {
     if (!searchRange)
         return true;
@@ -688,7 +691,7 @@ bool CreatureLinkingHolder::CanSpawn(uint32 lowGuid, Map* _map, CreatureLinkingI
     for (BossGuidMap::const_iterator itr = finds.first; itr != finds.second; ++itr)
     {
         Creature* pMaster = _map->GetCreature(itr->second);
-        if (pMaster && IsSlaveInRangeOfBoss(pMaster, sx, sy, pInfo->searchRange))
+        if (pMaster && IsSlaveInRangeOfMaster(pMaster, sx, sy, pInfo->searchRange))
         {
             if (pInfo->linkingFlag & FLAG_CANT_SPAWN_IF_BOSS_DEAD)
                 return pMaster->IsAlive();
@@ -716,7 +719,7 @@ bool CreatureLinkingHolder::TryFollowMaster(Creature* pCreature)
         for (BossGuidMap::const_iterator itr = finds.first; itr != finds.second; ++itr)
         {
             pMaster = pCreature->GetMap()->GetCreature(itr->second);
-            if (pMaster && IsSlaveInRangeOfBoss(pCreature, pMaster, pInfo->searchRange))
+            if (pMaster && IsSlaveInRangeOfMaster(pCreature, pMaster, pInfo->searchRange))
                 break;
         }
     }

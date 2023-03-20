@@ -56,7 +56,7 @@ void PetEventAI::MoveInLineOfSight(Unit* pWho)
     if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature))
     {
         float const attackRadius = m_creature->GetAttackDistance(pWho);
-        if (m_creature->IsWithinDistInMap(pWho, attackRadius, true, false) && m_creature->IsHostileTo(pWho) &&
+        if (m_creature->IsWithinDistInMap(pWho, attackRadius, true, SizeFactor::None) && m_creature->IsHostileTo(pWho) &&
             pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             AttackStart(pWho);
     }
@@ -70,14 +70,24 @@ void PetEventAI::AttackStart(Unit* pWho)
     if (m_creature->IsPet() && !static_cast<Pet*>(m_creature)->IsEnabled())
         return;
 
-    if (pWho == m_creature->GetCharmerOrOwner())
+    Unit* pOwner = m_creature->GetCharmerOrOwner();
+    if (pWho == pOwner)
         return;
 
-    if (m_creature->HasReactState(REACT_PASSIVE) && m_creature->GetCharmInfo() && !m_creature->GetCharmInfo()->IsCommandAttack())
-        return;
+    if (m_creature->GetCharmInfo() && !m_creature->GetCharmInfo()->IsCommandAttack())
+    {
+        // Passive - passive pets can attack if told to
+        if (m_creature->HasReactState(REACT_PASSIVE))
+            return;
 
-    if (pWho->HasAuraPetShouldAvoidBreaking() && m_creature->GetCharmerOrOwner() && m_creature->GetCharmerOrOwner()->IsAlive())
-        return;
+        // Player's pet should not attack PvP flagged target unless told to
+        if (!m_creature->IsPvP() && pWho->IsPvP() && pOwner && pOwner->IsPlayer())
+            return;
+
+        // CC - mobs under crowd control can be attacked if owner commanded
+        if (pWho->HasAuraPetShouldAvoidBreaking() && pOwner && pOwner->IsAlive())
+            return;
+    }
 
     if (m_creature->Attack(pWho, m_bMeleeAttack))
     {
@@ -85,7 +95,7 @@ void PetEventAI::AttackStart(Unit* pWho)
         m_creature->SetInCombatWith(pWho);
         pWho->SetInCombatWith(m_creature);
 
-        if (Player* pOwner = ToPlayer(m_creature->GetCharmerOrOwner()))
+        if (pOwner && pOwner->IsPlayer())
         {
             if (!pOwner->IsInCombat())
             {
@@ -126,11 +136,20 @@ Unit* PetEventAI::FindTargetForAttack() const
     if (Unit* pTaunter = m_creature->GetTauntTarget())
         return pTaunter;
 
-    // Check for valid targets on threat list.
-    if (!m_creature->GetThreatManager().isThreatListEmpty())
-        if (Unit* pTarget = m_creature->GetThreatManager().getHostileTarget())
-            if (!pTarget->HasAuraPetShouldAvoidBreaking())
-                return pTarget;
+    if (m_creature->CanHaveThreatList())
+    {
+        // Check for valid targets on threat list.
+        if (!m_creature->GetThreatManager().isThreatListEmpty())
+            if (Unit* pTarget = m_creature->GetThreatManager().getHostileTarget())
+                if (!pTarget->HasAuraPetShouldAvoidBreaking())
+                    return pTarget;
+    }
+    else if (!m_creature->GetAttackers().empty())
+    {
+        Unit* pAttacker = *(m_creature->GetAttackers().begin());
+        if (pAttacker->IsInCombat() && m_creature->IsValidAttackTarget(pAttacker))
+            return pAttacker;
+    }
 
     Unit const* pOwner = m_creature->GetCharmerOrOwner();
     if (!pOwner)
@@ -238,15 +257,12 @@ void PetEventAI::MovementInform(uint32 moveType, uint32 data)
 {
     CreatureEventAI::MovementInform(moveType, data);
 
-    if (!m_creature->GetCharmInfo() || !m_creature->GetCharmerOrOwner())
-        return;
-
     // Receives notification when pet reaches owner
     if (moveType == FOLLOW_MOTION_TYPE)
     {
         // If data is owner's GUIDLow then we've reached follow point,
         // otherwise we're probably chasing a creature.
-        if ((data == m_creature->GetCharmerOrOwner()->GetGUIDLow()) && m_creature->GetCharmInfo()->IsReturning())
+        if (m_creature->GetCharmInfo() && m_creature->GetCharmInfo()->IsReturning() && data == m_creature->GetCharmerOrOwnerGuid().GetCounter())
         {
             m_creature->GetCharmInfo()->SetIsReturning(false);
         }

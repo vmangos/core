@@ -39,7 +39,7 @@ bool CreatureEventAIHolder::UpdateRepeatTimer(Creature* creature, uint32 repeatM
         Time = urand(repeatMin, repeatMax);
     else
     {
-        sLog.outErrorDb("CreatureEventAI: Creature %u using Event %u (Type = %u) has RandomMax < RandomMin. Event repeating disabled.", creature->GetEntry(), Event.event_id, Event.event_type);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI: Creature %u using Event %u (Type = %u) has RandomMax < RandomMin. Event repeating disabled.", creature->GetEntry(), Event.event_id, Event.event_type);
         Enabled = false;
         return false;
     }
@@ -62,42 +62,28 @@ void CreatureEventAI::GetAIInformation(ChatHandler& reader)
 CreatureEventAI::CreatureEventAI(Creature* c) : BasicAI(c)
 {
     // Need make copy for filter unneeded steps and safe in case table reload
-    CreatureEventAI_Event_Map::const_iterator creatureEventsItr = sEventAIMgr.GetCreatureEventAIMap().find(m_creature->GetEntry());
+    CreatureEventAI_Event_Map::const_iterator creatureEventsItr = sEventAIMgr.GetCreatureEventAIMap().find(c->GetEntry());
     if (creatureEventsItr != sEventAIMgr.GetCreatureEventAIMap().end())
     {
-        uint32 events_count = 0;
-
-        const CreatureEventAI_Event_Vec& creatureEvent = creatureEventsItr->second;
+        CreatureEventAI_Event_Vec const& creatureEvent = creatureEventsItr->second;
+        m_CreatureEventAIList.reserve(creatureEvent.size());
         for (const auto& i : creatureEvent)
         {
+
             //Debug check
 #ifndef _DEBUG
             if (i.event_flags & EFLAG_DEBUG_ONLY)
                 continue;
 #endif
 
-            ++events_count;
-        }
-        //EventMap had events but they were not added because they must be for instance
-        if (events_count == 0)
-            sLog.outError("CreatureEventAI: Creature %u has events but no events added to list because of instance flags.", m_creature->GetEntry());
-        else
-        {
-            m_CreatureEventAIList.reserve(events_count);
-            for (const auto& i : creatureEvent)
-            {
+            if (i.event_type == EVENT_T_OOC_LOS)
+                c->EnableMoveInLosEvent();
 
-                //Debug check
-#ifndef _DEBUG
-                if (i.event_flags & EFLAG_DEBUG_ONLY)
-                    continue;
-#endif
-                m_CreatureEventAIList.push_back(CreatureEventAIHolder(i));
-            }
+            m_CreatureEventAIList.push_back(CreatureEventAIHolder(i));
         }
     }
     else
-        sLog.outError("CreatureEventAI: EventMap for Creature %u is empty but creature is using CreatureEventAI.", m_creature->GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreatureEventAI: EventMap for Creature %u is empty but creature is using CreatureEventAI.", m_creature->GetEntry());
 
     m_bEmptyList = m_CreatureEventAIList.empty();
     m_Phase = 0;
@@ -371,7 +357,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
             pHolder.UpdateRepeatTimer(m_creature, event.hit_by_aura.repeatMin, event.hit_by_aura.repeatMax);
             break;
         default:
-            sLog.outErrorDb("CreatureEventAI: Creature %u using Event %u has invalid Event Type(%u), missing from ProcessEvent() Switch.", m_creature->GetEntry(), pHolder.Event.event_id, pHolder.Event.event_type);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI: Creature %u using Event %u has invalid Event Type(%u), missing from ProcessEvent() Switch.", m_creature->GetEntry(), pHolder.Event.event_id, pHolder.Event.event_type);
             break;
     }
 

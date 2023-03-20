@@ -89,7 +89,7 @@ void FollowerAI::MoveInLineOfSight(Unit* pWho)
         if (m_creature->IsHostileTo(pWho))
         {
             float fAttackRadius = m_creature->GetAttackDistance(pWho);
-            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius, true, false) && m_creature->IsWithinLOSInMap(pWho))
+            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius, true, SizeFactor::None) && m_creature->IsWithinLOSInMap(pWho))
             {
                 m_creature->EnterCombatWithTarget(pWho);
             }
@@ -197,7 +197,7 @@ void FollowerAI::UpdateAI(uint32 const uiDiff)
         {
             if (HasFollowState(STATE_FOLLOW_COMPLETE) && !HasFollowState(STATE_FOLLOW_POSTEVENT))
             {
-                sLog.outDebug("FollowerAI is set completed, despawns.");
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FollowerAI is set completed, despawns.");
                 m_creature->DisappearAndDie();
                 return;
             }
@@ -208,7 +208,7 @@ void FollowerAI::UpdateAI(uint32 const uiDiff)
             {
                 if (HasFollowState(STATE_FOLLOW_RETURNING))
                 {
-                    sLog.outDebug("FollowerAI is returning to leader.");
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FollowerAI is returning to leader.");
 
                     RemoveFollowState(STATE_FOLLOW_RETURNING);
                     m_creature->GetMotionMaster()->MoveFollow(pPlayer, m_uiFollowDistance, PET_FOLLOW_ANGLE);
@@ -244,7 +244,7 @@ void FollowerAI::UpdateAI(uint32 const uiDiff)
 
             if (bShouldAbort)
             {
-                sLog.outDebug("FollowerAI failed because quest failed or player/group was to far away or not found");
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FollowerAI failed because quest failed or player/group was to far away or not found");
                 SetFollowPaused(false);
                 OnEscortFailed(false);
                 m_creature->DisappearAndDie();
@@ -298,13 +298,13 @@ void FollowerAI::StartFollow(Player* pLeader, uint32 uiFactionForFollower, Quest
 {
     if (m_creature->GetVictim())
     {
-        sLog.outDebug("FollowerAI attempt to StartFollow while in combat.");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FollowerAI attempt to StartFollow while in combat.");
         return;
     }
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {
-        sLog.outError("FollowerAI attempt to StartFollow while already following.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FollowerAI attempt to StartFollow while already following.");
         return;
     }
 
@@ -321,7 +321,7 @@ void FollowerAI::StartFollow(Player* pLeader, uint32 uiFactionForFollower, Quest
     {
         m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MoveIdle();
-        sLog.outDebug("FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
     }
 
     m_creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -330,7 +330,7 @@ void FollowerAI::StartFollow(Player* pLeader, uint32 uiFactionForFollower, Quest
 
     m_creature->GetMotionMaster()->MoveFollow(pLeader, followDist, PET_FOLLOW_ANGLE);
 
-    sLog.outDebug("FollowerAI start follow %s (GUID %u)", pLeader->GetName(), m_uiLeaderGUID);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FollowerAI start follow %s (GUID %u)", pLeader->GetName(), m_uiLeaderGUID);
 }
 
 Player* FollowerAI::GetLeaderForFollower()
@@ -348,7 +348,7 @@ Player* FollowerAI::GetLeaderForFollower()
 
                 if (pMember && pMember->IsAlive() && m_creature->IsWithinDistInMap(pMember, MAX_PLAYER_DISTANCE))
                 {
-                    sLog.outDebug("FollowerAI GetLeader changed and returned new leader.");
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FollowerAI GetLeader changed and returned new leader.");
                     m_uiLeaderGUID = pMember->GetGUID();
                     return pMember;
                 }
@@ -356,7 +356,7 @@ Player* FollowerAI::GetLeaderForFollower()
         }
     }
 
-    sLog.outDebug("FollowerAI GetLeader can not find suitable leader.");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FollowerAI GetLeader can not find suitable leader.");
     return nullptr;
 }
 

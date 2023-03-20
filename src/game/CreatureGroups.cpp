@@ -175,26 +175,30 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
     m_respawnGuard = true;
     if (member->IsInWorld() && member->GetRespawnTime() > time(nullptr))
     {
-        if (memberEntry && memberEntry->memberFlags & OPTION_FORMATION_MOVE)
+        BattleGround* bg = member->GetMap()->IsBattleGround() ? ((BattleGroundMap*)member->GetMap())->GetBG() : nullptr;
+        if (!bg || bg->CanBeSpawned(member))
         {
-            if (Unit* leader = member->GetMap()->GetUnit(GetOriginalLeaderGuid()))
+            if (memberEntry && memberEntry->memberFlags & OPTION_FORMATION_MOVE)
             {
-                float x, y, z;
-                if (leader->IsAlive() || leader->GetTypeId() != TYPEID_UNIT)
-                    leader->GetPosition(x, y, z);
-                else
-                    leader->ToCreature()->GetRespawnCoord(x, y, z);
+                if (Unit* leader = member->GetMap()->GetUnit(GetOriginalLeaderGuid()))
+                {
+                    float x, y, z;
+                    if (leader->IsAlive() || leader->GetTypeId() != TYPEID_UNIT)
+                        leader->GetPosition(x, y, z);
+                    else
+                        leader->ToCreature()->GetRespawnCoord(x, y, z);
 
-                float tmpx = x;
-                float tmpy = y;
-                memberEntry->ComputeRelativePosition(leader->GetOrientation(), x, y);
-                x += tmpx;
-                y += tmpy;
-                member->UpdateGroundPositionZ(x, y, z);
-                member->NearTeleportTo(x, y, z, leader->GetAngle(x, y) + M_PI);
+                    float tmpx = x;
+                    float tmpy = y;
+                    memberEntry->ComputeRelativePosition(leader->GetOrientation(), x, y);
+                    x += tmpx;
+                    y += tmpy;
+                    member->UpdateGroundPositionZ(x, y, z);
+                    member->NearTeleportTo(x, y, z, leader->GetAngle(x, y) + M_PI);
+                }
             }
+            member->Respawn();
         }
-        member->Respawn();
     }
     m_respawnGuard = false;
 }
@@ -307,8 +311,8 @@ void CreatureGroupsManager::Load()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outErrorDb(">>  Loaded 0 creature groups. DB table `creature_groups` is empty!");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, ">>  Loaded 0 creature groups. DB table `creature_groups` is empty!");
         return;
     }
 
@@ -328,12 +332,12 @@ void CreatureGroupsManager::Load()
         if (leaderGuid.IsEmpty())
         {
             if (!sObjectMgr.IsExistingCreatureGuid(fields[0].GetUInt32()))
-                sLog.outErrorDb("CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
         }
         else if (memberGuid.IsEmpty())
         {
             if (!sObjectMgr.IsExistingCreatureGuid(fields[1].GetUInt32()))
-                sLog.outErrorDb("CREATURE GROUPS: Bad member guid %u", fields[1].GetUInt32());
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad member guid %u", fields[1].GetUInt32());
         }
         else
         {
@@ -348,8 +352,8 @@ void CreatureGroupsManager::Load()
     }
     while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u creature groups in %u ms", count, WorldTimer::getMSTime() - oldMSTime);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creature groups in %u ms", count, WorldTimer::getMSTime() - oldMSTime);
 }
 
 void CreatureGroupsManager::LoadCreatureGroup(Creature* creature, CreatureGroup*& group)

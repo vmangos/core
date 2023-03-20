@@ -64,6 +64,7 @@ class CreatureGroup
         std::map<ObjectGuid, CreatureGroupMember*> const& GetMembers() const { return m_members; }
         bool ContainsGuid(ObjectGuid guid) const { return m_members.find(guid) != m_members.end(); }
         bool IsFormation() const { return m_options & OPTION_FORMATION_MOVE; }
+        bool HasGroupFlag(uint32 flag) const { return m_options & flag; }
         void SetLastReachedWaypoint(uint32 point) { m_lastReachedWaypoint = point; }
 
         void OnMemberAttackStart(Creature* member, Unit* target);

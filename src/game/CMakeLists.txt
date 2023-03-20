@@ -114,7 +114,6 @@ set (game_SRCS
     Handlers/GroupHandler.cpp
     Handlers/GuildHandler.cpp
     Handlers/ItemHandler.cpp
-    Handlers/LFGHandler.cpp
     Handlers/LootHandler.cpp
     Handlers/MailHandler.cpp
     Handlers/MiscHandler.cpp
@@ -128,7 +127,9 @@ set (game_SRCS
     Handlers/SpellHandler.cpp
     Handlers/TaxiHandler.cpp
     Handlers/TradeHandler.cpp
+    LFG/LFGHandler.cpp
     LFG/LFGMgr.cpp
+    LFG/LFGQueue.cpp
     Mail/Mail.cpp
     Mail/MassMailMgr.cpp
     Maps/GridMap.cpp
@@ -232,6 +233,7 @@ set (game_SRCS
     ItemEnchantmentMgr.h
     Language.h
     LootMgr.h
+    LoveIsInTheAir.h
     ObjectAccessor.h
     ObjectGridLoader.h
     ObjectGuid.h
@@ -301,8 +303,9 @@ set (game_SRCS
     Guild/GuildMgr.h
     Handlers/AddonHandler.h
     Handlers/NPCHandler.h
-    Handlers/LFGHandler.h
+    LFG/LFGDefines.h
     LFG/LFGMgr.h
+    LFG/LFGQueue.h
     Mail/Mail.h
     Mail/MassMailMgr.h
     Maps/Cell.h

@@ -27,6 +27,8 @@
 *.opendb
 *.exp
 *.res
+CMakeSettings.json
+/out/
 
 # CLion files
 cmake-build-debug

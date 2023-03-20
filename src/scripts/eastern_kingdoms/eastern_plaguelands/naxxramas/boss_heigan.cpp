@@ -52,6 +52,7 @@ enum HeiganData
     EMOTE_RETURN            = -1533137, // need find correct bct id!
 
     SPELL_ERUPTION          = 29371,
+    SPELL_PLAGUE_WAVE       = 30243,
 
     //Spells by boss
     SPELL_DECREPIT_FEVER    = 29998,
@@ -59,8 +60,7 @@ enum HeiganData
     SPELL_TELEPORT_SELF     = 30211,
     SPELL_MANABURN          = 29310,
 
-    NPC_PLAGUE_FISSURE      = 533001,
-    NPC_PLAGUE_CLOUD        = 533002
+    NPC_PLAGUE_WAVE         = 17293
 };
 
 enum Events
@@ -219,7 +219,7 @@ struct boss_heiganAI : public ScriptedAI
 
     void SendEruptCustomLocation(float x, float y, float z)
     {
-        if (Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 50))
+        if (Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_WAVE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 50))
         {
             fissureCreature->CastSpell(fissureCreature, SPELL_ERUPTION, true);
         }
@@ -229,10 +229,10 @@ struct boss_heiganAI : public ScriptedAI
     {
         if (!m_pInstance)
             return;
-        Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, 2773.0f, -3684.0f, 292.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000);
+        Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_WAVE, 2773.0f, -3684.0f, 292.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000);
         if (!fissureCreature)
         {
-            sLog.outError("Heigan: failed spawning fissure creature");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Heigan: failed spawning fissure creature");
             return;
         }
 
@@ -280,12 +280,12 @@ struct boss_heiganAI : public ScriptedAI
         ++eruptionPhase;
     }
 
-    void SummmonPlagueCloud(float x, float y, float z, float o)
+    void SummmonPlagueWave(float x, float y, float z, float o)
     {
-        if (Creature* pCloud = m_creature->SummonCreature(NPC_PLAGUE_CLOUD, x, y, z, o,
+        if (Creature* pCloud = m_creature->SummonCreature(NPC_PLAGUE_WAVE, x, y, z, o,
             TEMPSUMMON_TIMED_DESPAWN, 45000))
         {
-            pCloud->CastSpell((Unit*)nullptr, SPELL_PLAGUE_CLOUD, true);
+            pCloud->CastSpell(pCloud, SPELL_PLAGUE_WAVE, true);
         }
     }
 
@@ -315,7 +315,7 @@ struct boss_heiganAI : public ScriptedAI
         // the regular ones
         for (const auto& eyeStalkPossition : eyeStalkPossitions)
         {
-            SummmonPlagueCloud(eyeStalkPossition[0], eyeStalkPossition[1], eyeStalkPossition[2], eyeStalkPossition[3]);
+            SummmonPlagueWave(eyeStalkPossition[0], eyeStalkPossition[1], eyeStalkPossition[2], eyeStalkPossition[3]);
         }
 
         DoScriptText(SAY_CHANNELING, m_creature);
@@ -373,7 +373,7 @@ struct boss_heiganAI : public ScriptedAI
             candidates.erase(candidates.begin() + idx);
             portedPlayersThisPhase.push_back(target->GetObjectGuid());
             // getting the spell visual to show both where you were TPed from and where you are TPed too
-            if (Creature* pCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, 
+            if (Creature* pCreature = m_creature->SummonCreature(NPC_PLAGUE_WAVE, 
                 target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(),
                 TEMPSUMMON_TIMED_DESPAWN, 2000))
             {
@@ -480,33 +480,9 @@ struct boss_heiganAI : public ScriptedAI
     }
 };
 
-struct mob_plague_cloudAI : public ScriptedAI
-{
-    mob_plague_cloudAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
-        m_creature->StopMoving();
-        m_creature->SetRooted(true);
-    }
-
-    void AttackStart(Unit*) override { }
-    void MoveInLineOfSight(Unit*) override { }
-    void UpdateAI(uint32 const) override { }
-};
-
 CreatureAI* GetAI_boss_heigan(Creature* pCreature)
 {
     return new boss_heiganAI(pCreature);
-}
-
-CreatureAI* GetAI_mob_plagueCloud(Creature* pCreature)
-{
-    return new mob_plague_cloudAI(pCreature);
 }
 
 void AddSC_boss_heigan()
@@ -515,10 +491,5 @@ void AddSC_boss_heigan()
     NewScript = new Script;
     NewScript->Name = "boss_heigan";
     NewScript->GetAI = &GetAI_boss_heigan;
-    NewScript->RegisterSelf();
-
-    NewScript = new Script;
-    NewScript->Name = "mob_plague_cloud";
-    NewScript->GetAI = &GetAI_mob_plagueCloud;
     NewScript->RegisterSelf();
 }

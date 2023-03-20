@@ -130,6 +130,9 @@ int32 MoveSplineInit::Launch()
     if (Player* pPlayer = unit.ToPlayer())
         pPlayer->GetCheatData()->ResetJumpCounters();
 
+    if (unit.IsPlayer() || unit.GetPossessorGuid().IsPlayer())
+        unit.SetSplineDonePending(true);
+
     unit.m_movementInfo.SetMovementFlags((MovementFlags)moveFlags);
     move_spline.SetMovementOrigin(movementType);
     move_spline.Initialize(args);
@@ -214,7 +217,7 @@ int32 MoveSplineInit::Launch()
             unit.SendMovementMessageToSet(std::move(data2), true);
         }
         else {
-            sLog.outError("[MoveSplineInit] Unable to compress move packet, move spline not sent");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MoveSplineInit] Unable to compress move packet, move spline not sent");
         }
     }
 #endif

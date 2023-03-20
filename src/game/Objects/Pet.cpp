@@ -67,7 +67,7 @@ Pet::Pet(PetType type) :
     m_loyaltyPoints(0), m_bonusdamage(0), m_auraUpdateMask(0), m_loading(false), m_pTmpCache(nullptr), m_unSummoned(false), m_enabled(true)
 {
     m_name = "Pet";
-    m_regenTimer = REGEN_TIME_FULL;
+    m_regenTimer = REGEN_TIME_CREATURE_FULL;
 
     // pets always have a charminfo, even if they are not actually charmed
     InitCharmInfo(this);
@@ -179,7 +179,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
     CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(petEntry);
     if (!creatureInfo)
     {
-        sLog.outError("Pet entry %u does not exist but used at pet load (owner: %s).", petEntry, owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet entry %u does not exist but used at pet load (owner: %s).", petEntry, owner->GetGuidStr().c_str());
         m_pTmpCache = nullptr;
         m_loading = false;
         return false;
@@ -226,7 +226,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
     uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_PET);
     if (!Create(guid, pos, creatureInfo, pet_number))
     {
-        sLog.outError("Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
                       GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
         m_pTmpCache = nullptr;
         m_loading = false;
@@ -400,10 +400,13 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
     _LoadSpellCooldowns();
 
     owner->SetPet(this);                                    // in DB stored only full controlled creature
-    DEBUG_LOG("New Pet has guid %u", GetGUIDLow());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "New Pet has guid %u", GetGUIDLow());
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
+        if (owner->IsMounted())
+            m_enabled = false;
+
         ((Player*)owner)->PetSpellInitialize();
         if (((Player*)owner)->GetGroup())
             ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
@@ -736,7 +739,7 @@ void Pet::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 
         RegenerateMana();
 
-        m_regenTimer = REGEN_TIME_FULL;
+        m_regenTimer = REGEN_TIME_CREATURE_FULL;
     }
     else
         m_regenTimer -= update_diff;
@@ -1264,7 +1267,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 {
     if (!creature)
     {
-        sLog.outError("CRITICAL: nullptr pointer passed into CreateBaseAtCreature()");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CRITICAL: nullptr pointer passed into CreateBaseAtCreature()");
         return false;
     }
 
@@ -1272,7 +1275,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 
     uint32 guid = creature->GetMap()->GenerateLocalLowGuid(HIGHGUID_PET);
 
-    //BASIC_LOG("Create pet");
+    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Create pet");
     uint32 pet_number = sObjectMgr.GeneratePetNumber();
     if (!Create(guid, pos, creature->GetCreatureInfo(), pet_number))
         return false;
@@ -1280,7 +1283,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     CreatureInfo const* cinfo = GetCreatureInfo();
     if (!cinfo)
     {
-        sLog.outError("CreateBaseAtCreature() failed, creatureInfo is missing!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreateBaseAtCreature() failed, creatureInfo is missing!");
         return false;
     }
 
@@ -1335,7 +1338,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         owner = GetOwner();
         if (!owner)
         {
-            sLog.outError("attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->entry);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->entry);
             return false;
         }
     }
@@ -1480,7 +1483,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             }
             else                                            // not exist in DB, use some default fake data
             {
-                sLog.outErrorDb("Hunter pet levelstats missing in DB");
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Hunter pet levelstats missing in DB");
                 CreatureClassLevelStats const* pCLS = GetClassLevelStats();
 
                 // disregard template multiplier
@@ -1520,7 +1523,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             break;
         }
         default:
-            sLog.outError("Pet have incorrect type (%u) for levelup.", getPetType());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet have incorrect type (%u) for levelup.", getPetType());
             break;
     }
 
@@ -1594,7 +1597,7 @@ void Pet::_LoadSpellCooldowns()
             SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
             if (!spellEntry)
             {
-                sLog.outError("%s has unknown spell %u in `character_spell_cooldown`, skipping.", GetGuidStr().c_str(), spellId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has unknown spell %u in `character_spell_cooldown`, skipping.", GetGuidStr().c_str(), spellId);
                 continue;
             }
 
@@ -1614,7 +1617,7 @@ void Pet::_LoadSpellCooldowns()
             m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellId, uint32(spellRecTime.count()));
 #ifdef _DEBUG
             uint32 spellCDDuration = std::chrono::duration_cast<std::chrono::seconds>(spellRecTime).count();
-            sLog.outDebug("Adding spell cooldown to %s, SpellID(%u), recDuration(%us).", GetGuidStr().c_str(), spellId, spellCDDuration);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Adding spell cooldown to %s, SpellID(%u), recDuration(%us).", GetGuidStr().c_str(), spellId, spellCDDuration);
 #endif
         }
         //while (result->NextRow());
@@ -1773,7 +1776,7 @@ void Pet::_LoadAuras(uint32 timediff)
             SpellEntry const* spellproto = sSpellMgr.GetSpellEntry(spellid);
             if (!spellproto)
             {
-                sLog.outError("Pet::_LoadAuras: Unknown spell (spellid %u), ignore.", spellid);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet::_LoadAuras: Unknown spell (spellid %u), ignore.", spellid);
                 continue;
             }
 
@@ -1943,11 +1946,11 @@ bool Pet::AddSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
         // do pet spell book cleanup
         if (state == PETSPELL_UNCHANGED)                    // spell load case
         {
-            sLog.outError("Pet::AddSpell: nonexistent in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spellId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet::AddSpell: nonexistent in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spellId);
             CharacterDatabase.PExecute("DELETE FROM `pet_spell` WHERE `spell` = '%u'", spellId);
         }
         else
-            sLog.outError("Pet::AddSpell: nonexistent in SpellStore spell #%u request.", spellId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet::AddSpell: nonexistent in SpellStore spell #%u request.", spellId);
 
         return false;
     }
@@ -2285,7 +2288,7 @@ bool Pet::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* ci
     SetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
 
     if (getPetType() == MINI_PET)                           // always non-attackable
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC);
 
     return true;
 }

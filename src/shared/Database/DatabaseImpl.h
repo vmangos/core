@@ -21,6 +21,7 @@
 
 #include "Database/Database.h"
 #include "Database/SqlOperations.h"
+#include "Log.h"
 
 /// Function body definitions for the template function members of the Database class
 
@@ -41,7 +42,7 @@
         \
         if(res==-1) \
         { \
-            sLog.outError("SQL Query truncated (and not execute) for format: %s",format); \
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format); \
             return false; \
         } \
     }
