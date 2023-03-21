@@ -128,27 +128,26 @@ private:
 };
 
 /* Run the display in an async task inside the main update, safe for session consistency */
-class PlayerAccountSearchDisplayTask
+class PlayerAccountSearchDisplayTask : public AsyncTask
 {
 public:
-
     PlayerAccountSearchDisplayTask(PlayerSearchQueryHolder* queryHolder)
         : holder(queryHolder) {}
 
-    void operator()();
+    void run() override;
 
 private:
     PlayerSearchQueryHolder* holder;
 };
 
 /* Run the display in an async task inside the main update, safe for session consistency */
-class PlayerCharacterLookupDisplayTask
+class PlayerCharacterLookupDisplayTask : public AsyncTask
 {
 public:
     PlayerCharacterLookupDisplayTask(QueryResult* result, uint32 accountId, uint32 limit)
         : query(result), accountId(accountId), limit(limit) {}
 
-    void operator ()();
+    void run() override;
 
 private:
     QueryResult* query;
@@ -156,13 +155,13 @@ private:
     uint32 limit;
 };
 
-class AccountSearchDisplayTask
+class AccountSearchDisplayTask : public AsyncTask
 {
 public:
     AccountSearchDisplayTask(QueryResult* result, uint32 accountId, uint32 limit)
         : query(result), accountId(accountId), limit(limit) {}
 
-    void operator ()();
+    void run() override;
 
 private:
     QueryResult* query;

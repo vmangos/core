@@ -24,8 +24,8 @@
 #include "Policies/Singleton.h"
 #include "DBCEnums.h"
 #include "ScriptCommands.h"
-
-#include <atomic>
+#include "SpellDefines.h"
+#include "ace/Atomic_Op.h"
 
 struct AreaTriggerEntry;
 class Aura;
@@ -311,7 +311,7 @@ class ScriptMgr
         std::set<uint32> m_referencedGameObjectGuids;
 
         //atomic op counter for active scripts amount
-        std::atomic<int> m_scheduledScripts;
+        ACE_Atomic_Op<ACE_Thread_Mutex, int> m_scheduledScripts;
 };
 
 #define sScriptMgr MaNGOS::Singleton<ScriptMgr>::Instance()

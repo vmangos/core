@@ -23,7 +23,7 @@ void MovementBroadcaster::StartThreads()
     ASSERT(m_threads.empty());
 
     // Create new mutex vector - can't resize a vector of locks (non-copyable)
-    std::vector<std::mutex> locks(m_num_threads);
+    std::vector<ACE_Thread_Mutex> locks(m_num_threads);
     m_thread_locks = std::move(locks);
     m_thread_players.resize(m_num_threads);
     m_thread_update_stats.resize(m_num_threads);
@@ -31,17 +31,8 @@ void MovementBroadcaster::StartThreads()
     m_stop = false;
 
     // start the workers
-    for (std::size_t i = 0; i < m_num_threads; ++i) {
-        auto mb = new MovementBroadcasterWorker(i, this);
-        m_threads.emplace_back(new std::thread(
-                                [mb, i](){mb->run();
-        }),[mb](std::thread *thread) {
-            if (thread->joinable())
-                thread->join();
-            delete thread;
-            delete mb;
-        });
-    }
+    for (std::size_t i = 0; i < m_num_threads; ++i)
+        m_threads.push_back(new ACE_Based::Thread(new MovementBroadcasterWorker(i, this)));
 
 }
 
@@ -51,7 +42,7 @@ void MovementBroadcaster::RegisterPlayer(std::shared_ptr<PlayerBroadcaster> cons
         return;
 
     std::size_t index = player->GetGUID().GetRawValue() % m_num_threads;
-    std::unique_lock<std::mutex> guard(m_thread_locks[index]);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_thread_locks[index]);
     m_thread_players[index].insert(player);
 }
 
@@ -61,7 +52,7 @@ void MovementBroadcaster::RemovePlayer(std::shared_ptr<PlayerBroadcaster> const&
         return;
 
     std::size_t index = player->GetGUID().GetRawValue() % m_num_threads;
-    std::unique_lock<std::mutex> guard(m_thread_locks[index]);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_thread_locks[index]);
     auto it = m_thread_players[index].find(player);
 
     if (it != m_thread_players[index].end())
@@ -95,7 +86,7 @@ void MovementBroadcaster::Work(std::size_t thread_id)
         else
             stats.slow_instance = -1;
 
-        std::this_thread::sleep_for(m_sleep_timer);
+        ACE_Based::Thread::Sleep(m_sleep_timer.count());
     }
 }
 
@@ -103,7 +94,7 @@ uint32 MovementBroadcaster::IdentifySlowMap(std::size_t thread_id)
 {
     std::map<uint32 /* instanceId */, uint32 /* numPackets */> map_packets;
 
-    std::unique_lock<std::mutex> guard(m_thread_locks[thread_id]);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_thread_locks[thread_id]);
 
     for (auto& player : m_thread_players[thread_id])
         map_packets[player->instanceId] += player->lastUpdatePackets;
@@ -125,7 +116,7 @@ void MovementBroadcaster::BroadcastPackets(std::size_t index, uint32& num_packet
 {
     PlayersBCastSet my_players;
     {
-        std::unique_lock<std::mutex> guard(m_thread_locks[index]);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_thread_locks[index]);
         my_players = m_thread_players[index];
     }
 
@@ -139,6 +130,15 @@ void MovementBroadcaster::Stop()
 
     m_stop = true;
 
+    for (auto& thread : m_threads)
+    {
+        if (thread)
+        {
+            thread->wait();
+            thread->destroy();
+            delete thread;
+        }
+    }
     m_threads.clear();
 }
 

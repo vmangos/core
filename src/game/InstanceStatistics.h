@@ -20,6 +20,7 @@
 #define INSTANCE_STATISTICS_H
 
 #include "Common.h"
+#include "Threading.h"
 
 enum eInstanceCustomCounter : int
 {
@@ -64,9 +65,9 @@ private:
     std::map<std::pair<uint32,uint32>,InstanceCreatureKlls> m_instanceCreatureKills;
     std::map<uint32, uint32> m_instanceCustomCounters;
     
-    std::mutex m_wipesMutex;
-    std::mutex m_creatureKillsMutex;
-    std::mutex m_customCountersMutex;
+    ACE_Thread_Mutex m_wipesMutex;
+    ACE_Thread_Mutex m_creatureKillsMutex;
+    ACE_Thread_Mutex m_customCountersMutex;
 };
 
 

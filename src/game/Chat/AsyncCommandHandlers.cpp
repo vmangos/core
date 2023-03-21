@@ -240,10 +240,11 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
 // the world update
 void PlayerSearchHandler::HandlePlayerAccountSearchResult(QueryResult*, SqlQueryHolder* queryHolder, int)
 {
-    sWorld.AddAsyncTask(PlayerAccountSearchDisplayTask((PlayerSearchQueryHolder*)queryHolder));
+    PlayerAccountSearchDisplayTask* task = new PlayerAccountSearchDisplayTask((PlayerSearchQueryHolder*)queryHolder);
+    sWorld.AddAsyncTask(task);
 }
 
-void PlayerAccountSearchDisplayTask::operator ()()
+void PlayerAccountSearchDisplayTask::run()
 {
     // NOTE: Do not currently support console access for these commands
     WorldSession* session = sWorld.FindSession(holder->GetAccountId());
@@ -309,7 +310,7 @@ void PlayerAccountSearchDisplayTask::operator ()()
     delete holder;
 }
 
-void PlayerCharacterLookupDisplayTask::operator()()
+void PlayerCharacterLookupDisplayTask::run()
 {
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
@@ -334,7 +335,8 @@ void PlayerCharacterLookupDisplayTask::operator()()
 // Handle the result and create a display task to run in the world update
 void PlayerSearchHandler::HandlePlayerCharacterLookupResult(QueryResult* result, uint32 accountId, uint32 limit)
 {
-    sWorld.AddAsyncTask({PlayerCharacterLookupDisplayTask(result, accountId, limit)});
+    PlayerCharacterLookupDisplayTask* task = new PlayerCharacterLookupDisplayTask(result, accountId, limit);
+    sWorld.AddAsyncTask(task);
 }
 
 void PlayerSearchHandler::ShowPlayerListHelper(QueryResult* result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
@@ -405,7 +407,7 @@ bool PlayerSearchQueryHolder::GetAccountInfo(uint32 queryIndex, std::pair<uint32
     return true;
 }
 
-void AccountSearchDisplayTask::operator ()()
+void AccountSearchDisplayTask::run()
 {
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
@@ -430,7 +432,8 @@ void AccountSearchDisplayTask::operator ()()
 
 void AccountSearchHandler::HandleAccountLookupResult(QueryResult* result, uint32 accountId, uint32 limit)
 {
-    sWorld.AddAsyncTask({AccountSearchDisplayTask(result, accountId, limit)});
+    AccountSearchDisplayTask *task = new AccountSearchDisplayTask(result, accountId, limit);
+    sWorld.AddAsyncTask(task);
 }
 
 void AccountSearchHandler::ShowAccountListHelper(QueryResult* result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)

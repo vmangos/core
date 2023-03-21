@@ -43,8 +43,8 @@
 extern int m_ServiceStatus;
 #endif
 
-// Heartbeat for the World
-void WorldRunnable::operator()()
+/// Heartbeat for the World
+void WorldRunnable::run()
 {
     // Init new SQL thread for the world database
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests (one connection call enough)
@@ -96,14 +96,14 @@ void WorldRunnable::operator()()
 
         // Update at the target 1000/WORLD_SLEEP_CONST framerate
         // Previous implementation attempted to smooth diffs out, but did not
-        // account properly for the spikes which using a constant causes.
-        // If a smoothing filter is desired, consider a moving average
+        // account properly for the spikes which using a fucking constant
+        // causes. If a smoothing filter is desired, consider a moving average
         // or other simple filter.
         auto updateTime = WorldTimer::getMSTimeDiffToNow(currTime);
         prevTime = currTime;
 
         if (updateTime < WORLD_SLEEP_CONST)
-            std::this_thread::sleep_for(std::chrono::milliseconds(WORLD_SLEEP_CONST - updateTime));
+            ACE_Based::Thread::Sleep(WORLD_SLEEP_CONST - updateTime);
 
         #ifdef WIN32
             if (m_ServiceStatus == 0) World::StopNow(SHUTDOWN_EXIT_CODE);

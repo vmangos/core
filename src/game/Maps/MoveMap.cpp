@@ -57,13 +57,14 @@ MMapManager::~MMapManager()
 
 bool MMapManager::loadMapData(uint32 mapId)
 {
-    std::shared_lock<std::shared_timed_mutex> rlock(loadedMMaps_lock);
+    loadedMMaps_lock.acquire_read();
     // we already have this map loaded?
     if (loadedMMaps.find(mapId) != loadedMMaps.end())
     {
+        loadedMMaps_lock.release();
         return true;
     }
-    rlock.unlock();
+    loadedMMaps_lock.release();
 
     if (!sWorld.getConfig(CONFIG_BOOL_MMAP_ENABLED))
         return false;
@@ -104,11 +105,12 @@ bool MMapManager::loadMapData(uint32 mapId)
     MMapData* mmap_data = new MMapData(mesh);
     mmap_data->mmapLoadedTiles.clear();
 
-    std::unique_lock<std::shared_timed_mutex> wlock(loadedMMaps_lock);
+    loadedMMaps_lock.acquire_write();
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
         loadedMMaps.insert(std::pair<uint32, MMapData*>(mapId, mmap_data));
     else
         delete mmap_data;
+    loadedMMaps_lock.release();
 
     return true;
 }
@@ -125,14 +127,14 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
         return false;
 
     // get this mmap data
-    std::shared_lock<std::shared_timed_mutex> rlock(loadedMMaps_lock);
+    loadedMMaps_lock.acquire_read();
     MMapData* mmap = loadedMMaps[mapId];
-    rlock.unlock();
+    loadedMMaps_lock.release();
     MANGOS_ASSERT(mmap->navMesh);
 
     // check if we already have this tile loaded
     uint32 packedGridPos = packTileID(x, y);
-    std::unique_lock<std::mutex> wlock(mmap->tilesLoading_lock);
+    ACE_Guard<ACE_Thread_Mutex> guard(mmap->tilesLoading_lock);
     if (mmap->mmapLoadedTiles.find(packedGridPos) != mmap->mmapLoadedTiles.end())
         return false;
 
@@ -279,7 +281,7 @@ bool MMapManager::unloadMap(uint32 mapId)
     return true;
 }
 
-bool MMapManager::unloadMapInstance(uint32 mapId, std::thread::id instanceId)
+bool MMapManager::unloadMapInstance(uint32 mapId, uint32 instanceId)
 {
     // check if we have this map loaded
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -326,16 +328,16 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
         return nullptr;
 
-    std::thread::id tid= std::this_thread::get_id();
+    uint32 tid = (uintptr_t) ACE_Based::Thread::currentId();
     MMapData* mmap = loadedMMaps[mapId];
-    std::shared_lock<std::shared_timed_mutex> lock(mmap->navMeshQueries_lock);
+    mmap->navMeshQueries_lock.acquire_read();
 
     NavMeshQuerySet::iterator it = mmap->navMeshQueries.find(tid);
     dtNavMeshQuery* navMeshQuery = nullptr;
     if (it == mmap->navMeshQueries.end())
     {
-        lock.unlock();
-        std::unique_lock<std::shared_timed_mutex> ulock(mmap->navMeshQueries_lock);
+        mmap->navMeshQueries_lock.release();
+        mmap->navMeshQueries_lock.acquire_write();
 
         // allocate mesh query
         navMeshQuery = dtAllocNavMeshQuery();
@@ -343,17 +345,18 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
         dtStatus dtResult = navMeshQuery->init(mmap->navMesh, 2048);
         if (dtStatusFailed(dtResult))
         {
-            ulock.unlock();
+            mmap->navMeshQueries_lock.release();
             dtFreeNavMeshQuery(navMeshQuery);
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u thread %u", mapId, tid);
             return nullptr;
         }
 
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MMAP:GetNavMeshQuery: created dtNavMeshQuery for mapId %03u thread %u", mapId, tid);
-        mmap->navMeshQueries.insert(std::pair<std::thread::id, dtNavMeshQuery*>(tid, navMeshQuery));
+        mmap->navMeshQueries.insert(std::pair<uint32, dtNavMeshQuery*>(tid, navMeshQuery));
     }
     else
         navMeshQuery = it->second;
+    mmap->navMeshQueries_lock.release();
 
     return navMeshQuery;
 }
@@ -436,11 +439,11 @@ dtNavMeshQuery const* MMapManager::GetModelNavMeshQuery(uint32 displayId)
     if (loadedModels.find(displayId) == loadedModels.end())
         return nullptr;
 
-    std::thread::id tid = std::this_thread::get_id();
+    uint32 tid = (uintptr_t) ACE_Based::Thread::currentId();
     MMapData* mmap = loadedModels[displayId];
     if (mmap->navMeshQueries.find(tid) == mmap->navMeshQueries.end())
     {
-        std::unique_lock<std::mutex> g(lockForModels);
+        ACE_Guard<ACE_Thread_Mutex> g(lockForModels);
         if (mmap->navMeshQueries.find(tid) == mmap->navMeshQueries.end())
         {
             // allocate mesh query
@@ -453,8 +456,8 @@ dtNavMeshQuery const* MMapManager::GetModelNavMeshQuery(uint32 displayId)
                 return nullptr;
             }
 
-            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MMAP:GetModelNavMeshQuery: created dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
-            mmap->navMeshQueries.insert(std::pair<std::thread::id, dtNavMeshQuery*>(tid, query));
+            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MMAP:GetNavMeshQuery: created dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
+            mmap->navMeshQueries.insert(std::pair<uint32, dtNavMeshQuery*>(tid, query));
         }
     }
 

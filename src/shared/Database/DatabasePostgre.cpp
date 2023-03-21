@@ -24,6 +24,7 @@
 #include "Util.h"
 #include "Policies/SingletonImp.h"
 #include "Platform/Define.h"
+#include "Threading.h"
 #include "DatabaseEnv.h"
 #include "Database/SqlOperations.h"
 #include "Timer.h"

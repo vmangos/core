@@ -23,7 +23,6 @@ include_directories(
 )
 
 # link loadlib with zlib
-
 if(UNIX)
   find_package(ZLIB REQUIRED)
   if(ZLIB_FOUND)

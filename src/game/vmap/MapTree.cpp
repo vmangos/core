@@ -317,6 +317,7 @@ namespace VMAP
             FILE* tf = fopen(tilefile.c_str(), "rb");
             if (!tf)
                 success = false;
+
             else
             {
                 if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
@@ -369,7 +370,7 @@ namespace VMAP
                 while (ModelSpawn::readFromFile(rf, spawn))
                 {
                     // acquire model instance
-                    std::shared_ptr<WorldModel> model = vm->acquireModelInstance(iBasePath, spawn.name);
+                    WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name);
                     if (model)
                         model->setModelFlags(spawn.flags);
                     else
@@ -412,6 +413,12 @@ namespace VMAP
 
     void StaticMapTree::UnloadMap(VMapManager2* vm)
     {
+        for (auto& iLoadedSpawn : iLoadedSpawns)
+        {
+            iTreeValues[iLoadedSpawn.first].setUnloaded();
+            for (uint32 refCount = 0; refCount < iLoadedSpawn.second; ++refCount)
+                vm->releaseModelInstance(iTreeValues[iLoadedSpawn.first].name);
+        }
         iLoadedSpawns.clear();
         iLoadedTiles.clear();
     }
@@ -452,7 +459,7 @@ namespace VMAP
                 if (result)
                 {
                     // acquire model instance
-                    std::shared_ptr<WorldModel> model = vm->acquireModelInstance(iBasePath, spawn.name);
+                    WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name);
                     if (model)
                         model->setModelFlags(spawn.flags);
                     else
@@ -524,7 +531,7 @@ namespace VMAP
                     if (result)
                     {
                         // release model instance
-                        //vm->releaseModelInstance(spawn.name);
+                        vm->releaseModelInstance(spawn.name);
 
                         // update tree
                         uint32 referencedNode;

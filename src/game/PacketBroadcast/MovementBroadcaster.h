@@ -1,71 +1,74 @@
-#ifndef MANGOS_PLAYER_BROADCASTER_H
-#define MANGOS_PLAYER_BROADCASTER_H
+#ifndef MANGOS_MOVEMENT_BROADCASTER_H
+#define MANGOS_MOVEMENT_BROADCASTER_H
 
+#include "Log.h"
 #include "ObjectGuid.h"
-#include "WorldPacket.h"
-#include "WorldSocket.h"
-#include "WorldPacket.h"
-#include "Opcodes.h"
+#include "Threading.h"
+#include <array>
+#include <atomic>
+#include <array>
+#include <chrono>
+#include <unordered_map>
 #include <list>
 #include <vector>
 #include <cstddef>
+#include <memory>
 
+class PlayerBroadcaster;
 class MovementBroadcaster;
-class Player;
 
-class PlayerBroadcaster final
+class MovementBroadcasterWorker : public ACE_Based::Runnable
 {
-    struct BroadcastData
-    {
-        WorldPacket packet;
-        bool sendToSelf;
-        ObjectGuid except;
-    };
+public:
+    MovementBroadcasterWorker(int threadId, MovementBroadcaster* broadcaster) : m_threadId(threadId), m_broadcaster(broadcaster) {};
+    virtual void run();
+    int m_threadId;
+    MovementBroadcaster* m_broadcaster;
+};
 
-    std::size_t const MAX_QUEUE_SIZE;
+class MovementBroadcaster final
+{
+    friend class MovementBroadcasterWorker;
+    typedef std::set<std::shared_ptr<PlayerBroadcaster> > PlayersBCastSet;
 
-    WorldSocket* m_socket;
-    ObjectGuid m_self;
+    std::size_t m_num_threads;
 
-    std::map<ObjectGuid, std::shared_ptr<PlayerBroadcaster> > m_listeners;
-    std::vector<BroadcastData> m_queue;
-    std::mutex m_listeners_lock;
-    std::mutex m_queue_lock;
+    std::atomic_bool m_stop;
+    std::vector<ACE_Based::Thread*> m_threads;
+    std::chrono::milliseconds m_sleep_timer;
 
-    void ProcessQueue(uint32& num_packets);
-    void SendPacket(WorldPacket const& packet);
+    std::vector<PlayersBCastSet> m_thread_players;
+    std::vector<ACE_Thread_Mutex> m_thread_locks;
 
-    static inline bool CanSkipPacket(uint32 opcode)
-    {
-        return (opcode < MSG_MOVE_SET_RUN_SPEED_CHEAT ||
-                (opcode > MSG_MOVE_SET_TURN_RATE &&
-                 opcode != MSG_MOVE_HEARTBEAT));
-    }
-
-    uint32 instanceId;
-    uint32 lastUpdatePackets;
+    void Work(std::size_t thread_id);
+    void BroadcastPackets(std::size_t index, uint32& num_packets);
+    uint32 IdentifySlowMap(std::size_t thread_id);
 
 public:
-    PlayerBroadcaster(WorldSocket* socket, ObjectGuid const& self, std::size_t max_queue = 500);
-    ~PlayerBroadcaster();
+    MovementBroadcaster(std::size_t threads, std::chrono::milliseconds frequency);
+    ~MovementBroadcaster();
 
-    static uint32 num_bcaster_created;
-    static uint32 num_bcaster_deleted;
+    void RegisterPlayer(std::shared_ptr<PlayerBroadcaster> const& player);
+    void RemovePlayer(std::shared_ptr<PlayerBroadcaster> const& player);
 
-    void ChangeSocket(WorldSocket* new_socket);
-    void FreeAtLogout();
+    void StartThreads();
+    void UpdateConfiguration(std::size_t new_threads_count, std::chrono::milliseconds new_frequency);
+    void Stop();
 
-    ObjectGuid GetGUID() const;
+    struct ThreadUpdateStats
+    {
+        uint32 update_time;
+        uint32 num_packets;
+        int32 slow_instance;
+    };
+    std::vector<ThreadUpdateStats> const& GetStats() const { return m_thread_update_stats; }
+    std::chrono::milliseconds GetSleepTimer() const { return m_sleep_timer; }
+    std::size_t GetNumThreads() const { return m_num_threads; }
+    bool IsMapSlow(uint32 instanceId);
+    bool IsEnabled();
 
-    void QueuePacket(WorldPacket packet, bool self, ObjectGuid except);
-
-    void AddListener(Player const* player);
-    void RemoveListener(Player const* player);
-
-    void ClearListeners();
-    void SetInstanceId(uint32 id) { instanceId = id; }
-
-    friend class MovementBroadcaster;
+protected:
+    std::vector<ThreadUpdateStats> m_thread_update_stats;
 };
 
 #endif
