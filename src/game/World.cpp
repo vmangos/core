@@ -143,7 +143,8 @@ World::World()
         value = false;
 
     m_timeRate = 1.0f;
-    m_charDbWorkerThread    = nullptr;
+    m_charDbWorkerThread = nullptr;
+    m_lfgQueueThread = nullptr;
 }
 
 /// World destructor
@@ -169,8 +170,11 @@ World::~World()
         delete m_charDbWorkerThread;
     }
 
-    if (m_lfgQueueThread.joinable())
-        m_lfgQueueThread.join();
+    if (m_lfgQueueThread)
+    {
+        m_lfgQueueThread->wait();
+        delete m_lfgQueueThread;
+    }
 
     //TODO free addSessQueue
 }
@@ -183,8 +187,8 @@ void World::Shutdown()
     UpdateSessions(1);                               // real players unload required UpdateSessions call
     if (m_charDbWorkerThread)
         m_charDbWorkerThread->wait();
-    if (m_lfgQueueThread.joinable())
-        m_lfgQueueThread.join();
+    if (m_lfgQueueThread)
+        m_lfgQueueThread->wait();
 }
 
 /// Find a session by its id
@@ -1198,6 +1202,19 @@ public:
     }
 };
 
+class LFGQueueWorkerThread : public ACE_Based::Runnable
+{
+public:
+    LFGQueueWorkerThread()
+    {
+    }
+
+    virtual void run()
+    {
+        sWorld.GetLFGQueue().Update();
+    }
+};
+
 char const* World::GetPatchName() const
 {
     switch(GetWowPatch())
@@ -1802,12 +1819,10 @@ void World::SetInitialWorldSettings()
         sObjectMgr.RestoreDeletedItems();
     }
 
-    StartLFGQueueThread();
-
     m_broadcaster =
         std::make_unique<MovementBroadcaster>(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
-
+    m_lfgQueueThread = new ACE_Based::Thread(new LFGQueueWorkerThread());
     m_charDbWorkerThread = new ACE_Based::Thread(new CharactersDatabaseWorkerThread());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -2508,14 +2523,6 @@ bool World::RemoveBanAccount(BanMode mode, std::string const& source, std::strin
         sAccountMgr.UnbanAccount(account);
     }
     return true;
-}
-
-void World::StartLFGQueueThread()
-{
-    m_lfgQueueThread = std::thread([&]()
-    {
-        m_lfgQueue.Update();
-    });
 }
 
 /// Update the game time
