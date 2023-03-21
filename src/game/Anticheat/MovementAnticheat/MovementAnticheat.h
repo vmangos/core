@@ -5,11 +5,10 @@
 #include "UnitDefines.h"
 #include "Anticheat.h"
 #include "SniffFile.h"
-
+#include "ace/Thread_Mutex.h"
 #include <array>
 #include <sstream>
 #include <deque>
-#include <mutex>
 
 enum CheatType
 {
@@ -129,7 +128,7 @@ private:
         std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTick = {};    // gets reset every anticheat update tick
         std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTotal = {};   // gets reset when total treshold is reached
         std::deque<LoggedPacket> m_packetLog;
-        std::mutex m_packetLogMutex;
+        ACE_Thread_Mutex m_packetLogMutex;
 };
 
 #endif

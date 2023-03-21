@@ -219,7 +219,7 @@ void LFGQueue::Update()
 
     NEXT_ITERATION:
         previously = now;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        ACE_Based::Thread::Sleep(1000);
     }
 }
 
