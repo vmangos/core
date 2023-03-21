@@ -22,6 +22,7 @@
 #include <vector>
 #include <functional>
 #include "ace/Thread_Mutex.h"
+#include "ace/Guard_T.h"
 
 template <class T>
 class Messager
