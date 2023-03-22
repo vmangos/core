@@ -11,7 +11,7 @@ INSERT INTO `migrations` VALUES ('20220925023354');
 
 -- Change build_min to patch_min
 ALTER TABLE `game_graveyard_zone`
-	CHANGE COLUMN `build_min` `patch_min` TINYINT(2) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Minimum content patch to load this entry' AFTER `faction`;
+	CHANGE COLUMN `build_min` `patch_min` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Minimum content patch to load this entry' AFTER `faction`;
 
 -- Set Silithus, Cenarion Hold GY to patch 1.8
 UPDATE `game_graveyard_zone` SET `patch_min`='6' WHERE  `id`=910 AND `ghost_zone`=1377;
@@ -153,6 +153,10 @@ INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`, `patch_min`, `
 (329, 2240, 0, 0, 10),
 (329, 3038, 0, 0, 10),
 (329, 3039, 0, 0, 10);
+
+ALTER TABLE `game_graveyard_zone`
+	CHANGE COLUMN `patch_min` `patch_min` TINYINT(2) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Minimum content patch to load this entry' AFTER `faction`,
+	CHANGE COLUMN `patch_max` `patch_max` TINYINT(2) UNSIGNED NOT NULL DEFAULT '10' COMMENT 'Maximum content patch to load this entry' AFTER `patch_min`;
 
 
 -- End of migration.
