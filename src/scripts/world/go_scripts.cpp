@@ -113,7 +113,7 @@ enum BellHourlySoundFX
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
-    LIGHTHOUSEFOGHORN  = 7197  // Lighthouses (TODO: not implememted yet)
+    LIGHTHOUSEFOGHORN  = 7197  // Lighthouses
 };
 
 enum BellHourlySoundZones
@@ -126,14 +126,21 @@ enum BellHourlySoundZones
     IRONFORGE_ZONE           = 1537,
     TELDRASSIL_ZONE          = 141,
     DARNASSUS_ZONE           = 1657,
-    ASHENVALE_ZONE           = 331,
+    ASHENVALE_ZONE           = 331
+};
+
+enum LightHouseAreas
+{
+    AREA_THERAMORE           = 513,
+    AREA_ALCAZ_ISLAND        = 2079,
+    AREA_WESTFALL_LIGHTHOUSE = 115
 };
 
 enum BellHourlyObjects
 {
     // bell gameobjects
     GO_HORDE_BELL = 175885,
-    GO_ALLIANCE_BELL = 176573,
+    GO_ALLIANCE_BELL = 176573 // also used for light house spawns
 };
 
 enum BellHourlyMisc
@@ -147,13 +154,6 @@ struct go_bells : public GameObjectAI
 {
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
-        // Assign lighthouse sound by guid (zone is to imprecise)
-        if (isLightHouseObject())
-        {
-            _soundId = LIGHTHOUSEFOGHORN;
-            return;
-        }
-
         // Assign hourly bell sound by zone
         uint32 zoneId = me->GetZoneId();
 
@@ -177,6 +177,12 @@ struct go_bells : public GameObjectAI
             }
             case GO_ALLIANCE_BELL:
             {
+                if (isLightHouseObject())
+                {
+                    _soundId = LIGHTHOUSEFOGHORN;
+                    return;
+                }
+
                 switch (zoneId)
                 {
                     case IRONFORGE_ZONE:
@@ -201,15 +207,20 @@ struct go_bells : public GameObjectAI
 
     bool isLightHouseObject()
     {
-        switch (me->GetGUIDLow())
+        switch (me->GetAreaId())
         {
-        case 42666: // Westfall Lighthouse
-        case 9104:  // Alcaz Lighthouse
-        case 18178: // Theramore Lighthouse
-            return true;
-        default:
-            return false;
+            case AREA_THERAMORE:
+            {
+                // There also is a alliance bell spwan in the same area, check if location is close to lighthouse
+                return me->GetDistance(-3667.0f, -4754.0f, 1.8f) < 1;
+            }
+            case AREA_ALCAZ_ISLAND:
+            case AREA_WESTFALL_LIGHTHOUSE:
+            {
+                return true;
+            }
         }
+        return false;
     }
 
     void UpdateAI(uint32 const diff) override
