@@ -140,7 +140,7 @@ enum BellHourlyObjects
 {
     // bell gameobjects
     GO_HORDE_BELL = 175885,
-    GO_ALLIANCE_BELL = 176573 // also used for light house spawns
+    GO_ALLIANCE_BELL = 176573 // Also used for lighthouse spawns
 };
 
 enum BellHourlyMisc
@@ -154,9 +154,8 @@ struct go_bells : public GameObjectAI
 {
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
-        // Assign hourly bell sound by zone
-        uint32 zoneId = me->GetZoneId();
 
+        uint32 zoneId = me->GetZoneId();
         switch (me->GetEntry())
         {
             case GO_HORDE_BELL:
@@ -211,7 +210,8 @@ struct go_bells : public GameObjectAI
         {
             case AREA_THERAMORE:
             {
-                // There also is a alliance bell spwan in the same area, check if location is close to lighthouse
+                // Area is not precise enough here, since there also is an alliance bell spawn
+                // in the same area. Check if location is close to lighthouse:
                 return me->GetDistance(-3667.0f, -4754.0f, 1.8f) < 1;
             }
             case AREA_ALCAZ_ISLAND:
