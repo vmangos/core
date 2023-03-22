@@ -8481,9 +8481,12 @@ void ObjectMgr::DeleteCreatureData(uint32 guid)
     // remove mapid*cellid -> guid_set map
     CreatureData const* data = GetCreatureData(guid);
     if (data)
+    {
         RemoveCreatureFromGrid(guid, data);
+        const_cast<CreatureData*>(data)->spawn_flags |= SPAWN_FLAG_DISABLED;
+    }
 
-    m_CreatureDataMap.erase(guid);
+    //m_CreatureDataMap.erase(guid);
 }
 
 void ObjectMgr::DeleteGOData(uint32 guid)
