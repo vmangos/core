@@ -249,7 +249,7 @@ struct go_bells : public GameObjectAI
 
                     // Only play once: Dwarf horn and Lighthouse
                     // On official servers, this sound is played once very two minutes.
-                    // This would require a additions event with a 2 minute timer.
+                    // This would require a additional event with a 2 minute timer.
                     // For now, play the correct sound at least once every hour.
                     if (_soundId == BELLTOLLDWARFGNOME || _soundId == LIGHTHOUSEFOGHORN)
                     {
