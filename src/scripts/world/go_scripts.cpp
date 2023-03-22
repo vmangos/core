@@ -147,6 +147,14 @@ struct go_bells : public GameObjectAI
 {
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
+        // Assign lighthouse sound by guid (zone is to imprecise)
+        if (isLightHouseObject())
+        {
+            _soundId = LIGHTHOUSEFOGHORN;
+            return;
+        }
+
+        // Assign hourly bell sound by zone
         uint32 zoneId = me->GetZoneId();
 
         switch (me->GetEntry())
@@ -191,6 +199,19 @@ struct go_bells : public GameObjectAI
         }
     }
 
+    bool isLightHouseObject()
+    {
+        switch (me->GetGUIDLow())
+        {
+        case 42666: // Westfall Lighthouse
+        case 9104:  // Alcaz Lighthouse
+        case 18178: // Theramore Lighthouse
+            return true;
+        default:
+            return false;
+        }
+    }
+
     void UpdateAI(uint32 const diff) override
     {
         m_events.Update(diff);
@@ -215,8 +236,11 @@ struct go_bells : public GameObjectAI
                     uint8 _rings = (timeinfo->tm_hour) % 12;
                     _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
 
-                    // Dwarf hourly horn should only play a single time, each time the next hour begins.
-                    if (_soundId == BELLTOLLDWARFGNOME)
+                    // Only play once: Dwarf horn and Lighthouse
+                    // On official servers, this sound is played once very two minutes.
+                    // This would require a additions event with a 2 minute timer.
+                    // For now, play the correct sound at least once every hour.
+                    if (_soundId == BELLTOLLDWARFGNOME || _soundId == LIGHTHOUSEFOGHORN)
                     {
                         _rings = 1;
                     }
