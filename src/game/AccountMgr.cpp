@@ -471,7 +471,7 @@ bool AccountMgr::IsAccountBanned(uint32 acc) const
 
 void AccountMgr::LoadAccountWarnings()
 {
-    std::unique_ptr<QueryResult> result(LoginDatabase.Query("SELECT `id`, `banreason` FROM `account_banned` WHERE `active` = 0 && (`banreason` LIKE \"WARN:%\") ORDER BY `bandate`"));
+    std::unique_ptr<QueryResult> result(LoginDatabase.Query("SELECT ab.`id`, ab.`banreason`, grouped.`total_id_count` FROM `account_banned` ab JOIN(SELECT `id`, MAX(`bandate`) as `latest_bandate`, COUNT(*) as `total_id_count` FROM `account_banned` WHERE `active` = 0 AND(`banreason` LIKE \"WARN:%\") GROUP BY `id`) grouped ON ab.`id` = grouped.`id` AND ab.`bandate` = grouped.`latest_bandate` ORDER BY ab.`bandate` ASC"));
 
     if (!result)
         return;
@@ -481,7 +481,10 @@ void AccountMgr::LoadAccountWarnings()
     {
         Field* fields = result->Fetch();
         std::string warning = fields[1].GetCppString();
-        m_accountWarnings[fields[0].GetUInt32()] = warning.substr(5, warning.size() - 5);
+        WarningData data;
+        data.warning = warning.substr(5, warning.size() - 5);
+        data.count = fields[2].GetUInt32();
+        m_accountWarnings[fields[0].GetUInt32()] = data;
     } while (result->NextRow());
 }
 
