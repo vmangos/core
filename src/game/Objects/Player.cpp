@@ -2855,7 +2855,7 @@ Creature* Player::FindNearestInteractableNpcWithFlag(uint32 npcFlags) const
 Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask) const
 {
     // some basic checks
-    if (!guid || !IsInWorld() || IsTaxiFlying())
+    if (!guid || !IsInWorld())
         return nullptr;
 
     // exist (we need look pets also for some interaction (quest/etc)
@@ -2929,7 +2929,7 @@ bool Player::CanInteractWithNPC(Creature const* pCreature, uint32 npcflagmask) c
 GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameobject_type) const
 {
     // some basic checks
-    if (!guid || !IsInWorld() || IsTaxiFlying())
+    if (!guid || !IsInWorld())
         return nullptr;
 
     GameObject* pGo = GetMap()->GetGameObject(guid);
@@ -2956,9 +2956,6 @@ bool Player::CanInteractWithGameObject(GameObject const* pGo, uint32 gameobject_
     {
         if (pGo->IsAtInteractDistance(this) && pGo->isSpawned())
             return true;
-
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CanInteractWithGameObject: GameObject '%s' [GUID: %u] is too far away from player %s [GUID: %u] to be used by him",
-            pGo->GetGOInfo()->name, pGo->GetGUIDLow(), GetName(), GetGUIDLow());
     }
 
     return false;
