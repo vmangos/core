@@ -136,15 +136,15 @@ uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
     {
         sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_BASIC, "DesyncMs %d DesyncDist %f Cheats %s",
             m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
-    }
-
-    if ((result & (CHEAT_ACTION_KICK | CHEAT_ACTION_BAN_ACCOUNT | CHEAT_ACTION_BAN_IP_ACCOUNT)) && !m_packetLog.empty())
-    {
-        AddMessageToPacketLog("End of packet log. Penalty: " + std::to_string(result) + ", Detected cheats: " + reason.str());
-        std::string fileName = "movement_log_" +  m_session->GetUsername() + "_" + std::to_string(time(nullptr)) + ".pkt";
-        SniffFile packetDump(fileName.c_str());
-        std::lock_guard<std::mutex> guard(m_packetLogMutex);
-        packetDump.WriteToFile(m_packetLog);
+        
+        if ((result & (CHEAT_ACTION_KICK | CHEAT_ACTION_BAN_ACCOUNT | CHEAT_ACTION_BAN_IP_ACCOUNT)) && !m_packetLog.empty())
+        {
+            AddMessageToPacketLog("End of packet log. Penalty: " + std::to_string(result) + ", Detected cheats: " + reason.str());
+            std::string fileName = "movement_log_" +  m_session->GetUsername() + "_" + std::to_string(time(nullptr)) + ".pkt";
+            SniffFile packetDump(fileName.c_str());
+            std::lock_guard<std::mutex> guard(m_packetLogMutex);
+            packetDump.WriteToFile(m_packetLog);
+        }
     }
 
     // Reset to zero tick counts
