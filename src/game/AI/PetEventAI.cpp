@@ -64,9 +64,6 @@ void PetEventAI::MoveInLineOfSight(Unit* pWho)
 
 void PetEventAI::AttackStart(Unit* pWho)
 {
-    if (!pWho)
-        return;
-
     if (m_creature->IsPet() && !static_cast<Pet*>(m_creature)->IsEnabled())
         return;
 
@@ -218,8 +215,6 @@ void PetEventAI::OwnerAttackedBy(Unit* pAttacker)
 {
     // Called when owner takes damage. This function helps keep pets from running off
     //  simply due to owner gaining aggro.
-    if (!pAttacker)
-        return;
 
     // Prevent pet from disengaging from current target
     if (m_creature->GetVictim() && m_creature->GetVictim()->IsAlive())
@@ -237,10 +232,6 @@ void PetEventAI::OwnerAttacked(Unit* pTarget)
 {
     // Called when owner attacks something. Allows defensive pets to know
     //  that they need to assist
-
-    // Target might be nullptr if called from spell with invalid cast targets
-    if (!pTarget)
-        return;
 
     // Prevent pet from disengaging from current target
     if (m_creature->GetVictim() && m_creature->GetVictim()->IsAlive())
