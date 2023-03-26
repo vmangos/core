@@ -663,6 +663,10 @@ void WorldSession::SendBattleGroundJoinError(uint8 err)
             return;
             break;
     }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     ChatHandler::BuildChatPacket(data, CHAT_MSG_BG_SYSTEM_NEUTRAL, GetMangosString(msg), LANG_UNIVERSAL);
+#else
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, GetMangosString(msg), LANG_UNIVERSAL);
+#endif
     SendPacket(&data);
 }
