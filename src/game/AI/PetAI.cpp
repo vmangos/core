@@ -642,6 +642,12 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
 void PetAI::MovementInform(uint32 moveType, uint32 data)
 {
+    
+    if (!m_creature->GetCharmInfo())
+    {
+        return;
+    }
+    
     // Receives notification when pet reaches stay or follow owner
     switch (moveType)
     {
