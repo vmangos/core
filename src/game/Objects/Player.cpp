@@ -17878,7 +17878,7 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 exceptPetitionId)
 
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM `petition` WHERE `owner_guid` = '%u'", lowguid);
-    CharacterDatabase.PExecute("DELETE FROM `petition_sign` WHERE `owner_guid` = '%u'", lowguid);
+    CharacterDatabase.PExecute("DELETE FROM `petition_sign` WHERE (`owner_guid` = '%u') || (`player_guid` = '%u')", lowguid, lowguid);
     CharacterDatabase.CommitTransaction();
 
     sGuildMgr.DeletePetitionSignaturesByPlayer(guid, exceptPetitionId);
