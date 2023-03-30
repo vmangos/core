@@ -112,7 +112,7 @@ bool Guild::Create(Petition* petition, Player* leader)
         if (signature->GetSignatureGuid().IsEmpty())
             continue;
 
-        AddMember(signature->GetSignatureGuid(), GetLowestRank());
+        AddMember(signature->GetSignatureGuid(), GetLowestRank(), petition->GetId());
     }
 
     return true;
@@ -194,7 +194,7 @@ void Guild::Rename(std::string& newName)
     CharacterDatabase.PExecute("UPDATE `guild` SET `name` = '%s' WHERE `guild_id` = '%u'", escaped.c_str(), m_Id);
 }
 
-GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
+GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank, uint32 petitionId)
 {
     Player* pl = sObjectAccessor.FindPlayerNotInWorld(plGuid);
     if (pl)
@@ -210,7 +210,7 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
 
     // remove all player signs from another petitions
     // this will be prevent attempt joining player to many guilds and corrupt guild data integrity
-    Player::RemovePetitionsAndSigns(plGuid);
+    Player::RemovePetitionsAndSigns(plGuid, petitionId);
 
     uint32 lowguid = plGuid.GetCounter();
 

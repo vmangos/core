@@ -17872,7 +17872,7 @@ void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask) const
     GetSession()->SendPacket(&data);
 }
 
-void Player::RemovePetitionsAndSigns(ObjectGuid guid)
+void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 exceptPetitionId)
 {
     uint32 lowguid = guid.GetCounter();
 
@@ -17880,6 +17880,8 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid)
     CharacterDatabase.PExecute("DELETE FROM `petition` WHERE `owner_guid` = '%u'", lowguid);
     CharacterDatabase.PExecute("DELETE FROM `petition_sign` WHERE `owner_guid` = '%u'", lowguid);
     CharacterDatabase.CommitTransaction();
+
+    sGuildMgr.DeletePetitionSignaturesByPlayer(guid, exceptPetitionId);
 }
 
 void Player::SetRestBonus(float rest_bonus_new)
