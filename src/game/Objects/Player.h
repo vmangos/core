@@ -1839,11 +1839,8 @@ class Player final: public Unit
         uint32 m_longSightSpell;
 
         // Homebind coordinates
-        uint32 m_homebindMapId;
+        WorldLocation m_homebind;
         uint16 m_homebindAreaId;
-        float m_homebindX;
-        float m_homebindY;
-        float m_homebindZ;
 
         // knockback/jumping states
         bool launched;
@@ -1931,8 +1928,8 @@ class Player final: public Unit
             o = m_recallO;
         };
 
-        void SetHomebindToLocation(WorldLocation const& loc, uint32 area_id);
-        void RelocateToHomebind() { SetLocationMapId(m_homebindMapId); Relocate(m_homebindX, m_homebindY, m_homebindZ); }
+        void SetHomebindToLocation(WorldLocation const& loc, uint32 areaId);
+        void RelocateToHomebind() { SetLocationMapId(m_homebind.mapId); Relocate(m_homebind.x, m_homebind.y, m_homebind.z); }
         bool TeleportToHomebind(uint32 options = 0, bool hearthCooldown = true);
 
         // currently visible objects at player client
@@ -1988,7 +1985,7 @@ class Player final: public Unit
         Position m_lastSafePosition;
         bool  m_undermapPosValid;
 
-        uint32 GetHomeBindMap() const { return m_homebindMapId; }
+        uint32 GetHomeBindMap() const { return m_homebind.mapId; }
         uint16 GetHomeBindAreaId() const { return m_homebindAreaId; }
 
         void SendSummonRequest(ObjectGuid summonerGuid, uint32 mapId, uint32 zoneId, float x, float y, float z);

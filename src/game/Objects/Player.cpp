@@ -2508,7 +2508,7 @@ void Player::RestorePendingTeleport()
 bool Player::TeleportToBGEntryPoint()
 {
     if (m_bgData.joinPos.x == 0.0f && m_bgData.joinPos.y == 0.0f && m_bgData.joinPos.z == 0.0f)
-        m_bgData.joinPos = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, 0.0f);
+        m_bgData.joinPos = m_homebind;
 
     return TeleportTo(m_bgData.joinPos);
 }
@@ -14708,7 +14708,7 @@ void Player::_LoadBGData(QueryResult* result)
                                               fields[4].GetFloat(),     // Z
                                               fields[5].GetFloat());    // Orientation
     else
-        m_bgData.joinPos      = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, 0.0f);
+        m_bgData.joinPos      = m_homebind;
 }
 
 bool Player::LoadPositionFromDB(ObjectGuid guid, uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight)
@@ -16276,17 +16276,17 @@ bool Player::_LoadHomeBind(QueryResult* result)
     if (result)
     {
         Field* fields = result->Fetch();
-        m_homebindMapId = fields[0].GetUInt32();
+        m_homebind.mapId = fields[0].GetUInt32();
         m_homebindAreaId = fields[1].GetUInt16();
-        m_homebindX = fields[2].GetFloat();
-        m_homebindY = fields[3].GetFloat();
-        m_homebindZ = fields[4].GetFloat();
+        m_homebind.x = fields[2].GetFloat();
+        m_homebind.y = fields[3].GetFloat();
+        m_homebind.z = fields[4].GetFloat();
 
-        MapEntry const* bindMapEntry = sMapStorage.LookupEntry<MapEntry>(m_homebindMapId);
+        MapEntry const* bindMapEntry = sMapStorage.LookupEntry<MapEntry>(m_homebind.mapId);
 
         // accept saved data only for valid position (and non instanceable), and accessable
-        if (MapManager::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
-                !bindMapEntry->Instanceable())
+        if (MapManager::IsValidMapCoord(m_homebind.mapId, m_homebind.x, m_homebind.y, m_homebind.z) &&
+            !bindMapEntry->Instanceable())
             ok = true;
         else
             CharacterDatabase.PExecute("DELETE FROM `character_homebind` WHERE `guid` = '%u'", GetGUIDLow());
@@ -16294,17 +16294,17 @@ bool Player::_LoadHomeBind(QueryResult* result)
 
     if (!ok)
     {
-        m_homebindMapId = info->mapId;
+        m_homebind.mapId = info->mapId;
         m_homebindAreaId = info->areaId;
-        m_homebindX = info->positionX;
-        m_homebindY = info->positionY;
-        m_homebindZ = info->positionZ;
+        m_homebind.x = info->positionX;
+        m_homebind.y = info->positionY;
+        m_homebind.z = info->positionZ;
 
-        CharacterDatabase.PExecute("INSERT INTO `character_homebind` (`guid`, `map`, `zone`, `position_x`, `position_y`, `position_z`) VALUES ('%u', '%u', '%u', '%f', '%f', '%f')", GetGUIDLow(), m_homebindMapId, (uint32)m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ);
+        CharacterDatabase.PExecute("INSERT INTO `character_homebind` (`guid`, `map`, `zone`, `position_x`, `position_y`, `position_z`) VALUES ('%u', '%u', '%u', '%f', '%f', '%f')", GetGUIDLow(), m_homebind.mapId, (uint32)m_homebindAreaId, m_homebind.x, m_homebind.y, m_homebind.z);
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Setting player home position: mapid is: %u, zoneid is %u, X is %f, Y is %f, Z is %f",
-              m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ);
+        m_homebind.mapId, m_homebindAreaId, m_homebind.x, m_homebind.y, m_homebind.z);
 
     return true;
 }
@@ -18571,6 +18571,7 @@ void Player::UpdateHomebindTime(uint32 time)
         {
             // teleport to homebind location
             TeleportToHomebind();
+            m_HomebindTimer = 0;
         }
         else
             m_HomebindTimer -= time;
@@ -18691,7 +18692,7 @@ void Player::SetBattleGroundEntryPoint(Player* leader /*= nullptr*/, bool queued
     }
 
     // In error cases use homebind position
-    m_bgData.joinPos = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, 0.0f);
+    m_bgData.joinPos = m_homebind;
     m_bgData.m_needSave = true;
 }
 
@@ -19094,8 +19095,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     // Homebind
     data.Initialize(SMSG_BINDPOINTUPDATE, 5 * 4);
-    data << m_homebindX << m_homebindY << m_homebindZ;
-    data << (uint32) m_homebindMapId;
+    data << m_homebind.x << m_homebind.y << m_homebind.z;
+    data << (uint32) m_homebind.mapId;
     data << (uint32) m_homebindAreaId;
     GetSession()->SendPacket(&data);
 
@@ -20938,17 +20939,15 @@ bool Player::HasMovementFlag(MovementFlags f) const
     return m_movementInfo.HasMovementFlag(f);
 }
 
-void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 area_id)
+void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 areaId)
 {
-    m_homebindMapId = loc.mapId;
-    m_homebindAreaId = area_id;
-    m_homebindX = loc.x;
-    m_homebindY = loc.y;
-    m_homebindZ = loc.z;
+    m_homebind = loc;
+    m_homebindAreaId = areaId;
 
     // update sql homebind
-    CharacterDatabase.PExecute("UPDATE `character_homebind` SET `map` = '%u', `zone` = '%u', `position_x` = '%f', `position_y` = '%f', `position_z` = '%f' WHERE `guid` = '%u'",
-                               m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ, GetGUIDLow());
+    if (!IsSavingDisabled())
+        CharacterDatabase.PExecute("UPDATE `character_homebind` SET `map` = '%u', `zone` = '%u', `position_x` = '%f', `position_y` = '%f', `position_z` = '%f' WHERE `guid` = '%u'",
+                                    m_homebind.mapId, m_homebindAreaId, m_homebind.x, m_homebind.y, m_homebind.z, GetGUIDLow());
 }
 
 bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown) 
@@ -20961,7 +20960,27 @@ bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown)
         ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(6948);
         AddCooldown(*spellInfo, itemProto);
     }
-    return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), (options | TELE_TO_FORCE_MAP_CHANGE));
+    MapEntry const* pMapEntry = sMapStorage.LookupEntry<MapEntry>(m_homebind.mapId);
+    if (!pMapEntry || pMapEntry->Instanceable() ||
+        !MaNGOS::IsValidMapCoord(m_homebind.x, m_homebind.y, m_homebind.z))
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Character %u has invalid homebind map %u.", GetGUIDLow(), m_homebind.mapId);
+        if (PlayerInfo const* info = sObjectMgr.GetPlayerInfo(GetRace(), GetClass()))
+        {
+            m_homebind.mapId = info->mapId;
+            m_homebind.x = info->positionX;
+            m_homebind.y = info->positionY;
+            m_homebind.z = info->positionZ;
+            m_homebind.o = info->orientation;
+            m_homebindAreaId = info->areaId;
+        }
+        else
+        {
+            m_homebind = WorldLocation();
+            m_homebindAreaId = 0;
+        }
+    }
+    return TeleportTo(m_homebind, (options | TELE_TO_FORCE_MAP_CHANGE));
 }
 
 Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
