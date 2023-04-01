@@ -2286,8 +2286,9 @@ bool Pet::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* ci
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC); // always non-attackable
 
         if (cinfo->auras)
-            LoadDefaultAuras(cinfo->auras, true);
+            LoadDefaultAuras(cinfo->auras);
     }
+
     return true;
 }
 
