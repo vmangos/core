@@ -3610,9 +3610,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
         spawnCreature->AIM_Initialize();
         spawnCreature->LoadCreatureAddon();
 
-        if (m_casterUnit->IsPvP())
-            spawnCreature->SetPvP(true);
-
         map->Add((Creature*)spawnCreature);
         m_casterUnit->AddGuardian(spawnCreature);
 
