@@ -1822,6 +1822,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         m_modifier.periodictime = 3000;
                         break;
                     }
+                    case 24984: // Murloc Critter Dance
+                    case 25165:
+                    {
+                        target->HandleEmoteCommand(EMOTE_STATE_DANCE);
+                        break;
+                    }
                 }
                 break;
             }
