@@ -317,7 +317,7 @@ Petition* GuildMgr::GetPetitionByOwnerGuid(ObjectGuid const& ownerGuid)
 
 void GuildMgr::DeletePetitionSignaturesByPlayer(ObjectGuid guid, uint32 exceptPetitionId)
 {
-    std::lock_guard<std::mutex> guard(m_petitionsMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
     for (const auto& iter : m_petitionMap)
     {
         if (iter.first == exceptPetitionId)
