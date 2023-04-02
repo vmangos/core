@@ -1087,7 +1087,6 @@ struct npc_stinky_ignatzAI : public npc_escortAI
     {
         currWaypoint = 0;
         timer = 21000;
-        hasDoneAggroText = false;
         Reset();
     }
 
@@ -1097,13 +1096,11 @@ struct npc_stinky_ignatzAI : public npc_escortAI
     {
         currWaypoint = 0;
         timer = 21000;
-        hasDoneAggroText = false;
         npc_escortAI::JustRespawned();
     }
 
     uint32 currWaypoint;
     uint32 timer;
-    bool hasDoneAggroText;
 
     void WaypointReached(uint32 uiPointId) override
     {
