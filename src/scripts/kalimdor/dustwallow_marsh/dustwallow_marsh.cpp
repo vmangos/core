@@ -1076,7 +1076,8 @@ enum
     SAY_IGNATZ_3             = 1615,
     SAY_IGNATZ_4             = 1617,
     SAY_IGNATZ_END           = 1618,
-    SAY_IGNATZ_AGGRO         = 1631,
+    SAY_IGNATZ_AGGRO_1       = 1630,
+    SAY_IGNATZ_AGGRO_2       = 1631,
     GOBJ_BOGBEAN_PLANT       = 20939
 };
 
@@ -1141,11 +1142,17 @@ struct npc_stinky_ignatzAI : public npc_escortAI
 
     void Aggro(Unit* pWho) override
     {
-        // random, only once
-        if (!hasDoneAggroText && urand(0, 3))
+        // not always
+        if (urand(0, 2))
+            return;
+
+        if (currWaypoint < 15)
         {
-            hasDoneAggroText = true;
-            DoScriptText(SAY_IGNATZ_AGGRO, m_creature, pWho);
+            DoScriptText(SAY_IGNATZ_AGGRO_1, m_creature, pWho);
+        }
+        else
+        {
+            DoScriptText(SAY_IGNATZ_AGGRO_2, m_creature, pWho);
         }
     }
 
