@@ -1076,6 +1076,7 @@ enum
     SAY_IGNATZ_3             = 1615,
     SAY_IGNATZ_4             = 1617,
     SAY_IGNATZ_END           = 1618,
+    SAY_IGNATZ_AGGRO         = 1631,
     GOBJ_BOGBEAN_PLANT       = 20939
 };
 
@@ -1085,6 +1086,7 @@ struct npc_stinky_ignatzAI : public npc_escortAI
     {
         currWaypoint = 0;
         timer = 21000;
+        hasDoneAggroText = false;
         Reset();
     }
 
@@ -1094,11 +1096,13 @@ struct npc_stinky_ignatzAI : public npc_escortAI
     {
         currWaypoint = 0;
         timer = 21000;
+        hasDoneAggroText = false;
         npc_escortAI::JustRespawned();
     }
 
     uint32 currWaypoint;
     uint32 timer;
+    bool hasDoneAggroText;
 
     void WaypointReached(uint32 uiPointId) override
     {
@@ -1134,6 +1138,17 @@ struct npc_stinky_ignatzAI : public npc_escortAI
                 break;
         }
     }
+
+    void Aggro(Unit* pWho) override
+    {
+        // random, only once
+        if (!hasDoneAggroText && urand(0, 3))
+        {
+            hasDoneAggroText = true;
+            DoScriptText(SAY_IGNATZ_AGGRO, m_creature, pWho);
+        }
+    }
+
     void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
