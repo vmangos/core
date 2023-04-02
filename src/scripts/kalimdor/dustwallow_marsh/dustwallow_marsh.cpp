@@ -1070,12 +1070,12 @@ enum
 {
     QUEST_STINKYS_ESCAPE_A   = 1222,
     QUEST_STINKYS_ESCAPE_H   = 1270,
-    SAY_IGNATZ_START         = -1780190,
-    SAY_IGNATZ_1             = -1780191,
-    SAY_IGNATZ_2             = -1780192,
-    SAY_IGNATZ_3             = -1780193,
-    SAY_IGNATZ_4             = -1780194,
-    SAY_IGNATZ_END           = -1780195,
+    SAY_IGNATZ_START         = 1610,
+    SAY_IGNATZ_1             = 1612,
+    SAY_IGNATZ_2             = 1614,
+    SAY_IGNATZ_3             = 1615,
+    SAY_IGNATZ_4             = 1617,
+    SAY_IGNATZ_END           = 1618,
     GOBJ_BOGBEAN_PLANT       = 20939
 };
 
