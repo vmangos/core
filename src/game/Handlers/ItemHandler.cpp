@@ -289,8 +289,8 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
     ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(item);
     if (pProto && (pProto->Discovered || (GetSecurity() > SEC_PLAYER)))
     {
-        std::string Name        = pProto->Name1;
-        std::string Description = pProto->Description;
+        char const* name        = pProto->Name1;
+        char const* description = pProto->Description;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
@@ -299,9 +299,9 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
             if (il)
             {
                 if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
-                    Name = il->Name[loc_idx];
+                    name = il->Name[loc_idx].c_str();
                 if (il->Description.size() > size_t(loc_idx) && !il->Description[loc_idx].empty())
-                    Description = il->Description[loc_idx];
+                    description = il->Description[loc_idx].c_str();
             }
         }
         // guess size
@@ -310,7 +310,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->Class;
         // client known only 0 subclass (and 1-2 obsolute subclasses)
         data << (pProto->Class == ITEM_CLASS_CONSUMABLE ? uint32(0) : pProto->SubClass);
-        data << Name;                                       // max length of any of 4 names: 256 bytes
+        data << name;                                       // max length of any of 4 names: 256 bytes
         data << uint8(0x00);                                //pProto->Name2; // blizz not send name there, just uint8(0x00); <-- \0 = empty string = empty name...
         data << uint8(0x00);                                //pProto->Name3; // blizz not send name there, just uint8(0x00);
         data << uint8(0x00);                                //pProto->Name4; // blizz not send name there, just uint8(0x00);
@@ -407,7 +407,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
             }
         }
         data << pProto->Bonding;
-        data << Description;
+        data << description;
         data << pProto->PageText;
         data << pProto->LanguageID;
         data << pProto->PageMaterial;

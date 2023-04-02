@@ -948,8 +948,8 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     if (itr == roll->playerVote.end())
         return true;                                        // result used for need iterator ++, so avoid for end of list
 
-    if (roll->getLoot())
-        if (roll->getLoot()->items.empty())
+    if (Loot* pLoot = roll->getLoot())
+        if (pLoot->items.empty())
             return false;
 
     switch (vote)

@@ -86,7 +86,7 @@ class Creature : public Unit
         void RemoveFromWorld() override;
 
         bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 firstCreatureId, GameEventCreatureData const* eventData = nullptr);
-        void LoadDefaultAuras(uint32 const* auras, bool reload);
+        void LoadDefaultAuras(uint32 const* auras);
         void LoadCreatureAddon(bool reload = false);
 
         // CreatureGroups

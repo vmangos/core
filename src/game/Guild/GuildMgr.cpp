@@ -315,6 +315,19 @@ Petition* GuildMgr::GetPetitionByOwnerGuid(ObjectGuid const& ownerGuid)
     return nullptr;
 }
 
+void GuildMgr::DeletePetitionSignaturesByPlayer(ObjectGuid guid, uint32 exceptPetitionId)
+{
+    std::lock_guard<std::mutex> guard(m_petitionsMutex);
+    for (const auto& iter : m_petitionMap)
+    {
+        if (iter.first == exceptPetitionId)
+            continue;
+
+        Petition* petition = iter.second;
+        petition->DeleteSignatureByPlayer(guid);
+    }
+}
+
 bool Petition::LoadFromDB(QueryResult* result)
 {
     if (!result)
@@ -431,6 +444,19 @@ bool Petition::AddNewSignature(Player* player)
     AddSignature(signature);
 
     return true;
+}
+
+void Petition::DeleteSignatureByPlayer(ObjectGuid guid)
+{
+    for (auto itr = m_signatures.begin(); itr != m_signatures.end(); ++itr)
+    {
+        if ((*itr)->GetSignatureGuid() == guid)
+        {
+            delete (*itr);
+            m_signatures.erase(itr);
+            return;
+        }
+    }
 }
 
 PetitionSignature::PetitionSignature(Petition* petition, Player* player)

@@ -2176,26 +2176,109 @@ bool ChatHandler::HandleDebugMonsterChatCommand(char* args)
     Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
         return false;
-    for (uint8 i = 0; i < 0xFF; ++i)
+
+    Player* pSender = m_session->GetPlayer();
+
+    uint32 chatType;
+    if (!ExtractUInt32(&args, chatType))
+        return false;
+    
+    std::ostringstream oss;
+    oss << "Chat" << int(chatType);
+    std::string rightText = oss.str();
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    data << (uint8)chatType;
+    data << (uint32)LANG_UNIVERSAL;
+
+    if (!chatType
+        || chatType == 11
+        || chatType == 5
+        || chatType == 12
+        || chatType == 1)
     {
-        std::ostringstream oss;
-        oss << "Chat" << int(i);
-        std::string rightText = oss.str();
-        WorldPacket data(SMSG_MESSAGECHAT, 200);
-        data << (uint8)i;
-        data << (uint32)LANG_UNIVERSAL;
-        data << (uint32)(strlen(pTarget->GetName()) + 1);
-        data << pTarget->GetName();
-        data << (uint64)0;
-        data << (uint32)(rightText.length() + 1);
-        data << rightText;
-        data << (uint8)0;                       // ChatTag
-        pTarget->SendMessageToSet(&data, true);
+        data << pSender->GetObjectGuid();
     }
 
-    pTarget->MonsterTextEmote("Testing WorldObject::MonsterTextEmote", m_session->GetPlayer());
-    pTarget->MonsterTextEmote("Testing WorldObject::MonsterTextEmote(boss)", m_session->GetPlayer(), true);
-    pTarget->MonsterWhisper("Testing WorldObject::MonsterWhisper", m_session->GetPlayer());
+    // 1.12.1 client
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    if (chatType == 11 || chatType == 12 || chatType == 90 || chatType == 13 || chatType == 26)
+    {
+        data << uint32(strlen(pSender->GetName()) + 1);
+        data << pSender->GetName();
+        data << pTarget->GetObjectGuid();
+        data << uint32(strlen(rightText.c_str()) + 1);
+        data << rightText.c_str();
+        data << uint8(0);
+        pTarget->SendMessageToSet(&data, true);
+        return true;
+    }
+
+    if (chatType != 89)
+    {
+        if (chatType != 82 && chatType != 83 && chatType != 84)
+        {
+            if (chatType == 14)
+            {
+                data << "Channel";
+            }
+            data << pTarget->GetObjectGuid();
+            data << uint32(strlen(rightText.c_str()) + 1);
+            data << rightText.c_str();
+            data << uint8(0);
+            pTarget->SendMessageToSet(&data, true);
+            return true;
+        }
+        data << pTarget->GetObjectGuid();
+        data << uint32(strlen(rightText.c_str()) + 1);
+        data << rightText.c_str();
+        data << uint8(0);
+        pTarget->SendMessageToSet(&data, true);
+        return true;
+    }
+
+    data << uint32(strlen(pSender->GetName()) + 1);
+    data << pSender->GetName();
+    data << pTarget->GetObjectGuid();
+    data << uint32(strlen(rightText.c_str()) + 1);
+    data << rightText.c_str();
+    data << uint8(0);
+    pTarget->SendMessageToSet(&data, true);
+#else // 1.11.2 client
+    
+    if (chatType == 11 || chatType == 12 || chatType == 89 || chatType == 13 || chatType == 26)
+    {
+        data << uint32(strlen(pSender->GetName()) + 1);
+        data << pSender->GetName();
+        data << pTarget->GetObjectGuid();
+        data << uint32(strlen(rightText.c_str()) + 1);
+        data << rightText.c_str();
+        data << uint8(0);
+        pTarget->SendMessageToSet(&data, true);
+        return true;
+    }
+
+    if (chatType == 82 || chatType == 83 || chatType == 84)
+    {
+        data << pTarget->GetObjectGuid();
+        data << uint32(strlen(rightText.c_str()) + 1);
+        data << rightText.c_str();
+        data << uint8(0);
+        pTarget->SendMessageToSet(&data, true);
+        return true;
+    }
+
+    if (chatType == 14)
+    {
+        data << "Channel";
+    }
+
+    data << pTarget->GetObjectGuid();
+    data << uint32(strlen(rightText.c_str()) + 1);
+    data << rightText.c_str();
+    data << uint8(0);
+    pTarget->SendMessageToSet(&data, true);
+#endif
+
     return true;
 }
 

@@ -200,7 +200,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
     if (!guid)
         return;
 
-    Loot *pLoot = nullptr;
+    Loot* pLoot = nullptr;
     Item* pItem = nullptr;
     bool shareMoneyWithGroup = true;
 
@@ -261,24 +261,25 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
             Group* group = player->GetGroup();
 
             std::vector<Player*> playersNear;
+            playersNear.reserve(group->GetMembersCount());
             for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* playerGroup = itr->getSource();
                 if (!playerGroup)
                     continue;
-                //if (player->IsWithinDistInMap(playerGroup, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+                
                 if (player->IsWithinLootXPDist(playerGroup))
                     playersNear.push_back(playerGroup);
             }
 
-            uint32 money_per_player = uint32((pLoot->gold) / (playersNear.size()));
+            uint32 moneyPerPlayer = uint32((pLoot->gold) / (playersNear.size()));
 
             for (const auto i : playersNear)
             {
-                i->LootMoney(money_per_player, pLoot);
-                //Offset surely incorrect, but works
+                i->LootMoney(moneyPerPlayer, pLoot);
+                
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
-                data << uint32(money_per_player);
+                data << uint32(moneyPerPlayer);
                 i->GetSession()->SendPacket(&data);
             }
         }

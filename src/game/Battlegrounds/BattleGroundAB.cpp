@@ -29,15 +29,17 @@
 #include "Util.h"
 #include "WorldPacket.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+
 BattleGroundAB::BattleGroundAB()
 {
     m_buffChange = true;
     m_bgObjects.resize(BG_AB_OBJECT_MAX);
 
     m_startMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
-    m_startMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_AB_START_ONE_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_AB_START_HALF_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_AB_HAS_BEGUN;
+    m_startMessageIds[BG_STARTING_EVENT_SECOND] = BCT_BG_AB_START_ONE_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = BCT_BG_AB_START_HALF_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = BCT_BG_AB_HAS_BEGUN;
 }
 
 BattleGroundAB::~BattleGroundAB()
@@ -116,12 +118,12 @@ void BattleGroundAB::Update(uint32 diff)
                 {
                     if (team == BG_TEAM_ALLIANCE)
                     {
-                        SendMessageToAll(LANG_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        SendMessageToAll(BCT_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
                         PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_ALLIANCE);
                     }
                     else
                     {
-                        SendMessageToAll(LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        SendMessageToAll(BCT_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
                         PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_HORDE);
                     }
                     m_isInformedNearVictory = true;
@@ -574,3 +576,5 @@ void BattleGroundAB::UpdatePlayerScore(Player* source, uint32 type, uint32 value
             break;
     }
 }
+
+#endif

@@ -428,9 +428,7 @@ void PetAI::OwnerAttackedBy(Unit* attacker)
 {
     // Called when owner takes damage. This function helps keep pets from running off
     //  simply due to owner gaining aggro.
-    if (!attacker)
-        return;
-    
+
     // If owner attacked by fire, attacker=owner. Don't attack our owner !
     if (!m_creature->IsValidAttackTarget(attacker))
         return;
@@ -458,10 +456,6 @@ void PetAI::OwnerAttackedBy(Unit* attacker)
 void PetAI::OwnerAttacked(Unit* target)
 {
     // Called when owner attacks something.
-
-    // Target might be nullptr if called from spell with invalid cast targets
-    if (!target)
-        return;
 
     // The owner attacking a mob while the pet is currently not in combat
     // will not make the pet attack that target too. Tested on classic.
@@ -648,6 +642,9 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
 void PetAI::MovementInform(uint32 moveType, uint32 data)
 {
+    if (!m_creature->GetCharmInfo())
+        return;
+
     // Receives notification when pet reaches stay or follow owner
     switch (moveType)
     {
@@ -668,7 +665,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
         {
             // If data is owner's GUIDLow then we've reached follow point,
             // otherwise we're probably chasing a creature
-            if (m_creature->GetCharmInfo() && m_creature->GetCharmInfo()->IsReturning() && data == m_creature->GetCharmerOrOwnerGuid().GetCounter())
+            if (m_creature->GetCharmInfo()->IsReturning() && data == m_creature->GetCharmerOrOwnerGuid().GetCounter())
             {
                 ClearCharmInfoFlags();
                 m_creature->GetCharmInfo()->SetIsFollowing(true);
@@ -684,10 +681,6 @@ bool PetAI::CanAttack(Unit* target)
 {
     // Evaluates whether a pet can attack a specific target based on CommandState, ReactState and other flags
     // IMPORTANT: The order in which things are checked is important, be careful if you add or remove checks
-
-    // Hmmm...
-    if (!target)
-        return false;
 
     if (!m_creature->IsValidAttackTarget(target, false))
         return false;
@@ -771,9 +764,6 @@ void PetAI::AttackedBy(Unit* attacker)
 {
     // Called when pet takes damage. This function helps keep pets from running off
     //  simply due to gaining aggro.
-
-    if (!attacker)
-        return;
 
     if (!m_creature->IsValidAttackTarget(attacker))
         return;
