@@ -1071,6 +1071,7 @@ enum
     QUEST_STINKYS_ESCAPE_A   = 1222,
     QUEST_STINKYS_ESCAPE_H   = 1270,
     SAY_IGNATZ_START         = 1610,
+    SAY_IGNATZ_0             = 1611,
     SAY_IGNATZ_1             = 1612,
     SAY_IGNATZ_2             = 1614,
     SAY_IGNATZ_3             = 1615,
@@ -1110,6 +1111,9 @@ struct npc_stinky_ignatzAI : public npc_escortAI
         {
             case 0:
                 DoScriptText(SAY_IGNATZ_START, m_creature);
+                break;;
+            case 4:
+                DoScriptText(SAY_IGNATZ_0, m_creature);
                 break;
             case 8:
                 DoScriptText(SAY_IGNATZ_1, m_creature);
