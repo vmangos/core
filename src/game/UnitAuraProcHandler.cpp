@@ -252,7 +252,7 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
 
     /// [TODO]
     /// Delete all these spells, and manage it via the DB (spell_proc_event)
-    if (procSpell && !(procExtra && PROC_EX_CAST_END))
+    if (procSpell && !(procExtra & PROC_EX_CAST_END))
     {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         // Eye for an Eye
@@ -342,15 +342,13 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
         // Chance of proc calculated after.
         if (spellProto->EffectApplyAuraName[0] == SPELL_AURA_ADD_TARGET_TRIGGER)
         {
-            // Tous les sorts qui proc sur la victime
-            // Puis les autres
+            // All spells that proc on the victim
+            // Then the others
             if (isVictim)
                 return SPELL_PROC_TRIGGER_FAILED;
 
             switch (spellProto->Id)
             {
-                // Wolfshead Helm (Part 1 only, from the pig system that does not count the effects :s)
-                case 17768:
                 // Frosty Zap
                 case 24392:
                     if (SpellCanTrigger(spellProto, procSpell))
@@ -1866,6 +1864,8 @@ SpellAuraProcResult Unit::HandleAddTargetTriggerAuraProc(Unit* pVictim, uint32 /
     // Chance = -1 -> A calculer manuellement
     if (!roll_chance_f(chance))
         return SPELL_AURA_PROC_FAILED;
+
+    printf("spell %u trigger %u\n", aurEntry->Id, trigger_spell_id);
 
     if (trigger_spell_id)
     {
