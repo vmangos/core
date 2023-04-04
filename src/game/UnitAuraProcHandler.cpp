@@ -1865,8 +1865,6 @@ SpellAuraProcResult Unit::HandleAddTargetTriggerAuraProc(Unit* pVictim, uint32 /
     if (!roll_chance_f(chance))
         return SPELL_AURA_PROC_FAILED;
 
-    printf("spell %u trigger %u\n", aurEntry->Id, trigger_spell_id);
-
     if (trigger_spell_id)
     {
         bool bTarget = true;
