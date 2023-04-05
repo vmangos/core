@@ -4285,7 +4285,9 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
     if (HasLowerSecurity(chr))
         return false;
 
-    int32 addmoney = atoi(args);
+    int32 addmoney;
+    if (!ExtractInt32(&args, addmoney))
+        return false;
 
     uint32 moneyuser = chr->GetMoney();
 
