@@ -220,7 +220,7 @@ void npc_j_eevee_scholomanceAI::UpdateAI(uint32 const uiDiff)
                             DoScriptText(SAY_J_EEVEE_SCHOLOMANCE_4, m_creature);
 
                             if (Player* player = m_creature->GetMap()->GetPlayer(guidPlayer))
-                                player->GroupEventHappens(QUEST_IMP_DELIVERY, m_creature);
+                                player->KilledMonsterCredit(14500, m_creature->GetObjectGuid());
 
                             break;
                     }
