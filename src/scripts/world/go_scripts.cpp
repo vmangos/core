@@ -436,6 +436,39 @@ GameObjectAI* GetAI_go_lunar_festival_firecracker(GameObject* gameobject)
     return new go_lunar_festival_firecracker(gameobject);
 }
 
+/*####
+## go_containment_coffer
+####*/
+
+struct go_containment_coffer : public GameObjectAI
+{
+    go_containment_coffer(GameObject* gobj) : GameObjectAI(gobj)
+    {
+        m_despawnTimer = 20000;
+    }
+
+    uint32 m_despawnTimer;
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (!m_despawnTimer)
+            return;
+
+        if (m_despawnTimer <= diff)
+        {
+            me->Despawn();
+            m_despawnTimer = 0;
+        }
+        else
+            m_despawnTimer -= diff;
+    }
+};
+
+GameObjectAI* GetAI_go_containment_coffer(GameObject* gameobject)
+{
+    return new go_containment_coffer(gameobject);
+}
+
 void AddSC_go_scripts()
 {
     Script* newscript;
@@ -478,5 +511,10 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_firework_rocket";
     newscript->GOGetAI = &GetAI_go_firework_rocket;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_containment_coffer";
+    newscript->GOGetAI = &GetAI_go_containment_coffer;
     newscript->RegisterSelf();
 }
