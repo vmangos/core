@@ -75,6 +75,8 @@ const char* GetMovementCheatName(CheatType flagId)
             return "ExploreHighLevelArea";
         case CHEAT_TYPE_FORBIDDEN_AREA:
             return "ForbiddenArea";
+        case CHEAT_TYPE_BOTTING:
+            return "Botting";
     }
 
     return "UnknownCheat";
@@ -254,6 +256,13 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     AddPenaltyForCheat(true, CHEAT_TYPE_EXPLORE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_EXPLORE_HIGH_LEVEL, CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FORBIDDEN_AREA, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_PENALTY);
+
+    if (HasEnoughBottingData())
+    {
+        AddPenaltyForCheat(true, CHEAT_TYPE_BOTTING, CONFIG_BOOL_AC_MOVEMENT_CHEAT_BOTTING_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_PENALTY);
+        if (action && !m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING])
+            ResetBottingStats();
+    }
 
     return action;
 }
@@ -720,6 +729,8 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
     if (IsFallEndOpcode(opcode) || 
         movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
         m_knockBack = false;
+
+    CheckBotting(opcode, movementInfo);
 
     AddCheats(cheatFlags);
 
@@ -1211,6 +1222,119 @@ bool MovementAnticheat::CheckTeleportToTransport(MovementInfo const& movementInf
             return true;
     }
     return false;
+}
+
+bool MovementAnticheat::HasEnoughBottingData()
+{
+    if (!m_bottingCheckStartTime)
+        return false;
+
+    uint32 const totalTime = WorldTimer::getMSTimeDiffToNow(m_bottingCheckStartTime);
+    if (totalTime < sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_PERIOD))
+        return false;
+
+    // player is mostly afk, start over in this case
+    if (totalTime > ((m_movementPacketsCount - m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING]) * 5000))
+    {
+        ResetBottingStats();
+        return false;
+    }
+
+    if (m_movementPacketsCount < sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_PACKETS))
+        return false;
+
+    // if more than 20% of packets are turns with mouse, then likely not a bot, as bots dont move camera this much
+    if (m_turnType == TURN_MOUSE && (m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING] > (m_movementPacketsCount / 4)))
+        return false;
+
+    return true;
+}
+
+void MovementAnticheat::ResetBottingStats()
+{
+    m_bottingCheckStartTime = WorldTimer::getMSTime();
+    m_movementPacketsCount = 0;
+    m_turnType = TURN_NONE;
+    m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING] = 0;
+}
+
+void MovementAnticheat::CheckBotting(uint16 opcode, MovementInfo const& movementInfo)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BOTTING_ENABLED))
+        return;
+
+    // we dont care about involuntary opcodes
+    if (IsAnyMoveAckOpcode(opcode))
+        return;
+
+    // bots dont strafe
+    if (opcode == MSG_MOVE_START_STRAFE_LEFT || opcode == MSG_MOVE_START_STRAFE_RIGHT)
+    {
+        ResetBottingStats();
+        return;
+    }
+
+    // if we were being moved by server previously, skip this packet
+    if (!GetLastMovementInfo().ctime)
+        return;
+
+    switch (opcode)
+    {
+        case MSG_MOVE_SET_FACING:
+        {
+            if (m_turnType != TURN_MOUSE && m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING])
+            {
+                ResetBottingStats();
+                m_turnType = TURN_MOUSE;
+            }
+            break;
+        }
+        case MSG_MOVE_START_TURN_LEFT:
+        case MSG_MOVE_START_TURN_RIGHT:
+        {
+            if (m_turnType != TURN_KEYBOARD && m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING])
+            {
+                ResetBottingStats();
+                m_turnType = TURN_KEYBOARD;
+            }
+            break;
+        }
+        case MSG_MOVE_START_FORWARD:
+        case MSG_MOVE_START_BACKWARD:
+        {
+            if (std::abs(GetLastMovementInfo().pos.o - movementInfo.pos.o) < 0.1f)
+                goto NOT_TURNING;
+
+            // if consistently turning this way then its certainly a cheater
+            if (m_turnType != TURN_ABNORMAL && m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING])
+            {
+                ResetBottingStats();
+                m_turnType = TURN_ABNORMAL;
+            }
+            break;
+        }
+        default:
+        {
+            // ignore stop opcodes
+            goto NOT_TURNING;
+        }
+    }
+
+    if (Unit* pVictim = me->GetVictim())
+    {
+        // bots do not turn in combat while already facing victim
+        if (pVictim->IsInCombat() && !pVictim->IsMoving() && me->HasInArc(pVictim, M_PI_F / 2.0f))
+        {
+            ResetBottingStats();
+            return;
+        }
+    }
+
+    // we store turns count here
+    m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING]++;
+
+    NOT_TURNING:
+    m_movementPacketsCount++;
 }
 
 bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
