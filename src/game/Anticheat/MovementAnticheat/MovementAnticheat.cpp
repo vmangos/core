@@ -271,7 +271,7 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
                     minTurnsConfig = CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_KEYBOARD;
                     break;
                 case TURN_ABNORMAL:
-                    minTurnsConfig = CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_MOUSE;
+                    minTurnsConfig = CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_ABNORMAL;
                     break;
                 default:
                     minTurnsConfig = CONFIG_UINT32_VALUE_COUNT;
