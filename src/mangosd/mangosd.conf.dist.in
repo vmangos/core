@@ -2015,11 +2015,13 @@ Warden.ModuleDir             = "warden_modules"
 #
 #    Anticheat.Botting.MinPackets
 #        Description: Minimum number of movement packets that need to have been sent.
-#        Default:     500
+#        Default:     160
 #
-#    Anticheat.Botting.MinTurns
+#    Anticheat.Botting.MinTurnsMouse
+#    Anticheat.Botting.MinTurnsKeyboard
+#    Anticheat.Botting.MinTurnsAbnormal
 #        Description: Minimum number of turns that need to happen in the given period.
-#        Default:     50
+#        Default:     20, 80, 5
 #
 #    Anticheat.Botting.Penalty
 #        Description: Action to take upon failing this check.
@@ -2142,8 +2144,10 @@ Anticheat.ForbiddenArea.Threshold = 1
 Anticheat.ForbiddenArea.Penalty = 3
 Anticheat.Botting.Enable = 1
 Anticheat.Botting.MinPeriod = 300000
-Anticheat.Botting.MinPackets = 500
-Anticheat.Botting.MinTurns = 50
+Anticheat.Botting.MinPackets = 160
+Anticheat.Botting.MinTurnsMouse = 20
+Anticheat.Botting.MinTurnsKeyboard = 80
+Anticheat.Botting.MinTurnsAbnormal = 5
 Anticheat.Botting.Penalty = 3
 
 # Time to wait for movement change ack
