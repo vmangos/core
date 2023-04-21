@@ -936,7 +936,6 @@ class World
         Messager<World>& GetMessager() { return m_messager; }
 
         LFGQueue& GetLFGQueue() { return m_lfgQueue; }
-        void StartLFGQueueThread();
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -1000,7 +999,7 @@ class World
 
         // Housing this here but logically it is completely asynchronous - TODO: Separate this and unify with BG queue
         LFGQueue m_lfgQueue;
-        std::thread m_lfgQueueThread;
+        std::unique_ptr<std::thread> m_lfgQueueThread;
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;

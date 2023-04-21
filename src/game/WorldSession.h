@@ -279,6 +279,7 @@ class WorldSession
         WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale);
         ~WorldSession();
 
+        uint32 GetGUID() const { return m_guid; }
         AccountTypes GetSecurity() const { return m_security; }
         uint32 GetAccountId() const { return m_accountId; }
         std::string GetUsername() const { return m_username; }
@@ -857,6 +858,7 @@ class WorldSession
         void LogUnexpectedOpcode(WorldPacket* packet, char const*  reason);
         void LogUnprocessedTail(WorldPacket* packet);
 
+        uint32 const m_guid; // unique identifier for each session
         WorldSocket* m_socket;
         std::string m_address;
         LockedQueue<WorldPacket*, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];

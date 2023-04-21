@@ -69,9 +69,11 @@ bool MapSessionFilter::Process(WorldPacket* packet)
     return MapSessionFilterHelper(m_pSession, opHandle);
 }
 
+static uint32 g_sessionCounter = 0;
+
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale) :
-    m_muteTime(mute_time), m_connected(true), m_disconnectTimer(0), m_who_recvd(false), m_ah_list_recvd(false),
+    m_guid(g_sessionCounter++), m_muteTime(mute_time), m_connected(true), m_disconnectTimer(0), m_who_recvd(false), m_ah_list_recvd(false),
     m_accountFlags(0), m_idleTime(WorldTimer::getMSTime()), _player(nullptr), m_socket(sock), m_security(sec), m_accountId(id), m_logoutTime(0), m_inQueue(false),
     m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false), m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
@@ -108,7 +110,9 @@ WorldSession::~WorldSession()
         while (i.next(packet))
             delete packet;
 
-    delete m_warden;
+    if (m_warden)
+        sAnticheatMgr->RemoveWardenSession(m_warden);
+
     delete m_cheatData;
 }
 
@@ -291,9 +295,6 @@ bool WorldSession::Update(PacketFilter& updater)
     if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_UNIQUE_SESSION_UPDATE) && sessionUpdateTime > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_UNIQUE_SESSION_UPDATE))
         sLog.Out(LOG_PERFORMANCE, LOG_LVL_MINIMAL, "Slow session update: %ums. Account %u on IP %s", sessionUpdateTime, GetAccountId(), GetRemoteAddress().c_str());
 
-    if (m_socket && !m_socket->IsClosed() && m_warden)
-        m_warden->Update();
-
     //check if we are safe to proceed with logout
     //logout procedure should happen only in World::UpdateSessions() method!!!
     if (updater.ProcessLogout())
@@ -309,6 +310,12 @@ bool WorldSession::Update(PacketFilter& updater)
         {
             m_socket->RemoveReference();
             m_socket = nullptr;
+
+            if (m_warden)
+            {
+                sAnticheatMgr->RemoveWardenSession(m_warden);
+                m_warden = nullptr;
+            }
 
             // Character stays IG for 2 minutes
             return ForcePlayerLogoutDelay();

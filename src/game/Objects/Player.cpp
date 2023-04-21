@@ -22528,22 +22528,6 @@ void Log::Player(WorldSession const* session, LogType logType, LogLevel logLevel
     // Player logs should never go to the console
 }
 
-void Log::OutWardenPlayer(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...)
-{
-    if (logType >= LOG_TYPE_MAX || logType < 0)
-        return;
-
-    va_list ap;
-
-    LOG_TO_DB_HELPER(logLevel, logType, "Warden", session, session->GetAccountId(), format, ap);
-
-    if (m_wardenDebug && logLevel > LOG_LVL_MINIMAL)
-        logLevel = LOG_LVL_MINIMAL;
-
-    LOG_TO_FILE_HELPER(logLevel, logType, "Warden", session, session->GetAccountId(), format, ap);
-    LOG_TO_CONSOLE_HELPER(logLevel, logType, "Warden", session, session->GetAccountId(), format, ap);
-}
-
 void Log::Player(WorldSession const* session, LogType logType, char const* subType, LogLevel logLevel, char const* format, ...)
 {
     if (logType >= LOG_TYPE_MAX || logType < 0)
