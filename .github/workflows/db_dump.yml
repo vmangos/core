@@ -12,7 +12,7 @@ env:
   WORLD_DB : "world_full_14_june_2021"
 jobs:
   build:
-    runs-on: ubuntu-18.04 # 18.04 has mysql5.7 and latest(20.04) has mysql8
+    runs-on: ubuntu-latest # 18.04 has mysql5.7 and latest(20.04) has mysql8
 
     # ... some other config ...
 
