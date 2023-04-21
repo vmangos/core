@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - '**.sql'
-      - '.github/workflows/**.yml'
+      - '.github/workflows/db_dump.yml'
 
 env:
   REPO_DIR : ${{github.workspace}}

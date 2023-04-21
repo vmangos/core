@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - '**.sql'
-      - '.github/workflows/**.yml'
+      - '.github/workflows/db_check.yml'
 env:
   REPO_DIR : ${{github.workspace}}
   WORLD_DB : "world_full_14_june_2021"
