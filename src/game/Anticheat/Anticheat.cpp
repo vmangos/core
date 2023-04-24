@@ -179,10 +179,4 @@ void AnticheatManager::RemoveWardenSession(Warden* warden)
     m_wardenSessionsToRemove.push_back(warden);
 }
 
-#else
-
-void Log::OutWarden(Warden const* warden, LogLevel logLevel, char const* format, ...)
-{
-}
-
 #endif
