@@ -2789,13 +2789,18 @@ void Map::SendObjectUpdates()
     _processingSendObjUpdates = true;
 
     // Compute maximum number of threads
-    uint32 threads = 1;
+//#define FORCE_OLD_THREADCOUNT
+#ifndef FORCE_OLD_THREADCOUNT
+    int threads = m_objectThreads->size();
+#else
+    int threads = 1;
     if (IsContinent())
         threads = m_objectThreads->size() +1;
     if (!_objUpdatesThreads)
         _objUpdatesThreads = 1;
     if (threads < _objUpdatesThreads)
         _objUpdatesThreads = threads;
+#endif
     if (threads > objectsCount)
         threads = objectsCount;
     int step = objectsCount / threads;
@@ -2870,11 +2875,13 @@ void Map::SendObjectUpdates()
         i_objectsToClientUpdate.erase(t[step * i], t[counters[i]]);
 #endif
 
+#ifdef FORCE_OLD_THREADCOUNT
     // If we timeout, use more threads !
     if (!i_objectsToClientUpdate.empty())
         ++_objUpdatesThreads;
     else
         --_objUpdatesThreads;
+#endif
 
     _processingSendObjUpdates = false;
 #ifdef MAP_SENDOBJECTUPDATES_PROFILE
