@@ -919,7 +919,6 @@ void Map::Update(uint32 t_diff)
     uint32 updateMapTime = WorldTimer::getMSTime();
     _dynamicTree.update(t_diff);
 
-    ProcessSessionPackets(PACKET_PROCESS_DB_QUERY); // TODO: Move somewhere else ?
     UpdateSessionsMovementAndSpellsIfNeeded();
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
