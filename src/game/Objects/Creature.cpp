@@ -2111,12 +2111,10 @@ void Creature::Respawn()
     RemoveCorpse();
 
     // forced recreate creature object at clients
-    UnitVisibility currentVis = GetVisibility();
-    SetVisibility(VISIBILITY_RESPAWN);
     SetUnitMovementFlags(MOVEFLAG_NONE);
-    UpdateObjectVisibility();
+    UnitVisibility currentVis = GetVisibility();
+    SetVisibility(VISIBILITY_RESPAWN);                      // this will call UpdateObjectVisibility
     SetVisibility(currentVis);                              // restore visibility state
-    UpdateObjectVisibility();
 
     if (IsDespawned())
     {
