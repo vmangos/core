@@ -511,7 +511,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -530,7 +530,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read SYSTEM_INFO");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read SYSTEM_INFO");
 
             return true;
         }
@@ -540,7 +540,7 @@ void WardenWin::LoadScriptedScans()
         // for classic, tbc, and wotlk, the architecute should never be anything other than x86 (0)
         if (!!wardenWin->_sysInfo.wProcessorArchitecture)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Incorrect architecture reported (%u)",
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Incorrect architecture reported (%u)",
                 wardenWin->_sysInfo.wProcessorArchitecture);
 
             return true;
@@ -551,7 +551,7 @@ void WardenWin::LoadScriptedScans()
             wardenWin->_sysInfo.dwProcessorType != 486 &&
             wardenWin->_sysInfo.dwProcessorType != 586)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Incorrect processor type: %u",
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Incorrect processor type: %u",
                 wardenWin->_sysInfo.dwProcessorType);
 
             return true;
@@ -567,7 +567,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -586,7 +586,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read warden->SysInfo");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read warden->SysInfo");
 
             return true;
         }
@@ -607,7 +607,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -626,7 +626,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read s_moduleInterface");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read s_moduleInterface");
 
             return true;
         }
@@ -645,7 +645,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -663,7 +663,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read CWorld::enables");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read CWorld::enables");
 
             return true;
         }
@@ -673,7 +673,7 @@ void WardenWin::LoadScriptedScans()
         // if any required flags are missing, or prohibited flags are present
         if ((val & Required) != Required || !!(val & Prohibited))
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "CWorld::enables expected 0x%lx prohibited 0x%lx received 0x%lx",
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "CWorld::enables expected 0x%lx prohibited 0x%lx received 0x%lx",
                 Required, Prohibited, val);
 
             return true;
@@ -689,7 +689,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -711,11 +711,10 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, ByteBuffer &buff)
     {
         auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
-        auto const session = wardenWin->_session;
 
         if (!!buff.read<uint8>())
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Timing check failed to read CSimpleTop::m_eventTime");
+            sLog.OutWarden(wardenWin, LOG_LVL_DEBUG, "Timing check failed to read CSimpleTop::m_eventTime");
             return true;
         }
 
@@ -730,14 +729,14 @@ void WardenWin::LoadScriptedScans()
             // or in XP compatibility mode.  there are probably other causes too.  therefore let us ignore this
             // failure, since the clock desync check will catch this same case if the clock is moving at an
             // unfair speed.
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_DEBUG, "Timing check failed");
+            sLog.OutWarden(wardenWin, LOG_LVL_DEBUG, "Timing check failed");
             return false;
         }
 
         // last hardware action cannot legitimately be past the current time
         if (lastHardwareAction > currentTime)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Current time: %u Last hardware action: %u (last hardware action in the future)",
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Current time: %u Last hardware action: %u (last hardware action in the future)",
                 currentTime, lastHardwareAction);
             return true;
         }
@@ -868,7 +867,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (hook check stage 1)");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read EndScene (hook check stage 1)");
 
             return true;
         }
@@ -890,7 +889,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -909,7 +908,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (stage 4)");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read EndScene (stage 4)");
 
             return true;
         }
@@ -930,7 +929,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -949,7 +948,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene (stage 3)");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read EndScene (stage 3)");
 
             return true;
         }
@@ -969,7 +968,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -988,7 +987,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Failed to read EndScene (stage 2)");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read EndScene (stage 2)");
 
             return true;
         }
@@ -1007,7 +1006,7 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
-        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
             return;
@@ -1026,7 +1025,7 @@ void WardenWin::LoadScriptedScans()
 
         if (!!result)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read g_theGxDevicePtr");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read g_theGxDevicePtr");
 
             return true;
         }
@@ -1036,7 +1035,7 @@ void WardenWin::LoadScriptedScans()
         // if for some reason we get nullptr, abort
         if (!wardenWin->_endSceneAddress)
         {
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "g_theGxDevicePtr is nullptr");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "g_theGxDevicePtr is nullptr");
             return true;
         }
 
@@ -1058,7 +1057,7 @@ void WardenWin::LoadScriptedScans()
             auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
             wardenWin->_proxifierFound = true;
 
-            sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Proxifier found");
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Proxifier found");
         }
 
         return false;
@@ -1169,7 +1168,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
     // int3 breakpoint
     if (*p == 0xCC)
     {
-        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Detected INT3 EndScene hook.  NOP count = %d.",
+        sLog.OutWarden(this, LOG_LVL_BASIC, "Detected INT3 EndScene hook.  NOP count = %d.",
             nopCount);
     }
     // JMP hook
@@ -1178,7 +1177,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
         auto const dest = *reinterpret_cast<const uint32 *>(p + 1);
 
         auto const absoluteDest = _endSceneAddress + nopCount + dest + 5;
-        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Detected JMP EndScene hook.  NOP count = %d.",
+        sLog.OutWarden(this, LOG_LVL_BASIC, "Detected JMP EndScene hook.  NOP count = %d.",
             nopCount);
 
         // request a custom scan just to check the JMP destination
@@ -1192,7 +1191,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
 
             if (!!result)
             {
-                sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Failed to read EndScene hook code");
+                sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read EndScene hook code");
                 return true;
             }
 
@@ -1201,7 +1200,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
             buff.read(&code[0], code.size());
 
             if (ValidateEndSceneHook(code))
-                sLog.Player(wardenWin->_session, LOG_ANTICHEAT, "Warden", LOG_LVL_BASIC, "Suspicious EndScene.  Probable bot.");
+                sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Suspicious EndScene.  Probable bot.");
 
             return false;
         }, "EndScene hook validate scan", None) });
@@ -1210,7 +1209,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
 
 uint32 WardenWin::GetScanFlags() const
 {
-    auto const game_build = _session->GetGameBuild();
+    auto const game_build = m_clientBuild;
 
     constexpr int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
     // for some reason these arrays are null terminated
@@ -1228,14 +1227,14 @@ uint32 WardenWin::GetScanFlags() const
 
     if (!found)
     {
-        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Invalid client build %u.  Kicking.", _session->GetGameBuild());
-        _session->KickPlayer();
+        sLog.OutWarden(this, LOG_LVL_BASIC, "Invalid client build %u.  Kicking.", m_clientBuild);
+        KickSession();
         return ScanFlags::None;
     }
 
     // at this point we know the game build is accepted
 
-    switch (_session->GetGameBuild())
+    switch (m_clientBuild)
     {
         case 4222:
             return ScanFlags::WinBuild4222;
@@ -1270,7 +1269,7 @@ uint32 WardenWin::GetScanFlags() const
 
 void WardenWin::InitializeClient()
 {
-    if (auto const offsets = GetClientOffets(_session->GetGameBuild()))
+    if (auto const offsets = GetClientOffets(m_clientBuild))
     {
         // initialize lua
         ByteBuffer lua;
@@ -1319,9 +1318,9 @@ void WardenWin::Update()
             "INSERT INTO `system_fingerprint_usage` (`fingerprint`, `account`, `ip`, `realm`, `architecture`, `cputype`, `activecpus`, `totalcpus`, `pagesize`) "
             "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        stmt.addUInt32(_session->GetFingerprint());
-        stmt.addUInt32(_session->GetAccountId());
-        stmt.addString(_session->GetRemoteAddress());
+        stmt.addUInt32(0); // fingerprint not implemented
+        stmt.addUInt32(m_accountId);
+        stmt.addString(m_sessionIP);
         stmt.addUInt32(realmID);
         stmt.addString(ArchitectureString(_sysInfo.wProcessorArchitecture));
         stmt.addString(CPUTypeAndRevision(_sysInfo.dwProcessorType, _sysInfo.wProcessorRevision));
@@ -1332,14 +1331,21 @@ void WardenWin::Update()
 
         LogsDatabase.CommitTransaction();
 
-        _session->CleanupFingerprintHistory();
+        //_session->CleanupFingerprintHistory();
 
         _sysInfoSaved = true;
 
         // at this point if we have the character enum packet, it is okay to send
         if (!_charEnum.empty())
         {
-            _session->SendPacket(&_charEnum);
+            sWorld.GetMessager().AddMessage([pkt = std::move(_charEnum), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+            {
+                if (WorldSession* session = world->FindSession(accountId))
+                {
+                    if (session->GetGUID() == sessionGuid)
+                        session->SendPacket(&pkt);
+                }
+            });
             _charEnum.clear();
         }
     }
@@ -1349,7 +1355,16 @@ void WardenWin::SetCharEnumPacket(WorldPacket &&packet)
 {
     // if we have already recorded system information, send the packet immediately.  otherwise delay
     if (_sysInfoSaved)
-        _session->SendPacket(&packet);
+    {
+        sWorld.GetMessager().AddMessage([pkt = std::move(packet), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+        {
+            if (WorldSession* session = world->FindSession(accountId))
+            {
+                if (session->GetGUID() == sessionGuid)
+                    session->SendPacket(&pkt);
+            }
+        });
+    }
     else
         _charEnum = std::move(packet);
 }

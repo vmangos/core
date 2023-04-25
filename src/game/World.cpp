@@ -182,13 +182,16 @@ World::~World()
 void World::Shutdown()
 {
     sPlayerBotMgr.DeleteAll();
-
     KickAll();                                       // save and kick all players
     UpdateSessions(1);                               // real players unload required UpdateSessions call
+    
     if (m_charDbWorkerThread)
         m_charDbWorkerThread->wait();
+    
     if (m_lfgQueueThread)
         m_lfgQueueThread->wait();
+    
+    sAnticheatMgr->StopWardenUpdateThread();
 }
 
 /// Find a session by its id
@@ -1160,6 +1163,13 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_ENABLED, "Anticheat.ForbiddenArea.Enable", true);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_THRESHOLD, "Anticheat.ForbiddenArea.Threshold", 1);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_PENALTY, "Anticheat.ForbiddenArea.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+    setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BOTTING_ENABLED, "Anticheat.Botting.Enable", true);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_PERIOD, "Anticheat.Botting.Period", 300000);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_PACKETS, "Anticheat.Botting.MinPackets", 160);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_MOUSE, "Anticheat.Botting.MinTurnsMouse", 20);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_KEYBOARD, "Anticheat.Botting.MinTurnsKeyboard", 80);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_ABNORMAL, "Anticheat.Botting.MinTurnsAbnormal", 5);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_PENALTY, "Anticheat.Botting.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
 
     // Warden Anticheat
     setConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED, "Warden.WinEnabled", true);
@@ -1818,6 +1828,8 @@ void World::SetInitialWorldSettings()
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Restoring deleted items to players ...");
         sObjectMgr.RestoreDeletedItems();
     }
+
+    sAnticheatMgr->StartWardenUpdateThread();
 
     m_broadcaster =
         std::make_unique<MovementBroadcaster>(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),

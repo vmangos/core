@@ -956,7 +956,6 @@ void Map::Update(uint32 t_diff)
     uint32 updateMapTime = WorldTimer::getMSTime();
     _dynamicTree.update(t_diff);
 
-    ProcessSessionPackets(PACKET_PROCESS_DB_QUERY); // TODO: Move somewhere else ?
     UpdateSessionsMovementAndSpellsIfNeeded();
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
@@ -1561,6 +1560,12 @@ bool Map::UnloadGrid(uint32 const& x, uint32 const& y, bool pForce)
         RemoveAllObjectsInRemoveList();
 
         unloader.UnloadN();
+
+        // Unloading a grid can also add creatures to the list of objects to be
+        // removed, for example guardian pets. Remove these now to avoid they
+        // wouldn't actually be removed because the grid is already unloaded.
+        RemoveAllObjectsInRemoveList();
+
         delete getNGrid(x, y);
         setNGrid(nullptr, x, y);
     }

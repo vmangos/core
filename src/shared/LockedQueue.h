@@ -61,6 +61,13 @@ namespace ACE_Based
                 ACE_Guard<LockType> g(this->_lock);
                 _queue.push_back(item);
             }
+            
+            //! Moves an item into the queue.
+            void add(T&& item)
+            {
+                ACE_Guard<LockType> g(this->_lock);
+                _queue.push_back(std::move(item));
+            }
 
             //! Gets the next result in the queue, if any.
             bool next(T& result)
@@ -70,7 +77,7 @@ namespace ACE_Based
                 if (_queue.empty())
                     return false;
 
-                result = _queue.front();
+                result = std::move(_queue.front());
                 _queue.pop_front();
 
                 return true;
@@ -84,10 +91,10 @@ namespace ACE_Based
                 if (_queue.empty())
                     return false;
 
-                result = _queue.front();
-                if(!check.Process(result))
+                if(!check.Process(_queue.front()))
                     return false;
-
+                    
+                result = std::move(_queue.front());
                 _queue.pop_front();
                 return true;
             }
@@ -126,6 +133,12 @@ namespace ACE_Based
             void unlock()
             {
                 this->_lock.release();
+            }
+            
+            void clear()
+            {
+                ACE_Guard<LockType> g(this->_lock);
+                _queue.clear();
             }
 
             bool empty_unsafe()

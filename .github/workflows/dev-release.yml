@@ -6,6 +6,8 @@ on:
       - '.github/ISSUE_TEMPLATE/**'
       - '.github/ISSUE_TEMPLATE.md'
       - '.github/PULL_REQUEST_TEMPLATE.md'
+      - '.github/workflows/db_check.yml'
+      - '.github/workflows/db_dump.yml'
       - 'sql/**'
       - '.drone.yml'
       - 'README.md'
@@ -81,8 +83,9 @@ jobs:
 
           copy ${{github.workspace}}/ACE_wrappers/lib/ACE.dll ${{github.workspace}}/bin/Release/ACE.dll
           copy c:/mysql/lib/libmysql.dll ${{github.workspace}}/bin/Release/libmysql.dll
-          copy "c:/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" ${{github.workspace}}/bin/Release/libssl-1_1-x64.dll
-          copy "c:/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" ${{github.workspace}}/bin/Release/libcrypto-1_1-x64.dll
+          copy "c:/Program Files/OpenSSL/bin/libssl-1_1-x64.dll" ${{github.workspace}}/bin/Release/libssl-1_1-x64.dll
+          copy "c:/Program Files/OpenSSL/bin/libcrypto-1_1-x64.dll" ${{github.workspace}}/bin/Release/libcrypto-1_1-x64.dll
+          copy ${{github.workspace}}/dep/windows/lib/x64_release/libeay32.dll ${{github.workspace}}/bin/Release/libeay32.dll
 
           7z a -tzip ${{env.ARCHIVE_FILENAME}} Release
     - name: Archive this artefact
@@ -123,8 +126,9 @@ jobs:
 
           copy ${{github.workspace}}/ACE_wrappers/lib/ACE.dll ${{github.workspace}}/bin/Release/ACE.dll
           copy c:/mysql/lib/libmysql.dll ${{github.workspace}}/bin/Release/libmysql.dll
-          copy "c:/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" ${{github.workspace}}/bin/Release/libssl-1_1-x64.dll
-          copy "c:/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" ${{github.workspace}}/bin/Release/libcrypto-1_1-x64.dll
+          copy "c:/Program Files/OpenSSL/bin/libssl-1_1-x64.dll" ${{github.workspace}}/bin/Release/libssl-1_1-x64.dll
+          copy "c:/Program Files/OpenSSL/bin/libcrypto-1_1-x64.dll" ${{github.workspace}}/bin/Release/libcrypto-1_1-x64.dll
+          copy ${{github.workspace}}/dep/windows/lib/x64_release/libeay32.dll ${{github.workspace}}/bin/Release/libeay32.dll
 
           7z a -tzip ${{env.ARCHIVE_FILENAME}} Release
     - name: Archive this artefact

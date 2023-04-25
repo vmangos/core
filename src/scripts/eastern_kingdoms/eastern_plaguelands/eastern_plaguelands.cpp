@@ -1749,7 +1749,7 @@ bool GossipHello_npc_joseph_redpath(Player* pPlayer, Creature* pCreature)
     pPlayer->SEND_GOSSIP_MENU(10935, pCreature->GetGUID());
     if (pPlayer->GetQuestStatus(QUEST_BATTLE_DARROWSHIRE) == QUEST_STATUS_INCOMPLETE)
     {
-        pPlayer->AreaExploredOrEventHappens(QUEST_BATTLE_DARROWSHIRE);
+        pPlayer->KilledMonsterCredit(NPC_JOSEPH_REDPATH, pCreature->GetObjectGuid());
         pCreature->HandleEmote(EMOTE_ONESHOT_BEG);
         if (npc_joseph_redpathAI* pJosephAI = dynamic_cast<npc_joseph_redpathAI*>(pCreature->AI()))
             pJosephAI->BeginEvent();

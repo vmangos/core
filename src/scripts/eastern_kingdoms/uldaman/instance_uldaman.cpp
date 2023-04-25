@@ -180,9 +180,8 @@ struct instance_uldaman : public ScriptedInstance
 
     void SetFrozenState(Creature* creature)
     {
-        creature->SetFactionTemplateId(FACTION_STONED);
+        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         creature->RemoveAllAuras();
-        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         if (!creature->HasAura(SPELL_STONED))
         {
             creature->CastSpell(creature, SPELL_STONED, false);
@@ -191,21 +190,17 @@ struct instance_uldaman : public ScriptedInstance
 
     void SetUnFrozenState(Creature* creature)
     {
-        creature->SetFactionTemplateId(FACTION_AWAKE);
+        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
         if (creature->HasAura(SPELL_STONED))
         {
             creature->RemoveAurasDueToSpell(SPELL_STONED);
         }
-        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-        //creature->ClearUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT);
-        //creature->RemoveFlag(UNIT_FIELD_FLAGS,
-    //                    UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
     }
 
     void RespawnMinion(uint64 guid)
     {
         Creature* target = instance->GetCreature(guid);
-        if (!target || (target->IsAlive() && target->GetFactionTemplateId() == FACTION_STONED))
+        if (!target || (target->IsAlive() && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC)))
             return;
         if (target->IsAlive())
         {
@@ -213,7 +208,7 @@ struct instance_uldaman : public ScriptedInstance
             target->RemoveCorpse();
         }
         target->Respawn();
-        target->SetFactionTemplateId(FACTION_STONED);
+        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void DespawnMinion(uint64 guid)
@@ -309,14 +304,14 @@ struct instance_uldaman : public ScriptedInstance
                             Creature* current = instance->GetCreature(guid);
 
                             /* Do nothing if one is already alive and awaken */
-                            if (current && current->IsAlive() && current->GetFactionTemplateId() == FACTION_AWAKE)
+                            if (current && current->IsAlive() && !current->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC))
                             {
                                 target = nullptr;
                                 encounterDone = false;
                                 break;
                             }
                             /* Save a creature that can be awaken for later */
-                            if (!target && current && current->IsAlive() && current->GetFactionTemplateId() != FACTION_AWAKE)
+                            if (!target && current && current->IsAlive() && current->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC))
                             {
                                 target = current;
                             }
@@ -326,6 +321,7 @@ struct instance_uldaman : public ScriptedInstance
                             encounterDone = false;
                             /** Creature become alive */
                             SetUnFrozenState(target);
+                            target->SetFactionTemporary(470, TEMPFACTION_RESTORE_RESPAWN | TEMPFACTION_RESTORE_COMBAT_STOP);
                             if (Unit* victim = target->SelectNearestTarget(80.0f))
                             {
                                 target->AI()->AttackStart(victim);
@@ -353,7 +349,7 @@ struct instance_uldaman : public ScriptedInstance
                                 target->Respawn();
                                 SetFrozenState(target);
                             }
-                            else if (target->GetFactionTemplateId() == FACTION_AWAKE)
+                            else if (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC))
                             {
                                 target->SetDeathState(JUST_DIED);
                                 target->RemoveCorpse();
@@ -415,7 +411,7 @@ struct instance_uldaman : public ScriptedInstance
                                 SetData(DATA_ANCIENT_DOOR, IN_PROGRESS);
                             if (archaedas)
                             {
-                                if (archaedas->IsAlive() && archaedas->GetFactionTemplateId() != FACTION_AWAKE)
+                                if (archaedas->IsAlive() && archaedas->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC))
                                 {
                                     archaedas->CastSpell(archaedas, SPELL_ARCHAEDAS_AWAKEN, false);
                                     SetUnFrozenState(archaedas);
@@ -427,12 +423,12 @@ struct instance_uldaman : public ScriptedInstance
                             for (const auto& i : vArchaedasWallMinions)
                             {
                                 Creature* target = instance->GetCreature(i);
-                                if (!target || !target->IsAlive() || target->GetFactionTemplateId() == FACTION_AWAKE)
+                                if (!target || !target->IsAlive() || !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC))
                                 {
                                     continue;
                                 }
                                 archaedas->CastSpell(target, SPELL_AWAKEN_EARTHEN_DWARF, false);
-                                target->SetFactionTemplateId(FACTION_AWAKE);
+                                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
                                 break; // only want the first one we find
                             }
                         }
@@ -550,6 +546,7 @@ struct instance_uldaman : public ScriptedInstance
             if (!ironaya)
                 return;
             SetUnFrozenState(ironaya);
+            ironaya->SetFactionTemplateId(415);
             DoOpenDoor(uiIronayaSealDoor);
             bKeystoneCheck = false;
         }

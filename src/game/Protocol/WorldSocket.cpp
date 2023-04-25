@@ -75,11 +75,9 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
 
                 if (m_Session != nullptr)
                 {
-                    // OK ,give the packet to WorldSession
-                    aptr.release();
                     // WARNINIG here we call it with locks held.
                     // Its possible to cause deadlock if QueuePacket calls back
-                    m_Session->QueuePacket(new_pct);
+                    m_Session->QueuePacket(std::move(aptr));
                     return 0;
                 }
                 else

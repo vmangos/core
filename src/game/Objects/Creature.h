@@ -354,8 +354,9 @@ class Creature : public Unit
         void ApplyDynamicRespawnDelay(uint32& delay);
         void CastSpawnSpell();
 
+        // the delay is in seconds
         uint32 GetRespawnDelay() const { return m_respawnDelay; }
-        void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
+        void SetRespawnDelay(uint32 seconds) { m_respawnDelay = seconds; }
 
         float GetWanderDistance() const { return m_wanderDistance; }
         void SetWanderDistance(float dist) { m_wanderDistance = dist; }

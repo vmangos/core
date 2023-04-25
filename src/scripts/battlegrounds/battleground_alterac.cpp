@@ -1964,7 +1964,7 @@ struct AV_NpcEventAI : public npc_escortAI
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 1000.0f);
             for (const auto& it : m_RamRiderList)
             {
-                it->SetRespawnDelay(432000);
+                it->SetRespawnDelay(5 * DAY);
                 it->SetDeathState(JUST_DIED);
                 it->RemoveCorpse();
             }
@@ -2304,7 +2304,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 if (AV_NpcEventTroopsAI* pEscortAI = dynamic_cast<AV_NpcEventTroopsAI*>(it->AI()))
                 {
                     pEscortAI->Reset();
-                    it->SetRespawnDelay(432000);
+                    it->SetRespawnDelay(5 * DAY);
                     pEscortAI->Start(true, 0, nullptr, false);
                     pEscortAI->setCurrentWP(getCurrentWP());
                 }

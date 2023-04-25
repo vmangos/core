@@ -76,7 +76,7 @@ bool BuildRawData(const std::string &hexData, std::vector<uint8> &out)
 }
 }
 
-void WardenScanMgr::loadFromDB()
+void WardenScanMgr::LoadFromDB()
 {
     //                                         0     1       2      3       4          5         6         7        8          9
     auto result = WorldDatabase.Query("SELECT `id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `comment` FROM `warden_scans`");
@@ -284,8 +284,8 @@ std::vector<std::shared_ptr<const Scan>> WardenScanMgr::GetRandomScans(ScanFlags
             continue;
 
         // if the scan is an in-world scan, and that wasn't explicitly requested, do not include it
-        if (!!(scan->flags & InWorld) && !(flags & InWorld))
-            continue;
+        //if (!!(scan->flags & InWorld) && !(flags & InWorld))
+        //    continue;
 
         matches.push_back(scan);
     }

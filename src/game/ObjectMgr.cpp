@@ -6232,29 +6232,29 @@ void ObjectMgr::LoadPageTexts()
         if (!page)
             continue;
 
-        if (page->Next_Page && !sPageTextStore.LookupEntry<PageText>(page->Next_Page))
+        if (page->next_page && !sPageTextStore.LookupEntry<PageText>(page->next_page))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Page text (Id: %u) has not existing next page (Id:%u)", i, page->Next_Page);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Page text (Id: %u) has not existing next page (Id:%u)", i, page->next_page);
             continue;
         }
 
         // detect circular reference
         std::set<uint32> checkedPages;
-        for (PageText const* pageItr = page; pageItr; pageItr = sPageTextStore.LookupEntry<PageText>(pageItr->Next_Page))
+        for (PageText const* pageItr = page; pageItr; pageItr = sPageTextStore.LookupEntry<PageText>(pageItr->next_page))
         {
-            if (!pageItr->Next_Page)
+            if (!pageItr->next_page)
                 break;
-            checkedPages.insert(pageItr->Page_ID);
-            if (checkedPages.find(pageItr->Next_Page) != checkedPages.end())
+            checkedPages.insert(pageItr->entry);
+            if (checkedPages.find(pageItr->next_page) != checkedPages.end())
             {
                 std::ostringstream ss;
                 ss << "The text page(s) ";
                 for (const auto checkedPage : checkedPages)
                     ss << checkedPage << " ";
-                ss << "create(s) a circular reference, which can cause the server to freeze. Changing Next_Page of page "
-                   << pageItr->Page_ID << " to 0";
+                ss << "create(s) a circular reference, which can cause the server to freeze. Changing next_page of page "
+                   << pageItr->entry << " to 0";
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "%s", ss.str().c_str());
-                const_cast<PageText*>(pageItr)->Next_Page = 0;
+                const_cast<PageText*>(pageItr)->next_page = 0;
                 break;
             }
         }
@@ -6304,10 +6304,10 @@ void ObjectMgr::LoadPageTextLocales()
             int idx = GetOrNewIndexForLocale(LocaleConstant(i));
             if (idx >= 0)
             {
-                if ((int32)data.Text.size() <= idx)
-                    data.Text.resize(idx + 1);
+                if ((int32)data.text.size() <= idx)
+                    data.text.resize(idx + 1);
 
-                data.Text[idx] = str;
+                data.text[idx] = str;
             }
         }
 

@@ -10,7 +10,7 @@ EndContentData */
 
 #define SAY_CRYSTAL_DESTROYED         -1900116
 #define SAY_ALL_CRYSTALS_DESTROYED    -1900115
-#define SAY_SCOURGE_HAVE_BROKEN_IN    -1900114
+
 /*######
 ## go_gauntlet_gate (this is the _first_ of the gauntlet gates, two exist)
 ######*/
@@ -624,177 +624,6 @@ CreatureAI* GetAI_mobs_rat_pestifere(Creature* pCreature)
 }
 
 /*######
-## EVENT POP MOBS FIN DE COULOIRS
-######*/
-
-#define NPC_DATHROHAN 10812
-#define NPC_CRIMSON_GALLANT 10424
-#define NPC_BERSERK  10391
-#define NPC_GUARDIAN 10390
-
-struct npc_couloir_trigger1AI : public ScriptedAI
-{
-    npc_couloir_trigger1AI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 m_uiScourgeTimer;
-    bool CorridorEnded;
-    bool ScourgeStarted;
-
-    void Reset() override
-    {
-        CorridorEnded = false;
-        ScourgeStarted = false;
-        m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS);
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
-        {
-            if (Creature* Crea = m_creature->FindNearestCreature(10812, 200.0f))
-                Crea->MonsterYell("Don't let them break our lines!", 0);
-
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3516.3f, -3067.8f, 135.08f, 0.837758f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3512.3f, -3065.8f, 135.08f, 0.837758f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3506.84f, -3093.61f, 135.751f, 2.46091f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-
-            CorridorEnded = true;
-            ScourgeStarted = true;
-        }
-    }
-
-    void JustSummoned(Creature* pSummoned) override
-    {
-        if (pSummoned->GetEntry() == NPC_BERSERK || pSummoned->GetEntry() == NPC_GUARDIAN)
-            pSummoned->SetInCombatWithZone();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (ScourgeStarted)
-        {
-            if (m_uiScourgeTimer < uiDiff)
-            {
-                m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS);
-
-                if (Creature* Crea = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_DATHROHAN)))
-                {
-                    if (Crea->IsAlive() && !Crea->IsInCombat())
-                    {
-                        //"The scourge has broken into our bastion!"
-                        Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
-                    }
-                    else
-                        return;
-                }             
-
-                for (uint8 i = 0; i < 4; ++i)
-                {
-                    switch (urand(0, 1))
-                    {
-                        case 0:
-                            m_creature->SummonCreature(NPC_BERSERK,
-                                                       m_creature->GetPositionX() + float(urand(0, 5)), m_creature->GetPositionY() - float(urand(0, 5)), m_creature->GetPositionZ(), 0,
-                                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_uiScourgeTimer);
-                            break;
-                        case 1:
-                            m_creature->SummonCreature(NPC_GUARDIAN,
-                                                       m_creature->GetPositionX() + float(urand(0, 5)), m_creature->GetPositionY() - float(urand(0, 5)), m_creature->GetPositionZ(), 0,
-                                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_uiScourgeTimer);
-                            break;
-                    }
-                }
-            }
-            else
-                m_uiScourgeTimer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_couloir_trigger1(Creature* pCreature)
-{
-    return new npc_couloir_trigger1AI(pCreature);
-}
-
-struct npc_couloir_trigger2AI : public ScriptedAI
-{
-    npc_couloir_trigger2AI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    bool CorridorEnded;
-
-    void Reset() override
-    {
-        CorridorEnded = false;
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
-        {
-            if (Creature* Crea = m_creature->FindNearestCreature(10812, 200.0f))
-                Crea->MonsterYell("Don't let them break our lines!", 0);
-
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3470.86f, -3073.86f, 135.088f, 0.907571f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3465.61f, -3065.72f, 135.084f, 0.20944f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3467.3f, -3068.8f, 135.004f, 0.837758f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-
-            CorridorEnded = true;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_couloir_trigger2(Creature* pCreature)
-{
-    return new npc_couloir_trigger2AI(pCreature);
-}
-
-struct npc_couloir_trigger3AI : public ScriptedAI
-{
-    npc_couloir_trigger3AI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    bool CorridorEnded;
-
-    void Reset() override
-    {
-        CorridorEnded = false;
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
-        {
-            if (Creature* Crea = m_creature->FindNearestCreature(10997, 200.0f))
-                Crea->MonsterYell("Don't let them break our lines!", 0);
-
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3569.11f, -2970.55f, 124.999f, 5.36522f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3577.11f, -2998.55f, 125.0011f, 5.36522f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3545.11f, -3018.55f, 124.999f, 5.36522f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-
-            CorridorEnded = true;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_couloir_trigger3(Creature* pCreature)
-{
-    return new npc_couloir_trigger3AI(pCreature);
-}
-
-/*######
 ## SUPPLY CRATE
 ######*/
 
@@ -877,21 +706,6 @@ void AddSC_stratholme()
     newscript->GetAI = &GetAI_mobs_rat_pestifere;
     newscript->RegisterSelf();
     */
-
-    newscript = new Script;
-    newscript->Name = "npc_couloir_trigger1";
-    newscript->GetAI = &GetAI_npc_couloir_trigger1;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_couloir_trigger2";
-    newscript->GetAI = &GetAI_npc_couloir_trigger2;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_couloir_trigger3";
-    newscript->GetAI = &GetAI_npc_couloir_trigger3;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_supply_crate";

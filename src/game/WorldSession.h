@@ -176,9 +176,9 @@ enum PacketProcessing
      * PACKET_PROCESS_DB_QUERY
      * Does not write anything. Can be processed in any environment.
      * Reads static data (usually data from World DB)
+     * Currently executed directly in the network thread.
      */
     PACKET_PROCESS_DB_QUERY,
-    PACKET_PROCESS_MASTER_SAFE,
     PACKET_PROCESS_MAX_TYPE,                                // no handler for this packet (server side, or not implemented)
     /*
      * PACKET_PROCESS_SELF_ITEMS
@@ -234,7 +234,7 @@ class PacketFilter
         explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession), m_processLogout(false), m_processType(PACKET_PROCESS_MAX_TYPE) {}
         virtual ~PacketFilter() {}
 
-        virtual bool Process(WorldPacket*) { return true; }
+        virtual bool Process(std::unique_ptr<WorldPacket> const&) { return true; }
         inline bool ProcessLogout() const { return m_processLogout; }
         inline PacketProcessing PacketProcessType() const { return m_processType; }
         inline void SetProcessType(PacketProcessing t) { m_processType = t; }
@@ -255,7 +255,7 @@ class MapSessionFilter : public PacketFilter
         }
         ~MapSessionFilter() override {}
 
-        bool Process(WorldPacket*  packet) override;
+        bool Process(std::unique_ptr<WorldPacket> const& packet) override;
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -279,6 +279,7 @@ class WorldSession
         WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale);
         ~WorldSession();
 
+        uint32 GetGUID() const { return m_guid; }
         AccountTypes GetSecurity() const { return m_security; }
         uint32 GetAccountId() const { return m_accountId; }
         std::string GetUsername() const { return m_username; }
@@ -381,7 +382,7 @@ class WorldSession
         bool m_ah_list_recvd;
 
         bool Update(PacketFilter& updater);
-        void QueuePacket(WorldPacket* new_packet);
+        void QueuePacket(std::unique_ptr<WorldPacket> new_packet);
         bool CanProcessPackets() const; // Returns true iif we can process packets (ie logged in Player, not a bot, etc ...
         void ProcessPackets(PacketFilter& updater);
         bool AllowPacket(uint16 opcode);
@@ -857,9 +858,10 @@ class WorldSession
         void LogUnexpectedOpcode(WorldPacket* packet, char const*  reason);
         void LogUnprocessedTail(WorldPacket* packet);
 
+        uint32 const m_guid; // unique identifier for each session
         WorldSocket* m_socket;
         std::string m_address;
-        ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
+        ACE_Based::LockedQueue<std::unique_ptr<WorldPacket>, ACE_Thread_Mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool m_receivedPacketType[PACKET_PROCESS_MAX_TYPE];
         uint32 m_floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         bool m_connected;

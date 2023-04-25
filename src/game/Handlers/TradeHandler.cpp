@@ -436,6 +436,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
             my_trade->SetAccepted(false);
             his_trade->SetAccepted(false);
             his_trade->SetLastModificationTime(time(nullptr));
+            if (my_spell)
+                my_spell->Delete();
+            if (his_spell)
+                his_spell->Delete();
             return;
         }
         else if (!hisCanCompleteTrade)
@@ -447,6 +451,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
             my_trade->SetAccepted(false);
             his_trade->SetAccepted(false);
             his_trade->SetLastModificationTime(time(nullptr));
+            if (my_spell)
+                my_spell->Delete();
+            if (his_spell)
+                his_spell->Delete();
             return;
         }
 

@@ -27,6 +27,7 @@
 
 #include <unordered_set>
 
+class Warden;
 class Config;
 class Player;
 class WorldSession;
@@ -170,7 +171,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         // for player-specific messages
         void Player(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(WorldSession const* session, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
-        void OutWardenPlayer(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+        void OutWarden(Warden const* warden, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4, 5);
         void Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(uint32 accountId, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
 
