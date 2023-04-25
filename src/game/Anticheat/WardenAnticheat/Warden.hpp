@@ -33,7 +33,7 @@
 
 #include <vector>
 #include <memory>
-#include <mutex>
+#include "ace/Thread_Mutex.h"
 
 enum WardenOpcodes
 {
@@ -171,7 +171,7 @@ class Warden
             std::string &endscene, std::string &proxifier) const = 0;
 
         std::vector<WorldPacket> m_packetQueue;
-        std::mutex m_packetQueueMutex;
+        ACE_Thread_Mutex m_packetQueueMutex;
 };
 
 #endif /*!__WARDEN_HPP_*/

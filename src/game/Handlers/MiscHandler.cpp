@@ -1255,7 +1255,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
         return;
     }
 
-    std::lock_guard<std::mutex> lock(m_warden->m_packetQueueMutex);
+    ACE_Guard<ACE_Thread_Mutex> lock(m_warden->m_packetQueueMutex);
     m_warden->m_packetQueue.emplace_back(std::move(recv_data));
 #endif
 }
