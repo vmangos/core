@@ -758,17 +758,17 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
     data << uint32(0); // members count placeholder
     spaceLeft -= sizeof(uint32);
     data << MOTD;
-    spaceLeft -= MOTD.length() + 1;
+    spaceLeft -= (MOTD.length() + 1);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GINFO;
-    spaceLeft -= GINFO.length() + 1;
+    spaceLeft -= (GINFO.length() + 1);
 #endif
 
     data << uint32(m_Ranks.size());
     spaceLeft -= sizeof(uint32);
     for (const auto& itr : m_Ranks)
         data << uint32(itr.Rights);
-    spaceLeft -= m_Ranks.size() * sizeof(uint32);
+    spaceLeft -= (m_Ranks.size() * sizeof(uint32));
 
     uint32 count = 0;
     for (const auto& itr : members)
@@ -789,7 +789,7 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
             1;                            // null byte for officer note
 
         spaceLeft -= spaceNeeded;
-        if (spaceLeft < 0)
+        if (spaceLeft <= 0)
             break;
         count++;
         

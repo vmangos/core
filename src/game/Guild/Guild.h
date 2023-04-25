@@ -35,7 +35,7 @@ enum
     GUILD_NOTE_MAX_LENGTH       = 31,
     GUILD_INFO_MAX_LENGTH       = 500,
     GUILD_MOTD_MAX_LENGTH       = 128,
-    GUILD_ROSTER_MAX_LENGTH     = 0x8000, // max packet size accepted by client
+    GUILD_ROSTER_MAX_LENGTH     = 0x8000 - 4, // max packet size accepted by client - packet header size
 };
 
 enum GuildDefaultRanks
