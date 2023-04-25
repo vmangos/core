@@ -861,7 +861,7 @@ class WorldSession
         uint32 const m_guid; // unique identifier for each session
         WorldSocket* m_socket;
         std::string m_address;
-        LockedQueue<std::unique_ptr<WorldPacket>, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
+        ACE_Based::LockedQueue<std::unique_ptr<WorldPacket>, ACE_Thread_Mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool m_receivedPacketType[PACKET_PROCESS_MAX_TYPE];
         uint32 m_floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         bool m_connected;

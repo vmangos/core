@@ -23,8 +23,7 @@
 
 #include "Policies/SingletonImp.h"
 
-INSTANTIATE_SINGLETON_2(Config, Config::Lock);
-INSTANTIATE_CLASS_MUTEX(Config, std::shared_timed_mutex);
+INSTANTIATE_SINGLETON_1(Config);
 
 // Defined here as it must not be exposed to end-users.
 bool Config::GetValueHelper(char const* name, ACE_TString& result)

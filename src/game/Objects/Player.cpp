@@ -18824,9 +18824,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             ObjectGuid t_guid = target->GetObjectGuid();
 
             target->DestroyForPlayer(this);
-            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs_lock.acquire_write();
             m_visibleGUIDs.erase(t_guid);
-            lock.unlock();
+            m_visibleGUIDs_lock.release();
 
             if (Player* plTarget = target->ToPlayer())
                 if (plTarget->m_broadcaster)
@@ -18842,9 +18842,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             target->SendCreateUpdateToPlayer(this);
             if (target->GetTypeId() != TYPEID_GAMEOBJECT || !((GameObject*)target)->IsMoTransport())
             {
-                std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+                m_visibleGUIDs_lock.acquire_write();
                 m_visibleGUIDs.insert(target->GetObjectGuid());
-                lock.unlock();
+                m_visibleGUIDs_lock.release();
 
                 if (Player* plTarget = target->ToPlayer())
                     if (plTarget->m_broadcaster)
@@ -18908,9 +18908,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
             ObjectGuid t_guid = target->GetObjectGuid();
 
             target->BuildOutOfRangeUpdateBlock(data);
-            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs_lock.acquire_write();
             m_visibleGUIDs.erase(t_guid);
-            lock.unlock();
+            m_visibleGUIDs_lock.release();
 
             RemoveBroadcastListener(target, this);
             DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range for %s. Distance = %f", t_guid.GetString().c_str(), GetGuidStr().c_str(), GetDistance(target));
@@ -18922,9 +18922,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         {
             visibleNow.insert(target);
             target->BuildCreateUpdateBlockForPlayer(data, this);
-            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs_lock.acquire_write();
             UpdateVisibilityOf_helper(m_visibleGUIDs, target);
-            lock.unlock();
+            m_visibleGUIDs_lock.release();
 
             AddBroadcastListener(target, this);
             DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is visible now for %s. Distance = %f", target->GetGuidStr().c_str(), GetGuidStr().c_str(), GetDistance(target));
@@ -19605,7 +19605,7 @@ void Player::UpdateForQuestWorldObjects()
         return;
 
     UpdateData updateData;
-    std::shared_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+    m_visibleGUIDs_lock.acquire_read();
     for (const auto& guid : m_visibleGUIDs)
     {
         if (guid.IsGameObject())
@@ -19620,7 +19620,7 @@ void Player::UpdateForQuestWorldObjects()
             }
         }
     }
-    lock.unlock();
+    m_visibleGUIDs_lock.release();
     if (updateData.HasData())
         updateData.Send(GetSession());
 }
@@ -21966,8 +21966,9 @@ bool Player::IsInVisibleList(WorldObject const* u) const
 {
     if (u == this)
         return true;
-    std::shared_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+    m_visibleGUIDs_lock.acquire_read();
     bool atClient = m_visibleGUIDs.find(u->GetObjectGuid()) != m_visibleGUIDs.end();
+    m_visibleGUIDs_lock.release();
     return atClient;
 }
 
@@ -22271,7 +22272,6 @@ void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32
         SendClearCooldown(spellEntry->Id, this);
     }
 }
-
 
 void Player::CastHighestStealthRank()
 {
@@ -22585,3 +22585,4 @@ void Player::ClearTemporaryWarWithFactions()
         m_temporaryAtWarFactions.clear();
     }
 }
+

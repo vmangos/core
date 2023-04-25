@@ -30,6 +30,7 @@
 #include "Timer.h"
 #include "Policies/Singleton.h"
 #include "SharedDefines.h"
+#include "ace/Atomic_Op.h"
 #include "ObjectGuid.h"
 #include "Chat/AbstractPlayer.h"
 #include "WorldPacket.h"
@@ -42,7 +43,6 @@
 #include <chrono>
 #include <memory>
 #include <unordered_map>
-#include <thread>
 
 class Object;
 class WorldSession;
@@ -654,12 +654,18 @@ enum RealmZone
     REALM_ZONE_CN9           = 29                           // basic-Latin at create, any at login
 };
 
-class SessionPacketSendTask
+class AsyncTask
 {
-    SessionPacketSendTask(const SessionPacketSendTask&) = delete;
+public:
+    virtual ~AsyncTask() {}
+    virtual void run() = 0;
+};
+
+class SessionPacketSendTask : public AsyncTask
+{
 public:
     SessionPacketSendTask(uint32 accountId, WorldPacket& data) : m_accountId(accountId), m_data(data) {}
-    void operator ()();
+    void run() override;
 private:
     uint32 m_accountId;
     WorldPacket m_data;
@@ -709,8 +715,6 @@ struct CliCommandHolder
 
     ~CliCommandHolder() { delete[] m_command; }
 };
-
-class ThreadPool;
 
 /// The World
 class World
@@ -891,10 +895,9 @@ class World
          * The tasks will be executed *while* maps are updated. So don't touch the mobs, pets, etc ...
          * includes reading, unless the read itself is serialized
          */
-        void AddAsyncTask(std::function<void ()> task);
-        std::mutex m_asyncTaskQueueMutex;
-        std::vector<std::function<void()>> _asyncTasks;
-        std::vector<std::function<void()>> _asyncTasksBusy;
+        void AddAsyncTask(AsyncTask* task) { _asyncTasks.add(task); }
+        bool GetNextAsyncTask(AsyncTask*& task) { return _asyncTasks.next(task); }
+        ACE_Based::LockedQueue<AsyncTask*, ACE_Thread_Mutex> _asyncTasks;
         /**
          * Database logs system
          */
@@ -961,10 +964,10 @@ class World
 
         static volatile bool m_stopEvent;
         static uint8 m_ExitCode;
-        uint32 m_ShutdownTimer = 0;
-        uint32 m_ShutdownMask = 0;
+        uint32 m_ShutdownTimer;
+        uint32 m_ShutdownMask;
 
-        uint32 m_MaintenanceTimeChecker = 0;
+        uint32 m_MaintenanceTimeChecker;
 
         time_t m_startTime;
         time_t m_gameTime;
@@ -977,8 +980,8 @@ class World
         std::map<uint32 /*accountId*/, time_t /*last logout*/> m_accountsLastLogout;
         bool CanSkipQueue(WorldSession const* session);
 
-        uint32 m_maxActiveSessionCount = 0;
-        uint32 m_maxQueuedSessionCount = 0;
+        uint32 m_maxActiveSessionCount;
+        uint32 m_maxQueuedSessionCount;
 
         uint32 m_configUint32Values[CONFIG_UINT32_VALUE_COUNT];
         int32 m_configInt32Values[CONFIG_INT32_VALUE_COUNT];
@@ -989,7 +992,7 @@ class World
         uint8 m_wowPatch;
 
         LocaleConstant m_defaultDbcLocale;                     // from config for one from loaded DBC locales
-        uint32 m_availableDbcLocaleMask = 0;                       // by loaded DBC
+        uint32 m_availableDbcLocaleMask;                       // by loaded DBC
         void DetectDBCLang();
         bool m_allowMovement;
         std::string m_motd;
@@ -999,7 +1002,7 @@ class World
 
         // Housing this here but logically it is completely asynchronous - TODO: Separate this and unify with BG queue
         LFGQueue m_lfgQueue;
-        std::unique_ptr<std::thread> m_lfgQueueThread;
+        ACE_Based::Thread* m_lfgQueueThread;
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;
@@ -1014,18 +1017,18 @@ class World
         static uint32 m_relocation_ai_notify_delay;
 
         // CLI command holder to be thread safe
-        LockedQueue<CliCommandHolder*,std::mutex> cliCmdQueue;
+        ACE_Based::LockedQueue<CliCommandHolder*,ACE_Thread_Mutex> cliCmdQueue;
 
         //Player Queue
         Queue m_QueuedSessions;
 
         //sessions that are added async
         void AddSession_(WorldSession* s);
-        LockedQueue<WorldSession*, std::mutex> addSessQueue;
+        ACE_Based::LockedQueue<WorldSession*, ACE_Thread_Mutex> addSessQueue;
 
         //used versions
-        uint32      m_anticrashRearmTimer = 0;
-        std::unique_ptr<std::thread> m_charDbWorkerThread;
+        uint32      m_anticrashRearmTimer;
+        ACE_Based::Thread* m_charDbWorkerThread;
 
         typedef std::unordered_map<uint32, ArchivedLogMessage> LogMessagesMap;
         LogMessagesMap m_logMessages;
@@ -1033,8 +1036,6 @@ class World
         // Packet broadcaster
         std::unique_ptr<MovementBroadcaster> m_broadcaster;
 
-        std::unique_ptr<ThreadPool> m_updateThreads;
-        
         static uint32 m_currentMSTime;
         static TimePoint m_currentTime;
         static uint32 m_currentDiff;

@@ -27,12 +27,13 @@
 #define __WORLDRUNNABLE_H
 
 #include "Common.h"
+#include "Threading.h"
 
 /// Heartbeat thread for the World
-class WorldRunnable
+class WorldRunnable : public ACE_Based::Runnable
 {
     public:
-        void operator()();
+        void run();
 };
 #endif
 /// @}

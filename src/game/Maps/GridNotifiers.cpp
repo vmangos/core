@@ -84,7 +84,7 @@ VisibleNotifier::Notify()
 
     // generate outOfRange for not iterate objects
     i_data.AddOutOfRangeGUID(i_clientGUIDs);
-    std::unique_lock<std::shared_timed_mutex> lock(player.m_visibleGUIDs_lock);
+    player.m_visibleGUIDs_lock.acquire_write();
     for (ObjectGuidSet::iterator itr = i_clientGUIDs.begin(); itr != i_clientGUIDs.end(); ++itr)
     {
         if ((*itr).IsPlayer())
@@ -99,7 +99,7 @@ VisibleNotifier::Notify()
         DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range (no in active cells set) now for %s",
                          itr->GetString().c_str(), player.GetGuidStr().c_str());
     }
-    lock.unlock();
+    player.m_visibleGUIDs_lock.release();
 
     if (i_data.HasData())
     {

@@ -31,20 +31,21 @@
 #include "Group.h"
 #include "ZoneScriptMgr.h"
 #include "Map.h"
-#include "ThreadPool.h"
 
-typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex> MapManagerLock;
+typedef MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
-INSTANTIATE_CLASS_MUTEX(MapManager, std::recursive_mutex);
+INSTANTIATE_CLASS_MUTEX(MapManager, ACE_Recursive_Thread_Mutex);
 
 MapManager::MapManager()
-    :
+    : 
+    i_GridStateErrorCount(0),
     i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN)),
     i_MaxInstanceId(RESERVED_INSTANCES_LAST),
-    m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS)))
+    i_maxContinentThread(0),
+    i_continentUpdateFinished(nullptr),
+    asyncMapUpdating(false)
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
-    m_threads->start<ThreadPool::MySQL<>>();
 }
 
 MapManager::~MapManager()
@@ -232,6 +233,55 @@ void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
     }
 }
 
+class MapAsyncUpdater : public ACE_Based::Runnable
+{
+public:
+    MapAsyncUpdater(bool* updFinished, uint32 updateDiff) :
+        updateFinished(updFinished), diff(updateDiff), loops(0)
+    {
+    }
+
+    virtual void run()
+    {
+        WorldDatabase.ThreadStart();
+        do
+        {
+            for (const auto& map : maps)
+            {
+                if (loops && *updateFinished)
+                    break;
+                map->DoUpdate(diff);
+            }
+            if (!(*updateFinished))
+                ACE_Based::Thread::Sleep(5);
+            ++loops;
+        }
+        while (!(*updateFinished));
+        WorldDatabase.ThreadEnd();
+    }
+    std::vector<Map*> maps;
+    volatile bool* updateFinished;
+    uint32 diff;
+    uint32 loops;
+};
+
+class ContinentAsyncUpdater : public ACE_Based::Runnable
+{
+public:
+    ContinentAsyncUpdater(uint32 updateDiff, Map* m) : map(m), diff(updateDiff)
+    {
+    }
+
+    virtual void run()
+    {
+        WorldDatabase.ThreadStart();
+        map->DoUpdate(diff);
+        WorldDatabase.ThreadEnd();
+    }
+    Map* map;
+    uint32 diff;
+};
+
 void MapManager::Update(uint32 diff)
 {
     i_timer.Update(diff);
@@ -243,71 +293,73 @@ void MapManager::Update(uint32 diff)
     ExecuteDelayedPlayerTeleports();
 
     uint32 mapsDiff = (uint32)i_timer.GetCurrent();
+    bool updateFinished = false;
     asyncMapUpdating = true;
+    std::vector<MapAsyncUpdater*> instanceUpdaters(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS));
+    std::vector<ContinentAsyncUpdater*> continentsUpdaters;
+    for (auto& instanceUpdater : instanceUpdaters)
+        instanceUpdater = new MapAsyncUpdater(&updateFinished, mapsDiff); // Will be deleted at thread end
 
+    int mapIdx = 0;
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
-
     uint32 inactiveTimeLimit = sWorld.getConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME);
-    std::vector<std::function<void()>> continentsUpdaters;
-    std::vector<std::function<void()>> instancesUpdaters;
-
-    for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
+    for (const auto& itr : i_maps)
     {
         // If this map has been empty for too long, we no longer update it.
-        if (!iter->second->ShouldUpdateMap(now, inactiveTimeLimit))
+        if (!itr.second->ShouldUpdateMap(now, inactiveTimeLimit))
             continue;
 
-        iter->second->UpdateSync(mapsDiff);
-        iter->second->MarkNotUpdated();
-        if (iter->second->Instanceable())
+        itr.second->UpdateSync(mapsDiff);
+        itr.second->MarkNotUpdated();
+        itr.second->SetMapUpdateIndex(-1);
+        if (itr.second->Instanceable())
         {
-            if (m_threads->status() == ThreadPool::Status::READY)
-                instancesUpdaters.emplace_back([iter,mapsDiff](){
-                    iter->second->DoUpdate(mapsDiff);
-                });
+            if (!instanceUpdaters.empty())
+            {
+                instanceUpdaters[mapIdx % instanceUpdaters.size()]->maps.push_back(itr.second);
+                ++mapIdx;
+            }
             else
-                iter->second->DoUpdate(mapsDiff);
+                itr.second->Update(mapsDiff);
         }
         else // One threat per continent part
         {
-            continentsUpdaters.emplace_back([iter,mapsDiff](){
-                Map *m = iter->second;
-                if (!m->IsUpdateFinished() || !sMapMgr.IsContinentUpdateFinished())
-                    m->DoUpdate(mapsDiff);
-            });
-            continentsIdx++;
+            itr.second->SetMapUpdateIndex(continentsIdx++);
+            ContinentAsyncUpdater* task = new ContinentAsyncUpdater(mapsDiff, itr.second);
+            continentsUpdaters.push_back(task);
         }
     }
     i_maxContinentThread = continentsIdx;
+    i_continentUpdateFinished = new volatile bool[i_maxContinentThread];
+    for (int i = 0; i < i_maxContinentThread; ++i)
+        i_continentUpdateFinished[i] = false;
 
-    i_continentUpdateFinished.store(0);
+    std::vector<ACE_Based::Thread*> asyncUpdateThreads(instanceUpdaters.size() + continentsUpdaters.size());
 
-    if (!m_continentThreads || m_continentThreads->size() < continentsUpdaters.size())
+    for (int tid = 0; tid < instanceUpdaters.size(); ++tid)
+        asyncUpdateThreads[tid]                             = new ACE_Based::Thread(instanceUpdaters[tid]);
+    for (int tid = 0; tid < continentsUpdaters.size(); ++tid)
+        asyncUpdateThreads[tid + instanceUpdaters.size()]   = new ACE_Based::Thread(continentsUpdaters[tid]);
+
+    // Finish continents updating
+    for (int tid = instanceUpdaters.size(); tid < asyncUpdateThreads.size(); ++tid)
     {
-        m_continentThreads.reset(new ThreadPool(continentsUpdaters.size()));
-        m_continentThreads->start<>();
+        asyncUpdateThreads[tid]->wait();
+        delete asyncUpdateThreads[tid];
     }
-    std::future<void> continents = m_continentThreads->processWorkload(std::move(continentsUpdaters),
-                                                                       ThreadPool::Callable());
 
-    std::chrono::high_resolution_clock::time_point start;
-    do {
-        start = std::chrono::high_resolution_clock::now();
-        std::future<void> f = m_threads->processWorkload(instancesUpdaters,
-                                                         ThreadPool::Callable());
-
-        if (f.valid())
-            f.wait();
-        else
-            break;
-    }while(!sMapMgr.waitContinentUpdateFinishedUntil(start + std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE))));
-
-
-    if (continents.valid())
-        continents.wait();
-
+    updateFinished = true;
     SwitchPlayersInstances();
+
+    // And then instances updating
+    for (int tid = 0; tid < instanceUpdaters.size(); ++tid)
+    {
+        asyncUpdateThreads[tid]->wait();
+        delete asyncUpdateThreads[tid];
+    }
+    delete[] i_continentUpdateFinished;
+    i_continentUpdateFinished = nullptr;
     asyncMapUpdating = false;
 
     // Execute far teleports after all map updates have finished
@@ -616,7 +668,7 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                 -6308.63f, -3049.32f,
                 -6107.82f, -3345.30f,
                 -6008.49f, -3590.52f,
-                -5989.37f, -4312.29f,
+                -5989.37f, -4312.29f, 
                 -5806.26f, -5864.11f
             };
             static float const stormwindAreaNorthLimit[] = {
@@ -827,7 +879,7 @@ void MapManager::ScheduleFarTeleport(Player* player, ScheduledTeleportData* data
     }
     else
     {
-        std::unique_lock<std::mutex> guard(m_scheduledFarTeleportsLock);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
         player->SetPendingFarTeleport(true);
         m_scheduledFarTeleports[player] = data;
     }
@@ -850,7 +902,7 @@ void MapManager::ExecuteDelayedPlayerTeleports()
 // player logout and login).
 void MapManager::ExecuteSingleDelayedTeleport(Player* player)
 {
-    std::unique_lock<std::mutex> guard(m_scheduledFarTeleportsLock);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
     ScheduledTeleportMap::iterator iter = m_scheduledFarTeleports.find(player);
 
     if (iter != m_scheduledFarTeleports.end())
@@ -874,7 +926,7 @@ void MapManager::ExecuteSingleDelayedTeleport(ScheduledTeleportMap::iterator ite
 
 void MapManager::CancelDelayedPlayerTeleport(Player* player)
 {
-    std::unique_lock<std::mutex> guard(m_scheduledFarTeleportsLock);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
     ScheduledTeleportMap::iterator iter = m_scheduledFarTeleports.find(player);
 
     if (iter != m_scheduledFarTeleports.end())
@@ -890,8 +942,9 @@ void MapManager::ScheduleInstanceSwitch(Player* player, uint16 newInstance)
 {
     uint8 mapId = player->GetMap()->GetId();
     ASSERT(mapId < LAST_CONTINENT_ID);
-    std::unique_lock<std::mutex> lock(m_scheduledInstanceSwitches_lock[mapId]);
+    m_scheduledInstanceSwitches_lock[mapId].acquire();
     m_scheduledInstanceSwitches[mapId][player] = newInstance;
+    m_scheduledInstanceSwitches_lock[mapId].release();
 }
 
 void MapManager::SwitchPlayersInstances()
@@ -907,30 +960,4 @@ void MapManager::SwitchPlayersInstances()
         }
         m_scheduledInstanceSwitches[continent].clear();
     }
-}
-
-void MapManager::MarkContinentUpdateFinished()
-{
-    ASSERT(i_continentUpdateFinished < i_maxContinentThread);
-    std::unique_lock<std::mutex> lock(m_continentMutex);
-    i_continentUpdateFinished++;
-    if (IsContinentUpdateFinished())
-        m_continentCV.notify_all();
-}
-
-bool MapManager::IsContinentUpdateFinished() const
-{
-    return i_continentUpdateFinished == i_maxContinentThread;
-}
-
-bool MapManager::waitContinentUpdateFinishedFor(std::chrono::milliseconds time) const
-{
-    std::unique_lock<std::mutex> lock(m_continentMutex);
-    return m_continentCV.wait_for(lock,time,std::bind(&MapManager::IsContinentUpdateFinished,this));
-}
-
-bool MapManager::waitContinentUpdateFinishedUntil(std::chrono::high_resolution_clock::time_point time) const
-{
-    std::unique_lock<std::mutex> lock(m_continentMutex);
-    return m_continentCV.wait_until(lock,time,std::bind(&MapManager::IsContinentUpdateFinished,this));
 }

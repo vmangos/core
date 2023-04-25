@@ -145,7 +145,7 @@ enum LogType
     LOG_TYPE_MAX
 };
 
-class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::mutex> >
+class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Thread_Mutex> >
 {
     friend class MaNGOS::OperatorNew<Log>;
     Log();

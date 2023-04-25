@@ -40,7 +40,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     MANGOS_ASSERT(new_pct);
 
     // manage memory ;)
-    std::unique_ptr<WorldPacket> aptr(new_pct);
+    ACE_Auto_Ptr<WorldPacket> aptr(new_pct);
 
     const ACE_UINT16 opcode = new_pct->GetOpcode();
 
@@ -71,7 +71,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 return HandleAuthSession(*new_pct);
             default:
             {
-                GuardType lock(m_SessionLock);
+                ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
 
                 if (m_Session != nullptr)
                 {
@@ -360,7 +360,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
             if (max_count && m_OverSpeedPings > max_count)
             {
-                GuardType lock(m_SessionLock);
+                ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
 
                 if (m_Session && m_Session->GetSecurity() == SEC_PLAYER)
                 {
@@ -378,7 +378,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
     // critical section
     {
-        GuardType lock(m_SessionLock);
+        ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         if (m_Session)

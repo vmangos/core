@@ -12,6 +12,7 @@
 #include "MovementPacketSender.h"
 #include "Geometry.h"
 #include "AccountMgr.h"
+#include "ace/Guard_T.h"
 
 using namespace Geometry;
 
@@ -145,7 +146,7 @@ uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
         AddMessageToPacketLog("End of packet log. Penalty: " + std::to_string(result) + ", Detected cheats: " + reason.str());
         std::string fileName = "movement_log_" +  m_session->GetUsername() + "_" + std::to_string(time(nullptr)) + ".pkt";
         SniffFile packetDump(fileName.c_str());
-        std::lock_guard<std::mutex> guard(m_packetLogMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_packetLogMutex);
         packetDump.WriteToFile(m_packetLog);
     }
 
@@ -390,7 +391,7 @@ void MovementAnticheat::LogMovementPacket(bool isClientPacket, WorldPacket const
 {
     if (uint32 maxLogSize = sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE))
     {
-        std::lock_guard<std::mutex> guard(m_packetLogMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_packetLogMutex);
         if (m_packetLog.size() >= maxLogSize)
             m_packetLog.pop_front();
 

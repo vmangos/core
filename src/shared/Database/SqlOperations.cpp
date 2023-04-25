@@ -24,7 +24,6 @@
 #include "DatabaseEnv.h"
 #include "DatabaseImpl.h"
 #include "Timer.h"
-#include "ThreadPool.h"
 
 #define LOCK_DB_CONN(conn) SqlConnection::Lock guard(conn)
 
@@ -101,11 +100,37 @@ bool SqlQuery::Execute(SqlConnection* conn)
     return true;
 }
 
+class SqlResultCallbackCaller : public ACE_Based::Runnable
+{
+    public:
+        typedef ACE_Based::LockedQueue<MaNGOS::IQueryCallback*, ACE_Thread_Mutex> CallbackQueue;
+        CallbackQueue queue;
+        virtual void run()
+        {
+            #ifndef DO_POSTGRESQL
+            mysql_thread_init();
+            #endif
+            MaNGOS::IQueryCallback* s = nullptr;
+            while (queue.next(s))
+            {
+                s->Execute();
+                delete s;
+            }
+            #ifndef DO_POSTGRESQL
+            mysql_thread_end();
+            #endif
+        }
+};
+
 void SqlResultQueue::Update(uint32 timeout)
 {
     uint32 begin = WorldTimer::getMSTime();
     /// execute the callbacks waiting in the synchronization queue
-    MaNGOS::IQueryCallback* callback = NULL;
+    int threadsCount = 6;
+    SqlResultCallbackCaller* caller = new SqlResultCallbackCaller();
+    caller->incReference();
+    ACE_Based::Thread** threads = new ACE_Based::Thread*[threadsCount];
+    MaNGOS::IQueryCallback* callback = nullptr;
     int n = 0;
     while (next(callback))
     {
@@ -117,15 +142,15 @@ void SqlResultQueue::Update(uint32 timeout)
         else
         {
             ++n;
-            //caller->queue.add(callback);
-            m_callbackThreads << [callback, n](){
-                callback->Execute();
-                delete callback;
-            };
+            caller->queue.add(callback);
         }
     }
-    std::future<void> job = m_callbackThreads->processWorkload();
-    MaNGOS::IQueryCallback* s = NULL;
+    if (threadsCount > n)
+        threadsCount = n;
+    for (int i = 0; i < threadsCount; ++i)
+        threads[i] = new ACE_Based::Thread(caller);
+    // Now execute thread unsafe callbacks
+    MaNGOS::IQueryCallback* s = nullptr;
     while (_threadUnsafeWaitingQueries.next(s))
     {
         s->Execute();
@@ -138,24 +163,15 @@ void SqlResultQueue::Update(uint32 timeout)
     if (numUnsafeQueries > 1000) // Bottleneck here
         sLog.Out(LOG_PERFORMANCE, LOG_LVL_MINIMAL, "Database: %u unsafe queries remaining!", numUnsafeQueries);
 
-    if (job.valid())
-        job.wait();
+    for (int i = 0; i < threadsCount; ++i)
+    {
+        ACE_Based::Thread* t = threads[i];
+        t->wait();
+        delete t;
+    }
+    delete[] threads;
+    caller->decReference();
  }
-
-
-#ifndef DO_POSTGRESQL
-using SqlResultQueueWorker = ThreadPool::ThreadPool::MySQL<>;
-#else
-using SqlResultQueueWorker = ThreadPool::SingleQueue;
-#endif
-
-SqlResultQueue::SqlResultQueue() :
-    numUnsafeQueries(0), m_callbackThreads(new ThreadPool(6))
-{
-    m_callbackThreads->start<SqlResultQueueWorker>();
-}
-
-SqlResultQueue::~SqlResultQueue(){}
 
 void SqlResultQueue::CancelAll()
 {
