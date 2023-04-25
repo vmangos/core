@@ -2799,7 +2799,7 @@ void Map::SendObjectUpdates()
     if (threads > objectsCount)
         threads = objectsCount;
     uint32 step = objectsCount / threads;
-    
+
     ASSERT(step > 0);
     ASSERT(threads >= 1);
 
@@ -2807,23 +2807,25 @@ void Map::SendObjectUpdates()
     t.reserve(i_objectsToClientUpdate.size()); //t will not contain end!
     for (std::unordered_set<Object*>::iterator it = i_objectsToClientUpdate.begin(); it != i_objectsToClientUpdate.end(); it++)
         t.push_back(it);
-    std::atomic<int> ait(0);
+    std::atomic_int ait(0);
     uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_TIMEOUT);
     auto f = [&t, &ait, beginTime=now, timeout](){
         UpdateDataMapType update_players; // Player -> UpdateData
-        int it = ait++;
-        while (it < t.size())
+        int it;
+        while ((it = ait++) < t.size())
         {
             (*t[it])->BuildUpdateData(update_players);
             if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
                 break;
-            it = ait++;
         }
 
         for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
             iter->second.Send(iter->first->GetSession());
     };
+
     std::future<void> job;
+    for (int i = 0; i < threads -1; i++)
+        m_objectThreads << f;
     if (m_objectThreads)
          job = m_objectThreads->processWorkload();
     f();
