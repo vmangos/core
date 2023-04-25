@@ -156,16 +156,20 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState->SetUsedByMapState(this);
     m_weatherSystem = new WeatherSystem(this);
 
+    int numObjThreads = (int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
+    if (numObjThreads > 1)
+    {
+        m_objectThreads.reset(new ThreadPool(numObjThreads -1));
+        m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
+    }
     if (IsContinent())
     {
         m_motionThreads.reset(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS)));
-        m_objectThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS) -1,0)));
         m_visibilityThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1,0)));
         m_cellThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) - 1, 0)));
         m_visibilityThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
         m_cellThreads->start();
         m_motionThreads->start();
-        m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
     }
 
     LoadElevatorTransports();
@@ -2791,11 +2795,11 @@ void Map::SendObjectUpdates()
     // Compute maximum number of threads
 //#define FORCE_OLD_THREADCOUNT
 #ifndef FORCE_OLD_THREADCOUNT
-    int threads = m_objectThreads->size();
+    int threads = m_objectThreads ? m_objectThreads->size() +1 : 1;
 #else
     int threads = 1;
     if (IsContinent())
-        threads = m_objectThreads->size() +1;
+        threads = m_objectThreads ? m_objectThreads->size() +1 : 1;
     if (!_objUpdatesThreads)
         _objUpdatesThreads = 1;
     if (threads < _objUpdatesThreads)
@@ -2812,9 +2816,10 @@ void Map::SendObjectUpdates()
         step++;
 
     std::vector<std::unordered_set<Object*>::iterator> t;
-    t.reserve(i_objectsToClientUpdate.size()); //t will not contain end!
+    t.reserve(i_objectsToClientUpdate.size() + 1);
     for (std::unordered_set<Object*>::iterator it = i_objectsToClientUpdate.begin(); it != i_objectsToClientUpdate.end(); it++)
         t.push_back(it);
+    t.push_back(i_objectsToClientUpdate.end());
     uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_TIMEOUT);
 //#define FORCE_NO_ATOMIC_INT
 #if ATOMIC_INT_LOCK_FREE == 2 && !defined(FORCE_NO_ATOMIC_INT)
@@ -2822,7 +2827,7 @@ void Map::SendObjectUpdates()
     auto f = [&t, &ait, beginTime=now, timeout](){
         UpdateDataMapType update_players; // Player -> UpdateData
         int it;
-        while ((it = ait++) < t.size())
+        while ((it = ait++) < t.size() -1)
         {
             (*t[it])->BuildUpdateData(update_players);
             if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
@@ -2833,10 +2838,11 @@ void Map::SendObjectUpdates()
             iter->second.Send(iter->first->GetSession());
     };
     std::future<void> job;
-    for (int i = 1; i < threads; i++)
-        m_objectThreads << f;
-    if (m_objectThreads)
-         job = m_objectThreads->processWorkload();
+    if (m_objectThreads) {
+        for (int i = 1; i < threads; i++)
+            m_objectThreads << f;
+        job = m_objectThreads->processWorkload();
+    }
 
     f();
 
@@ -2852,7 +2858,7 @@ void Map::SendObjectUpdates()
         counters.push_back(i * step);
     auto f = [&t, &counters, step, beginTime=now, timeout](int id){
         UpdateDataMapType update_players; // Player -> UpdateData
-        for (int &it = counters[id]; it < std::min((int)t.size(), step * (id + 1)); it++)
+        for (int &it = counters[id]; it < std::min((int)t.size() -1, step * (id + 1)); it++)
         {
             if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
                 break;
@@ -2862,16 +2868,17 @@ void Map::SendObjectUpdates()
             iter->second.Send(iter->first->GetSession());
     };
     std::future<void> job;
-    for (int i = 1; i < threads; i++)
-        m_objectThreads << std::bind(f, i);
-    if (m_objectThreads)
-         job = m_objectThreads->processWorkload();
+    if (m_objectThreads) {
+        for (int i = 1; i < threads; i++)
+            m_objectThreads << std::bind(f, i);
+        job = m_objectThreads->processWorkload();
+    }
 
     f(0);
 
     if (job.valid())
         job.wait();
-    for (int i = threads -1; i >= 0; i--)
+    for (int i = 0; i < threads; i++)
         i_objectsToClientUpdate.erase(t[step * i], t[counters[i]]);
 #endif
 
