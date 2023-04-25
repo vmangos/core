@@ -606,7 +606,8 @@ void Group::Disband(bool hideDestroy, ObjectGuid initiator)
         });
     }
 
-    RollId.clear();
+    for (auto itr = RollId.begin(); itr != RollId.end(); itr = RollId.begin())
+        CountTheRoll(itr);
     m_memberSlots.clear();
 
     RemoveAllInvites();
