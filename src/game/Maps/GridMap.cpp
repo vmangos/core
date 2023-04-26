@@ -912,7 +912,7 @@ bool TerrainInfo::GetAreaInfo(float x, float y, float z, uint32& flags, int32& a
 
 uint16 TerrainInfo::GetAreaFlag(float x, float y, float z, bool* isOutdoors) const
 {
-    uint32 mogpFlags;
+    uint32 mogpFlags = 0;
     int32 adtId, rootId, groupId;
     WMOAreaTableEntry const* wmoEntry = nullptr;
     AreaEntry const* atEntry = nullptr;
