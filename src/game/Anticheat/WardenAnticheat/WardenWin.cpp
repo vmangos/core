@@ -1109,7 +1109,8 @@ void WardenWin::LoadScriptedScans()
             warden->SetHasUsedClickToMove();
 
         return false;
-    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
+    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
+       sizeof(uint8) + sizeof(float) + sizeof(float) + sizeof(float),
         "Click To Move Position", WinAllBuild));
 }
 

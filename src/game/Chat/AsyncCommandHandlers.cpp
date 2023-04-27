@@ -44,7 +44,7 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
     if (target)
     {
         data->m_money = target->GetMoney();
-        data->m_totalPlayerTime = target->GetTotalPlayedTime();
+        data->m_totalPlayedTime = target->GetTotalPlayedTime();
         data->m_level = target->GetLevel();
         data->m_latency = target->GetSession()->GetLatency();
         data->m_locale = target->GetSession()->GetSessionDbcLocale();
@@ -82,7 +82,7 @@ void PInfoHandler::HandlePlayerLookupResult(QueryResult* result, PInfoData *data
     }
 
     Field* fields = result->Fetch();
-    data->m_totalPlayerTime = fields[0].GetUInt32();
+    data->m_totalPlayedTime = fields[0].GetUInt32();
     data->m_level = fields[1].GetUInt32();
     data->m_money = fields[2].GetUInt32();
     data->m_accountId = fields[3].GetUInt32();
@@ -206,7 +206,7 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
         sAccountMgr.IsIPBanned(data->m_lastIp) ? " [BANIP]" : "", data->m_lastLogin.c_str(),
         data->m_latency, localeNames[data->m_locale], data->m_twoFactorEnabled.c_str());
 
-    std::string timeStr = secsToTimeString(data->m_totalPlayerTime, true, true);
+    std::string timeStr = secsToTimeString(data->m_totalPlayedTime, true, true);
     uint32 money = data->m_money;
     uint32 mail_gold_inbox = data->m_mailGoldInbox;
     uint32 mail_gold_outbox = data->m_mailGoldOutbox;

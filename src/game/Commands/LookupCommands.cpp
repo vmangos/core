@@ -1535,6 +1535,9 @@ bool ChatHandler::HandleListClickToMoveCommand(char* args)
     HashMapHolder<Player>::MapType const& plist = sObjectAccessor.GetPlayers();
     for (auto const& itr : plist)
     {
+        if (!itr.second->IsInWorld())
+            continue;
+
         if (itr.second->GetSession()->HasUsedClickToMove())
             levelSortedList.insert(std::make_pair(itr.second->GetLevel(), itr.second));
     }
@@ -1548,7 +1551,7 @@ bool ChatHandler::HandleListClickToMoveCommand(char* args)
     SendSysMessage("Listing players using click to move:");
     for (auto const& itr : levelSortedList)
     {
-        PSendSysMessage("- Name %s IP %s Level |cffffffff[%u]|r", GetNameLink(itr.second).c_str(), playerLink(itr.second->GetSession()->GetRemoteAddress()).c_str(), itr.first);
+        PSendSysMessage("- Name %s IP %s Level %s", GetNameLink(itr.second).c_str(), playerLink(itr.second->GetSession()->GetRemoteAddress()).c_str(), playerLink(std::to_string(itr.first)).c_str());
     }
 
     return true;

@@ -45,7 +45,7 @@ struct PInfoData
     uint32 m_money = 0;
     uint32 m_mailGoldInbox = 0;
     uint32 m_mailGoldOutbox = 0;
-    uint32 m_totalPlayerTime = 0;
+    uint32 m_totalPlayedTime = 0;
     uint32 m_level = 0;
     uint32 m_latency = 0;
     uint32 m_securityFlag = 0;
