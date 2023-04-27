@@ -80,6 +80,9 @@ static constexpr struct ClientOffsets
     uint32 WardenModule;
     uint32 OfsWardenSysInfo;
     uint32 OfsWardenWinSysInfo;
+
+    // Click to move
+    uint32 ClickToMovePosition;
 } Offsets[] = {
     {
         5875,
@@ -89,7 +92,8 @@ static constexpr struct ClientOffsets
         0xC7B2A4,
         0xCF0BC8,
         0xC0ED38, 0x38A8, 0x0, 0xA8,
-        0xCE897C, 0x228, 0x08
+        0xCE897C, 0x228, 0x08,
+        0xC4D890
     },
     {
         6005,
@@ -99,7 +103,8 @@ static constexpr struct ClientOffsets
         0xC7B2A4,
         0xCF0BC8,
         0xC0ED38, 0x38A8, 0x0, 0xA8,
-        0xCE897C, 0x228, 0x08
+        0xCE897C, 0x228, 0x08,
+        0xC4D890
     },
     {
         6141,
@@ -109,7 +114,8 @@ static constexpr struct ClientOffsets
         0xC7F9C4,
         0xCF52E8,
         0xC133E0, 0x38A8, 0x0, 0xA8,
-        0xCED09C, 0x228, 0x08
+        0xCED09C, 0x228, 0x08,
+        0xC51FB0
     }
 };
 
@@ -1062,6 +1068,49 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }), "Proxifier check", WinAllBuild | InitialLogin));
+
+    // click to move enabled check
+    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
+        // builder
+        [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    {
+        // no need to scan multiple times
+        if (warden->HasUsedClickToMove())
+            return;
+
+        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
+
+        if (!offsets)
+            return;
+
+        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
+            << static_cast<uint8>(0)
+            << offsets->ClickToMovePosition
+            << static_cast<uint8>(sizeof(float) * 3);
+    },
+        // checker
+        [](const Warden *warden, ByteBuffer &buff)
+    {
+        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+
+        auto const result = buff.read<uint8>();
+
+        if (!!result)
+        {
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read click to move position!");
+            return true;
+        }
+
+        float positionX = buff.read<float>();
+        float positionY = buff.read<float>();
+        float positionZ = buff.read<float>();
+        if (positionX || positionY || positionZ)
+            warden->SetHasUsedClickToMove();
+
+        return false;
+    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
+        "Click To Move Position", WinAllBuild));
 }
 
 void WardenWin::BuildLuaInit(const std::string &module, bool fastcall, uint32 offset, ByteBuffer &out) const

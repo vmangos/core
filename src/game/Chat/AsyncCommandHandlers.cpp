@@ -39,31 +39,33 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
 {
     PInfoData* data = new PInfoData;
     data->m_accountId = session->GetAccountId();
-    data->target_name = name;
+    data->m_targetName = name;
 
     if (target)
     {
-        data->accId = target->GetSession()->GetAccountId();
-        data->money = target->GetMoney();
-        data->total_player_time = target->GetTotalPlayedTime();
-        data->level = target->GetLevel();
-        data->latency = target->GetSession()->GetLatency();
-        data->loc = target->GetSession()->GetSessionDbcLocale();
-        data->race = target->GetRace();
-        data->class_ = target->GetClass();
+        data->m_money = target->GetMoney();
+        data->m_totalPlayerTime = target->GetTotalPlayedTime();
+        data->m_level = target->GetLevel();
+        data->m_latency = target->GetSession()->GetLatency();
+        data->m_locale = target->GetSession()->GetSessionDbcLocale();
+        data->m_race = target->GetRace();
+        data->m_class = target->GetClass();
 
-        data->target_guid = target->GetObjectGuid();
-        data->online = true;
+        data->m_targetGuid = target->GetObjectGuid();
+        data->m_online = true;
 
         if (auto const warden = target->GetSession()->GetWarden())
-            warden->GetPlayerInfo(data->warden_clock, data->warden_fingerprint, data->warden_hypervisors,
-                data->warden_endscene, data->warden_proxifier);
+        {
+            warden->GetPlayerInfo(data->m_wardenClock, data->m_wardenFingerprint, data->m_wardenHypervisors,
+                data->m_wardenEndscene, data->m_wardenProxifier);
+            data->m_hasUsedClickToMove = warden->HasUsedClickToMove();
+        }
 
         HandleDataAfterPlayerLookup(data);
     }
     else
     {
-        data->target_guid = target_guid;
+        data->m_targetGuid = target_guid;
         CharacterDatabase.AsyncPQuery(&PInfoHandler::HandlePlayerLookupResult, data,
             //       0                    1        2        3          4       5
             "SELECT `played_time_total`, `level`, `money`, `account`, `race`, `class` FROM `characters` WHERE `guid` = '%u'",
@@ -80,12 +82,12 @@ void PInfoHandler::HandlePlayerLookupResult(QueryResult* result, PInfoData *data
     }
 
     Field* fields = result->Fetch();
-    data->total_player_time = fields[0].GetUInt32();
-    data->level = fields[1].GetUInt32();
-    data->money = fields[2].GetUInt32();
-    data->accId = fields[3].GetUInt32();
-    data->race = fields[4].GetUInt8();
-    data->class_ = fields[5].GetUInt8();
+    data->m_totalPlayerTime = fields[0].GetUInt32();
+    data->m_level = fields[1].GetUInt32();
+    data->m_money = fields[2].GetUInt32();
+    data->m_accountId = fields[3].GetUInt32();
+    data->m_race = fields[4].GetUInt8();
+    data->m_class = fields[5].GetUInt8();
 
     delete result;
 
@@ -96,8 +98,8 @@ void PInfoHandler::HandleDataAfterPlayerLookup(PInfoData *data)
 {
     SqlQueryHolder* charHolder = new SqlQueryHolder;
     charHolder->SetSize(2);
-    charHolder->SetPQuery(PINFO_QUERY_GOLD_SENT, "SELECT SUM(`money`) FROM `mail` WHERE `sender_guid` = %u", data->target_guid.GetCounter());
-    charHolder->SetPQuery(PINFO_QUERY_GOLD_RECEIVED, "SELECT SUM(`money`) FROM `mail` WHERE `receiver_guid` = %u", data->target_guid.GetCounter());
+    charHolder->SetPQuery(PINFO_QUERY_GOLD_SENT, "SELECT SUM(`money`) FROM `mail` WHERE `sender_guid` = %u", data->m_targetGuid.GetCounter());
+    charHolder->SetPQuery(PINFO_QUERY_GOLD_RECEIVED, "SELECT SUM(`money`) FROM `mail` WHERE `receiver_guid` = %u", data->m_targetGuid.GetCounter());
 
     CharacterDatabase.DelayQueryHolder(&PInfoHandler::HandleDelayedMoneyQuery, charHolder, data);
 }
@@ -108,11 +110,11 @@ void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder,
     {
         QueryResult* result = holder->GetResult(PINFO_QUERY_GOLD_SENT);
         if (result)
-            data->mail_gold_outbox = result->Fetch()[0].GetUInt32();
+            data->m_mailGoldOutbox = result->Fetch()[0].GetUInt32();
 
         result = holder->GetResult(PINFO_QUERY_GOLD_RECEIVED);
         if (result)
-            data->mail_gold_inbox = result->Fetch()[0].GetUInt32();
+            data->m_mailGoldInbox = result->Fetch()[0].GetUInt32();
 
         // Delete all results now
         holder->DeleteAllResults();
@@ -125,7 +127,7 @@ void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder,
     // so this cannot be done in an async task
     LoginDatabase.AsyncPQueryUnsafe(&PInfoHandler::HandleAccountInfoResult, data,
         "SELECT `username`, `last_ip`, `last_login`, `locale`, `locked` FROM `account` WHERE `id` = '%u'",
-        data->accId);
+        data->m_accountId);
 }
 
 // Not threadsafe, executed in unsafe callback
@@ -143,28 +145,28 @@ void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
     if (result)
     {
         Field* fields = result->Fetch();
-        data->username = fields[0].GetCppString();
-        data->security = sAccountMgr.GetSecurity(data->accId);
-        data->loc = LocaleConstant(fields[3].GetUInt8());
-        data->security_flag = fields[4].GetUInt8();
+        data->m_username = fields[0].GetCppString();
+        data->m_security = sAccountMgr.GetSecurity(data->m_accountId);
+        data->m_locale = LocaleConstant(fields[3].GetUInt8());
+        data->m_securityFlag = fields[4].GetUInt8();
 
         bool showIp = true;
-        if (session->GetSecurity() < data->security)
+        if (session->GetSecurity() < data->m_security)
             showIp = false;
-        else if (session->GetSecurity() < SEC_ADMINISTRATOR && data->security > SEC_PLAYER) // Only admins can see GM IPs
+        else if (session->GetSecurity() < SEC_ADMINISTRATOR && data->m_security > SEC_PLAYER) // Only admins can see GM IPs
             showIp = false;
         if (showIp)
         {
-            data->last_ip = fields[1].GetCppString();
-            data->last_login = fields[2].GetCppString();
+            data->m_lastIp = fields[1].GetCppString();
+            data->m_lastLogin = fields[2].GetCppString();
         }
         else
         {
-            data->last_ip = "-";
-            data->last_login = "-";
+            data->m_lastIp = "-";
+            data->m_lastLogin = "-";
         }
 
-        data->hasAccount = true;
+        data->m_hasAccount = true;
 
         delete result;
     }
@@ -175,39 +177,39 @@ void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
 // Not threadsafe, executed in thread unsafe callback
 void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
 {
-    char const* raceName = GetUnitRaceName(data->race, session->GetSessionDbcLocale());
-    char const* className = GetUnitClassName(data->class_, session->GetSessionDbcLocale());
+    char const* raceName = GetUnitRaceName(data->m_race, session->GetSessionDbcLocale());
+    char const* className = GetUnitClassName(data->m_class, session->GetSessionDbcLocale());
     if (!raceName)
         raceName = "";
     if (!className)
         className = "";
 
-    if (data->loc > LOCALE_esMX)
-        data->loc = LOCALE_enUS;
+    if (data->m_locale > LOCALE_esMX)
+        data->m_locale = LOCALE_enUS;
     ChatHandler cHandler(session);
 
-    data->two_factor_enabled = data->security_flag & 4 ? "Enabled" : "Disabled";
-    if (!data->hasAccount)
+    data->m_twoFactorEnabled = data->m_securityFlag & 4 ? "Enabled" : "Disabled";
+    if (!data->m_hasAccount)
     {
-        data->username = cHandler.GetMangosString(LANG_ERROR);
-        data->last_ip = cHandler.GetMangosString(LANG_ERROR);
-        data->security = SEC_PLAYER;
+        data->m_username = cHandler.GetMangosString(LANG_ERROR);
+        data->m_lastIp = cHandler.GetMangosString(LANG_ERROR);
+        data->m_security = SEC_PLAYER;
     }
 
-    std::string nameLink = cHandler.playerLink(data->target_name);
+    std::string nameLink = cHandler.playerLink(data->m_targetName);
 
     cHandler.PSendSysMessage(LANG_PINFO_ACCOUNT, raceName, className,
-        (data->online ? "" : cHandler.GetMangosString(LANG_OFFLINE)),
-        nameLink.c_str(), data->target_guid.GetCounter(), cHandler.playerLink(data->username).c_str(),
-        data->accId, sAccountMgr.IsAccountBanned(data->accId) ? ", banned" : "",
-        data->security, cHandler.playerLink(data->last_ip).c_str(),
-        sAccountMgr.IsIPBanned(data->last_ip) ? " [BANIP]" : "", data->last_login.c_str(),
-        data->latency, localeNames[data->loc], data->two_factor_enabled.c_str());
+        (data->m_online ? "" : cHandler.GetMangosString(LANG_OFFLINE)),
+        nameLink.c_str(), data->m_targetGuid.GetCounter(), cHandler.playerLink(data->m_username).c_str(),
+        data->m_accountId, sAccountMgr.IsAccountBanned(data->m_accountId) ? ", banned" : "",
+        data->m_security, cHandler.playerLink(data->m_lastIp).c_str(),
+        sAccountMgr.IsIPBanned(data->m_lastIp) ? " [BANIP]" : "", data->m_lastLogin.c_str(),
+        data->m_latency, localeNames[data->m_locale], data->m_twoFactorEnabled.c_str());
 
-    std::string timeStr = secsToTimeString(data->total_player_time, true, true);
-    uint32 money = data->money;
-    uint32 mail_gold_inbox = data->mail_gold_inbox;
-    uint32 mail_gold_outbox = data->mail_gold_outbox;
+    std::string timeStr = secsToTimeString(data->m_totalPlayerTime, true, true);
+    uint32 money = data->m_money;
+    uint32 mail_gold_inbox = data->m_mailGoldInbox;
+    uint32 mail_gold_outbox = data->m_mailGoldOutbox;
 
     uint32 gold = money / GOLD;
     uint32 silv = (money % GOLD) / SILVER;
@@ -218,20 +220,22 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
     uint32 gold_out = mail_gold_outbox / GOLD;
     uint32 silv_out = (mail_gold_outbox % GOLD) / SILVER;
     uint32 copp_out = (mail_gold_outbox % GOLD) % SILVER;
-    cHandler.PSendSysMessage(LANG_PINFO_LEVEL, timeStr.c_str(), data->level, gold, silv, copp, gold_in, silv_in, copp_in, gold_out, silv_out, copp_out);
-    if (Guild* guild = sGuildMgr.GetPlayerGuild(data->target_guid))
+    cHandler.PSendSysMessage(LANG_PINFO_LEVEL, timeStr.c_str(), data->m_level, gold, silv, copp, gold_in, silv_in, copp_in, gold_out, silv_out, copp_out);
+    if (Guild* guild = sGuildMgr.GetPlayerGuild(data->m_targetGuid))
         cHandler.PSendSysMessage("Guild: %s", cHandler.playerLink(guild->GetName()).c_str());
 
-    if (!data->warden_clock.empty())
-        cHandler.SendSysMessage(data->warden_clock.c_str());
-    if (!data->warden_fingerprint.empty())
-        cHandler.SendSysMessage(data->warden_fingerprint.c_str());
-    if (!data->warden_hypervisors.empty())
-        cHandler.SendSysMessage(data->warden_hypervisors.c_str());
-    if (!data->warden_endscene.empty())
-        cHandler.SendSysMessage(data->warden_endscene.c_str());
-    if (!data->warden_proxifier.empty())
-        cHandler.SendSysMessage(data->warden_proxifier.c_str());
+    if (!data->m_wardenClock.empty())
+        cHandler.SendSysMessage(data->m_wardenClock.c_str());
+    if (!data->m_wardenFingerprint.empty())
+        cHandler.SendSysMessage(data->m_wardenFingerprint.c_str());
+    if (!data->m_wardenHypervisors.empty())
+        cHandler.SendSysMessage(data->m_wardenHypervisors.c_str());
+    if (!data->m_wardenEndscene.empty())
+        cHandler.SendSysMessage(data->m_wardenEndscene.c_str());
+    if (!data->m_wardenProxifier.empty())
+        cHandler.SendSysMessage(data->m_wardenProxifier.c_str());
+    if (data->m_hasUsedClickToMove)
+        cHandler.SendSysMessage("Using Click to Move!");
 
     delete data;
 }

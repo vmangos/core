@@ -372,6 +372,7 @@ class WorldSession
         uint32 GetFingerprint() const { return 0; } // TODO
         void CleanupFingerprintHistory() {} // TODO
         bool HasClientMovementControl() const { return !m_clientMoverGuid.IsEmpty(); }
+        bool HasUsedClickToMove() const;
         
         void SetReceivedWhoRequest(bool v) { m_who_recvd = v; }
         bool ReceivedWhoRequest() const { return m_who_recvd; }

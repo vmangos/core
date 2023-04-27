@@ -1118,6 +1118,13 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
         detector, playerDesc.c_str(), reason, action);
 }
 
+bool WorldSession::HasUsedClickToMove() const
+{
+    if (m_warden)
+        return m_warden->HasUsedClickToMove();
+    return false;
+}
+
 bool WorldSession::AllowPacket(uint16 opcode)
 {
     // Do not count packets that are often spamed by the client when loading a zone for example.

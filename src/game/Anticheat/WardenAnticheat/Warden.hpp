@@ -139,6 +139,9 @@ class Warden
         // true when the client has been confirmed and sent any initialization packet(s)
         bool _initialized;
 
+        // true if client has used click to move at any point since starting game
+        mutable bool m_hasUsedClickToMove = false;
+
         std::vector<std::shared_ptr<const Scan>> _pendingScans;
         std::vector<std::shared_ptr<const Scan>> _enqueuedScans;
 
@@ -154,6 +157,9 @@ class Warden
         uint32 GetAccountId() const { return m_accountId; }
         char const* GetAccountName() const { return m_accountName.c_str(); }
         char const* GetSessionIP() const { return m_sessionIP.c_str(); }
+
+        bool HasUsedClickToMove() const { return m_hasUsedClickToMove; }
+        void SetHasUsedClickToMove() const { m_hasUsedClickToMove = true; }
 
         static void LoadScriptedScans();
 
