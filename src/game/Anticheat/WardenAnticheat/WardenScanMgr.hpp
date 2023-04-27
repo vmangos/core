@@ -40,7 +40,7 @@ class WardenScanMgr
 
     public:
         // load static scans from database
-        void loadFromDB();
+        void LoadFromDB();
 
         size_t Count() const { return m_scans.size(); }
 

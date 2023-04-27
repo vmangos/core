@@ -409,12 +409,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                     m_creature->SetTargetGuid(target->GetObjectGuid());
                     m_uiRestoreTargetTimer = 1000;
                     m_uiImpaleTimer = IMPALE_CD();
-
-                    if (Creature* pC = m_creature->SummonCreature(533003, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(target),
-                        TEMPSUMMON_TIMED_DESPAWN, 4000))
-                    {
-                        pC->CastSpell(pC, SPELL_IMPALE, true);
-                    }
+                    DoCastSpellIfCan(target, SPELL_IMPALE);
                 }
             }
             else

@@ -291,8 +291,6 @@ void MapManager::Update(uint32 diff)
     std::future<void> continents = m_continentThreads->processWorkload(std::move(continentsUpdaters),
                                                                        ThreadPool::Callable());
 
-    SwitchPlayersInstances();
-
     std::chrono::high_resolution_clock::time_point start;
     do {
         start = std::chrono::high_resolution_clock::now();
@@ -309,6 +307,7 @@ void MapManager::Update(uint32 diff)
     if (continents.valid())
         continents.wait();
 
+    SwitchPlayersInstances();
     asyncMapUpdating = false;
 
     // Execute far teleports after all map updates have finished

@@ -219,8 +219,181 @@ void WorldSession::HandleQuestQueryOpcode(WorldPacket& recv_data)
     recv_data >> quest;
 
     Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest);
-    if (pQuest)
-        _player->PlayerTalkClass->SendQuestQueryResponse(pQuest);
+    if (!pQuest)
+        return;
+
+    char const* Title = pQuest->GetTitle().c_str();
+    size_t titleLen = pQuest->GetTitle().length();
+    char const* Details = pQuest->GetDetails().c_str();
+    size_t detailsLen = pQuest->GetDetails().length();
+    char const* Objectives = pQuest->GetObjectives().c_str();
+    size_t objectivesLen = pQuest->GetObjectives().length();
+    char const*  EndText = pQuest->GetEndText().c_str();
+    size_t endTextLen = pQuest->GetEndText().length();
+    char const* ObjectiveText[QUEST_OBJECTIVES_COUNT];
+    size_t objectiveTextLen[QUEST_OBJECTIVES_COUNT];
+
+    for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+    {
+        ObjectiveText[i] = pQuest->ObjectiveText[i].c_str();
+        objectiveTextLen[i] = pQuest->ObjectiveText[i].length();
+    }
+
+    int loc_idx = GetSessionDbLocaleIndex();
+    if (loc_idx >= 0)
+    {
+        if (QuestLocale const* ql = sObjectMgr.GetQuestLocale(pQuest->GetQuestId()))
+        {
+            if (ql->Title.size() >(size_t)loc_idx && !ql->Title[loc_idx].empty())
+            {
+                Title = ql->Title[loc_idx].c_str();
+                titleLen = ql->Title[loc_idx].length();
+            }
+            if (ql->Details.size() > (size_t)loc_idx && !ql->Details[loc_idx].empty())
+            {
+                Details = ql->Details[loc_idx].c_str();
+                detailsLen = ql->Details[loc_idx].length();
+            }
+            if (ql->Objectives.size() > (size_t)loc_idx && !ql->Objectives[loc_idx].empty())
+            {
+                Objectives = ql->Objectives[loc_idx].c_str();
+                objectivesLen = ql->Objectives[loc_idx].length();
+            }
+            if (ql->EndText.size() > (size_t)loc_idx && !ql->EndText[loc_idx].empty())
+            {
+                EndText = ql->EndText[loc_idx].c_str();
+                endTextLen = ql->EndText[loc_idx].length();
+            }
+
+            for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+            {
+                if (ql->ObjectiveText[i].size() >(size_t)loc_idx && !ql->ObjectiveText[i][loc_idx].empty())
+                {
+                    ObjectiveText[i] = ql->ObjectiveText[i][loc_idx].c_str();
+                    objectiveTextLen[i] = ql->ObjectiveText[i][loc_idx].length();
+                }
+            }
+        }
+    }
+
+    constexpr size_t questTemplateFixedSize =
+        sizeof(uint32) + // Id
+        sizeof(uint32) + // Method
+        sizeof(uint32) + // Level
+        sizeof(int32) + // ZoneOrSort
+        sizeof(uint32) + // Type
+        sizeof(uint32) + // RepObjectiveFaction
+        sizeof(uint32) + // RepObjectiveValue
+        sizeof(uint32) + // RequiredOpositeRepFaction
+        sizeof(uint32) + // RequiredOpositeRepValue
+        sizeof(uint32) + // NextQuestInChain
+        sizeof(uint32) + // RewOrReqMoney
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        sizeof(uint32) + // RewMoneyMaxLevel
+#endif
+        sizeof(uint32) + // RewSpell
+        sizeof(uint32) + // SrcItemId
+        sizeof(uint32) + // QuestFlags
+        sizeof(uint32) * QUEST_REWARDS_COUNT + // RewItemId
+        sizeof(uint32) * QUEST_REWARDS_COUNT + // RewItemCount
+        sizeof(uint32) * QUEST_REWARD_CHOICES_COUNT + // RewChoiceItemId
+        sizeof(uint32) * QUEST_REWARD_CHOICES_COUNT + // RewChoiceItemCount
+        sizeof(uint32) + // PointMapId
+        sizeof(float) + // PointX
+        sizeof(float) + // PointY
+        sizeof(uint32) + // PointOpt
+        sizeof(char) + // Title
+        sizeof(char) + // Objectives
+        sizeof(char) + // Details
+        sizeof(char) + // EndText
+        sizeof(uint32) * QUEST_OBJECTIVES_COUNT + // ReqCreatureOrGOId
+        sizeof(uint32) * QUEST_OBJECTIVES_COUNT + // ReqCreatureOrGOCount
+        sizeof(uint32) * QUEST_OBJECTIVES_COUNT + // ReqItemId
+        sizeof(uint32) * QUEST_OBJECTIVES_COUNT + // ReqItemCount
+        sizeof(char) * QUEST_OBJECTIVES_COUNT; // ObjectiveText
+
+    WorldPacket data(SMSG_QUEST_QUERY_RESPONSE, questTemplateFixedSize + titleLen + detailsLen + objectivesLen + endTextLen + objectiveTextLen[0] + objectiveTextLen[1] + objectiveTextLen[2] + objectiveTextLen[3]);
+
+    data << uint32(pQuest->GetQuestId());                   // quest id
+    data << uint32(pQuest->GetQuestMethod());               // Accepted values: 0, 1 or 2. 0==IsAutoComplete() (skip objectives/details)
+    data << uint32(pQuest->GetQuestLevel());                // may be 0, static data, in other cases must be used dynamic level: Player::GetQuestLevelForPlayer
+    data << int32(pQuest->GetZoneOrSort());                 // zone or sort to display in quest log
+
+    data << uint32(pQuest->GetType());
+    //[-ZERO] data << uint32(pQuest->GetSuggestedPlayers());
+
+    data << uint32(pQuest->GetRepObjectiveFaction());       // shown in quest log as part of quest objective
+    data << uint32(pQuest->GetRepObjectiveValue());         // shown in quest log as part of quest objective
+
+    data << uint32(0);                                      // RequiredOpositeRepFaction
+    data << uint32(0);                                      // RequiredOpositeRepValue, required faction value with another (oposite) faction (objective)
+
+    data << uint32(pQuest->GetNextQuestInChain());          // client will request this quest from NPC, if not 0
+
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+        data << uint32(0);                                  // Hide money rewarded
+    else
+        data << uint32(pQuest->GetRewOrReqMoney());
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    data << uint32(pQuest->GetRewMoneyMaxLevel());          // used in XP calculation at client
+#endif
+    data << uint32(pQuest->GetRewSpell());                  // reward spell, this spell will display (icon) (casted if RewSpellCast==0)
+
+    data << uint32(pQuest->GetSrcItemId());                 // source item id
+    data << uint32(pQuest->GetQuestFlags());                // quest flags
+
+    int iI;
+
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    {
+        for (iI = 0; iI < QUEST_REWARDS_COUNT; ++iI)
+            data << uint32(0) << uint32(0);
+        for (iI = 0; iI < QUEST_REWARD_CHOICES_COUNT; ++iI)
+            data << uint32(0) << uint32(0);
+    }
+    else
+    {
+        for (iI = 0; iI < QUEST_REWARDS_COUNT; ++iI)
+        {
+            data << uint32(pQuest->RewItemId[iI]);
+            data << uint32(pQuest->RewItemCount[iI]);
+        }
+        for (iI = 0; iI < QUEST_REWARD_CHOICES_COUNT; ++iI)
+        {
+            data << uint32(pQuest->RewChoiceItemId[iI]);
+            data << uint32(pQuest->RewChoiceItemCount[iI]);
+        }
+    }
+
+    data << pQuest->GetPointMapId();
+    data << pQuest->GetPointX();
+    data << pQuest->GetPointY();
+    data << pQuest->GetPointOpt();
+
+    data.append(Title, titleLen + 1);
+    data.append(Objectives, objectivesLen + 1);
+    data.append(Details, detailsLen + 1);
+    data.append(EndText, endTextLen + 1);
+
+    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
+    {
+        if (pQuest->ReqCreatureOrGOId[iI] < 0)
+        {
+            // client expected gameobject template id in form (id|0x80000000)
+            data << uint32((pQuest->ReqCreatureOrGOId[iI] * (-1)) | 0x80000000);
+        }
+        else
+            data << uint32(pQuest->ReqCreatureOrGOId[iI]);
+        data << uint32(pQuest->ReqCreatureOrGOCount[iI]);
+        data << uint32(pQuest->ReqItemId[iI]);
+        data << uint32(pQuest->ReqItemCount[iI]);
+    }
+
+    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
+        data.append(ObjectiveText[iI], objectiveTextLen[iI] + 1);
+
+    SendPacket(&data);
 }
 
 void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recv_data)

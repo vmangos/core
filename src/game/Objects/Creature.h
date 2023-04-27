@@ -85,8 +85,8 @@ class Creature : public Unit
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 firstCreatureId, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
-        void LoadDefaultAuras(uint32 const* auras, bool reload);
+        bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 firstCreatureId, GameEventCreatureData const* eventData = nullptr);
+        void LoadDefaultAuras(uint32 const* auras);
         void LoadCreatureAddon(bool reload = false);
 
         // CreatureGroups
@@ -114,6 +114,7 @@ class Creature : public Unit
         bool HasStaticDBSpawnData() const;                  // listed in `creature` table and have fixed in DB guid
         uint32 GetDBTableGUIDLow() const;
 
+        virtual char const* GetName() const override { return GetCreatureInfo()->name; }
         char const* GetSubName() const { return GetCreatureInfo()->subname; }
 
         void Update(uint32 update_diff, uint32 time) override;  // overwrite Unit::Update
@@ -223,7 +224,7 @@ class Creature : public Unit
         void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) final;
         void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) final;
         void StartCooldownForSummoner();
-        bool UpdateEntry(uint32 entry, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
+        bool UpdateEntry(uint32 entry, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
 
         void ApplyGameEventSpells(GameEventCreatureData const* eventData, bool activated);
         bool UpdateStats(Stats stat) override;
@@ -250,8 +251,8 @@ class Creature : public Unit
         TrainerSpellData const* GetTrainerSpells() const;
 
         CreatureInfo const* GetCreatureInfo() const { return m_creatureInfo; }
-        CreatureDataAddon const* GetCreatureAddon() const;
-        CreatureData const* GetCreatureData() const;
+        CreatureData const* GetCreatureData() const { return m_creatureData; };
+        CreatureDataAddon const* GetCreatureAddon() const { return m_creatureDataAddon; };
 
         static uint32 ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data = nullptr, CreatureDataAddon const* addon = nullptr, GameEventCreatureData const* eventData = nullptr, float* scale = nullptr);
 
@@ -340,7 +341,7 @@ class Creature : public Unit
         bool IsVisibleInGridForPlayer(Player const* pl) const override;
 
         void RemoveCorpse();
-        bool IsDeadByDefault() const;
+        bool IsDeadByDefault() const { return m_isDeadByDefault; }
 
         void ForcedDespawn(uint32 msTimeToDespawn = 0, uint32 secsTimeToRespawn = 0);
         void DespawnOrUnsummon(uint32 msTimeToDespawn = 0, uint32 secsTimeToRespawn = 0);
@@ -350,11 +351,12 @@ class Creature : public Unit
         void SetRespawnTime(uint32 respawn) { m_respawnTime = respawn ? time(nullptr) + respawn : 0; }
         void Respawn();
         void SaveRespawnTime() override;
-        void ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data);
+        void ApplyDynamicRespawnDelay(uint32& delay);
         void CastSpawnSpell();
 
+        // the delay is in seconds
         uint32 GetRespawnDelay() const { return m_respawnDelay; }
-        void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
+        void SetRespawnDelay(uint32 seconds) { m_respawnDelay = seconds; }
 
         float GetWanderDistance() const { return m_wanderDistance; }
         void SetWanderDistance(float dist) { m_wanderDistance = dist; }
@@ -577,8 +579,8 @@ class Creature : public Unit
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
 
-        bool CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, uint32 firstCreatureId, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
-        bool InitEntry(uint32 entry, CreatureData const* data = nullptr, CreatureDataAddon const* addon = nullptr, GameEventCreatureData const* eventData = nullptr);
+        bool CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, uint32 firstCreatureId, GameEventCreatureData const* eventData = nullptr);
+        bool InitEntry(uint32 entry, GameEventCreatureData const* eventData = nullptr);
         void SetInitCreaturePowerType();
 
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
@@ -607,6 +609,7 @@ class Creature : public Unit
         uint32 m_equipmentId;
         uint32 m_mountId;                                   // display Id to mount
 
+        bool m_isDeadByDefault;
         bool m_AI_locked;
         uint16 m_creatureStateFlags;
         uint32 m_temporaryFactionFlags;                     // used for real faction changes (not auras etc)
@@ -636,6 +639,7 @@ class Creature : public Unit
         uint32 m_playerDamageTaken;
         uint32 m_nonPlayerDamageTaken;
         
+        uint32 m_callForHelpTimer;
         float m_callForHelpDist;
         float m_leashDistance;
         float m_detectionDistance;
@@ -643,6 +647,8 @@ class Creature : public Unit
     private:
         GridReference<Creature> m_gridRef;
         CreatureInfo const* m_creatureInfo;
+        CreatureData const* m_creatureData;
+        CreatureDataAddon const* m_creatureDataAddon;
 };
 
 inline Creature* Object::ToCreature()

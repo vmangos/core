@@ -743,15 +743,36 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
     MasterPlayer* pl = GetMasterPlayer();
     ASSERT(pl);
 
-    // client can't work with packets > max int16 value
-    // uint32 const maxPacketSize = 32767;
+    constexpr uint32 averageSizePerMail =
+        sizeof(uint32) /*Message Id*/ +
+        sizeof(uint8) /*Message Type*/ + 
+        sizeof(uint64) /*Sender Guid*/ +
+        32 /*Subject (max 64)*/ +
+        sizeof(uint32) /*Item Text Id*/ +
+        sizeof(uint32) /*Unknown*/ +
+        sizeof(uint32) /*Stationery*/ +
+        sizeof(uint32) /*Item Entry*/ +
+        sizeof(uint32) /*Item Enchantment Id*/ +
+        sizeof(uint32) /*Item Random Property Id*/ +
+        sizeof(uint32) /*Item Suffix Factor*/ +
+        sizeof(uint8) /*Item Count*/ +
+        sizeof(uint32) /*Item Spell Charges*/ +
+        sizeof(uint32) /*Item Max Durability*/ +
+        sizeof(uint32) /*Item Durability*/ +
+        sizeof(uint32) /*Money*/ +
+        sizeof(uint32) /*Cod*/ +
+        sizeof(uint32) /*Checked*/ +
+        sizeof(float) /*Expire Time*/
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        + sizeof(uint32) /*Mail Template Id*/
+#endif
+        ;
 
-    uint32 mailsCount = 0;                                  // real send to client mails amount
-
-    WorldPacket data(SMSG_MAIL_LIST_RESULT, (200));         // guess size
+    WorldPacket data(SMSG_MAIL_LIST_RESULT, 1 + std::min(pl->GetMailSize(), 253u) * averageSizePerMail);
     data << uint8(0);                                       // mail's count
     time_t cur_time = time(nullptr);
 
+    uint32 mailsCount = 0;                                  // real send to client mails amount
     for (PlayerMails::iterator itr = pl->GetMailBegin(); itr != pl->GetMailEnd(); ++itr)
     {
         // packet send mail count as uint8, prevent overflow
@@ -761,13 +782,6 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
         // skip deleted or not delivered (deliver delay not expired) mails
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time || cur_time > (*itr)->expire_time)
             continue;
-
-        /*[-ZERO] TODO recheck this
-        size_t next_mail_size = 4+1+8+((*itr)->subject.size()+1)+4*7+1+item_count*(1+4+4+6*3*4+4+4+1+4+4+4);
-
-        if (data.wpos()+next_mail_size > maxPacketSize)
-            break;
-        */
 
         data << uint32((*itr)->messageID);                  // Message ID
         data << uint8((*itr)->messageType);                 // Message Type

@@ -1128,7 +1128,7 @@ class Unit : public SpellCaster
         void SetInCombatWithAssisted(Unit* pAssisted);
         void SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly = false);
         inline void SetOutOfCombatWithAggressor(Unit* pAggressor) { SetInCombatWithAggressor(pAggressor, true); }
-        void SetInCombatWithVictim(Unit* pVictim, bool touchOnly = false, uint32 combatTimer = 0);
+        void SetInCombatWithVictim(Unit* pVictim, bool touchOnly = false, uint32 combatTimer = 0, bool direct = true);
         inline void SetOutOfCombatWithVictim(Unit* pVictim) { SetInCombatWithVictim(pVictim, true); }
         void TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly = false);
         uint32 GetCombatTimer() const { return m_combatTimer; }

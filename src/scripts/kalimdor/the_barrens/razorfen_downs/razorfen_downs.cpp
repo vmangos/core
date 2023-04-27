@@ -128,11 +128,9 @@ struct npc_belnistraszAI : public npc_escortAI
 
     void SpawnerSummon(Creature* pSummoner)
     {
-        Creature * crea = nullptr;
         if (m_uiRitualPhase > 7)
         {
-            if(crea = pSummoner->SummonCreature(NPC_PLAGUEMAW_THE_ROTTING, pSummoner->GetPositionX(), pSummoner->GetPositionY(), pSummoner->GetPositionZ(), pSummoner->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-               crea->SetRespawnDelay(600000);
+            pSummoner->SummonCreature(NPC_PLAGUEMAW_THE_ROTTING, pSummoner->GetPositionX(), pSummoner->GetPositionY(), pSummoner->GetPositionZ(), pSummoner->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
             return;
         }
 
@@ -156,8 +154,7 @@ struct npc_belnistraszAI : public npc_escortAI
                     uiEntry = NPC_DEATHS_HEAD_GEOMANCER;
                     break;
             }
-            if (crea = pSummoner->SummonCreature(uiEntry, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-                crea->SetRespawnDelay(600000);
+            pSummoner->SummonCreature(uiEntry, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
         }
     }
 
@@ -169,8 +166,7 @@ struct npc_belnistraszAI : public npc_escortAI
     void DoSummonRandom()
     {
         uint32 type = urand(0, 2);
-        if(Creature * crea = m_creature->SummonCreature(NPC_IDOL_ROOM_SPAWNER, m_fSpawnerCoord[type][0], m_fSpawnerCoord[type][1], m_fSpawnerCoord[type][2], m_fSpawnerCoord[type][3], TEMPSUMMON_TIMED_DESPAWN, 10000))
-            crea->SetRespawnDelay(600000);
+        m_creature->SummonCreature(NPC_IDOL_ROOM_SPAWNER, m_fSpawnerCoord[type][0], m_fSpawnerCoord[type][1], m_fSpawnerCoord[type][2], m_fSpawnerCoord[type][3], TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 10000);
     }
 
     void WaypointReached(uint32 uiPointId) override

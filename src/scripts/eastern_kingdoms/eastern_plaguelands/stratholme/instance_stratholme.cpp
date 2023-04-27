@@ -544,7 +544,7 @@ struct instance_stratholme : public ScriptedInstance
                                             pPlayer->RemoveAurasDueToSpell(*spells_itr);
 
                                     if (pPlayer->GetQuestStatus(QUEST_DEAD_MAN_PLEA) == QUEST_STATUS_INCOMPLETE)
-                                        pPlayer->AreaExploredOrEventHappens(QUEST_DEAD_MAN_PLEA);
+                                        pPlayer->KilledMonsterCredit(NPC_YSIDA, m_uiYsidaGUID);
                                 }
                             }
                         }

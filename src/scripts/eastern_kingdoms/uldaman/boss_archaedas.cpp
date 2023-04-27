@@ -96,7 +96,7 @@ struct boss_archaedasAI : public ScriptedAI
         bGuardiansAwake = false;
         bVaultWardersAwake = false;
 
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
 
     void SpellHit(SpellCaster* /*caster*/, SpellEntry const* spell) override
@@ -194,14 +194,14 @@ struct boss_archaedasAI : public ScriptedAI
             // fix factions now or they'll look green for a brief moment
             if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(1)))
             {
-                target->SetFactionTemplateId(FACTION_AWAKE);
-                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                target->SetFactionTemporary(415, TEMPFACTION_RESTORE_RESPAWN | TEMPFACTION_RESTORE_COMBAT_STOP);
                 target->CastSpell(target, SPELL_STONE_DWARF_AWAKEN, false);
             }
             if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(2)))
             {
-                target->SetFactionTemplateId(FACTION_AWAKE);
-                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE);
+                target->SetFactionTemporary(415, TEMPFACTION_RESTORE_RESPAWN | TEMPFACTION_RESTORE_COMBAT_STOP);
                 target->CastSpell(target, SPELL_STONE_DWARF_AWAKEN, false);
             }
             me->CastSpell(me, SPELL_AWAKEN_VAULT_WARDER, false);

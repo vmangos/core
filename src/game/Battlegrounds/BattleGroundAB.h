@@ -26,6 +26,8 @@
 #include "BattleGround.h"
 #include "World.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+
 enum BG_AB_WorldStates
 {
     BG_AB_OP_OCCUPIED_BASES_HORDE       = 1778,
@@ -245,4 +247,5 @@ class BattleGroundAB : public BattleGround
         uint32              m_honorTics;
         uint32              m_reputationTics;
 };
+#endif
 #endif

@@ -606,7 +606,8 @@ void Group::Disband(bool hideDestroy, ObjectGuid initiator)
         });
     }
 
-    RollId.clear();
+    for (auto itr = RollId.begin(); itr != RollId.end(); itr = RollId.begin())
+        CountTheRoll(itr);
     m_memberSlots.clear();
 
     RemoveAllInvites();
@@ -948,8 +949,8 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     if (itr == roll->playerVote.end())
         return true;                                        // result used for need iterator ++, so avoid for end of list
 
-    if (roll->getLoot())
-        if (roll->getLoot()->items.empty())
+    if (Loot* pLoot = roll->getLoot())
+        if (pLoot->items.empty())
             return false;
 
     switch (vote)

@@ -457,8 +457,9 @@ bool ChatHandler::HandleAddCharacterNoteCommand(char* args)
 
 bool ChatHandler::HandleWarnCharacterCommand(char* args)
 {
+    Player* pPlayer;
     ObjectGuid playerGuid;
-    if (!ExtractPlayerTarget(&args, nullptr, &playerGuid))
+    if (!ExtractPlayerTarget(&args, &pPlayer, &playerGuid))
     {
         PSendSysMessage(LANG_PLAYER_NOT_FOUND);
         SetSentErrorMessage(true);
@@ -477,6 +478,9 @@ bool ChatHandler::HandleWarnCharacterCommand(char* args)
         reason = "<no reason given>";
 
     sWorld.WarnAccount(playerData->uiAccount, authorName, reason, "WARN");
+    sAccountMgr.WarnAccount(playerData->uiAccount, reason);
+    if (pPlayer)
+        ChatHandler(pPlayer).PSendSysMessage(LANG_ACCOUNT_WARNED, reason);
 
     PSendSysMessage("Account #%u (character %s) has been warned for \"%s\"", playerData->uiAccount, playerData->sName.c_str(), reason);
     return true;

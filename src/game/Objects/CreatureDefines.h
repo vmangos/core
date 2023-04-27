@@ -588,4 +588,6 @@ enum TemporaryFactionFlags                                  // Used at real fact
     TEMPFACTION_ALL,
 };
 
+#define MAX_LEVEL_DIFF_FOR_AGGRO_RANGE 25
+
 #endif

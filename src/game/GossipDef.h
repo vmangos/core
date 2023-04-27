@@ -308,12 +308,8 @@ class PlayerMenu
         /***                    QUEST SYSTEM                   ***/
         /*********************************************************/
         void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID);
-
         void SendQuestGiverQuestList(QEmote eEmote, std::string const& Title, ObjectGuid guid);
-
-        void SendQuestQueryResponse(Quest const* pQuest);
         void SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid npcGUID, bool ActivateAccept);
-
         void SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGUID, bool EnbleNext);
         void SendQuestGiverRequestItems(Quest const* pQuest, ObjectGuid npcGUID, bool Completable, bool CloseOnCancel);
 };

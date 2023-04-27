@@ -52,6 +52,47 @@
 #include <algorithm>
 #include <memory>
 
+void Log::OutWarden(Warden const* warden, LogLevel logLevel, char const* format, ...)
+{
+    if (m_wardenDebug && logLevel > LOG_LVL_MINIMAL)
+        logLevel = LOG_LVL_MINIMAL;
+
+    if (m_consoleLevel >= logLevel)
+    {
+        SetColor(stdout, g_logColors[logLevel]);
+
+        if (m_includeTime)
+            outTime(stdout);
+
+        // Append tag to console warden messages.
+        printf("[Warden] (Name %s, Id %u, IP %s) ", warden->GetAccountName(), warden->GetAccountId(), warden->GetSessionIP());
+
+        va_list ap;
+        va_start(ap, format);
+        vutf8printf(stdout, format, &ap);
+        va_end(ap);
+
+        ResetColor(stdout);
+
+        printf("\n");
+        fflush(stdout);
+    }
+
+    if (logFiles[LOG_ANTICHEAT] && m_fileLevel >= logLevel)
+    {
+        outTimestamp(logFiles[LOG_ANTICHEAT]);
+        fprintf(logFiles[LOG_ANTICHEAT], "[Warden] (Name %s, Id %u, IP %s) ", warden->GetAccountName(), warden->GetAccountId(), warden->GetSessionIP());
+
+        va_list ap;
+        va_start(ap, format);
+        vfprintf(logFiles[LOG_ANTICHEAT], format, ap);
+        va_end(ap);
+
+        fprintf(logFiles[LOG_ANTICHEAT], "\n");
+        fflush(logFiles[LOG_ANTICHEAT]);
+    }
+}
+
 void Warden::LoadScriptedScans()
 {
     auto const start = sWardenScanMgr.Count();
@@ -63,7 +104,9 @@ void Warden::LoadScriptedScans()
 }
 
 Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumber &K) :
-    _session(session), _inputCrypto(KeyLength), _outputCrypto(KeyLength), _initialized(false), _module(module), _crk(nullptr),
+    m_accountId(session->GetAccountId()), m_sessionGuid(session->GetGUID()), m_clientBuild(session->GetGameBuild()), m_accountName(session->GetUsername()),
+    m_sessionIP(session->GetRemoteAddress()), m_clientOS(session->GetOS()), m_clientPlatform(session->GetPlatform()),
+    _inputCrypto(KeyLength), _outputCrypto(KeyLength), _initialized(false), _module(module), _crk(nullptr),
     _timeoutClock(0), _scanClock(0), _moduleSendPending(false)
 {
     MANGOS_ASSERT(!!_module || session->GetPlatform() != CLIENT_PLATFORM_X86);
@@ -83,9 +126,9 @@ Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumbe
 
     _xor = inputKey[0];
 
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Initializing");
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "C->S Key: %s", ByteArrayToHexStr(inputKey, 16).c_str());
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "S->C Key: %s", ByteArrayToHexStr(outputKey, 16).c_str());
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Initializing");
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "C->S Key: %s", ByteArrayToHexStr(inputKey, 16).c_str());
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "S->C Key: %s", ByteArrayToHexStr(outputKey, 16).c_str());
 
     if (_module)
     {
@@ -98,7 +141,7 @@ Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumbe
 
         pkt << static_cast<uint32>(_module->binary.size());
 
-        SendPacket(pkt);
+        SendPacketDirect(pkt, session);
 
         BeginTimeoutClock();
     }
@@ -113,8 +156,8 @@ void Warden::RequestChallenge()
     // select a random challenge/response/key entry
     _crk = &_module->crk[urand(0, _module->crk.size() - 1)];
 
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Sending challenge");
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Seed: %s", ByteArrayToHexStr(_crk->seed, 16).c_str());
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Sending challenge");
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Seed: %s", ByteArrayToHexStr(_crk->seed, 16).c_str());
 
     ByteBuffer pkt(1 + sizeof(_crk->seed));
 
@@ -151,14 +194,14 @@ void Warden::HandleChallengeResponse(ByteBuffer &buff)
 
     _xor = _crk->clientKey[0];
 
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Challenge response validated.  Warden packet encryption initialized.");
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Challenge response validated.  Warden packet encryption initialized.");
 
     _crk = nullptr;
 }
 
 void Warden::SendModuleToClient()
 {
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Sending module");
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Sending module");
 
     StopTimeoutClock();
 
@@ -181,7 +224,7 @@ void Warden::SendModuleToClient()
 
     _moduleSendPending = true;
 
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Module transfer complete");
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Module transfer complete");
 }
 
 std::vector<std::shared_ptr<const Scan>> Warden::SelectScans(ScanFlags flags) const
@@ -233,7 +276,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
         auto const startSize = scan.wpos();
         auto const startStringSize = strings.size();
 
-        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Requesting scan \"%s\"", (*i)->comment.c_str());
+        sLog.OutWarden(this, LOG_LVL_DEBUG, "Requesting scan \"%s\"", (*i)->comment.c_str());
         (*i)->Build(this, strings, scan);
 
         // if the scan did not change the buffer size or the string size, consider
@@ -257,7 +300,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
     // warden opcode
     buff << static_cast<uint8>(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
 
-    if (_session->GetOS() == CLIENT_OS_WIN)
+    if (m_clientOS == CLIENT_OS_WIN)
     {
         // string table for this request
         for (auto const &s : strings)
@@ -273,7 +316,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
     // all scan requests
     buff.append(scan);
 
-    if (_session->GetOS() == CLIENT_OS_WIN)
+    if (m_clientOS == CLIENT_OS_WIN)
     {
         // indicates to the client that there are no further requests in this packet
         buff << _xor;
@@ -288,7 +331,7 @@ void Warden::ReadScanResults(ByteBuffer &buff)
     // move the scans to the stack because the check handlers we call may enqueue additional scans
     auto const scans = std::move(_pendingScans);
 
-    auto const inWorld = _session->GetPlayer() && _session->GetPlayer()->IsInWorld();
+    //auto const inWorld = _session->GetPlayer() && _session->GetPlayer()->IsInWorld();
 
     for (auto const &s : scans)
     {
@@ -297,8 +340,8 @@ void Warden::ReadScanResults(ByteBuffer &buff)
         {
             // if this scan requires being in the world and they are not in the world (meaning they left
             // the world between the request and response), ignore the results
-            if (!!(s->flags & InWorld) && !inWorld)
-                continue;
+            //if (!!(s->flags & InWorld) && !inWorld)
+            //    continue;
 
             ApplyPenalty("", WARDEN_ACTION_MAX, s);
             LogPositiveToDB(s);
@@ -320,7 +363,38 @@ void Warden::SendPacket(const ByteBuffer &buff)
     // creating side-effects for this function
     EncryptData(const_cast<uint8 *>(pkt.contents()), pkt.wpos());
 
-    _session->SendPacket(&pkt);
+    sWorld.GetMessager().AddMessage([packet = std::move(pkt), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+    {
+        if (WorldSession* session = world->FindSession(accountId))
+        {
+            if (session->GetGUID() == sessionGuid)
+                session->SendPacket(&packet);
+        }
+    });
+}
+
+void Warden::SendPacketDirect(ByteBuffer const& buff, WorldSession* session)
+{
+    WorldPacket pkt(SMSG_WARDEN_DATA, buff.wpos());
+    pkt.append(buff);
+
+    // we specifically append the packet copy, rather than the input copy, to avoid
+    // creating side-effects for this function
+    EncryptData(const_cast<uint8 *>(pkt.contents()), pkt.wpos());
+
+    session->SendPacket(&pkt);
+}
+
+void Warden::KickSession() const
+{
+    sWorld.GetMessager().AddMessage([accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+    {
+        if (WorldSession* session = world->FindSession(accountId))
+        {
+            if (session->GetGUID() == sessionGuid)
+                session->KickPlayer();
+        }
+    });
 }
 
 void Warden::DecryptData(uint8* buffer, size_t size)
@@ -381,28 +455,28 @@ void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::share
             penalty = WardenActions(sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY));
     }
 
-    std::string playerName = _session->GetPlayerName();
-    std::string accountName = std::to_string(_session->GetAccountId());
-    sAccountMgr.GetName(_session->GetAccountId(), accountName);
-
     switch (penalty)
     {
-    case WARDEN_ACTION_KICK:
-        _session->KickPlayer();
-        break;
-    case WARDEN_ACTION_BAN:
-    {
-        std::stringstream duration;
-        std::stringstream banReason;
-        banReason << "Warden Anticheat Violation";
-        // Check can be NULL, for example if the client sent a wrong signature in the warden packet (CHECKSUM FAIL)
-        if (scan)
-            banReason << ": " << (scan->comment.empty() ? std::string("Undocumented Check") : scan->comment);
+        case WARDEN_ACTION_KICK:
+            KickSession();
+            break;
+        case WARDEN_ACTION_BAN:
+        {
+            std::stringstream duration;
+            std::stringstream banReason;
+            banReason << "Warden Anticheat Violation";
+            // Check can be NULL, for example if the client sent a wrong signature in the warden packet (CHECKSUM FAIL)
+            if (scan)
+                banReason << ": " << (scan->comment.empty() ? std::string("Undocumented Check") : scan->comment);
+            std::string banReasonStr = banReason.str();
 
-        sWorld.BanAccount(BAN_ACCOUNT, accountName, sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_BAN_DURATION), banReason.str(), "Warden");
-    }
-    default:
-        break;
+            sWorld.GetMessager().AddMessage([accountName = m_accountName, banReasonStr](World* world)
+            {
+                world->BanAccount(BAN_ACCOUNT, accountName, sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_BAN_DURATION), banReasonStr, "Warden");
+            });
+        }
+        default:
+            break;
     }
 
     if (message.empty())
@@ -417,11 +491,11 @@ void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::share
             message = "failed an internal warden check";
     }
 
-    // Append names to message.
-    message = "Player " + playerName + " (Account " + accountName + ") " + message;
-
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, message.c_str());
-    sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "WardenAnticheat", message.c_str());
+    sLog.OutWarden(this, LOG_LVL_BASIC, message.c_str());
+    sWorld.GetMessager().AddMessage([message](World* world)
+    {
+        world->SendGMText(LANG_GM_ANNOUNCE_COLOR, "WardenAnticheat", message.c_str());
+    });
 }
 
 void Warden::HandlePacket(WorldPacket& recvData)
@@ -432,7 +506,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
     uint8 opcode;
     recvData >> opcode;
 
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
 
     // when there is a challenge/response pending, the only packet we expect is the hash result
     if (!!_crk && opcode != WARDEN_CMSG_HASH_RESULT)
@@ -449,20 +523,20 @@ void Warden::HandlePacket(WorldPacket& recvData)
         {
             if (!_module)
             {
-                sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Requested module when none was offered.", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
-                _session->KickPlayer();
+                sLog.OutWarden(this, LOG_LVL_BASIC, "Requested module when none was offered.");
+                KickSession();
                 break;
             }
 
             if (_moduleSendPending)
             {
-                sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Failed to load module.  Kicking.", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
-                _session->KickPlayer();
+                sLog.OutWarden(this, LOG_LVL_BASIC, "Failed to load module.  Kicking.");
+                KickSession();
                 _moduleSendPending = false;
                 break;
             }
 
-            sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Client needs module sent");
+            sLog.OutWarden(this, LOG_LVL_DEBUG, "Client needs module sent");
             SendModuleToClient();
             break;
         }
@@ -471,20 +545,20 @@ void Warden::HandlePacket(WorldPacket& recvData)
         {
             if (!_module)
             {
-                sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Loaded module without server request.", _session->GetAccountId(), _session->GetRemoteAddress().c_str());
-                _session->KickPlayer();
+                sLog.OutWarden(this, LOG_LVL_BASIC, "Loaded module without server request.");
+                KickSession();
                 break;
             }
 
             _moduleSendPending = false;
-            sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Module loaded");
+            sLog.OutWarden(this, LOG_LVL_DEBUG, "Module loaded");
             RequestChallenge();
             break;
         }
 
         case WARDEN_CMSG_CHEAT_CHECKS_RESULT:
         {
-            if (_session->GetOS() == CLIENT_OS_WIN)
+            if (m_clientOS == CLIENT_OS_WIN)
             {
                 // verify checksum integrity
                 uint16 length;
@@ -511,13 +585,13 @@ void Warden::HandlePacket(WorldPacket& recvData)
         // FIXME: Find when/why/how this actually happens and how to handle it
         case WARDEN_CMSG_MEM_CHECKS_RESULT:
         {
-            sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Received mem checks result");
+            sLog.OutWarden(this, LOG_LVL_DEBUG, "Received mem checks result");
             break;
         }
 
         case WARDEN_CMSG_HASH_RESULT:
         {
-            sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_DEBUG, "Received hash result");
+            sLog.OutWarden(this, LOG_LVL_DEBUG, "Received hash result");
 
             HandleChallengeResponse(recvData);
 
@@ -540,8 +614,8 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
         case WARDEN_CMSG_MODULE_FAILED:
         {
-            sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Module load failed.  Kicking.");
-            _session->KickPlayer();
+            sLog.OutWarden(this, LOG_LVL_BASIC, "Module load failed.  Kicking.");
+            KickSession();
             break;
         }
 
@@ -556,10 +630,22 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
 void Warden::Update()
 {
+    {
+        std::vector<WorldPacket> packetQueue;
+    
+        {
+            std::lock_guard<std::mutex> lock(m_packetQueueMutex);
+            std::swap(packetQueue, m_packetQueue);
+        }
+
+        for (auto& packet : packetQueue)
+            HandlePacket(packet);
+    }
+
     if (!!_timeoutClock && WorldTimer::getMSTime() > _timeoutClock)
     {
-        sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_BASIC, "Client response timeout.  Kicking.");
-        _session->KickPlayer();
+        sLog.OutWarden(this, LOG_LVL_BASIC, "Client response timeout.  Kicking.");
+        KickSession();
         return;
     }
 
@@ -571,9 +657,9 @@ void Warden::Update()
         // otherwise, if the scan clock is running and has expired, request randomly selected scans
         else if (!!_scanClock && WorldTimer::getMSTime() > _scanClock)
         {
-            auto const inWorld = _session->GetPlayer() ? _session->GetPlayer()->IsInWorld() : false;
+            //auto const inWorld = _session->GetPlayer() ? _session->GetPlayer()->IsInWorld() : false;
 
-            RequestScans(SelectScans(inWorld ? InWorld : None));
+            RequestScans(SelectScans(/*inWorld ? InWorld :*/ None));
 
             // if no scans were found, just begin the clock again, in case things change
             if (_pendingScans.empty())
@@ -590,8 +676,8 @@ void Warden::Update()
 
 void Warden::LogPositiveToDB(std::shared_ptr<const Scan> scan)
 {
-    if (!scan || !_session)
+    if (!scan)
         return;
 
-    sLog.OutWardenPlayer(_session, LOG_ANTICHEAT, LOG_LVL_MINIMAL, "Check %u penalty %u", scan->checkId, scan->penalty);
+    sLog.OutWarden(this, LOG_LVL_MINIMAL, "Check %u penalty %u", scan->checkId, scan->penalty);
 }

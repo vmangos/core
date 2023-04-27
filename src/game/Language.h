@@ -282,7 +282,7 @@ enum MangosStrings
     LANG_COMMAND_ADDVENDORITEMITEMS     = 280,
     LANG_COMMAND_KICKSELF               = 281,
     LANG_COMMAND_KICKMESSAGE            = 282,
-    //                                    283, not used
+    LANG_ACCOUNT_WARNED                 = 283,
     LANG_COMMAND_WHISPERACCEPTING       = 284,
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,
@@ -637,25 +637,6 @@ enum MangosStrings
     LANG_GMLIST_EMPTY                   = 599,
     // End Level 3 list, continued at 1100
 
-    // Battleground
-    LANG_BG_A_WINS                      = 600,
-    LANG_BG_H_WINS                      = 601,
-
-    LANG_BG_WS_START_ONE_MINUTE         = 602,
-    LANG_BG_WS_START_HALF_MINUTE        = 603,
-    LANG_BG_WS_HAS_BEGUN                = 604,
-
-    LANG_BG_WS_CAPTURED_HF              = 605,
-    LANG_BG_WS_CAPTURED_AF              = 606,
-    LANG_BG_WS_DROPPED_HF               = 607,
-    LANG_BG_WS_DROPPED_AF               = 608,
-    LANG_BG_WS_RETURNED_AF              = 609,
-    LANG_BG_WS_RETURNED_HF              = 610,
-    LANG_BG_WS_PICKEDUP_HF              = 611,
-    LANG_BG_WS_PICKEDUP_AF              = 612,
-    LANG_BG_WS_F_PLACED                 = 613,
-    LANG_BG_WS_ALLIANCE_FLAG_RESPAWNED  = 614,
-    LANG_BG_WS_HORDE_FLAG_RESPAWNED     = 615,
     LANG_COMMAND_SOUND_NOT_FOUND        = 617,
     LANG_COMMAND_SOUND_LIST             = 618,
 
@@ -705,11 +686,6 @@ enum MangosStrings
     LANG_BG_AB_NODE_ASSAULTED           = 659,
     LANG_BG_AB_NODE_CLAIMED             = 660,
 
-    LANG_BG_AB_START_ONE_MINUTE         = 661,
-    LANG_BG_AB_START_HALF_MINUTE        = 662,
-    LANG_BG_AB_HAS_BEGUN                = 663,
-    LANG_BG_AB_A_NEAR_VICTORY           = 664,
-    LANG_BG_AB_H_NEAR_VICTORY           = 665,
     LANG_BG_MARK_BY_MAIL                = 666,
     LANG_NARAIN_LETTER                  = 667,
 
@@ -836,8 +812,7 @@ enum MangosStrings
     LANG_BG_AV_START_ONE_MINUTE         = 784,
     LANG_BG_AV_START_HALF_MINUTE        = 785,
     LANG_BG_AV_HAS_BEGUN                = 786,
-    LANG_BG_AV_A_NEAR_LOSE              = 787,
-    LANG_BG_AV_H_NEAR_LOSE              = 788,
+
     LANG_BG_AV_H_GENERAL_DEAD           = 789,
     LANG_BG_AV_A_GENERAL_DEAD           = 790,
     // Room for battleground/arena strings 791-799 not used
