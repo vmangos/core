@@ -15,7 +15,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     SET @NPC_FLAMESHOCKER_GUID                                      = 66900;
     SET @NPC_MOUTH_OF_KELTHUZAD_GUID                                = 31274;
     SET @NPC_NECROPOLIS_HEALTH_GUID                                 = 16207;
-    SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 21841;
+    SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 35028;
     SET @GOBJ_ZONES_GUID                                            = 82090; -- 474 Entries
 
     SET @GOBJ_SKULLPILE_WINTERSPRING_GUID                           = 52495; -- 648 Entries
@@ -25,19 +25,19 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 54949; -- 432 Entries
     SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 56119; -- 432 Entries
 
-    SET @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY                 = 14281; -- 162 Entries
-    SET @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY                      = 14443; -- 162 Entries
-    SET @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY                      = 14605; -- 108 Entries
-    SET @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY                = 14713; -- 107 Entries
-    SET @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY          = 14820; -- 108 Entries
-    SET @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY              = 14928; -- 108 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY                 = 43858; -- 162 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY                      = 44020; -- 162 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_AZSHARA_ENTRY                      = 44182; -- 108 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_BLASTED_LANDS_ENTRY                = 44290; -- 107 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_EASTERN_PLAGUELANDS_ENTRY          = 44397; -- 108 Entries
+    SET @POOL_TEMPLATE_SKULLPILE_BURNING_STEPPES_ENTRY              = 44505; -- 108 Entries
 
-    SET @GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID               = 24166;
-    SET @GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID                    = 24418;
-    SET @GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID                    = 24670;
-    SET @GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID              = 25119;
-    SET @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID        = 27173;
-    SET @GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID            = 27341;
+    SET @GOBJ_MINION_SPAWNER_FINDER_WINTERSPRING_GUID               = 220841;
+    SET @GOBJ_MINION_SPAWNER_FINDER_TANARIS_GUID                    = 221093;
+    SET @GOBJ_MINION_SPAWNER_FINDER_AZSHARA_GUID                    = 221345;
+    SET @GOBJ_MINION_SPAWNER_FINDER_BLASTED_LANDS_GUID              = 221513;
+    SET @GOBJ_MINION_SPAWNER_FINDER_EASTERN_PLAGUELANDS_GUID        = 221681;
+    SET @GOBJ_MINION_SPAWNER_FINDER_BURNING_STEPPES_GUID            = 221841;
 
     SET @EVENT_SCOURGE_INVASION                                     = 17;
     SET @EVENT_SCOURGE_INVASION_ATTACKING_WINTERSPRING              = 90;
@@ -1509,80 +1509,80 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     --     (@NPC_FLAMESHOCKER_GUID+61, @NPC_FLAMESHOCKER_GUID+70, 4.500366, 2.011575, 9);
 
     INSERT INTO `pool_creature`(`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
-        (@NPC_FLAMESHOCKER_GUID+1, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+2, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+3, 1431, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+4, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+5, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+6, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+7, 1432, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+8, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+9, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+10, 1433, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+11, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+12, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+13, 1434, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+14, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+15, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+16, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+17, 1441, 0, 'Pallid Horror in Stormwind City Cathedral of Light', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+18, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+19, 1441, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+20, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+21, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+22, 1435, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+23, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+24, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+25, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+26, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+27, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+28, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+29, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+30, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+31, 1442, 0, 'Pallid Horror in Undercity Canals', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+32, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+33, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+34, 1442, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+35, 1436, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+36, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+37, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+38, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+39, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+40, 1437, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+41, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+42, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+43, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+44, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+45, 1442, 0, 'Pallid Horror in Undercity Sewers', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+46, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+47, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+48, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+49, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        -- (@NPC_FLAMESHOCKER_GUID+50, 1442, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+51, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+52, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+53, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+54, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+55, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+56, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+57, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+58, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+59, 1439, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+60, 1438, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
-        (@NPC_FLAMESHOCKER_GUID+61, 1441, 0, 'Patchwork Terror in Stormwind The Park', 0, 9, 10);
+        (@NPC_FLAMESHOCKER_GUID+1, 43848, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+2, 43848, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+3, 43848, 0, 'Flameshocker in Stormwind City Mage Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+4, 43849, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+5, 43849, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+6, 43849, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+7, 43849, 0, 'Flameshocker in Stormwind City Trade District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+8, 43850, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+9, 43850, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+10, 43850, 0, 'Flameshocker in Stormwind City The Park', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+11, 43851, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+12, 43851, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+13, 43851, 0, 'Flameshocker in Stormwind City Old Town', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+14, 43857, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+15, 43857, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+16, 43857, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+17, 43857, 0, 'Pallid Horror in Stormwind City Cathedral of Light', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+18, 43857, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+19, 43857, 0, 'Flameshocker in Stormwind City Cathedral of Light', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+20, 43852, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+21, 43852, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+22, 43852, 0, 'Flameshocker in Stormwind City Dwarven District', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+23, 43853, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+24, 43853, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+25, 43853, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+26, 43853, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+27, 43853, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+28, 43858, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+29, 43858, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+30, 43853, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+31, 43858, 0, 'Pallid Horror in Undercity Canals', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+32, 43858, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+33, 43858, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+34, 43858, 0, 'Flameshocker in Undercity Canals', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+35, 43853, 0, 'Flameshocker in Undercity Rogues Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+36, 43854, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+37, 43854, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+38, 43854, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+39, 43854, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+40, 43854, 0, 'Flameshocker in Undercity Trade Quarter', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+41, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+42, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+43, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+44, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+45, 43858, 0, 'Pallid Horror in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+46, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+47, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+48, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+49, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        -- (@NPC_FLAMESHOCKER_GUID+50, 43858, 0, 'Flameshocker in Undercity Sewers', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+51, 43855, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+52, 43856, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+53, 43855, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+54, 43856, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+55, 43855, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+56, 43855, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+57, 43856, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+58, 43855, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+59, 43856, 0, 'Flameshocker in Undercity War Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+60, 43855, 0, 'Flameshocker in Undercity Magic Quarter', 0, 9, 10),
+        (@NPC_FLAMESHOCKER_GUID+61, 43857, 0, 'Patchwork Terror in Stormwind The Park', 0, 9, 10);
 
     INSERT INTO `pool_template`(`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-        (1431, 1, 'Flameshockers in Stormwind City Mage Quarter', 0, 0, 9, 10),
-        (1432, 1, 'Flameshockers in Stormwind City Trade District', 0, 0, 9, 10),
-        (1433, 1, 'Flameshockers in Stormwind City The Park', 0, 0, 9, 10),
-        (1434, 1, 'Flameshockers in Stormwind City Old Town', 0, 0, 9, 10),
-        (1435, 1, 'Flameshockers in Stormwind City Dwarven District', 0, 0, 9, 10),
-        (1436, 1, 'Flameshockers in Undercity Rogues Quarter', 0, 0, 9, 10),
-        (1437, 1, 'Flameshockers in Undercity Trade Quarter', 0, 0, 9, 10),
-        (1438, 1, 'Flameshockers in Undercity Magic Quarter', 0, 0, 9, 10),
-        (1439, 1, 'Flameshockers in Undercity War Quarter', 0, 0, 9, 10),
-        (1441, 1, 'Pallids in Stormwind City', 0, 0, 9, 10),
-        (1442, 1, 'Pallids in Undercity', 0, 0, 9, 10);
+        (43848, 1, 'Flameshockers in Stormwind City Mage Quarter', 0, 0, 9, 10),
+        (43849, 1, 'Flameshockers in Stormwind City Trade District', 0, 0, 9, 10),
+        (43850, 1, 'Flameshockers in Stormwind City The Park', 0, 0, 9, 10),
+        (43851, 1, 'Flameshockers in Stormwind City Old Town', 0, 0, 9, 10),
+        (43852, 1, 'Flameshockers in Stormwind City Dwarven District', 0, 0, 9, 10),
+        (43853, 1, 'Flameshockers in Undercity Rogues Quarter', 0, 0, 9, 10),
+        (43854, 1, 'Flameshockers in Undercity Trade Quarter', 0, 0, 9, 10),
+        (43855, 1, 'Flameshockers in Undercity Magic Quarter', 0, 0, 9, 10),
+        (43856, 1, 'Flameshockers in Undercity War Quarter', 0, 0, 9, 10),
+        (43857, 1, 'Pallids in Stormwind City', 0, 0, 9, 10),
+        (43858, 1, 'Pallids in Undercity', 0, 0, 9, 10);
 
     INSERT INTO `game_event_creature`(`guid`, `event`) VALUES
         (@NPC_FLAMESHOCKER_GUID+1, 17),

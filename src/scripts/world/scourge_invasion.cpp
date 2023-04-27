@@ -354,6 +354,7 @@ struct go_scourge_invasion_spawner : public GameObjectAI
 
         me->CastSpell(nullptr, SPELL_DND_SUMMON_CRYSTAL_MINION_FINDER, false);
         me->Despawn();
+        // uint32 respawnTime = urand(uint32(30), uint32(180)); // seconds
         uint32 respawnTime = me->GetRespawnDelay();
         if (!respawnTime)
             respawnTime = me->GetGOData()->GetRandomRespawnTime();
