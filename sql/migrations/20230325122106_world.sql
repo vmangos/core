@@ -5993,7 +5993,6 @@ UPDATE `locales_quest` SET `Objectives_loc1` = '퇴마 향로를 가지고 스�
 UPDATE `locales_quest` SET `Title_loc1` = '테러데일 퇴마' WHERE `entry`=7640;
 UPDATE `locales_quest` SET `Objectives_loc1` = '퇴마 향로를 사용하여 테러데일에 고통을 주는 영혼을 몰아내야 합니다. 25명의 테러데일 영혼을 해치운 다음 스톰윈드 빛의 대성당에 있는 그레이슨 섀도브레이커 경에게 돌아가야 합니다.' WHERE `entry`=7640;
 UPDATE `locales_quest` SET `Title_loc1` = '그리만트 엘모어의 마갑' WHERE `entry`=7641;
-UPDATE `locales_quest` SET `OfferRewardText_loc6` = 'Hello there lass - Lord Shadowbreaker sent me word ahead of time that you\'d be coming around this way to see me.  I\'m willing to make the barding you need, but it won\'t be either cheap or easy; let\'s get that out in the open first and foremost.$B$BI will say this much, and Grayson will back me up when I make this claim... you\'ll not find better barding made anywhere in all of Azeroth than right here.' WHERE `entry`=7641;
 UPDATE `locales_quest` SET `Title_loc1` = '마갑 재료 수집' WHERE `entry`=7642;
 UPDATE `locales_quest` SET `Objectives_loc1` = '룬무늬 옷감 40개, 아케이나이트 주괴 6개, 아서스의 눈물 10개, 스트라솔름 성수 물병 5개 그리고 150골드를 스톰윈드의 드워프 지구에 있는 그리만트 엘모어에게 가져가야 합니다.' WHERE `entry`=7642;
 UPDATE `locales_quest` SET `Title_loc1` = '고대 준마의 영혼' WHERE `entry`=7643;
