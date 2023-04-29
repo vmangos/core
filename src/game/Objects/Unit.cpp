@@ -1090,15 +1090,13 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
             pVictim->DirectSendPublicValueUpdate(PLAYER_SELF_RES_SPELL);
         pVictim->DirectSendPublicValueUpdate(UNIT_FIELD_HEALTH);
     }
-    else
-    {
-        // Before the stop of combat, the auras of type MC are removed. We must be able to redirect the mobs to the caster.
-        pVictim->RemoveCharmAuras(AURA_REMOVE_BY_DEATH);
 
-        // stop combat
-        pVictim->CombatStop();
-        pVictim->GetHostileRefManager().deleteReferences();
-    }
+    // Before the stop of combat, the auras of type MC are removed. We must be able to redirect the mobs to the caster.
+    pVictim->RemoveCharmAuras(AURA_REMOVE_BY_DEATH);
+
+    // stop combat
+    pVictim->CombatStop();
+    pVictim->GetHostileRefManager().deleteReferences();
 
     // outdoor pvp things, do these after setting the death state, else the player activity notify won't work... doh...
     // handle player kill only if not suicide (spirit of redemption for example)
