@@ -1179,9 +1179,6 @@ void ScriptedEvent::SendEventToAllTargets(uint32 uiData)
 
 void Map::Remove(Player* player, bool remove)
 {
-    if (!player)
-        return;
-
     if (i_data)
         i_data->OnPlayerLeave(player);
 
