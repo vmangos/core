@@ -2849,13 +2849,9 @@ void Map::UpdateVisibilityForRelocations()
 {
     // VERY HEAVY LOAD in case of a lot of players at the same place
     uint32 now = WorldTimer::getMSTime();
-    uint32 objectsCount = 0;
-    {
-        std::lock_guard<std::mutex> lock(i_unitsRelocated_lock);
-        objectsCount = i_unitsRelocated.size();
-        if (!objectsCount)
-            return;
-    }
+    uint32 objectsCount = i_unitsRelocated.size();
+    if (!objectsCount)
+        return;
     _processingUnitsRelocation = true;
 
     // Compute number of threads to spawn
@@ -2869,31 +2865,26 @@ void Map::UpdateVisibilityForRelocations()
     if (threads > objectsCount)
         threads = objectsCount;
     uint32 step = objectsCount / threads;
-
+    
     ASSERT(step > 0);
 
     std::vector<std::unordered_set<Unit*>::iterator> t;
-    t.reserve(objectsCount);
-    {
-        std::lock_guard<std::mutex> lock(i_unitsRelocated_lock);
-        for (std::unordered_set<Unit*>::iterator it = i_unitsRelocated.begin(); it != i_unitsRelocated.end(); it++)
-            t.emplace_back(it);
-    }
+    t.reserve(i_unitsRelocated.size());
+    for (std::unordered_set<Unit*>::iterator it = i_unitsRelocated.begin(); it != i_unitsRelocated.end(); it++)
+        t.emplace_back(it);
     std::atomic<int> ait(0);
     uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_TIMEOUT);
-    auto f = [this, &t, &ait, beginTime = now, timeout]() {
+    auto f = [&t, &ait, beginTime=now, timeout](){
         int it = ait++;
         while (it < t.size())
         {
-            std::lock_guard<std::mutex> lock(i_unitsRelocated_lock);
             (*t[it])->ProcessRelocationVisibilityUpdates();
             if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
                 break;
             it = ait++;
         }
     };
-
-    for (uint32 i = 0; i < threads - 1; ++i)
+    for (uint32 i = 0; i < threads -1; ++i)
         m_visibilityThreads << f;
 
     std::future<void> job;
@@ -2903,16 +2894,10 @@ void Map::UpdateVisibilityForRelocations()
     f();
     if (job.valid())
         job.wait();
-    if (ait >= objectsCount)
-    {
-        std::lock_guard<std::mutex> lock(i_unitsRelocated_lock);
+    if (ait >= i_unitsRelocated.size()) //ait is increased before checks, so max value is `objectsCount + threads`
         i_unitsRelocated.clear();
-    }
     else
-    {
-        std::lock_guard<std::mutex> lock(i_unitsRelocated_lock);
         i_unitsRelocated.erase(t.front(), t[ait]);
-    }
 
     if (!i_unitsRelocated.empty())
         ++_unitRelocationThreads;
@@ -2927,7 +2912,6 @@ void Map::UpdateVisibilityForRelocations()
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "VisibilityUpdate in %04u ms [%u threads/done %u/%u]", diff, threads, objectsCount - i_unitsRelocated.size(), objectsCount);
 #endif
 }
-
 
 uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
 {
