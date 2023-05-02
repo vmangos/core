@@ -226,6 +226,12 @@ class FindGOData
         float i_spawnedDist;
 };
 
+struct AreaTriggerLocale
+{
+    std::vector<std::string> message;
+};
+
+typedef std::unordered_map<uint32, AreaTriggerLocale> AreaTriggerLocaleMap;
 typedef std::unordered_map<uint32,CreatureLocale> CreatureLocaleMap;
 typedef std::unordered_map<uint32,GameObjectLocale> GameObjectLocaleMap;
 typedef std::unordered_map<uint32,ItemLocale> ItemLocaleMap;
@@ -588,6 +594,7 @@ class ObjectMgr
 
         typedef std::unordered_map<uint32, AreaTriggerEntry> AreaTriggerMap;
         typedef std::map<uint32, AreaTriggerTeleport> AreaTriggerTeleportMap;
+
         typedef std::unordered_map<uint32, BattlegroundEntranceTrigger> BGEntranceTriggerMap;
 
         typedef std::unordered_map<uint32, RepRewardRate > RepRewardRateMap;
@@ -857,6 +864,7 @@ class ObjectMgr
         void LoadAreaTriggerTeleports();
         void LoadQuestAreaTriggers();
         void LoadTavernAreaTriggers();
+        void LoadAreaTriggerLocales();
         void LoadGameObjectForQuests();
         void LoadBattlegroundEntranceTriggers();
 
@@ -984,6 +992,13 @@ class ObjectMgr
         {
             auto itr = m_CreatureSpellsMap.find(entry);
             if (itr == m_CreatureSpellsMap.end()) return nullptr;
+            return &itr->second;
+        }
+
+        AreaTriggerLocale const* GetAreaTriggerLocale(uint32 entry) const
+        {
+            auto itr = m_AreaTriggerLocaleMap.find(entry);
+            if (itr == m_AreaTriggerLocaleMap.end()) return nullptr;
             return &itr->second;
         }
 
@@ -1503,6 +1518,7 @@ class ObjectMgr
         MapObjectGuids m_MapObjectGuids;
         std::mutex m_MapObjectGuids_lock;
 
+        AreaTriggerLocaleMap m_AreaTriggerLocaleMap;
         CreatureDataMap m_CreatureDataMap;
         CreatureLocaleMap m_CreatureLocaleMap;
         CreatureSpellsMap m_CreatureSpellsMap;

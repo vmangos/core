@@ -850,7 +850,20 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
             }
             else
             {
-                SendAreaTriggerMessage(pTeleTrigger->message.c_str());
+                char const* message = pTeleTrigger->message.c_str();
+
+                int loc_idx = GetSessionDbLocaleIndex();
+                if (loc_idx >= 0)
+                {
+                    AreaTriggerLocale const* locale = sObjectMgr.GetAreaTriggerLocale(triggerId);
+                    if (locale)
+                    {
+                        if (locale->message.size() > size_t(loc_idx) && !locale->message[loc_idx].empty())
+                            message = locale->message[loc_idx].c_str();
+                    }
+                }
+
+                SendAreaTriggerMessage(message);
             }
             return;
         }
