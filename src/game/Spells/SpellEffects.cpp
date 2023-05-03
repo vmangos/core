@@ -1623,15 +1623,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }
                     return;
                 }
-                case 23852: // Jubling Cooldown
-                {
-                    // Trigger 7 day cooldown
-                    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(23851);
-                    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(19462);
-                    if (spellInfo && itemProto)
-                        unitTarget->AddCooldown(*spellInfo, itemProto);
-                    return;
-                }
                 case 29518: // Sillithus Flag Click (DND)
                 {
                     // Also mark player with pvp on
@@ -3610,9 +3601,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
         spawnCreature->AIM_Initialize();
         spawnCreature->LoadCreatureAddon();
 
-        if (m_casterUnit->IsPvP())
-            spawnCreature->SetPvP(true);
-
         map->Add((Creature*)spawnCreature);
         m_casterUnit->AddGuardian(spawnCreature);
 
@@ -4562,6 +4550,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
 
                     // Shadow Flame
                     m_caster->CastSpell(unitTarget, 22682, true);
+                    return;
+                }
+                case 23853: // Jubling Cooldown
+                {
+                    // Trigger 7 day cooldown
+                    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(23851);
+                    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(19462);
+                    if (spellInfo && itemProto)
+                        unitTarget->AddCooldown(*spellInfo, itemProto);
                     return;
                 }
                 case 24194:                                 // Uther's Tribute

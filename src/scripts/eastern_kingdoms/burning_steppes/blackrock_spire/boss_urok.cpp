@@ -81,7 +81,7 @@ struct go_urok_challengeAI: public GameObjectAI
         {
             if (Creature* invoc = me->SummonCreature(entry, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 400000, false))
             {
-                invoc->SetRespawnDelay(600000);
+                invoc->SetRespawnDelay(7 * DAY);
                 // Visuel d'apparition
                 if (entry == NPC_UROK_DOOMHOWL)
                     invoc->SendSpellGo(invoc, SPELL_UROK_SUMMONED);

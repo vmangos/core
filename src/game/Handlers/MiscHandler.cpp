@@ -850,7 +850,20 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
             }
             else
             {
-                SendAreaTriggerMessage(pTeleTrigger->message.c_str());
+                char const* message = pTeleTrigger->message.c_str();
+
+                int loc_idx = GetSessionDbLocaleIndex();
+                if (loc_idx >= 0)
+                {
+                    AreaTriggerLocale const* locale = sObjectMgr.GetAreaTriggerLocale(triggerId);
+                    if (locale)
+                    {
+                        if (locale->message.size() > size_t(loc_idx) && !locale->message[loc_idx].empty())
+                            message = locale->message[loc_idx].c_str();
+                    }
+                }
+
+                SendAreaTriggerMessage(message);
             }
             return;
         }
@@ -1247,6 +1260,7 @@ void WorldSession::HandleRequestPetInfoOpcode(WorldPacket& /*recv_data */)
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
 {
+#ifdef USE_ANTICHEAT
     if (!m_warden)
     {
         sLog.Player(GetAccountId(), LOG_ANTICHEAT, LOG_LVL_MINIMAL,
@@ -1254,5 +1268,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
         return;
     }
 
-    m_warden->HandlePacket(recv_data);
+    std::lock_guard<std::mutex> lock(m_warden->m_packetQueueMutex);
+    m_warden->m_packetQueue.emplace_back(std::move(recv_data));
+#endif
 }

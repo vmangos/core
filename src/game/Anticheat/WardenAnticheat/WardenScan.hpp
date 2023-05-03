@@ -47,7 +47,7 @@ enum ScanFlags
     MacBuild5875    = 0x00010,  // 1.12.1
 
     InitialLogin    = 0x00020,  // scans when world session is first created
-    InWorld         = 0x00040,  // scans run whenever the player is in the world
+    //InWorld         = 0x00040,  // scans run whenever the player is in the world
 
     WinBuild4222    = 0x00080,  // 1.2.4
     WinBuild4297    = 0x00100,  // 1.3.1

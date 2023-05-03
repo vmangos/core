@@ -91,6 +91,8 @@ bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 case CHAT_MSG_RAID_LEADER:
                 case CHAT_MSG_RAID_WARNING:
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
                 case CHAT_MSG_BATTLEGROUND:
                 case CHAT_MSG_BATTLEGROUND_LEADER:
 #endif
@@ -236,7 +238,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
     char* msg = nullptr;
     size_t msgLen = 0;
     std::string channel, to;
-
+    
     // Message parsing
     switch (type)
     {
@@ -268,6 +270,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case CHAT_MSG_RAID_LEADER:
         case CHAT_MSG_RAID_WARNING:
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
         case CHAT_MSG_BATTLEGROUND:
         case CHAT_MSG_BATTLEGROUND_LEADER:
 #endif
@@ -517,7 +521,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             if (!group)
             {
                 group = _player->GetGroup();
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
                 if (!group || group->isBGGroup())
 #else
                 if (!group)
@@ -559,7 +563,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             if (!group)
             {
                 group = GetPlayer()->GetGroup();
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
                 if (!group || group->isBGGroup() || !group->isRaidGroup())
 #else
                 if (!group || !group->isRaidGroup())
@@ -583,8 +587,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             if (!group)
             {
                 group = GetPlayer()->GetGroup();
-                if (!group || group->isBGGroup() || !group->isRaidGroup() || !group->IsLeader(_player->GetObjectGuid()))
+                if (!group ||  !group->isRaidGroup() || !group->IsLeader(_player->GetObjectGuid()))
                     return;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+                if (group->isBGGroup())
+                    return;
+#endif
             }
 
             WorldPacket data;
@@ -611,7 +619,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 sWorld.LogChat(this, "Raid", msg, nullptr, group->GetId());
         }
         break;
-
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
         case CHAT_MSG_BATTLEGROUND: // Node side
         {
             // battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()

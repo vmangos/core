@@ -39,33 +39,33 @@ class BigNumber
 
         void SetRand(int numbits);
 
-        BigNumber operator=(BigNumber const& bn);
+        BigNumber& operator=(BigNumber const& bn);
 
-        BigNumber operator+=(BigNumber const& bn);
+        BigNumber& operator+=(BigNumber const& bn);
         BigNumber operator+(BigNumber const& bn)
         {
             BigNumber t(*this);
             return t += bn;
         }
-        BigNumber operator-=(BigNumber const& bn);
+        BigNumber& operator-=(BigNumber const& bn);
         BigNumber operator-(BigNumber const& bn)
         {
             BigNumber t(*this);
             return t -= bn;
         }
-        BigNumber operator*=(BigNumber const& bn);
+        BigNumber& operator*=(BigNumber const& bn);
         BigNumber operator*(BigNumber const& bn)
         {
             BigNumber t(*this);
             return t *= bn;
         }
-        BigNumber operator/=(BigNumber const& bn);
+        BigNumber& operator/=(BigNumber const& bn);
         BigNumber operator/(BigNumber const& bn)
         {
             BigNumber t(*this);
             return t /= bn;
         }
-        BigNumber operator%=(BigNumber const& bn);
+        BigNumber& operator%=(BigNumber const& bn);
         BigNumber operator%(BigNumber const& bn)
         {
             BigNumber t(*this);

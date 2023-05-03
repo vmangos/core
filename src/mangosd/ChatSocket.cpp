@@ -292,7 +292,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
         else
         {
             // Or just queue a normal chat packet
-            WorldPacket* data = new WorldPacket(CMSG_MESSAGECHAT, 100);
+            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_MESSAGECHAT, 100);
             uint32 lang = player->GetTeam() == ALLIANCE ? LANG_COMMON : LANG_ORCISH;
             *data << messageType;
             *data << lang;
@@ -322,7 +322,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
                     sendf("err_packet\n");
                     return 0;
             }
-            player->GetSession()->QueuePacket(data);
+            player->GetSession()->QueuePacket(std::move(data));
             DEBUG_OUT_CHAT(">> Queue packet.");
         }
     }

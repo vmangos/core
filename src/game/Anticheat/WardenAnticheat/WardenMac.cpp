@@ -74,7 +74,7 @@ WardenMac::WardenMac(WorldSession *session, const BigNumber &K)
 
     // the only known capability of the Mac Warden module is hashing a string and sending back the hashed value
     // so at least we can make the string that we ask it to hash change by account, I guess...
-    hash << "namreeb was here.  please be good.  your username is " << _session->GetUsername();
+    hash << "namreeb was here.  please be good.  your username is " << m_accountName;
 
     _hashString = hash.str();
 
@@ -91,21 +91,7 @@ WardenMac::WardenMac(WorldSession *session, const BigNumber &K)
     MD5_CTX md5;
     MD5_Init(&md5);
     MD5_Update(&md5, _hashString.c_str(), _hashString.size());
-    MD5_Final(_hashMD5, &md5);
-
-    // PPC no module, begin string hashing requests directly
-    if (!_module)
-    {
-        // at this point the client has our module loaded.  send whatever packets are necessary to initialize Warden
-        InitializeClient();
-
-        // send any initial hack scans that the scan manager may have for us
-        RequestScans(SelectScans(ScanFlags::InitialLogin));
-
-        // begin the scan clock (note that even if the clock expires before any initial scans are answered, no new
-        // checks will be requested until the reply is received).
-        BeginScanClock();
-    }
+    MD5_Final(_hashMD5, &md5);    
 }
 
 void WardenMac::Update()
@@ -113,7 +99,21 @@ void WardenMac::Update()
     Warden::Update();
 
     if (!_initialized)
+    {
+        // PPC no module, begin string hashing requests directly
+        if (!_module)
+        {
+            InitializeClient();
+
+            // send any initial hack scans that the scan manager may have for us
+            RequestScans(SelectScans(ScanFlags::InitialLogin));
+
+            // begin the scan clock (note that even if the clock expires before any initial scans are answered, no new
+            // checks will be requested until the reply is received).
+            BeginScanClock();
+        }
         return;
+    }
 
     if (!_fingerprintSaved)
     {
@@ -124,9 +124,9 @@ void WardenMac::Update()
         auto stmt = LogsDatabase.CreateStatement(fingerprintUpdate,
             "INSERT INTO system_fingerprint_usage (fingerprint, account, ip, realm) VALUES(?, ?, ?, ?)");
 
-        stmt.addUInt32(_session->GetFingerprint());
-        stmt.addUInt32(_session->GetAccountId());
-        stmt.addString(_session->GetRemoteAddress());
+        stmt.addUInt32(0); // fingerprint not implemented
+        stmt.addUInt32(m_accountId);
+        stmt.addString(m_sessionIP);
         stmt.addUInt32(realmID);
         stmt.Execute();
 
@@ -137,7 +137,14 @@ void WardenMac::Update()
         // at this point if we have the character enum packet, it is okay to send
         if (!_charEnum.empty())
         {
-            _session->SendPacket(&_charEnum);
+            sWorld.GetMessager().AddMessage([pkt = std::move(_charEnum), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+            {
+                if (WorldSession* session = world->FindSession(accountId))
+                {
+                    if (session->GetGUID() == sessionGuid)
+                        session->SendPacket(&pkt);
+                }
+            });
             _charEnum.clear();
         }
     }
@@ -147,7 +154,16 @@ void WardenMac::SetCharEnumPacket(WorldPacket &&packet)
 {
     // if we have already recorded system information, send the packet immediately.  otherwise delay
     if (_initialized)
-        _session->SendPacket(&packet);
+    {
+        sWorld.GetMessager().AddMessage([pkt = std::move(packet), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+        {
+            if (WorldSession* session = world->FindSession(accountId))
+            {
+                if (session->GetGUID() == sessionGuid)
+                    session->SendPacket(&pkt);
+            }
+        });
+    }
     else
         _charEnum = std::move(packet);
 }

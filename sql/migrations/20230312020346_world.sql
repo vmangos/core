@@ -39,14 +39,6 @@ Seen in TBC on map:
 DELETE FROM `gameobject_template` WHERE `entry`=22657;
 
 /*
-Bright Campfire
-Seen in TBC on map:
--- Eastern Kingdoms (0)
-*/
-DELETE FROM `gameobject_template` WHERE `entry`=31511;
-DELETE FROM `gameobject` WHERE `id`=31511;
-
-/*
 Bonfire
 Seen in TBC on map:
 -- Outland (530)
@@ -1330,7 +1322,6 @@ DELETE FROM `locales_gameobject` WHERE `entry` = 3884;
 DELETE FROM `locales_gameobject` WHERE `entry` = 3885;
 DELETE FROM `locales_gameobject` WHERE `entry` = 3886;
 DELETE FROM `locales_gameobject` WHERE `entry` = 22657;
-DELETE FROM `locales_gameobject` WHERE `entry` = 31511;
 DELETE FROM `locales_gameobject` WHERE `entry` = 180863;
 DELETE FROM `locales_gameobject` WHERE `entry` = 181013;
 DELETE FROM `locales_gameobject` WHERE `entry` = 181357;

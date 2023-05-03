@@ -265,21 +265,12 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                     extraPirateType[0] = NPC_PIRATES_1;
                     extraPirateType[1] = NPC_PIRATES_2;
 
-                    if (pirate1 = pGo->SummonCreature(NPC_PIRATES_1, -10119.85f, -4068.36f, 4.55f, 1.35f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate1 = pGo->SummonCreature(NPC_PIRATES_1, -10119.85f, -4068.36f, 4.55f, 1.35f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate1->AI()->AttackStart(pPlayer);
-                        pirate1->SetRespawnDelay(350000);
-                    }
-                    if (pirate2 = pGo->SummonCreature(NPC_PIRATES_2, -10109.80f, -4054.45f, 5.64f, 3.17f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate2 = pGo->SummonCreature(NPC_PIRATES_2, -10109.80f, -4054.45f, 5.64f, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate2->AI()->AttackStart(pPlayer);
-                        pirate2->SetRespawnDelay(350000);
-                    }
-                    if (pirate3 = pGo->SummonCreature(NPC_PIRATES_3, -10127.80f, -4047.04f, 4.50f, 5.07f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate3 = pGo->SummonCreature(NPC_PIRATES_3, -10127.80f, -4047.04f, 4.50f, 5.07f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate3->AI()->AttackStart(pPlayer);
-                        pirate3->SetRespawnDelay(350000);
-                    }
 
                     for (int & pirateEntry : extraPirateType)
                     {
@@ -296,16 +287,10 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                                 break;
                         }
                     }
-                    if (pirate4 = pGo->SummonCreature(extraPirateType[0], -10113.952148f, -4040.484375f, 5.174251f, 4.300828f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate4 = pGo->SummonCreature(extraPirateType[0], -10113.952148f, -4040.484375f, 5.174251f, 4.300828f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate4->AI()->AttackStart(pPlayer);
-                        pirate4->SetRespawnDelay(350000);
-                    }
-                    if (pirate5 = pGo->SummonCreature(extraPirateType[1], -10136.779297f, -4063.175049f, 4.787039f, 0.526417f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate5 = pGo->SummonCreature(extraPirateType[1], -10136.779297f, -4063.175049f, 4.787039f, 0.526417f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate5->AI()->AttackStart(pPlayer);
-                        pirate5->SetRespawnDelay(350000);
-                    }
                 }
             }
         }

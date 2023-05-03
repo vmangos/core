@@ -174,14 +174,13 @@ struct boss_baron_geddonAI : public ScriptedAI
                         break;
                     case 4:
                     case 5:
-                        Damage = 1500;
-                        break;
-                    case 6:
-                    case 7:
                         Damage = 2000;
                         break;
-                    case 8:
-                        Damage = 2500;
+                    case 6:
+                        Damage = 3000;
+                        break;
+                    case 7:
+                        Damage = 5000;
                         m_bInferno = false;
                         m_creature->ClearUnitState(UNIT_STAT_ROOT);
                         break;
