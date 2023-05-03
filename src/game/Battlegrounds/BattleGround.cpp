@@ -46,7 +46,7 @@ public:
         : i_msgtype(msgtype), i_textId(textId), i_source(source) {}
     void operator()(WorldPacket& data, int32 loc_idx)
     {
-        char const* text = sObjectMgr.GetBroadcastText(i_textId, loc_idx);
+        char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
 
         ObjectGuid sourceGuid = i_source ? i_source->GetObjectGuid() : ObjectGuid();
         std::string sourceName = i_source ? i_source->GetName() : "";
