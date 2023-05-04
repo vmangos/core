@@ -377,12 +377,12 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
 #else
     PSendSysMessage("Casting speed mod: %i", pTarget->GetInt32Value(UNIT_MOD_CAST_SPEED));
 #endif
-    PSendSysMessage("Base strenght: %g", pTarget->GetCreateStat(STAT_STRENGTH));
+    PSendSysMessage("Base strength: %g", pTarget->GetCreateStat(STAT_STRENGTH));
     PSendSysMessage("Base agility: %g", pTarget->GetCreateStat(STAT_AGILITY));
     PSendSysMessage("Base stamina: %g", pTarget->GetCreateStat(STAT_STAMINA));
     PSendSysMessage("Base intellect: %g", pTarget->GetCreateStat(STAT_INTELLECT));
     PSendSysMessage("Base spirit: %g", pTarget->GetCreateStat(STAT_SPIRIT));
-    PSendSysMessage("Total strenght: %g", pTarget->GetStat(STAT_STRENGTH));
+    PSendSysMessage("Total strength: %g", pTarget->GetStat(STAT_STRENGTH));
     PSendSysMessage("Total agility: %g", pTarget->GetStat(STAT_AGILITY));
     PSendSysMessage("Total stamina: %g", pTarget->GetStat(STAT_STAMINA));
     PSendSysMessage("Total intellect: %g", pTarget->GetStat(STAT_INTELLECT));
@@ -446,12 +446,12 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Frost spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_FROST));
     PSendSysMessage("Shadow spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Arcane spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_ARCANE));
-    PSendSysMessage("Positive strenght: %g", pPlayer->GetPosStat(STAT_STRENGTH));
+    PSendSysMessage("Positive strength: %g", pPlayer->GetPosStat(STAT_STRENGTH));
     PSendSysMessage("Positive agility: %g", pPlayer->GetPosStat(STAT_AGILITY));
     PSendSysMessage("Positive stamina: %g", pPlayer->GetPosStat(STAT_STAMINA));
     PSendSysMessage("Positive intellect: %g", pPlayer->GetPosStat(STAT_INTELLECT));
     PSendSysMessage("Positive spirit: %g", pPlayer->GetPosStat(STAT_SPIRIT));
-    PSendSysMessage("Negative strenght: %g", pPlayer->GetNegStat(STAT_STRENGTH));
+    PSendSysMessage("Negative strength: %g", pPlayer->GetNegStat(STAT_STRENGTH));
     PSendSysMessage("Negative agility: %g", pPlayer->GetNegStat(STAT_AGILITY));
     PSendSysMessage("Negative stamina: %g", pPlayer->GetNegStat(STAT_STAMINA));
     PSendSysMessage("Negative intellect: %g", pPlayer->GetNegStat(STAT_INTELLECT));
