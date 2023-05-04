@@ -63,6 +63,10 @@ enum BattleGroundTexts
     BCT_BG_AV_A_WINS                   = 7335,
     BCT_BG_AV_H_WINS                   = 7336,
 
+    BCT_BG_AV_START_ONE_MINUTE         = 10638,
+    BCT_BG_AV_START_HALF_MINUTE        = 10639,
+    BCT_BG_AV_HAS_BEGUN                = 10640,
+
     BCT_BG_WS_A_WINS                   = 9843,
     BCT_BG_WS_H_WINS                   = 9842,
 
