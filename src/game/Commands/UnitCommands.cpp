@@ -128,7 +128,7 @@ bool ChatHandler::HandleGPSCommand(char* args)
                     obj->GetMapId(), (mapEntry ? mapEntry->name : "<unknown>"),
                     zone_id, zoneName.c_str(), area_id, areaName.c_str(),
                     obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation(),
-                    cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), obj->GetInstanceId(),
+                    gx, gy, cell.CellX(), cell.CellY(), obj->GetInstanceId(),
                     zone_x, zone_y, ground_z, floor_z, have_map, have_vmap);
 
     if (GenericTransport* transport = obj->GetTransport())
