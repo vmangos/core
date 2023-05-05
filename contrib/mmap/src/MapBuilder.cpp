@@ -690,12 +690,6 @@ namespace MMAP
                 tileCfg.bmax[0] = config.bmin[0] + float((x + 1) * config.tileSize + config.borderSize) * config.cs;
                 tileCfg.bmax[2] = config.bmin[2] + float((y + 1) * config.tileSize + config.borderSize) * config.cs;
 
-                float tbmin[2], tbmax[2];
-                tbmin[0] = tileCfg.bmin[0];
-                tbmin[1] = tileCfg.bmin[2];
-                tbmax[0] = tileCfg.bmax[0];
-                tbmax[1] = tileCfg.bmax[2];
-
                 // NOSTALRIUS - MMAPS TILE GENERATION
                 /// 1. Alloc heightfield for walkable areas
                 tile.solid = rcAllocHeightfield();
@@ -764,11 +758,8 @@ namespace MMAP
                             for (int v = 0; v < 3; ++v) // Coordinate
                                 verts[3*c + v] = (5*tVerts[tri[c]*3 + v] + tVerts[tri[(c+1)%3]*3 + v] + tVerts[tri[(c+2)%3]*3 + v]) / 7;
                         // A triangle is undermap if all corners are undermap
-                        bool undermap1 = m_terrainBuilder->IsUnderMap(&verts[0]);
-                        bool undermap2 = m_terrainBuilder->IsUnderMap(&verts[3]);
-                        bool undermap3 = m_terrainBuilder->IsUnderMap(&verts[6]);
 
-                        if ((undermap1 + undermap2 + undermap3) == 3)
+                        if (m_terrainBuilder->IsUnderMap(&verts[0]) && m_terrainBuilder->IsUnderMap(&verts[3]) && m_terrainBuilder->IsUnderMap(&verts[6]))
                         {
                             areas[i] = 0;
                             continue;
