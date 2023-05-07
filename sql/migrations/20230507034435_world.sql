@@ -97,6 +97,7 @@ INSERT INTO `gameobject` VALUES (258806, 164726, 229, 108.036, -420.331, 110.954
 -- Add missing bonfires in the rooms near Blackrock Stadium
 INSERT INTO `gameobject` VALUES (260289, 136964, 229, 82.5879, -364.586, 116.859, 2.72271, 0, 0, 0.978148, 0.207912, 25, 25, 100, 1, 0, 0, 0, 10);
 INSERT INTO `gameobject` VALUES (260290, 136922, 229, 88.2152, -415.1, 110.957, 2.72271, 0, 0, 0.978148, 0.207912, 25, 25, 100, 1, 0, 0, 0, 10);
+INSERT INTO `gameobject` VALUES (260291, 136923, 229, 87.4498, -468.454, 116.887, 2.72271, 0, 0, 0.978148, 0.207912, 25, 25, 100, 1, 0, 0, 0, 10);
 
 
 -- End of migration.
