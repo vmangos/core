@@ -87,6 +87,13 @@ INSERT INTO `gameobject` VALUES (260288, 136963, 229, 107.69, -253.095, 91.5711,
 -- Drakkisath's Brand position
 UPDATE `gameobject` SET `position_x`=41.663, `position_y`=-286.199, `position_z`=110.96, `orientation`=3.49067, `rotation2`=-0.984807, `rotation3`=0.173652 WHERE `id`=179880;
 
+-- Move Blackrock Stadium second gate to correct position, already scripted
+-- No longer possible to bypass Blackrock Stadium
+UPDATE `gameobject` SET `position_x`=92.9595, `position_y`=-435.59, `position_z`=110.954, `orientation`=4.71239, `rotation2`=-0.707107, `rotation3`=0.707107 WHERE `id`=175186;
+-- Add missing gate for Blackrock Stadium, already scripted
+-- Now possible to enter Blackrock Stadium without jumping from balcony
+INSERT INTO `gameobject` VALUES (258806, 164726, 229, 108.036, -420.331, 110.954, 3.14159, 0, 0, 0, -1, 25, 25, 100, 0, 0, 0, 0, 10);
+
 
 -- End of migration.
 END IF;
