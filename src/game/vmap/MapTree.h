@@ -31,14 +31,14 @@ namespace VMAP
 
     struct GroupLocationInfo
     {
-        const GroupModel* hitModel = nullptr;
+        GroupModel const* hitModel = nullptr;
         int32 rootId = -1;
     };
 
     struct LocationInfo
     {
         LocationInfo() : hitInstance(nullptr), hitModel(nullptr), ground_Z(-G3D::inf()), rootId(-1) {};
-        const ModelInstance* hitInstance;
+        ModelInstance const* hitInstance;
         GroupModel const* hitModel;
         float ground_Z;
         int32 rootId;
