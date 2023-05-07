@@ -99,6 +99,11 @@ INSERT INTO `gameobject` VALUES (260289, 136964, 229, 82.5879, -364.586, 116.859
 INSERT INTO `gameobject` VALUES (260290, 136922, 229, 88.2152, -415.1, 110.957, 2.72271, 0, 0, 0.978148, 0.207912, 25, 25, 100, 1, 0, 0, 0, 10);
 INSERT INTO `gameobject` VALUES (260291, 136923, 229, 87.4498, -468.454, 116.887, 2.72271, 0, 0, 0.978148, 0.207912, 25, 25, 100, 1, 0, 0, 0, 10);
 
+-- Add missing exit gates at General Drakkisath
+INSERT INTO `gameobject` VALUES (260292, 175946, 229, 45.1933, -259.712, 106.533, 3.14159, 0, 0, -1, 0, 25, 25, 100, 1, 0, 0, 0, 10);
+UPDATE `gameobject_template` SET `faction`=114, `flags`=32 WHERE  `entry`=175947;
+INSERT INTO `gameobject` VALUES (260293, 175947, 229, 45.1933, -312.52, 106.533, 3.14159, 0, 0, -1, 0, 25, 25, 100, 1, 0, 0, 0, 10);
+
 
 -- End of migration.
 END IF;
