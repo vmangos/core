@@ -94,6 +94,10 @@ UPDATE `gameobject` SET `position_x`=92.9595, `position_y`=-435.59, `position_z`
 -- Now possible to enter Blackrock Stadium without jumping from balcony
 INSERT INTO `gameobject` VALUES (258806, 164726, 229, 108.036, -420.331, 110.954, 3.14159, 0, 0, 0, -1, 25, 25, 100, 0, 0, 0, 0, 10);
 
+-- Add missing bonfires in the rooms near Blackrock Stadium
+INSERT INTO `gameobject` VALUES (260289, 136964, 229, 82.5879, -364.586, 116.859, 2.72271, 0, 0, 0.978148, 0.207912, 25, 25, 100, 1, 0, 0, 0, 10);
+INSERT INTO `gameobject` VALUES (260290, 136922, 229, 88.2152, -415.1, 110.957, 2.72271, 0, 0, 0.978148, 0.207912, 25, 25, 100, 1, 0, 0, 0, 10);
+
 
 -- End of migration.
 END IF;
