@@ -1150,7 +1150,7 @@ bool Item::IsBindedNotWith(Player const* player) const
 void Item::AddToClientUpdateList()
 {
     if (Player* pl = GetOwner())
-        if (!pl->GetSession()->PlayerLogout())
+        if (pl->GetSession()->IsConnected() && !pl->GetSession()->PlayerLogout())
             pl->GetMap()->AddUpdateObject(this);
 }
 

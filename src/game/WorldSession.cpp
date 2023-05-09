@@ -275,10 +275,10 @@ bool WorldSession::ForcePlayerLogoutDelay()
         else if (sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
         {
             sLog.Player(this, LOG_CHAR, "LostSocket", LOG_LVL_BASIC, "");
-            GetPlayer()->OnDisconnected();
-            GetPlayer()->SaveToDB();
             SetDisconnectedSession();
             m_disconnectTimer = 120000;
+            GetPlayer()->OnDisconnected();
+            GetPlayer()->SaveToDB();
             return true;
         }
     }
