@@ -41,7 +41,7 @@ struct PInfoData
 {
     uint8 m_race = 0;
     uint8 m_class = 0;
-    uint32 m_accountId = 0;
+    uint32 accId = 0;
     uint32 m_money = 0;
     uint32 m_mailGoldInbox = 0;
     uint32 m_mailGoldOutbox = 0;
@@ -51,6 +51,7 @@ struct PInfoData
     uint32 m_securityFlag = 0;
     LocaleConstant m_locale = LOCALE_enUS;
     ObjectGuid m_targetGuid;
+    uint32 m_accountId;
     bool m_online = false;
 
     bool m_hasAccount = false;
