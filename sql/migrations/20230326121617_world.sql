@@ -13,7 +13,7 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=10596;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
  (1059601, 10596, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1059601, 0, 0, 'Mother Smolderweb - On Death - Cast Summon Spire Spiderling');
 
-DELETE FROM `creature_ai_scripts` WHERE `id`=1059601;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1059601, 1059603);
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1059601, 0, 0, 15, 16103, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mother Smolderweb - Cast Summon Spire Spiderling');
 
