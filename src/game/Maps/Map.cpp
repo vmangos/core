@@ -780,11 +780,11 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
     for (int step = 0; step < 2; step++)
     {
         for (int i = 0; i < nthreads; ++i)
-            m_cellThreads << [this, diff, now, i, nthreads](){
-                UpdateActiveCellsCallback(diff, now, i, nthreads+1, 0);
+            m_cellThreads << [this, diff, now, i, nthreads, step](){
+                UpdateActiveCellsCallback(diff, now, i, nthreads+1, step);
             };
         std::future<void> job = m_cellThreads->processWorkload();
-        UpdateActiveCellsCallback(diff, now, nthreads, nthreads+1, 0);
+        UpdateActiveCellsCallback(diff, now, nthreads, nthreads+1, step);
         if (job.valid())
             job.wait();
     }
