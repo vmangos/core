@@ -394,6 +394,7 @@ class BattleGround
         BattleGroundScoreMap::const_iterator GetPlayerScoresBegin() const { return m_playerScores.begin(); }
         BattleGroundScoreMap::const_iterator GetPlayerScoresEnd() const { return m_playerScores.end(); }
         uint32 GetPlayerScoresSize() const { return m_playerScores.size(); }
+        WorldPacket const* GetFinalScorePacket() const { return &m_finalScore; }
 
         void StartBattleGround();
         void StopBattleGround();
@@ -592,6 +593,7 @@ class BattleGround
         BattleGroundTypeId m_typeId;
         BattleGroundStatus m_status;
         BattleGroundWinner  m_winner;
+        WorldPacket m_finalScore;
 
         uint32 m_clientInstanceId;                          //the instance-id which is sent to the client and without any other internal use
         uint32 m_startTime;

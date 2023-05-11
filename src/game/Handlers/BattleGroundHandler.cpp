@@ -348,9 +348,14 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recv_data*/)
     if (!bg)
         return;
 
-    WorldPacket data;
-    sBattleGroundMgr.BuildPvpLogDataPacket(&data, bg);
-    SendPacket(&data);
+    if (bg->GetStatus() != STATUS_WAIT_LEAVE)
+    {
+        WorldPacket data;
+        sBattleGroundMgr.BuildPvpLogDataPacket(&data, bg);
+        SendPacket(&data);
+    }
+    else
+        SendPacket(bg->GetFinalScorePacket());
 }
 
 void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recv_data)
