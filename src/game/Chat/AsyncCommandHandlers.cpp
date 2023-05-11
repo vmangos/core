@@ -38,21 +38,20 @@
 void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, ObjectGuid& target_guid, std::string& name)
 {
     PInfoData* data = new PInfoData;
-    data->m_accountId = session->GetAccountId();
+    data->m_ownAccountId = session->GetAccountId();
     data->m_targetName = name;
 
     if (target)
     {
-        data->accId = target->GetSession()->GetAccountId();
-        data->m_money = target->GetMoney();
-        data->m_totalPlayedTime = target->GetTotalPlayedTime();
-        data->m_level = target->GetLevel();
-        data->m_latency = target->GetSession()->GetLatency();
-        data->m_locale = target->GetSession()->GetSessionDbcLocale();
+        data->m_targetGuid = target->GetObjectGuid();
         data->m_race = target->GetRace();
         data->m_class = target->GetClass();
-
-        data->m_targetGuid = target->GetObjectGuid();
+        data->m_level = target->GetLevel();
+        data->m_money = target->GetMoney();
+        data->m_totalPlayedTime = target->GetTotalPlayedTime();
+        data->m_accountId = target->GetSession()->GetAccountId();
+        data->m_latency = target->GetSession()->GetLatency();
+        data->m_locale = target->GetSession()->GetSessionDbcLocale();
         data->m_online = true;
 
         if (auto const warden = target->GetSession()->GetWarden())
@@ -86,7 +85,7 @@ void PInfoHandler::HandlePlayerLookupResult(QueryResult* result, PInfoData *data
     data->m_totalPlayedTime = fields[0].GetUInt32();
     data->m_level = fields[1].GetUInt32();
     data->m_money = fields[2].GetUInt32();
-    data->accId = fields[3].GetUInt32();
+    data->m_accountId = fields[3].GetUInt32();
     data->m_race = fields[4].GetUInt8();
     data->m_class = fields[5].GetUInt8();
 
@@ -128,13 +127,13 @@ void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder,
     // so this cannot be done in an async task
     LoginDatabase.AsyncPQueryUnsafe(&PInfoHandler::HandleAccountInfoResult, data,
         "SELECT `username`, `last_ip`, `last_login`, `locale`, `locked` FROM `account` WHERE `id` = '%u'",
-        data->accId);
+        data->m_accountId);
 }
 
 // Not threadsafe, executed in unsafe callback
 void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
 {
-    WorldSession* session = sWorld.FindSession(data->m_accountId);
+    WorldSession* session = sWorld.FindSession(data->m_ownAccountId);
     // Caller re-logged mid query. ChatHandler requires a player in the session
     if (!session || !session->GetPlayer())
     {
@@ -147,7 +146,7 @@ void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
     {
         Field* fields = result->Fetch();
         data->m_username = fields[0].GetCppString();
-        data->m_security = sAccountMgr.GetSecurity(data->accId);
+        data->m_security = sAccountMgr.GetSecurity(data->m_accountId);
         data->m_locale = LocaleConstant(fields[3].GetUInt8());
         data->m_securityFlag = fields[4].GetUInt8();
 
@@ -189,7 +188,7 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
         data->m_locale = LOCALE_enUS;
     ChatHandler cHandler(session);
 
-    data->m_twoFactorEnabled = data->m_securityFlag & 4 ? "Enabled" : "Disabled";
+    std::string twoFactorEnabled = data->m_securityFlag & 4 ? "Enabled" : "Disabled";
     if (!data->m_hasAccount)
     {
         data->m_username = cHandler.GetMangosString(LANG_ERROR);
@@ -202,10 +201,10 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
     cHandler.PSendSysMessage(LANG_PINFO_ACCOUNT, raceName, className,
         (data->m_online ? "" : cHandler.GetMangosString(LANG_OFFLINE)),
         nameLink.c_str(), data->m_targetGuid.GetCounter(), cHandler.playerLink(data->m_username).c_str(),
-        data->accId, sAccountMgr.IsAccountBanned(data->accId) ? ", banned" : "",
+        data->m_accountId, sAccountMgr.IsAccountBanned(data->m_accountId) ? ", banned" : "",
         data->m_security, cHandler.playerLink(data->m_lastIp).c_str(),
         sAccountMgr.IsIPBanned(data->m_lastIp) ? " [BANIP]" : "", data->m_lastLogin.c_str(),
-        data->m_latency, localeNames[data->m_locale], data->m_twoFactorEnabled.c_str());
+        data->m_latency, localeNames[data->m_locale], twoFactorEnabled.c_str());
 
     std::string timeStr = secsToTimeString(data->m_totalPlayedTime, true, true);
     uint32 money = data->m_money;
