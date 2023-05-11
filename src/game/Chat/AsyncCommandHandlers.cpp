@@ -43,6 +43,7 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
 
     if (target)
     {
+        data->accId = target->GetSession()->GetAccountId();
         data->m_money = target->GetMoney();
         data->m_totalPlayedTime = target->GetTotalPlayedTime();
         data->m_level = target->GetLevel();
@@ -85,7 +86,7 @@ void PInfoHandler::HandlePlayerLookupResult(QueryResult* result, PInfoData *data
     data->m_totalPlayedTime = fields[0].GetUInt32();
     data->m_level = fields[1].GetUInt32();
     data->m_money = fields[2].GetUInt32();
-    data->m_accountId = fields[3].GetUInt32();
+    data->accId = fields[3].GetUInt32();
     data->m_race = fields[4].GetUInt8();
     data->m_class = fields[5].GetUInt8();
 
@@ -127,7 +128,7 @@ void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder,
     // so this cannot be done in an async task
     LoginDatabase.AsyncPQueryUnsafe(&PInfoHandler::HandleAccountInfoResult, data,
         "SELECT `username`, `last_ip`, `last_login`, `locale`, `locked` FROM `account` WHERE `id` = '%u'",
-        data->m_accountId);
+        data->accId);
 }
 
 // Not threadsafe, executed in unsafe callback
@@ -146,7 +147,7 @@ void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
     {
         Field* fields = result->Fetch();
         data->m_username = fields[0].GetCppString();
-        data->m_security = sAccountMgr.GetSecurity(data->m_accountId);
+        data->m_security = sAccountMgr.GetSecurity(data->accId);
         data->m_locale = LocaleConstant(fields[3].GetUInt8());
         data->m_securityFlag = fields[4].GetUInt8();
 
@@ -201,7 +202,7 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
     cHandler.PSendSysMessage(LANG_PINFO_ACCOUNT, raceName, className,
         (data->m_online ? "" : cHandler.GetMangosString(LANG_OFFLINE)),
         nameLink.c_str(), data->m_targetGuid.GetCounter(), cHandler.playerLink(data->m_username).c_str(),
-        data->m_accountId, sAccountMgr.IsAccountBanned(data->m_accountId) ? ", banned" : "",
+        data->accId, sAccountMgr.IsAccountBanned(data->accId) ? ", banned" : "",
         data->m_security, cHandler.playerLink(data->m_lastIp).c_str(),
         sAccountMgr.IsIPBanned(data->m_lastIp) ? " [BANIP]" : "", data->m_lastLogin.c_str(),
         data->m_latency, localeNames[data->m_locale], data->m_twoFactorEnabled.c_str());
