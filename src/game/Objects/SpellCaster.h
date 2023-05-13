@@ -390,9 +390,9 @@ public:
     void EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
     void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
 
-    void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut);
-    DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex);
-    DynamicObject* GetDynObject(uint32 spellId);
+    void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut) const;
+    DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex) const;
+    DynamicObject* GetDynObject(uint32 spellId) const;
     void AddDynObject(DynamicObject* dynObj);
     void RemoveDynObject(uint32 spellid);
     void RemoveDynObjectWithGUID(ObjectGuid guid) { m_dynObjGUIDs.remove(guid); }

@@ -39,27 +39,34 @@ enum
 
 struct PInfoData
 {
+    // GM who used the command
+    // needed for callback since command is async
+    uint32 m_ownAccountId = 0;
+
+    // Character data
+    ObjectGuid m_targetGuid;
+    std::string m_targetName;
     uint8 m_race = 0;
     uint8 m_class = 0;
-    uint32 m_accountId = 0;
+    uint32 m_level = 0;
     uint32 m_money = 0;
     uint32 m_mailGoldInbox = 0;
     uint32 m_mailGoldOutbox = 0;
     uint32 m_totalPlayedTime = 0;
-    uint32 m_level = 0;
     uint32 m_latency = 0;
-    uint32 m_securityFlag = 0;
-    LocaleConstant m_locale = LOCALE_enUS;
-    ObjectGuid m_targetGuid;
     bool m_online = false;
 
-    bool m_hasAccount = false;
-    std::string m_twoFactorEnabled;
+    // Account data
+    uint32 m_accountId = 0;
     std::string m_username;
-    std::string m_lastIp;
+    LocaleConstant m_locale = LOCALE_enUS;
     AccountTypes m_security = SEC_PLAYER;
+    uint32 m_securityFlag = 0;
+    std::string m_lastIp;
     std::string m_lastLogin;
-    std::string m_targetName;
+    bool m_hasAccount = false;
+
+    // Warden data
     std::string m_wardenClock;
     std::string m_wardenFingerprint;
     std::string m_wardenHypervisors;

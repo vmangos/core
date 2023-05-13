@@ -275,10 +275,10 @@ bool WorldSession::ForcePlayerLogoutDelay()
         else if (sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
         {
             sLog.Player(this, LOG_CHAR, "LostSocket", LOG_LVL_BASIC, "");
-            GetPlayer()->OnDisconnected();
-            GetPlayer()->SaveToDB();
             SetDisconnectedSession();
             m_disconnectTimer = 120000;
+            GetPlayer()->OnDisconnected();
+            GetPlayer()->SaveToDB();
             return true;
         }
     }
@@ -356,7 +356,7 @@ bool WorldSession::Update(PacketFilter& updater)
 
 bool WorldSession::CanProcessPackets() const
 {
-    return ((m_socket && !m_socket->IsClosed()) || (_player && sPlayerBotMgr.IsChatBot(_player->GetGUIDLow())));
+    return ((m_socket && !m_socket->IsClosed()) || (_player && (m_bot || sPlayerBotMgr.IsChatBot(_player->GetGUIDLow()))));
 }
 
 void WorldSession::ProcessPackets(PacketFilter& updater)

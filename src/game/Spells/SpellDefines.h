@@ -824,7 +824,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_BLOCKABLE_SPELL            = 0x00000008,            // 3 Only dmg class melee in 3.1.3
     SPELL_ATTR_EX3_IGNORE_RESURRECTION_TIMER  = 0x00000010,            // 4 you don't have to wait to be resurrected with these spells. Druid Rebirth only this spell have this flag
     SPELL_ATTR_EX3_UNK5                       = 0x00000020,            // 5
-    SPELL_ATTR_EX3_UNK6                       = 0x00000040,            // 6
+    SPELL_ATTR_EX3_NO_AVOIDANCE               = 0x00000040,            // 6 Persistent Area Aura not removed on leaving radius
     SPELL_ATTR_EX3_STACK_FOR_DIFF_CASTERS     = 0x00000080,            // 7 create a separate (de)buff stack for each caster
     SPELL_ATTR_EX3_TARGET_ONLY_PLAYER         = 0x00000100,            // 8 can target only players
     SPELL_ATTR_EX3_NOT_A_PROC                 = 0x00000200,            // 9 aura periodic trigger is not evaluated as triggered (official meaning of proc)

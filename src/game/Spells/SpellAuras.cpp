@@ -859,23 +859,22 @@ void PersistentAreaAura::Update(uint32 diff)
     // remove the aura if its caster or the dynamic object causing it was removed
     // or if the target moves too far from the dynamic object
 
-    bool remove = false;
-    uint32 spellId = GetId();
-    // Nostalrius: piege explosif. Ne doit pas etre retire lorsqu'on sort de la zone.
-    if (spellId != 13812 && spellId != 14314 && spellId != 14315)
+    bool remove;
+
+    // Explosive Trap Effect should not be removed on leaving radius.
+    if (remove = !GetSpellProto()->HasAttribute(SPELL_ATTR_EX3_NO_AVOIDANCE)) // assignment
     {
-        remove = true;
-        if (SpellCaster* caster = GetRealCaster())
+        if (SpellCaster* pCaster = GetRealCaster())
         {
             std::vector<DynamicObject*> dynObjs;
-            caster->GetDynObjects(spellId, GetEffIndex(), dynObjs);
-            Unit* pUnitTarget = GetTarget();
+            pCaster->GetDynObjects(GetId(), GetEffIndex(), dynObjs);
+            Unit* pTarget = GetTarget();
             for (DynamicObject* obj : dynObjs)
             {
-                if (pUnitTarget->IsWithinDistInMap(obj, obj->GetRadius()))
+                if (pTarget->IsWithinDistInMap(obj, obj->GetRadius()))
                     remove = false;
                 else
-                    obj->RemoveAffected(pUnitTarget);           // let later reapply if target return to range
+                    obj->RemoveAffected(pTarget);           // let later reapply if target return to range
             }
         }
     }
@@ -6936,22 +6935,17 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
     if (m_removeMode != AURA_REMOVE_BY_STACK)
         CleanupTriggeredSpells();
 
-    Unit* caster = GetCaster();
+    SpellCaster* caster = GetRealCaster();
 
     if (IsPersistent())
     {
-        if (SpellCaster* realCaster = GetRealCaster())
+        if (caster)
         {
-            DynamicObject *dynObj = realCaster->GetDynObject(GetId());
+            DynamicObject *dynObj = caster->GetDynObject(GetId());
             if (dynObj)
                 dynObj->RemoveAffected(m_target);
         }
     }
-
-    //passive auras do not get put in slots
-    // Note: but totem can be not accessible for aura target in time remove (to far for find in grid)
-    //if (m_isPassive && !(caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem()))
-    //    return false;
 
     uint8 slot = GetAuraSlot();
 
@@ -6961,7 +6955,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
             return;
         SetAura(slot, true);
         SetAuraFlag(slot, false);
-        SetAuraLevel(slot, caster ? caster->GetLevel() : sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
+        SetAuraLevel(slot, 0);
     }
 
     // unregister aura diminishing (and store last time)

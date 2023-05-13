@@ -1397,18 +1397,20 @@ bool MovementAnticheat::IsTeleportAllowed(MovementInfo const& movementInfo) cons
     float const distance = GetDistance3D(me->GetPosition(), movementInfo.pos);
     float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE) * std::max(1.0f, me->GetSpeedRate(GetMoveTypeForMovementInfo(movementInfo)) * 0.2f);
 
-    // Exclude elevators
-    uint32 destZoneId = 0;
-    uint32 destAreaId = 0;
-    me->GetTerrain()->GetZoneAndAreaId(destZoneId, destAreaId, movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z);
-    if (destZoneId == me->GetZoneId() && destAreaId == me->GetAreaId())
+    if (distance > maxDistance)
     {
+        // Exclude elevators
+        
         // Undercity Lift
-        if ((me->GetZoneId() == 1497 && me->GetAreaId() == 1497) ||
+        if ((me->GetCachedZoneId() == 1497 && me->GetCachedAreaId() == 1497) ||
+        // Deeprun Tram
+           (me->GetCachedZoneId() == 2257) || 
         // Thousand Needles Lift
-           (me->GetZoneId() == 2257 || (me->GetZoneId() == 400 && me->GetAreaId() == 485)))
-            maxDistance = std::max(maxDistance, ALLOWED_TRANSPORT_DISTANCE);
+           (me->GetCachedZoneId() == 400 && me->GetCachedAreaId() == 485))
+            return distance < ALLOWED_TRANSPORT_DISTANCE;
+
+        return false;
     }
 
-    return distance < maxDistance;
+    return true;
 }

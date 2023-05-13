@@ -843,6 +843,9 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
                 data << uint32(price);
                 data << uint32(pProto->MaxDurability);
                 data << uint32(pProto->BuyCount);
+
+                if (count >= MAX_VENDOR_ITEMS)
+                    break;
             }
         }
     }

@@ -808,11 +808,7 @@ enum MangosStrings
     LANG_BG_AV_NODE_TOWER_FROST_W       = 781,
     LANG_BG_AV_NODE_GRAVE_FROST_HUT     = 782,
 
-//                                      = 783, not used
-    LANG_BG_AV_START_ONE_MINUTE         = 784,
-    LANG_BG_AV_START_HALF_MINUTE        = 785,
-    LANG_BG_AV_HAS_BEGUN                = 786,
-
+    //                                    783 - 788 not used
     LANG_BG_AV_H_GENERAL_DEAD           = 789,
     LANG_BG_AV_A_GENERAL_DEAD           = 790,
     // Room for battleground/arena strings 791-799 not used

@@ -63,6 +63,10 @@ enum BattleGroundTexts
     BCT_BG_AV_A_WINS                   = 7335,
     BCT_BG_AV_H_WINS                   = 7336,
 
+    BCT_BG_AV_START_ONE_MINUTE         = 10638,
+    BCT_BG_AV_START_HALF_MINUTE        = 10639,
+    BCT_BG_AV_HAS_BEGUN                = 10640,
+
     BCT_BG_WS_A_WINS                   = 9843,
     BCT_BG_WS_H_WINS                   = 9842,
 
@@ -390,6 +394,7 @@ class BattleGround
         BattleGroundScoreMap::const_iterator GetPlayerScoresBegin() const { return m_playerScores.begin(); }
         BattleGroundScoreMap::const_iterator GetPlayerScoresEnd() const { return m_playerScores.end(); }
         uint32 GetPlayerScoresSize() const { return m_playerScores.size(); }
+        WorldPacket const* GetFinalScorePacket() const { return &m_finalScore; }
 
         void StartBattleGround();
         void StopBattleGround();
@@ -588,6 +593,7 @@ class BattleGround
         BattleGroundTypeId m_typeId;
         BattleGroundStatus m_status;
         BattleGroundWinner  m_winner;
+        WorldPacket m_finalScore;
 
         uint32 m_clientInstanceId;                          //the instance-id which is sent to the client and without any other internal use
         uint32 m_startTime;

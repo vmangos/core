@@ -82,7 +82,8 @@ public:
     }
 
     virtual void OnPacketReceived(WorldPacket const* packet) override;
-    virtual void SendFakePacket(uint16 opcode) override;
+    void SendBattlefieldPortPacket();
+    void SendBattlemasterJoinPacket(uint8 battlegroundId);
 
     void AutoAssignRole();
     void PopulateSpellData();

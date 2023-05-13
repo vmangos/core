@@ -7323,6 +7323,65 @@ AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
     return nullptr;
 }
 
+void ObjectMgr::LoadAreaTriggerLocales()
+{
+    m_AreaTriggerLocaleMap.clear();                           // need for reload case
+
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `message_loc1`, `message_loc2`, `message_loc3`, `message_loc4`, `message_loc5`, `message_loc6`, `message_loc7`, `message_loc8` FROM `locales_areatrigger`"));
+
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 areatrigger locale strings. DB table `locales_areatrigger` is empty.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        bar.step();
+        Field* fields = result->Fetch();
+
+        uint32 entry = fields[0].GetUInt32();
+
+        if (!GetAreaTrigger(entry))
+        {
+            if (!IsExistingAreaTriggerId(entry))
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `locales_areatrigger` has data for nonexistent areatrigger entry %u, skipped.", entry);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM `locales_areatrigger` WHERE `entry` = %u;", entry);
+            }
+            continue;
+        }
+
+        AreaTriggerLocale& data = m_AreaTriggerLocaleMap[entry];
+
+        for (int i = 1; i < MAX_LOCALE; ++i)
+        {
+            std::string str = fields[i].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    if ((int32)data.message.size() <= idx)
+                        data.message.resize(idx + 1);
+
+                    data.message[idx] = str;
+                }
+            }
+        }
+
+    } while (result->NextRow());
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %lu areatrigger locale strings", (unsigned long)m_AreaTriggerLocaleMap.size());
+}
+
 void ObjectMgr::PackGroupIds()
 {
     // this routine renumbers groups in such a way so they start from 1 and go up
@@ -10109,8 +10168,6 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
         itr.second.Clear();
     vendorList.clear();
 
-    std::set<uint32> skip_vendors;
-
     std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `item`, `maxcount`, `incrtime`, `itemflags`, `condition_id` FROM %s WHERE (`item` NOT IN (SELECT `entry` FROM `forbidden_items` WHERE (`after_or_before` = 0 && `patch` <= %u) || (`after_or_before` = 1 && `patch` >= %u))) ORDER BY `entry`, `slot`", tableName, sWorld.GetWowPatch(), sWorld.GetWowPatch()));
     if (!result)
     {
@@ -10137,7 +10194,7 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
         uint32 itemflags    = fields[4].GetUInt32();
         uint32 conditionId  = fields[5].GetUInt32();
 
-        if (!IsVendorItemValid(isTemplates, tableName, entry, item_id, maxcount, incrtime, conditionId, nullptr, &skip_vendors))
+        if (!IsVendorItemValid(isTemplates, tableName, entry, item_id, maxcount, incrtime, conditionId, nullptr))
             continue;
 
         VendorItemData& vList = vendorList[entry];
@@ -10552,7 +10609,7 @@ bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item)
     return true;
 }
 
-bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item_id, uint32 maxcount, uint32 incrtime, uint32 conditionId, Player* pl, std::set<uint32>* skip_vendors) const
+bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item_id, uint32 maxcount, uint32 incrtime, uint32 conditionId, Player* pl) const
 {
     char const* idStr = isTemplate ? "vendor template" : "vendor";
     CreatureInfo const* cInfo = nullptr;
@@ -10647,13 +10704,13 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     uint32 countItems = vItems ? vItems->GetItemCount() : 0;
     countItems += tItems ? tItems->GetItemCount() : 0;
 
-    if (countItems >= MAX_VENDOR_ITEMS)
+    if (countItems >= UINT8_MAX)
     {
         if (pl)
             ChatHandler(pl).SendSysMessage(LANG_COMMAND_ADDVENDORITEMITEMS);
         else
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has too many items (%u >= %i) for %s %u, ignoring",
-                            tableName, countItems, MAX_VENDOR_ITEMS, idStr, vendor_entry);
+                            tableName, countItems, UINT8_MAX, idStr, vendor_entry);
         return false;
     }
 
@@ -11369,7 +11426,8 @@ void ObjectMgr::LoadMailTemplate()
 char const* ObjectMgr::GetMailTextTemplate(uint32 id, LocaleConstant locale_idx)
 {
     if (MailTemplateEntry const* pTemplate = sMailTemplateStorage.LookupEntry<MailTemplateEntry>(id))
-        return pTemplate->subject[locale_idx];
+        if (locale_idx < (sizeof(pTemplate->subject) / sizeof(char*)))
+            return pTemplate->subject[locale_idx];
 
     return "Missing mail text template!";
 }
