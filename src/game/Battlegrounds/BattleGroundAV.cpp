@@ -33,9 +33,9 @@
 BattleGroundAV::BattleGroundAV()
 {
     m_startMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
-    m_startMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_AV_START_ONE_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_AV_START_HALF_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_AV_HAS_BEGUN;
+    m_startMessageIds[BG_STARTING_EVENT_SECOND] = BCT_BG_AV_START_ONE_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = BCT_BG_AV_START_HALF_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = BCT_BG_AV_HAS_BEGUN;
 }
 
 BattleGroundAV::~BattleGroundAV()
@@ -783,8 +783,6 @@ void BattleGroundAV::UpdateScore(BattleGroundTeamIndex teamIdx, int32 points)
         }
         else if (!m_isInformedNearLose[teamIdx] && m_teamScores[teamIdx] < BG_AV_SCORE_NEAR_LOSE)
         {
-            // SendMessageToAll((teamIdx == BG_TEAM_HORDE) ? LANG_BG_AV_H_NEAR_LOSE : LANG_BG_AV_A_NEAR_LOSE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-            // PlaySoundToAll(BG_AV_SOUND_NEAR_LOSE);
             m_isInformedNearLose[teamIdx] = true;
         }
     }

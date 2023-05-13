@@ -809,6 +809,7 @@ enum OpcodesList
     SMSG_GHOSTEE_GONE                               = 0x326,
     CMSG_GM_UPDATE_TICKET_STATUS                    = 0x327,
     SMSG_GM_TICKET_STATUS_UPDATE                    = 0x328,
+    MSG_SET_DUNGEON_DIFFICULTY                      = 0x329,
     CMSG_GMSURVEY_SUBMIT                            = 0x32A,
     SMSG_UPDATE_INSTANCE_OWNERSHIP                  = 0x32B,
     CMSG_IGNORE_KNOCKBACK_CHEAT                     = 0x32C,

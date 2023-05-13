@@ -50,7 +50,6 @@ public:
     void OnPlayerLogin() final;
     void UpdateAI(uint32 const diff) final;
     void OnPacketReceived(WorldPacket const* packet) final;
-    void SendFakePacket(uint16 opcode) final;
     void MovementInform(uint32 MovementType, uint32 Data = 0) final;
 
     bool DrinkAndEat();

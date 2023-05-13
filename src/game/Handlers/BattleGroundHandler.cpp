@@ -348,9 +348,14 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recv_data*/)
     if (!bg)
         return;
 
-    WorldPacket data;
-    sBattleGroundMgr.BuildPvpLogDataPacket(&data, bg);
-    SendPacket(&data);
+    if (bg->GetStatus() != STATUS_WAIT_LEAVE)
+    {
+        WorldPacket data;
+        sBattleGroundMgr.BuildPvpLogDataPacket(&data, bg);
+        SendPacket(&data);
+    }
+    else
+        SendPacket(bg->GetFinalScorePacket());
 }
 
 void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recv_data)
@@ -663,6 +668,10 @@ void WorldSession::SendBattleGroundJoinError(uint8 err)
             return;
             break;
     }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     ChatHandler::BuildChatPacket(data, CHAT_MSG_BG_SYSTEM_NEUTRAL, GetMangosString(msg), LANG_UNIVERSAL);
+#else
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, GetMangosString(msg), LANG_UNIVERSAL);
+#endif
     SendPacket(&data);
 }

@@ -224,6 +224,11 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_output(ACE_HANDLE)
         return -1;
     else if (n == -1)
     {
+#ifdef _WIN32
+        if (WSAGetLastError() == WSAEWOULDBLOCK)
+            return schedule_wakeup_output(lock);
+#endif
+
         if (errno == EWOULDBLOCK || errno == EAGAIN)
             return schedule_wakeup_output(lock);
 

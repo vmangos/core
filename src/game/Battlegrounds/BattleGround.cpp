@@ -39,6 +39,25 @@
 
 namespace MaNGOS
 {
+class BattleGroundBroadcastBuilder
+{
+public:
+    BattleGroundBroadcastBuilder(ChatMsg msgtype, int32 textId, Player const* source)
+        : i_msgtype(msgtype), i_textId(textId), i_source(source) {}
+    void operator()(WorldPacket& data, int32 loc_idx)
+    {
+        char const* text = sObjectMgr.GetBroadcastText(i_textId, loc_idx);
+
+        ObjectGuid sourceGuid = i_source ? i_source->GetObjectGuid() : ObjectGuid();
+        std::string sourceName = i_source ? i_source->GetName() : "";
+        ChatHandler::BuildChatPacket(data, i_msgtype, text, LANG_UNIVERSAL, CHAT_TAG_NONE, sourceGuid, sourceName.c_str(), sourceGuid, sourceName.c_str());
+    }
+private:
+    ChatMsg i_msgtype;
+    int32 i_textId;
+    Player const* i_source;
+};
+
 class BattleGroundChatBuilder
 {
 public:
@@ -222,9 +241,9 @@ BattleGround::BattleGround()
     m_startDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
     //we must set to some default existing values
     m_startMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
-    m_startMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
+    m_startMessageIds[BG_STARTING_EVENT_SECOND] = BCT_BG_WS_START_ONE_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = BCT_BG_WS_START_HALF_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = BCT_BG_WS_HAS_BEGUN;
 }
 
 BattleGround::~BattleGround()
@@ -347,19 +366,31 @@ void BattleGround::Update(uint32 diff)
             SetStartDelayTime(m_startDelayTimes[BG_STARTING_EVENT_FIRST]);
             //first start warning - 2 or 1 minute, only if defined
             if (m_startMessageIds[BG_STARTING_EVENT_FIRST])
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 SendMessageToAll(m_startMessageIds[BG_STARTING_EVENT_FIRST], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#else
+                DoOrSimulateScriptTextForMap(m_startMessageIds[BG_STARTING_EVENT_FIRST], GetHeraldEntry(), GetBgMap());
+#endif
         }
         // After 1 minute or 30 seconds, warning is signalled
         else if (GetStartDelayTime() <= m_startDelayTimes[BG_STARTING_EVENT_SECOND] && !(m_events & BG_STARTING_EVENT_2))
         {
             m_events |= BG_STARTING_EVENT_2;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             SendMessageToAll(m_startMessageIds[BG_STARTING_EVENT_SECOND], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#else
+            DoOrSimulateScriptTextForMap(m_startMessageIds[BG_STARTING_EVENT_SECOND], GetHeraldEntry(), GetBgMap());
+#endif
         }
         // After 30 or 15 seconds, warning is signalled
         else if (GetStartDelayTime() <= m_startDelayTimes[BG_STARTING_EVENT_THIRD] && !(m_events & BG_STARTING_EVENT_3))
         {
             m_events |= BG_STARTING_EVENT_3;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             SendMessageToAll(m_startMessageIds[BG_STARTING_EVENT_THIRD], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#else
+            DoOrSimulateScriptTextForMap(m_startMessageIds[BG_STARTING_EVENT_THIRD], GetHeraldEntry(), GetBgMap());
+#endif
         }
         // delay expired (atfer 2 or 1 minute)
         else if (GetStartDelayTime() <= 0 && !(m_events & BG_STARTING_EVENT_4))
@@ -370,7 +401,11 @@ void BattleGround::Update(uint32 diff)
 
             ReturnPlayersToHomeGY();
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             SendMessageToAll(m_startMessageIds[BG_STARTING_EVENT_FOURTH], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#else
+            DoOrSimulateScriptTextForMap(m_startMessageIds[BG_STARTING_EVENT_FOURTH], GetHeraldEntry(), GetBgMap());
+#endif
             SetStatus(STATUS_IN_PROGRESS);
             SetStartDelayTime(m_startDelayTimes[BG_STARTING_EVENT_FOURTH]);
 
@@ -571,6 +606,32 @@ void BattleGround::UpdateWorldStateForPlayer(uint32 field, uint32 value, Player*
     source->GetSession()->SendPacket(&data);
 }
 
+int32 BattleGround::GetWinnerText(Team winner) const
+{
+    switch (GetTypeID())
+    {
+        case BATTLEGROUND_AV:
+            return (winner == HORDE ? BCT_BG_AV_H_WINS : BCT_BG_AV_A_WINS);
+        case BATTLEGROUND_WS:
+            return (winner == HORDE ? BCT_BG_WS_H_WINS : BCT_BG_WS_A_WINS);
+        case BATTLEGROUND_AB:
+            return (winner == HORDE ? BCT_BG_AB_H_WINS : BCT_BG_AB_A_WINS);
+    }
+    return 0;
+}
+
+int32 BattleGround::GetHeraldEntry() const
+{
+    switch (GetTypeID())
+    {
+        case BATTLEGROUND_AV:
+            return NPC_AV_HERALD;
+        case BATTLEGROUND_WS:
+            return NPC_WSG_HERALD;
+    }
+    return 0;
+}
+
 void BattleGround::EndBattleGround(Team winner)
 {
     uint32 bgTypeID = BATTLEGROUND_TYPE_NONE;
@@ -581,30 +642,25 @@ void BattleGround::EndBattleGround(Team winner)
     RemoveFromBGFreeSlotQueue();
 
     WorldPacket data;
-    int32 winmsg_id = 0;
 
     if (winner == ALLIANCE)
     {
-        winmsg_id = LANG_BG_A_WINS;
-
         PlaySoundToAll(SOUND_ALLIANCE_WINS);                // alliance wins sound
-
         SetWinner(WINNER_ALLIANCE);
     }
     else if (winner == HORDE)
     {
-        winmsg_id = LANG_BG_H_WINS;
-
         PlaySoundToAll(SOUND_HORDE_WINS);                   // horde wins sound
-
         SetWinner(WINNER_HORDE);
     }
     else
         SetWinner(WINNER_NONE);
 
     SetStatus(STATUS_WAIT_LEAVE);
-    //we must set it this way, because end time is sent in packet!
-    m_endTime = TIME_TO_AUTOREMOVE;
+    SetEndTime(TIME_TO_AUTOREMOVE);
+
+    if (m_finalScore.empty())
+        sBattleGroundMgr.BuildPvpLogDataPacket(&m_finalScore, this);
 
     for (const auto& itr : m_players)
     {
@@ -645,8 +701,8 @@ void BattleGround::EndBattleGround(Team winner)
 
         BlockMovement(pPlayer);
 
-        sBattleGroundMgr.BuildPvpLogDataPacket(&data, this);
-        pPlayer->GetSession()->SendPacket(&data);
+        // Send final scoreboard
+        pPlayer->GetSession()->SendPacket(&m_finalScore);
 
         BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BgQueueTypeId(GetTypeID());
         sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, pPlayer->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime());
@@ -684,8 +740,12 @@ void BattleGround::EndBattleGround(Team winner)
             GetInstanceID(), GetTypeID(), GetStartTime() / 1000, team);
     }
 
-    if (winmsg_id)
-        SendMessageToAll(winmsg_id, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+    if (int32 winTextId = GetWinnerText(winner))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+        SendMessageToAll(winTextId, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#else
+        DoOrSimulateScriptTextForMap(winTextId, GetHeraldEntry(), GetBgMap());
+#endif
 }
 
 uint32 BattleGround::GetBonusHonorFromKill(uint32 kills) const
@@ -896,12 +956,12 @@ void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool transport, bool sen
             // a player has left the battleground, so there are free slots -> add to queue
             AddToBGFreeSlotQueue();
             sBattleGroundMgr.ScheduleQueueUpdate(bgQueueTypeId, bgTypeId, GetBracketId());
-        }
 
-        // Let others know
-        WorldPacket data;
-        sBattleGroundMgr.BuildPlayerLeftBattleGroundPacket(&data, guid);
-        SendPacketToTeam(team, &data, pPlayer, false);
+            // Let others know
+            WorldPacket data;
+            sBattleGroundMgr.BuildPlayerLeftBattleGroundPacket(&data, guid);
+            SendPacketToTeam(team, &data, pPlayer, false);
+        }
     }
 
     if (pPlayer)
@@ -1508,8 +1568,8 @@ bool BattleGround::DelObject(uint32 type)
 
 void BattleGround::SendMessageToAll(int32 entry, ChatMsg type, Player const* source)
 {
-    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry, source);
-    MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundChatBuilder> bg_do(bg_builder);
+    MaNGOS::BattleGroundBroadcastBuilder bg_builder(type, entry, source);
+    MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundBroadcastBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
 
@@ -1562,6 +1622,9 @@ void BattleGround::EndNow()
     RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
     SetEndTime(0);
+
+    if (m_finalScore.empty())
+        sBattleGroundMgr.BuildPvpLogDataPacket(&m_finalScore, this);
 }
 
 /*

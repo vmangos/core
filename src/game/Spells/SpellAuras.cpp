@@ -48,6 +48,7 @@
 #include "MoveSpline.h"
 #include "MovementPacketSender.h"
 #include "ZoneScript.h"
+#include "LoveIsInTheAir.h"
 
 using namespace Spells;
 
@@ -858,23 +859,22 @@ void PersistentAreaAura::Update(uint32 diff)
     // remove the aura if its caster or the dynamic object causing it was removed
     // or if the target moves too far from the dynamic object
 
-    bool remove = false;
-    uint32 spellId = GetId();
-    // Nostalrius: piege explosif. Ne doit pas etre retire lorsqu'on sort de la zone.
-    if (spellId != 13812 && spellId != 14314 && spellId != 14315)
+    bool remove;
+
+    // Explosive Trap Effect should not be removed on leaving radius.
+    if (remove = !GetSpellProto()->HasAttribute(SPELL_ATTR_EX3_NO_AVOIDANCE)) // assignment
     {
-        remove = true;
-        if (SpellCaster* caster = GetRealCaster())
+        if (SpellCaster* pCaster = GetRealCaster())
         {
             std::vector<DynamicObject*> dynObjs;
-            caster->GetDynObjects(spellId, GetEffIndex(), dynObjs);
-            Unit* pUnitTarget = GetTarget();
+            pCaster->GetDynObjects(GetId(), GetEffIndex(), dynObjs);
+            Unit* pTarget = GetTarget();
             for (DynamicObject* obj : dynObjs)
             {
-                if (pUnitTarget->IsWithinDistInMap(obj, obj->GetRadius()))
+                if (pTarget->IsWithinDistInMap(obj, obj->GetRadius()))
                     remove = false;
                 else
-                    obj->RemoveAffected(pUnitTarget);           // let later reapply if target return to range
+                    obj->RemoveAffected(pTarget);           // let later reapply if target return to range
             }
         }
     }
@@ -1819,6 +1819,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     {
                         m_isPeriodic = true;
                         m_modifier.periodictime = 3000;
+                        break;
+                    }
+                    case 24984: // Murloc Critter Dance
+                    case 25165:
+                    {
+                        target->HandleEmoteCommand(EMOTE_STATE_DANCE);
                         break;
                     }
                 }
@@ -4360,24 +4366,47 @@ void Aura::HandlePeriodicTriggerSpell(bool apply, bool /*Real*/)
 
     Unit* target = GetTarget();
 
-    if (!apply)
+    if (apply)
     {
         switch (GetId())
         {
-            case 23620:                                     // Burning Adrenaline
+            case 26869: // Amorous (Love is in the Air)
+            {
+                if (Creature* pCreature = target->ToCreature())
+                {
+                    if (uint32 gossipMenuId = GetLoveIsInTheAirGossipForCreature(pCreature->GetEntry(), pCreature->GetGender()))
+                    {
+                        pCreature->SetDefaultGossipMenuId(gossipMenuId);
+                        pCreature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    }
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        switch (GetId())
+        {
+            case 23620: // Burning Adrenaline
+            {
                 if (m_removeMode == AURA_REMOVE_BY_DEATH)
                     target->CastSpell(target, 23478, true);
-                return;
-                /*
-                this is not needed. Might have been in the past, but if functions correct without this hack now.
-            case 29213:                                     // Curse of the Plaguebringer
-                if (m_removeMode != AURA_REMOVE_BY_DISPEL)
-                    // Cast Wrath of the Plaguebringer if not dispelled
-                    target->CastSpell(target, 29214, true, nullptr, this);
-                return;
-                */
-            default:
                 break;
+            }
+            case 26869: // Amorous (Love is in the Air)
+            {
+                if (Creature* pCreature = target->ToCreature())
+                {
+                    if (CreatureInfo const* pInfo = pCreature->GetCreatureInfo())
+                    {
+                        pCreature->SetDefaultGossipMenuId(pInfo->gossip_menu_id);
+                        if (!(pInfo->npc_flags & UNIT_NPC_FLAG_GOSSIP))
+                            pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    }
+                }
+                break;
+            }
         }
     }
 }
@@ -5223,8 +5252,12 @@ void Aura::HandleRangedAmmoHaste(bool apply, bool /*Real*/)
 
     // Quivers should not increase attack speed for ranged weapons which do not require any ammo.
     Item* ranged_weapon = GetTarget()->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-    if (!ranged_weapon || ranged_weapon->GetProto()->AmmoType == 0)
+    if ((!ranged_weapon || ranged_weapon->GetProto()->AmmoType == 0) && apply)
+    {
+        // Revert m_applied assigned in Aura::ApplyModidier
+        m_applied = !apply;
         return;
+    }
 
     if (apply)
     {
@@ -6715,7 +6748,7 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
         m_realCasterGuid = m_casterGuid;
 
     m_applyTime      = time(nullptr);
-    m_isPassive      = IsPassiveSpell(GetId()) || spellproto->Attributes == 0x80;
+    m_isPassive      = IsPassiveSpell(GetId()) || (spellproto->Attributes == SPELL_ATTR_DO_NOT_DISPLAY && spellproto->DurationIndex == 21);
     m_isDeathPersist = spellproto->IsDeathPersistentSpell();
     m_isSingleTarget = spellproto->HasSingleTargetAura();
     m_procCharges    = spellproto->procCharges;
@@ -6871,22 +6904,17 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
     if (m_removeMode != AURA_REMOVE_BY_STACK)
         CleanupTriggeredSpells();
 
-    Unit* caster = GetCaster();
+    SpellCaster* caster = GetRealCaster();
 
     if (IsPersistent())
     {
-        if (SpellCaster* realCaster = GetRealCaster())
+        if (caster)
         {
-            DynamicObject *dynObj = realCaster->GetDynObject(GetId());
+            DynamicObject *dynObj = caster->GetDynObject(GetId());
             if (dynObj)
                 dynObj->RemoveAffected(m_target);
         }
     }
-
-    //passive auras do not get put in slots
-    // Note: but totem can be not accessible for aura target in time remove (to far for find in grid)
-    //if (m_isPassive && !(caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem()))
-    //    return false;
 
     uint8 slot = GetAuraSlot();
 
@@ -6896,7 +6924,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
             return;
         SetAura(slot, true);
         SetAuraFlag(slot, false);
-        SetAuraLevel(slot, caster ? caster->GetLevel() : sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
+        SetAuraLevel(slot, 0);
     }
 
     // unregister aura diminishing (and store last time)

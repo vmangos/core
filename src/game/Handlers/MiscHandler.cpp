@@ -850,7 +850,20 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
             }
             else
             {
-                SendAreaTriggerMessage(pTeleTrigger->message.c_str());
+                char const* message = pTeleTrigger->message.c_str();
+
+                int loc_idx = GetSessionDbLocaleIndex();
+                if (loc_idx >= 0)
+                {
+                    AreaTriggerLocale const* locale = sObjectMgr.GetAreaTriggerLocale(triggerId);
+                    if (locale)
+                    {
+                        if (locale->message.size() > size_t(loc_idx) && !locale->message[loc_idx].empty())
+                            message = locale->message[loc_idx].c_str();
+                    }
+                }
+
+                SendAreaTriggerMessage(message);
             }
             return;
         }
@@ -879,18 +892,16 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
         return;
     }
 
-    ByteBuffer dest;
+    std::vector<uint8> dest;
     dest.resize(decompressedSize);
 
     uint32 currentPosition = recv_data.rpos();
     uLongf realSize = decompressedSize;
-    uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + currentPosition), recv_data.size() - currentPosition);
+    uncompress(const_cast<uint8*>(dest.data()), &realSize, const_cast<uint8*>(recv_data.contents() + currentPosition), recv_data.size() - currentPosition);
 
     recv_data.rpos(recv_data.wpos());                       // uncompress read (recv_data.size() - recv_data.rpos())
 
-    std::string adata;
-    dest >> adata;
-
+    std::string adata((char*)dest.data(), dest.size());
     SetAccountData(AccountDataType(type), adata);
 }
 
@@ -1086,8 +1097,12 @@ void WorldSession::HandleTeleportToUnitOpcode(WorldPacket& recv_data)
 {
     std::string playerName;
     recv_data >> playerName;
-    playerName = ".goname " + playerName;
-    ProcessChatMessageAfterSecurityCheck(playerName, LANG_UNIVERSAL, CHAT_MSG_SYSTEM);
+    if (playerName.length() > MAX_PLAYER_NAME)
+        return;
+
+    char txt[21] = {};
+    sprintf(txt, ".goname %s", playerName.c_str());
+    ProcessChatMessageAfterSecurityCheck(txt, LANG_UNIVERSAL, CHAT_MSG_SYSTEM);
 }
 
 void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
@@ -1245,6 +1260,7 @@ void WorldSession::HandleRequestPetInfoOpcode(WorldPacket& /*recv_data */)
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
 {
+#ifdef USE_ANTICHEAT
     if (!m_warden)
     {
         sLog.Player(GetAccountId(), LOG_ANTICHEAT, LOG_LVL_MINIMAL,
@@ -1252,5 +1268,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
         return;
     }
 
-    m_warden->HandlePacket(recv_data);
+    std::lock_guard<std::mutex> lock(m_warden->m_packetQueueMutex);
+    m_warden->m_packetQueue.emplace_back(std::move(recv_data));
+#endif
 }

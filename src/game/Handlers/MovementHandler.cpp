@@ -840,10 +840,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     if (pMover->HasPendingSplineDone())
         pMover->SetSplineDonePending(false);
     else
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleMoveSplineDoneOpcode: client sent unexpected spline done for %s", pMover->GetGuidStr().c_str());
         return;
-    }
 
     if (Player* pPlayerMover = pMover->ToPlayer())
     {

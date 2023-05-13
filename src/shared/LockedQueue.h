@@ -53,10 +53,17 @@ template <class T, class LockType, typename StorageType=std::deque<T> >
         }
 
         //! Adds an item to the queue.
-        void add(const T& item)
+        void add(T const& item)
         {
             std::unique_lock<LockType> g(this->_lock);
             _queue.push_back(item);
+        }
+
+        //! Moves an item into the queue.
+        void add(T&& item)
+        {
+            std::unique_lock<LockType> g(this->_lock);
+            _queue.push_back(std::move(item));
         }
 
         //! Gets the next result in the queue, if any.
@@ -67,7 +74,7 @@ template <class T, class LockType, typename StorageType=std::deque<T> >
             if (_queue.empty())
                 return false;
 
-            result = _queue.front();
+            result = std::move(_queue.front());
             _queue.pop_front();
 
             return true;
@@ -81,10 +88,10 @@ template <class T, class LockType, typename StorageType=std::deque<T> >
             if (_queue.empty())
                 return false;
 
-            result = _queue.front();
-            if(!check.Process(result))
+            if(!check.Process(_queue.front()))
                 return false;
 
+            result = std::move(_queue.front());
             _queue.pop_front();
             return true;
         }
@@ -123,6 +130,12 @@ template <class T, class LockType, typename StorageType=std::deque<T> >
         void unlock()
         {
             this->_lock.unlock();
+        }
+
+        void clear()
+        {
+            std::unique_lock<LockType> g(this->_lock);
+            _queue.clear();
         }
 
         bool empty_unsafe()

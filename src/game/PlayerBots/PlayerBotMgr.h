@@ -38,7 +38,6 @@ struct PlayerBotEntry
     bool isChatBot; // bot des joueurs en discussion via le site.
     bool customBot; // Enabled even if PlayerBot system disabled (AutoTesting system for example)
     bool requestRemoval;
-    std::vector<uint16> m_pendingResponses;
     std::unique_ptr<PlayerBotAI> ai;
 
     PlayerBotEntry(uint64 guid, uint32 account, uint32 chance_): playerGUID(guid), accountId(account), chance(chance_), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)

@@ -1097,8 +1097,9 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
 
         // stop combat
         pVictim->CombatStop();
-        pVictim->GetHostileRefManager().deleteReferences();
     }
+
+    pVictim->GetHostileRefManager().deleteReferences();
 
     // outdoor pvp things, do these after setting the death state, else the player activity notify won't work... doh...
     // handle player kill only if not suicide (spirit of redemption for example)
@@ -4559,6 +4560,11 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         if (Pet* pet = GetPet())
             if (pet->IsAlive())
                 pet->AI()->OwnerAttacked(victim);
+
+        for (auto const& guid : m_guardianPets)
+            if (Pet* pGuardian = GetMap()->GetPet(guid))
+                if (pGuardian->IsAlive())
+                    pGuardian->AI()->OwnerAttacked(victim);
     }
 
     // delay offhand weapon attack to next attack time
@@ -4576,6 +4582,11 @@ void Unit::AttackedBy(Unit* attacker)
     if (Pet* pet = GetPet())
         if (pet->IsAlive())
             pet->AI()->OwnerAttackedBy(attacker);
+
+    for (auto const& guid : m_guardianPets)
+        if (Creature* pGuardian = GetMap()->GetPet(guid))
+            if (pGuardian->IsAlive())
+                pGuardian->AI()->OwnerAttackedBy(attacker);
 
     if (Creature* pCreature = ToCreature())
     {
@@ -5829,16 +5840,6 @@ void Unit::SetInCombatState(uint32 combatTimer, Unit* pEnemy)
     if (IsCharmed() || (IsCreature() && ((Creature*)this)->IsPet()))
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
 
-    // set pet in combat
-    if (Pet* pet = GetPet())
-    {
-        if (!pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT))
-        {
-            if (IsPlayer() && pet->IsAlive() && pEnemy)
-                pet->AI()->OwnerAttacked(pEnemy);
-        }
-    }
-
     // interrupt all delayed non-combat casts
     if (!wasInCombat)
         for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
@@ -5953,7 +5954,7 @@ void Unit::TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly
     }
 }
 
-void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint32 combatTimer/* = 0*/)
+void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint32 combatTimer/* = 0*/, bool direct/* = true*/)
 {
     // This is a wrapper for SetInCombatWith initially created to improve PvP timers responsiveness. Can be extended in the future for broader use.
 
@@ -5969,12 +5970,25 @@ void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint
         // pet owner should not enter combat on spell missile launching
         if (!combatTimer)
         {
+            // let pet AI know owner is attacking
+            if (direct && IsPlayer())
+            {
+                if (Pet* pet = GetPet())
+                    if (!pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT) && pet->IsAlive())
+                        pet->AI()->OwnerAttacked(pVictim);
+
+                for (auto const& guid : m_guardianPets)
+                    if (Pet* pGuardian = GetMap()->GetPet(guid))
+                        if (pGuardian->IsAlive())
+                            pGuardian->AI()->OwnerAttacked(pVictim);
+            }
+
             if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
             {
                 if (pOwner->IsTargetableBy(pVictim) && !pOwner->IsFeigningDeathSuccessfully())
                     pVictim->AddThreat(pOwner);
                 
-                pOwner->SetInCombatWithVictim(pVictim, false, combatTimer >= UNIT_PVP_COMBAT_TIMER ? combatTimer : UNIT_PVP_COMBAT_TIMER);
+                pOwner->SetInCombatWithVictim(pVictim, false, combatTimer >= UNIT_PVP_COMBAT_TIMER ? combatTimer : UNIT_PVP_COMBAT_TIMER, false);
             }
         }
     }
@@ -6338,7 +6352,6 @@ bool Unit::IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
 
 void Unit::UpdateVisibilityAndView()
 {
-
     static const AuraType auratypes[] = {SPELL_AURA_BIND_SIGHT, SPELL_AURA_FAR_SIGHT, SPELL_AURA_NONE};
     for (AuraType const* type = &auratypes[0]; *type != SPELL_AURA_NONE; ++type)
     {
@@ -6382,7 +6395,7 @@ bool Unit::CanDetectInvisibilityOf(Unit const* u) const
         if (worldBoss->IsWorldBoss())
             return true;
 
-    if (uint32 mask = (m_detectInvisibilityMask & u->m_invisibilityMask))
+    if (uint32 mask = u->m_invisibilityMask)
     {
         for (int32 i = 0; i < 32; ++i)
         {
@@ -6398,10 +6411,13 @@ bool Unit::CanDetectInvisibilityOf(Unit const* u) const
 
             // find invisibility detect level
             int32 detectLevel = 0;
-            Unit::AuraList const& dAuras = GetAurasByType(SPELL_AURA_MOD_INVISIBILITY_DETECTION);
-            for (const auto& itr : dAuras)
-                if (itr->GetModifier()->m_miscvalue == i && detectLevel < itr->GetModifier()->m_amount)
-                    detectLevel = itr->GetModifier()->m_amount;
+            if (((1 << i) & m_detectInvisibilityMask) != 0)
+            {
+                Unit::AuraList const& dAuras = GetAurasByType(SPELL_AURA_MOD_INVISIBILITY_DETECTION);
+                for (const auto& itr : dAuras)
+                    if (itr->GetModifier()->m_miscvalue == i && detectLevel < itr->GetModifier()->m_amount)
+                        detectLevel = itr->GetModifier()->m_amount;
+            }
 
             if (i == 6 && IsPlayer())     // special drunk detection case
                 detectLevel = ((Player*)this)->GetDrunkValue();
@@ -8042,6 +8058,9 @@ void Unit::RemoveFromWorld()
         Uncharm();
         RemoveNotOwnSingleTargetAuras();
         RemoveGuardians();
+        // Remove non-guardian pet
+        if (Pet* pet = GetPet())
+            pet->Unsummon(PET_SAVE_AS_DELETED, this);
         RemoveAllGameObjects();
         RemoveAllDynObjects();
         CleanupDeletedAuras();

@@ -248,8 +248,6 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
         SetFlag(GAMEOBJECT_FLAGS, (GO_FLAG_TRANSPORT | GO_FLAG_NODESPAWN));
     }
 
-    SetName(goinfo->name);
-
     if (GetGOInfo()->IsLargeGameObject())
     {
         SetVisibilityModifier(VISIBILITY_DISTANCE_LARGE);
@@ -1047,11 +1045,6 @@ void GameObject::DeleteFromDB() const
     WorldDatabase.PExecuteLog("DELETE FROM gameobject_battleground WHERE guid = '%u'", GetGUIDLow());
 }
 
-GameObjectInfo const* GameObject::GetGOInfo() const
-{
-    return m_goInfo;
-}
-
 /*********************************************************/
 /***                    QUEST SYSTEM                   ***/
 /*********************************************************/
@@ -1161,9 +1154,6 @@ bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject c
                 if (!(pDetectorUnit->m_detectInvisibilityMask & (1 << 3))) // Detection des pieges
                     return false;
             }
-            // Smuggled Mana Cell required 10 invisibility type detection/state
-            if (GetEntry() == 187039 && ((pDetectorUnit->m_detectInvisibilityMask | pDetectorUnit->m_invisibilityMask) & (1 << 10)) == 0)
-                return false;
         }
         
     }
@@ -2059,7 +2049,7 @@ char const* GameObject::GetNameForLocaleIdx(int32 loc_idx) const
         }
     }
 
-    return GetName();
+    return GameObject::GetName();
 }
 
 void GameObject::UpdateRotationFields(float rotation2 /*=0.0f*/, float rotation3 /*=0.0f*/)

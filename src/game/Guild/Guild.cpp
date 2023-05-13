@@ -112,7 +112,7 @@ bool Guild::Create(Petition* petition, Player* leader)
         if (signature->GetSignatureGuid().IsEmpty())
             continue;
 
-        AddMember(signature->GetSignatureGuid(), GetLowestRank());
+        AddMember(signature->GetSignatureGuid(), GetLowestRank(), petition->GetId());
     }
 
     return true;
@@ -132,7 +132,7 @@ bool Guild::Create(Player* leader, std::string gname)
     {
         if (a->filterMessage(gname))
         {
-            sWorld.LogChat(lSession, "Guild", "Attempt to create guild with spam name" + gname);
+            sWorld.LogChat(lSession, "Guild", "Attempt to create guild with spam name");
             return false;
         }
     }
@@ -194,7 +194,7 @@ void Guild::Rename(std::string& newName)
     CharacterDatabase.PExecute("UPDATE `guild` SET `name` = '%s' WHERE `guild_id` = '%u'", escaped.c_str(), m_Id);
 }
 
-GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
+GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank, uint32 petitionId)
 {
     Player* pl = sObjectAccessor.FindPlayerNotInWorld(plGuid);
     if (pl)
@@ -210,7 +210,7 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
 
     // remove all player signs from another petitions
     // this will be prevent attempt joining player to many guilds and corrupt guild data integrity
-    Player::RemovePetitionsAndSigns(plGuid);
+    Player::RemovePetitionsAndSigns(plGuid, petitionId);
 
     uint32 lowguid = plGuid.GetCounter();
 
@@ -583,7 +583,7 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
     return members.empty();
 }
 
-void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint32 language)
+void Guild::BroadcastToGuild(WorldSession* session, char const* msg, uint32 language)
 {
     if (!session)
         return;
@@ -593,7 +593,7 @@ void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint
         return;
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg.c_str(), Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg, Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
 
     for (const auto& member : members)
     {
@@ -607,7 +607,7 @@ void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint
     }
 }
 
-void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, uint32 language)
+void Guild::BroadcastToOfficers(WorldSession* session, char const* msg, uint32 language)
 {
     if (!session)
         return;
@@ -617,7 +617,7 @@ void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, u
         return;
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg.c_str(), Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg, Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
 
     for (const auto& member : members)
     {
@@ -758,17 +758,17 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
     data << uint32(0); // members count placeholder
     spaceLeft -= sizeof(uint32);
     data << MOTD;
-    spaceLeft -= MOTD.length() + 1;
+    spaceLeft -= (MOTD.length() + 1);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GINFO;
-    spaceLeft -= GINFO.length() + 1;
+    spaceLeft -= (GINFO.length() + 1);
 #endif
 
     data << uint32(m_Ranks.size());
     spaceLeft -= sizeof(uint32);
     for (const auto& itr : m_Ranks)
         data << uint32(itr.Rights);
-    spaceLeft -= m_Ranks.size() * sizeof(uint32);
+    spaceLeft -= (m_Ranks.size() * sizeof(uint32));
 
     uint32 count = 0;
     for (const auto& itr : members)
@@ -789,7 +789,7 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
             1;                            // null byte for officer note
 
         spaceLeft -= spaceNeeded;
-        if (spaceLeft < 0)
+        if (spaceLeft <= 0)
             break;
         count++;
         

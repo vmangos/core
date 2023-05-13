@@ -74,6 +74,8 @@ class Corpse : public WorldObject
         void ResetGhostTime() { m_time = time(nullptr); }
         CorpseType GetType() const { return m_type; }
 
+        char const* GetName() const final { return "Corpse"; }
+
         ReputationRank GetReactionTo(WorldObject const* target) const final ;
         bool IsHostileTo(WorldObject const* target) const override;
         bool IsFriendlyTo(WorldObject const* target) const override;

@@ -767,7 +767,11 @@ namespace MMAP
                     float outDist = -1.0f;
                     float inDist  = -1.0f;
                     if (it->IsUnderObject(v, up, isM2, &outDist, &inDist)) // inDist < outDist
-                        terrainInsideModelsVerts[t] = inDist;
+                    {
+                        //if there are less than 1.5y between terrain and model then mark the terrain as unwalkable
+                        if (inDist < 1.5f)
+                            terrainInsideModelsVerts[t] = inDist;
+                    }
                 }
         }
         /// Correct triangles partially under models
@@ -1018,7 +1022,7 @@ namespace MMAP
                              &p0[0], &p0[1], &p0[2], &p1[0], &p1[1], &p1[2], &size))
                 continue;
 
-            if (mapID == mid, tileX == tx, tileY == ty)
+            if (mapID == mid && tileX == tx && tileY == ty)
             {
                 meshData.offMeshConnections.append(p0[1]);
                 meshData.offMeshConnections.append(p0[2]);

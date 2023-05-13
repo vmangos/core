@@ -55,7 +55,7 @@ void CreatureAI::AttackedBy(Unit* attacker)
 
 void CreatureAI::AttackStart(Unit* pVictim)
 {
-    if (!pVictim || m_creature->HasReactState(REACT_PASSIVE))
+    if (m_creature->HasReactState(REACT_PASSIVE))
         return;
 
     if (m_creature->Attack(pVictim, m_bMeleeAttack))
@@ -336,10 +336,6 @@ void CreatureAI::EnterEvadeMode()
 // Distract creature, if player gets too close while stealthed/prowling
 void CreatureAI::TriggerAlert(Unit const* who)
 {
-    // If there's no target, or target isn't a player do nothing
-    if (!who || who->GetTypeId() != TYPEID_PLAYER)
-        return;
-
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
     if (m_creature->GetTypeId() != TYPEID_UNIT || m_creature->IsInCombat() || m_creature->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
         return;

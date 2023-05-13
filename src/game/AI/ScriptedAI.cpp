@@ -261,9 +261,6 @@ void ScriptedAI::EnterEvadeIfOutOfHomeArea()
 
 void Scripted_NoMovementAI::AttackStart(Unit* pWho)
 {
-    if (!pWho)
-        return;
-
     if (m_creature->Attack(pWho, true))
     {
         m_creature->AddThreat(pWho);

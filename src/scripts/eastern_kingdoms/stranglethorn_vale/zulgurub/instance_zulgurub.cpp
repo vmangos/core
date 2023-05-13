@@ -380,69 +380,6 @@ InstanceData* GetInstanceData_instance_zulgurub(Map* pMap)
     return new instance_zulgurub(pMap);
 }
 
-struct npc_brazierAI: public ScriptedAI
-{
-    npc_brazierAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 Timer;
-    uint32 Var;
-
-    void Reset() override
-    {
-        Timer = 0;
-        Var = 0;
-    }
-
-    void UseGo(int Nombre)
-    {
-        int var = 0;
-        while (var < Nombre)
-        {
-            std::list<GameObject*> GOListe;
-            GetGameObjectListWithEntryInGrid(GOListe, m_creature, 180252, 100.0f);
-            std::list<GameObject*>::iterator itr = GOListe.begin();
-            if (itr == GOListe.end())
-                return;
-
-            std::advance(itr, rand() % GOListe.size());
-            if (GameObject* GO = *itr)
-            {
-                GO->Use(m_creature);
-                GOListe.erase(itr);
-                var++;
-            }
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (Var > 24)
-            m_creature->ForcedDespawn();
-
-        if (Timer < uiDiff)
-        {
-            if (Var > 3)
-                UseGo(4);
-            else if (Var < 10)
-                UseGo(12);
-            else
-                UseGo(6);
-            Timer = 1000;
-            Var++;
-            return;
-        }
-        else Timer -= uiDiff;
-    }
-};
-
-CreatureAI* GetAI_npc_brazier(Creature* pCreature)
-{
-    return new npc_brazierAI(pCreature);
-}
-
 enum
 {
     TABLET_GRILEK1 = 180358,
@@ -559,11 +496,6 @@ void AddSC_instance_zulgurub()
     newscript = new Script;
     newscript->Name = "go_table_madness";
     newscript->pGOHello = &OnGossipHello_go_table_madness;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_brazier";
-    newscript->GetAI = &GetAI_npc_brazier;
     newscript->RegisterSelf();
 
     newscript = new Script;

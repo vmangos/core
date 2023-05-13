@@ -30,6 +30,7 @@ namespace VMAP
 {
     class TreeNode;
     struct AreaInfo;
+    struct GroupLocationInfo;
     struct LocationInfo;
 
     class MeshTriangle
@@ -120,7 +121,7 @@ namespace VMAP
             bool IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit, bool ignoreM2Model) const;
             bool IntersectPoint(G3D::Vector3 const& p, G3D::Vector3 const& down, float& dist, AreaInfo& info) const;
             bool IsUnderObject(G3D::Vector3 const& p, G3D::Vector3 const& up, bool m2, float* outDist = nullptr, float* inDist = nullptr) const;
-            bool GetLocationInfo(G3D::Vector3 const& p, G3D::Vector3 const& down, float& dist, LocationInfo& info) const;
+            bool GetLocationInfo(G3D::Vector3 const& p, G3D::Vector3 const& down, float& dist, GroupLocationInfo& info) const;
             bool writeFile(std::string const& filename);
             bool readFile(std::string const& filename);
             void setModelFlags(uint32 newFlags) { modelFlags = newFlags; }

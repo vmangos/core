@@ -21,13 +21,6 @@
 #include "Group.h"
 #include "ObjectAccessor.h"
 
-struct LootResponseData
-{
-    LootResponseData(uint64 guid_, uint32 slot_) : guid(guid_), slot(slot_) {}
-    uint64 guid = 0;
-    uint32 slot = 0;
-};
-
 class PartyBotAI : public CombatBotBaseAI
 {
 public:
@@ -52,7 +45,6 @@ public:
     void OnPlayerLogin() final;
     void UpdateAI(uint32 const diff) final;
     void OnPacketReceived(WorldPacket const* packet) final;
-    void SendFakePacket(uint16 opcode) final;
 
     void CloneFromPlayer(Player const* pPlayer);
     void AddToPlayerGroup();
@@ -95,7 +87,6 @@ public:
     void UpdateInCombatAI_Druid() final;
     void UpdateOutOfCombatAI_Druid() final;
 
-    std::vector<LootResponseData> m_lootResponses;
     std::vector<RaidTargetIcon> m_marksToCC;
     std::vector<RaidTargetIcon> m_marksToFocus;
     ShortTimeTracker m_updateTimer;

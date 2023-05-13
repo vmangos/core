@@ -224,6 +224,38 @@ void stripLineInvisibleChars(std::string &str)
         str.erase(wpos,str.size());
 }
 
+void stripLineInvisibleChars(char* str)
+{
+    static std::string invChars = " \t\7\n";
+
+    size_t wpos = 0;
+
+    bool space = false;
+    size_t pos = 0;
+    for (; str[pos] != '\0'; ++pos)
+    {
+        if (invChars.find(str[pos]) != std::string::npos)
+        {
+            if (!space)
+            {
+                str[wpos++] = ' ';
+                space = true;
+            }
+        }
+        else
+        {
+            if (wpos != pos)
+                str[wpos++] = str[pos];
+            else
+                ++wpos;
+            space = false;
+        }
+    }
+
+    for (; wpos < pos; wpos++)
+        str[wpos] = '\0';
+}
+
 std::string secsToTimeString(time_t timeInSecs, bool shortText, bool hoursOnly)
 {
     time_t secs    = timeInSecs % MINUTE;

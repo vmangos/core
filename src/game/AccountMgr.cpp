@@ -254,6 +254,7 @@ void AccountMgr::Load()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     LoadAccountBanList();
     LoadIPBanList();
+    LoadAccountWarnings();
 }
 
 AccountTypes AccountMgr::GetSecurity(uint32 acc_id)
@@ -466,6 +467,22 @@ bool AccountMgr::IsAccountBanned(uint32 acc) const
 {
     std::map<uint32, uint32>::const_iterator it = m_accountBanned.find(acc);
     return !(it == m_accountBanned.end() || it->second < time(nullptr));
+}
+
+void AccountMgr::LoadAccountWarnings()
+{
+    std::unique_ptr<QueryResult> result(LoginDatabase.Query("SELECT `id`, `banreason` FROM `account_banned` WHERE `active` = 0 && (`banreason` LIKE \"WARN:%\") ORDER BY `bandate`"));
+
+    if (!result)
+        return;
+
+    m_accountWarnings.clear();
+    do
+    {
+        Field* fields = result->Fetch();
+        std::string warning = fields[1].GetCppString();
+        m_accountWarnings[fields[0].GetUInt32()] = warning.substr(5, warning.size() - 5);
+    } while (result->NextRow());
 }
 
 bool AccountMgr::CheckInstanceCount(uint32 accountId, uint32 instanceId, uint32 maxCount)

@@ -35,7 +35,9 @@ enum
     SPELL_DARK_WATER = 25743,
     SPELL_FRENZY     = 19812,
     SPELL_RAMPAGE    = 25744,
-    EMOTE_THE_BEAST_RETURNS = 11160
+    EMOTE_THE_BEAST_RETURNS = 11160,
+    GO_BAY_OF_STORMS = 180670,
+    FACTION_MONSTER  = 14,
 };
 
 struct Locations
@@ -84,6 +86,17 @@ struct mob_mawsAI : public ScriptedAI
     bool InCombat;
     bool PhaseTwo;
 
+    void DespawnBayOfStorms() const
+    {
+        if (GameObject* pGo = m_creature->FindNearestGameObject(GO_BAY_OF_STORMS, MAX_VISIBILITY_DISTANCE))
+            pGo->DeleteLater();
+    }
+
+    void OnRemoveFromWorld() override
+    {
+        DespawnBayOfStorms();
+    }
+
     void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (!InCombat)
@@ -91,7 +104,12 @@ struct mob_mawsAI : public ScriptedAI
             if (uiPointId < 14)
                 m_creature->GetMotionMaster()->MovePoint(uiPointId + 1, ronde[uiPointId + 1].x, ronde[uiPointId + 1].y, ronde[uiPointId + 1].z);
             else if (uiPointId == 14)
+            {
+                if (m_creature->GetFactionTemplateId() != FACTION_MONSTER)
+                    m_creature->SetFactionTemporary(FACTION_MONSTER, TEMPFACTION_RESTORE_RESPAWN);
+
                 m_creature->GetMotionMaster()->MovePoint(1, ronde[1].x, ronde[1].y, ronde[1].z);
+            }
         }
         if (uiPointId > 0 && uiPointId < 15)
             LastWayPoint = uiPointId;
@@ -163,7 +181,8 @@ struct mob_mawsAI : public ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-        sWorld.SendWorldText(EMOTE_THE_BEAST_RETURNS);
+        DespawnBayOfStorms();
+        sWorld.SendBroadcastTextToWorld(EMOTE_THE_BEAST_RETURNS);
     }
 
     void Reset() override
@@ -181,6 +200,7 @@ struct mob_mawsAI : public ScriptedAI
         FrenzyTimerMax = 25000;
         DarkWaterTimer = 15000;
 
+        m_creature->SetWalk(m_creature->GetFactionTemplateId() == FACTION_MONSTER);
         m_creature->GetMotionMaster()->MovePoint(LastWayPoint, ronde[LastWayPoint].x, ronde[LastWayPoint].y, ronde[LastWayPoint].z);
     }
 
@@ -192,6 +212,39 @@ CreatureAI* GetAI_mob_maws(Creature* pCreature)
 }
 //--
 
+struct go_bay_of_stormsAI : public GameObjectAI
+{
+    go_bay_of_stormsAI(GameObject* go) : GameObjectAI(go)
+    {
+        m_animId = 0;
+        m_playAnimTimer = 1000;
+    }
+
+    uint32 m_animId;
+    uint32 m_playAnimTimer;
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (m_playAnimTimer < diff)
+        {
+            m_playAnimTimer = urand(3000, 8000);
+            me->SendGameObjectCustomAnim(m_animId);
+
+            if (m_animId >= 2)
+                m_animId = 0;
+            else
+                m_animId++;
+        }
+        else
+            m_playAnimTimer -= diff;
+    }
+};
+
+GameObjectAI* GetAI_go_bay_of_storms(GameObject* gameobject)
+{
+    return new go_bay_of_stormsAI(gameobject);
+}
+
 void AddSC_azshara()
 {
     Script* newscript;
@@ -202,4 +255,9 @@ void AddSC_azshara()
     newscript->GetAI = &GetAI_mob_maws;
     newscript->RegisterSelf();
     //--
+
+    newscript = new Script;
+    newscript->Name = "go_bay_of_storms";
+    newscript->GOGetAI = &GetAI_go_bay_of_storms;
+    newscript->RegisterSelf();
 }

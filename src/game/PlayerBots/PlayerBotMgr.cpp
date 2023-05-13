@@ -229,17 +229,6 @@ void PlayerBotMgr::Update(uint32 diff)
 
         if (iter->second->state == PB_STATE_ONLINE)
         {
-            if (!iter->second->m_pendingResponses.empty() &&
-                iter->second->ai && iter->second->ai->me)
-            {
-                std::vector<uint16> pendingResponses = iter->second->m_pendingResponses;
-                iter->second->m_pendingResponses.clear();
-                for (const auto opcode : pendingResponses)
-                {
-                    iter->second->ai->SendFakePacket(opcode);
-                }
-            }
-
             if (iter->second->requestRemoval)
             {
                 if (iter->second->ai && iter->second->ai->me)

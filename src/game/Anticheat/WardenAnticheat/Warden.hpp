@@ -33,6 +33,7 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 
 enum WardenOpcodes
 {
@@ -112,15 +113,24 @@ class Warden
         // enqueue scans, and send them immediately if possible
         void RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans);
 
-        void SendPacket(const ByteBuffer &buff);
+        void SendPacket(ByteBuffer const& buff);
+        void SendPacketDirect(ByteBuffer const& buff, WorldSession* session); // only to be used in constructor
 
         static uint32 BuildChecksum(const uint8* data, size_t size);
 
         // If no scan is passed, the default action from config is executed
         void ApplyPenalty(std::string message, WardenActions penalty = WARDEN_ACTION_MAX,  std::shared_ptr<const Scan> scan = nullptr);
         void LogPositiveToDB(std::shared_ptr<const Scan> scan);
+        void KickSession() const;
 
-        WorldSession *const _session;
+        // client session data
+        uint32 m_accountId;
+        uint32 m_sessionGuid;
+        uint32 m_clientBuild;
+        std::string m_accountName;
+        std::string m_sessionIP;
+        ClientOSType m_clientOS;
+        ClientPlatformType m_clientPlatform;
 
         const WardenModule *const _module;
 
@@ -128,6 +138,9 @@ class Warden
 
         // true when the client has been confirmed and sent any initialization packet(s)
         bool _initialized;
+
+        // true if client has used click to move at any point since starting game
+        mutable bool m_hasUsedClickToMove = false;
 
         std::vector<std::shared_ptr<const Scan>> _pendingScans;
         std::vector<std::shared_ptr<const Scan>> _enqueuedScans;
@@ -140,6 +153,13 @@ class Warden
 
         // size, in bytes, of client reply buffer
         static constexpr size_t MaxReply = 256;
+
+        uint32 GetAccountId() const { return m_accountId; }
+        char const* GetAccountName() const { return m_accountName.c_str(); }
+        char const* GetSessionIP() const { return m_sessionIP.c_str(); }
+
+        bool HasUsedClickToMove() const { return m_hasUsedClickToMove; }
+        void SetHasUsedClickToMove() const { m_hasUsedClickToMove = true; }
 
         static void LoadScriptedScans();
 
@@ -155,6 +175,9 @@ class Warden
 
         virtual void GetPlayerInfo(std::string &clock, std::string &fingerprint, std::string &hypervisors,
             std::string &endscene, std::string &proxifier) const = 0;
+
+        std::vector<WorldPacket> m_packetQueue;
+        std::mutex m_packetQueueMutex;
 };
 
 #endif /*!__WARDEN_HPP_*/
