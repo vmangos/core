@@ -2681,7 +2681,7 @@ void RemoveItemsSetItem(Player*player,ItemPrototype const* proto);
 template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell)
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
-    if (!spellInfo) return 0;
+    if (!spellInfo || spellInfo->HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS)) return 0;
     float totalpct = 0;
     float totalflat = 0;
     for (const auto mod : m_spellMods[op])

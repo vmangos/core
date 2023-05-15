@@ -859,7 +859,12 @@ void Spell::prepareDataForTriggerSystem()
             }
             else                                           // Negative spell
             {
-                if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
+                if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_TREAT_AS_PERIODIC))
+                {
+                    m_procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
+                    m_procVictim = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
+                }
+                else if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
                 {
                     m_procAttacker = PROC_FLAG_DEAL_HARMFUL_SPELL;
                     m_procVictim = PROC_FLAG_TAKE_HARMFUL_SPELL;
@@ -1286,7 +1291,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                         
                     pRealUnitCaster->SetInCombatWithVictim(unit);
                 }
-                else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_OUT_OF_COMBAT_ATTACK))
+                else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_PVP_ENABLING))
                 {
                     unit->SetOutOfCombatWithAggressor(pRealUnitCaster);
                     pRealUnitCaster->SetOutOfCombatWithVictim(unit);
@@ -1440,14 +1445,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         m_absorbed = damageInfo.absorb;
 
         pCaster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
-        
-        // terribly ugly hack for Gluth Decimate to not be affected by any damage modifiers.
-        // SPELL_ATTR_EX3_UNK29 is probably meant to make the spell ignore any damage modifiers,
-        // but until implemented, this is the best we can do.
-        if (m_spellInfo->Id == 28375)
-        {
-            damageInfo.damage = m_damage;
-        }
 
         // Send log damage message to client
         pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
@@ -1731,7 +1728,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                         pRealUnitCaster->SetInCombatWithVictim(unit);
                     }
                 }
-                else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_OUT_OF_COMBAT_ATTACK) && pRealUnitCaster)
+                else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_PVP_ENABLING) && pRealUnitCaster)
                 {
                     unit->SetOutOfCombatWithAggressor(pRealUnitCaster);
                     pRealUnitCaster->SetOutOfCombatWithVictim(unit);
@@ -2442,13 +2439,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if (!prev->IsWithinDist(*next, CHAIN_SPELL_JUMP_RADIUS))
                         break;
 
-                    if (!(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LINE_OF_SIGHT) && !prev->IsWithinLOSInMap(*next))
+                    if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX2_IGNORE_LINE_OF_SIGHT) && !prev->IsWithinLOSInMap(*next))
                     {
                         ++next;
                         continue;
                     }
 
-                    if ((m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER) && ((*next)->GetTypeId() != TYPEID_PLAYER))
+                    if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_ONLY_ON_PLAYER) && ((*next)->GetTypeId() != TYPEID_PLAYER))
                     {
                         ++next;
                         continue;
@@ -4206,7 +4203,7 @@ void Spell::update(uint32 difftime)
         nowPosZ = m_caster->GetPositionZ();
         nowO = m_caster->GetOrientation();
     }
-    if (m_caster->IsPlayer() && m_timer != 0 && !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_DONT_DISPLAY_CHANNEL_BAR) &&
+    if (m_caster->IsPlayer() && m_timer != 0 && !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_HIDE_CHANNEL_BAR) &&
        (fabs(m_castPosition.x - nowPosX) > 0.5f || fabs(m_castPosition.y - nowPosY) > 0.5f || fabs(m_castPosition.z - nowPosZ) > 0.5f) &&
        (m_spellInfo->Effect[EFFECT_INDEX_0] != SPELL_EFFECT_STUCK || !((Player*)m_caster)->m_movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR)) &&
        (m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_MOVEMENT) || m_spellInfo->HasAuraInterruptFlag(AURA_INTERRUPT_MOVING_CANCELS) || m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_MOVING_CANCELS)))
@@ -5151,21 +5148,25 @@ void Spell::SendChannelStart(uint32 duration)
     }
 }
 
-void Spell::SendResurrectRequest(Player* target)
+void Spell::SendResurrectRequest(Player* target, bool sickness)
 {
     // Both players and NPCs can resurrect using spells - have a look at creature 28487 for example
     // However, the packet structure differs slightly
 
-    char const* sentName = m_caster->IsPlayer() ? "" : m_caster->GetNameForLocaleIdx(target->GetSession()->GetSessionDbLocaleIndex());
+    char const* sentName = m_caster->IsPlayer() ?
+        ""
+        : 
+        m_caster->GetNameForLocaleIdx(target->GetSession()->GetSessionDbLocaleIndex());
 
     WorldPacket data(SMSG_RESURRECT_REQUEST, (8 + 4 + strlen(sentName) + 1 + 1 + 1));
     data << m_caster->GetObjectGuid();
     data << uint32(strlen(sentName) + 1);
 
     data << sentName;
-    data << uint8(0);
+    data << uint8(sickness); // warns it will cause ressurrection sickness
 
-    data << uint8(m_caster->IsPlayer() ? 0 : 1);
+    // override delay sent with SMSG_CORPSE_RECLAIM_DELAY, set instant resurrection for spells with this attribute
+    data << uint8(!m_spellInfo->HasAttribute(SPELL_ATTR_EX3_NO_RES_TIMER));
     target->GetSession()->SendPacket(&data);
 }
 
@@ -5748,7 +5749,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                                     return SPELL_FAILED_CANT_CAST_ON_TAPPED;
                 }
 
-                if (strict && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER && !m_spellInfo->IsAreaOfEffectSpell())
+                if (strict && m_spellInfo->HasAttribute(SPELL_ATTR_EX3_ONLY_ON_PLAYER) && target->GetTypeId() != TYPEID_PLAYER && !m_spellInfo->IsAreaOfEffectSpell())
                     return SPELL_FAILED_BAD_TARGETS;
             }
             // Can't help a friend in duel   |  sorry, not enough time to figure out why this is necessary
@@ -8237,7 +8238,11 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
             break;
     }
 
-    return !(target->GetTypeId() != TYPEID_PLAYER && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER
+    if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_NOT_ON_AOE_IMMUNE) &&
+        target->IsCreature() && static_cast<Creature*>(target)->IsImmuneToAoe())
+        return false;
+
+    return !(target->GetTypeId() != TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR_EX3_ONLY_ON_PLAYER)
             && m_spellInfo->EffectImplicitTargetA[eff] != TARGET_UNIT_SCRIPT_NEAR_CASTER && m_spellInfo->EffectImplicitTargetA[eff] != TARGET_UNIT_CASTER);
 }
 

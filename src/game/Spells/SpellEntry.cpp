@@ -431,7 +431,7 @@ WeaponAttackType SpellEntry::GetWeaponAttackType() const
     switch (DmgClass)
     {
         case SPELL_DAMAGE_CLASS_MELEE:
-            if (HasAttribute(SPELL_ATTR_EX3_REQ_OFFHAND))
+            if (HasAttribute(SPELL_ATTR_EX3_REQUIRES_OFFHAND_WEAPON))
                 return OFF_ATTACK;
             else
                 return BASE_ATTACK;

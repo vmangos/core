@@ -2560,10 +2560,10 @@ void SpellMgr::LoadSpellAreas()
 
 SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const* spellInfo, Unit const* caster, Player const* player)
 {
-    // Spell casted only on battleground
-    if ((spellInfo->AttributesEx3 & SPELL_ATTR_EX3_BATTLEGROUND))
-        if (!player || !player->InBattleGround())
-            return SPELL_FAILED_ONLY_BATTLEGROUNDS;
+    // Spell can be casted only in battleground
+    if (spellInfo->HasAttribute(SPELL_ATTR_EX3_ONLY_BATTLEGROUNDS) &&
+        (!player || !player->InBattleGround()))
+        return SPELL_FAILED_ONLY_BATTLEGROUNDS;
 
     uint32 mapId = caster ? caster->GetMapId() : (player ? player->GetMapId() : 0);
 

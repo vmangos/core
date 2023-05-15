@@ -310,6 +310,15 @@ struct ProcSystemArguments
         SpellEntry const* procSpell_ = nullptr, Spell const* spell = nullptr);
 };
 
+// Needed because of SPELL_ATTR_EX3_INSTANT_TARGET_PROCS
+// We need to call ProcDamageAndSpell twice
+enum ProcessProcsAuraType
+{
+    PROC_PROCESS_INSTANT,
+    PROC_PROCESS_DELAYED,
+    PROC_PROCESS_ALL
+};
+
 // Intermediary absract class to hold all the common spell casting method between Units and GameObjects.
 class SpellCaster : public WorldObject
 {
@@ -363,7 +372,7 @@ public:
     SpellMissInfo SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
     void UpdatePendingProcs(uint32 diff);
     void ProcDamageAndSpell(ProcSystemArguments&& data);
-    void ProcDamageAndSpell_real(ProcSystemArguments& data);
+    void ProcDamageAndSpell_real(ProcSystemArguments& data, ProcessProcsAuraType processAurasType);
     void ProcDamageAndSpell_delayed(ProcSystemArguments& data);
     void CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float damage, SpellEntry const* spellInfo, SpellEffectIndex effectIndex, WeaponAttackType attackType, Spell* spell, bool crit);
     float CalculateSpellEffectValue(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr) const;
