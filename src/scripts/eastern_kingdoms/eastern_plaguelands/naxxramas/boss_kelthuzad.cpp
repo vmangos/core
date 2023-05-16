@@ -681,6 +681,11 @@ struct boss_kelthuzadAI : public ScriptedAI
                         events.Repeat(5000 - timeSinceLastFrostBlast);
                         break;
                     }
+                    else if (timeSinceLastShadowFissure < 5000)
+                    {
+                        events.Repeat(5000 - timeSinceLastShadowFissure);
+                        break;
+                    }
                     if (DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
                     {
                         events.Repeat(Seconds(urand(15, 17)));
@@ -692,14 +697,14 @@ struct boss_kelthuzadAI : public ScriptedAI
                 }
                 case EVENT_FROST_BLAST:
                 {
-                    if (timeSinceLastShadowFissure < 4000)
+                    if (timeSinceLastShadowFissure < 5000)
                     {
-                        events.Repeat(4000 - timeSinceLastShadowFissure);
+                        events.Repeat(5000 - timeSinceLastShadowFissure);
                         break;
                     }
-                    else if (timeSinceLastAEFrostBolt < 5000)
+                    else if (timeSinceLastAEFrostBolt < 8000)
                     {
-                        events.Repeat(5000 - timeSinceLastAEFrostBolt);
+                        events.Repeat(8000 - timeSinceLastAEFrostBolt);
                         break;
                     }
                     if (m_creature->IsNonMeleeSpellCasted())
@@ -732,9 +737,14 @@ struct boss_kelthuzadAI : public ScriptedAI
                 }
                 case EVENT_SHADOW_FISSURE:
                 {
-                    if (timeSinceLastFrostBlast < 4000)
+                    if (timeSinceLastFrostBlast < 5000)
                     {
-                        events.Repeat(4000 - timeSinceLastFrostBlast);
+                        events.Repeat(5000 - timeSinceLastFrostBlast);
+                        break;
+                    }
+                    else if (timeSinceLastAEFrostBolt < 8000)
+                    {
+                        events.Repeat(8000 - timeSinceLastAEFrostBolt);
                         break;
                     }
                     if (m_creature->IsNonMeleeSpellCasted())
