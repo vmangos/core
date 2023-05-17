@@ -24,7 +24,7 @@ EndScriptData */
 /*
  * Notes:
  * Whirlwind - Sartura does a physical AoE that does 3k+ damage to everyone within 10 yards of her.
- * During this time she is immune to stuns and taunt. She tends to use this ability after a stun fades.
+ * During this time she is immune to stuns. She tends to use this ability after a stun fades.
  */
 
 #include "scriptPCH.h"
@@ -42,8 +42,6 @@ enum
     SPELL_CLEAVE                    = 25174,
     SPELL_ENRAGE                    = 26527,
     SPELL_ENRAGEHARD                = 27680,
-
-    TAUNT_IMMUNE                    = 26602,
 
     EMOTE_ENRAGE                    = 2384,
     EMOTE_ENRAGEHARD                = 4428,
@@ -186,7 +184,6 @@ struct boss_sarturaAI : public ScriptedAI
                 // Remove the negative haste modifier from Whirlwind to restore Sartura's auto attack
                 m_creature->ApplyAttackTimePercentMod(BASE_ATTACK, 0, true);
                 m_creature->SetAttackTimer(BASE_ATTACK, 100);
-                m_creature->RemoveAurasByCasterSpell(TAUNT_IMMUNE, m_creature->GetObjectGuid());
             }
             else
                 m_uiWhirlWindEndTimer -= uiDiff;
@@ -199,7 +196,6 @@ struct boss_sarturaAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_WHIRLWIND) == CAST_OK)
                 {
-                    m_creature->CastSpell(m_creature, TAUNT_IMMUNE, true);
                     AssignRandomThreat();
                     m_uiWhirlWindEndTimer = 15000;
                     m_uiAggroResetTimer = urand(1000, 2000);
@@ -228,7 +224,7 @@ struct boss_sarturaAI : public ScriptedAI
 
         }
         
-        // If she is <25% enrage
+        // If she is <20% enrage
         if (!m_bIsEnraged && m_creature->GetHealthPercent() <= 20.0f)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE, m_uiWhirlWindEndTimer ? CF_TRIGGERED : 0) == CAST_OK)
