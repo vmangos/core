@@ -6267,11 +6267,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // for caster applied auras only
                     bool found = false;
                     auto const& mPeriodic = m_targets.getUnitTarget()->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for (const auto i : mPeriodic)
+                    for (const auto periodicDamageAura : mPeriodic)
                     {
                         // Immolate
-                        if (i->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
-                            i->GetCasterGuid() == m_caster->GetObjectGuid())
+                        if (periodicDamageAura->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
+                            periodicDamageAura->GetCasterGuid() == m_caster->GetObjectGuid())
                         {
                             found = true;
                             break;
