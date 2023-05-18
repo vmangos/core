@@ -982,7 +982,7 @@ class SpellEntry
 
         bool HasRealTimeDuration() const
         {
-            return HasAttribute(SPELL_ATTR_EX4_REAL_TIME_DURATION);
+            return HasAttribute(SPELL_ATTR_EX4_AURA_EXPIRES_OFFLINE);
         }
 
         bool HasAuraWithSpellTriggerEffect() const
