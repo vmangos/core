@@ -7273,7 +7273,7 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
 
     for (const auto& i : proto->ItemStat)
     {
-        float val = float(i.ItemStatValue);
+        float const val = float(i.ItemStatValue);
 
         if (val == 0)
             continue;
@@ -7281,30 +7281,30 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
         switch (i.ItemStatType)
         {
             case ITEM_MOD_MANA:
-                HandleStatModifier(UNIT_MOD_MANA, BASE_VALUE, float(val), apply);
+                HandleStatModifier(UNIT_MOD_MANA, BASE_VALUE, val, apply);
                 break;
             case ITEM_MOD_HEALTH:                           // modify HP
-                HandleStatModifier(UNIT_MOD_HEALTH, BASE_VALUE, float(val), apply);
+                HandleStatModifier(UNIT_MOD_HEALTH, BASE_VALUE, val, apply);
                 break;
             case ITEM_MOD_AGILITY:                          // modify agility
-                HandleStatModifier(UNIT_MOD_STAT_AGILITY, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_AGILITY, float(val), apply);
+                HandleStatModifier(UNIT_MOD_STAT_AGILITY, BASE_VALUE, val, apply);
+                ApplyStatBuffMod(STAT_AGILITY, val, apply);
                 break;
             case ITEM_MOD_STRENGTH:                         //modify strength
-                HandleStatModifier(UNIT_MOD_STAT_STRENGTH, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_STRENGTH, float(val), apply);
+                HandleStatModifier(UNIT_MOD_STAT_STRENGTH, BASE_VALUE, val, apply);
+                ApplyStatBuffMod(STAT_STRENGTH, val, apply);
                 break;
             case ITEM_MOD_INTELLECT:                        //modify intellect
-                HandleStatModifier(UNIT_MOD_STAT_INTELLECT, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_INTELLECT, float(val), apply);
+                HandleStatModifier(UNIT_MOD_STAT_INTELLECT, BASE_VALUE, val, apply);
+                ApplyStatBuffMod(STAT_INTELLECT, val, apply);
                 break;
             case ITEM_MOD_SPIRIT:                           //modify spirit
-                HandleStatModifier(UNIT_MOD_STAT_SPIRIT, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_SPIRIT, float(val), apply);
+                HandleStatModifier(UNIT_MOD_STAT_SPIRIT, BASE_VALUE, val, apply);
+                ApplyStatBuffMod(STAT_SPIRIT, val, apply);
                 break;
             case ITEM_MOD_STAMINA:                          //modify stamina
-                HandleStatModifier(UNIT_MOD_STAT_STAMINA, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_STAMINA, float(val), apply);
+                HandleStatModifier(UNIT_MOD_STAT_STAMINA, BASE_VALUE, val, apply);
+                ApplyStatBuffMod(STAT_STAMINA, val, apply);
                 break;
         }
     }
@@ -7342,15 +7342,12 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
         else if (slot == EQUIPMENT_SLOT_OFFHAND)
             attType = OFF_ATTACK;
 
-        bool hasDamage = false;
         m_weaponDamageCount[attType] = 0;
 
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; i++)
         {
             if (proto->Damage[i].DamageMax == 0)
                 break;
-
-            hasDamage = true;
 
             float minDamage = 0.0f;
             float maxDamage = 0.0f;
