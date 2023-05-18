@@ -5159,19 +5159,26 @@ float Unit::SpellDamageBonusTaken(SpellCaster* pCaster, SpellEntry const* spellP
     uint32 schoolMask = spell ? spell->m_spellSchoolMask : spellProto->GetSpellSchoolMask();
 
     // Taken total percent damage auras
-    float TakenTotalMod = 1.0f;
-    float TakenTotal = 0;
+    float takenTotalMod = 1.0f;
+    takenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, schoolMask);
 
-    // ..taken
-    TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, schoolMask);
+    float tmpDamage;
 
     // Taken fixed damage bonus auras
-    int32 TakenAdvertisedBenefit = SpellBaseDamageBonusTaken(spellProto->GetSpellSchoolMask());
+    int32 takenFlatMod = SpellBaseDamageBonusTaken(spellProto->GetSpellSchoolMask());
+    if (takenFlatMod < 0)
+    {
+        if ((-takenFlatMod > (pdamage / 2)))
+            takenFlatMod = -int(pdamage / 2);
 
-    // apply benefit affected by spell power implicit coeffs and spell level penalties
-    TakenTotal = SpellBonusWithCoeffs(spellProto, effectIndex, TakenTotal, TakenAdvertisedBenefit, 0, damagetype, false, pCaster, spell);
-
-    float tmpDamage = (pdamage + TakenTotal * int32(stack)) * TakenTotalMod;
+        tmpDamage = (pdamage + takenFlatMod) * takenTotalMod;
+    }
+    else
+    {
+        // apply benefit affected by spell power implicit coeffs and spell level penalties
+        float takenTotal = SpellBonusWithCoeffs(spellProto, effectIndex, 0, takenFlatMod, 0, damagetype, false, pCaster, spell);
+        tmpDamage = (pdamage + takenTotal * int32(stack)) * takenTotalMod;
+    }
 
     return tmpDamage > 0 ? tmpDamage : 0;
 }
@@ -8724,7 +8731,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, ProcSystemArgumen
                     break;
                 }
             }
-            
         }
 
         // don't reroll chance for each target in this case
