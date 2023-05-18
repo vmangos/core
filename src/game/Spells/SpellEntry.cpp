@@ -935,7 +935,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                             SpellFamilyName == SPELLFAMILY_GENERIC)
                         return false;
                     // but not this if this first effect (don't found better check)
-                    if (Attributes & 0x4000000 && effIndex == EFFECT_INDEX_0)
+                    if (Attributes & SPELL_ATTR_AURA_IS_DEBUFF && effIndex == EFFECT_INDEX_0)
                         return false;
                     break;
                 case SPELL_AURA_MOD_SCALE:
