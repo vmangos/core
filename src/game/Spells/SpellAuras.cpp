@@ -5980,15 +5980,6 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             uint32 pdamage = ditheru(std::max(fdamage, 0.f)); // prevent negative damage due to sickness
 
-            // Calculate armor mitigation if it is a physical spell
-            // But not for bleed mechanic spells
-            if (spellProto->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_NORMAL && spellProto->GetEffectMechanic(m_effIndex) != MECHANIC_BLEED && !(spellProto->Custom & SPELL_CUSTOM_IGNORE_ARMOR))
-            {
-                uint32 pdamageReductedArmor = ditheru(pCaster->CalcArmorReducedDamage(target, pdamage));
-                cleanDamage.damage += pdamage - pdamageReductedArmor;
-                pdamage = pdamageReductedArmor;
-            }
-
             target->CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), DOT, pdamage, &absorb, &resist, spellProto);
 
             DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %s attacked %s for %u dmg inflicted by %u",
@@ -6054,14 +6045,6 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             CleanDamage cleanDamage =  CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL, 0, 0);
 
             uint32 pdamage = ditheru(m_modifier.m_amount > 0 ? m_modifier.m_amount : 0);
-
-            //Calculate armor mitigation if it is a physical spell
-            if (spellProto->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_NORMAL)
-            {
-                uint32 pdamageReductedArmor = ditheru(pCaster->CalcArmorReducedDamage(target, pdamage));
-                cleanDamage.damage += pdamage - pdamageReductedArmor;
-                pdamage = pdamageReductedArmor;
-            }
 
             pdamage = target->SpellDamageBonusTaken(pCaster, spellProto, GetEffIndex(), pdamage, DOT, GetStackAmount());
 
