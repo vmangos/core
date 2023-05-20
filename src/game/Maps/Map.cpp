@@ -3148,7 +3148,7 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
     if ((t < 1) && (t > 0))
     {
         for (int i = 0; i < 3; ++i)
-            endPosition[i] = point[i] + (endPosition[i] - point[i]) * t;
+            endPosition[i] = point[i] + (endPosition[i] - point[i]) * hitNormal[i];
     }
 
     if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(visited[visitedCount - 1], endPosition, endPosition, nullptr)))
