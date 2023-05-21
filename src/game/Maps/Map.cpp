@@ -3143,8 +3143,14 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WalkHitPos: Navmesh raycast failed");
         return false;
     }
-    for (int i = 0; i < 3; ++i)
-        endPosition[i] += hitNormal[i] * 0.5f;
+
+    // We hit a wall - calculate new endposition
+    if ((t < 1) && (t > 0))
+    {
+        for (int i = 0; i < 3; ++i)
+            endPosition[i] = point[i] + (endPosition[i] - point[i]) * hitNormal[i];
+    }
+
     if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(visited[visitedCount - 1], endPosition, endPosition, nullptr)))
         return false;
 
