@@ -1636,11 +1636,9 @@ CreatureDisplayInfoAddon const* ObjectMgr::GetCreatureDisplayInfoRandomGender(ui
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Model (Entry: %u) has display_id_other_gender %u not found in table `creature_display_info_addon`. ", minfo->display_id, minfo->display_id_other_gender);
             return minfo;                                   // not fatal, just use the previous one
         }
-        else
-            return minfo_tmp;
+        return minfo_tmp;
     }
-    else
-        return minfo;
+    return minfo;
 }
 
 void ObjectMgr::LoadCreatureDisplayInfoAddon()
