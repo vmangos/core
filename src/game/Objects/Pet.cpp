@@ -472,8 +472,8 @@ void Pet::SavePetToDB(PetSaveMode mode)
         if (!bInCache)
             m_pTmpCache = new CharacterPetCache;
 
-        uint32 curhealth = GetHealth();
-        uint32 curmana = GetPower(POWER_MANA);
+        uint32 const curhealth = GetHealth();
+        uint32 const curmana = GetPower(POWER_MANA);
 
         // stable and not in slot saves
         if ((mode != PET_SAVE_AS_CURRENT && getPetType() != HUNTER_PET) ||
@@ -485,10 +485,6 @@ void Pet::SavePetToDB(PetSaveMode mode)
         _SaveSpells();
         _SaveSpellCooldowns();
         _SaveAuras();
-
-        uint32 loyalty = 1;
-        if (getPetType() != HUNTER_PET)
-            loyalty = GetLoyaltyLevel();
 
         // remove current data
         static SqlStatementID delPet ;
