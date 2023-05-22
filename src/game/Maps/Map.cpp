@@ -203,6 +203,8 @@ public:
         map->LoadGrid(c, true);
         return false;
     }
+
+private:
     Map* map;
 };
 
@@ -338,12 +340,10 @@ Map::EnsureGridCreated(GridPair const& p)
 void
 Map::EnsureGridLoadedAtEnter(Cell const& cell, Player* player)
 {
-    NGridType* grid;
+    NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
 
     if (EnsureGridLoaded(cell))
     {
-        grid = getNGrid(cell.GridX(), cell.GridY());
-
         if (player)
             DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_MOVES, "Player %s enter cell[%u,%u] triggers of loading grid[%u,%u] on map %u", player->GetName(), cell.CellX(), cell.CellY(), cell.GridX(), cell.GridY(), i_id);
         else
@@ -352,8 +352,6 @@ Map::EnsureGridLoadedAtEnter(Cell const& cell, Player* player)
         ResetGridExpiry(*getNGrid(cell.GridX(), cell.GridY()), 0.1f);
         grid->SetGridState(GRID_STATE_ACTIVE);
     }
-    else
-        grid = getNGrid(cell.GridX(), cell.GridY());
 
     if (player)
         AddToGrid(player, grid, cell);
@@ -816,7 +814,7 @@ inline void Map::UpdateActiveCellsSynch(uint32 now, uint32 diff)
 }
 
 
-inline void Map::UpdateCells(uint32 map_diff)
+inline void Map::UpdateCells(uint32 /* map_diff */)
 {
     uint32 now = WorldTimer::getMSTime();
     uint32 diff = WorldTimer::getMSTimeDiff(_lastCellsUpdate, now);
@@ -1091,7 +1089,8 @@ bool ScriptedEvent::UpdateEvent()
         EndEvent(false);
         return true;
     }
-    else if (m_uiSuccessCondition && IsConditionSatisfied(m_uiSuccessCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+    
+    if (m_uiSuccessCondition && IsConditionSatisfied(m_uiSuccessCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
     {
         EndEvent(true);
         return true;
@@ -1109,7 +1108,8 @@ bool ScriptedEvent::UpdateEvent()
             EndEvent(false);
             return true;
         }
-        else if (target.uiSuccessCondition && IsConditionSatisfied(target.uiSuccessCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+        
+        if (target.uiSuccessCondition && IsConditionSatisfied(target.uiSuccessCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(true);
             return true;
@@ -1393,7 +1393,7 @@ Map::PlayerRelocation(Player* player, float x, float y, float z, float orientati
 }
 
 
-void Map::DoPlayerGridRelocation(Player* player, float x, float y, float z, float orientation)
+void Map::DoPlayerGridRelocation(Player* player, float x, float y, float /* z */, float /* orientation */)
 {
     MANGOS_ASSERT(player);
 
@@ -1499,8 +1499,8 @@ bool Map::CreatureRespawnRelocation(Creature* c, bool forGridUnload)
         c->OnRelocated();
         return true;
     }
-    else
-        return false;
+    
+    return false;
 }
 
 bool Map::UnloadGrid(uint32 const& x, uint32 const& y, bool pForce)
@@ -1994,7 +1994,7 @@ void Map::CreateInstanceData(bool load)
 void Map::SetWeather(uint32 zoneId, WeatherType type, float grade, bool permanently)
 {
     Weather* wth = m_weatherSystem->FindOrCreateWeather(zoneId);
-    wth->SetWeather(WeatherType(type), grade, this, permanently);
+    wth->SetWeather(type, grade, this, permanently);
 }
 
 void Map::TeleportAllPlayersTo(TeleportLocation loc)
@@ -3205,7 +3205,7 @@ bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y,
     // Find the navMeshQuery.
     MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
     dtNavMeshQuery const* m_navMeshQuery = transport ? mmap->GetModelNavMeshQuery(transport->GetDisplayId()) : mmap->GetNavMeshQuery(GetId());
-    float radius = maxRadius * rand_norm_f();
+    float const radius = maxRadius * rand_norm_f();
 
     // Find a valid position nearby.
     float endPosition[3];
@@ -3230,7 +3230,7 @@ bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y,
             return false;
 
         // Random point may be at a bigger distance than allowed
-        float d = sqrt(pow(x - point[2], 2) + pow(y - point[0], 2));
+        float const d = sqrt(pow(x - point[2], 2) + pow(y - point[0], 2));
         endPosition[0] = y + radius*(y - point[0]) / d;
         endPosition[1] = z;
         endPosition[2] = x + radius*(x - point[2]) / d;
@@ -3241,8 +3241,12 @@ bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y,
         result = m_navMeshQuery->raycast(startRef, closestPoint, endPosition, &filter, &t, hitNormal, visited, &visitedCount, 10);
         if (dtStatusFailed(result) || !visitedCount)
             return false;
-        for (int i = 0; i < 3; ++i)
-            endPosition[i] += hitNormal[i] * 0.5f;
+        // we hit a wall - calculate new endposition
+        if ((t < 1) && (t > 0))
+        {
+            for (int i = 0; i < 3; ++i)
+                endPosition[i] = point[i] + (endPosition[i] - point[i]) * hitNormal[i];
+        }
         result = m_navMeshQuery->closestPointOnPoly(visited[visitedCount - 1], endPosition, endPosition, nullptr);
         if (dtStatusFailed(result) || !MaNGOS::IsValidMapCoord(endPosition[2], endPosition[0], endPosition[1]))
             return false;
@@ -3265,7 +3269,7 @@ bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y,
         z += 0.5f; // Allow us a little error (mmaps not very precise regarding height computations)
     else
     {
-        float vmapH = GetHeight(x, y, z);
+        float const vmapH = GetHeight(x, y, z);
         if (vmapH > z)
             z = vmapH;
     }
