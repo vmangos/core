@@ -447,14 +447,14 @@ bool PatrolMovementGenerator::InitPatrol(Creature& creature)
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PatrolMovementGenerator] %s is not allowed for this generator.", creature.GetObjectGuid().GetString().c_str());
         return false;
     }
-    std::map<ObjectGuid, CreatureGroupMember*>::const_iterator it = group->GetMembers().find(creature.GetObjectGuid());
+    std::map<ObjectGuid, CreatureGroupMember>::const_iterator it = group->GetMembers().find(creature.GetObjectGuid());
     if (it == group->GetMembers().end())
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PatrolMovementGenerator] %s not found in patrol members.", creature.GetObjectGuid().GetString().c_str());
         return false;
     }
-    _leaderGuid = group->GetLeaderGuid();
-    _groupMember = it->second;
+    m_leaderGuid = group->GetLeaderGuid();
+    m_groupMember = it->second;
     return true;
 }
 
@@ -499,10 +499,10 @@ bool PatrolMovementGenerator::Update(Creature &creature, uint32 const& diff)
 
 bool PatrolMovementGenerator::GetResetPosition(Creature& creature, float& x, float& y, float& z)
 {
-    Creature* leader = creature.GetMap()->GetCreature(_leaderGuid);
+    Creature* leader = creature.GetMap()->GetCreature(m_leaderGuid);
     if (!leader)
         return false;
-    _groupMember->ComputeRelativePosition(leader->GetOrientation(), x, y);
+    m_groupMember.ComputeRelativePosition(leader->GetOrientation(), x, y);
     x += leader->GetPositionX();
     y += leader->GetPositionY();
     z = leader->GetPositionZ();
@@ -513,7 +513,7 @@ bool PatrolMovementGenerator::GetResetPosition(Creature& creature, float& x, flo
 
 void PatrolMovementGenerator::StartMove(Creature& creature)
 {
-    Creature* leader = creature.GetMap()->GetCreature(_leaderGuid);
+    Creature* leader = creature.GetMap()->GetCreature(m_leaderGuid);
     if (!leader || leader->movespline->Finalized())
         return;
 
@@ -545,7 +545,7 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     Vector3 direction = last - leader->movespline->GetPoint(totalLeaderPoints - 1);
     float angle = atan2(direction.y, direction.x);
     float x, y, z;
-    _groupMember->ComputeRelativePosition(angle, x, y);
+    m_groupMember.ComputeRelativePosition(angle, x, y);
     x += last.x;
     y += last.y;
     z = last.z;
