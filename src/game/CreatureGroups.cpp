@@ -25,12 +25,12 @@ void CreatureGroup::AddMember(ObjectGuid guid, float followDist, float followAng
 {
     if (guid == m_leaderGuid)
         return;
+
     CreatureGroupMember& member = m_members[guid];
     member.followDistance = followDist;
     member.followAngle    = followAngle;
     member.memberFlags    = memberFlags;
     m_options |= memberFlags;
-    return;
 }
 
 void CreatureGroup::OnMemberAttackStart(Creature* member, Unit* target)
