@@ -451,7 +451,7 @@ PersistentAreaAura::~PersistentAreaAura()
 {
 }
 
-DynamicObject* PersistentAreaAura::GetDynObject()
+DynamicObject* PersistentAreaAura::GetDynObject() const
 {
     return GetTarget()->GetMap()->GetDynamicObject(m_dynObjectGuid);
 }
