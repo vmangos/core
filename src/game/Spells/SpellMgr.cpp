@@ -945,7 +945,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     
                     // Atiesh aura stacking with Moonkin Aura
                     if (spellInfo_1->SpellIconID == 46 && spellInfo_2->SpellIconID == 46)
-	                    return false;
+                        return false;
                     
                     // Soulstone Resurrection and Twisting Nether (resurrector)
                     if (spellInfo_1->SpellIconID == 92 && spellInfo_2->SpellIconID == 92 && (
