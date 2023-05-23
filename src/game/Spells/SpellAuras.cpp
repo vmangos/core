@@ -441,14 +441,19 @@ AreaAura::~AreaAura()
 {
 }
 
-PersistentAreaAura::PersistentAreaAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder* holder, Unit* target,
-                                       Unit* caster, Item* castItem) : Aura(spellproto, eff, currentBasePoints, holder, target, caster, castItem)
+PersistentAreaAura::PersistentAreaAura(ObjectGuid dynObjectGuid, SpellEntry const* spellproto, SpellEffectIndex eff, SpellAuraHolder* holder, Unit* target, Unit* caster) :
+    Aura(spellproto, eff, nullptr, holder, target, caster, nullptr), m_dynObjectGuid(dynObjectGuid)
 {
     m_isPersistent = true;
 }
 
 PersistentAreaAura::~PersistentAreaAura()
 {
+}
+
+DynamicObject* PersistentAreaAura::GetDynObject()
+{
+    return GetTarget()->GetMap()->GetDynamicObject(m_dynObjectGuid);
 }
 
 SingleEnemyTargetAura::SingleEnemyTargetAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder* holder, Unit* target,
@@ -864,18 +869,13 @@ void PersistentAreaAura::Update(uint32 diff)
     // Explosive Trap Effect should not be removed on leaving radius.
     if (remove = !GetSpellProto()->HasAttribute(SPELL_ATTR_EX3_NO_AVOIDANCE)) // assignment
     {
-        if (SpellCaster* pCaster = GetRealCaster())
+        Unit* pTarget = GetTarget();
+        if (DynamicObject* pDynObject = GetDynObject())
         {
-            std::vector<DynamicObject*> dynObjs;
-            pCaster->GetDynObjects(GetId(), GetEffIndex(), dynObjs);
-            Unit* pTarget = GetTarget();
-            for (DynamicObject* obj : dynObjs)
-            {
-                if (pTarget->IsWithinDistInMap(obj, obj->GetRadius()))
-                    remove = false;
-                else
-                    obj->RemoveAffected(pTarget);           // let later reapply if target return to range
-            }
+            if (pTarget->IsWithinDistInMap(pDynObject, pDynObject->GetRadius()))
+                remove = false;
+            else
+                pDynObject->RemoveAffected(pTarget);           // let later reapply if target return to range
         }
     }
 
@@ -6887,15 +6887,12 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
     if (m_removeMode != AURA_REMOVE_BY_STACK)
         CleanupTriggeredSpells();
 
-    SpellCaster* caster = GetRealCaster();
-
-    if (IsPersistent())
+    for (const auto aura : m_auras)
     {
-        if (caster)
+        if (aura && aura->IsPersistent())
         {
-            DynamicObject *dynObj = caster->GetDynObject(GetId());
-            if (dynObj)
-                dynObj->RemoveAffected(m_target);
+            if (DynamicObject* pDynObject = static_cast<PersistentAreaAura*>(aura)->GetDynObject())
+                pDynObject->RemoveAffected(m_target);
         }
     }
 
@@ -6964,10 +6961,11 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
         }
 
         // reset cooldown state for spells
-        if (caster && GetSpellProto()->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
+        if (GetSpellProto()->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
         {
             // some spells need to start cooldown at aura fade (like stealth)
-            caster->AddCooldown(*GetSpellProto());
+            if (SpellCaster* caster = GetRealCaster())
+                caster->AddCooldown(*GetSpellProto());
         }
     }
 }
