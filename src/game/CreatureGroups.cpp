@@ -268,18 +268,16 @@ void CreatureGroup::RemoveMember(ObjectGuid guid)
 
 void CreatureGroup::DisbandGroup(Creature* pLeader)
 {
-    if (m_deleted)
-        return;
+    MANGOS_ASSERT(!m_deleted);
+    MANGOS_ASSERT(pLeader->GetObjectGuid() == GetOriginalLeaderGuid());
 
     m_deleted = true;
-
-    MANGOS_ASSERT(pLeader->GetObjectGuid() == GetOriginalLeaderGuid());
 
     if (pLeader->HasStaticDBSpawnData())
         sCreatureGroupsManager->EraseCreatureGroup(GetOriginalLeaderGuid());
     pLeader->SetCreatureGroup(nullptr);
 
-    for (auto& it : m_members)
+    for (auto const& it : m_members)
     {
         if (Creature* pOtherMember = pLeader->GetMap()->GetCreature(it.first))
         {
