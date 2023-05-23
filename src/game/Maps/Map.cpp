@@ -340,10 +340,12 @@ Map::EnsureGridCreated(GridPair const& p)
 void
 Map::EnsureGridLoadedAtEnter(Cell const& cell, Player* player)
 {
-    NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
+    NGridType* grid;
 
     if (EnsureGridLoaded(cell))
     {
+        grid = getNGrid(cell.GridX(), cell.GridY());
+
         if (player)
             DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_MOVES, "Player %s enter cell[%u,%u] triggers of loading grid[%u,%u] on map %u", player->GetName(), cell.CellX(), cell.CellY(), cell.GridX(), cell.GridY(), i_id);
         else
@@ -352,6 +354,8 @@ Map::EnsureGridLoadedAtEnter(Cell const& cell, Player* player)
         ResetGridExpiry(*getNGrid(cell.GridX(), cell.GridY()), 0.1f);
         grid->SetGridState(GRID_STATE_ACTIVE);
     }
+    else
+        grid = getNGrid(cell.GridX(), cell.GridY());
 
     if (player)
         AddToGrid(player, grid, cell);
