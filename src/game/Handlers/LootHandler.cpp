@@ -351,6 +351,10 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             if (!go)
                 return;
 
+            // Chest closed animation
+            if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+                go->SetGoState(GO_STATE_READY);
+
             loot = &go->loot;
 
             // Don't despawn temporarily spawned chests that contain group wide quest items.
