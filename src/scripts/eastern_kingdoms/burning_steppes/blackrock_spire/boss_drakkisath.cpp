@@ -22,6 +22,7 @@ SDCategory: Blackrock Spire
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "blackrock_spire.h"
 
 enum
 {
@@ -38,6 +39,7 @@ struct boss_drakkisathAI : public ScriptedAI
 {
     boss_drakkisathAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = static_cast<ScriptedInstance*>(pCreature->GetInstanceData());
         Reset();
     }
 
@@ -48,6 +50,8 @@ struct boss_drakkisathAI : public ScriptedAI
     uint32 m_uiRageTimer;
     uint32 m_uiPierceArmorTimer;
 
+    ScriptedInstance* m_pInstance;
+
     void Reset() override
     {
         m_uiFlameStrikeTimer    = 16000;
@@ -56,6 +60,21 @@ struct boss_drakkisathAI : public ScriptedAI
         m_uiThunderclapTimer    = 1000;
         m_uiRageTimer           = 1000;
         m_uiPierceArmorTimer    = 5000;
+
+        if (m_pInstance && m_creature->IsAlive())
+            m_pInstance->SetData(TYPE_DRAKKISATH, NOT_STARTED);
+    }
+
+    void EnterCombat(Unit* /*pVictim*/) override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_DRAKKISATH, IN_PROGRESS);
+    }
+
+    void JustDied(Unit* /*pKiller*/) override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_DRAKKISATH, DONE);
     }
 
     void UpdateAI(uint32 const uiDiff) override

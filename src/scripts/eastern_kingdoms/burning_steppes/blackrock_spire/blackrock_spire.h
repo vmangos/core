@@ -18,7 +18,8 @@ enum
     TYPE_VALTHALAK              = 4,                        // Only summon once per instance
     TYPE_EVENT_DOOR_UBRS        = 5,                        // UBRS door event
     TYPE_SOLAKAR                = 6,                        // Rookery event
-    INSTANCE_BRS_MAX_ENCOUNTER  = 7,
+    TYPE_DRAKKISATH             = 7,
+    INSTANCE_BRS_MAX_ENCOUNTER  = 8,
 
     NPC_SCARSHIELD_INFILTRATOR  = 10299,
     NPC_BLACKHAND_SUMMONER      = 9818,
@@ -49,6 +50,8 @@ enum
     GO_GYTH_ENTRY_DOOR          = 164726,
     GO_GYTH_COMBAT_DOOR         = 175185,                   // control in boss_script, because will auto-close after each wave
     GO_GYTH_EXIT_DOOR           = 175186,
+    GO_DRAKKISATH_DOOR1         = 175946,
+    GO_DRAKKISATH_DOOR2         = 175947,
 
     GO_BLACKROCK_ALTAR          = 175706,
 
@@ -132,6 +135,8 @@ class instance_blackrock_spire : public ScriptedInstance, private DialogueHelper
         uint64 m_uiGythEntryDoorGUID;
         uint64 m_uiGythCombatDoorGUID;
         uint64 m_uiGythExitDoorGUID;
+        uint64 m_uiDrakkisathDoor1GUID;
+        uint64 m_uiDrakkisathDoor2GUID;
 
         uint64 m_uiFatherFlameGUID;
         uint32 m_uiFatherFlame_timer;
