@@ -256,7 +256,7 @@ void MapManager::CreateNewInstancesForPlayers()
 {
     do
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
         std::unordered_set<Player*> players;
         std::swap(players, m_scheduledNewInstancesForPlayers);
 
