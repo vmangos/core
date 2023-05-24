@@ -989,6 +989,7 @@ class DungeonMap : public Map
 
         // can't be nullptr for loaded map
         DungeonPersistentState* GetPersistanceState() const;
+        void BindPlayerOrGroupOnEnter(Player* player);
 
         void InitVisibilityDistance() override;
         // Activated at raid expiration. No one can enter.

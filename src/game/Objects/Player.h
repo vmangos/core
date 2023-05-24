@@ -1873,6 +1873,8 @@ class Player final: public Unit
         // _NOT_ thread-safe. Must be executed by the map manager after map updates, since we
         // remove objects from the map
         bool ExecuteTeleportFar(ScheduledTeleportData* data);
+        void SendNewWorld();
+        void HandleReturnOnTeleportFail(WorldLocation const& oldLoc);
 
         bool TeleportToBGEntryPoint();
         void RestorePendingTeleport();

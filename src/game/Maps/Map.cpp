@@ -2096,6 +2096,7 @@ bool DungeonMap::CanEnter(Player* player)
     if (m_resetAfterUnload)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[DungeonReset] %s attempted to enter map %u, instance %u during reset", player->GetName(), i_InstanceId);
+        player->SendTransferAborted(TRANSFER_ABORT_NOT_FOUND);
         return false;
     }
 
@@ -2134,6 +2135,27 @@ bool DungeonMap::Add(Player* player)
     if (!CanEnter(player))
         return false;
 
+    BindPlayerOrGroupOnEnter(player);
+
+    // for normal instances cancel the reset schedule when the
+    // first player enters (no players yet)
+    SetResetSchedule(false);
+    player->AddInstanceEnterTime(GetInstanceId(), time(nullptr));
+
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MAP: Player '%s' is entering instance '%u' of map '%s'", player->GetName(), GetInstanceId(), GetMapName());
+    // initialize unload state
+    m_unloadTimer = 0;
+    m_resetAfterUnload = false;
+    m_unloadWhenEmpty = false;
+
+    // this will acquire the same mutex so it cannot be in the previous block
+    Map::Add(player);
+
+    return true;
+}
+
+void DungeonMap::BindPlayerOrGroupOnEnter(Player* player)
+{
     // check for existing instance binds
     InstancePlayerBind *playerBind = player->GetBoundInstance(GetId());
     if (playerBind && playerBind->perm)
@@ -2142,13 +2164,13 @@ bool DungeonMap::Add(Player* player)
         if (playerBind->state != GetPersistanceState())
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "InstanceMap::Add: player %s(%d) is permanently bound to instance %d,%d,%d,%d,%d but he is being put in instance %d,%d,%d,%d,%d",
-                          player->GetName(), player->GetGUIDLow(), playerBind->state->GetMapId(),
-                          playerBind->state->GetInstanceId(),
-                          playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(),
-                          playerBind->state->CanReset(),
-                          GetPersistanceState()->GetMapId(), GetPersistanceState()->GetInstanceId(),
-                          GetPersistanceState()->GetPlayerCount(),
-                          GetPersistanceState()->GetGroupCount(), GetPersistanceState()->CanReset());
+                player->GetName(), player->GetGUIDLow(), playerBind->state->GetMapId(),
+                playerBind->state->GetInstanceId(),
+                playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(),
+                playerBind->state->CanReset(),
+                GetPersistanceState()->GetMapId(), GetPersistanceState()->GetInstanceId(),
+                GetPersistanceState()->GetPlayerCount(),
+                GetPersistanceState()->GetGroupCount(), GetPersistanceState()->CanReset());
             MANGOS_ASSERT(false);
         }
     }
@@ -2162,17 +2184,17 @@ bool DungeonMap::Add(Player* player)
             if (playerBind)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "InstanceMap::Add: %s is being put in instance %d,%d,%d,%d,%d but he is in group (Id: %d) and is bound to instance %d,%d,%d,%d,%d!",
-                              player->GetObjectGuid().GetString().c_str(), playerBind->state->GetMapId(), playerBind->state->GetInstanceId(),
-                              playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(),
-                              playerBind->state->CanReset(), pGroup->GetId(),
-                              playerBind->state->GetMapId(), playerBind->state->GetInstanceId(),
-                              playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(), playerBind->state->CanReset());
+                    player->GetObjectGuid().GetString().c_str(), playerBind->state->GetMapId(), playerBind->state->GetInstanceId(),
+                    playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(),
+                    playerBind->state->CanReset(), pGroup->GetId(),
+                    playerBind->state->GetMapId(), playerBind->state->GetInstanceId(),
+                    playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(), playerBind->state->CanReset());
 
                 if (groupBind)
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "InstanceMap::Add: the group (Id: %d) is bound to instance %d,%d,%d,%d,%d",
-                                  pGroup->GetId(),
-                                  groupBind->state->GetMapId(), groupBind->state->GetInstanceId(),
-                                  groupBind->state->GetPlayerCount(), groupBind->state->GetGroupCount(), groupBind->state->CanReset());
+                        pGroup->GetId(),
+                        groupBind->state->GetMapId(), groupBind->state->GetInstanceId(),
+                        groupBind->state->GetPlayerCount(), groupBind->state->GetGroupCount(), groupBind->state->CanReset());
 
                 // no reason crash if we can fix state
                 player->UnbindInstance(GetId());
@@ -2187,13 +2209,13 @@ bool DungeonMap::Add(Player* player)
                 if (groupBind->state != GetPersistentState())
                 {
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "InstanceMap::Add: %s is being put in instance %d,%d but he is in group (Id: %d) which is bound to instance %d,%d!",
-                                  player->GetObjectGuid().GetString().c_str(), GetPersistentState()->GetMapId(),
-                                  GetPersistentState()->GetInstanceId(),
-                                  pGroup->GetId(), groupBind->state->GetMapId(),
-                                  groupBind->state->GetInstanceId());
+                        player->GetObjectGuid().GetString().c_str(), GetPersistentState()->GetMapId(),
+                        GetPersistentState()->GetInstanceId(),
+                        pGroup->GetId(), groupBind->state->GetMapId(),
+                        groupBind->state->GetInstanceId());
 
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MapSave players: %d, group count: %d",
-                                  GetPersistanceState()->GetPlayerCount(), GetPersistanceState()->GetGroupCount());
+                        GetPersistanceState()->GetPlayerCount(), GetPersistanceState()->GetGroupCount());
 
                     if (groupBind->state)
                         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GroupBind save players: %d, group count: %d", groupBind->state->GetPlayerCount(), groupBind->state->GetGroupCount());
@@ -2222,22 +2244,6 @@ bool DungeonMap::Add(Player* player)
                 MANGOS_ASSERT(playerBind->state == GetPersistentState());
         }
     }
-
-    // for normal instances cancel the reset schedule when the
-    // first player enters (no players yet)
-    SetResetSchedule(false);
-    player->AddInstanceEnterTime(GetInstanceId(), time(nullptr));
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MAP: Player '%s' is entering instance '%u' of map '%s'", player->GetName(), GetInstanceId(), GetMapName());
-    // initialize unload state
-    m_unloadTimer = 0;
-    m_resetAfterUnload = false;
-    m_unloadWhenEmpty = false;
-
-    // this will acquire the same mutex so it cannot be in the previous block
-    Map::Add(player);
-
-    return true;
 }
 
 void DungeonMap::Update(uint32 t_diff)
