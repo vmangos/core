@@ -3193,6 +3193,41 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
     return true;
 }
 
+// This will generate a random point to all directions in water for the provided point in radius range.
+bool Map::GetSwimRandomPosition(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status, bool randomRange/* = true*/) const
+{
+    const float angle = rand_norm_f() * (M_PI_F * 2.0f);
+    const float range = (randomRange ? rand_norm_f() : 1.f) * radius;
+
+    float i_x = x + range * cos(angle);
+    float i_y = y + range * sin(angle);
+
+    // get real ground of new point
+    // the code consider cylinder instead of sphere for possible z
+    float ground = GetHeight(i_x, i_y, z);
+    if (ground > INVALID_HEIGHT) // GetHeight can fail
+    {
+        float min_z = z - 0.7f * radius; // 0.7 to have a bit a "flat" cylinder, TODO which value looks nicest
+        if (min_z < ground)
+            min_z = ground + 0.5f; // Get some space to prevent under map
+
+        float liquidLevel = liquid_status.level - 2.0f; // just to make the generated point is in water and not on surface or a bit above
+
+        // if not enough space to fit the creature better is to return from here
+        if (min_z > liquidLevel)
+            return false;
+
+        // Mobs underwater do not move along Z axis
+        //float max_z = std::max(z + 0.7f * radius, min_z);
+        //max_z = std::min(max_z, liquidLevel);
+        x = i_x;
+        y = i_y;
+        if (min_z > z)
+            z = min_z;
+        return true;
+    }
+    return false;
+}
 
 bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags) const
 {

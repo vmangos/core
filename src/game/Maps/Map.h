@@ -555,6 +555,7 @@ class Map : public GridRefManager<NGridType>
         bool GetWalkHitPosition(GenericTransport* t, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, 
             uint32 moveAllowedFlags = 0xF /*NAV_GROUND | NAV_WATER | NAV_MAGMA | NAV_SLIME*/, float zSearchDist = 20.0f, bool locatedOnSteepSlope = true) const;
         bool GetWalkRandomPosition(GenericTransport* t, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags = 0xF) const;
+        bool GetSwimRandomPosition(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status, bool randomRange = true) const;
         VMAP::ModelInstance* FindCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
 
         void Balance() { _dynamicTree.balance(); }

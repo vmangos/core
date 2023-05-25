@@ -24,10 +24,6 @@
 
 void RandomMovementGenerator::_setRandomLocation(Creature &creature)
 {
-    // Don't move if invalid coordinates have been set somehow.
-    if (i_positionX == 0.0f && i_positionY == 0.0f)
-        return;
-
     if (creature.CanFly())
     {
         //typedef std::vector<Vector3> PointsArray;
@@ -35,7 +31,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
         uint32 ptsPerCycle = ceil(i_wanderDistance * 2);
         static uint32 const nbCyclesPerPacket = 1;
         for (uint32 i = 0; i <= nbCyclesPerPacket * ptsPerCycle; ++i)
-            path.push_back(Vector3(i_positionX + i_wanderDistance * cos(i * 2 * M_PI / ptsPerCycle), i_positionY + i_wanderDistance * sin(i * 2 * M_PI / ptsPerCycle), i_positionZ));
+            path.push_back(Vector3(i_startPosition.x + i_wanderDistance * cos(i * 2 * M_PI / ptsPerCycle), i_startPosition.y + i_wanderDistance * sin(i * 2 * M_PI / ptsPerCycle), i_startPosition.z));
         Movement::MoveSplineInit init(creature, "RandomMovementGenerator (CanFly)");
         init.SetFly();
         init.SetWalk(false);
@@ -46,13 +42,14 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
         return;
     }
 
-    float destX, destY, destZ;
-    if (!creature.GetRandomPoint(i_positionX, i_positionY, i_positionZ, i_wanderDistance, destX, destY, destZ))
+    if (i_randomPoints.empty())
         return;
+
+    G3D::Vector3 const& dest = SelectRandomContainerElement(i_randomPoints);
 
     creature.AddUnitState(UNIT_STAT_ROAMING_MOVE);
     Movement::MoveSplineInit init(creature, "RandomMovementGenerator");
-    init.MoveTo(destX, destY, destZ, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
+    init.MoveTo(dest.x, dest.y, dest.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
     init.SetWalk(!creature.HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN));
     init.Launch();
 
@@ -69,10 +66,26 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
     }
 }
 
+#define MAX_RANDOM_POINTS 10
+
 void RandomMovementGenerator::Initialize(Creature &creature)
 {
     if (!creature.IsAlive())
         return;
+
+    i_randomPoints.clear();
+    i_randomPoints.reserve(MAX_RANDOM_POINTS + 1);
+    for (uint32 i = 0; (i < MAX_RANDOM_POINTS * 3) && (i_randomPoints.size() < MAX_RANDOM_POINTS); ++i)
+    {
+        G3D::Vector3 point;
+        if (creature.GetRandomPoint(i_startPosition.x, i_startPosition.y, i_startPosition.z, i_wanderDistance, point.x, point.y, point.z))
+            i_randomPoints.push_back(point);
+    }
+
+    if (i_randomPoints.empty())
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to generate random points for %s!", creature.GetGuidStr().c_str());
+    else
+        i_randomPoints.push_back(i_startPosition);
 
     creature.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     i_nextMoveTime.Reset(1000);
@@ -134,13 +147,13 @@ void RandomMovementGenerator::UpdateAsync(Creature &creature, uint32 diff)
 bool RandomMovementGenerator::GetResetPosition(Creature& c, float& x, float& y, float& z)
 {
     // use current if in range
-    if (c.IsWithinDist2d(i_positionX, i_positionY, i_wanderDistance))
+    if (c.IsWithinDist2d(i_startPosition.x, i_startPosition.y, i_wanderDistance))
         c.GetPosition(x, y, z);
     else
     {
-        x = i_positionX;
-        y = i_positionY;
-        z = i_positionZ;
+        x = i_startPosition.x;
+        y = i_startPosition.y;
+        z = i_startPosition.z;
     }
 
     return true;
