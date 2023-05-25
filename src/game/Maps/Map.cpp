@@ -3196,8 +3196,8 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
 // This will generate a random point to all directions in water for the provided point in radius range.
 bool Map::GetSwimRandomPosition(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status, bool randomRange/* = true*/) const
 {
-    const float angle = rand_norm_f() * (M_PI_F * 2.0f);
-    const float range = (randomRange ? rand_norm_f() : 1.f) * radius;
+    float const angle = rand_norm_f() * (M_PI_F * 2.0f);
+    float const range = (randomRange ? rand_norm_f() : 1.f) * radius;
 
     float i_x = x + range * cos(angle);
     float i_y = y + range * sin(angle);
