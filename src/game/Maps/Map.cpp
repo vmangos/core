@@ -2661,16 +2661,6 @@ Creature* Map::GetAnyTypeCreature(ObjectGuid guid)
 }
 
 /**
- * Function return dynamic object that in world at CURRENT map
- *
- * @param guid must be dynamic object guid (HIGHGUID_DYNAMICOBJECT)
- */
-DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
-{
-    return m_objectsStore.find<DynamicObject>(guid, (DynamicObject*)nullptr);
-}
-
-/**
  * Function return unit in world at CURRENT map
  *
  * Note: in case player guid not always expected need player at current map only.
