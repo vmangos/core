@@ -453,7 +453,9 @@ PersistentAreaAura::~PersistentAreaAura()
 
 DynamicObject* PersistentAreaAura::GetDynObject() const
 {
-    return GetTarget()->GetMap()->GetDynamicObject(m_dynObjectGuid);
+    if (GetTarget()->IsInWorld())
+        return GetTarget()->GetMap()->GetDynamicObject(m_dynObjectGuid);
+    return nullptr;
 }
 
 SingleEnemyTargetAura::SingleEnemyTargetAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder* holder, Unit* target,
