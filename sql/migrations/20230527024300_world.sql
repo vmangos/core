@@ -28,6 +28,9 @@ UPDATE `creature` SET `position_x`=-6760.2, `position_y`=768.678, `position_z`=8
 -- Uses random movement already
 DELETE FROM `creature_movement_template` WHERE `entry` = 495;
 
+-- Ash'ari Crystal should not have random movement
+UPDATE `creature` SET `wander_distance` = 0, `movement_type` = 0 WHERE `id` = 10415;
+
 
 -- End of migration.
 END IF;
