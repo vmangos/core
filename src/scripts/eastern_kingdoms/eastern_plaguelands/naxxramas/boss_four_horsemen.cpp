@@ -110,6 +110,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     bool m_bShieldWall1;
     bool m_bShieldWall2;
     uint32 m_uiMarkTimer;
+    uint32 m_uiShieldWallTimer;
     uint32 const m_uiMarkId;
     uint32 const m_uiGhostId;
     bool const m_bIsSpirit;
@@ -229,6 +230,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
         m_bShieldWall1 = true;
         m_bShieldWall2 = true;
+        m_uiShieldWallTimer = 0;
         m_uiMarkTimer = 20000;
         killSayCooldown = 0;
 
@@ -347,13 +349,19 @@ struct boss_four_horsemen_shared : public ScriptedAI
         {
             if ((DoCastSpellIfCan(m_creature, SPELL_SHIELDWALL)) == CAST_OK)
                 m_bShieldWall1 = false;
+                m_uiShieldWallTimer = 0;
         }
         else if (m_bShieldWall2 && m_creature->GetHealthPercent() < 20.0f)
         {
-            if ((DoCastSpellIfCan(m_creature, SPELL_SHIELDWALL)) == CAST_OK)
+            if (m_uiShieldWallTimer < 30000) // If a Horseman is taken from 50% to 20% health in less than 30 seconds, the second Shield Wall will never trigger.
+            {
+                m_bShieldWall2 = false;
+            }
+            else if ((DoCastSpellIfCan(m_creature, SPELL_SHIELDWALL)) == CAST_OK)
                 m_bShieldWall2 = false;
         }
-
+        m_uiShieldWallTimer += uiDiff;
+        
         if (m_uiMarkTimer < uiDiff)
         {
             if ((DoCastSpellIfCan(m_creature, m_uiMarkId)) == CAST_OK)
