@@ -205,8 +205,19 @@ bool Group::LoadMemberFromDB(uint32 guidLow, uint8 subgroup, bool assistant)
     if (!data)
         return false;
 
+    ObjectGuid guid = ObjectGuid(HIGHGUID_PLAYER, guidLow);
+
+    for (auto const& itr : m_memberSlots)
+    {
+        if (itr.guid == guid)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to add duplicate member into group on load.");
+            return false;
+        }
+    }
+
     MemberSlot member;
-    member.guid      = ObjectGuid(HIGHGUID_PLAYER, guidLow);
+    member.guid      = guid;
     member.name      = data->sName;
     member.group     = subgroup;
     member.assistant = assistant;
@@ -1504,6 +1515,15 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
 
     if (!guid)
         return false;
+
+    for (auto const& itr : m_memberSlots)
+    {
+        if (itr.guid == guid)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to add duplicate member into group.");
+            return false;
+        }
+    }
 
     Player* player = sObjectMgr.GetPlayer(guid);
 
