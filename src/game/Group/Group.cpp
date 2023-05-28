@@ -1352,12 +1352,15 @@ void Group::SendUpdate()
         Player* player = sObjectMgr.GetPlayer(citr->guid);
         if (!player || !player->GetSession() || player->GetGroup() != this)
             continue;
+
         // guess size
         WorldPacket data(SMSG_GROUP_LIST, (1 + 1 + 1 + 4 + GetMembersCount() * 20) + 8 + 1 + 8 + 1);
         data << (uint8)m_groupType;                         // group type
         data << (uint8)(citr->group | (citr->assistant ? 0x80 : 0)); // own flags (groupid | (assistant?0x80:0))
 
-        data << uint32(GetMembersCount() - 1);
+        uint32 count = 0;
+        size_t countPos = data.wpos();
+        data << uint32(0);
         for (const auto& itr : m_memberSlots)
         {
             if (citr->guid == itr.guid)
@@ -1367,10 +1370,12 @@ void Group::SendUpdate()
             data << itr.guid;
             data << uint8(GetGroupMemberStatus(sObjectMgr.GetPlayer(itr.guid)));
             data << (uint8)(itr.group | (itr.assistant ? 0x80 : 0));
+            count++;
         }
+        data.put<uint32>(countPos, count);
 
         data << m_leaderGuid;                               // leader guid
-        if (GetMembersCount() - 1)
+        if (count)
         {
             data << uint8(m_lootMethod);                    // loot method
             if (GetLootMethod() == MASTER_LOOT)
