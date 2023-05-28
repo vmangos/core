@@ -30,6 +30,7 @@
 #include "GossipDef.h"
 #include "Chat/AbstractPlayer.h"
 #include "SniffFile.h"
+#include "ClientDefines.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -78,20 +79,6 @@ struct AccountData
 
     time_t timestamp;
     std::string data;
-};
-
-enum ClientOSType
-{
-    CLIENT_OS_UNKNOWN,
-    CLIENT_OS_WIN,
-    CLIENT_OS_MAC
-};
-
-enum ClientPlatformType
-{
-    CLIENT_PLATFORM_UNKNOWN,
-    CLIENT_PLATFORM_X86,
-    CLIENT_PLATFORM_PPC
 };
 
 enum PartyOperation

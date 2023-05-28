@@ -20,6 +20,7 @@
 #define MANGOS_RANDOMMOTIONGENERATOR_H
 
 #include "MovementGenerator.h"
+#include "G3D/Vector3.h"
 
 class RandomMovementGenerator
 : public MovementGeneratorMedium< Creature, RandomMovementGenerator >

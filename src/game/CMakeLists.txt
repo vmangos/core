@@ -219,6 +219,7 @@ set (game_SRCS
     AuraRemovalMgr.h
     AutoBroadCastMgr.h
     Camera.h
+    ClientDefines.h
     Conditions.h
     CreatureGroups.h
     Formulas.h

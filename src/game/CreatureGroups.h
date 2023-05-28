@@ -20,9 +20,13 @@
 #define _CREATURE_GROUPS_H
 
 #include "Common.h"
+#include "ObjectGuid.h"
 
+#include <map>
+
+class Unit;
+class Creature;
 class CreatureGroup;
-
 
 enum OptionFlags
 {

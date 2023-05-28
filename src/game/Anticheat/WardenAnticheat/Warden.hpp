@@ -29,6 +29,7 @@
 
 #include "Common.h"
 #include "ByteBuffer.h"
+#include "ClientDefines.h"
 #include "Auth/ARC4.h"
 
 #include <vector>
