@@ -20118,13 +20118,6 @@ bool Player::HasSelfMovementControl() const
     return true;
 }
 
-bool Player::IsAllowedToMove(Unit* unit) const
-{
-    if (unit == this)
-        return !HasUnitState(UNIT_STAT_POSSESSED | UNIT_STAT_FLEEING | UNIT_FLAG_CONFUSED);
-    return !unit->HasUnitState(UNIT_STAT_FLEEING | UNIT_FLAG_CONFUSED);
-}
-
 void Player::UpdateZoneDependentAuras()
 {
     // Some spells applied at enter into zone (with subzones), aura removed in UpdateAreaDependentAuras that called always at zone->area update
