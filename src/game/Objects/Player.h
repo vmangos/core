@@ -1810,8 +1810,6 @@ class Player final: public Unit
                 m_DelayedOperations |= operation;
         }
 
-        bool IsAllowedToMove(Unit* unit) const;
-
         Unit* m_mover;
         GridReference<Player> m_gridRef;
         MapReference m_mapRef;
