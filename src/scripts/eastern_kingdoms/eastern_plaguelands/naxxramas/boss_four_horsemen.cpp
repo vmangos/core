@@ -348,8 +348,10 @@ struct boss_four_horsemen_shared : public ScriptedAI
         if (m_bShieldWall1 && m_creature->GetHealthPercent() < 50.0f)
         {
             if ((DoCastSpellIfCan(m_creature, SPELL_SHIELDWALL)) == CAST_OK)
+            {
                 m_bShieldWall1 = false;
                 m_uiShieldWallTimer = 0;
+            }
         }
         else if (m_bShieldWall2 && m_creature->GetHealthPercent() < 20.0f)
         {
