@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20220918154102');
 
 
 -- Add Missing Quest Related Gameobjects
-SET @OGUID = ;
+SET @OGUID = 54950;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 140971, 1, -8960.19, -3519.93, 17.8637, 2.04204, 0, 0, 0.85264, 0.522499, 300, 300, 100, 1, 0, 0, 0, 10),
 (@OGUID+2, 140971, 1, -8051.12, -2983.68, 53.5337, 4.24115, 0, 0, -0.85264, 0.522499, 300, 300, 100, 1, 0, 0, 0, 10),
@@ -510,8 +510,8 @@ UPDATE `gameobject` SET `animprogress` = 100, `state` = 1, `spawn_flags` = 0 WHE
 
 -- ---------------------------------------------------------------------------------------------------------------------------
 -- Deepmoss Eggs
-SET @DEEPMOS_EGGS_OGUID = ;
-SET @DEEPMOS_EGGS_POOL_TEMPLATE = ;
+SET @DEEPMOS_EGGS_OGUID = 180;
+SET @DEEPMOS_EGGS_POOL_TEMPLATE = 1550;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@DEEPMOS_EGGS_OGUID, 19541, 1, 1163.37, -414.925, 17.3143, 3.61284, 0, 0, -0.972369, 0.233448, 300, 300, 100, 1, 0, 0, 0, 10),
@@ -536,8 +536,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 
 -- ---------------------------------------------------------------------------------------------------------------------------
 -- Atal'ai Artifact
-SET @ATAL_ARTIFACT_OGUID = ;
-SET @ATAL_ARTIFACT_POOL_TEMPLATE = ;
+SET @ATAL_ARTIFACT_OGUID = 210;
+SET @ATAL_ARTIFACT_POOL_TEMPLATE = 1583;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@ATAL_ARTIFACT_OGUID+1, 30854, 0, -10528.7, -3820.75, -18.8854, 5.41052, 0, 0, -0.422618, 0.906308, 300, 300, 100, 1, 0, 0, 0, 10),
@@ -576,8 +576,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 
 -- ---------------------------------------------------------------------------------------------------------------------------
 -- Twilight Tablet Fragments
-SET @TWILIGHT_TABLET_OGUID = ;
-SET @TWILIGHT_TABLET_POOL_TEMPLATE = ;
+SET @TWILIGHT_TABLET_OGUID = 245;
+SET @TWILIGHT_TABLET_POOL_TEMPLATE = 1763;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@TWILIGHT_TABLET_OGUID+1, 180501, 1, -6268.7, 1767.91, 6.55819, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 100, 1, 0, 0, 0, 10),
@@ -630,8 +630,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`,
 
 -- ---------------------------------------------------------------------------------------------------------------------------
 -- Supply Crate
-SET @SUPPLY_CRATE_OGUID = ;
-SET @SUPPLY_CRATE_POOL_TEMPLATE = ;
+SET @SUPPLY_CRATE_OGUID = 4893;
+SET @SUPPLY_CRATE_POOL_TEMPLATE = 2218;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@SUPPLY_CRATE_OGUID+1, 176224, 329, 3454.34, -3363.78, 141.026, 6.07375, 0, 0, -0.104528, 0.994522, 300, 300, 100, 1, 0, 0, 0, 10),
@@ -699,7 +699,7 @@ DELETE FROM `gameobject` WHERE `guid` IN (25689, 25690, 25691, 25692, 25693, 256
 -- ---------------------------------------------------------------------------------------------------------------------------
 -- Blood of Heroes Traps
 DELETE FROM `gameobject` WHERE `id` = 176214;
-SET @BLOOD_OGUID = ;
+SET @BLOOD_OGUID = 25343;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@BLOOD_OGUID+1, 176214, 0, 1158.57, -2524.99, 60.7516, 5.68977, 0, 0, -0.292372, 0.956305, 7200, 7200, 100, 1, 12, 0, 0, 10),
