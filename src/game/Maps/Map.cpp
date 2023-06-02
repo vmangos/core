@@ -3069,7 +3069,7 @@ bool Map::GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, fl
     bool result1 = GetDynamicObjectHitPos(startPos, dstPos, resultPos, modifyDist);
     if (result1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Map::GetHitPosition vmaps corrects gained with dynamic objects! new dest coords are X:%f Y:%f Z:%f", destX, destY, destZ);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Map::GetHitPosition vmaps corrects gained with dynamic objects! new dest coords are X:%f Y:%f Z:%f", resultPos.x, resultPos.y, resultPos.z);
         destX = resultPos.x;
         destY = resultPos.y;
         destZ = resultPos.z;
