@@ -343,12 +343,22 @@ void Object::SendCreateUpdateToPlayer(Player* player)
     upd.Send(player->GetSession());
 }
 
-void WorldObject::DirectSendPublicValueUpdate(uint32 index)
+void WorldObject::DirectSendPublicValueUpdate(uint32 index, uint32 count)
 {
     // Do we need an update ?
-    if (m_uint32Values_mirror[index] == m_uint32Values[index])
+    bool abort = true;
+    for (int i = 0; i < count; i++)
+    {
+        if (m_uint32Values_mirror[index + i] != m_uint32Values[index + i])
+        {
+            abort = false;
+            m_uint32Values_mirror[index + i] = m_uint32Values[index + i];
+        }
+    }
+
+    if (abort)
         return;
-    m_uint32Values_mirror[index] = m_uint32Values[index];
+
     UpdateData data;
     ByteBuffer buf(50);
     buf << uint8(UPDATETYPE_VALUES);
@@ -360,11 +370,13 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index)
 
     UpdateMask updateMask;
     updateMask.SetCount(m_valuesCount);
-    updateMask.SetBit(index);
+    for (int i = 0; i < count; i++)
+        updateMask.SetBit(index + i);
 
     buf << (uint8)updateMask.GetBlockCount();
     buf.append(updateMask.GetMask(), updateMask.GetLength());
-    buf << uint32(m_uint32Values[index]);
+    for (int i = 0; i < count; i++)
+        buf << uint32(m_uint32Values[index + i]);
 
     data.AddUpdateBlock(buf);
     WorldPacket packet;

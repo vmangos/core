@@ -19080,7 +19080,10 @@ void Player::UpdateLongSight()
 void Player::ScheduleCameraUpdate(ObjectGuid guid)
 {
     if (guid.IsEmpty() && m_pendingCameraUpdate.IsEmpty())
+    {
         SetGuidValue(PLAYER_FARSIGHT, guid);
+        DirectSendPublicValueUpdate(PLAYER_FARSIGHT, 2);
+    }
     else
     {
         m_cameraUpdateTimer = BATCHING_INTERVAL;
