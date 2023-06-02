@@ -188,6 +188,7 @@ UPDATE `creature_template` SET `damage_school` = 5 WHERE `entry` IN (521, 3470, 
 
 -- Gurubashi Bat Rider, Giant Buzzard and Bloodshot Are Not Skinnable
 UPDATE `creature_template` SET `skinning_loot_id`= 0 WHERE `entry` IN  (14750, 11614, 2831, 5982, 15316);
+UPDATE `creature_template` SET `skinning_loot_id`= 0 WHERE `skinning_loot_id` IN  (5982);
 DELETE FROM `skinning_loot_template` WHERE `entry` IN (10151, 14750, 2831, 5982, 15316);
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -232,8 +233,10 @@ INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 
 -- Add Missing Greetings
 INSERT INTO `quest_greeting` (`entry`, `type`, `emote_id`, `emote_delay`, `content_default`) VALUES
-(2083, 0, 0, 0, 'Like Teldrassil itself, Dolanaar embraces those who embrace the land.'),
-(186420, 1, 0, 0, 'This collection of scrolls contains various logistic and strategic information, as well as coded correspondences.');
+(2083, 0, 0, 0, 'Like Teldrassil itself, Dolanaar embraces those who embrace the land.');
+-- ERROR: Table `quest_greeting` have entry for nonexistent gameobject template (Entry: 186420), ignore
+-- This is a TBC gameobject! Why are we adding quest greeting for it?
+-- (186420, 1, 0, 0, 'This collection of scrolls contains various logistic and strategic information, as well as coded correspondences.');
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -576,11 +579,13 @@ INSERT INTO `game_event_creature_data` (`guid`, `patch`, `entry_id`, `display_id
 
 -- Remove Incorrect Stormwind Guard
 DELETE FROM `creature` WHERE `guid` = 2473;
+DELETE FROM `game_event_creature_data` WHERE `guid`=2473;
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Remove Incorrect Gossip
 DELETE FROM `gossip_menu` WHERE  `entry` = 9406 AND `text_id` = 5495;
+DELETE FROM `gossip_menu_option` WHERE `menu_id`=9406;
 UPDATE `creature_template` SET `gossip_menu_id`=0 WHERE `entry`=5637;
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -652,6 +657,7 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 
 -- Cant Reset Talents At Loganaar  Untill TBC
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 4687 AND `id`=1;
+DELETE FROM `locales_gossip_menu_option` WHERE `menu_id` = 4687 AND `id`=1;
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -872,6 +878,7 @@ UPDATE `creature` SET `position_x` = -8348.79, `position_y` = -3081.22,`position
 -- Redo Blasted Lands Creatures
 -- Remove Obvious Duplicates
 DELETE FROM `creature` WHERE `guid` IN (3838, 3919, 3837, 3916, 3944, 3940, 3943, 3939, 3910, 3836, 3942, 3904, 3899, 3900, 5982, 3898, 3896, 1448);
+DELETE FROM `creature_addon` WHERE `guid` IN (3942);
 
 -- Add Correct Spawns and ID's
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -935,6 +942,7 @@ UPDATE `creature` SET `id` = 5990, `id2` = 5992 WHERE `id` = 5990 AND `id2` = 0;
 
 -- Remove Incorrect Gossip Option
 DELETE FROM `gossip_menu_option` WHERE  `menu_id` = 347 AND `id` = 0;
+DELETE FROM `locales_gossip_menu_option` WHERE  `menu_id` = 347 AND `id` = 0;
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
