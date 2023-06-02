@@ -18920,6 +18920,47 @@ void RemoveBroadcastListener(Player* target, Player* me)
         target->m_broadcaster->RemoveListener(me);
 }
 
+// specialization for players so we can exclude self
+template<>
+void Player::UpdateVisibilityOf<Player>(WorldObject const* viewPoint, Player* target, UpdateData& data, std::set<WorldObject*>& visibleNow)
+{
+    // own player is always visible
+    if (target == this)
+        return;
+
+    bool inVisibleList = IsInVisibleList(target);
+    if (inVisibleList)
+    {
+        if (!target->FindMap() || !target->isWithinVisibilityDistanceOf(this, viewPoint, inVisibleList) || !target->IsVisibleForInState(this, viewPoint, true))
+        {
+            ObjectGuid t_guid = target->GetObjectGuid();
+
+            target->BuildOutOfRangeUpdateBlock(data);
+            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs.erase(t_guid);
+            lock.unlock();
+
+            RemoveBroadcastListener(target, this);
+            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range for %s. Distance = %f", t_guid.GetString().c_str(), GetGuidStr().c_str(), GetDistance(target));
+        }
+    }
+    else
+    {
+        if (target->FindMap() && target->isWithinVisibilityDistanceOf(this, viewPoint, inVisibleList) && target->IsVisibleForInState(this, viewPoint, false))
+        {
+            visibleNow.insert(target);
+            target->BuildCreateUpdateBlockForPlayer(data, this);
+            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            UpdateVisibilityOf_helper(m_visibleGUIDs, target);
+            lock.unlock();
+
+            AddBroadcastListener(target, this);
+            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is visible now for %s. Distance = %f", target->GetGuidStr().c_str(), GetGuidStr().c_str(), GetDistance(target));
+        }
+    }
+}
+
+// handles all other objects except players
 template<class T>
 void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow)
 {
