@@ -56,14 +56,14 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 
 -- Kroshius 
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(39715, 14467, 0, 0, 0, 1, 5780.3354, -964.8442, 412.69403, 3.5081117, 180, 180, 0, 100, 0, 0, 0, 0, 0, 10);
+(39715, 14467, 0, 0, 0, 1, 5780.3354, -964.8442, 412.69403, 3.5081117, 180, 180, 0, 100, 0, 0, 0, 0, 2, 10);
 UPDATE `creature_template` SET `faction` = 1194, `flags_extra` = 0 WHERE `entry` = 14467;
 
 
 -- Events list for Kroshius
 DELETE FROM `creature_ai_events` WHERE `creature_id`=14467;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(1446701, 14467, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1446701, 0, 0, 'Kroshius - Set Stand State - Just Spawned');
+(1446701, 14467, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1446701, 0, 0, 'Kroshius - Set Stand State on Just Spawned');
 DELETE FROM `creature_ai_scripts` WHERE `id`=1446701;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1446701, 0, 0, 28, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kroshius - Set Stand State');
@@ -77,14 +77,14 @@ INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `
 (8328, 5, 0, 1, 15, 0, 0, 0, 39715, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kroshius - Emote'),
 (8328, 10, 0, 22, 14, 1, 0, 0, 39715, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kroshius - Set Faction'),
 (8328, 10, 0, 4, 46, 768, 2, 0, 39715, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kroshius - Remove Unit Flag'),
-(8328, 1200, 0, 18, 0, 0, 0, 0, 39715, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kroshius - Despawn');
+(8328, 10, 0, 18, 1200000, 0, 0, 0, 39715, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kroshius - Despawn');
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Add Spells to Doomguard Minion (credit cmangos)
-UPDATE `creature_template` SET `spell_list_id` = 14385 WHERE `entry` = 14385;
+UPDATE `creature_template` SET `spell_list_id` = 143850 WHERE `entry` = 14385;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
-(14385, 'Dire Maul - Doomguard Minion', 16005, 100, 4, 0, 0, 0, 5, 8, 18, 24, 0, 16727, 100, 0, 0, 0, 0, 12, 15, 20, 25, 0, 89, 100, 1, 0, 0, 32, 0, 0, 30, 30, 0, 15090, 100, 1, 0, 0, 0, 7, 14, 17, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(143850, 'Dire Maul - Doomguard Minion', 16005, 100, 4, 0, 0, 0, 5, 8, 18, 24, 0, 16727, 100, 0, 0, 0, 0, 12, 15, 20, 25, 0, 89, 100, 1, 0, 0, 32, 0, 0, 30, 30, 0, 15090, 100, 1, 0, 0, 0, 7, 14, 17, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -124,7 +124,6 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1187804;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1187804, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7234, 7235, 7236, 7237, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - Say Random Text'),
 (1187804, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - Despawn Guardians');
-
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1187806;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -234,17 +233,6 @@ INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 -- Add Missing Greetings
 INSERT INTO `quest_greeting` (`entry`, `type`, `emote_id`, `emote_delay`, `content_default`) VALUES
 (2083, 0, 0, 0, 'Like Teldrassil itself, Dolanaar embraces those who embrace the land.'),
-(7740, 0, 0, 0, ''),
-(7825, 0, 0, 0, ''),
-(7884, 0, 0, 0, ''),
-(8582, 0, 0, 0, ''),
-(10306, 0, 0, 0, ''),
-(11857, 0, 0, 0, ''),
-(11862, 0, 0, 0, ''),
-(11864, 0, 0, 0, ''),
-(12126, 0, 0, 0, ''),
-(150075, 1, 0, 0, ''),
-(179827, 1, 0, 0, ''),
 (186420, 1, 0, 0, 'This collection of scrolls contains various logistic and strategic information, as well as coded correspondences.');
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -280,7 +268,7 @@ UPDATE quest_template SET ReqItemId1 = 0, ReqItemId2 = 12627, ReqItemCount1 = 0,
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- Respawn Wintterfall Villiage (credit cmangos)
+-- Respawn Winterfall Villiage (credit cmangos)
 UPDATE `creature` SET `position_x` = 6865.51, `position_y` = -5099.49, `position_z` = 692.725, `orientation` = 0.695391, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41030;
 UPDATE `creature` SET `position_x` = 6845.32, `position_y` = -5115.65, `position_z` = 694.404, `orientation` = 0.135005, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41034;
 UPDATE `creature` SET `position_x` = 6833.81, `position_y` = -5108.76, `position_z` = 693.604, `orientation` = 5.84685, `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 41048;
@@ -438,13 +426,7 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 3897;
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Increase Dropchance of Shadow Hunter Knife
-UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -23.30 WHERE `item` = 5040;
-
--- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
--- Update Creatures Under Map
-UPDATE `creature` SET `position_z` = -0.5432 WHERE `guid` = 9492;
-UPDATE `creature` SET `position_x` = -3643.21, `position_y` = -951.42, `position_z` = -6.4994 WHERE `guid` = 9681;
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -23 WHERE `item` = 5040;
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -599,6 +581,7 @@ DELETE FROM `creature` WHERE `guid` = 2473;
 
 -- Remove Incorrect Gossip
 DELETE FROM `gossip_menu` WHERE  `entry` = 9406 AND `text_id` = 5495;
+UPDATE `creature_template` SET `gossip_menu_id`=0 WHERE `entry`=5637;
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -638,8 +621,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Beached Sea Creature Should Not Despawn On Loot (Note To Self: Maybe Convert Beached Sea Creatures Hardcoded Scripts To DB)
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (48555, 48788);
 
--- Tallonkai's Dresser Should Not Despawn When Looted
-UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0, `spawn_flags` = 0 WHERE `guid` = 49828;
+-- Nicky: Tallonkai's Dresser Should Not Despawn When Looted
+-- brotalnia: But it has consumable flag (data3) in the gameobject_template? All the other gameobjects updated in this section don't have it.
+-- UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0, `spawn_flags` = 0 WHERE `guid` = 49828;
 
 -- Objects Used In Quest The Relics of Wakening Should Not Despawn when Looted
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (49807, 49810, 49808, 49809);
@@ -745,15 +729,17 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- End script for Quest Onu is meditating (credit cmangos)
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(960, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1219, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu - Talk');
-UPDATE `quest_template` SET `CompleteScript` = 960 WHERE  `entry` IN (960, 961);
+-- Nicky: End script for Quest Onu is meditating (credit cmangos)
+-- brotalnia: I remember I had tested these quests myself, to tell on which quest the text is said, in 2019-2020 on classic. The current way is correct.
+-- INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+-- (960, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1219, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu - Talk');
+-- UPDATE `quest_template` SET `CompleteScript` = 960 WHERE  `entry` IN (960, 961);
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- Various Gobjects Should Not Despawn When Looted
-UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (26242, 42485, 27082, 18541, 49805, 10153, 11028, 65, 6771, 30100, 15216, 16598, 15398);
+-- Nicky: Various Gobjects Should Not Despawn When Looted
+-- brotalnia: Guid 18541 has the consumable flag (data3) in gameobject_template, all the others don't.
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (26242, 42485, 27082, 49805, 10153, 11028, 65, 6771, 30100, 15216, 16598, 15398);
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -826,8 +812,9 @@ UPDATE `creature_loot_template` SET `condition_id` = 0 WHERE `item` = 1357;
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- Attack on Camp Narache is Not Exclusive To Tauren
-UPDATE `quest_template` SET `RequiredRaces` = 0 WHERE `entry` = 781;
+-- Nicky: Attack on Camp Narache is Not Exclusive To Tauren
+-- brotalnia: The race mask is not 0 in sniff (0 would allow both factions). The sniffed mask is 434. We exclude 256 since thats goblin. The remainded is 178 which is the current value. This change is wrong!
+-- UPDATE `quest_template` SET `RequiredRaces` = 0 WHERE `entry` = 781;
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -842,7 +829,11 @@ UPDATE `creature` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- Corrections to Dunemaul Compound
+-- Nicky: Corrections to Dunemaul Compound
+-- brotalnia: There have been mass updates to creature spawn positions and assignment of alternative creature ids. It's highly likely these updates which were made before would now fuck up the spawns, since the mass update to sniff moved them. Needs to be recheched carefully and then resubmitted. From a quick check, i find many of the guids referenced here in the mass update...
+-- https://github.com/vmangos/core/commit/d32f0d4a6d3dec983dbadb6566c27dd282ab7c05
+-- https://github.com/vmangos/core/commit/cbb7973b4202205a1d49590cb78d87f9e20ece61
+/*
 UPDATE `creature` SET `id` = 5472, `id2` = 5474 WHERE `id` = 5474;
 UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8545.49, `position_y` = -2992.34,`position_z` = 10.248, `orientation` = 5.98197, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23193;
 UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0, `position_x` = -8543.34, `position_y` = -2971.38, `position_z` = 9.43386, `orientation` = 2.35826, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23156;
@@ -875,7 +866,7 @@ DELETE FROM `creature` WHERE `guid` = 23147;
 UPDATE `creature` SET `id` = 5472, `id2` = 5474, `id3` = 0, `id4` = 0 WHERE `guid` IN  (23146, 23144, 23151, 23145, 23149, 23148);
 UPDATE `creature` SET `position_x` = -8418.63, `position_y` = -3082.32,`position_z` = 8.70868, `orientation` = 3.56047, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23132;
 UPDATE `creature` SET `position_x` = -8348.79, `position_y` = -3081.22,`position_z` = 8.70805, `orientation` = 1.15154, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 23165;
-
+*/
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Redo Blasted Lands Creatures
