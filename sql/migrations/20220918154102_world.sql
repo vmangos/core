@@ -508,6 +508,7 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 600 WHERE
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 140971;
 UPDATE `gameobject` SET `animprogress` = 100, `state` = 1, `spawn_flags` = 0 WHERE `id` IN ( 140971, 37099, 375, 175334, 2087, 176753, 175566, 2743, 2910, 3240, 3290, 20920, 22246, 153123, 157936, 164662, 164958, 171938, 175324, 175384, 175708, 176630, 178186, 179922, 181287, 181098, 2554, 153556, 17282, 143980, 1673, 3640, 3685, 175928, 2724, 13360, 12654, 13872, 28604, 86492, 89634, 89635, 148516, 148513, 148514, 148515, 152094, 152631, 152622, 152620, 176213, 176150, 2560);
 
+-- ---------------------------------------------------------------------------------------------------------------------------
 -- Deepmoss Eggs
 SET @DEEPMOS_EGGS_OGUID = ;
 SET @DEEPMOS_EGGS_POOL_TEMPLATE = ;
@@ -533,6 +534,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 (@DEEPMOS_EGGS_OGUID+4, @DEEPMOS_EGGS_POOL_TEMPLATE, 'Stonetalon Mountains - Deepmoss Eggs', 10),
 (@DEEPMOS_EGGS_OGUID+5, @DEEPMOS_EGGS_POOL_TEMPLATE+1, 'Stonetalon Mountains - Deepmoss Eggs', 10);
 
+-- ---------------------------------------------------------------------------------------------------------------------------
 -- Atal'ai Artifact
 SET @ATAL_ARTIFACT_OGUID = ;
 SET @ATAL_ARTIFACT_POOL_TEMPLATE = ;
@@ -572,6 +574,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 (@ATAL_ARTIFACT_OGUID+11, @ATAL_ARTIFACT_POOL_TEMPLATE+3, 'Swamp of Sorrows - Atal\'ai Artifact', 10),
 (@ATAL_ARTIFACT_OGUID+12, @ATAL_ARTIFACT_POOL_TEMPLATE+4, 'Swamp of Sorrows - Atal\'ai Artifact', 10);
 
+-- ---------------------------------------------------------------------------------------------------------------------------
 -- Twilight Tablet Fragments
 SET @TWILIGHT_TABLET_OGUID = ;
 SET @TWILIGHT_TABLET_POOL_TEMPLATE = ;
@@ -625,6 +628,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`,
 (@TWILIGHT_TABLET_OGUID+17, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Silithus - Twilight Tablet Fragment', 6, 10),
 (@TWILIGHT_TABLET_OGUID+18, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Silithus - Twilight Tablet Fragment', 6, 10);
 
+-- ---------------------------------------------------------------------------------------------------------------------------
 -- Supply Crate
 SET @SUPPLY_CRATE_OGUID = ;
 SET @SUPPLY_CRATE_POOL_TEMPLATE = ;
@@ -692,6 +696,7 @@ UPDATE `pool_gameobject` SET `description` = 'Stratholme - Supply Crate' WHERE `
 -- Remove Custom Objects
 DELETE FROM `gameobject` WHERE `guid` IN (25689, 25690, 25691, 25692, 25693, 25694, 25695, 25696, 25697);
 
+-- ---------------------------------------------------------------------------------------------------------------------------
 -- Blood of Heroes Traps
 DELETE FROM `gameobject` WHERE `id` = 176214;
 SET @BLOOD_OGUID = ;
@@ -786,6 +791,114 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@BLOOD_OGUID+87, 176214, 0, 1873.27, -3189.56, 128.554, 0.15708, 0, 0, 0.078459, 0.996917, 7200, 7200, 100, 1, 12, 0, 0, 10),
 (@BLOOD_OGUID+88, 176214, 0, 2115.7, -4691.12, 74.3362, 1.15192, 0, 0, 0.544639, 0.838671, 7200, 7200, 100, 1, 12, 0, 0, 10);
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` IN (176213, 176214);
+
+-- ---------------------------------------------------------------------------------------------------------------------------
+-- Correct max limit for pool 1090
+UPDATE `pool_template` SET `max_limit` = 24 WHERE `entry` = 1090;
+
+-- ---------------------------------------------------------------------------------------------------------------------------
+-- Update Pool Description
+UPDATE `pool_pool` SET `description` = 'Arathi Highlands - Tin Vein / Silver Vein' WHERE `pool_id` = 21664;
+
+-- ---------------------------------------------------------------------------------------------------------------------------
+-- Pool Laden Mushrooms Correctly
+DELETE FROM `pool_template` WHERE `entry` = 1615;
+DELETE FROM `pool_gameobject_template` WHERE `pool_entry` = 1615;
+
+-- Lushwater Oasis
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(299, 9, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(13191, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(13192, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(13198, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(13200, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(13204, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(13205, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(13235, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(13236, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25611, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25613, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25615, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25618, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25622, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25623, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25625, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25626, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25627, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10),
+(25628, 299, 'The Barrens - Lushwater Oasis - Laden Mushroom', 10);
+
+-- Stagnant Oasis
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(324, 7, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(13194, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(13196, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(13206, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(13207, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(13241, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(13242, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(25612, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(25614, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(25629, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(25631, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(25632, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(25633, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10),
+(25634, 324, 'The Barrens - Stagnant Oasis - Laden Mushroom', 10);
+
+-- Forgotten Pools
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(327, 7, 'The Barrens - Forgoten Pools - Laden Mushroom', 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(127, 3640, 1, 21.8035, -1891.34, 88.906, 1.91986, 0, 0, 0.819152, 0.573577, 300, 300, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(13201, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(13202, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(13237, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(13243, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(13244, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(13251, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(25616, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(25617, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(25619, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(25620, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(25621, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(25624, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(25630, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10),
+(127, 327, 'The Barrens - Forgoten Pools - Laden Mushroom', 10);
+
+-- ---------------------------------------------------------------------------------------------------------------------------
+
+-- Pool Cortello's Riddle Correctly
+DELETE FROM `pool_template` WHERE `entry` = 1336;
+DELETE FROM `pool_gameobject_template` WHERE `pool_entry` = 1336;
+
+-- Ship 1
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES 
+(129, 2554, 0, -14938, 351.788, 7.5324, 5.39307, 0, 0, -0.430511, 0.902586, 300, 300, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(332, 1, 'Stranglethorn Vale - Ship 1 - Cortello\'s Riddle', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(11133, 332, 'Stranglethorn Vale - Ship 1 - Cortello\'s Riddle', 10),
+(26044, 332, 'Stranglethorn Vale - Ship 1 - Cortello\'s Riddle', 10),
+(26045, 332, 'Stranglethorn Vale - Ship 1 - Cortello\'s Riddle', 10),
+(129, 332, 'Stranglethorn Vale - Ship 1 - Cortello\'s Riddle', 10);
+
+-- Ship 2
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(335, 1, 'Stranglethorn Vale - Ship 2 - Cortello\'s Riddle', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(12172, 335, 'Stranglethorn Vale - Ship 2 - Cortello\'s Riddle', 10),
+(26042, 335, 'Stranglethorn Vale - Ship 2 - Cortello\'s Riddle', 10),
+(26043, 335, 'Stranglethorn Vale - Ship 2 - Cortello\'s Riddle', 10);
+
+-- Ship 3
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(398, 1, 'Stranglethorn Vale - Ship 3 - Cortello\'s Riddle', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(11652, 398, 'Stranglethorn Vale - Ship 3 - Cortello\'s Riddle', 10),
+(26046, 398, 'Stranglethorn Vale - Ship 3 - Cortello\'s Riddle', 10),
+(26047, 398, 'Stranglethorn Vale - Ship 3 - Cortello\'s Riddle', 10);
 
 
 -- End of migration.
