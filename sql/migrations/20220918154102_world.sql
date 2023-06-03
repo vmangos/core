@@ -902,6 +902,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 -- ---------------------------------------------------------------------------------------------------------------------------
 
 -- Corrections to Dunemaul Compound
+UPDATE `creature` SET `id` = 5472, `id2` = 5474 WHERE `id` = 5474;
+UPDATE `creature` SET `id` = 5472, `id2` = 5474 WHERE `id` = 5472;
 UPDATE `creature` SET `id` = 5472, `id2` = 5474, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` IN (
 23193,
 23156,
