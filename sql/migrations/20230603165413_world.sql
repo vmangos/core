@@ -157,7 +157,7 @@ UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` IN (142141, 176642);
 UPDATE `pool_template` SET `description` = 'Arthas Tears in Eastern Plaguelands' WHERE `entry` = 1266;
 UPDATE `pool_template` SET `description` = 'Arthas Tears in Western Plaguelands' WHERE `entry` = 1259;
 UPDATE `pool_template` SET `description` = 'Arthas Tears in Felwood' WHERE `entry` = 1226;
-UPDATE pool_gameobject SET `description` = 'Arthas Tears' WHERE description LIKE 'Arthas\' Tears';
+UPDATE `pool_gameobject` SET `description` = 'Arthas Tears' WHERE `description` LIKE 'Arthas\' Tears';
 
 -- Update Counters
 UPDATE `pool_template` SET `max_limit` = 8 WHERE `entry`=1226;
