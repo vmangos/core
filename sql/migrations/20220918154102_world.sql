@@ -899,6 +899,37 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 (26046, 398, 'Stranglethorn Vale - Ship 3 - Cortello\'s Riddle', 10),
 (26047, 398, 'Stranglethorn Vale - Ship 3 - Cortello\'s Riddle', 10);
 
+-- ---------------------------------------------------------------------------------------------------------------------------
+
+-- Corrections to Dunemaul Compound
+UPDATE `creature` SET `id` = 5472, `id2` = 5474, `movement_type` = 1, `wander_distance` = 2 WHERE `guid` IN (
+23193,
+23156,
+23196,
+23157,
+23194,
+23182,
+23172,
+23154,
+23153,
+23183,
+23184,
+23137,
+23186,
+23141,
+23170,
+23177,
+23147,
+23169,
+23143,
+23175,
+23146,
+23144,
+23151,
+23145,
+23149,
+23148);
+
 
 -- End of migration.
 END IF;
