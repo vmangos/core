@@ -1676,7 +1676,8 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
     uint8 botRace = SelectRandomRaceForClass(botClass, botTeam);
 
     // Spawn bot on GM Island
-    BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, 0, 16224.356f, 16284.763f, 13.175f, 4.56f, bg);
+    uint32 instanceId = sMapMgr.GetContinentInstanceId(1, 16224.356f, 16284.763f);
+    BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, instanceId, 16224.356f, 16284.763f, 13.175f, 4.56f, bg);
     sPlayerBotMgr.AddBot(ai);
 
     if (bg == BATTLEGROUND_QUEUE_WS)
