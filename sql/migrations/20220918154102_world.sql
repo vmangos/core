@@ -529,9 +529,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 (@DEEPMOS_EGGS_OGUID, @DEEPMOS_EGGS_POOL_TEMPLATE, 'Stonetalon Mountains - Deepmoss Eggs', 10),
 (@DEEPMOS_EGGS_OGUID+1, @DEEPMOS_EGGS_POOL_TEMPLATE+1, 'Stonetalon Mountains - Deepmoss Eggs', 10),
 (@DEEPMOS_EGGS_OGUID+2, @DEEPMOS_EGGS_POOL_TEMPLATE, 'Stonetalon Mountains - Deepmoss Eggs', 10),
-(@DEEPMOS_EGGS_OGUID+3, @DEEPMOS_EGGS_POOL_TEMPLATE+1, 'Stonetalon Mountains - Deepmoss Eggs', 10),
-(@DEEPMOS_EGGS_OGUID+4, @DEEPMOS_EGGS_POOL_TEMPLATE, 'Stonetalon Mountains - Deepmoss Eggs', 10),
-(@DEEPMOS_EGGS_OGUID+5, @DEEPMOS_EGGS_POOL_TEMPLATE+1, 'Stonetalon Mountains - Deepmoss Eggs', 10);
+(@DEEPMOS_EGGS_OGUID+3, @DEEPMOS_EGGS_POOL_TEMPLATE+1, 'Stonetalon Mountains - Deepmoss Eggs', 10);
 
 -- ---------------------------------------------------------------------------------------------------------------------------
 -- Atal'ai Artifact
@@ -619,13 +617,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`,
 (@TWILIGHT_TABLET_OGUID+9, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Silithus - Twilight Tablet Fragment', 6, 10),
 (@TWILIGHT_TABLET_OGUID+10, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Silithus - Twilight Tablet Fragment', 6, 10),
 (@TWILIGHT_TABLET_OGUID+11, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Silithus - Twilight Tablet Fragment', 6, 10),
-(@TWILIGHT_TABLET_OGUID+12, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Silithus - Twilight Tablet Fragment', 6, 10),
-(@TWILIGHT_TABLET_OGUID+13, @TWILIGHT_TABLET_POOL_TEMPLATE+1, 'Silithus - Twilight Tablet Fragment', 6, 10),
-(@TWILIGHT_TABLET_OGUID+14, @TWILIGHT_TABLET_POOL_TEMPLATE+2, 'Silithus - Twilight Tablet Fragment', 6, 10),
-(@TWILIGHT_TABLET_OGUID+15, @TWILIGHT_TABLET_POOL_TEMPLATE+3, 'Silithus - Twilight Tablet Fragment', 6, 10),
-(@TWILIGHT_TABLET_OGUID+16, @TWILIGHT_TABLET_POOL_TEMPLATE+4, 'Silithus - Twilight Tablet Fragment', 6, 10),
-(@TWILIGHT_TABLET_OGUID+17, @TWILIGHT_TABLET_POOL_TEMPLATE+5, 'Silithus - Twilight Tablet Fragment', 6, 10),
-(@TWILIGHT_TABLET_OGUID+18, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Silithus - Twilight Tablet Fragment', 6, 10);
+(@TWILIGHT_TABLET_OGUID+12, @TWILIGHT_TABLET_POOL_TEMPLATE+6, 'Silithus - Twilight Tablet Fragment', 6, 10);
 
 -- ---------------------------------------------------------------------------------------------------------------------------
 -- Supply Crate
