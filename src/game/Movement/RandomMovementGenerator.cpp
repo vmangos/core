@@ -22,6 +22,8 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 
+#define MAX_RANDOM_POINTS 10
+
 void RandomMovementGenerator::_setRandomLocation(Creature &creature)
 {
     if (creature.CanFly())
@@ -45,7 +47,18 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
     if (i_randomPoints.empty())
         return;
 
-    G3D::Vector3 const& dest = SelectRandomContainerElement(i_randomPoints);
+    G3D::Vector3 dest;
+    if (i_randomPoints.size() < MAX_RANDOM_POINTS)
+    {
+        if (!creature.GetRandomPoint(i_startPosition.x, i_startPosition.y, i_startPosition.z, i_wanderDistance, dest.x, dest.y, dest.z))
+            return;
+
+        i_randomPoints.push_back(dest);
+    }
+    else
+    {
+        dest = SelectRandomContainerElement(i_randomPoints);
+    }
 
     creature.AddUnitState(UNIT_STAT_ROAMING_MOVE);
     Movement::MoveSplineInit init(creature, "RandomMovementGenerator");
@@ -66,26 +79,26 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
     }
 }
 
-#define MAX_RANDOM_POINTS 10
-
 void RandomMovementGenerator::Initialize(Creature &creature)
 {
     if (!creature.IsAlive())
         return;
 
-    i_randomPoints.clear();
-    i_randomPoints.reserve(MAX_RANDOM_POINTS + 1);
-    for (uint32 i = 0; (i < MAX_RANDOM_POINTS * 3) && (i_randomPoints.size() < MAX_RANDOM_POINTS); ++i)
-    {
-        G3D::Vector3 point;
-        if (creature.GetRandomPoint(i_startPosition.x, i_startPosition.y, i_startPosition.z, i_wanderDistance, point.x, point.y, point.z))
-            i_randomPoints.push_back(point);
-    }
-
     if (i_randomPoints.empty())
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to generate random points for %s!", creature.GetGuidStr().c_str());
-    else
+    {
+        i_randomPoints.reserve(MAX_RANDOM_POINTS + 1);
+        for (uint32 i = 0; i < MAX_RANDOM_POINTS; ++i)
+        {
+            G3D::Vector3 point;
+            if (creature.GetRandomPoint(i_startPosition.x, i_startPosition.y, i_startPosition.z, i_wanderDistance, point.x, point.y, point.z))
+                i_randomPoints.push_back(point);
+        }
+
+        if (i_randomPoints.empty())
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to generate random points for %s!", creature.GetGuidStr().c_str());
+    
         i_randomPoints.push_back(i_startPosition);
+    }
 
     creature.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     i_nextMoveTime.Reset(1000);
