@@ -72,6 +72,7 @@ enum EventAI_Type
     EVENT_T_GROUP_MEMBER_DIED       = 32,                   // Param1 = CreatureId, Param2 = IsLeader
     EVENT_T_VICTIM_ROOTED           = 33,                   // RepeatMin, RepeatMax
     EVENT_T_HIT_BY_AURA             = 34,                   // AuraType, Unused, RepeatMin, RepeatMax
+    EVENT_T_STEALTH_ALERT           = 35,                   // RepeatMin, RepeatMax
 
     EVENT_T_END,
 };
@@ -260,6 +261,12 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } hit_by_aura;
+        // EVENT_T_STEALTH_ALERT                            = 34
+        struct
+        {
+            uint32 repeatMin;
+            uint32 repeatMax;
+        } stealth_alert;
         // RAW
         struct
         {
@@ -319,6 +326,7 @@ class CreatureEventAI : public BasicAI
         void SummonedCreatureJustDied(Creature* unit) override;
         void SummonedCreatureDespawn(Creature* unit) override;
         void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override;
+        void OnMoveInStealth(Unit* who) override;
 
         static int Permissible(Creature const*);
 

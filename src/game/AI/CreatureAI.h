@@ -159,7 +159,7 @@ class CreatureAI
         virtual void UpdateAI_corpse(uint32 const /*uiDiff*/) {}
 
         // Triggers an alert when a Unit moves near stealth detection range.
-        virtual void TriggerAlert(Unit const* who);
+        virtual void OnMoveInStealth(Unit* who);
 
         // Will auto attack if the swing timer is ready.
         bool DoMeleeAttackIfReady();
@@ -210,6 +210,8 @@ class CreatureAI
         void SetUseAiAtControl(bool v) { m_bUseAiAtControl = v; }
     protected:
         ///== Fields =======================================
+        bool CanTriggerAlert(Unit const* who);
+        void TriggerAlertDirect(Unit const* who);
         bool   m_bUseAiAtControl;
         bool   m_bMeleeAttack;                                  // If we allow melee auto attack
         bool   m_bCombatMovement;                               // If we allow targeted movement gen (chasing target)

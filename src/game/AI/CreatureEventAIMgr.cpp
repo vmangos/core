@@ -310,6 +310,12 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Creature %u is using repeatable event(%u) with param4 < param3 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
                     break;
                 }
+                case EVENT_T_STEALTH_ALERT:
+                {
+                    if (temp.stealth_alert.repeatMax < temp.stealth_alert.repeatMin)
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Creature %u is using repeatable event(%u) with param2 < param1 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
+                    break;
+                }
                 default:
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI: Creature %u using not checked at load event (%u) in event %u. Need check code update?", temp.creature_id, temp.event_id, i);
                     break;

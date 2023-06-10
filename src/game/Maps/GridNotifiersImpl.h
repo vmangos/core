@@ -66,7 +66,7 @@ inline void CallAIMoveLOS(Creature* c, Unit* moving)
               c->AI()->MoveInLineOfSight(moving);
         else
             if (moving->GetTypeId() == TYPEID_PLAYER && moving->HasStealthAura() && alert)
-                c->AI()->TriggerAlert(moving);
+                c->AI()->OnMoveInStealth(moving);
     }
 }
 
