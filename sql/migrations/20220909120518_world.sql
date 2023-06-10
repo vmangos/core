@@ -38,7 +38,7 @@ SET @POOL9 := 20058;
 SET @POOL10 := 20059;
 SET @POOL11 := 20060;
 
---  Missing spawns at Dun Morgoth
+--  Missing spawns at Dun Morogh
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@CHEST1,106318,0,-5906.34,-1873.73,404.95,5.91667,0,0,-0.182235,0.983255,300,900,100,1,0,0,0,10),   -- Helm\'s Bed Lake
 (@CHEST2,106318,0,-5867.88,-1521.54,379.035,4.32842,0,0,-0.829037,0.559194,300,900,100,1,0,0,0,10),  -- Gol\'Bolar Quarry (Outside Cave)
@@ -56,49 +56,49 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@CHEST14,106318,0,-5299.75,-105.227,403.395,1.62316,0,0,0.725374,0.688355,300,900,100,1,0,0,0,10),  -- Iceflow Lake
 (@CHEST15,106318,0,-5055.85,-264.972,442.079,4.04917,0,0,-0.898793,0.438373,300,900,100,1,0,0,0,10); -- Shimmer Ridge
 
--- Correct respawn times of existing chests in Dun Morgoth (source: CMangos)
+-- Correct respawn times of existing chests in Dun Morogh (source: CMangos)
 UPDATE `gameobject` SET `spawntimesecsmin`=300, `spawntimesecsmax`=900 WHERE `guid` IN
 (9477,9932,9940,10048,10850,10856,10870,10891,29334,29343,29633,29638,32370);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@POOL1,1,'Battered Chests (106318) - Dun Morgoth - Gnomeregan',0,0,0,10),
-(@POOL2,1,'Battered Chests (106318) - Dun Morgoth - Frostmane Hold',0,0,0,10),
-(@POOL3,1,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den',0,0,0,10),
-(@POOL4,1,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave)',0,0,0,10),
-(@POOL5,1,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry (Outside Cave)',0,0,0,10),
-(@POOL6,1,'Battered Chests (106318) - Dun Morgoth - Helm\'s Bed Lake',0,0,0,10),
-(@POOL7,1,'Battered Chests (106318) - Dun Morgoth - Iceflow Lake',0,0,0,10),
-(@POOL8,1,'Battered Chests (106318) - Dun Morgoth - Shimmer Ridge',0,0,0,10);
+(@POOL1,1,'Battered Chests (106318) - Dun Morogh - Gnomeregan',0,0,0,10),
+(@POOL2,1,'Battered Chests (106318) - Dun Morogh - Frostmane Hold',0,0,0,10),
+(@POOL3,1,'Battered Chests (106318) - Dun Morogh - The Grizzled Den',0,0,0,10),
+(@POOL4,1,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry Mine (Inside Cave)',0,0,0,10),
+(@POOL5,1,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry (Outside Cave)',0,0,0,10),
+(@POOL6,1,'Battered Chests (106318) - Dun Morogh - Helm\'s Bed Lake',0,0,0,10),
+(@POOL7,1,'Battered Chests (106318) - Dun Morogh - Iceflow Lake',0,0,0,10),
+(@POOL8,1,'Battered Chests (106318) - Dun Morogh - Shimmer Ridge',0,0,0,10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
-(9477,@POOL1,0,'Battered Chests (106318) - Dun Morgoth - Gnomeregan #1',0,0,10),
-(32370,@POOL1,0,'Battered Chests (106318) - Dun Morgoth - Gnomeregan #2',0,0,10),
-(9932,@POOL2,0,'Battered Chests (106318) - Dun Morgoth - Frostmane Hold #1',0,0,10),
-(9940,@POOL2,0,'Battered Chests (106318) - Dun Morgoth - Frostmane Hold #2',0,0,10),
-(@CHEST6,@POOL2,0,'Battered Chests (106318) - Dun Morgoth - Frostmane Hold #3',0,0,10),
-(10048,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #1',0,0,10),
-(29334,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #2',0,0,10),
-(29633,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #3',0,0,10),
-(@CHEST10,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #4',0,0,10),
-(@CHEST11,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #5',0,0,10),
-(@CHEST12,@POOL3,0,'Battered Chests (106318) - Dun Morgoth - The Grizzled Den #6',0,0,10),
-(10856,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #1',0,0,10),
-(29343,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #2',0,0,10),
-(@CHEST7,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #3',0,0,10),
-(@CHEST8,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #4',0,0,10),
-(@CHEST9,@POOL4,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry Mine (Inside Cave) #5',0,0,10),
-(10850,@POOL5,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry (Outside Cave) #1',0,0,10),
-(@CHEST2,@POOL5,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry (Outside Cave) #2',0,0,10),
-(@CHEST3,@POOL5,0,'Battered Chests (106318) - Dun Morgoth - Gol\'Bolar Quarry (Outside Cave) #3',0,0,10),
-(10870,@POOL6,0,'Battered Chests (106318) - Dun Morgoth - Helm\'s Bed Lake #1',0,0,10),
-(10891,@POOL6,0,'Battered Chests (106318) - Dun Morgoth - Helm\'s Bed Lake #2',0,0,10),
-(@CHEST1,@POOL6,0,'Battered Chests (106318) - Dun Morgoth - Helm\'s Bed Lake #3',0,0,10),
-(@CHEST4,@POOL6,0,'Battered Chests (106318) - Dun Morgoth - Helm\'s Bed Lake #4',0,0,10),
-(@CHEST5,@POOL6,0,'Battered Chests (106318) - Dun Morgoth - Helm\'s Bed Lake #5',0,0,10),
-(29638,@POOL7,0,'Battered Chests (106318) - Dun Morgoth - Iceflow Lake #1',0,0,10),
-(@CHEST14,@POOL7,0,'Battered Chests (106318) - Dun Morgoth - Iceflow Lake #2',0,0,10),
-(@CHEST13,@POOL8,0,'Battered Chests (106318) - Dun Morgoth - Shimmer Ridge #1',0,0,10),
-(@CHEST15,@POOL8,0,'Battered Chests (106318) - Dun Morgoth - Shimmer Ridge #2',0,0,10);
+(9477,@POOL1,0,'Battered Chests (106318) - Dun Morogh - Gnomeregan #1',0,0,10),
+(32370,@POOL1,0,'Battered Chests (106318) - Dun Morogh - Gnomeregan #2',0,0,10),
+(9932,@POOL2,0,'Battered Chests (106318) - Dun Morogh - Frostmane Hold #1',0,0,10),
+(9940,@POOL2,0,'Battered Chests (106318) - Dun Morogh - Frostmane Hold #2',0,0,10),
+(@CHEST6,@POOL2,0,'Battered Chests (106318) - Dun Morogh - Frostmane Hold #3',0,0,10),
+(10048,@POOL3,0,'Battered Chests (106318) - Dun Morogh - The Grizzled Den #1',0,0,10),
+(29334,@POOL3,0,'Battered Chests (106318) - Dun Morogh - The Grizzled Den #2',0,0,10),
+(29633,@POOL3,0,'Battered Chests (106318) - Dun Morogh - The Grizzled Den #3',0,0,10),
+(@CHEST10,@POOL3,0,'Battered Chests (106318) - Dun Morogh - The Grizzled Den #4',0,0,10),
+(@CHEST11,@POOL3,0,'Battered Chests (106318) - Dun Morogh - The Grizzled Den #5',0,0,10),
+(@CHEST12,@POOL3,0,'Battered Chests (106318) - Dun Morogh - The Grizzled Den #6',0,0,10),
+(10856,@POOL4,0,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry Mine (Inside Cave) #1',0,0,10),
+(29343,@POOL4,0,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry Mine (Inside Cave) #2',0,0,10),
+(@CHEST7,@POOL4,0,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry Mine (Inside Cave) #3',0,0,10),
+(@CHEST8,@POOL4,0,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry Mine (Inside Cave) #4',0,0,10),
+(@CHEST9,@POOL4,0,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry Mine (Inside Cave) #5',0,0,10),
+(10850,@POOL5,0,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry (Outside Cave) #1',0,0,10),
+(@CHEST2,@POOL5,0,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry (Outside Cave) #2',0,0,10),
+(@CHEST3,@POOL5,0,'Battered Chests (106318) - Dun Morogh - Gol\'Bolar Quarry (Outside Cave) #3',0,0,10),
+(10870,@POOL6,0,'Battered Chests (106318) - Dun Morogh - Helm\'s Bed Lake #1',0,0,10),
+(10891,@POOL6,0,'Battered Chests (106318) - Dun Morogh - Helm\'s Bed Lake #2',0,0,10),
+(@CHEST1,@POOL6,0,'Battered Chests (106318) - Dun Morogh - Helm\'s Bed Lake #3',0,0,10),
+(@CHEST4,@POOL6,0,'Battered Chests (106318) - Dun Morogh - Helm\'s Bed Lake #4',0,0,10),
+(@CHEST5,@POOL6,0,'Battered Chests (106318) - Dun Morogh - Helm\'s Bed Lake #5',0,0,10),
+(29638,@POOL7,0,'Battered Chests (106318) - Dun Morogh - Iceflow Lake #1',0,0,10),
+(@CHEST14,@POOL7,0,'Battered Chests (106318) - Dun Morogh - Iceflow Lake #2',0,0,10),
+(@CHEST13,@POOL8,0,'Battered Chests (106318) - Dun Morogh - Shimmer Ridge #1',0,0,10),
+(@CHEST15,@POOL8,0,'Battered Chests (106318) - Dun Morogh - Shimmer Ridge #2',0,0,10);
 
 -- End of migration.
 END IF;
