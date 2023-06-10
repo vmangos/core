@@ -253,7 +253,7 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } victim_rooted;
-        // EVENT_T_HIT_BY_AURA                              = 33
+        // EVENT_T_HIT_BY_AURA                              = 34
         struct
         {
             uint32 auraType;
@@ -261,7 +261,7 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } hit_by_aura;
-        // EVENT_T_STEALTH_ALERT                            = 34
+        // EVENT_T_STEALTH_ALERT                            = 35
         struct
         {
             uint32 repeatMin;
