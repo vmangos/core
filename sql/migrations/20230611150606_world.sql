@@ -440,9 +440,14 @@ UPDATE `pool_template` SET `max_limit`=3 WHERE  `entry`=1055;
 UPDATE `pool_template` SET `max_limit`=6 WHERE  `entry`=1282;
 UPDATE `pool_template` SET `max_limit`=17 WHERE  `entry`=1102;
 UPDATE `pool_template` SET `max_limit`=23 WHERE  `entry`=1189;
-UPDATE `pool_template` SET `max_limit`=3 WHERE  `entry`=1248;
+UPDATE `pool_template` SET `max_limit`=4 WHERE  `entry`=1248;
 UPDATE `pool_template` SET `max_limit`=36 WHERE  `entry`=1173;
 UPDATE `pool_template` SET `max_limit`=13 WHERE  `entry`=1309;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(13693, 2043, 0, -224.735, -434.981, 71.6844, 3.59538, 0, 0, -0.97437, 0.224951, 300, 300, 1, 100, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(13693, 1248, 0, 'Khadgars Whisker', 0, 10); -- Khadgars Whisker in Hinterlands 28 objects total
 
 
 -- End of migration.
