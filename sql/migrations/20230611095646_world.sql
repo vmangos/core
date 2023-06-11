@@ -140,17 +140,17 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (@OGUID+34, 1083, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Barrens
 (@OGUID+35, 1083, 0, 'Grave Moss', 0, 10); -- Grave Mosss in Barrens
 
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (327, 4, 'Grave Moss in Scarlet Monastery Graveyard', 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (514, 4, 'Grave Moss in Scarlet Monastery Graveyard', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(@OGUID+36, 327, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
-(@OGUID+37, 327, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
-(@OGUID+38, 327, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
-(@OGUID+39, 327, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
-(@OGUID+40, 327, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
-(@OGUID+41, 327, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
-(@OGUID+42, 327, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
-(@OGUID+43, 327, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
-(@OGUID+44, 327, 0, 'Grave Moss', 0, 10); -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+36, 514, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+37, 514, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+38, 514, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+39, 514, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+40, 514, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+41, 514, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+42, 514, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+43, 514, 0, 'Grave Moss', 0, 10), -- Grave Mosss in Scarlet Monastery Graveyard
+(@OGUID+44, 514, 0, 'Grave Moss', 0, 10); -- Grave Mosss in Scarlet Monastery Graveyard
 
 -- Correct Pools
 UPDATE `pool_gameobject` SET `description`='Grave Moss' WHERE `guid` IN (4469, 16751, 4507, 4437, 4495, 4465, 4502, 4452, 33483, 14026, 4433, 17892); 
