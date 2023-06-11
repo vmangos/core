@@ -693,7 +693,7 @@ void CreatureEventAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell)
                 break;
             }
         }
-    }     
+    }
 }
 
 void CreatureEventAI::MovementInform(uint32 type, uint32 id)

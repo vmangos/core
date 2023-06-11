@@ -8557,6 +8557,9 @@ public:
                     continue;
             }
 
+            if (unit->IsCreature() && static_cast<Creature*>(unit)->IsImmuneToAoe())
+                continue;
+
             switch (i_TargetType)
             {
                 case SPELL_TARGETS_HOSTILE:
@@ -8577,9 +8580,6 @@ public:
                     break;
                 case SPELL_TARGETS_AOE_DAMAGE:
                 {
-                    if (unit->IsCreature() && static_cast<Creature*>(unit)->IsImmuneToAoe())
-                        continue;
-
                     if (i_originalCaster->IsFriendlyTo(unit))
                         continue;
 

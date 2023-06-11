@@ -209,9 +209,9 @@ class CreatureAI
         bool SwitchAiAtControl() const { return !m_bUseAiAtControl; }
         void SetUseAiAtControl(bool v) { m_bUseAiAtControl = v; }
     protected:
-        ///== Fields =======================================
         bool CanTriggerAlert(Unit const* who);
         void TriggerAlertDirect(Unit const* who);
+        ///== Fields =======================================
         bool   m_bUseAiAtControl;
         bool   m_bMeleeAttack;                                  // If we allow melee auto attack
         bool   m_bCombatMovement;                               // If we allow targeted movement gen (chasing target)
