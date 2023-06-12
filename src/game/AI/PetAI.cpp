@@ -414,7 +414,11 @@ void PetAI::KilledUnit(Unit* victim)
 
 void PetAI::AttackStart(Unit* target)
 {
-    // Overrides Unit::AttackStart to correctly evaluate Pet states
+    // Overrides CreatureAI::AttackStart to correctly evaluate Pet states
+
+    // Creature was uncharmed, but PetAI not yet removed
+    if (!m_creature->GetCharmInfo())
+        return;
 
     // Check all pet states to decide if we can attack this target
     if (!CanAttack(target))
