@@ -810,6 +810,13 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 10 (client limitation)
 #                The number must be between 1 and 10
 #
+#    LimitPlayTime
+#        Keep track of how long player accounts have been online, and limit loot and experience after that.
+#        After 3 hours looted gold and experience gains are cut in half. After 5 hours they are prevented.
+#        This feature was only used on Chinese realms.
+#        Default: 0 (Disabled)
+#                 1 (Enabled)
+#
 #    SkipCinematics
 #        Disable in-game intro cinematic on first login of character (allows to prevent buggy intro when using custom start location)
 #        Default: 0 - show intro for each new character
@@ -1058,6 +1065,7 @@ WorldAvailable = 1
 CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
+LimitPlayTime = 0
 SkipCinematics = 0
 ShowHealthValues = 0
 MaxPlayerLevel = 60

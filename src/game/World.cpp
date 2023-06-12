@@ -265,8 +265,24 @@ void World::AddSession_(WorldSession* s)
             // prevent decrease sessions count if session queued
             if (RemoveQueuedSession(old->second))
                 decrease_session = false;
+
+            // don't allow resetting consecutive play time on double login to same account
+            s->SetPreviousPlayedTime(old->second->GetConsecutivePlayTime(time(nullptr)));
+
+            // player is not kept in world so session can be deleted
             if (!old->second->ForcePlayerLogoutDelay())
                 delete old->second;
+        }
+        else
+        {
+            auto itr = m_accountsPlayHistory.find(s->GetAccountId());
+            if (itr != m_accountsPlayHistory.end())
+            {
+                if ((time(nullptr) - itr->second.logoutTime) < PLAY_TIME_LIMIT_FULL)
+                    s->SetPreviousPlayedTime(itr->second.playedTime);
+                else
+                    itr->second.playedTime = 0;
+            }
         }
     }
 
@@ -583,6 +599,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_CHARACTERS_CREATING_DISABLED, "CharactersCreatingDisabled", 0);
     setConfigMinMax(CONFIG_UINT32_CHARACTERS_PER_REALM, "CharactersPerRealm", 10, 1, 10);
     setConfigMin(CONFIG_UINT32_CHARACTERS_PER_ACCOUNT, "CharactersPerAccount", 50, getConfig(CONFIG_UINT32_CHARACTERS_PER_REALM));
+    setConfig(CONFIG_BOOL_LIMIT_PLAY_TIME, "LimitPlayTime", false);
 
     setConfig(CONFIG_BOOL_SKIP_CINEMATICS, "SkipCinematics", false);
     setConfig(CONFIG_BOOL_OBJECT_HEALTH_VALUE_SHOW, "ShowHealthValues", false);
@@ -2682,7 +2699,7 @@ void World::UpdateSessions(uint32 diff)
         AddSession_(sess);
 
     ///- Then send an update signal to remaining ones
-    time_t time_now = time(nullptr);
+    time_t timeNow = time(nullptr);
     for (SessionMap::iterator itr = m_sessions.begin(), next; itr != m_sessions.end(); itr = next)
     {
         next = itr;
@@ -2695,8 +2712,12 @@ void World::UpdateSessions(uint32 diff)
         {
             if (pSession->PlayerLoading())
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] World::UpdateSession attempt to delete session %u loading a player.", pSession->GetAccountId());
+            
+            AccountPlayHistory& history = m_accountsPlayHistory[pSession->GetAccountId()];
             if (!RemoveQueuedSession(pSession))
-                m_accountsLastLogout[pSession->GetAccountId()] = time_now;
+                history.logoutTime = timeNow;
+            history.playedTime += (timeNow - pSession->GetCreateTime());
+
             m_sessions.erase(itr);
             delete pSession;
         }
@@ -2962,7 +2983,11 @@ void World::SetSessionDisconnected(WorldSession* sess)
 {
     SessionMap::iterator itr = m_sessions.find(sess->GetAccountId());
     ASSERT(itr != m_sessions.end());
-    m_accountsLastLogout[sess->GetAccountId()] = time(nullptr);
+
+    AccountPlayHistory& history = m_accountsPlayHistory[sess->GetAccountId()];
+    history.logoutTime = time(nullptr);
+    history.playedTime += (history.logoutTime - sess->GetCreateTime());
+
     m_sessions.erase(itr);
     m_disconnectedSessions.insert(sess);
 }
@@ -3041,11 +3066,11 @@ bool World::CanSkipQueue(WorldSession const* sess)
     uint32 grace_period = getConfig(CONFIG_UINT32_LOGIN_QUEUE_GRACE_PERIOD_SECS);
     if (!grace_period)
         return false;
-    auto prev_logout = m_accountsLastLogout.find(sess->GetAccountId());
-    if (prev_logout == m_accountsLastLogout.end())
+    auto prev_logout = m_accountsPlayHistory.find(sess->GetAccountId());
+    if (prev_logout == m_accountsPlayHistory.end())
         return false;
     time_t now = time(nullptr);
-    return (now - prev_logout->second) < grace_period;
+    return (now - prev_logout->second.logoutTime) < grace_period;
 }
 
 uint32 World::InsertLog(std::string const& message, AccountTypes sec)

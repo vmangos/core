@@ -2894,3 +2894,38 @@ bool ChatHandler::HandleDebugUnitBytes2Command(char *args)
 
     return true;
 }
+
+bool ChatHandler::HandleDebugGetPrevPlayTimeCommand(char* args)
+{
+    Player* player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Account %s has been previously played for %s", player->GetSession()->GetUsername().c_str(), secsToTimeString(player->GetSession()->GetPreviousPlayedTime()).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugSetPrevPlayTimeCommand(char* args)
+{
+    Player* player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 seconds;
+    if (!ExtractUInt32(&args, seconds))
+        return false;
+
+    player->GetSession()->SetPreviousPlayedTime(seconds);
+    PSendSysMessage("Previous played time of account %s has been set to %s", player->GetSession()->GetUsername().c_str(), secsToTimeString(seconds).c_str());
+
+    return true;
+}

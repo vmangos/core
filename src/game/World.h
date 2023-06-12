@@ -604,6 +604,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_WORLD_AVAILABLE,
     CONFIG_BOOL_GM_CHEAT_GOD,
     CONFIG_BOOL_LFG_MATCHMAKING,
+    CONFIG_BOOL_LIMIT_PLAY_TIME,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -708,6 +709,12 @@ struct CliCommandHolder
     }
 
     ~CliCommandHolder() { delete[] m_command; }
+};
+
+struct AccountPlayHistory
+{
+    time_t logoutTime;
+    time_t playedTime; // reset after 5 hours offline time
 };
 
 class ThreadPool;
@@ -974,7 +981,7 @@ class World
 
         SessionMap m_sessions;
         SessionSet m_disconnectedSessions;
-        std::map<uint32 /*accountId*/, time_t /*last logout*/> m_accountsLastLogout;
+        std::map<uint32 /*accountId*/, AccountPlayHistory> m_accountsPlayHistory;
         bool CanSkipQueue(WorldSession const* session);
 
         uint32 m_maxActiveSessionCount = 0;

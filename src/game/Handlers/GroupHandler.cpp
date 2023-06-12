@@ -390,6 +390,12 @@ void WorldSession::HandleLootRoll(WorldPacket& recv_data)
     if (rollType >= MAX_ROLL_FROM_CLIENT)
         return;
 
+    if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+        rollType = ROLL_PASS;
+    }
+
     // everything is fine, do it, if false then some cheating problem found (result not used in pre-3.0)
     group->CountRollVote(GetPlayer(), lootedTarget, itemSlot, RollVote(rollType));
 }

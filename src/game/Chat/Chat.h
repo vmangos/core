@@ -450,12 +450,14 @@ class ChatHandler
         bool HandleDebugGetLootRecipientCommand(char* args);
         bool HandleDebugGetValueByIndexCommand(char* args);
         bool HandleDebugGetValueByNameCommand(char* args);
+        bool HandleDebugGetPrevPlayTimeCommand(char* args);
         bool HandleDebugModItemValueCommand(char* args);
         bool HandleDebugModValueCommand(char* args);
         bool HandleDebugSetAuraStateCommand(char* args);
         bool HandleDebugSetItemValueCommand(char* args);
         bool HandleDebugSetValueByIndexCommand(char* args);
         bool HandleDebugSetValueByNameCommand(char* args);
+        bool HandleDebugSetPrevPlayTimeCommand(char* args);
         bool HandleDebugSpellCheckCommand(char* args);
         bool HandleDebugSpellCoefsCommand(char* args);
         bool HandleDebugSpellModsCommand(char* args);
