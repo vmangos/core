@@ -9,8 +9,8 @@ INSERT INTO `migrations` VALUES ('20230526183338');
 -- Add your query below.
 
 -- AQ40 twin emperors room and trash mobs in their room give reputation with Cenarion Circle.
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction2`=609, `MaxStanding2`=7, `RewOnKillRepValue2`=33 WHERE  `creature_id`=15275; -- Emperor Vek'nilash
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction2`=609, `MaxStanding2`=7, `RewOnKillRepValue2`=33 WHERE  `creature_id`=15276; -- Emperor Vek'lor
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction2`=609, `MaxStanding2`=7, `RewOnKillRepValue2`=33 WHERE `creature_id`=15275; -- Emperor Vek'nilash
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction2`=609, `MaxStanding2`=7, `RewOnKillRepValue2`=33 WHERE `creature_id`=15276; -- Emperor Vek'lor
 INSERT INTO `creature_onkill_reputation` VALUES (15316, 0, 609, 0, 7, 0, 5, 0, 0, 0, 0); -- Qiraji Scarab
 INSERT INTO `creature_onkill_reputation` VALUES (15317, 0, 609, 0, 7, 0, 5, 0, 0, 0, 0); -- Qiraji Scorpion
 
@@ -30,12 +30,12 @@ UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`=5 WHERE `RewOnKillR
 -- Affected IDS are 15168, 15318, 15319, 15320, 15323, 15324, 15325, 15327, 15333, 15335, 15336, 15338, 15461, 15462, 15505, 15521, 15537, 15538, 15555, 15934
 
 -- AQ20 Bosses give too much reputation except Rajaxx who doesn't give any. Ossirian should give 100, all else give 50.
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=100 WHERE  `creature_id`=15339 AND `patch`=0; -- Ossirian
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=50 WHERE  `creature_id`=15348 AND `patch`=0; -- Kurinnaxx
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=50 WHERE  `creature_id`=15370 AND `patch`=0; -- Buru the Gorger
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=50 WHERE  `creature_id`=15340 AND `patch`=0; -- Moam
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=50 WHERE  `creature_id`=15369 AND `patch`=0; -- Ayamiss the Hunter
-UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction2`=609, `MaxStanding2`=7, `RewOnKillRepValue2`=50 WHERE  `creature_id`=15341 AND `patch`=0; -- General Rajaxx
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=100 WHERE `creature_id`=15339 AND `patch`=0; -- Ossirian
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=50 WHERE `creature_id`=15348 AND `patch`=0; -- Kurinnaxx
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=50 WHERE `creature_id`=15370 AND `patch`=0; -- Buru the Gorger
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=50 WHERE `creature_id`=15340 AND `patch`=0; -- Moam
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue2`=50 WHERE `creature_id`=15369 AND `patch`=0; -- Ayamiss the Hunter
+UPDATE `creature_onkill_reputation` SET `RewOnKillRepFaction2`=609, `MaxStanding2`=7, `RewOnKillRepValue2`=50 WHERE `creature_id`=15341 AND `patch`=0; -- General Rajaxx
 
 -- This creature does not exist. Looks like a french version of Vem not used for anything?
 DELETE FROM `creature_onkill_reputation` WHERE `creature_id`=15547;
