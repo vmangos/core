@@ -75,7 +75,7 @@ static uint32 g_sessionCounter = 0;
 WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale) :
     m_guid(g_sessionCounter++), m_muteTime(mute_time), m_connected(true), m_disconnectTimer(0), m_who_recvd(false), m_ah_list_recvd(false),
     m_accountFlags(0), m_idleTime(WorldTimer::getMSTime()), _player(nullptr), m_socket(sock), m_security(sec), m_accountId(id),
-    m_lastUpdateTime(0), m_createTime(time(nullptr)), m_previousPlayTime(0), m_logoutTime(0), m_inQueue(false),
+    m_exhaustionState(0), m_createTime(time(nullptr)), m_previousPlayTime(0), m_logoutTime(0), m_inQueue(false),
     m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false), m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
     m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_clientPlatform(CLIENT_PLATFORM_UNKNOWN), m_gameBuild(0),
@@ -268,34 +268,45 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 void WorldSession::CheckPlayedTimeLimit(time_t now)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-    time_t const previousPlayed = GetConsecutivePlayTime(m_lastUpdateTime);
     time_t const currentPlayed = GetConsecutivePlayTime(now);
 
-    if ((previousPlayed < PLAY_TIME_LIMIT_FULL) &&
-        (currentPlayed >= PLAY_TIME_LIMIT_FULL))
+    if (currentPlayed >= PLAY_TIME_LIMIT_FULL)
     {
-        SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
-        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
-        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+        if (m_exhaustionState < PLAY_TIME_LIMIT_FULL)
+        {
+            SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+            GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+            GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+            m_exhaustionState = PLAY_TIME_LIMIT_FULL;
+        }
     }
-    else if ((previousPlayed < PLAY_TIME_LIMIT_APPROCHING_FULL) &&
-        (currentPlayed >= PLAY_TIME_LIMIT_APPROCHING_FULL))
+    else if (currentPlayed >= PLAY_TIME_LIMIT_APPROCHING_FULL)
     {
-        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
-        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
-        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+        if (m_exhaustionState < PLAY_TIME_LIMIT_APPROCHING_FULL)
+        {
+            SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+            GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+            GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+            m_exhaustionState = PLAY_TIME_LIMIT_APPROCHING_FULL;
+        }
     }
-    else if ((previousPlayed < PLAY_TIME_LIMIT_PARTIAL) &&
-        (currentPlayed >= PLAY_TIME_LIMIT_PARTIAL))
+    else if (currentPlayed >= PLAY_TIME_LIMIT_PARTIAL)
     {
-        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
-        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
-        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+        if (m_exhaustionState < PLAY_TIME_LIMIT_PARTIAL)
+        {
+            SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+            GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+            GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+            m_exhaustionState = PLAY_TIME_LIMIT_PARTIAL;
+        }
     }
-    else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_PARTIAL) &&
-        (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_PARTIAL))
+    else if (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_PARTIAL)
     {
-        SendPlayTimeWarning(PTF_APPROACHING_PARTIAL_PLAY_TIME, int32(PLAY_TIME_LIMIT_PARTIAL - currentPlayed));
+        if (m_exhaustionState < PLAY_TIME_LIMIT_APPROACHING_PARTIAL)
+        {
+            SendPlayTimeWarning(PTF_APPROACHING_PARTIAL_PLAY_TIME, int32(PLAY_TIME_LIMIT_PARTIAL - currentPlayed));
+            m_exhaustionState = PLAY_TIME_LIMIT_APPROACHING_PARTIAL;
+        }
     }
 #endif
 }
@@ -380,7 +391,6 @@ bool WorldSession::Update(PacketFilter& updater)
         if (sWorld.getConfig(CONFIG_BOOL_LIMIT_PLAY_TIME) &&
             GetPlayer() && GetPlayer()->IsInWorld())
             CheckPlayedTimeLimit(currTime);
-        m_lastUpdateTime = currTime;
 
         ///- If necessary, log the player out
         bool const forceConnection = !sWorld.IsStopped() && sPlayerBotMgr.ForceAccountConnection(this);

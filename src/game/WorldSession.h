@@ -110,6 +110,21 @@ enum TutorialDataState
     TUTORIALDATA_NEW       = 2
 };
 
+enum PlayTimeLimit : uint32
+{
+    PLAY_TIME_LIMIT_APPROACHING_PARTIAL = 2 * HOUR + 30 * MINUTE,
+    PLAY_TIME_LIMIT_PARTIAL = 3 * HOUR,
+    PLAY_TIME_LIMIT_APPROCHING_FULL = 4 * HOUR + 30 * MINUTE,
+    PLAY_TIME_LIMIT_FULL = 5 * HOUR,
+};
+
+enum PlayTimeFlag : uint32
+{
+    PTF_APPROACHING_PARTIAL_PLAY_TIME = 0x1000,
+    PTF_APPROACHING_NO_PLAY_TIME = 0x2000,
+    PTF_UNHEALTHY_TIME = 0x80000000,
+};
+
 enum AntifloodOpcodeExecutionSpeed
 {
     FLOOD_TOTAL_PACKETS = 0,
@@ -883,7 +898,6 @@ class WorldSession
         ObjectGuid m_currentPlayerGuid;
         ObjectGuid m_clientMoverGuid;
         uint32 m_moveRejectTime;
-        time_t m_lastUpdateTime;                            // last time session was updated by world
         time_t m_createTime;                                // when session was created
         time_t m_previousPlayTime;                          // play time from previous session less than 5 hours ago
         time_t m_logoutTime;                                // when its time to log out character
@@ -892,6 +906,7 @@ class WorldSession
         bool m_playerLogout;                                // code processed in LogoutPlayer
         bool m_playerRecentlyLogout;
         bool m_playerSave;
+        uint32 m_exhaustionState;
         uint32 m_charactersCount;
         uint32 m_characterMaxLevel;
         AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];

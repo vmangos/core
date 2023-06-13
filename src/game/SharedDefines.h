@@ -1556,21 +1556,6 @@ enum ResponseCodes
     CHAR_NAME_SUCCESS,
 };
 
-enum PlayTimeLimit : uint32
-{
-    PLAY_TIME_LIMIT_APPROACHING_PARTIAL = 2 * HOUR + 30 * MINUTE,
-    PLAY_TIME_LIMIT_PARTIAL = 3 * HOUR,
-    PLAY_TIME_LIMIT_APPROCHING_FULL = 4 * HOUR + 30 * MINUTE,
-    PLAY_TIME_LIMIT_FULL = 5 * HOUR,
-};
-
-enum PlayTimeFlag : uint32
-{
-    PTF_APPROACHING_PARTIAL_PLAY_TIME = 0x1000,
-    PTF_APPROACHING_NO_PLAY_TIME = 0x2000,
-    PTF_UNHEALTHY_TIME = 0x80000000,
-};
-
 /// Ban function modes
 enum BanMode
 {
