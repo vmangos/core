@@ -287,6 +287,10 @@ std::vector<std::shared_ptr<const Scan>> WardenScanMgr::GetRandomScans(ScanFlags
         //if (!!(scan->flags & InWorld) && !(flags & InWorld))
         //    continue;
 
+        // if the scan requires the module to be initialized, and it's not initialized, do not request it
+        if ((scan->flags & ModuleInitialized) && !(flags & ModuleInitialized))
+            continue;
+
         matches.push_back(scan);
     }
 

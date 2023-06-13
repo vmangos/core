@@ -60,6 +60,8 @@ enum ScanFlags
     WinBuild5302    = 0x08000,  // 1.10.2
     WinBuild5464    = 0x10000,  // 1.11.2
 
+    ModuleInitialized = 0x20000, // requires MODULE_INITIALIZE packet to be sent first (File, Lua, Timing)
+
     WinAllBuild     = (
         WinBuild5875|WinBuild6005|WinBuild6141|WinBuild4222|WinBuild4297|WinBuild4375|
         WinBuild4449|WinBuild4544|WinBuild4695|WinBuild4878|WinBuild5086|WinBuild5302|

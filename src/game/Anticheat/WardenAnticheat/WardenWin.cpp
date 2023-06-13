@@ -193,39 +193,45 @@ ScanFlags GetScanFlagsByAvailableOffsets()
     {
         switch (Offsets[i].Build)
         {
-        case CLIENT_BUILD_1_2_4:
-            result |= WinBuild4222;
-            break;
-        case CLIENT_BUILD_1_3_1:
-            result |= WinBuild4297;
-            break;
-        case CLIENT_BUILD_1_4_2:
-            result |= WinBuild4375;
-            break;
-        case CLIENT_BUILD_1_5_1:
-            result |= WinBuild4449;
-            break;
-        case CLIENT_BUILD_1_6_1:
-            result |= WinBuild4544;
-            break;
-        case CLIENT_BUILD_1_7_1:
-            result |= WinBuild4695;
-            break;
-        case CLIENT_BUILD_1_8_4:
-            result |= WinBuild4878;
-            break;
-        case CLIENT_BUILD_1_9_4:
-            result |= WinBuild5086;
-            break;
-        case CLIENT_BUILD_1_10_2:
-            result |= WinBuild5302;
-            break;
-        case CLIENT_BUILD_1_11_2:
-            result |= WinBuild5464;
-            break;
-        case CLIENT_BUILD_1_12_1:
-            result |= WinBuild5875 | WinBuild6005 | WinBuild6141;
-            break;
+            case CLIENT_BUILD_1_2_4:
+                result |= WinBuild4222;
+                break;
+            case CLIENT_BUILD_1_3_1:
+                result |= WinBuild4297;
+                break;
+            case CLIENT_BUILD_1_4_2:
+                result |= WinBuild4375;
+                break;
+            case CLIENT_BUILD_1_5_1:
+                result |= WinBuild4449;
+                break;
+            case CLIENT_BUILD_1_6_1:
+                result |= WinBuild4544;
+                break;
+            case CLIENT_BUILD_1_7_1:
+                result |= WinBuild4695;
+                break;
+            case CLIENT_BUILD_1_8_4:
+                result |= WinBuild4878;
+                break;
+            case CLIENT_BUILD_1_9_4:
+                result |= WinBuild5086;
+                break;
+            case CLIENT_BUILD_1_10_2:
+                result |= WinBuild5302;
+                break;
+            case CLIENT_BUILD_1_11_2:
+                result |= WinBuild5464;
+                break;
+            case CLIENT_BUILD_1_12_1:
+                result |= WinBuild5875;
+                break;
+            case 6005:
+                result |= WinBuild6005;
+                break;
+            case 6141:
+                result |= WinBuild6141;
+                break;
         }
     }
 
@@ -565,7 +571,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(WIN_SYSTEM_INFO),
-        "Sysinfo locate", None);
+        "Sysinfo locate", offset_flags);
 
     // sys info locate phase 1
     auto const wardenSysInfo1 = std::make_shared<WindowsScan>(
@@ -605,7 +611,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-        "Intermediate sysinfo locate", None);
+        "Intermediate sysinfo locate", offset_flags);
 
     // find warden module
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
@@ -927,7 +933,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 4", None);
+    "EndScene locate stage 4", offset_flags);
 
     // end scene locate phase 3
     auto const endSceneLocate3 = std::make_shared<WindowsScan>(
@@ -966,7 +972,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 3", None);
+    "EndScene locate stage 3", offset_flags);
 
     // end scene locate phase 2
     auto const endSceneLocate2 = std::make_shared<WindowsScan>(
@@ -1005,7 +1011,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 2", None);
+    "EndScene locate stage 2", offset_flags);
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
@@ -1111,7 +1117,7 @@ void WardenWin::LoadScriptedScans()
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
        sizeof(uint8) + sizeof(float) + sizeof(float) + sizeof(float),
-        "Click To Move Position", WinAllBuild));
+        "Click To Move Position", offset_flags));
 }
 
 void WardenWin::BuildLuaInit(const std::string &module, bool fastcall, uint32 offset, ByteBuffer &out) const
@@ -1198,7 +1204,7 @@ void WardenWin::BuildTimingInit(const std::string &module, uint32 offset, bool s
 WardenWin::WardenWin(WorldSession *session, const BigNumber &K) :
     _wardenAddress(0), Warden(session, sWardenModuleMgr.GetWindowsModule(), K),
     _lastClientTime(0), _lastHardwareActionTime(0), _lastTimeCheckServer(0), _sysInfoSaved(false),
-    _proxifierFound(false), _hypervisors(""), _endSceneFound(false), _endSceneAddress(0)
+    _proxifierFound(false), _hypervisors(""), _endSceneFound(false), _endSceneAddress(0), _offsetsInitialized(false)
 {
     memset(&_sysInfo, 0, sizeof(_sysInfo));
 }
@@ -1257,7 +1263,7 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
     }
 }
 
-uint32 WardenWin::GetScanFlags() const
+uint32 WardenWin::GetScanFlagForBuild() const
 {
     auto const game_build = m_clientBuild;
 
@@ -1317,6 +1323,18 @@ uint32 WardenWin::GetScanFlags() const
     return ScanFlags::None;
 }
 
+uint32 WardenWin::GetScanFlags() const
+{
+    uint32 scanFlags = GetScanFlagForBuild();
+    if (scanFlags == ScanFlags::None)
+        return scanFlags;
+
+    if (_offsetsInitialized)
+        scanFlags |= ModuleInitialized;
+
+    return scanFlags;
+}
+
 void WardenWin::InitializeClient()
 {
     if (auto const offsets = GetClientOffets(m_clientBuild))
@@ -1340,8 +1358,9 @@ void WardenWin::InitializeClient()
         pkt.append(timing);
 
         SendPacket(pkt);
-    }
 
+        _offsetsInitialized = true;
+    }
     _initialized = true;
 }
 

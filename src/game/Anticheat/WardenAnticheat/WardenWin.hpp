@@ -80,8 +80,11 @@ class WardenWin final : public Warden
         bool _endSceneFound;
         uint32 _endSceneAddress;
 
+        bool _offsetsInitialized;
+
         void ValidateEndScene(const std::vector<uint8> &code);
 
+        uint32 GetScanFlagForBuild() const;
         virtual uint32 GetScanFlags() const;
 
         // send module initialization information (function offsets, etc.)

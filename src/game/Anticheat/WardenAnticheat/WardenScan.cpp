@@ -253,7 +253,7 @@ WindowsFileHashScan::WindowsFileHashScan(const std::string &file, const void *ex
 
         // if a hash was given, check it (some checks may only be interested in existence)
         return this->_hashMatch && !!memcmp(hash, this->_expected, sizeof(hash));
-    }, sizeof(uint8) + sizeof(uint8) + file.length(), sizeof(uint8) + SHA_DIGEST_LENGTH, comment, flags)
+    }, sizeof(uint8) + sizeof(uint8) + file.length(), sizeof(uint8) + SHA_DIGEST_LENGTH, comment, flags | ModuleInitialized)
 {
     if (_hashMatch)
         ::memcpy(_expected, expected, sizeof(_expected));
@@ -287,7 +287,7 @@ WindowsLuaScan::WindowsLuaScan(const std::string &lua, bool wanted, const std::s
         }
 
         return found != this->_wanted;
-    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags) {}
+    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ModuleInitialized) {}
 
 WindowsLuaScan::WindowsLuaScan(const std::string &lua, const std::string &expectedValue, const std::string &comment, uint32 flags)
     : _lua(lua), _expectedValue(expectedValue),
@@ -319,7 +319,7 @@ WindowsLuaScan::WindowsLuaScan(const std::string &lua, const std::string &expect
         buff.rpos(buff.rpos() + len);
 
         return str == this->_expectedValue;
-    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags)
+    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ModuleInitialized)
 {
     MANGOS_ASSERT(expectedValue.length() <= 0xFF);
 }
@@ -337,7 +337,7 @@ WindowsLuaScan::WindowsLuaScan(const std::string &lua, CheckT checker, const std
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[GET_LUA_VARIABLE] ^ winWarden->GetXor())
             << static_cast<uint8>(strings.size());
-    }, checker, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags)
+    }, checker, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ModuleInitialized)
 {
     MANGOS_ASSERT(checker);
 }
@@ -414,7 +414,7 @@ WindowsTimeScan::WindowsTimeScan(CheckT checker, const std::string &comment, uin
     {
         auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[CHECK_TIMING_VALUES] ^ winWarden->GetXor());
-    }, checker, sizeof(uint8), sizeof(uint8) + sizeof(uint32), comment, flags)
+    }, checker, sizeof(uint8), sizeof(uint8) + sizeof(uint32), comment, flags | ModuleInitialized)
 {
     MANGOS_ASSERT(!!checker);
 }
