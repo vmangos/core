@@ -312,11 +312,13 @@ void WorldSession::HandleLootOpcode(WorldPacket& recv_data)
         return;
     }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     if (_player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
     {
         _player->SendLootError(guid, LOOT_ERROR_PLAY_TIME_EXCEEDED);
         return;
     }
+#endif
 
     if (_player->GetStandState() != UNIT_STAND_STATE_STAND)
     {
@@ -584,12 +586,19 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
     }
 
     // No loot for a player on another map, or not in the raid.
-    if (!_player->IsInRaidWith(target) || !_player->IsInMap(target) ||
-        target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
+    if (!_player->IsInRaidWith(target) || !_player->IsInMap(target))
     {
         _player->SendLootError(lootGuid, LOOT_ERROR_MASTER_OTHER);
         return;
     }
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    if (target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        _player->SendLootError(lootGuid, LOOT_ERROR_MASTER_OTHER);
+        return;
+    }
+#endif
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = %s [%s].", playerGuid.GetString().c_str(), target->GetName());
 

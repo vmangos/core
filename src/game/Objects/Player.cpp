@@ -3360,13 +3360,18 @@ void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP) const
 
 void Player::GiveXP(uint32 xp, Unit* victim)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
+        return;
+
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+        xp /= 2;
+#endif
+
     if (xp < 1)
         return;
 
     if (!IsAlive())
-        return;
-
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
         return;
 
     uint32 level = GetLevel();
@@ -3374,9 +3379,6 @@ void Player::GiveXP(uint32 xp, Unit* victim)
     // XP to money conversion processed in Player::RewardQuest
     if (level >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         return;
-
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME))
-        xp = std::max(1u, xp / 2u);
 
     // XP resting bonus for kill
     uint32 rested_bonus_xp = victim ? GetXPRestBonus(xp) : 0;
@@ -13003,12 +13005,14 @@ bool Player::CanRewardQuest(Quest const* pQuest, bool msg) const
         return false;
     }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
     {
         if (msg)
             GetSession()->SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
         return false;
     }
+#endif
 
     return true;
 }
@@ -14926,6 +14930,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     time_t const now = time(nullptr);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     if (sWorld.getConfig(CONFIG_BOOL_LIMIT_PLAY_TIME))
     {
         time_t const accountPlayedTime = GetSession()->GetConsecutivePlayTime(now);
@@ -14935,6 +14940,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         else if (accountPlayedTime >= PLAY_TIME_LIMIT_PARTIAL)
             SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
     }
+#endif
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[48].GetInt32());
@@ -21799,11 +21805,13 @@ std::string Player::GetShortDescription() const
 
 void Player::LootMoney(int32 money, Loot* loot)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
         return;
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME))
         money /= 2;
+#endif
 
     if (!money)
         return;

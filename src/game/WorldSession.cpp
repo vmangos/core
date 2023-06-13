@@ -267,6 +267,7 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 
 void WorldSession::CheckPlayedTimeLimit(time_t now)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     time_t const previousPlayed = GetConsecutivePlayTime(m_lastUpdateTime);
     time_t const currentPlayed = GetConsecutivePlayTime(now);
 
@@ -296,14 +297,17 @@ void WorldSession::CheckPlayedTimeLimit(time_t now)
     {
         SendPlayTimeWarning(PTF_APPROACHING_PARTIAL_PLAY_TIME, int32(PLAY_TIME_LIMIT_PARTIAL - currentPlayed));
     }
+#endif
 }
 
 void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 timeLeftInSeconds)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     WorldPacket data(SMSG_PLAY_TIME_WARNING, sizeof(uint32) + sizeof(int32));
     data << uint32(flag);
     data << int32(timeLeftInSeconds);
     SendPacket(&data);
+#endif
 }
 
 bool WorldSession::ForcePlayerLogoutDelay()
