@@ -229,7 +229,7 @@ void Warden::SendModuleToClient()
 
 std::vector<std::shared_ptr<const Scan>> Warden::SelectScans(ScanFlags flags) const
 {
-    return std::move(sWardenScanMgr.GetRandomScans(static_cast<ScanFlags>(flags | GetScanFlags())));
+    return std::move(sWardenScanMgr.GetRandomScans(static_cast<ScanFlags>(flags | GetScanFlags()), m_clientBuild));
 }
 
 void Warden::EnqueueScans(std::vector<std::shared_ptr<const Scan>> &&scans)
@@ -659,7 +659,7 @@ void Warden::Update()
         {
             //auto const inWorld = _session->GetPlayer() ? _session->GetPlayer()->IsInWorld() : false;
 
-            RequestScans(SelectScans(/*inWorld ? InWorld :*/ None));
+            RequestScans(SelectScans(/*inWorld ? InWorld :*/ ScanFlags::None));
 
             // if no scans were found, just begin the clock again, in case things change
             if (_pendingScans.empty())

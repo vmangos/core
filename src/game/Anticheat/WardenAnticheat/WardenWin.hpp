@@ -84,8 +84,7 @@ class WardenWin final : public Warden
 
         void ValidateEndScene(const std::vector<uint8> &code);
 
-        uint32 GetScanFlagForBuild() const;
-        virtual uint32 GetScanFlags() const;
+        virtual ScanFlags GetScanFlags() const;
 
         // send module initialization information (function offsets, etc.)
         virtual void InitializeClient();

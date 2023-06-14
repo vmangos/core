@@ -46,7 +46,7 @@ class WardenMac final : public Warden
 
         WorldPacket _charEnum;
 
-        virtual uint32 GetScanFlags() const;
+        virtual ScanFlags GetScanFlags() const;
 
         virtual void InitializeClient();
 

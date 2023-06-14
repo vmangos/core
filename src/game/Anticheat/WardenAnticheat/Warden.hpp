@@ -102,7 +102,7 @@ class Warden
         // RC4 key length for packet encryption
         static constexpr size_t KeyLength = 16;
 
-        virtual uint32 GetScanFlags() const = 0;
+        virtual ScanFlags GetScanFlags() const = 0;
         std::vector<std::shared_ptr<const Scan>> SelectScans(ScanFlags flags) const;
 
         void BeginScanClock();

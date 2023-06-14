@@ -50,7 +50,7 @@ class WardenScanMgr
         void AddWindowsScan(const WindowsScan *);
         void AddWindowsScan(std::shared_ptr<WindowsScan>);
 
-        std::vector<std::shared_ptr<const Scan>> GetRandomScans(ScanFlags flags) const;
+        std::vector<std::shared_ptr<const Scan>> GetRandomScans(ScanFlags flags, uint32 build) const;
 };
 
 #define sWardenScanMgr MaNGOS::Singleton<WardenScanMgr>::Instance()

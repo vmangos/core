@@ -78,8 +78,8 @@ bool BuildRawData(const std::string &hexData, std::vector<uint8> &out)
 
 void WardenScanMgr::LoadFromDB()
 {
-    //                                         0     1       2      3       4          5         6         7        8          9
-    auto result = WorldDatabase.Query("SELECT `id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `comment` FROM `warden_scans`");
+    //                                         0     1       2      3       4          5         6         7        8          9            10           11
+    auto result = WorldDatabase.Query("SELECT `id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `build_min`, `build_max`, `comment` FROM `warden_scans`");
 
     // copy any non-database scans into a placeholder
     std::vector<std::shared_ptr<const Scan> > new_scans;
@@ -110,7 +110,9 @@ void WardenScanMgr::LoadFromDB()
         auto const length = fields[5].GetUInt32();
         auto const flags = static_cast<ScanFlags>(fields[7].GetUInt32()) | ScanFlags::FromDatabase;
         int8 penalty = fields[8].GetUInt8();
-        auto const comment = fields[9].GetCppString();
+        uint16 buildMin = fields[9].GetUInt16();
+        uint16 buildMax = fields[10].GetUInt16();
+        auto const comment = fields[11].GetCppString();
 
         if (penalty < WARDEN_ACTION_LOG || penalty >= WARDEN_ACTION_MAX)
             penalty = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY);
@@ -131,9 +133,9 @@ void WardenScanMgr::LoadFromDB()
 
                 // optional for this scan to specify a module name to use as a base
                 if (moduleName.empty())
-                    scan = new WindowsMemoryScan(offset, &expected[0], expected.size(), comment, flags);
+                    scan = new WindowsMemoryScan(offset, &expected[0], expected.size(), comment, flags, buildMin, buildMax);
                 else
-                    scan = new WindowsMemoryScan(moduleName, offset, &expected[0], expected.size(), comment, flags);
+                    scan = new WindowsMemoryScan(moduleName, offset, &expected[0], expected.size(), comment, flags, buildMin, buildMax);
 
                 break;
             }
@@ -143,7 +145,7 @@ void WardenScanMgr::LoadFromDB()
                 auto const moduleName = fields[2].GetCppString();
                 auto const wanted = fields[6].GetBool();
 
-                scan = new WindowsModuleScan(moduleName, wanted, comment, flags);
+                scan = new WindowsModuleScan(moduleName, wanted, comment, flags, buildMin, buildMax);
                 break;
             }
 
@@ -159,7 +161,7 @@ void WardenScanMgr::LoadFromDB()
                     continue;
                 }
 
-                scan = new WindowsCodeScan(offset, pattern, scanType == FIND_MEM_IMAGE_CODE_BY_HASH, wanted, comment, flags);
+                scan = new WindowsCodeScan(offset, pattern, scanType == FIND_MEM_IMAGE_CODE_BY_HASH, wanted, comment, flags, buildMin, buildMax);
                 break;
             }
 
@@ -174,7 +176,7 @@ void WardenScanMgr::LoadFromDB()
                     continue;
                 }
 
-                scan = new WindowsFileHashScan(filename, &expected[0], !expected.empty(), comment, flags);
+                scan = new WindowsFileHashScan(filename, &expected[0], !expected.empty(), comment, flags, buildMin, buildMax);
                 break;
             }
 
@@ -184,9 +186,9 @@ void WardenScanMgr::LoadFromDB()
                 auto const expected = fields[3].GetCppString();
 
                 if (expected.empty())
-                    scan = new WindowsLuaScan(variable, fields[6].GetBool(), comment, flags);
+                    scan = new WindowsLuaScan(variable, fields[6].GetBool(), comment, flags, buildMin, buildMax);
                 else
-                    scan = new WindowsLuaScan(variable, expected, comment, flags);
+                    scan = new WindowsLuaScan(variable, expected, comment, flags, buildMin, buildMax);
 
                 break;
             }
@@ -203,7 +205,7 @@ void WardenScanMgr::LoadFromDB()
                     continue;
                 }
 
-                scan = new WindowsHookScan(module, proc, &hash[0], offset, length, comment, flags);
+                scan = new WindowsHookScan(module, proc, &hash[0], offset, length, comment, flags, buildMin, buildMax);
                 break;
             }
 
@@ -213,7 +215,7 @@ void WardenScanMgr::LoadFromDB()
                 auto const path = fields[3].GetCppString();
                 auto const wanted = fields[6].GetBool();
 
-                scan = new WindowsDriverScan(driver, path, wanted, comment, flags);
+                scan = new WindowsDriverScan(driver, path, wanted, comment, flags, buildMin, buildMax);
                 break;
             }
 
@@ -261,7 +263,7 @@ void WardenScanMgr::AddWindowsScan(std::shared_ptr<WindowsScan> scan)
     m_scans.push_back(scan);
 }
 
-std::vector<std::shared_ptr<const Scan>> WardenScanMgr::GetRandomScans(ScanFlags flags) const
+std::vector<std::shared_ptr<const Scan>> WardenScanMgr::GetRandomScans(ScanFlags flags, uint32 build) const
 {
     std::vector<std::shared_ptr<const Scan>> matches;
     matches.reserve(m_scans.size());
@@ -269,18 +271,22 @@ std::vector<std::shared_ptr<const Scan>> WardenScanMgr::GetRandomScans(ScanFlags
     // save those scans which match the requested flags
     for (auto const &scan : m_scans)
     {
-        auto const buildMask = scan->flags & (WinAllBuild | MacAllBuild);
+        auto const osMask = scan->flags & (ScanFlags::Windows | ScanFlags::Mac);
 
-        // does the build part of the flags match? if not, continue
-        if (!(flags & buildMask))
+        // does the os part of the flags match? if not, continue
+        if (!(flags & osMask))
+            continue;
+
+        // check if the scan can be sent to this client version
+        if (scan->buildMin > build || scan->buildMax < build)
             continue;
 
         // if the scan is an initial-login scan, and that wasn't explicitly requested, do not include it
-        if ((scan->flags & InitialLogin) && !(flags & InitialLogin))
+        if (!!(scan->flags & ScanFlags::InitialLogin) && !(flags & ScanFlags::InitialLogin))
             continue;
 
         // if the scan is not an initial-login scan, and that was explicitly requested, do not include it
-        if (!(scan->flags & InitialLogin) && (flags & InitialLogin))
+        if (!(scan->flags & ScanFlags::InitialLogin) && !!(flags & ScanFlags::InitialLogin))
             continue;
 
         // if the scan is an in-world scan, and that wasn't explicitly requested, do not include it
@@ -288,7 +294,7 @@ std::vector<std::shared_ptr<const Scan>> WardenScanMgr::GetRandomScans(ScanFlags
         //    continue;
 
         // if the scan requires the module to be initialized, and it's not initialized, do not request it
-        if ((scan->flags & ModuleInitialized) && !(flags & ModuleInitialized))
+        if (!!(scan->flags & ScanFlags::ModuleInitialized) && !(flags & ScanFlags::ModuleInitialized))
             continue;
 
         matches.push_back(scan);

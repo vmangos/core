@@ -64,7 +64,7 @@ void WardenMac::LoadScriptedScans()
         buff.read(md5, sizeof(md5));
 
         return !!memcmp(sha, macWarden->_hashSHA, sizeof(sha)) || !!memcmp(md5, macWarden->_hashMD5, sizeof(md5));
-    }, 128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, "Mac string hash check"));
+    }, 128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, "Mac string hash check", ScanFlags::Mac, 0, UINT16_MAX));
 }
 
 WardenMac::WardenMac(WorldSession *session, const BigNumber &K)
@@ -168,9 +168,9 @@ void WardenMac::SetCharEnumPacket(WorldPacket &&packet)
         _charEnum = std::move(packet);
 }
 
-uint32 WardenMac::GetScanFlags() const
+ScanFlags WardenMac::GetScanFlags() const
 {
-    return ScanFlags::MacAllBuild;
+    return ScanFlags::Mac;
 }
 
 void WardenMac::InitializeClient()
