@@ -24,12 +24,17 @@
 
 void ByteBufferException::PrintPosError() const
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: " SIZEFMTD ") value with size: " SIZEFMTD,
-        (add ? "put" : "get"), pos, size, esize);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in ByteBuffer::%s (pos: " SIZEFMTD " size: " SIZEFMTD ") value with size: " SIZEFMTD,
+        (add ? "append" : "get"), pos, size, esize);
 }
 
 void ByteBuffer::append(uint8 const* src, size_t cnt)
 {
+    if (!src)
+    {
+        throw ByteBufferException(true, _wpos, size(), cnt);
+    }
+
     if (!cnt)
         return;
 
@@ -37,7 +42,7 @@ void ByteBuffer::append(uint8 const* src, size_t cnt)
 
     if (_storage.size() < _wpos + cnt)
         _storage.resize(_wpos + cnt);
-    memcpy(&_storage[_wpos], src, cnt);
+    std::copy(src, src + cnt, &_storage[_wpos]);
     _wpos += cnt;
 }
 
@@ -47,6 +52,7 @@ void ByteBuffer::hexlike() const
         return;
 
     std::ostringstream ss;
+    ss.reserve(size() * 3);
     ss << "STORAGE_SIZE: " << size() << "\n";
 
     if (sLog.IsIncludeTime())
