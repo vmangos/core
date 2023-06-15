@@ -9,8 +9,8 @@ INSERT INTO \`migrations\` VALUES ('20230615134916');
 -- Add your query below.
 
 -- Archmage Tarsis Kir-Moldir 16381
--- remove c++ script (npc_archmage_tarsis) and extraflags, correct gossip menu id
-UPDATE creature_template SET script_name='', flags_extra=0, gossip_menu_id=7229 WHERE entry=16381;
+-- remove c++ script (npc_archmage_tarsis), correct gossip menu id
+UPDATE creature_template SET script_name='', gossip_menu_id=7229 WHERE entry=16381;
 DELETE FROM gossip_menu WHERE entry IN (8400,8401,8402,8403,8404,8405,8406,8407,8408,8409);
 DELETE FROM gossip_menu WHERE entry IN (7229,7228,7227,7226,7225,7224,7223,7222,7233,7232,7231);
 INSERT INTO gossip_menu (entry, text_id, script_id, condition_id) VALUES
