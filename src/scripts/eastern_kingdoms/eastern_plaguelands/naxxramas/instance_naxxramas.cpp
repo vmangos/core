@@ -1762,13 +1762,6 @@ CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
     return new mob_dark_touched_warriorAI(pCreature);
 }
 
-bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->GetStandState() != UNIT_STAND_STATE_SIT)
-        pCreature->SetStandState(UNIT_STAND_STATE_SIT);
-    return false;
-}
-
 enum OmarionMisc
 {
     QUEST_OMARIONS_HANDBOOK = 9233,
