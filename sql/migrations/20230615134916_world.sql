@@ -56,7 +56,7 @@ INSERT INTO `gossip_scripts` (`id`,`delay`,`priority`,`command`,`datalong`,`data
 (722901, 7, 0, 84, 7228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Tarsis Kir-Moldir - Set Default Gossip Menu Id to 7228'),
 (722901, 8, 0, 4, 147, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Tarsis Kir-Moldir - Add Gossip NPCFlag'),
 
-(722902, 0, 0, 4, 147, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Tarsis Kir-Moldir - Remove Gossip NPCFlag'),
+(722902, 0, 0, 4, 147, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Tarsis Kir-Moldir - Remove Gossip NPCFlag'),
 (722902, 1, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Tarsis Kir-Moldir - Set Stand State to Stand'), -- guesswork
 (722902, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12312, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Tarsis Kir-Moldir - Say Text'), -- "You... The frame! How? You must not... It... the Destroyer..."
 (722902, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12314, 0, 0, 0, 0, 0, 0, 0, 0, 'Archmage Tarsis Kir-Moldir - Say Emote Text'), -- "%s scratches at his throat."
