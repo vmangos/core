@@ -20,66 +20,46 @@
  */
 
 #include "Common.h"
+#include <map>
 
-char const* localeNames[MAX_LOCALE] = {
-  "enUS",                                                   // also enGB
-  "koKR",
-  "frFR",
-  "deDE",
-  "zhCN",
-  "zhTW",
-  "esES",
-  "esMX",
-  "ruRU",
+enum class Locale {
+    enUS,
+    koKR,
+    frFR,
+    deDE,
+    zhCN,
+    zhTW,
+    esES,
+    esMX,
+    ruRU,
+    MAX_LOCALE
 };
 
-// used for search by name or iterate all names
-LocaleNameStr const fullLocaleNameList[] =
-{
-    { "enUS", LOCALE_enUS },
-    { "enGB", LOCALE_enUS },
-    { "koKR", LOCALE_koKR },
-    { "frFR", LOCALE_frFR },
-    { "deDE", LOCALE_deDE },
-    { "zhCN", LOCALE_zhCN },
-    { "zhTW", LOCALE_zhTW },
-    { "esES", LOCALE_esES },
-    { "esMX", LOCALE_esMX },
-    { "ruRU", LOCALE_ruRU },
-    { NULL,   LOCALE_enUS }
+constexpr Locale MAX_LOCALE = Locale::MAX_LOCALE;
+
+const std::map<std::string_view, Locale> localeNames = {
+    {"enUS", Locale::enUS},
+    {"koKR", Locale::koKR},
+    {"frFR", Locale::frFR},
+    {"deDE", Locale::deDE},
+    {"zhCN", Locale::zhCN},
+    {"zhTW", Locale::zhTW},
+    {"esES", Locale::esES},
+    {"esMX", Locale::esMX},
+    {"ruRU", Locale::ruRU}
 };
 
-LocaleConstant GetLocaleByName(std::string const& name)
-{
-    for(LocaleNameStr const* itr = &fullLocaleNameList[0]; itr->name; ++itr)
-        if (name==itr->name)
-            return itr->locale;
-
-    return LOCALE_enUS;                                     // including enGB case
+std::optional<Locale> GetLocaleByName(std::string_view name) {
+    auto it = localeNames.find(name);
+    if (it == localeNames.end()) {
+        return std::nullopt;
+    }
+    return it->second;
 }
 
-LocaleConstant GetDbcLocaleFromDbLocale(DBLocaleConstant localeIndex)
-{
-    switch (localeIndex)
-    {
-        case DB_LOCALE_enUS:
-            return LOCALE_enUS;
-        case DB_LOCALE_frFR:
-            return LOCALE_frFR;
-        case DB_LOCALE_deDE:
-            return LOCALE_deDE;
-        case DB_LOCALE_koKR:
-            return LOCALE_koKR;
-        case DB_LOCALE_zhCN:
-            return LOCALE_zhCN;
-        case DB_LOCALE_zhTW:
-            return LOCALE_zhTW;
-        case DB_LOCALE_esES:
-            return LOCALE_esES;
-        case DB_LOCALE_esMX:
-            return LOCALE_esMX; // index exists in dbcs, but no actual client
-        case DB_LOCALE_ruRU:
-            return LOCALE_enUS; // there are no russian dbcs for vanilla
+std::optional<Locale> GetDbcLocaleFromDbLocale(Locale localeIndex) noexcept {
+    if (localeIndex < Locale::enUS || localeIndex >= MAX_LOCALE) {
+        return std::nullopt;
     }
-    return LOCALE_enUS;
+    return localeIndex;
 }
