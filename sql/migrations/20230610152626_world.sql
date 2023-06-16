@@ -302,6 +302,9 @@ UPDATE `pool_template` SET `max_limit`= 10 WHERE  `entry`=1276;
 UPDATE `pool_template` SET `max_limit`= 34 WHERE  `entry`=1291;
 UPDATE `pool_template` SET `max_limit`= 39 WHERE  `entry`=1208;
 
+-- Remove Custom Script
+DELETE FROM `gameobject_scripts` WHERE `id`=12297;
+
 
 -- End of migration.
 END IF;
