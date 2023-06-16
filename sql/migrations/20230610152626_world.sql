@@ -295,7 +295,7 @@ DELETE FROM `gameobject` WHERE `guid` IN (12241, 12309, 12287, 12303, 12312, 122
 DELETE FROM `pool_gameobject` WHERE `guid` IN (12241, 12309, 12287, 12303, 12312, 12279, 13230, 12215, 12285, 12296, 12266, 12247, 12257, 12213, 12214, 12220, 12221, 12223, 12231, 12234, 12238, 12246, 12250, 12251, 12255, 12259, 12260, 12271, 12273, 12274, 12275, 12276, 12280, 12281, 12282, 12283, 12290, 12292, 12297, 12308, 12314, 12321, 12330, 12335, 12336, 39967);
 
 -- Sync Gobject Data
-UPDATE `gameobject` SET `spawn_flags` = 0, `animprogress` = 100 WHERE `id` IN (2866);
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `spawn_flags` = 0, `animprogress` = 100 WHERE `id` IN (2866);
 
 -- Update Counters
 UPDATE `pool_template` SET `max_limit`= 10 WHERE  `entry`=1276;
