@@ -1210,6 +1210,20 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 
                 break;
             }
+            case SCRIPT_COMMAND_START_SCRIPT_ON_ZONE:
+            {
+                if (!tmp.startScriptOnZone.scriptId)
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has no provided script id in SCRIPT_COMMAND_START_SCRIPT_ON_ZONE for script id %u.", tablename, tmp.id);
+                    continue;
+                }
+                if (!tmp.startScriptOnZone.zoneId)
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has no provided zone id in SCRIPT_COMMAND_START_SCRIPT_ON_ZONE for script id %u.", tablename, tmp.id);
+                    continue;
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
@@ -2413,8 +2427,8 @@ void ScriptMgr::CollectPossibleGenericIds(std::set<uint32>& genericIds)
             } while (result->NextRow());
         }
 
-        // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL.
-        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command`=68 && `datalong`!=0", script_table));
+        // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL and SCRIPT_COMMAND_START_SCRIPT_ON_ZONE.
+        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command` IN (68, 92) && `datalong`!=0", script_table));
 
         if (result)
         {

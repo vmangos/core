@@ -2135,7 +2135,7 @@ bool Map::ScriptCommand_AddAura(ScriptInfo const& script, WorldObject* source, W
         return ShouldAbortScript(script);
     }
 
-    pSource->AddAura(script.addAura.spellId, script.addAura.flags);
+    pSource->AddAura(script.addAura.spellId, script.addAura.flags, ToUnit(target));
 
     return false;
 }
@@ -2499,5 +2499,20 @@ bool Map::ScriptCommand_LoadCreatureSpawn(ScriptInfo const& script, WorldObject*
             return ShouldAbortScript(script);
     }
        
+    return false;
+}
+
+// SCRIPT_COMMAND_START_SCRIPT_ON_ZONE (92)
+bool Map::ScriptCommand_StartScriptOnZone(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    for (auto const& itr : m_mapRefManager)
+    {
+        if (itr.getSource()->GetCachedZoneId() == script.startScriptOnZone.zoneId)
+        {
+            printf("start on %s with target %s\n", itr.getSource()->GetName(), target->GetName());
+            ScriptsStart(sGenericScripts, script.startScriptOnZone.scriptId, itr.getSource()->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+        }
+    }
+
     return false;
 }
