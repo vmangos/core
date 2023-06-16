@@ -236,13 +236,13 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (7563, 7726, 7631, 7558, 7560, 756
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `spawn_flags` = 0, `animprogress` = 100 WHERE `id` IN (2042);
 
 -- Update Counters
-UPDATE `pool_template` SET `max_limit`='10' WHERE  `entry`=1172;
-UPDATE `pool_template` SET `max_limit`='4' WHERE  `entry`=1252;
-UPDATE `pool_template` SET `max_limit`='6' WHERE  `entry`=1183;
-UPDATE `pool_template` SET `max_limit`='4' WHERE  `entry`=1071;
-UPDATE `pool_template` SET `max_limit`='4' WHERE  `entry`=1285;
-UPDATE `pool_template` SET `max_limit`='8' WHERE  `entry`=1311;
-UPDATE `pool_template` SET `max_limit`='12' WHERE  `entry`=1328;
+UPDATE `pool_template` SET `max_limit`=10 WHERE  `entry`=1172;
+UPDATE `pool_template` SET `max_limit`=4 WHERE  `entry`=1252;
+UPDATE `pool_template` SET `max_limit`=6 WHERE  `entry`=1183;
+UPDATE `pool_template` SET `max_limit`=4 WHERE  `entry`=1071;
+UPDATE `pool_template` SET `max_limit`=4 WHERE  `entry`=1285;
+UPDATE `pool_template` SET `max_limit`=8 WHERE  `entry`=1311;
+UPDATE `pool_template` SET `max_limit`=12 WHERE  `entry`=1328;
 
 
 -- End of migration.
