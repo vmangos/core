@@ -2509,7 +2509,6 @@ bool Map::ScriptCommand_StartScriptOnZone(ScriptInfo const& script, WorldObject*
     {
         if (itr.getSource()->GetCachedZoneId() == script.startScriptOnZone.zoneId)
         {
-            printf("start on %s with target %s\n", itr.getSource()->GetName(), target->GetName());
             ScriptsStart(sGenericScripts, script.startScriptOnZone.scriptId, itr.getSource()->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
         }
     }
