@@ -207,11 +207,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 
 -- Create new pool to hold Mountain Silversage spawns in Felwood.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(324, 1, 'Mountain Silversages in Felwood', 0, 10);
+(401, 1, 'Mountain Silversages in Felwood', 0, 10);
 
 -- Create new pool to hold Mountain Silversage spawns in Western Plaguelands.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(332, 1, 'Mountain Silversages in Western Plaguelands', 0, 10);
+(402, 1, 'Mountain Silversages in Western Plaguelands', 0, 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 1243, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversage in Azshara 52 objects total
@@ -311,28 +311,28 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (@OGUID+95, 1237, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversage in Winterspring 85 objects total
 (@OGUID+96, 1237, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversage in Winterspring 85 objects total
 (@OGUID+97, 1237, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversage in Winterspring 85 objects total
-(@OGUID+98, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+99, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+100, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+101, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+102, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+103, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+104, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+105, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+106, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+107, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+108, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+109, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+110, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+111, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+112, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+113, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+114, 324, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
-(@OGUID+115, 332, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(@OGUID+116, 332, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(@OGUID+117, 332, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(@OGUID+118, 332, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(@OGUID+119, 332, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(@OGUID+98, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+99, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+100, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+101, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+102, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+103, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+104, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+105, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+106, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+107, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+108, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+109, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+110, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+111, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+112, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+113, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+114, 401, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Felwood
+(@OGUID+115, 402, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(@OGUID+116, 402, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(@OGUID+117, 402, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(@OGUID+118, 402, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(@OGUID+119, 402, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
 (@OGUID+120, 332, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Silithus
 (@OGUID+121, 1222, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Silithus
 (@OGUID+122, 1222, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Silithus
@@ -346,8 +346,8 @@ UPDATE `pool_template` SET `description`='Mountain Silversage in Eastern Plaguel
 UPDATE `pool_template` SET `description`='Mountain Silversage in Silithus' WHERE  `entry`=1222;
 UPDATE `pool_template` SET `description`='Mountain Silversage in Ungoro Crater' WHERE  `entry`=1218;
 UPDATE `pool_template` SET `description`='Mountain Silversage in Winterspring' WHERE  `entry`=1237;
-UPDATE `pool_template` SET `description`='Mountain Silversage in Felwood' WHERE  `entry`=324;
-UPDATE `pool_template` SET `description`='Mountain Silversage in Western Plaguelands' WHERE  `entry`=332;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Felwood' WHERE  `entry`=401;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Western Plaguelands' WHERE  `entry`=402;
 
 -- Remove Custom Spawns (Non of these spawns exist in the sniff-db)
 DELETE FROM `gameobject` WHERE `guid` IN (19751, 19790, 19748, 19697, 19663, 19664, 19665, 19666, 19669, 19670, 19671, 19672, 19673, 19674, 19675, 19676, 19677, 19678, 19680, 19683, 19684, 19685, 19688, 19689, 19690, 19691, 19692, 19693, 19694, 19695, 19696, 19698, 19699, 19700, 19701, 19703, 19704, 19705, 19707, 19708, 19709, 19710, 19711, 19712, 19714, 19716, 19717, 19718, 19719, 19720, 19721, 19722, 19723, 19724, 19726, 19727, 19728, 19729, 19730, 19731, 19732, 19733, 19735, 19736, 19738, 19740, 19741, 19742, 19743, 19744, 19745, 19749, 19752, 19753, 19755, 19756, 19757, 19759, 19760, 19761, 19762, 19763, 19764, 19765, 19766, 19767, 19768, 19769, 19770, 19771, 19772, 19773, 19774, 19775, 19776, 19777, 19778, 19779, 19780, 19781, 19783, 19784, 19785, 19786, 19787, 19788, 19789, 19791, 19792, 19793, 19794, 19795, 19796, 19797, 19798, 19799, 19800, 19801, 19802, 19803, 19804, 19805, 19808, 19809, 19810, 19811, 19812, 19813, 19814, 19815, 19817, 19818, 19819, 19820, 19821, 19822, 19823, 19824, 19825, 19829, 19830, 19831, 19832, 19833, 19834, 19835, 19836, 19837, 19843, 19844, 19845, 19846, 19848, 19849, 19850, 19851, 19852, 19853, 19854, 19855, 19856, 19857, 19858, 19859, 19860, 19861, 19862, 19863, 19864, 19865, 19866, 19867, 19869, 19870, 19871, 19872, 39955, 39956);
@@ -362,8 +362,8 @@ UPDATE `pool_template` SET `max_limit`=3 WHERE  `entry`=1222;
 UPDATE `pool_template` SET `max_limit`=20 WHERE  `entry`=1237;
 UPDATE `pool_template` SET `max_limit`=16 WHERE  `entry`=1218;
 UPDATE `pool_template` SET `max_limit`=12 WHERE  `entry`=1302;
-UPDATE `pool_template` SET `max_limit`=6 WHERE  `entry`=324;
-UPDATE `pool_template` SET `max_limit`=3 WHERE  `entry`=332;
+UPDATE `pool_template` SET `max_limit`=6 WHERE  `entry`=401;
+UPDATE `pool_template` SET `max_limit`=3 WHERE  `entry`=402;
 
 
 -- End of migration.
