@@ -306,7 +306,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+71, 1618, 0, -11086.5, 627.683, 36.5317, 3.26377, 0, 0, -0.998135, 0.0610518, 300, 300, 1, 100, 0, 10),
 (@OGUID+72, 1618, 0, -10568.1, 834.061, 45.3067, 3.01941, 0, 0, 0.998135, 0.0610518, 300, 300, 1, 100, 0, 10),
 (@OGUID+73, 1618, 0, -10148.5, 1501, 41.724, 3.7001, 0, 0, -0.961261, 0.27564, 300, 300, 1, 100, 0, 10);
--100.278
+
 -- Missing Peacebloom spawns in Tirisfal Glades.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (@OGUID+74, 1618, 0, 1850.44, -552.155, 41.4346, 6.14356, 0, 0, -0.0697556, 0.997564, 300, 300, 1, 100, 0, 10), 
