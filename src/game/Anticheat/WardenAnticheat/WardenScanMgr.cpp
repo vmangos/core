@@ -36,7 +36,7 @@ INSTANTIATE_SINGLETON_1(WardenScanMgr);
 
 namespace
 {
-bool BuildRawData(const std::string &hexData, std::vector<uint8> &out)
+bool BuildRawData(std::string const& hexData, std::vector<uint8>& out)
 {
     if (!!(hexData.length() % 2))
         return false;
@@ -82,10 +82,10 @@ void WardenScanMgr::LoadFromDB()
     auto result = WorldDatabase.Query("SELECT `id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `build_min`, `build_max`, `comment` FROM `warden_scans`");
 
     // copy any non-database scans into a placeholder
-    std::vector<std::shared_ptr<const Scan> > new_scans;
+    std::vector<std::shared_ptr<Scan const> > new_scans;
     new_scans.reserve(m_scans.size());
 
-    for (auto const &s : m_scans)
+    for (auto const& s : m_scans)
         if (!(s->flags & ScanFlags::FromDatabase))
             new_scans.push_back(std::move(s));
 
@@ -104,7 +104,7 @@ void WardenScanMgr::LoadFromDB()
             continue;
         }
 
-        Scan *scan = nullptr;
+        Scan* scan = nullptr;
 
         auto const offset = fields[4].GetUInt32();
         auto const length = fields[5].GetUInt32();
@@ -237,15 +237,15 @@ void WardenScanMgr::LoadFromDB()
             scan->penalty = WardenActions(penalty);
         }
 
-        m_scans.emplace_back(std::shared_ptr<const Scan>(scan));
+        m_scans.emplace_back(std::shared_ptr<Scan const>(scan));
     } while (result->NextRow());
 
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, ">> %u Warden scans loaded from world database", m_scans.size());
 }
 
-void WardenScanMgr::AddMacScan(const MacScan *scan)
+void WardenScanMgr::AddMacScan(MacScan const* scan)
 {
-    m_scans.push_back(std::shared_ptr<const MacScan>(scan));
+    m_scans.push_back(std::shared_ptr<MacScan const>(scan));
 }
 
 void WardenScanMgr::AddMacScan(std::shared_ptr<MacScan> scan)
@@ -253,9 +253,9 @@ void WardenScanMgr::AddMacScan(std::shared_ptr<MacScan> scan)
     m_scans.push_back(scan);
 }
 
-void WardenScanMgr::AddWindowsScan(const WindowsScan *scan)
+void WardenScanMgr::AddWindowsScan(WindowsScan const* scan)
 {
-    m_scans.push_back(std::shared_ptr<const WindowsScan>(scan));
+    m_scans.push_back(std::shared_ptr<WindowsScan const>(scan));
 }
 
 void WardenScanMgr::AddWindowsScan(std::shared_ptr<WindowsScan> scan)
@@ -263,13 +263,13 @@ void WardenScanMgr::AddWindowsScan(std::shared_ptr<WindowsScan> scan)
     m_scans.push_back(scan);
 }
 
-std::vector<std::shared_ptr<const Scan>> WardenScanMgr::GetRandomScans(ScanFlags flags, uint32 build) const
+std::vector<std::shared_ptr<Scan const>> WardenScanMgr::GetRandomScans(ScanFlags flags, uint32 build) const
 {
-    std::vector<std::shared_ptr<const Scan>> matches;
+    std::vector<std::shared_ptr<Scan const>> matches;
     matches.reserve(m_scans.size());
 
     // save those scans which match the requested flags
-    for (auto const &scan : m_scans)
+    for (auto const& scan : m_scans)
     {
         auto const osMask = scan->flags & (ScanFlags::Windows | ScanFlags::Mac);
 
@@ -312,7 +312,7 @@ std::vector<std::shared_ptr<const Scan>> WardenScanMgr::GetRandomScans(ScanFlags
 
     for (auto i = 0u; i < matches.size(); ++i)
     {
-        auto const &scan = matches[i];
+        auto const& scan = matches[i];
 
         // if by including the current scan, the request or reply would become too large, stop here, shrinking the results to size
         if (request + scan->requestSize > Warden::MaxRequest || reply + scan->replySize > Warden::MaxReply)

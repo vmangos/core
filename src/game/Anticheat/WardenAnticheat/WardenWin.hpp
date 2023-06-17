@@ -62,27 +62,27 @@ class WardenWin final : public Warden
     private:
         // pointer in client memory to the loaded warden module.  as this should never change once the module is loaded,
         // it is only read once (upon initial login)
-        uint32 _wardenAddress;
+        uint32 m_wardenAddress;
 
-        WIN_SYSTEM_INFO _sysInfo;
+        WIN_SYSTEM_INFO m_sysInfo;
 
-        bool _sysInfoSaved;
-        bool _proxifierFound;
+        bool m_sysInfoSaved;
+        bool m_proxifierFound;
 
-        std::string _hypervisors;
+        std::string m_hypervisors;
 
-        WorldPacket _charEnum;
+        WorldPacket m_charEnum;
 
-        uint32 _lastClientTime;
-        uint32 _lastHardwareActionTime;
-        uint32 _lastTimeCheckServer;
+        uint32 m_lastClientTime;
+        uint32 m_lastHardwareActionTime;
+        uint32 m_lastTimeCheckServer;
 
-        bool _endSceneFound;
-        uint32 _endSceneAddress;
+        bool m_endSceneFound;
+        uint32 m_endSceneAddress;
 
-        bool _offsetsInitialized;
+        bool m_offsetsInitialized;
 
-        void ValidateEndScene(const std::vector<uint8> &code);
+        void ValidateEndScene(std::vector<uint8> const& code);
 
         virtual ScanFlags GetScanFlags() const;
 
@@ -101,19 +101,19 @@ class WardenWin final : public Warden
                     -- funcptr[0] has preference
                     -- if (!funcptr[0]) funcptr[1]();
                     -- 'str' given in lua string check packet
-                    -- 0: const char * (__fastcall *)(str, 0, 0)
-                    -- 1: const char * (__cdecl *)(str, 0, 0)
+                    -- 0: char const* (__fastcall*)(str, 0, 0)
+                    -- 1: char const* (__cdecl*)(str, 0, 0)
 
             (1, 0) -> "file hash check" initialization
                 <uint8 option>
-                        int __stdcall SFileOpenFile(const char *filename, SFile **result)
-                        int __stdcall SFileGetFileSize(SFile *file, unsigned int *result)
-                        void __stdcall SFileCloseFile(SFile *file)
+                        int __stdcall SFileOpenFile(char const* filename, SFile** result)
+                        int __stdcall SFileGetFileSize(SFile* file, unsigned int* result)
+                        void __stdcall SFileCloseFile(SFile* file)
 
                     -- 1:
-                        int __stdcall SFileReadFile(SFile *file, void *buffer, unsigned int bytesToRead, unsigned int *bytesRead, void *overlap)
+                        int __stdcall SFileReadFile(SFile* file, void* buffer, unsigned int bytesToRead, unsigned int* bytesRead, void* overlap)
                     -- 2:
-                        int __stdcall SFileReadFile(SFile *file, void *buffer, unsigned int bytesToRead, unsigned int *bytesRead, void *overlap, void *asyncparam)
+                        int __stdcall SFileReadFile(SFile* file, void* buffer, unsigned int bytesToRead, unsigned int* bytesRead, void* overlap, void* asyncparam)
 
                 <uint8 len><module name>
                     -- no null terminator
@@ -128,26 +128,26 @@ class WardenWin final : public Warden
                     -- no null terminator
                     -- passed to GetModuleHandle(), therefore passing 0 means wow.exe
                 <uint32 offset from module base>
-                    -- int (__thiscall *)(WardenSysInfo *)
+                    -- int (__thiscall*)(WardenSysInfo*)
                 <uint8 option>
                     -- 0 to clear function pointer, 1 to write
             */
 
         // initialization packets
-        void BuildLuaInit(const std::string &module, bool fastcall, uint32 offset, ByteBuffer &out) const;
-        void BuildFileHashInit(const std::string &module, bool asyncparam, uint32 openOffset, uint32 sizeOffset,
-            uint32 readOffset, uint32 closeOffset, ByteBuffer &out) const;
-        void BuildTimingInit(const std::string &module, uint32 offset, bool set, ByteBuffer &out) const;
+        void BuildLuaInit(std::string const& module, bool fastcall, uint32 offset, ByteBuffer& out) const;
+        void BuildFileHashInit(std::string const& module, bool asyncparam, uint32 openOffset, uint32 sizeOffset,
+            uint32 readOffset, uint32 closeOffset, ByteBuffer& out) const;
+        void BuildTimingInit(std::string const& module, uint32 offset, bool set, ByteBuffer& out) const;
 
     public:
         static void LoadScriptedScans();
 
-        WardenWin(WorldSession *session, const BigNumber &K);
+        WardenWin(WorldSession* session, BigNumber const& K);
 
         void Update();
 
         // set pending character enum packet (to be sent once we are satisfied that Warden is loaded)
-        virtual void SetCharEnumPacket(WorldPacket &&packet);
+        virtual void SetCharEnumPacket(WorldPacket&& packet);
 
         virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
             std::string& endscene, std::string& proxifier) const;

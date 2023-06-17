@@ -65,19 +65,19 @@ struct ChallengeResponseEntry;
 class Warden
 {
     private:
-        const ChallengeResponseEntry *_crk;
+        ChallengeResponseEntry const* m_crk;
 
         // when non-zero, if the current time passes this value, kick for inactivity
-        uint32 _timeoutClock;
+        uint32 m_timeoutClock;
 
         // when non-zero, if the current time passes this value, perform hack scans
-        uint32 _scanClock;
+        uint32 m_scanClock;
 
         // true when we have sent a module to the client and are waiting for a result
-        bool _moduleSendPending;
+        bool m_moduleSendPending;
 
-        ARC4 _inputCrypto;
-        ARC4 _outputCrypto;
+        ARC4 m_inputCrypto;
+        ARC4 m_outputCrypto;
 
         void EncryptData(uint8* buffer, size_t size);
         void DecryptData(uint8* buffer, size_t size);
@@ -92,36 +92,36 @@ class Warden
         virtual void InitializeClient() = 0;
 
         void RequestChallenge();
-        void HandleChallengeResponse(ByteBuffer &buff);
+        void HandleChallengeResponse(ByteBuffer& buff);
 
-        void ReadScanResults(ByteBuffer &buff);
+        void ReadScanResults(ByteBuffer& buff);
 
     protected:
-        Warden(WorldSession *session, const WardenModule *module, const BigNumber &K);
+        Warden(WorldSession* session, WardenModule const* module, BigNumber const& K);
 
         // RC4 key length for packet encryption
         static constexpr size_t KeyLength = 16;
 
         virtual ScanFlags GetScanFlags() const = 0;
-        std::vector<std::shared_ptr<const Scan>> SelectScans(ScanFlags flags) const;
+        std::vector<std::shared_ptr<Scan const>> SelectScans(ScanFlags flags) const;
 
         void BeginScanClock();
 
         // enqueue, but do not immediately send scans.  this is useful if we anticipate wanting to
         // send multiple scans and can wait to send them all at once.
-        void EnqueueScans(std::vector<std::shared_ptr<const Scan>> &&scans);
+        void EnqueueScans(std::vector<std::shared_ptr<Scan const>>&& scans);
 
         // enqueue scans, and send them immediately if possible
-        void RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans);
+        void RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans);
 
         void SendPacket(ByteBuffer const& buff);
         void SendPacketDirect(ByteBuffer const& buff, WorldSession* session); // only to be used in constructor
 
-        static uint32 BuildChecksum(const uint8* data, size_t size);
+        static uint32 BuildChecksum(uint8 const* data, size_t size);
 
         // If no scan is passed, the default action from config is executed
-        void ApplyPenalty(std::string message, WardenActions penalty = WARDEN_ACTION_MAX,  std::shared_ptr<const Scan> scan = nullptr);
-        void LogPositiveToDB(std::shared_ptr<const Scan> scan);
+        void ApplyPenalty(std::string message, WardenActions penalty = WARDEN_ACTION_MAX,  std::shared_ptr<Scan const> scan = nullptr);
+        void LogPositiveToDB(std::shared_ptr<Scan const> scan);
         void KickSession() const;
 
         // client session data
@@ -133,18 +133,18 @@ class Warden
         ClientOSType m_clientOS;
         ClientPlatformType m_clientPlatform;
 
-        const WardenModule *const _module;
+        WardenModule const* const m_module;
 
-        uint8 _xor;
+        uint8 m_xor;
 
         // true when the client has been confirmed and sent any initialization packet(s)
-        bool _initialized;
+        bool m_initialized;
 
         // true if client has used click to move at any point since starting game
         mutable bool m_hasUsedClickToMove = false;
 
-        std::vector<std::shared_ptr<const Scan>> _pendingScans;
-        std::vector<std::shared_ptr<const Scan>> _enqueuedScans;
+        std::vector<std::shared_ptr<Scan const>> m_pendingScans;
+        std::vector<std::shared_ptr<Scan const>> m_enqueuedScans;
 
     public:
         virtual ~Warden() = default;
@@ -164,18 +164,18 @@ class Warden
 
         static void LoadScriptedScans();
 
-        void HandlePacket(WorldPacket & recvData);
+        void HandlePacket(WorldPacket& recvData);
 
-        const WardenModule *GetModule() const { return _module; }
-        uint8 GetXor() const { return _xor; }
+        WardenModule const* GetModule() const { return m_module; }
+        uint8 GetXor() const { return m_xor; }
 
         virtual void Update();
 
         // set pending character enum packet (to be sent once we are satisfied that Warden is loaded)
-        virtual void SetCharEnumPacket(WorldPacket &&packet) = 0;
+        virtual void SetCharEnumPacket(WorldPacket&& packet) = 0;
 
-        virtual void GetPlayerInfo(std::string &clock, std::string &fingerprint, std::string &hypervisors,
-            std::string &endscene, std::string &proxifier) const = 0;
+        virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
+            std::string& endscene, std::string& proxifier) const = 0;
 
         std::vector<WorldPacket> m_packetQueue;
         std::mutex m_packetQueueMutex;

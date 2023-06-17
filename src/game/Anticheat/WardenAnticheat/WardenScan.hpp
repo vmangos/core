@@ -69,16 +69,16 @@ class Warden;
 class Scan
 {
     public:
-        using BuildT = std::function<void(const Warden *, std::vector<std::string> &, ByteBuffer &)>;
-        using CheckT = std::function<bool(const Warden *, ByteBuffer &)>;
+        using BuildT = std::function<void(Warden const*, std::vector<std::string>&, ByteBuffer&)>;
+        using CheckT = std::function<bool(Warden const*, ByteBuffer&)>;
 
     private:
-        BuildT _builder;
-        CheckT _checker;
+        BuildT m_builder;
+        CheckT m_checker;
 
     protected:  // should not be called by the user
         Scan(BuildT builder, CheckT checker, ScanFlags f, size_t req, size_t rep, uint32 minBuild, uint32 maxBuild, std::string const&c)
-            : _builder(builder), _checker(checker), checkId(0), flags(f), buildMin(minBuild), buildMax(maxBuild), comment(c), requestSize(req), replySize(rep)
+            : m_builder(builder), m_checker(checker), checkId(0), flags(f), buildMin(minBuild), buildMax(maxBuild), comment(c), requestSize(req), replySize(rep)
         { 
             MANGOS_ASSERT(!((flags & ScanFlags::Windows) && (flags & ScanFlags::Mac)));
             penalty = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY);
@@ -97,23 +97,23 @@ class Scan
         Scan() = delete;
         virtual ~Scan() = default;
 
-        void Build(const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan) const { _builder(warden, strings, scan); }
+        void Build(Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan) const { m_builder(warden, strings, scan); }
 
         // return true when the scan revealed a hack
-        bool Check(const Warden *warden, ByteBuffer &buff) const { return _checker(warden, buff); }
+        bool Check(Warden const* warden, ByteBuffer& buff) const { return m_checker(warden, buff); }
 };
 
 class MacScan : public Scan
 {
     public:
-        MacScan(BuildT builder, CheckT checker, size_t requestSize, size_t replySize, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+        MacScan(BuildT builder, CheckT checker, size_t requestSize, size_t replySize, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
             : Scan(builder, checker, flags | ScanFlags::Mac, requestSize, replySize, minBuild, maxBuild, comment) {}
 };
 
 class WindowsScan : public Scan
 {
     public:
-        WindowsScan(BuildT builder, CheckT checker, size_t requestSize, size_t replySize, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+        WindowsScan(BuildT builder, CheckT checker, size_t requestSize, size_t replySize, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
             : Scan(builder, checker, flags | ScanFlags::Windows, requestSize, replySize, minBuild, maxBuild, comment) {}
 
         WindowsScan() = delete;
@@ -123,57 +123,57 @@ class WindowsScan : public Scan
 class WindowsModuleScan : public WindowsScan
 {
     private:
-        std::string _module;
-        bool _wanted;
+        std::string m_module;
+        bool m_wanted;
 
     public:
         static constexpr uint8 ModuleFound = 0x4A;
 
-        WindowsModuleScan(const std::string &module, bool wanted, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
-        WindowsModuleScan(const std::string &module, CheckT checker, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsModuleScan(std::string const& module, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsModuleScan(std::string const& module, CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // read arbitrary memory from the client, optionally offset from the base of a module by name
 class WindowsMemoryScan : public WindowsScan
 {
     private:
-        std::vector<uint8> _expected;
-        uint32 _offset;
-        std::string _module;
+        std::vector<uint8> m_expected;
+        uint32 m_offset;
+        std::string m_module;
 
     public:
-        WindowsMemoryScan(uint32 offset, const void *expected, size_t length, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
-        WindowsMemoryScan(const std::string &module, uint32 offset, const void *expected, size_t length, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
-        WindowsMemoryScan(uint32 offset, size_t length, CheckT checker, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
-        WindowsMemoryScan(const std::string &module, uint32 offset, size_t length, CheckT checker, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsMemoryScan(uint32 offset, void const* expected, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsMemoryScan(std::string const& module, uint32 offset, void const* expected, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsMemoryScan(uint32 offset, size_t length, CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsMemoryScan(std::string const& module, uint32 offset, size_t length, CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // scan the start of each executable memory segment, optionally filtered by those belonging to regions marked by type MEM_IMAGE (as reported by VirtualQuery())
 class WindowsCodeScan : public WindowsScan
 {
     private:
-        uint32 _offset;
-        std::vector<uint8> _pattern;
-        bool _memImageOnly;
-        bool _wanted;
+        uint32 m_offset;
+        std::vector<uint8> m_pattern;
+        bool m_memImageOnly;
+        bool m_wanted;
 
     public:
         static constexpr uint8 PatternFound = 0x4A;
 
-        WindowsCodeScan(uint32 offset, const std::vector<uint8> &pattern, bool memImageOnly, bool wanted, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsCodeScan(uint32 offset, std::vector<uint8> const& pattern, bool memImageOnly, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // reads the specified file from the client MPQs, hashes it, and sends back the hash
 class WindowsFileHashScan : public WindowsScan
 {
     private:
-        std::string _file;
-        uint8 _expected[SHA_DIGEST_LENGTH];
-        bool _hashMatch;
-        bool _wanted;
+        std::string m_file;
+        uint8 m_expected[SHA_DIGEST_LENGTH];
+        bool m_hashMatch;
+        bool m_wanted;
 
     public:
-        WindowsFileHashScan(const std::string &file, const void *expected, bool wanted, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsFileHashScan(std::string const& file, void const* expected, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // reads the value of a lua variable and returns it.  keep in mind when using this that different states
@@ -181,14 +181,14 @@ class WindowsFileHashScan : public WindowsScan
 class WindowsLuaScan : public WindowsScan
 {
     private:
-        std::string _lua;
-        std::string _expectedValue;
-        bool _wanted;
+        std::string m_lua;
+        std::string m_expectedValue;
+        bool m_wanted;
 
     public:
-        WindowsLuaScan(const std::string &lua, bool wanted, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
-        WindowsLuaScan(const std::string &lua, const std::string &expectedValue, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
-        WindowsLuaScan(const std::string &lua, CheckT checker, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsLuaScan(std::string const& lua, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsLuaScan(std::string const& lua, std::string const& expectedValue, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsLuaScan(std::string const& lua, CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // this scan will examine a procedure defined by its module and export name (for GetModuleHandle() and GetProcAddress()).
@@ -200,14 +200,14 @@ class WindowsHookScan : public WindowsScan
     private:
         static constexpr uint8 Detoured = 0x4A;
 
-        std::string _module;
-        std::string _proc;
-        uint8 _hash[SHA_DIGEST_LENGTH];
-        uint32 _offset;
-        size_t _length;
+        std::string m_module;
+        std::string m_proc;
+        uint8 m_hash[SHA_DIGEST_LENGTH];
+        uint32 m_offset;
+        size_t m_length;
 
     public:
-        WindowsHookScan(const std::string &module, const std::string &proc, const void *hash, uint32 offset, size_t length, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsHookScan(std::string const& module, std::string const& proc, void const* hash, uint32 offset, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // this scan will search for call kernel32!QueryDosDevice() and search for a device with the given name.
@@ -218,12 +218,12 @@ class WindowsDriverScan : public WindowsScan
     private:
         static constexpr uint8 Found = 0x4A;
 
-        std::string _name;
-        std::string _targetPath;
-        bool _wanted;
+        std::string m_name;
+        std::string m_targetPath;
+        bool m_wanted;
 
     public:
-        WindowsDriverScan(const std::string &name, const std::string &targetPath, bool wanted, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsDriverScan(std::string const& name, std::string const& targetPath, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // this scan will call the game's function 'OsGetAsyncTimeMs()' as well as kernel32!GetTickCount() up to five times
@@ -233,6 +233,6 @@ class WindowsDriverScan : public WindowsScan
 class WindowsTimeScan : public WindowsScan
 {
     public:
-        WindowsTimeScan(CheckT checker, const std::string &comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsTimeScan(CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 #endif /*!__WARDENSCAN_HPP_*/

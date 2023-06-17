@@ -38,13 +38,13 @@ class BigNumber;
 class WardenMac final : public Warden
 {
     private:
-        bool _fingerprintSaved;
+        bool m_fingerprintSaved;
 
-        std::string _hashString;
-        uint8 _hashSHA[SHA_DIGEST_LENGTH];
-        uint8 _hashMD5[MD5_DIGEST_LENGTH];
+        std::string m_hashString;
+        uint8 m_hashSHA[SHA_DIGEST_LENGTH];
+        uint8 m_hashMD5[MD5_DIGEST_LENGTH];
 
-        WorldPacket _charEnum;
+        WorldPacket m_charEnum;
 
         virtual ScanFlags GetScanFlags() const;
 
@@ -53,12 +53,12 @@ class WardenMac final : public Warden
     public:
         static void LoadScriptedScans();
 
-        WardenMac(WorldSession *session, const BigNumber &K);
+        WardenMac(WorldSession* session, BigNumber const& K);
 
         void Update();
 
         // set pending character enum packet (to be sent once we are satisfied that Warden is loaded)
-        virtual void SetCharEnumPacket(WorldPacket &&packet);
+        virtual void SetCharEnumPacket(WorldPacket&& packet);
 
         virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
             std::string& endscene, std::string& proxifier) const {}
