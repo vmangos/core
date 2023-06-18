@@ -50,8 +50,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         return;
 
     // get start teleport coordinates (will used later in fail case)
-    WorldLocation old_loc;
-    GetPlayer()->GetPosition(old_loc);
+    WorldLocation oldLoc;
+    GetPlayer()->GetPosition(oldLoc);
 
     // get the teleport destination
     WorldLocation &loc = GetPlayer()->GetTeleportDest();
@@ -86,15 +86,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
                        " (map:%u, x:%f, y:%f, z:%f) Trying to port him to his previous place..",
                        GetPlayer()->GetGuidStr().c_str(), loc.mapId, loc.x, loc.y, loc.z);
 
-            GetPlayer()->SetSemaphoreTeleportFar(false);
-
-            // Teleport to previous place, if cannot be ported back TP to homebind place
-            if (!GetPlayer()->TeleportTo(old_loc))
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WorldSession::HandleMoveWorldportAckOpcode: %s cannot be ported to his previous place, teleporting him to his homebind place...",
-                           GetPlayer()->GetGuidStr().c_str());
-                GetPlayer()->TeleportToHomebind();
-            }
+            GetPlayer()->HandleReturnOnTeleportFail(oldLoc);
             return;
         }
     }
@@ -122,21 +114,11 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // while the player is in transit, for example the map may get full
     if (!GetPlayer()->GetMap()->Add(GetPlayer()))
     {
-        GetPlayer()->SetSemaphoreTeleportFar(false);
-        // if player wasn't added to map, reset his map pointer!
-        GetPlayer()->ResetMap();
-
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WorldSession::HandleMoveWorldportAckOpcode: %s was teleported far but couldn't be added to map "
                    " (map:%u, x:%f, y:%f, z:%f) Trying to port him to his previous place..",
                    GetPlayer()->GetGuidStr().c_str(), loc.mapId, loc.x, loc.y, loc.z);
 
-        // Teleport to previous place, if cannot be ported back TP to homebind place
-        if (!GetPlayer()->TeleportTo(old_loc))
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WorldSession::HandleMoveWorldportAckOpcode: %s cannot be ported to his previous place, teleporting him to his homebind place...",
-                       GetPlayer()->GetGuidStr().c_str());
-            GetPlayer()->TeleportToHomebind();
-        }
+        GetPlayer()->HandleReturnOnTeleportFail(oldLoc);
         return;
     }
     GetPlayer()->SetSemaphoreTeleportFar(false);

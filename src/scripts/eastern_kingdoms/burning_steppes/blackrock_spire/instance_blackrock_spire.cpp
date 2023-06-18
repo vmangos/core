@@ -188,6 +188,9 @@ instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance
 
     m_uiBlackRockAltarGUID(0),
 
+    m_uiDrakkisathDoor1GUID(0),
+    m_uiDrakkisathDoor2GUID(0),
+
     m_uiUBRSDoor_Timer(0),
     m_uiUBRSDoor_Step(0),
 
@@ -241,7 +244,16 @@ void instance_blackrock_spire::OnObjectCreate(GameObject* pGo)
             if (GetData(TYPE_STADIUM) == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-
+        case GO_DRAKKISATH_DOOR1:
+            m_uiDrakkisathDoor1GUID = pGo->GetGUID();
+            if (GetData(TYPE_DRAKKISATH) == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
+        case GO_DRAKKISATH_DOOR2:
+            m_uiDrakkisathDoor2GUID = pGo->GetGUID();
+            if (GetData(TYPE_DRAKKISATH) == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
         case GO_ROOM_1_RUNE:
             m_auiRoomRuneGUID[0] = pGo->GetGUID();
             break;
@@ -468,6 +480,14 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
 
             m_auiEncounter[TYPE_SOLAKAR] = uiData;
             break;
+        case TYPE_DRAKKISATH:
+            if (uiData == DONE)
+            {
+                DoUseDoorOrButton(m_uiDrakkisathDoor1GUID);
+                DoUseDoorOrButton(m_uiDrakkisathDoor2GUID);
+            }
+            m_auiEncounter[TYPE_DRAKKISATH] = uiData;
+            break;
     }
 
     if (uiData == DONE)
@@ -475,7 +495,7 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " " << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5] << " " << m_auiEncounter[6];
+        saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " " << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5] << " " << m_auiEncounter[6] << " " << m_auiEncounter[7];
 
         strInstData = saveStream.str();
 
@@ -833,7 +853,7 @@ void instance_blackrock_spire::Load(char const* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-    loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6];
+    loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6] >> m_auiEncounter[7];
 
     for (uint32 & i : m_auiEncounter)
     {
@@ -855,6 +875,7 @@ uint32 instance_blackrock_spire::GetData(uint32 uiType)
         case TYPE_VALTHALAK:
         case TYPE_EVENT_DOOR_UBRS:
         case TYPE_SOLAKAR:
+        case TYPE_DRAKKISATH:
             return m_auiEncounter[uiType];
     }
     return 0;

@@ -634,11 +634,6 @@ int32 BattleGround::GetHeraldEntry() const
 
 void BattleGround::EndBattleGround(Team winner)
 {
-    uint32 bgTypeID = BATTLEGROUND_TYPE_NONE;
-
-    if (m_maxPlayers == 40)
-        bgTypeID = BATTLEGROUND_AV;
-
     RemoveFromBGFreeSlotQueue();
 
     WorldPacket data;
@@ -1614,11 +1609,6 @@ void BattleGround::SendYell2ToAll(int32 entry, uint32 language, ObjectGuid guid,
 
 void BattleGround::EndNow()
 {
-    uint32 bgTypeID = BATTLEGROUND_TYPE_NONE;
-
-    if (m_maxPlayers == 40)
-        bgTypeID = BATTLEGROUND_AV;
-
     RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
     SetEndTime(0);

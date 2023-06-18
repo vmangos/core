@@ -103,13 +103,13 @@ void Warden::LoadScriptedScans()
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, ">> %u scripted Warden scans loaded from anticheat module", sWardenScanMgr.Count() - start);
 }
 
-Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumber &K) :
+Warden::Warden(WorldSession* session, WardenModule const* module, BigNumber const& K) :
     m_accountId(session->GetAccountId()), m_sessionGuid(session->GetGUID()), m_clientBuild(session->GetGameBuild()), m_accountName(session->GetUsername()),
     m_sessionIP(session->GetRemoteAddress()), m_clientOS(session->GetOS()), m_clientPlatform(session->GetPlatform()),
-    _inputCrypto(KeyLength), _outputCrypto(KeyLength), _initialized(false), _module(module), _crk(nullptr),
-    _timeoutClock(0), _scanClock(0), _moduleSendPending(false)
+    m_inputCrypto(KeyLength), m_outputCrypto(KeyLength), m_initialized(false), m_module(module), m_crk(nullptr),
+    m_timeoutClock(0), m_scanClock(0), m_moduleSendPending(false)
 {
-    MANGOS_ASSERT(!!_module || session->GetPlatform() != CLIENT_PLATFORM_X86);
+    MANGOS_ASSERT(!!m_module || session->GetPlatform() != CLIENT_PLATFORM_X86);
 
     auto const kBytes = K.AsByteArray();
 
@@ -121,25 +121,25 @@ Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumbe
     uint8 outputKey[KeyLength];
     WK.Generate(outputKey, sizeof(outputKey));
 
-    _inputCrypto.Init(inputKey);
-    _outputCrypto.Init(outputKey);
+    m_inputCrypto.Init(inputKey);
+    m_outputCrypto.Init(outputKey);
 
-    _xor = inputKey[0];
+    m_xor = inputKey[0];
 
     sLog.OutWarden(this, LOG_LVL_DEBUG, "Initializing");
     sLog.OutWarden(this, LOG_LVL_DEBUG, "C->S Key: %s", ByteArrayToHexStr(inputKey, 16).c_str());
     sLog.OutWarden(this, LOG_LVL_DEBUG, "S->C Key: %s", ByteArrayToHexStr(outputKey, 16).c_str());
 
-    if (_module)
+    if (m_module)
     {
-        ByteBuffer pkt(1 + _module->hash.size() + _module->key.size() + 4);
+        ByteBuffer pkt(1 + m_module->hash.size() + m_module->key.size() + 4);
 
         pkt << static_cast<uint8>(WARDEN_SMSG_MODULE_USE);
 
-        pkt.append(&_module->hash[0], _module->hash.size());
-        pkt.append(&_module->key[0], _module->key.size());
+        pkt.append(&m_module->hash[0], m_module->hash.size());
+        pkt.append(&m_module->key[0], m_module->key.size());
 
-        pkt << static_cast<uint32>(_module->binary.size());
+        pkt << static_cast<uint32>(m_module->binary.size());
 
         SendPacketDirect(pkt, session);
 
@@ -149,39 +149,39 @@ Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumbe
 
 void Warden::RequestChallenge()
 {
-    MANGOS_ASSERT(!!_module && !_module->crk.empty());
+    MANGOS_ASSERT(!!m_module && !m_module->crk.empty());
 
     StopTimeoutClock();
 
     // select a random challenge/response/key entry
-    _crk = &_module->crk[urand(0, _module->crk.size() - 1)];
+    m_crk = &m_module->crk[urand(0, m_module->crk.size() - 1)];
 
     sLog.OutWarden(this, LOG_LVL_DEBUG, "Sending challenge");
-    sLog.OutWarden(this, LOG_LVL_DEBUG, "Seed: %s", ByteArrayToHexStr(_crk->seed, 16).c_str());
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Seed: %s", ByteArrayToHexStr(m_crk->seed, 16).c_str());
 
-    ByteBuffer pkt(1 + sizeof(_crk->seed));
+    ByteBuffer pkt(1 + sizeof(m_crk->seed));
 
     pkt << static_cast<uint8>(WARDEN_SMSG_HASH_REQUEST);
-    pkt.append(_crk->seed, sizeof(_crk->seed));
+    pkt.append(m_crk->seed, sizeof(m_crk->seed));
 
     SendPacket(pkt);
 
     BeginTimeoutClock();
 }
 
-void Warden::HandleChallengeResponse(ByteBuffer &buff)
+void Warden::HandleChallengeResponse(ByteBuffer& buff)
 {
     buff.rpos(buff.wpos());
 
     // shouldn't happen under normal conditions
-    if (!_crk)
+    if (!m_crk)
     {
         ApplyPenalty("sent challenge response without request having been made", WARDEN_ACTION_KICK);
         return;
     }
 
     // Verify key
-    if (buff.wpos() != 1 + sizeof(_crk->reply) || !!memcmp(buff.contents() + 1, _crk->reply, sizeof(_crk->reply)))
+    if (buff.wpos() != 1 + sizeof(m_crk->reply) || !!memcmp(buff.contents() + 1, m_crk->reply, sizeof(m_crk->reply)))
     {
         ApplyPenalty("failed challenge response", WARDEN_ACTION_KICK);
         return;
@@ -189,14 +189,14 @@ void Warden::HandleChallengeResponse(ByteBuffer &buff)
 
     StopTimeoutClock();
 
-    _inputCrypto.Init(_crk->clientKey);
-    _outputCrypto.Init(_crk->serverKey);
+    m_inputCrypto.Init(m_crk->clientKey);
+    m_outputCrypto.Init(m_crk->serverKey);
 
-    _xor = _crk->clientKey[0];
+    m_xor = m_crk->clientKey[0];
 
     sLog.OutWarden(this, LOG_LVL_DEBUG, "Challenge response validated.  Warden packet encryption initialized.");
 
-    _crk = nullptr;
+    m_crk = nullptr;
 }
 
 void Warden::SendModuleToClient()
@@ -205,15 +205,15 @@ void Warden::SendModuleToClient()
 
     StopTimeoutClock();
 
-    for (auto pos = 0u; pos < _module->binary.size(); )
+    for (auto pos = 0u; pos < m_module->binary.size(); )
     {
-        const std::uint16_t sizeLeft = _module->binary.size() - pos;
-        const std::uint16_t len = std::min(sizeLeft, static_cast<decltype(sizeLeft)>(500));
+        std::uint16_t const sizeLeft = m_module->binary.size() - pos;
+        std::uint16_t const len = std::min(sizeLeft, static_cast<decltype(sizeLeft)>(500));
 
         ByteBuffer pkt(1 + 2 + len);
 
         pkt << static_cast<uint8>(WARDEN_SMSG_MODULE_CACHE) << len;
-        pkt.append(&_module->binary[pos], len);
+        pkt.append(&m_module->binary[pos], len);
 
         SendPacket(pkt);
 
@@ -222,33 +222,33 @@ void Warden::SendModuleToClient()
 
     BeginTimeoutClock();
 
-    _moduleSendPending = true;
+    m_moduleSendPending = true;
 
     sLog.OutWarden(this, LOG_LVL_DEBUG, "Module transfer complete");
 }
 
-std::vector<std::shared_ptr<const Scan>> Warden::SelectScans(ScanFlags flags) const
+std::vector<std::shared_ptr<Scan const>> Warden::SelectScans(ScanFlags flags) const
 {
-    return std::move(sWardenScanMgr.GetRandomScans(static_cast<ScanFlags>(flags | GetScanFlags())));
+    return std::move(sWardenScanMgr.GetRandomScans(static_cast<ScanFlags>(flags | GetScanFlags()), m_clientBuild));
 }
 
-void Warden::EnqueueScans(std::vector<std::shared_ptr<const Scan>> &&scans)
+void Warden::EnqueueScans(std::vector<std::shared_ptr<Scan const>>&& scans)
 {
     // append the requested scans to the queue
-    _enqueuedScans.insert(_enqueuedScans.end(), scans.cbegin(), scans.cend());
+    m_enqueuedScans.insert(m_enqueuedScans.end(), scans.cbegin(), scans.cend());
 }
 
-void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
+void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
 {
     // start by appending the requested scans to the queue, which will usually be empty when this is called
-    _enqueuedScans.insert(_enqueuedScans.end(), scans.cbegin(), scans.cend());
+    m_enqueuedScans.insert(m_enqueuedScans.end(), scans.cbegin(), scans.cend());
 
     // if for whatever reason there is nothing to do, stop
-    if (_enqueuedScans.empty())
+    if (m_enqueuedScans.empty())
         return;
 
     // if there are already some scans pending, stop
-    if (!_pendingScans.empty())
+    if (!m_pendingScans.empty())
         return;
 
     // begin building the scan request, taking as many scans from the queue as we can
@@ -260,13 +260,13 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
 
     bool queueUpdated = false;
 
-    for (auto i = _enqueuedScans.begin(); i != _enqueuedScans.end(); ++i)
+    for (auto i = m_enqueuedScans.begin(); i != m_enqueuedScans.end(); ++i)
     {
         // too many or too big? keep the current scan, as well as all following it, in the queue, and halt
         if (request + (*i)->requestSize > MaxRequest || reply + (*i)->replySize > MaxReply ||
-            _pendingScans.size() >= sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_NUM_SCANS))
+            m_pendingScans.size() >= sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_NUM_SCANS))
         {
-            _enqueuedScans = std::move(std::vector<std::shared_ptr<const Scan>>(i, _enqueuedScans.end()));
+            m_enqueuedScans = std::move(std::vector<std::shared_ptr<Scan const>>(i, m_enqueuedScans.end()));
             queueUpdated = true;
             break;
         }
@@ -282,17 +282,17 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
         // if the scan did not change the buffer size or the string size, consider
         // it a NOP and don't bother marking it as pending
         if (scan.wpos() != startSize || strings.size() != startStringSize)
-            _pendingScans.push_back(*i);
+            m_pendingScans.push_back(*i);
     }
 
     // if there are still no pending scans, it means that there is a single scan which is too big.
     // this should never happen, so if it does, just crash
-    MANGOS_ASSERT(!_pendingScans.empty());
+    MANGOS_ASSERT(!m_pendingScans.empty());
 
     // if the scan queue has not been updated, its because we were able to fit the entire queue into one request.
     // therefore, the queue can be emptied
     if (!queueUpdated)
-        _enqueuedScans.clear();
+        m_enqueuedScans.clear();
 
     // this buffer is where we will combine the different portions of the packet
     ByteBuffer buff;
@@ -303,7 +303,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
     if (m_clientOS == CLIENT_OS_WIN)
     {
         // string table for this request
-        for (auto const &s : strings)
+        for (auto const& s : strings)
         {
             buff << static_cast<uint8>(s.length());
             buff.append(s.c_str(), s.length());
@@ -319,21 +319,21 @@ void Warden::RequestScans(std::vector<std::shared_ptr<const Scan>> &&scans)
     if (m_clientOS == CLIENT_OS_WIN)
     {
         // indicates to the client that there are no further requests in this packet
-        buff << _xor;
+        buff << m_xor;
     }
 
     BeginTimeoutClock();
     SendPacket(buff);
 }
 
-void Warden::ReadScanResults(ByteBuffer &buff)
+void Warden::ReadScanResults(ByteBuffer& buff)
 {
     // move the scans to the stack because the check handlers we call may enqueue additional scans
-    auto const scans = std::move(_pendingScans);
+    auto const scans = std::move(m_pendingScans);
 
     //auto const inWorld = _session->GetPlayer() && _session->GetPlayer()->IsInWorld();
 
-    for (auto const &s : scans)
+    for (auto const& s : scans)
     {
         // checks return true when they have discovered a hack 
         if (s->Check(this, buff))
@@ -350,18 +350,18 @@ void Warden::ReadScanResults(ByteBuffer &buff)
 
     // if there are enqueued scans at this point, the check handlers must have requested them.
     // when this happens, request them to be sent immediately.
-    if (!_enqueuedScans.empty())
+    if (!m_enqueuedScans.empty())
         RequestScans({});
 }
 
-void Warden::SendPacket(const ByteBuffer &buff)
+void Warden::SendPacket(ByteBuffer const& buff)
 {
     WorldPacket pkt(SMSG_WARDEN_DATA, buff.wpos());
     pkt.append(buff);
 
     // we specifically append the packet copy, rather than the input copy, to avoid
     // creating side-effects for this function
-    EncryptData(const_cast<uint8 *>(pkt.contents()), pkt.wpos());
+    EncryptData(const_cast<uint8*>(pkt.contents()), pkt.wpos());
 
     sWorld.GetMessager().AddMessage([packet = std::move(pkt), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
     {
@@ -380,7 +380,7 @@ void Warden::SendPacketDirect(ByteBuffer const& buff, WorldSession* session)
 
     // we specifically append the packet copy, rather than the input copy, to avoid
     // creating side-effects for this function
-    EncryptData(const_cast<uint8 *>(pkt.contents()), pkt.wpos());
+    EncryptData(const_cast<uint8*>(pkt.contents()), pkt.wpos());
 
     session->SendPacket(&pkt);
 }
@@ -399,40 +399,40 @@ void Warden::KickSession() const
 
 void Warden::DecryptData(uint8* buffer, size_t size)
 {
-    _inputCrypto.UpdateData(buffer, size);
+    m_inputCrypto.UpdateData(buffer, size);
 }
 
 void Warden::EncryptData(uint8* buffer, size_t size)
 {
-    _outputCrypto.UpdateData(buffer, size);
+    m_outputCrypto.UpdateData(buffer, size);
 }
 
 void Warden::BeginTimeoutClock()
 {
 #ifdef _DEBUG
-    _timeoutClock = 0;
+    m_timeoutClock = 0;
 #else
     // we will expect a reply eventually
-    _timeoutClock = WorldTimer::getMSTime() + IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY);
+    m_timeoutClock = WorldTimer::getMSTime() + IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY);
 #endif
 }
 
 void Warden::StopTimeoutClock()
 {
-    _timeoutClock = 0;
+    m_timeoutClock = 0;
 }
 
 void Warden::BeginScanClock()
 {
-    _scanClock = WorldTimer::getMSTime() + 1000 * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY);
+    m_scanClock = WorldTimer::getMSTime() + 1000 * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY);
 }
 
 void Warden::StopScanClock()
 {
-    _scanClock = 0;
+    m_scanClock = 0;
 }
 
-uint32 Warden::BuildChecksum(const uint8* data, size_t size)
+uint32 Warden::BuildChecksum(uint8 const* data, size_t size)
 {
     uint8 hash[SHA_DIGEST_LENGTH];
     SHA1(data, size, hash);
@@ -440,12 +440,12 @@ uint32 Warden::BuildChecksum(const uint8* data, size_t size)
     uint32 checkSum = 0;
 
     for (auto i = 0u; i < sizeof(hash) / sizeof(uint32); ++i)
-        checkSum ^= *reinterpret_cast<uint32 *>(&hash[i * 4]);
+        checkSum ^= *reinterpret_cast<uint32*>(&hash[i * 4]);
 
     return checkSum;
 }
 
-void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::shared_ptr<const Scan> scan)
+void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::shared_ptr<Scan const> scan)
 {
     if (penalty >= WARDEN_ACTION_MAX)
     {
@@ -509,7 +509,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
     sLog.OutWarden(this, LOG_LVL_DEBUG, "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
 
     // when there is a challenge/response pending, the only packet we expect is the hash result
-    if (!!_crk && opcode != WARDEN_CMSG_HASH_RESULT)
+    if (!!m_crk && opcode != WARDEN_CMSG_HASH_RESULT)
     {
         recvData.rpos(recvData.wpos());
         std::string msg = "sent unexpected opcode (" + std::to_string(opcode) + ") while awaiting hash challenge response";
@@ -521,18 +521,18 @@ void Warden::HandlePacket(WorldPacket& recvData)
     {
         case WARDEN_CMSG_MODULE_MISSING:
         {
-            if (!_module)
+            if (!m_module)
             {
                 sLog.OutWarden(this, LOG_LVL_BASIC, "Requested module when none was offered.");
                 KickSession();
                 break;
             }
 
-            if (_moduleSendPending)
+            if (m_moduleSendPending)
             {
                 sLog.OutWarden(this, LOG_LVL_BASIC, "Failed to load module.  Kicking.");
                 KickSession();
-                _moduleSendPending = false;
+                m_moduleSendPending = false;
                 break;
             }
 
@@ -543,14 +543,14 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
         case WARDEN_CMSG_MODULE_OK:
         {
-            if (!_module)
+            if (!m_module)
             {
                 sLog.OutWarden(this, LOG_LVL_BASIC, "Loaded module without server request.");
                 KickSession();
                 break;
             }
 
-            _moduleSendPending = false;
+            m_moduleSendPending = false;
             sLog.OutWarden(this, LOG_LVL_DEBUG, "Module loaded");
             RequestChallenge();
             break;
@@ -596,7 +596,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
             HandleChallengeResponse(recvData);
 
             // if the challenge failed, this will still be set.  by now, the session will be closed.  do nothing further.
-            if (!!_crk)
+            if (!!m_crk)
                 return;
 
             // at this point the client has our module loaded.  send whatever packets are necessary to initialize Warden
@@ -642,27 +642,27 @@ void Warden::Update()
             HandlePacket(packet);
     }
 
-    if (!!_timeoutClock && WorldTimer::getMSTime() > _timeoutClock)
+    if (!!m_timeoutClock && WorldTimer::getMSTime() > m_timeoutClock)
     {
         sLog.OutWarden(this, LOG_LVL_BASIC, "Client response timeout.  Kicking.");
         KickSession();
         return;
     }
 
-    if (_pendingScans.empty())
+    if (m_pendingScans.empty())
     {
         // if there are enqueued scans which may now be requested, do so immediately (with no additional scans)
-        if (!_enqueuedScans.empty())
+        if (!m_enqueuedScans.empty())
             RequestScans({});
         // otherwise, if the scan clock is running and has expired, request randomly selected scans
-        else if (!!_scanClock && WorldTimer::getMSTime() > _scanClock)
+        else if (!!m_scanClock && WorldTimer::getMSTime() > m_scanClock)
         {
             //auto const inWorld = _session->GetPlayer() ? _session->GetPlayer()->IsInWorld() : false;
 
-            RequestScans(SelectScans(/*inWorld ? InWorld :*/ None));
+            RequestScans(SelectScans(/*inWorld ? InWorld :*/ ScanFlags::None));
 
             // if no scans were found, just begin the clock again, in case things change
-            if (_pendingScans.empty())
+            if (m_pendingScans.empty())
                 BeginScanClock();
             else
             {
@@ -674,7 +674,7 @@ void Warden::Update()
     }
 }
 
-void Warden::LogPositiveToDB(std::shared_ptr<const Scan> scan)
+void Warden::LogPositiveToDB(std::shared_ptr<Scan const> scan)
 {
     if (!scan)
         return;

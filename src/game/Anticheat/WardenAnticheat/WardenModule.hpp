@@ -48,9 +48,9 @@ private:
 
 public:
     // windows module
-    WardenModule(std::string const &binary, std::string const &key, std::string const &cr);
+    WardenModule(std::string const& binary, std::string const& key, std::string const& cr);
 
-    WardenModule(WardenModule &&other) = default;
+    WardenModule(WardenModule&& other) = default;
 
     // true when this module is for windows (otherwise it is for Mac x86)
     bool Windows() const;

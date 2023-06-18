@@ -825,7 +825,7 @@ class SpellEntry
 
         bool IsDeathOnlySpell() const
         {
-            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || 
+            return HasAttribute(SPELL_ATTR_EX3_ONLY_ON_GHOSTS) || 
                    (Targets & (TARGET_FLAG_PVP_CORPSE | TARGET_FLAG_UNIT_CORPSE | TARGET_FLAG_CORPSE)) ||
                    (Id == 2584);
         }
@@ -846,7 +846,7 @@ class SpellEntry
 
         bool IsDeathPersistentSpell() const
         {
-            return HasAttribute(SPELL_ATTR_EX3_DEATH_PERSISTENT);
+            return HasAttribute(SPELL_ATTR_EX3_ALLOW_AURA_WHILE_DEAD);
         }
 
         bool IsNonCombatSpell() const
@@ -982,7 +982,7 @@ class SpellEntry
 
         bool HasRealTimeDuration() const
         {
-            return HasAttribute(SPELL_ATTR_EX4_REAL_TIME_DURATION);
+            return HasAttribute(SPELL_ATTR_EX4_AURA_EXPIRES_OFFLINE);
         }
 
         bool HasAuraWithSpellTriggerEffect() const

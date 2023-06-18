@@ -369,6 +369,9 @@ struct FactionTemplateEntry
     uint32      friendFaction[4];                           // 10-13
     //-------------------------------------------------------  end structure
 
+    // assigned by core
+    bool isEnemyOfAnother = false;
+
     // helpers
     bool IsFriendlyTo(FactionTemplateEntry const& entry) const
     {

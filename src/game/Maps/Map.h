@@ -505,7 +505,7 @@ class Map : public GridRefManager<NGridType>
         Creature* GetAnyTypeCreature(ObjectGuid guid);      // normal creature or pet
         GenericTransport* GetTransport(ObjectGuid guid);
         ElevatorTransport* GetElevatorTransport(ObjectGuid);
-        DynamicObject* GetDynamicObject(ObjectGuid guid);
+        DynamicObject* GetDynamicObject(ObjectGuid guid) { return GetObject<DynamicObject>(guid); }
         Corpse* GetCorpse(ObjectGuid guid);                   // !!! find corpse can be not in world
         Unit* GetUnit(ObjectGuid guid);                       // only use if sure that need objects at current map, specially for player case
         WorldObject* GetWorldObject(ObjectGuid guid);         // only use if sure that need objects at current map, specially for player case
@@ -555,6 +555,7 @@ class Map : public GridRefManager<NGridType>
         bool GetWalkHitPosition(GenericTransport* t, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, 
             uint32 moveAllowedFlags = 0xF /*NAV_GROUND | NAV_WATER | NAV_MAGMA | NAV_SLIME*/, float zSearchDist = 20.0f, bool locatedOnSteepSlope = true) const;
         bool GetWalkRandomPosition(GenericTransport* t, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags = 0xF) const;
+        bool GetSwimRandomPosition(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status, bool randomRange = true) const;
         VMAP::ModelInstance* FindCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
 
         void Balance() { _dynamicTree.balance(); }
@@ -854,6 +855,7 @@ class Map : public GridRefManager<NGridType>
         bool ScriptCommand_PlayCustomAnim(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_StartScriptOnGroup(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_LoadCreatureSpawn(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_StartScriptOnZone(ScriptInfo const& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         ScriptCommandFunction const m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -950,6 +952,7 @@ class Map : public GridRefManager<NGridType>
             &Map::ScriptCommand_PlayCustomAnim,         // 89
             &Map::ScriptCommand_StartScriptOnGroup,     // 90
             &Map::ScriptCommand_LoadCreatureSpawn,      // 91
+            &Map::ScriptCommand_StartScriptOnZone,      // 92
         };
 
     public:
@@ -989,6 +992,7 @@ class DungeonMap : public Map
 
         // can't be nullptr for loaded map
         DungeonPersistentState* GetPersistanceState() const;
+        void BindPlayerOrGroupOnEnter(Player* player);
 
         void InitVisibilityDistance() override;
         // Activated at raid expiration. No one can enter.

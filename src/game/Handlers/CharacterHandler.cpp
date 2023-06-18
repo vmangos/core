@@ -440,6 +440,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         m_playerLoading = false;
         return;
     }
+
     ObjectGuid playerGuid = holder->GetGuid();
     ASSERT(playerGuid.IsPlayer());
     m_currentPlayerGuid = playerGuid;
@@ -453,19 +454,30 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Hacking attempt
         if (pCurrChar->GetSession()->GetAccountId() != GetAccountId())
         {
+            ProcessAnticheatAction("PassiveAnticheat", "Attempt to login to character on different account", CHEAT_ACTION_LOG);
             KickPlayer();
             delete holder;
             m_playerLoading = false;
             return;
         }
+
+        if (pCurrChar->FindMap() != sMapMgr.FindMap(pCurrChar->GetMapId(), pCurrChar->GetInstanceId()))
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Dangling map pointer during login on character guid %u", playerGuid.GetCounter());
+            KickPlayer();
+            delete holder;
+            m_playerLoading = false;
+            return;
+        }
+
+        alreadyOnline = true;
         pCurrChar->GetSession()->SetPlayer(nullptr);
         pCurrChar->SetSession(this);
 
         // Need to attach packet bcaster to the new socket
         pCurrChar->m_broadcaster->ChangeSocket(GetSocket());
-        alreadyOnline = true;
 
-        // If the character had a logout request, then he is articifially stunned (cf CMSG_LOGOUT_REQUEST handler). Fix it here.
+        // If the character had a logout request, then he is articifially stunned (in CMSG_LOGOUT_REQUEST handler). Fix it here.
         if (pCurrChar->CanFreeMove())
         {
             pCurrChar->SetRootedReal(false);
@@ -598,7 +610,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     pCurrChar->SendInitialPacketsBeforeAddToMap();
     GetMasterPlayer()->SendInitialActionButtons();
 
-    //Show cinematic at the first time that player login
+    // Show cinematic at the first time that player login
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST) && !sWorld.getConfig(CONFIG_BOOL_SKIP_CINEMATICS))
     {
         if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->GetRace()))

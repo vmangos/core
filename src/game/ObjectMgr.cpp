@@ -1636,11 +1636,9 @@ CreatureDisplayInfoAddon const* ObjectMgr::GetCreatureDisplayInfoRandomGender(ui
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Model (Entry: %u) has display_id_other_gender %u not found in table `creature_display_info_addon`. ", minfo->display_id, minfo->display_id_other_gender);
             return minfo;                                   // not fatal, just use the previous one
         }
-        else
-            return minfo_tmp;
+        return minfo_tmp;
     }
-    else
-        return minfo;
+    return minfo;
 }
 
 void ObjectMgr::LoadCreatureDisplayInfoAddon()
@@ -2157,7 +2155,6 @@ CreatureClassLevelStats const* ObjectMgr::GetCreatureClassLevelStats(uint32 unit
 
 void ObjectMgr::LoadCreatures(bool reload)
 {
-    uint32 count = 0;
     //                                                                          0                  1                2                 3                 4                 5      6
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `creature`.`id2`, `creature`.`id3`, `creature`.`id4`, `creature`.`id5`, `map`,"
     //                      7             8             9             10             11                  12                  13
@@ -2336,8 +2333,6 @@ void ObjectMgr::LoadCreatures(bool reload)
 
         if (!alreadyPresent && existsInPatch && gameEvent == 0 && GuidPoolId == 0 && EntryPoolId == 0) // if not this is to be managed by GameEvent System or Pool system
             AddCreatureToGrid(guid, &data);
-        ++count;
-
     }
     while (result->NextRow());
 
@@ -2367,8 +2362,6 @@ void ObjectMgr::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
 
 void ObjectMgr::LoadGameobjects(bool reload)
 {
-    uint32 count = 0;
-
     //                                                                            0                    1     2      3             4             5             6
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `gameobject`.`guid`, `gameobject`.`id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`,"
     //                      7            8            9            10           11                12              13       14      15
@@ -2513,8 +2506,6 @@ void ObjectMgr::LoadGameobjects(bool reload)
         // if not this is to be managed by GameEvent System or Pool system
         else if (!alreadyPresent && gameEvent == 0 && GuidPoolId == 0 && EntryPoolId == 0)
             AddGameobjectToGrid(guid, &data);
-        ++count;
-
     }
     while (result->NextRow());
 
@@ -4286,7 +4277,7 @@ void ObjectMgr::LoadPetLevelInfo()
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Wrong (> %u) level %u in `pet_levelstats` table, ignoring.", PLAYER_STRONG_MAX_LEVEL, currentLevel);
                 else
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Unused (> MaxPlayerLevel in mangosd.conf) level %u in `pet_levelstats` table, ignoring.", currentLevel);("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `pet_levelstats` table, ignoring.", currentLevel);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Unused (> MaxPlayerLevel in mangosd.conf) level %u in `pet_levelstats` table, ignoring.", currentLevel);
                     ++count;                                 // make result loading percent "expected" correct in case disabled detail mode for example.
                 }
                 continue;
@@ -8195,6 +8186,8 @@ void ObjectMgr::LoadFactions()
             return;
         }
 
+        std::set<uint32> factionsWithEnemies;
+
         BarGoLink bar(result->GetRowCount());
 
         do
@@ -8212,18 +8205,29 @@ void ObjectMgr::LoadFactions()
             faction.ourMask = fields[4].GetUInt32();
             faction.friendlyMask = fields[5].GetUInt32();
             faction.hostileMask = fields[6].GetUInt32();
-            faction.enemyFaction[0] = fields[7].GetUInt32();
-            faction.enemyFaction[1] = fields[8].GetUInt32();
-            faction.enemyFaction[2] = fields[9].GetUInt32();
-            faction.enemyFaction[3] = fields[10].GetUInt32();
-            faction.friendFaction[0] = fields[11].GetInt32();
-            faction.friendFaction[1] = fields[12].GetInt32();
-            faction.friendFaction[2] = fields[13].GetInt32();
-            faction.friendFaction[3] = fields[14].GetInt32();
+            for (int i = 0; i < 4; ++i)
+            {
+                if (faction.enemyFaction[i] = fields[7 + i].GetUInt32())
+                {
+                    if (faction.factionFlags & (FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_LOW_PRIO | FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_MED_PRIO | FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_HIG_PRIO))
+                        factionsWithEnemies.insert(faction.enemyFaction[i]);
+                }
+            }
+            for (int i = 0; i < 4; ++i)
+            {
+                faction.friendFaction[i] = fields[11 + i].GetUInt32();
+            }
 
             m_FactionTemplatesMap[factionId] = faction;
 
         } while (result->NextRow());
+
+        // This is needed to make sure passive factions who are someone's enemy notify their enemies upon moving.
+        for (auto& itr : m_FactionTemplatesMap)
+        {
+            if (factionsWithEnemies.find(itr.second.faction) != factionsWithEnemies.end())
+                itr.second.isEnemyOfAnother = true;
+        }
     }
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u faction templates.", m_FactionTemplatesMap.size());
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -11223,7 +11227,7 @@ void ObjectMgr::RestoreDeletedItems()
         bar.step();
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Restored 0 prevously deleted items.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Restored 0 previously deleted items.");
         return;
     }
 
@@ -11242,8 +11246,7 @@ void ObjectMgr::RestoreDeletedItems()
         
         if (ItemPrototype const* itemProto = GetItemPrototype(itemId))
         {
-            ObjectGuid playerGuid = ObjectGuid(HIGHGUID_PLAYER, playerGuidLow);
-            Player* pPlayer = ObjectAccessor::FindPlayerNotInWorld(playerGuid);
+            ObjectGuid const playerGuid = ObjectGuid(HIGHGUID_PLAYER, playerGuidLow);
 
             if (Item* restoredItem = Item::CreateItem(itemId, stackCount ? stackCount : 1, playerGuid))
             {

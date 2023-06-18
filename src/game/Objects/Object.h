@@ -867,7 +867,7 @@ class WorldObject : public Object
 
         virtual void SendMessageToSetInRange(WorldPacket* data, float dist, bool self) const;
         void SendMessageToSetExcept(WorldPacket* data, Player const* skipped_receiver) const;
-        void DirectSendPublicValueUpdate(uint32 index);
+        void DirectSendPublicValueUpdate(uint32 index, uint32 count = 1);
 
         void PlayDistanceSound(uint32 sound_id, Player const* target = nullptr) const;
         void PlayDirectSound(uint32 sound_id, Player const* target = nullptr) const;

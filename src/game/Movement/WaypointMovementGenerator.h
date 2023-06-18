@@ -27,7 +27,7 @@
 
 #include "MovementGenerator.h"
 #include "WaypointManager.h"
-
+#include "CreatureGroups.h"
 #include "Player.h"
 
 #include <vector>
@@ -35,8 +35,6 @@
 
 #define FLIGHT_TRAVEL_UPDATE  100
 #define STOP_TIME_FOR_PLAYER  (30 * IN_MILLISECONDS)
-
-struct CreatureGroupMember;
 
 template<class T, class P>
 class PathMovementBase
@@ -158,7 +156,7 @@ class PatrolMovementGenerator
 {
     public:
         explicit PatrolMovementGenerator(Creature& c) { ASSERT(InitPatrol(c)); }
-        explicit PatrolMovementGenerator(ObjectGuid leader, CreatureGroupMember const* member) : _leaderGuid(leader), _groupMember(member) {}
+        explicit PatrolMovementGenerator(ObjectGuid leader, CreatureGroupMember const* member) : m_leaderGuid(leader), m_groupMember(*member) {}
         bool InitPatrol(Creature& c);
 
         void LoadPath(Creature &c);
@@ -172,8 +170,8 @@ class PatrolMovementGenerator
 
         bool GetResetPosition(Creature&, float& x, float& y, float& z);
     private:
-        ObjectGuid _leaderGuid;
-        CreatureGroupMember const* _groupMember;
+        ObjectGuid m_leaderGuid;
+        CreatureGroupMember m_groupMember;
 };
 
 #endif

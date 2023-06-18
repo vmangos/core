@@ -148,7 +148,7 @@ bool ChatHandler::HandleSpellInfosCommand(char *args)
 
 bool ChatHandler::HandleSpellSearchCommand(char *args)
 {
-    if (!args)
+    if (!*args)
         return false;
 
     uint32 familyName = 0;
@@ -158,7 +158,7 @@ bool ChatHandler::HandleSpellSearchCommand(char *args)
     if (!familyFlags)
         return false;
     PSendSysMessage("* Results for SpellFamilyName %u and SpellFamilyFlags & 0x%x", familyName, familyFlags);
-    LocaleConstant loc = GetSessionDbcLocale();
+    LocaleConstant const loc = GetSessionDbcLocale();
     SpellEntry const* pSpell = nullptr;
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); ++id)
     {
@@ -1846,7 +1846,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     if (checkItem)
         lootChances[checkItem] = 0;
 
-    uint32 const MAX_TIME = 30;
+    uint32 constexpr MAX_TIME = 30;
     auto startTime = time(nullptr);
 
     for (uint32 i = 0; i < simCount; ++i)
@@ -1911,7 +1911,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
 bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, uint32 simCount)
 {
     std::map<uint32, uint32> lootChances;
-    uint32 const MAX_TIME = 30;
+    uint32 constexpr MAX_TIME = 30;
     auto startTime = time(nullptr);
 
     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(lootid);
@@ -2042,13 +2042,13 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 
 bool ChatHandler::HandleVideoTurn(char*)
 {
-    float const radiusBegin = 40.0f;
-    float const radiusEnd = 10.0f;
-    float const zBegin = 30.0f;
-    float const zEnd = 10.0f;
-    float const angleBegin = 0.0f;
-    float const angleEnd = 10 * M_PI_F;
-    float const moveSpeed = 30.0f;
+    float constexpr radiusBegin = 40.0f;
+    float constexpr radiusEnd = 10.0f;
+    float constexpr zBegin = 30.0f;
+    float constexpr zEnd = 10.0f;
+    float constexpr angleBegin = 0.0f;
+    float constexpr angleEnd = 10 * M_PI_F;
+    float constexpr moveSpeed = 30.0f;
     std::list<Creature*> targets;
     Unit* selection = GetSelectedUnit();
     if (!selection)
@@ -2078,10 +2078,10 @@ bool ChatHandler::HandleVideoTurn(char*)
 
 bool ChatHandler::HandleDebugExp(char*)
 {
-    float const moveDist = 80.0f;
-    float const searchCreaturesRange = 60.0f;
-    float const retournementRayon = 2.0f;
-    float const moveSpeed = 6.0f;
+    float constexpr moveDist = 80.0f;
+    float constexpr searchCreaturesRange = 60.0f;
+    float constexpr retournementRayon = 2.0f;
+    float constexpr moveSpeed = 6.0f;
     std::list<Creature*> targets;
     Unit* selection = GetSelectedUnit();
     if (!selection)
@@ -2891,6 +2891,41 @@ bool ChatHandler::HandleDebugUnitBytes2Command(char *args)
         return false;
 
     target->SetByteValue(UNIT_FIELD_BYTES_2, offset, value);
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugGetPrevPlayTimeCommand(char* args)
+{
+    Player* player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Account %s has been previously played for %s", player->GetSession()->GetUsername().c_str(), secsToTimeString(player->GetSession()->GetPreviousPlayedTime()).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugSetPrevPlayTimeCommand(char* args)
+{
+    Player* player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 seconds;
+    if (!ExtractUInt32(&args, seconds))
+        return false;
+
+    player->GetSession()->SetPreviousPlayedTime(seconds);
+    PSendSysMessage("Previous played time of account %s has been set to %s", player->GetSession()->GetUsername().c_str(), secsToTimeString(seconds).c_str());
 
     return true;
 }

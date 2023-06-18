@@ -573,6 +573,8 @@ bool ChatHandler::HandleUnitFactionInfoCommand(char* args)
     if (!friends.empty())
         PSendSysMessage("Friends: %s", friends.c_str());
 
+    PSendSysMessage("Is Enemy of Another: %s", pFactionTemplate->isEnemyOfAnother ? "True" : "False");
+
     return true;
 }
 

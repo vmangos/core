@@ -30,6 +30,7 @@
 #include "GossipDef.h"
 #include "Chat/AbstractPlayer.h"
 #include "SniffFile.h"
+#include "ClientDefines.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -80,20 +81,6 @@ struct AccountData
     std::string data;
 };
 
-enum ClientOSType
-{
-    CLIENT_OS_UNKNOWN,
-    CLIENT_OS_WIN,
-    CLIENT_OS_MAC
-};
-
-enum ClientPlatformType
-{
-    CLIENT_PLATFORM_UNKNOWN,
-    CLIENT_PLATFORM_X86,
-    CLIENT_PLATFORM_PPC
-};
-
 enum PartyOperation
 {
     PARTY_OP_INVITE = 0,
@@ -121,6 +108,21 @@ enum TutorialDataState
     TUTORIALDATA_UNCHANGED = 0,
     TUTORIALDATA_CHANGED   = 1,
     TUTORIALDATA_NEW       = 2
+};
+
+enum PlayTimeLimit : uint32
+{
+    PLAY_TIME_LIMIT_APPROACHING_PARTIAL = 2 * HOUR + 30 * MINUTE,
+    PLAY_TIME_LIMIT_PARTIAL = 3 * HOUR,
+    PLAY_TIME_LIMIT_APPROCHING_FULL = 4 * HOUR + 30 * MINUTE,
+    PLAY_TIME_LIMIT_FULL = 5 * HOUR,
+};
+
+enum PlayTimeFlag : uint32
+{
+    PTF_APPROACHING_PARTIAL_PLAY_TIME = 0x1000,
+    PTF_APPROACHING_NO_PLAY_TIME = 0x2000,
+    PTF_UNHEALTHY_TIME = 0x80000000,
 };
 
 enum AntifloodOpcodeExecutionSpeed
@@ -320,6 +322,14 @@ class WorldSession
 
         bool CharacterScreenIdleKick(uint32 diff);
         uint32 m_idleTime;
+
+        // Played time limit
+        time_t GetCreateTime() const { return m_createTime; }
+        time_t GetConsecutivePlayTime(time_t now) const { return (now - m_createTime) + m_previousPlayTime; }
+        time_t GetPreviousPlayedTime() { return m_previousPlayTime; }
+        void SetPreviousPlayedTime(time_t playedTime) { m_previousPlayTime = playedTime; }
+        void CheckPlayedTimeLimit(time_t now);
+        void SendPlayTimeWarning(PlayTimeFlag flag, int32 timeLeftInSeconds);
 
         // Is the user engaged in a log out process?
         bool IsLogingOut() const { return m_logoutTime || m_playerLogout; }
@@ -888,12 +898,15 @@ class WorldSession
         ObjectGuid m_currentPlayerGuid;
         ObjectGuid m_clientMoverGuid;
         uint32 m_moveRejectTime;
-        time_t m_logoutTime;
+        time_t m_createTime;                                // when session was created
+        time_t m_previousPlayTime;                          // play time from previous session less than 5 hours ago
+        time_t m_logoutTime;                                // when its time to log out character
         bool m_inQueue;                                     // session wait in auth.queue
         bool m_playerLoading;                               // code processed in LoginPlayer
         bool m_playerLogout;                                // code processed in LogoutPlayer
         bool m_playerRecentlyLogout;
         bool m_playerSave;
+        uint32 m_exhaustionState;
         uint32 m_charactersCount;
         uint32 m_characterMaxLevel;
         AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];

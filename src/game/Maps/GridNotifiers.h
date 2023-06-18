@@ -595,6 +595,9 @@ namespace MaNGOS
                 if (goInfo->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
                     return false;
 
+                if (!go->isSpawned())
+                    return false;
+
                 if (goInfo->spellFocus.focusId != i_focusId)
                     return false;
 

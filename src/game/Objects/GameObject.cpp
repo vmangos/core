@@ -1469,7 +1469,7 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (GetFactionTemplateId())
+            if (GetFactionTemplateId() && !GetGOInfo()->chest.minSuccessOpens && !GetGOInfo()->chest.maxSuccessOpens)
             {
                 std::list<Unit*> targets;
                 MaNGOS::AnyFriendlyUnitInObjectRangeCheck check(this, 10.0f);

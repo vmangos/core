@@ -1223,6 +1223,7 @@ class Player final: public Unit
         void RemovedInsignia(Player* looterPlr, Corpse* corpse);
         void SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim = nullptr);
         void SendLootRelease(ObjectGuid guid) const;
+        void SendLootError(ObjectGuid guid, LootError error) const;
         void SendNotifyLootItemRemoved(uint8 lootSlot) const;
         void SendNotifyLootMoneyRemoved() const;
         bool IsAllowedToLoot(Creature const* creature);
@@ -1810,8 +1811,6 @@ class Player final: public Unit
                 m_DelayedOperations |= operation;
         }
 
-        bool IsAllowedToMove(Unit* unit) const;
-
         Unit* m_mover;
         GridReference<Player> m_gridRef;
         MapReference m_mapRef;
@@ -1873,6 +1872,8 @@ class Player final: public Unit
         // _NOT_ thread-safe. Must be executed by the map manager after map updates, since we
         // remove objects from the map
         bool ExecuteTeleportFar(ScheduledTeleportData* data);
+        void SendNewWorld();
+        void HandleReturnOnTeleportFail(WorldLocation const& oldLoc);
 
         bool TeleportToBGEntryPoint();
         void RestorePendingTeleport();
@@ -2681,7 +2682,7 @@ void RemoveItemsSetItem(Player*player,ItemPrototype const* proto);
 template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell)
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
-    if (!spellInfo) return 0;
+    if (!spellInfo || spellInfo->HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS)) return 0;
     float totalpct = 0;
     float totalflat = 0;
     for (const auto mod : m_spellMods[op])

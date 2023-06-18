@@ -751,9 +751,7 @@ namespace MMAP
             /// Check every map vertice
             // x, y * -1
             Vector3 up(0, 0, 1);
-            up.x *= -1.0f;
-            up.y *= -1.0f;
-            up = up * rotation.inverse() / scale;
+
             for (vector<GroupModel>::iterator it = groupModels.begin(); it != groupModels.end(); ++it)
                 for (int t = 0; t < mapVertsCount / 3; ++t)
                 {
