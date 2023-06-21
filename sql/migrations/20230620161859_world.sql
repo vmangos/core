@@ -880,6 +880,9 @@ UPDATE `pool_template` SET `max_limit`=7 WHERE  `entry`=1014;
 UPDATE `pool_template` SET `max_limit`=30 WHERE  `entry`=1035;
 UPDATE `pool_template` SET `max_limit`=11 WHERE  `entry`=2003;
 
+-- Correct Respawn Time For Instance Herbs
+UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1014, 4291, 34902, 2003, 2002, 1054, 1092, 1034, 1053, 1035))
+
 
 -- End of migration.
 END IF;
