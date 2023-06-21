@@ -64,7 +64,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_halycon.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_highlord_omokk.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_overlord_wyrmthalak.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_pyroguard_emberseer.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_shadow_hunter_voshgajin.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_the_beast.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_urok.cpp

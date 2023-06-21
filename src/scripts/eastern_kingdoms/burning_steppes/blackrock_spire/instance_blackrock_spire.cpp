@@ -150,7 +150,6 @@ static const SIDialogueEntry aStadiumDialogue[] =
 };
 
 instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance(pMap), DialogueHelper(aStadiumDialogue), 
-    m_uiEmberseerGUID(0),
     m_uiNefariusGUID(0),
     m_uiRendGUID(0),
     m_uiGythGUID(0),
@@ -177,14 +176,6 @@ instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance
     m_uiBrazier04GUID(0),
     m_uiBrazier05GUID(0),
     m_uiBrazier06GUID(0),
-
-    m_uiEmberseerRune01GUID(0),
-    m_uiEmberseerRune02GUID(0),
-    m_uiEmberseerRune03GUID(0),
-    m_uiEmberseerRune04GUID(0),
-    m_uiEmberseerRune05GUID(0),
-    m_uiEmberseerRune06GUID(0),
-    m_uiEmberseerRune07GUID(0),
 
     m_uiBlackRockAltarGUID(0),
 
@@ -320,28 +311,6 @@ void instance_blackrock_spire::OnObjectCreate(GameObject* pGo)
             if (GetData(TYPE_EVENT_DOOR_UBRS) == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-
-        case GO_EMBERSEER_RUNE01:
-            m_uiEmberseerRune01GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE02:
-            m_uiEmberseerRune02GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE03:
-            m_uiEmberseerRune03GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE04:
-            m_uiEmberseerRune04GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE05:
-            m_uiEmberseerRune05GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE06:
-            m_uiEmberseerRune06GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE07:
-            m_uiEmberseerRune07GUID = pGo->GetGUID();
-            break;
     }
 }
 
@@ -349,9 +318,6 @@ void instance_blackrock_spire::OnCreatureCreate(Creature* pCreature)
 {
     switch (pCreature->GetEntry())
     {
-        case NPC_PYROGUARD_EMBERSEER:
-            m_uiEmberseerGUID = pCreature->GetGUID();
-            break;
         case NPC_LORD_VICTOR_NEFARIUS:
             m_uiNefariusGUID = pCreature->GetGUID();
             break;
@@ -409,20 +375,6 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[TYPE_ROOM_EVENT] = uiData;
             break;
         case TYPE_EMBERSEER:
-            if (uiData == IN_PROGRESS || uiData == FAIL)
-                DoUseDoorOrButton(m_uiEmberseerCombatDoorGUID);
-            else if (uiData == DONE)
-            {
-                DoUseDoorOrButton(m_uiEmberseerCombatDoorGUID);
-                DoUseDoorOrButton(m_uiEmberseerOutDoorGUID);
-                DoUseDoorOrButton(m_uiEmberseerRune01GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune02GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune03GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune04GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune05GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune06GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune07GUID);
-            }
             m_auiEncounter[TYPE_EMBERSEER] = uiData;
             break;
         case TYPE_FLAMEWREATH:
@@ -887,8 +839,6 @@ uint64 instance_blackrock_spire::GetData64(uint32 uiType)
     {
         case GO_BLACKROCK_ALTAR:
             return m_uiBlackRockAltarGUID;
-        case NPC_PYROGUARD_EMBERSEER:
-            return m_uiEmberseerGUID;
         case NPC_LORD_VICTOR_NEFARIUS:
             return m_uiNefariusGUID;
         case NPC_REND_BLACKHAND:
