@@ -39,59 +39,14 @@
 
 void WardenMac::LoadScriptedScans()
 {
-    sWardenScanMgr.AddMacScan(std::make_shared<MacScan>(
-    // builder
-    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
-    {
-        auto const macWarden = reinterpret_cast<WardenMac const*>(warden);
-
-        MANGOS_ASSERT(macWarden->m_hashString.size() <= 0xFF);
-
-        scan << static_cast<uint8>(macWarden->m_hashString.size());
-
-        // skip null terminator this way
-        scan.append(macWarden->m_hashString.c_str(), macWarden->m_hashString.size());
-    },
-    // checker
-    [](Warden const* warden, ByteBuffer& buff)
-    {
-        auto const macWarden = reinterpret_cast<WardenMac const*>(warden);
-
-        uint8 sha[SHA_DIGEST_LENGTH];
-        uint8 md5[MD5_DIGEST_LENGTH];
-
-        buff.read(sha, sizeof(sha));
-        buff.read(md5, sizeof(md5));
-
-        return !!memcmp(sha, macWarden->m_hashSHA, sizeof(sha)) || !!memcmp(md5, macWarden->m_hashMD5, sizeof(md5));
-    }, 128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, "Mac string hash check", ScanFlags::Mac, 0, UINT16_MAX));
+    sWardenScanMgr.AddMacScan(std::make_shared<MacStringHashScan>(true));
+    sWardenScanMgr.AddMacScan(std::make_shared<MacStringHashScan>(false));
 }
 
 WardenMac::WardenMac(WorldSession* session, BigNumber const& K)
     : m_fingerprintSaved(false), Warden(session, session->GetPlatform() == CLIENT_PLATFORM_X86 ? sWardenModuleMgr.GetMacModule() : nullptr, K)
 {
-    std::stringstream hash;
-
-    // the only known capability of the Mac Warden module is hashing a string and sending back the hashed value
-    // so at least we can make the string that we ask it to hash change by account, I guess...
-    hash << "namreeb was here.  please be good.  your username is " << m_accountName;
-
-    m_hashString = hash.str();
-
-    static constexpr uint32 magic = 0xFEEDFACE;
-
-    Sha1Hash sha1;
-    sha1.UpdateData(m_hashString);
-    if (m_module) // this constant is only used if there is a module
-        sha1.UpdateData(reinterpret_cast<uint8 const*>(&magic), sizeof(magic));
-    sha1.Finalize();
-
-    memcpy(m_hashSHA, sha1.GetDigest(), sizeof(m_hashSHA));
-
-    MD5_CTX md5;
-    MD5_Init(&md5);
-    MD5_Update(&md5, m_hashString.c_str(), m_hashString.size());
-    MD5_Final(m_hashMD5, &md5);    
+  
 }
 
 void WardenMac::Update()
@@ -100,17 +55,12 @@ void WardenMac::Update()
 
     if (!m_initialized)
     {
-        // PPC no module, begin string hashing requests directly
-        if (!m_module)
+        if (m_maiev && !TimeoutClockStarted())
         {
-            InitializeClient();
+            RequestScans(SelectScans(ScanFlags::Maiev));
 
-            // send any initial hack scans that the scan manager may have for us
-            RequestScans(SelectScans(ScanFlags::InitialLogin));
-
-            // begin the scan clock (note that even if the clock expires before any initial scans are answered, no new
-            // checks will be requested until the reply is received).
-            BeginScanClock();
+            if (!m_module)
+                BeginScanClock();
         }
         return;
     }
@@ -170,7 +120,12 @@ void WardenMac::SetCharEnumPacket(WorldPacket&& packet)
 
 ScanFlags WardenMac::GetScanFlags() const
 {
-    return ScanFlags::Mac;
+    ScanFlags scanFlags = ScanFlags::Mac;
+
+    if (m_maiev)
+        scanFlags = scanFlags | ScanFlags::Maiev;
+
+    return scanFlags;
 }
 
 void WardenMac::InitializeClient()

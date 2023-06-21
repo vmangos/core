@@ -513,7 +513,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(WIN_SYSTEM_INFO),
-        "Sysinfo locate", ScanFlags::ModuleInitialized, 0, UINT16_MAX);
+        "Sysinfo locate", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     // sys info locate phase 1
     auto const wardenSysInfo1 = std::make_shared<WindowsScan>(
@@ -553,7 +553,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-        "Intermediate sysinfo locate", ScanFlags::ModuleInitialized, 0, UINT16_MAX);
+        "Intermediate sysinfo locate", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     // find warden module
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
@@ -592,7 +592,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-        "Warden locate", ScanFlags::ModuleInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
+        "Warden locate", ScanFlags::OffsetsInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
@@ -635,7 +635,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
-    sizeof(uint32), "CWorld::enables hack", ScanFlags::ModuleInitialized, 0, UINT16_MAX));
+    sizeof(uint32), "CWorld::enables hack", ScanFlags::OffsetsInitialized, 0, UINT16_MAX));
 
     // read game time and last hardware action time together
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
@@ -700,7 +700,7 @@ void WardenWin::LoadScriptedScans()
         wardenWin->m_lastTimeCheckServer = WorldTimer::getMSTime();
 
         return false;
-    }, 11, 10, "Anti-AFK hack", ScanFlags::ModuleInitialized, 0, UINT16_MAX));
+    }, 11, 10, "Anti-AFK hack", ScanFlags::OffsetsInitialized, 0, UINT16_MAX));
 
     // check for hypervisors
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
@@ -875,7 +875,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 4", ScanFlags::ModuleInitialized, 0, UINT16_MAX);
+    "EndScene locate stage 4", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     // end scene locate phase 3
     auto const endSceneLocate3 = std::make_shared<WindowsScan>(
@@ -914,7 +914,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 3", ScanFlags::ModuleInitialized, 0, UINT16_MAX);
+    "EndScene locate stage 3", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     // end scene locate phase 2
     auto const endSceneLocate2 = std::make_shared<WindowsScan>(
@@ -953,7 +953,7 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 2", ScanFlags::ModuleInitialized, 0, UINT16_MAX);
+    "EndScene locate stage 2", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
@@ -1000,7 +1000,7 @@ void WardenWin::LoadScriptedScans()
     },
     sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
     sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 1", ScanFlags::ModuleInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
+    "EndScene locate stage 1", ScanFlags::OffsetsInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsModuleScan>("prxdrvpe.dll",
     // checker
@@ -1015,7 +1015,7 @@ void WardenWin::LoadScriptedScans()
         }
 
         return false;
-    }), "Proxifier check", ScanFlags::ModuleInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
+    }), "Proxifier check", ScanFlags::OffsetsInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
 
     // click to move enabled check
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
@@ -1059,7 +1059,10 @@ void WardenWin::LoadScriptedScans()
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
        sizeof(uint8) + sizeof(float) + sizeof(float) + sizeof(float),
-        "Click To Move Position", ScanFlags::ModuleInitialized, 0, UINT16_MAX));
+        "Click To Move Position", ScanFlags::OffsetsInitialized, 0, UINT16_MAX));
+
+    // maiev string hashing
+    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsStringHashScan>());
 }
 
 void WardenWin::BuildLuaInit(std::string const& module, bool fastcall, uint32 offset, ByteBuffer& out) const
@@ -1209,39 +1212,49 @@ ScanFlags WardenWin::GetScanFlags() const
 {
     ScanFlags scanFlags = ScanFlags::Windows;
 
+    if (m_maiev)
+        scanFlags = scanFlags | ScanFlags::Maiev;
+
     if (m_offsetsInitialized)
-        scanFlags = scanFlags | ScanFlags::ModuleInitialized;
+        scanFlags = scanFlags | ScanFlags::OffsetsInitialized;
 
     return scanFlags;
 }
 
 void WardenWin::InitializeClient()
 {
-    if (auto const offsets = GetClientOffets(m_clientBuild))
+    if (m_module)
     {
-        // initialize lua
-        ByteBuffer lua;
-        BuildLuaInit("", true, offsets->GetText, lua);
+        // should never call this while still using maiev
+        MANGOS_ASSERT(!m_maiev);
 
-        // initialize SFile*
-        ByteBuffer file;
-        BuildFileHashInit("", true, offsets->Open, offsets->Size, offsets->Read, offsets->Close, file);
+        if (auto const offsets = GetClientOffets(m_clientBuild))
+        {
+            // initialize lua
+            ByteBuffer lua;
+            BuildLuaInit("", true, offsets->GetText, lua);
 
-        // initialize timing check
-        ByteBuffer timing;
-        BuildTimingInit("", offsets->TickCount, true, timing);
+            // initialize SFile*
+            ByteBuffer file;
+            BuildFileHashInit("", true, offsets->Open, offsets->Size, offsets->Read, offsets->Close, file);
 
-        ByteBuffer pkt(lua.wpos() + file.wpos() + timing.wpos());
+            // initialize timing check
+            ByteBuffer timing;
+            BuildTimingInit("", offsets->TickCount, true, timing);
 
-        pkt.append(lua);
-        pkt.append(file);
-        pkt.append(timing);
+            ByteBuffer pkt(lua.wpos() + file.wpos() + timing.wpos());
 
-        SendPacket(pkt);
+            pkt.append(lua);
+            pkt.append(file);
+            pkt.append(timing);
 
-        m_offsetsInitialized = true;
-        sLog.OutWarden(this, LOG_LVL_DEBUG, "Initialized module offsets.");
+            SendPacket(pkt);
+
+            m_offsetsInitialized = true;
+            sLog.OutWarden(this, LOG_LVL_DEBUG, "Initialized module offsets.");
+        }
     }
+
     m_initialized = true;
 }
 
@@ -1250,7 +1263,16 @@ void WardenWin::Update()
     Warden::Update();
 
     if (!m_initialized)
+    {
+        if (m_maiev && !TimeoutClockStarted())
+        {
+            RequestScans(SelectScans(ScanFlags::Maiev));
+
+            if (!m_module)
+                BeginScanClock();
+        }
         return;
+    }
 
     // 'lpMaximumApplicationAddress' should never be zero if the structure has been read
     if (!m_sysInfoSaved && !!m_sysInfo.lpMaximumApplicationAddress)

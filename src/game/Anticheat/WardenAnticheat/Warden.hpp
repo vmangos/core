@@ -87,6 +87,7 @@ class Warden
 
         void StopScanClock();
 
+        void SendModuleUse();
         void SendModuleToClient();
 
         virtual void InitializeClient() = 0;
@@ -106,6 +107,7 @@ class Warden
         std::vector<std::shared_ptr<Scan const>> SelectScans(ScanFlags flags) const;
 
         void BeginScanClock();
+        bool TimeoutClockStarted() const;
 
         // enqueue, but do not immediately send scans.  this is useful if we anticipate wanting to
         // send multiple scans and can wait to send them all at once.
@@ -140,6 +142,9 @@ class Warden
         // true when the client has been confirmed and sent any initialization packet(s)
         bool m_initialized;
 
+        // true when we have not loaded a module and are using maiev
+        bool m_maiev;
+
         // true if client has used click to move at any point since starting game
         mutable bool m_hasUsedClickToMove = false;
 
@@ -166,6 +171,7 @@ class Warden
 
         void HandlePacket(WorldPacket& recvData);
 
+        bool IsUsingMaiev() const { return m_maiev; }
         WardenModule const* GetModule() const { return m_module; }
         uint8 GetXor() const { return m_xor; }
 
@@ -179,6 +185,9 @@ class Warden
 
         std::vector<WorldPacket> m_packetQueue;
         std::mutex m_packetQueueMutex;
+
+        // used by maiev string hash check
+        mutable std::string m_hashString;
 };
 
 #endif /*!__WARDEN_HPP_*/

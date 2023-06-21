@@ -28,6 +28,7 @@
 #include "World.h"
 #include "Log.h"
 #include <openssl/sha.h>
+#include <openssl/md5.h>
 
 #include <functional>
 #include <vector>
@@ -36,13 +37,14 @@
 
 enum class ScanFlags : uint32
 {
-    None              = 0x00000,
-    FromDatabase      = 0x00001,  // this scan came from the database, and should be deleted on reload
-    Windows           = 0x00002,  // this scan is for windows clients
-    Mac               = 0x00004,  // this scan is for mac clients
-    InitialLogin      = 0x00008,  // this scan is sent when world session is first created
-    //InWorld         = 0x00010,  // this scan is only sent when player is in world
-    ModuleInitialized = 0x00020,  // requires MODULE_INITIALIZE packet to be sent first (File, Lua, Timing)
+    None               = 0x00000,
+    FromDatabase       = 0x00001,  // this scan came from the database, and should be deleted on reload
+    Windows            = 0x00002,  // this scan is for windows clients
+    Mac                = 0x00004,  // this scan is for mac clients
+    InitialLogin       = 0x00008,  // this scan is sent when world session is first created
+    //InWorld          = 0x00010,  // this scan is only sent when player is in world
+    Maiev              = 0x00020,  // this scan is only for the default module
+    OffsetsInitialized = 0x00040,  // requires MODULE_INITIALIZE packet to be sent first (File, Lua, Timing)
 };
 
 ScanFlags operator|(ScanFlags lhs, ScanFlags rhs);
@@ -117,6 +119,27 @@ class WindowsScan : public Scan
             : Scan(builder, checker, flags | ScanFlags::Windows, requestSize, replySize, minBuild, maxBuild, comment) {}
 
         WindowsScan() = delete;
+};
+
+class StringHashScan
+{
+public:
+    Scan::BuildT GetBuilder();
+    Scan::CheckT GetChecker();
+};
+
+// only supported by maiev
+class WindowsStringHashScan : public WindowsScan, public StringHashScan
+{
+    public:
+        WindowsStringHashScan();
+};
+
+// supported by both maiev and the mac module, but extra constant used
+class MacStringHashScan : public MacScan, public StringHashScan
+{
+    public:
+        MacStringHashScan(bool moduleLoaded);
 };
 
 // check to see if a module is loaded
