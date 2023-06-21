@@ -285,7 +285,7 @@ std::vector<std::shared_ptr<Scan const>> WardenScanMgr::GetRandomScans(ScanFlags
         if ((scan->flags & ScanFlags::InitialLogin) != (flags & ScanFlags::InitialLogin))
             continue;
 
-        // only send maniev scans when explicitly requested
+        // only send maiev scans when explicitly requested
         if ((scan->flags & ScanFlags::Maiev) != (flags & ScanFlags::Maiev))
             continue;
 
