@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20220914052803');
 -- Add your query below.
 
--- Remove level requirement for training a new weapon (execpt for polearms)
+-- Remove level requirement for training a new weapon (except for polearms)
 UPDATE `npc_trainer` SET `reqlevel`= 0 WHERE `spell` IN (
 1847,   -- One-Handed Swords
 15983,  -- Two-Handed Swords
