@@ -883,6 +883,81 @@ UPDATE `pool_template` SET `max_limit`=11 WHERE  `entry`=2003;
 -- Correct Respawn Time For Instance Herbs
 UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1014, 4291, 34902, 2003, 2002, 1054, 1092, 1034, 1053, 1035));
 
+-- Correctly Pool Scarlet Monastery Herbs
+UPDATE `pool_template` SET `description`='Herbs in Scarlet Monastery Cathedral', `max_limit`=5 WHERE  `entry`=1054;
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(1555, 2, 'Herbs in Scarlet Monastery Library');
+UPDATE `pool_gameobject` SET `pool_entry` = 1555 WHERE `guid` IN (6830, 6832, 11900, 11904);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(1556, 2, 'Herbs in Scarlet Monastery Armory');
+UPDATE `pool_gameobject` SET `pool_entry` = 1556 WHERE `guid` IN (6838, 32251, 67095);
+
+SET @PTEMPLATE = 2249;
+
+DELETE FROM `pool_gameobject` WHERE `guid` IN (11871, 29154, 14459, 29156, 67098, 68716, 17730, 29153, 11873, 67097, 29159, 67099, 12679, 68717, 14457, 29158, 12027, 29152, 10445, 29155, 29157, 67096);
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1002, 1624, 189, 1833.85, 1318.35, 19.6896, 2.49582, 0, 0, 0.948323, 0.317306, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(1004, 1624, 189, 1840.29, 1347.77, 18.0907, 0, 0, 0, 0, 1, 604800, 604800, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+2, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+3, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+4, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+5, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+6, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+7, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+8, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+9, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+10, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+11, 1, 'Herbs in Scarlet Monastery Graveyard', 10),
+(@PTEMPLATE+12, 1, 'Herbs in Scarlet Monastery Graveyard', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(11871, @PTEMPLATE+1, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(29154, @PTEMPLATE+1, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(14459, @PTEMPLATE+2, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(29156, @PTEMPLATE+2, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(67098, @PTEMPLATE+3, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(68716, @PTEMPLATE+3, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(17730, @PTEMPLATE+4, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(29153, @PTEMPLATE+4, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(11873, @PTEMPLATE+5, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(67097, @PTEMPLATE+5, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(29159, @PTEMPLATE+6, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(67099, @PTEMPLATE+6, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(12679, @PTEMPLATE+7, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(68717, @PTEMPLATE+7, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(14457, @PTEMPLATE+8, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(29158, @PTEMPLATE+8, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(12027, @PTEMPLATE+9, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(29152, @PTEMPLATE+9, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(10445, @PTEMPLATE+10, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(29155, @PTEMPLATE+10, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(29157, @PTEMPLATE+11, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(1002, @PTEMPLATE+11, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(67096, @PTEMPLATE+12, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10),
+(1004, @PTEMPLATE+12, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+13, 6, 'Scarlet Monastery Graveyard - Kingsblood / Grave Moss (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+2,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+3,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+4,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+5,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+6,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+7,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+8,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+9,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+10,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+11,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0),
+(@PTEMPLATE+12,  @PTEMPLATE+13, 0, 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard', 0);
+
 
 -- End of migration.
 END IF;
