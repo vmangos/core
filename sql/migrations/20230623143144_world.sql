@@ -86,7 +86,7 @@ UPDATE `gameobject` SET `patch_min` = 5 WHERE `id` = 165658
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Missing Blood of Heroes
-INSERT INTO `gameobject` (`zone_id`, `guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (3009, 176214, 0, 1158.58, -2524.99, 60.7516, 5.68977, 0, 0, -0.292372, 0.956305, 7200, 7200, 1, 100, 0, 10),
 (3010, 176214, 0, 1374.47, -1289.64, 57.5279, 1.309, 0, 0, 0.608761, 0.793354, 7200, 7200, 1, 100, 0, 10),
 (3011, 176214, 0, 1502.38, -1486.16, 57.1851, 6.19592, 0, 0, -0.0436192, 0.999048, 7200, 7200, 1, 100, 0, 10),
