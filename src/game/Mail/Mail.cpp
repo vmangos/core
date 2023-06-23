@@ -70,7 +70,7 @@ MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery
         default:
             m_messageType = MAIL_NORMAL;
             m_senderId = 0;                                 // will show mail from nonexistent player
-            sLog.outError("MailSender::MailSender - Mail have unexpected sender typeid (%u)", sender->GetTypeId());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MailSender::MailSender - Mail have unexpected sender typeid (%u)", sender->GetTypeId());
             break;
     }
 }
@@ -127,6 +127,16 @@ MailDraft::MailDraft(std::string subject, std::string text) : m_mailTemplateId(0
     m_bodyId(!text.empty() ? sObjectMgr.CreateItemText(text) : 0), m_money(0), m_COD(0)
 {
 
+}
+
+MailDraft& MailDraft::SetSubjectAndBodyId(std::string subject, uint32 itemTextId)
+{
+    m_subject = subject;
+
+    MANGOS_ASSERT(!m_bodyId);
+    m_bodyId = itemTextId;
+
+    return *this;
 }
 
 MailDraft& MailDraft::SetSubjectAndBody(std::string subject, std::string text)

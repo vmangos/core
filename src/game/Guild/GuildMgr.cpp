@@ -116,8 +116,8 @@ void GuildMgr::LoadGuilds()
 
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded %u guild definitions", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u guild definitions", count);
         return;
     }
 
@@ -165,8 +165,8 @@ void GuildMgr::LoadGuilds()
     //you can comment these lines if you don't plan to change CONFIG_UINT32_GUILD_EVENT_LOG_COUNT
     CharacterDatabase.PExecute("DELETE FROM `guild_eventlog` WHERE `log_guid` > '%u'", sWorld.getConfig(CONFIG_UINT32_GUILD_EVENT_LOG_COUNT));
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u guild definitions", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u guild definitions", count);
 }
 
 void GuildMgr::LoadPetitions()
@@ -183,8 +183,8 @@ void GuildMgr::LoadPetitions()
 
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded %u petitions", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u petitions", count);
         return;
     }
 
@@ -227,14 +227,14 @@ void GuildMgr::LoadPetitions()
             if (!petition)
             {
                 // Signatures for a petition that does not exist. Delete it
-                sLog.outErrorDb("Signatures exist for petition %u that does not exist", petitionId);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Signatures exist for petition %u that does not exist", petitionId);
                 CharacterDatabase.PExecute("DELETE FROM `petition_sign` WHERE `petition_guid` = '%u'", petitionId);
                 continue;
             }
 
             if (ownerGuid != petition->GetOwnerGuid())
             {
-                sLog.outErrorDb("Signatures exist for petition %u with a different owner, updating", petitionId);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Signatures exist for petition %u with a different owner, updating", petitionId);
                 CharacterDatabase.PExecute("UPDATE `petition_sign` SET `owner_guid` = '%u' WHERE `petition_guid` = '%u'",
                     petition->GetOwnerGuid().GetCounter(), petition->GetId());
 
@@ -248,8 +248,8 @@ void GuildMgr::LoadPetitions()
         delete petitionSignatures;
     }
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u petitions", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u petitions", count);
 }
 
 Petition::~Petition()
@@ -315,11 +315,24 @@ Petition* GuildMgr::GetPetitionByOwnerGuid(ObjectGuid const& ownerGuid)
     return nullptr;
 }
 
+void GuildMgr::DeletePetitionSignaturesByPlayer(ObjectGuid guid, uint32 exceptPetitionId)
+{
+    std::lock_guard<std::mutex> guard(m_petitionsMutex);
+    for (const auto& iter : m_petitionMap)
+    {
+        if (iter.first == exceptPetitionId)
+            continue;
+
+        Petition* petition = iter.second;
+        petition->DeleteSignatureByPlayer(guid);
+    }
+}
+
 bool Petition::LoadFromDB(QueryResult* result)
 {
     if (!result)
     {
-        sLog.outErrorDb("[Petitions] Unable to load petitions from DB");
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "[Petitions] Unable to load petitions from DB");
         return false;
     }
 
@@ -364,7 +377,7 @@ bool Petition::Rename(std::string& newname)
     CharacterDatabase.PExecute("UPDATE `petition` SET `name` = '%s' WHERE `petition_guid` = '%u'",
         db_newname.c_str(), m_id);
 
-    DEBUG_LOG("Petition %u renamed to '%s'", m_id, newname.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Petition %u renamed to '%s'", m_id, newname.c_str());
 
     m_name = newname;
 
@@ -431,6 +444,19 @@ bool Petition::AddNewSignature(Player* player)
     AddSignature(signature);
 
     return true;
+}
+
+void Petition::DeleteSignatureByPlayer(ObjectGuid guid)
+{
+    for (auto itr = m_signatures.begin(); itr != m_signatures.end(); ++itr)
+    {
+        if ((*itr)->GetSignatureGuid() == guid)
+        {
+            delete (*itr);
+            m_signatures.erase(itr);
+            return;
+        }
+    }
 }
 
 PetitionSignature::PetitionSignature(Petition* petition, Player* player)

@@ -37,7 +37,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
+            printf("<object not loaded>");
     #endif
             return false;
         }
@@ -45,7 +45,7 @@ namespace VMAP
         if (time == G3D::inf())
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("Ray does not hit '%s'", name.c_str());
+            printf("Ray does not hit '%s'", name.c_str());
     #endif
             return false;
         }
@@ -58,7 +58,7 @@ namespace VMAP
         {
             distance *= iScale;
             pMaxDist = distance;
-            //sLog.outString("LoS HIT ! Flags 0x%x (%s)", flags, name.c_str());
+            //printf("LoS HIT ! Flags 0x%x (%s)", flags, name.c_str());
         }
         return hit;
     }
@@ -68,7 +68,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
+            printf("<object not loaded>");
     #endif
             return;
         }
@@ -102,7 +102,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
+            printf("<object not loaded>");
     #endif
             return false;
         }
@@ -127,7 +127,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
+            printf("<object not loaded>");
     #endif
             return false;
         }
@@ -141,7 +141,8 @@ namespace VMAP
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
         Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
         float zDist;
-        if (iModel->GetLocationInfo(pModel, zDirModel, zDist, info))
+        GroupLocationInfo groupInfo;
+        if (iModel->GetLocationInfo(pModel, zDirModel, zDist, groupInfo))
         {
             Vector3 modelGround = pModel + zDist * zDirModel;
             // Transform back to world space. Note that:
@@ -150,6 +151,8 @@ namespace VMAP
             float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
             if (info.ground_Z < world_Z) // hm...could it be handled automatically with zDist at intersection?
             {
+                info.rootId = groupInfo.rootId;
+                info.hitModel = groupInfo.hitModel;
                 info.ground_Z = world_Z;
                 info.hitInstance = this;
                 return true;
@@ -184,7 +187,7 @@ namespace VMAP
         if (!check)
         {
             if (ferror(rf))
-                ERROR_LOG("Error reading ModelSpawn!");
+                printf("Error reading ModelSpawn!");
             return false;
         }
         check += fread(&spawn.adtId, sizeof(uint16), 1, rf);
@@ -203,19 +206,19 @@ namespace VMAP
         check += fread(&nameLen, sizeof(uint32), 1, rf);
         if (check != uint32(has_bound ? 17 : 11))
         {
-            ERROR_LOG("Error reading ModelSpawn!");
+            printf("Error reading ModelSpawn!");
             return false;
         }
         char nameBuff[500];
         if (nameLen > 500) // file names should never be that long, must be file error
         {
-            ERROR_LOG("Error reading ModelSpawn, file name too long!");
+            printf("Error reading ModelSpawn, file name too long!");
             return false;
         }
         check = fread(nameBuff, sizeof(char), nameLen, rf);
         if (check != nameLen)
         {
-            ERROR_LOG("Error reading name string of ModelSpawn!");
+            printf("Error reading name string of ModelSpawn!");
             return false;
         }
         spawn.name = std::string(nameBuff, nameLen);

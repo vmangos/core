@@ -190,7 +190,7 @@ struct AnnoraAI : public ScriptedAI
     AnnoraAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_creature->SetVisibility(VISIBILITY_OFF);
-        m_creature->SetFactionTemplateId(FACTION_STONED);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC);
         m_uiNbScorpion = 0;
         isSpawned = false;
         Reset();

@@ -105,12 +105,24 @@ class AccountMgr
         void UnbanAccount(uint32 acc) { m_accountBanned.erase(acc); }
         bool IsIPBanned(std::string const& ip) const;
         bool IsAccountBanned(uint32 acc) const;
+
+        void LoadAccountWarnings();
+        void WarnAccount(uint32 acc, std::string reason) { m_accountWarnings[acc] = reason; }
+        char const* GetWarningText(uint32 acc) const
+        {
+            auto itr = m_accountWarnings.find(acc);
+            if (itr != m_accountWarnings.end())
+                return itr->second.c_str();
+            return nullptr;
+        }
+
         // Max instance reset per account per hour
         bool CheckInstanceCount(uint32 accountId, uint32 instanceId, uint32 maxCount);
         void AddInstanceEnterTime(uint32 accountId, uint32 instanceId, time_t enterTime);
 
         AccountPersistentData& GetAccountPersistentData(uint32 accountId) { return m_accountPersistentData[accountId]; }
     protected:
+        std::map<uint32, std::string> m_accountWarnings;
         std::map<uint32, AccountTypes> m_accountSecurity;
         uint32 m_banlistUpdateTimer;
         std::map<std::string, uint32> m_ipBanned;

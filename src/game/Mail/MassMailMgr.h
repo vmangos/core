@@ -103,11 +103,7 @@ class MassMailMgr
         /// Mass mail task store mail prototype and receivers list who not get mail yet
         struct MassMail
         {
-            explicit MassMail(MailDraft* mailProto, MailSender sender)
-                : m_protoMail(mailProto), m_sender(sender)
-            {
-                MANGOS_ASSERT(mailProto);
-            }
+            explicit MassMail(MailDraft* mailProto, MailSender sender);
 
             MassMail(MassMail const& massmail)
                 : m_protoMail(std::move(const_cast<MassMail&>(massmail).m_protoMail)), m_sender(massmail.m_sender)

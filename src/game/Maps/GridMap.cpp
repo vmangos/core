@@ -91,7 +91,7 @@ bool GridMap::loadData(char const* filename)
         // loadup area data
         if (header.areaMapOffset && !loadAreaData(in, header.areaMapOffset, header.areaMapSize))
         {
-            sLog.outError("Error loading map area data\n");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error loading map area data\n");
             fclose(in);
             return false;
         }
@@ -99,7 +99,7 @@ bool GridMap::loadData(char const* filename)
         // loadup holes data
         if (header.holesOffset && !loadHolesData(in, header.holesOffset, header.holesSize))
         {
-            sLog.outError("Error loading map holes data\n");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error loading map holes data\n");
             fclose(in);
             return false;
         }
@@ -107,7 +107,7 @@ bool GridMap::loadData(char const* filename)
         // loadup height data
         if (header.heightMapOffset && !loadHeightData(in, header.heightMapOffset, header.heightMapSize))
         {
-            sLog.outError("Error loading map height data\n");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error loading map height data\n");
             fclose(in);
             return false;
         }
@@ -115,7 +115,7 @@ bool GridMap::loadData(char const* filename)
         // loadup liquid data
         if (header.liquidMapOffset && !loadGridMapLiquidData(in, header.liquidMapOffset, header.liquidMapSize))
         {
-            sLog.outError("Error loading map liquids data\n");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error loading map liquids data\n");
             fclose(in);
             return false;
         }
@@ -124,7 +124,7 @@ bool GridMap::loadData(char const* filename)
         return true;
     }
 
-    sLog.outError("Map file '%s' is non-compatible version (outdated?). Please, create new using ad.exe program.", filename);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Map file '%s' is non-compatible version (outdated?). Please, create new using ad.exe program.", filename);
     fclose(in);
     return false;
 }
@@ -643,7 +643,7 @@ bool GridMap::ExistMap(uint32 mapid, int gx, int gy)
 
     if (!pf)
     {
-        sLog.outError("Check existing of map file '%s': not exist!", tmp);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Check existing of map file '%s': not exist!", tmp);
         delete[] tmp;
         return false;
     }
@@ -653,7 +653,7 @@ bool GridMap::ExistMap(uint32 mapid, int gx, int gy)
     if (header.mapMagic     != *((uint32 const*)(MAP_MAGIC)) ||
             header.versionMagic != *((uint32 const*)(MAP_VERSION_MAGIC)))
     {
-        sLog.outError("Map file '%s' is non-compatible version (outdated?). Please, create new using ad.exe program.", tmp);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Map file '%s' is non-compatible version (outdated?). Please, create new using ad.exe program.", tmp);
         delete[] tmp;
         fclose(pf);                                         // close file before return
         return false;
@@ -675,7 +675,7 @@ bool GridMap::ExistVMap(uint32 mapid, int gx, int gy)
             if (!exists)
             {
                 std::string name = vmgr->getDirFileName(mapid, gx, gy);
-                sLog.outError("VMap file '%s' is missing or point to wrong version vmap file, redo vmaps with latest vmap_assembler.exe program", (sWorld.GetDataPath() + "vmaps/" + name).c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "VMap file '%s' is missing or point to wrong version vmap file, redo vmaps with latest vmap_assembler.exe program", (sWorld.GetDataPath() + "vmaps/" + name).c_str());
                 return false;
             }
         }
@@ -912,7 +912,7 @@ bool TerrainInfo::GetAreaInfo(float x, float y, float z, uint32& flags, int32& a
 
 uint16 TerrainInfo::GetAreaFlag(float x, float y, float z, bool* isOutdoors) const
 {
-    uint32 mogpFlags;
+    uint32 mogpFlags = 0;
     int32 adtId, rootId, groupId;
     WMOAreaTableEntry const* wmoEntry = nullptr;
     AreaEntry const* atEntry = nullptr;
@@ -980,7 +980,7 @@ GridMapLiquidStatus TerrainInfo::getLiquidStatus(float x, float y, float z, uint
 
     if (vmgr->GetLiquidLevel(GetMapId(), x, y, z, ReqLiquidType, liquid_level, ground_level, liquid_type))
     {
-        //DEBUG_LOG("getLiquidStatus(): vmap liquid level: %f ground: %f type: %u", liquid_level, ground_level, liquid_type);
+        //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "getLiquidStatus(): vmap liquid level: %f ground: %f type: %u", liquid_level, ground_level, liquid_type);
         // Check water level and ground level
         if (liquid_level > ground_level && z > ground_level - 2)
         {
@@ -1142,7 +1142,7 @@ GridMap* TerrainInfo::LoadMapAndVMap(uint32 const x, uint32 const y)
 
             if (!map->loadData(tmp))
             {
-                sLog.outError("Error load map file: \n %s\n", tmp);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error load map file: \n %s\n", tmp);
                 // ASSERT(false);
             }
 
@@ -1159,10 +1159,10 @@ GridMap* TerrainInfo::LoadMapAndVMap(uint32 const x, uint32 const y)
                 case VMAP::VMAP_LOAD_RESULT_OK:
                     break;
                 case VMAP::VMAP_LOAD_RESULT_ERROR:
-                    DEBUG_LOG("Could not load VMAP name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", mapName, m_mapId, x, y, x, y);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Could not load VMAP name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", mapName, m_mapId, x, y, x, y);
                     break;
                 case VMAP::VMAP_LOAD_RESULT_IGNORED:
-                    DEBUG_LOG("Ignored VMAP name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", mapName, m_mapId, x, y, x, y);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Ignored VMAP name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", mapName, m_mapId, x, y, x, y);
                     break;
             }
 

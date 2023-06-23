@@ -163,7 +163,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
     // Try to open the patch file
     std::string path = szFileName;
     FILE* pPatch = fopen(path.c_str (), "rb");
-    DEBUG_LOG("Loading patch info from file %s", path.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Loading patch info from file %s", path.c_str());
 
     if(!pPatch)
         return;
@@ -206,7 +206,7 @@ void PatchCache::LoadPatchesInfo()
     std::string path = sConfig.GetStringDefault("PatchesDir", "./patches") + "/";
     std::string fullpath;
     ACE_DIR* dirp = ACE_OS::opendir(ACE_TEXT(path.c_str()));
-    DEBUG_LOG("Loading patch info from folder %s", path.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Loading patch info from folder %s", path.c_str());
 
     if (!dirp)
         return;

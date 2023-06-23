@@ -25,15 +25,21 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 
+#include <unordered_set>
+
+class Warden;
 class Config;
+class Player;
+class WorldSession;
 class ByteBuffer;
 
 enum LogLevel
 {
-    LOG_LVL_MINIMAL = 0,                                    // unconditional and errors
-    LOG_LVL_BASIC   = 1,
-    LOG_LVL_DETAIL  = 2,
-    LOG_LVL_DEBUG   = 3
+    LOG_LVL_ERROR = 0,
+    LOG_LVL_MINIMAL,
+    LOG_LVL_BASIC,
+    LOG_LVL_DETAIL,
+    LOG_LVL_DEBUG,
 };
 
 // bitmask (not forgot update logFilterData content)
@@ -66,10 +72,33 @@ struct LogFilterData
     bool defaultState;
 };
 
-extern LogFilterData logFilterData[LOG_FILTER_COUNT];
+// TODO: Get rid of these, in favor of additional log types
+constexpr LogFilterData logFilterData[] =
+{
+    { "transport_moves",     "LogFilter_TransportMoves",     true  },
+    { "creature_moves",      "LogFilter_CreatureMoves",      true  },
+    { "visibility_changes",  "LogFilter_VisibilityChanges",  true  },
+    { "",                    "",                             true  },
+    { "weather",             "LogFilter_Weather",            true  },
+    { "player_stats",        "LogFilter_PlayerStats",        false },
+    { "sql_text",            "LogFilter_SQLText",            false },
+    { "player_moves",        "LogFilter_PlayerMoves",        false },
+    { "periodic_effects",    "LogFilter_PeriodicAffects",    false },
+    { "ai_and_movegens",     "LogFilter_AIAndMovegens",      false },
+    { "damage",              "LogFilter_Damage",             false },
+    { "combat",              "LogFilter_Combat",             false },
+    { "spell_cast",          "LogFilter_SpellCast",          false },
+    { "db_stricted_check",   "LogFilter_DbStrictedCheck",    true  },
+    { "pathfinding",         "LogFilter_Pathfinding",        false },
+    { "honor",               "LogFilter_Honor",              true  },
+};
+
+static_assert(sizeof(logFilterData) / sizeof(logFilterData[0]) == LOG_FILTER_COUNT,
+    "logFilterData size must match LOG_FILTER_COUNT");
 
 enum Color
 {
+    RESET,
     BLACK,
     RED,
     GREEN,
@@ -84,38 +113,37 @@ enum Color
     LBLUE,
     LMAGENTA,
     LCYAN,
-    WHITE
+    WHITE,
+    COLOR_COUNT
 };
 
-enum LogFile
-{
-    LOG_CHAT            = 0,
-    LOG_BG,
-    LOG_CHAR,
-    LOG_RA,
-    LOG_DBERRFIX,
-    LOG_CLIENT_IDS,
-    LOG_LOOTS,
-    LOG_LEVELUP,
-    LOG_PERFORMANCE,
-    LOG_MONEY_TRADES,
-    LOG_GM_CRITICAL,
-    LOG_CHAT_SPAM,
-    LOG_EXPLOITS,
-    LOG_MAX_FILES
+constexpr Color g_logColors[] = {
+    RED,    // error
+    RESET,  // minimal
+    RESET,  // basic
+    YELLOW, // detail
+    BLUE    // debug
 };
 
 enum LogType
 {
-    LogNormal = 0,
-    LogDetails,
-    LogDebug,
-    LogError,
-    LogWarden,
-    LOG_TYPE_MAX // add new entries *before* this value!
+    LOG_BASIC,
+    LOG_CHAT,
+    LOG_BG,
+    LOG_CHAR,
+    LOG_HONOR,
+    LOG_RA,
+    LOG_DBERROR,
+    LOG_DBERRFIX,
+    LOG_LOOTS,
+    LOG_LEVELUP,
+    LOG_PERFORMANCE,
+    LOG_MONEY_TRADES,
+    LOG_GM,
+    LOG_GM_CRITICAL,
+    LOG_ANTICHEAT,
+    LOG_TYPE_MAX
 };
-
-int const Color_count = int(WHITE)+1;
 
 class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::mutex> >
 {
@@ -124,30 +152,6 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
     ~Log()
     {
-        if(logfile != nullptr)
-            fclose(logfile);
-        logfile = nullptr;
-
-        if(gmLogfile != nullptr)
-            fclose(gmLogfile);
-        gmLogfile = nullptr;
-
-        if(dberLogfile != nullptr)
-            fclose(dberLogfile);
-        dberLogfile = nullptr;
-
-        if (worldLogfile != nullptr)
-            fclose(worldLogfile);
-        worldLogfile = nullptr;
-
-        if (nostalriusLogFile != nullptr)
-            fclose(nostalriusLogFile);
-        nostalriusLogFile = nullptr;
-
-        if (honorLogfile != nullptr)
-            fclose(honorLogfile);
-        honorLogfile = nullptr;
-
         for (auto& logFile : logFiles)
         {
             if (logFile != nullptr)
@@ -158,140 +162,92 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         } 
     }
     public:
-        void Initialize();
-        void InitColors(std::string const& init_str);
-
         void InitSmartlogEntries(std::string const& str);
         void InitSmartlogGuids(std::string const& str);
 
-        void out(LogFile t, char const* format, ...) ATTR_PRINTF(3,4);
-        void outCommand(uint32 account, char const* str, ...) ATTR_PRINTF(3,4);
-        void outString();                                   // any log level
-                                                            // any log level
-        void outString(char const* str, ...)      ATTR_PRINTF(2,3);
-        void outInfo(char const* str, ...)      ATTR_PRINTF(2,3);
-        void outHonor(char const* str, ...)       ATTR_PRINTF(2, 3);
-                                                            // any log level
-        void outError(char const* err, ...)       ATTR_PRINTF(2,3);
-                                                            // log level >= 1
-        void outBasic(char const* str, ...)       ATTR_PRINTF(2,3);
-                                                            // log level >= 2
-        void outDetail(char const* str, ...)      ATTR_PRINTF(2,3);
-                                                            // log level >= 3
-        void outDebug(char const* str, ...)       ATTR_PRINTF(2,3);
-        void outWarden(char const* wrd, ...)        ATTR_PRINTF(2,3);
-        void outWardenDebug(char const* wrd, ...)   ATTR_PRINTF(2,3);
-        void outAnticheat(char const* detector, char const* player, char const* reason, char const* penalty);
+        // for general server messages
+        void Out(LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4,5);
 
-        void outErrorDb();                                  // any log level
-                                                            // any log level
-        void outErrorDb(char const* str, ...)     ATTR_PRINTF(2,3);
-                                                            // any log level
-        void outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
-                                char const* opcodeName,
-                                ByteBuffer const* packet, bool incoming);
-        // any log level
-        uint32 GetLogLevel() const { return m_logLevel; }
-        void SetLogLevel(char* Level);
-        void SetLogFileLevel(char* Level);
-        void SetColor(bool stdout_stream, Color color);
-        void ResetColor(bool stdout_stream);
-        void outTime(FILE* where);
-        static void outTimestamp(FILE* file);
+        // for player-specific messages
+        void Player(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+        void Player(WorldSession const* session, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
+        void OutWarden(Warden const* warden, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4, 5);
+        void Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+        void Player(uint32 accountId, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
+
+        bool IsSmartLog(uint32 entry, uint32 guid) const;
+
+        uint32 GetConsoleLevel() const { return m_consoleLevel; }
+        uint32 GetFileLevel() const { return m_fileLevel; }
+        uint32 GetDbLevel() const { return m_dbLevel; }
+        void SetConsoleLevel(LogLevel level);
+        void SetFileLevel(LogLevel level);
+
         static std::string GetTimestampStr();
         bool HasLogFilter(uint32 filter) const { return m_logFilter & filter; }
         void SetLogFilter(LogFilters filter, bool on) { if (on) m_logFilter |= filter; else m_logFilter &= ~filter; }
-        bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_logLevel >= loglvl || (m_logFileLevel >= loglvl && logfile); }
+        bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_consoleLevel >= loglvl || (m_fileLevel >= loglvl && logFiles[LOG_BASIC]); }
         bool IsIncludeTime() const { return m_includeTime; }
 
         static void WaitBeforeContinueIfNeed();
 
-        std::list<uint32> m_smartlogExtraEntries;
-        std::list<uint32> m_smartlogExtraGuids;
 
     private:
-        FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);
-        FILE* openGmlogPerAccount(uint32 account);
+        void OutConsole(LogType logType, LogLevel logLevel, std::string const& str) const;
+        void OutFile(LogType logType, LogLevel logLevel, std::string const& str) const;
+        void PlayerLogHeaderToConsole(uint32 accountId, WorldSession const* session, LogType logType, char const* subType);
+        void PlayerLogHeaderToFile(uint32 accountId, WorldSession const* session, LogType logType, char const* subType);
 
-        FILE* logfile;
-        FILE* gmLogfile;
-        FILE* dberLogfile;
-        FILE* wardenLogfile;
-        FILE* anticheatLogfile;
-        FILE* worldLogfile;
-        FILE* nostalriusLogFile;
-        FILE* honorLogfile;
-        FILE* logFiles[LOG_MAX_FILES];
-        bool  timestampPrefix[LOG_MAX_FILES];
+        void SetColor(FILE* where, Color color) const;
+        void ResetColor(FILE* where) const;
 
-        bool m_bIsChatLogFileActivated;
+        static void outTime(FILE* where);
+        static void outTimestamp(FILE* file);
+
+        FILE* openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile, bool overwriteOnOpen) const;
+        FILE* openGmlogPerAccount(uint32 account) const;
+
+        FILE* logFiles[LOG_TYPE_MAX];
 
         // log/console control
-        LogLevel m_logLevel;
-        LogLevel m_logFileLevel;
-        bool m_colored;
-        bool m_includeTime;
+        LogLevel m_consoleLevel;
+        LogLevel m_fileLevel;
+        LogLevel m_dbLevel;
+        uint16 const m_defaultColor;
+
+        // include timestamp in console output
         bool m_wardenDebug;
-        Color m_colors[LOG_TYPE_MAX];
+        bool m_includeTime;
         uint32 m_logFilter;
 
         // cache values for after initilization use (like gm log per account case)
         std::string m_logsDir;
-        std::string m_logsTimestamp;
+        std::string const m_logsTimestamp;
 
         // char log control
         bool m_charLog_Dump;
 
         // gm log control
-        bool m_gmlog_per_account;
         std::string m_gmlog_filename_format;
+
+        // smart log for logging events (e.g. deaths) of certain entities
+        std::unordered_set<uint32> m_smartlogExtraEntries;
+        std::unordered_set<uint32> m_smartlogExtraGuids;
+
 };
 
 #define sLog MaNGOS::Singleton<Log>::Instance()
 
-#define BASIC_LOG(...)                                  \
-    do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC))    \
-            sLog.outBasic(__VA_ARGS__);                 \
-    } while(0)
-
-#define BASIC_FILTER_LOG(F,...)                         \
-    do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && !sLog.HasLogFilter(F)) \
-            sLog.outBasic(__VA_ARGS__);                 \
-    } while(0)
-
-#define DETAIL_LOG(...)                                 \
-    do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL))   \
-            sLog.outDetail(__VA_ARGS__);                \
-    } while(0)
-
 #define DETAIL_FILTER_LOG(F,...)                        \
     do {                                                \
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && !sLog.HasLogFilter(F)) \
-            sLog.outDetail(__VA_ARGS__);                \
-    } while(0)
-
-#define DEBUG_LOG(...)                                  \
-    do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))    \
-            sLog.outDebug(__VA_ARGS__);                 \
+            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, __VA_ARGS__);                \
     } while(0)
 
 #define DEBUG_FILTER_LOG(F,...)                         \
     do {                                                \
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && !sLog.HasLogFilter(F)) \
-            sLog.outDebug(__VA_ARGS__);                 \
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, __VA_ARGS__);                  \
     } while(0)
-
-#define ERROR_DB_FILTER_LOG(F,...)                      \
-    do {                                                \
-        if (!sLog.HasLogFilter(F))                      \
-            sLog.outErrorDb(__VA_ARGS__);               \
-    } while(0)
-
-#define ERROR_DB_STRICT_LOG(...) \
-    ERROR_DB_FILTER_LOG(LOG_FILTER_DB_STRICTED_CHECK, __VA_ARGS__)
 
 #endif

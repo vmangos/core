@@ -588,10 +588,12 @@ class AreaAura : public Aura
 class PersistentAreaAura : public Aura
 {
     public:
-        PersistentAreaAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32* currentBasePoints, SpellAuraHolder* holder, Unit* target, Unit* caster = nullptr, Item* castItem = nullptr);
+        PersistentAreaAura(ObjectGuid dynObjectGuid, SpellEntry const* spellproto, SpellEffectIndex eff, SpellAuraHolder* holder, Unit* target, Unit* caster = nullptr);
         ~PersistentAreaAura() override;
+        DynamicObject* GetDynObject() const;
     protected:
         void Update(uint32 diff) override;
+        ObjectGuid m_dynObjectGuid;
 };
 
 class SingleEnemyTargetAura : public Aura

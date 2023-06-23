@@ -23,15 +23,9 @@ EndScriptData */
 
 /* ContentData
 go_cat_figurine (the "trap" version of GO, two different exist)
-go_barov_journal
 go_field_repair_bot_74A
 go_resonite_cask
-go_tablet_of_madness
 go_silithyste
-go_restes_sha_ni
-go_Hive_Regal_Glyphed_Crystal
-go_Hive_Ashi_Glyphed_Crystal
-go_Hive_Zora_Glyphed_Crystal
 go_bells
 go_darkmoon_faire_music
 EndContentData */
@@ -54,41 +48,6 @@ bool GOHello_go_cat_figurine(Player* pPlayer, GameObject* pGo)
     return false;
 }
 
-/*######
-## go_barov_journal
-######*/
-
-bool GOHello_go_barov_journal(Player* pPlayer, GameObject* pGo)
-{
-    if (sWorld.GetWowPatch() > WOW_PATCH_108 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVE_EVENTS))
-    {
-        if (pPlayer->HasSkill(SKILL_TAILORING) && pPlayer->GetSkillValueBase(SKILL_TAILORING) >= 285)
-        {
-            if (!pPlayer->HasSpell(26086))
-            {
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Learn recipe Felcloth Bag", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                pPlayer->SEND_GOSSIP_MENU(8121, pGo->GetObjectGuid());
-            }
-            else
-                pPlayer->SEND_GOSSIP_MENU(8122, pGo->GetObjectGuid());
-        }
-        else
-            pPlayer->SEND_GOSSIP_MENU(8120, pGo->GetObjectGuid());
-        return true;
-    }
-
-    return false;
-}
-
-bool GossipSelect_go_barov_journal(Player* pPlayer, GameObject* pGo, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF)
-    {
-        pPlayer->CastSpell(pPlayer, 26095, false);
-        pPlayer->CLOSE_GOSSIP_MENU();
-    }
-    return true;
-}
 
 /*######
 ## go_field_repair_bot_74A
@@ -118,17 +77,6 @@ bool GOHello_go_resonite_cask(Player* pPlayer, GameObject* pGO)
     return false;
 }
 
-/*######
-## go_tablet_of_madness
-######*/
-
-bool GOHello_go_tablet_of_madness(Player* pPlayer, GameObject* pGo)
-{
-    if (pPlayer->HasSkill(SKILL_ALCHEMY) && pPlayer->GetSkillValue(SKILL_ALCHEMY) >= 300 && !pPlayer->HasSpell(24266))
-        pPlayer->CastSpell(pPlayer, 24267, false);
-    return true;
-}
-
 // go_silithyste
 bool GOHello_go_silithyste(Player* pPlayer, GameObject* pGo)
 {
@@ -138,7 +86,7 @@ bool GOHello_go_silithyste(Player* pPlayer, GameObject* pGo)
 
     pPlayer->CastSpell(pPlayer, 29519, true);
 
-    sLog.out(LOG_BG, "%s [%u:%u:'%s'] reprend une Silithyst d'un monticule",
+    sLog.Out(LOG_BG, LOG_LVL_DETAIL, "%s [%u:%u:'%s'] reprend une Silithyst d'un monticule",
              pPlayer->GetName(),
              pPlayer->GetGUIDLow(), pPlayer->GetSession()->GetAccountId(), pPlayer->GetSession()->GetRemoteAddress().c_str());
 
@@ -154,77 +102,6 @@ bool GOHello_go_silithyste(Player* pPlayer, GameObject* pGo)
     return true;
 }
 
-/*######
-## go_restes_sha_ni
-######
-SQL :
-UPDATE quest_template SET QuestFlags = QuestFlags | 2, SpecialFlags = SpecialFlags | 2 WHERE entry = 3821;
-UPDATE gameobject_template SET script_name="go_restes_sha_ni" WHERE entry=160445;
-UPDATE creature_template SET npc_flags = 0 WHERE entry=9136;
-*/
-
-bool GOHello_go_restes_sha_ni(Player* pPlayer, GameObject* pGo)
-{
-    // Completion de la quete
-    if (pPlayer->GetQuestStatus(3821) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->AreaExploredOrEventHappens(3821);
-    // Invoquer (ou non) l'esprit.
-    if (!pGo->FindNearestCreature(9136, 10.0f, true))
-    {
-        if (pPlayer->GetQuestStatus(3821) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(3821) == QUEST_STATUS_COMPLETE)
-        {
-            pGo->SummonCreature(9136, -7919.9f, -2603.8f, 223.345f, 5.13f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-            return true;
-        }
-    }
-    return true;
-}
-
-/*######
-## go_Hive_Regal_Glyphed_Crystal
-## go_Hive_Ashi_Glyphed_Crystal
-## go_Hive_Zora_Glyphed_Crystal
-######*/
-
-enum
-{
-    QUEST_GLYPH_CHASING                 = 8309,
-    ITEM_GEOLOGIST_TRANSCRIPTION_KIT    = 20453,
-    ITEM_HIVE_ZORA_RUBBING              = 20454,
-    ITEM_HIVE_ASHI_RUBBING              = 20455,
-    ITEM_HIVE_REGAL_RUBBING             = 20456,
-};
-
-// gossip menu 20000 : Le cristal est couvert de glyphes et de runes compliqués. Vous n'y comprenez rien.
-template <int REWARD_ITEM>
-bool GOHello_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo)
-{
-    pPlayer->PlayerTalkClass->CloseGossip();
-    pPlayer->PlayerTalkClass->ClearMenus();
-
-    if (pPlayer->GetQuestStatus(QUEST_GLYPH_CHASING) == QUEST_STATUS_INCOMPLETE &&
-        pPlayer->HasItemCount(ITEM_GEOLOGIST_TRANSCRIPTION_KIT, 1) &&
-        !pPlayer->HasItemCount(REWARD_ITEM, 1))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<Use the transcription device to gather a rubbing.>", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(7770, pGo->GetGUID());
-    return true;
-}
-
-template <int REWARD_ITEM>
-bool GOSelect_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
-{
-    pPlayer->PlayerTalkClass->CloseGossip();
-    pPlayer->PlayerTalkClass->ClearMenus();
-
-    if (pPlayer->GetQuestStatus(QUEST_GLYPH_CHASING) == QUEST_STATUS_INCOMPLETE &&
-        pPlayer->HasItemCount(ITEM_GEOLOGIST_TRANSCRIPTION_KIT, 1) &&
-        !pPlayer->HasItemCount(REWARD_ITEM, 1))
-        pPlayer->AddItem(REWARD_ITEM, 1);
-
-    return true;
-}
-
 /*####
 ## go_bells
 ####*/
@@ -236,6 +113,7 @@ enum BellHourlySoundFX
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
+    LIGHTHOUSEFOGHORN  = 7197  // Lighthouses
 };
 
 enum BellHourlySoundZones
@@ -248,30 +126,36 @@ enum BellHourlySoundZones
     IRONFORGE_ZONE           = 1537,
     TELDRASSIL_ZONE          = 141,
     DARNASSUS_ZONE           = 1657,
-    ASHENVALE_ZONE           = 331,
+    ASHENVALE_ZONE           = 331
+};
+
+enum LightHouseAreas
+{
+    AREA_THERAMORE           = 513,
+    AREA_ALCAZ_ISLAND        = 2079,
+    AREA_WESTFALL_LIGHTHOUSE = 115
 };
 
 enum BellHourlyObjects
 {
     // bell gameobjects
     GO_HORDE_BELL = 175885,
-    GO_ALLIANCE_BELL = 176573,
+    GO_ALLIANCE_BELL = 176573 // Also used for lighthouse spawns
 };
 
 enum BellHourlyMisc
 {
     GAME_EVENT_HOURLY_BELLS = 78,
     EVENT_RING_BELL = 1,
-    EVENT_RESET = 2,
-    EVENT_TIME = 3
+    EVENT_TIME = 2
 };
 
 struct go_bells : public GameObjectAI
 {
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
-        uint32 zoneId = me->GetZoneId();
 
+        uint32 zoneId = me->GetZoneId();
         switch (me->GetEntry())
         {
             case GO_HORDE_BELL:
@@ -292,6 +176,12 @@ struct go_bells : public GameObjectAI
             }
             case GO_ALLIANCE_BELL:
             {
+                if (isLightHouseObject())
+                {
+                    _soundId = LIGHTHOUSEFOGHORN;
+                    return;
+                }
+
                 switch (zoneId)
                 {
                     case IRONFORGE_ZONE:
@@ -310,8 +200,27 @@ struct go_bells : public GameObjectAI
             break;
             }
         default:
-            sLog.outError("go_bells() called with invalid object, ID: %u", me->GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "go_bells() called with invalid object, ID: %u", me->GetEntry());
         }
+    }
+
+    bool isLightHouseObject()
+    {
+        switch (me->GetAreaId())
+        {
+            case AREA_THERAMORE:
+            {
+                // Area is not precise enough here, since there also is an alliance bell spawn
+                // in the same area. Check if location is close to lighthouse:
+                return me->GetDistance(-3667.0f, -4754.0f, 1.8f) < 1;
+            }
+            case AREA_ALCAZ_ISLAND:
+            case AREA_WESTFALL_LIGHTHOUSE:
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     void UpdateAI(uint32 const diff) override
@@ -336,10 +245,17 @@ struct go_bells : public GameObjectAI
                     time(&rawtime);
                     struct tm * timeinfo = localtime(&rawtime);
                     uint8 _rings = (timeinfo->tm_hour) % 12;
-                    if (_rings == 0) // 00:00 and 12:00
+                    _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
+
+                    // Only play once: Dwarf horn and Lighthouse
+                    // On official servers, this sound is played once very two minutes.
+                    // This would require a additional event with a 2 minute timer.
+                    // For now, play the correct sound at least once every hour.
+                    if (_soundId == BELLTOLLDWARFGNOME || _soundId == LIGHTHOUSEFOGHORN)
                     {
-                        _rings = 12;
+                        _rings = 1;
                     }
+
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
                         m_events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
@@ -520,6 +436,39 @@ GameObjectAI* GetAI_go_lunar_festival_firecracker(GameObject* gameobject)
     return new go_lunar_festival_firecracker(gameobject);
 }
 
+/*####
+## go_containment_coffer
+####*/
+
+struct go_containment_coffer : public GameObjectAI
+{
+    go_containment_coffer(GameObject* gobj) : GameObjectAI(gobj)
+    {
+        m_despawnTimer = 20000;
+    }
+
+    uint32 m_despawnTimer;
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (!m_despawnTimer)
+            return;
+
+        if (m_despawnTimer <= diff)
+        {
+            me->Despawn();
+            m_despawnTimer = 0;
+        }
+        else
+            m_despawnTimer -= diff;
+    }
+};
+
+GameObjectAI* GetAI_go_containment_coffer(GameObject* gameobject)
+{
+    return new go_containment_coffer(gameobject);
+}
+
 void AddSC_go_scripts()
 {
     Script* newscript;
@@ -527,12 +476,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_cat_figurine";
     newscript->pGOHello = &GOHello_go_cat_figurine;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_barov_journal";
-    newscript->pGOHello = &GOHello_go_barov_journal;
-    newscript->pGOGossipSelect = &GossipSelect_go_barov_journal;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -546,36 +489,8 @@ void AddSC_go_scripts()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "go_tablet_of_madness";
-    newscript->pGOHello = &GOHello_go_tablet_of_madness;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "go_silithyste";
     newscript->pGOHello = &GOHello_go_silithyste;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_restes_sha_ni";
-    newscript->pGOHello = &GOHello_go_restes_sha_ni;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_Hive_Regal_Glyphed_Crystal";
-    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_REGAL_RUBBING>);
-    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_REGAL_RUBBING>);
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_Hive_Ashi_Glyphed_Crystal";
-    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ASHI_RUBBING>);
-    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ASHI_RUBBING>);
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_Hive_Zora_Glyphed_Crystal";
-    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
-    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -596,5 +511,10 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_firework_rocket";
     newscript->GOGetAI = &GetAI_go_firework_rocket;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_containment_coffer";
+    newscript->GOGetAI = &GetAI_go_containment_coffer;
     newscript->RegisterSelf();
 }

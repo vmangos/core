@@ -61,12 +61,9 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_magmus.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_tomb_of_seven.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/instance_blackrock_depths.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_drakkisath.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_halycon.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_highlord_omokk.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_mother_smolderweb.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_overlord_wyrmthalak.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_pyroguard_emberseer.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_shadow_hunter_voshgajin.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_the_beast.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_urok.cpp
@@ -198,7 +195,6 @@ set (SCRIPTS_SRCS
     kalimdor/desolace/maraudon/boss_landslide.cpp
     kalimdor/desolace/maraudon/boss_noxxion.cpp
     kalimdor/desolace/maraudon/instance_maraudon.cpp
-    kalimdor/desolace/maraudon/maraudon.cpp
     kalimdor/durotar/durotar.cpp
     kalimdor/dustwallow_marsh/dustwallow_marsh.cpp
     kalimdor/dustwallow_marsh/onyxias_lair/boss_onyxia.cpp
@@ -220,7 +216,6 @@ set (SCRIPTS_SRCS
     kalimdor/silithus/ruins_of_ahnqiraj/boss_kurinnaxx.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/boss_moam.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/boss_ossirian.cpp
-    kalimdor/silithus/ruins_of_ahnqiraj/boss_rajaxx.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/instance_ruins_of_ahnqiraj.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/npc_sandstalker.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/ruins_of_ahnqiraj.cpp

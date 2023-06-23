@@ -1,4 +1,4 @@
-##################################4##########
+############################################
 # MaNGOS realmd configuration file         #
 ############################################
 
@@ -68,13 +68,6 @@ ConfVersion=2020010501
 #        Server file level of logging
 #        0 = Minimum; 1 = Error; 2 = Detail; 3 = Full/Debug
 #        Default: 0
-#
-#    LogColors
-#        Color for messages (format "normal_color details_color debug_color error_color)
-#        Colors: 0 - BLACK, 1 - RED, 2 - GREEN,  3 - BROWN, 4 - BLUE, 5 - MAGENTA, 6 -  CYAN, 7 - GREY,
-#                8 - YELLOW, 9 - LRED, 10 - LGREEN, 11 - LBLUE, 12 - LMAGENTA, 13 - LCYAN, 14 - WHITE
-#        Default: "" - none colors
-#                 "13 7 11 9" - for example :)
 #
 #    UseProcessors
 #        Used processors mask for multi-processors system (Used only at Windows)
@@ -169,7 +162,6 @@ LogTime = 0
 LogFile = "Realmd.log"
 LogTimestamp = 0
 LogFileLevel = 0
-LogColors = ""
 UseProcessors = 0
 ProcessPriority = 1
 WaitAtStartupError = 0

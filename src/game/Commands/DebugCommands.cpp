@@ -148,7 +148,7 @@ bool ChatHandler::HandleSpellInfosCommand(char *args)
 
 bool ChatHandler::HandleSpellSearchCommand(char *args)
 {
-    if (!args)
+    if (!*args)
         return false;
 
     uint32 familyName = 0;
@@ -158,7 +158,7 @@ bool ChatHandler::HandleSpellSearchCommand(char *args)
     if (!familyFlags)
         return false;
     PSendSysMessage("* Results for SpellFamilyName %u and SpellFamilyFlags & 0x%x", familyName, familyFlags);
-    LocaleConstant loc = GetSessionDbcLocale();
+    LocaleConstant const loc = GetSessionDbcLocale();
     SpellEntry const* pSpell = nullptr;
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); ++id)
     {
@@ -303,7 +303,7 @@ bool ChatHandler::HandleDebugSendPoiCommand(char* args)
     if (!ExtractUInt32(&args, flags))
         return false;
 
-    DETAIL_LOG("Command : POI, NPC = %u, icon = %u flags = %u", target->GetGUIDLow(), icon, flags);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Command : POI, NPC = %u, icon = %u flags = %u", target->GetGUIDLow(), icon, flags);
     pPlayer->PlayerTalkClass->SendPointOfInterest(target->GetPositionX(), target->GetPositionY(), Poi_Icon(icon), flags, 30, "Test POI");
     return true;
 }
@@ -437,12 +437,12 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
             data << unit->GetPackGUID();
         else
         {
-            DEBUG_LOG("Sending opcode: unknown type '%s'", type.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sending opcode: unknown type '%s'", type.c_str());
             break;
         }
     }
     ifs.close();
-    DEBUG_LOG("Sending opcode %u", data.GetOpcode());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sending opcode %u", data.GetOpcode());
     data.hexlike();
     m_session->SendPacket(&data);
     PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcode(), unit->GetName());
@@ -986,7 +986,7 @@ bool ChatHandler::HandleDebugBattlegroundCommand(char* /*args*/)
 
 bool ChatHandler::HandleDebugSpellCheckCommand(char* /*args*/)
 {
-    sLog.outString("Check expected in code spell properties base at table 'spell_check' content...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Check expected in code spell properties base at table 'spell_check' content...");
     sSpellMgr.CheckUsedSpells("spell_check");
     return true;
 }
@@ -1058,7 +1058,7 @@ bool ChatHandler::HandleSetValueHelper(Object* target, uint32 field, char* typeS
         if (!ExtractUInt32Base(&valStr, iValue, base))
             return false;
 
-        DEBUG_LOG(GetMangosString(LANG_SET_UINT), guid.GetString().c_str(), field, iValue);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_SET_UINT), guid.GetString().c_str(), field, iValue);
         target->SetUInt32Value(field , iValue);
         PSendSysMessage(LANG_SET_UINT_FIELD, guid.GetString().c_str(), field, iValue);
     }
@@ -1068,7 +1068,7 @@ bool ChatHandler::HandleSetValueHelper(Object* target, uint32 field, char* typeS
         if (!ExtractFloat(&valStr, fValue))
             return false;
 
-        DEBUG_LOG(GetMangosString(LANG_SET_FLOAT), guid.GetString().c_str(), field, fValue);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_SET_FLOAT), guid.GetString().c_str(), field, fValue);
         target->SetFloatValue(field , fValue);
         PSendSysMessage(LANG_SET_FLOAT_FIELD, guid.GetString().c_str(), field, fValue);
     }
@@ -1263,24 +1263,24 @@ bool ChatHandler::HandleGetValueHelper(Object* target, uint32 field, char* typeS
                 res = iValue & (1 << (32 - 1)) ? "0" : " ";
                 for (int i = 32; i > 0; --i)
                     res += iValue & (1 << (i - 1)) ? "1" : "0";
-                DEBUG_LOG(GetMangosString(LANG_GET_BITSTR), guid.GetString().c_str(), field, res.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_GET_BITSTR), guid.GetString().c_str(), field, res.c_str());
                 PSendSysMessage(LANG_GET_BITSTR_FIELD, guid.GetString().c_str(), field, res.c_str());
                 break;
             }
             case 16:
-                DEBUG_LOG(GetMangosString(LANG_GET_HEX), guid.GetString().c_str(), field, iValue);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_GET_HEX), guid.GetString().c_str(), field, iValue);
                 PSendSysMessage(LANG_GET_HEX_FIELD, guid.GetString().c_str(), field, iValue);
                 break;
             case 10:
             default:
-                DEBUG_LOG(GetMangosString(LANG_GET_UINT), guid.GetString().c_str(), field, iValue);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_GET_UINT), guid.GetString().c_str(), field, iValue);
                 PSendSysMessage(LANG_GET_UINT_FIELD, guid.GetString().c_str(), field, iValue);
         }
     }
     else
     {
         float fValue = target->GetFloatValue(field);
-        DEBUG_LOG(GetMangosString(LANG_GET_FLOAT), guid.GetString().c_str(), field, fValue);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_GET_FLOAT), guid.GetString().c_str(), field, fValue);
         PSendSysMessage(LANG_GET_FLOAT_FIELD, guid.GetString().c_str(), field, fValue);
     }
 
@@ -1446,22 +1446,22 @@ bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char*
             default:
             case 1:                                         // int +
                 value = uint32(int32(value) + int32(iValue));
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_INT32), guidString, field, iValue, value, value);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_CHANGE_INT32), guidString, field, iValue, value, value);
                 PSendSysMessage(LANG_CHANGE_INT32_FIELD, guidString, field, iValue, value, value);
                 break;
             case 2:                                         // |= bit or
                 value |= iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
                 PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
             case 3:                                         // &= bit and
                 value &= iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
                 PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
             case 4:                                         // &=~ bit and not
                 value &= ~iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
                 PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
         }
@@ -1478,7 +1478,7 @@ bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char*
 
         value += fValue;
 
-        DEBUG_LOG(GetMangosString(LANG_CHANGE_FLOAT), guidString, field, fValue, value);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_CHANGE_FLOAT), guidString, field, fValue, value);
         PSendSysMessage(LANG_CHANGE_FLOAT_FIELD, guidString, field, fValue, value);
 
         target->SetFloatValue(field, value);
@@ -1681,7 +1681,7 @@ bool ChatHandler::HandleDebugLoSAllowCommand(char* args)
         SendSysMessage("* No collision found.");
     else if (((spawn->flags & VMAP::MOD_NO_BREAK_LOS) > 0) != value)
     {
-        sLog.outInfo("[VMAPS] Collision for model '%s' %s by %s (guid %u)", spawn->name.c_str(), value ? "disabled" : "enabled", m_session->GetPlayer()->GetName(), m_session->GetPlayer()->GetGUIDLow());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[VMAPS] Collision for model '%s' %s by %s (guid %u)", spawn->name.c_str(), value ? "disabled" : "enabled", m_session->GetPlayer()->GetName(), m_session->GetPlayer()->GetGUIDLow());
         if (value)
         {
             spawn->flags |= VMAP::MOD_NO_BREAK_LOS;
@@ -1774,15 +1774,13 @@ bool ChatHandler::HandleDebugAssertFalseCommand(char*)
 
 bool ChatHandler::HandleDebugChatFreezeCommand(char* args)
 {
-    std::string message("| |01");
-
     MasterPlayer* pReceiver = GetSession()->GetMasterPlayer();
 
     if (Player* pPlayer = GetSelectedPlayer())
         if (pPlayer->GetSession()->GetSecurity() == SEC_PLAYER)
             pReceiver = pPlayer->GetSession()->GetMasterPlayer();
 
-    pReceiver->Whisper(message, LANG_UNIVERSAL, pReceiver);
+    pReceiver->Whisper("| |01", LANG_UNIVERSAL, pReceiver);
 
     return true;
 }
@@ -1848,7 +1846,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     if (checkItem)
         lootChances[checkItem] = 0;
 
-    uint32 const MAX_TIME = 30;
+    uint32 constexpr MAX_TIME = 30;
     auto startTime = time(nullptr);
 
     for (uint32 i = 0; i < simCount; ++i)
@@ -1894,7 +1892,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     {
         if (itr.first == checkItem || !checkItem)
         {
-            ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(itr.first);
+            ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itr.first);
             if (!proto)
                 continue;
 
@@ -1913,10 +1911,10 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
 bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, uint32 simCount)
 {
     std::map<uint32, uint32> lootChances;
-    uint32 const MAX_TIME = 30;
+    uint32 constexpr MAX_TIME = 30;
     auto startTime = time(nullptr);
 
-    ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(lootid);
+    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(lootid);
     if (!proto)
     {
         PSendSysMessage("Error: invalid item id %u", lootid);
@@ -1985,17 +1983,19 @@ bool IsSimilarItem(ItemPrototype const* proto1, ItemPrototype const* proto2)
 
 bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 {
-    for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* proto1 = sItemStorage.LookupEntry<ItemPrototype>(id);
-        if (!proto1)
-            continue;
+        uint32 id = itr.first;
+        ItemPrototype const* proto1 = &itr.second;
+
         Races currMountRace;
         uint8 currRaceNum = 0;
         if (sObjectMgr.GetMountDataByEntry(id, currMountRace, currRaceNum))
             continue;
+
         if (proto1->Quality <= 1)
             continue;
+
         bool inDb = false;
         for (std::map<uint32, uint32>::const_iterator it2 = sObjectMgr.factionchange_items.begin(); it2 != sObjectMgr.factionchange_items.end(); ++it2)
         {
@@ -2018,18 +2018,20 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
         if (!canEquip)
         {
             ItemPrototype const* similar = nullptr;
-            for (uint32 id2 = 0; id2 < sItemStorage.GetMaxEntry(); id2++)
-                if (ItemPrototype const* proto2 = sItemStorage.LookupEntry<ItemPrototype>(id2))
-                    if (proto1 != proto2 && IsSimilarItem(proto1, proto2))
+            for (auto const& itr2 : sObjectMgr.GetItemPrototypeMap())
+            {
+                ItemPrototype const* proto2 = &itr2.second;
+                if (proto1 != proto2 && IsSimilarItem(proto1, proto2))
+                {
+                    if (similar)
                     {
-                        if (similar)
-                        {
-                            // Ambiguity. Other similar items.
-                            similar = nullptr;
-                            break;
-                        }
-                        similar = proto2;
+                        // Ambiguity. Other similar items.
+                        similar = nullptr;
+                        break;
                     }
+                    similar = proto2;
+                }
+            }
 
 
             PSendSysMessage("Item %u not handled ! Similar item : %u", proto1->ItemId, similar ? similar->ItemId : 0);
@@ -2040,13 +2042,13 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 
 bool ChatHandler::HandleVideoTurn(char*)
 {
-    float const radiusBegin = 40.0f;
-    float const radiusEnd = 10.0f;
-    float const zBegin = 30.0f;
-    float const zEnd = 10.0f;
-    float const angleBegin = 0.0f;
-    float const angleEnd = 10 * M_PI_F;
-    float const moveSpeed = 30.0f;
+    float constexpr radiusBegin = 40.0f;
+    float constexpr radiusEnd = 10.0f;
+    float constexpr zBegin = 30.0f;
+    float constexpr zEnd = 10.0f;
+    float constexpr angleBegin = 0.0f;
+    float constexpr angleEnd = 10 * M_PI_F;
+    float constexpr moveSpeed = 30.0f;
     std::list<Creature*> targets;
     Unit* selection = GetSelectedUnit();
     if (!selection)
@@ -2063,7 +2065,7 @@ bool ChatHandler::HandleVideoTurn(char*)
         float angle = angleBegin * t + (1 - t) * angleEnd;
         float posZ = zBegin * t + (1 - t) * zEnd + z;
         float d = radiusBegin * t + (1 - t) * radiusEnd;
-        sLog.outString("%f %f %f", angle, d, z);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%f %f %f", angle, d, z);
         a.push_back(Vector3(x + d * cos(angle), y + d * sin(angle), posZ));
     }
     Movement::MoveSplineInit init(*m_session->GetPlayer());
@@ -2076,10 +2078,10 @@ bool ChatHandler::HandleVideoTurn(char*)
 
 bool ChatHandler::HandleDebugExp(char*)
 {
-    float const moveDist = 80.0f;
-    float const searchCreaturesRange = 60.0f;
-    float const retournementRayon = 2.0f;
-    float const moveSpeed = 6.0f;
+    float constexpr moveDist = 80.0f;
+    float constexpr searchCreaturesRange = 60.0f;
+    float constexpr retournementRayon = 2.0f;
+    float constexpr moveSpeed = 6.0f;
     std::list<Creature*> targets;
     Unit* selection = GetSelectedUnit();
     if (!selection)
@@ -2174,48 +2176,108 @@ bool ChatHandler::HandleDebugMonsterChatCommand(char* args)
     Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
         return false;
-    for (uint8 i = 0; i < 0xFF; ++i)
+
+    Player* pSender = m_session->GetPlayer();
+
+    uint32 chatType;
+    if (!ExtractUInt32(&args, chatType))
+        return false;
+    
+    std::ostringstream oss;
+    oss << "Chat" << int(chatType);
+    std::string rightText = oss.str();
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    data << (uint8)chatType;
+    data << (uint32)LANG_UNIVERSAL;
+
+    if (!chatType
+        || chatType == 11
+        || chatType == 5
+        || chatType == 12
+        || chatType == 1)
     {
-        std::ostringstream oss;
-        oss << "Chat" << int(i);
-        std::string rightText = oss.str();
-        WorldPacket data(SMSG_MESSAGECHAT, 200);
-        data << (uint8)i;
-        data << (uint32)LANG_UNIVERSAL;
-        data << (uint32)(strlen(pTarget->GetName()) + 1);
-        data << pTarget->GetName();
-        data << (uint64)0;
-        data << (uint32)(rightText.length() + 1);
-        data << rightText;
-        data << (uint8)0;                       // ChatTag
-        pTarget->SendMessageToSet(&data, true);
+        data << pSender->GetObjectGuid();
     }
 
-    pTarget->MonsterTextEmote("Testing WorldObject::MonsterTextEmote", m_session->GetPlayer());
-    pTarget->MonsterTextEmote("Testing WorldObject::MonsterTextEmote(boss)", m_session->GetPlayer(), true);
-    pTarget->MonsterWhisper("Testing WorldObject::MonsterWhisper", m_session->GetPlayer());
-    return true;
-}
+    // 1.12.1 client
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    if (chatType == 11 || chatType == 12 || chatType == 90 || chatType == 13 || chatType == 26)
+    {
+        data << uint32(strlen(pSender->GetName()) + 1);
+        data << pSender->GetName();
+        data << pTarget->GetObjectGuid();
+        data << uint32(strlen(rightText.c_str()) + 1);
+        data << rightText.c_str();
+        data << uint8(0);
+        pTarget->SendMessageToSet(&data, true);
+        return true;
+    }
 
-bool ChatHandler::HandleDebugUnitCommand(char* args)
-{
-    Unit* target = GetSelectedUnit();
-    if (!target)
-        return false;
-    uint32 flags = 0;
-    if (ExtractUInt32(&args, flags))
-        target->SetDebugger(m_session->GetPlayer()->GetObjectGuid(), flags);
+    if (chatType != 89)
+    {
+        if (chatType != 82 && chatType != 83 && chatType != 84)
+        {
+            if (chatType == 14)
+            {
+                data << "Channel";
+            }
+            data << pTarget->GetObjectGuid();
+            data << uint32(strlen(rightText.c_str()) + 1);
+            data << rightText.c_str();
+            data << uint8(0);
+            pTarget->SendMessageToSet(&data, true);
+            return true;
+        }
+        data << pTarget->GetObjectGuid();
+        data << uint32(strlen(rightText.c_str()) + 1);
+        data << rightText.c_str();
+        data << uint8(0);
+        pTarget->SendMessageToSet(&data, true);
+        return true;
+    }
 
-    PSendSysMessage("Debugs on target [%s]%s", target->GetName(), (target->GetDebuggerGuid() == m_session->GetPlayer()->GetObjectGuid()) ? " ATTACHE" : "");
-#define HANDLE_DEBUG(flag, nom) PSendSysMessage("[%s] %6u \"" nom "\"", (target->GetDebugFlags() & flag) ? "ON" : "OFF", flag);
-    HANDLE_DEBUG(DEBUG_SPELL_COMPUTE_RESISTS, "Spell Resist Calculations");
-    HANDLE_DEBUG(DEBUG_PACKETS_RECV, "Packet received by the server");
-    HANDLE_DEBUG(DEBUG_PACKETS_SEND, "Packets send by the server");
-    HANDLE_DEBUG(DEBUG_AI, "Various AI debug");
-    HANDLE_DEBUG(DEBUG_DR, "Diminishing returns");
-    HANDLE_DEBUG(DEBUG_CHEAT, "Anticheat");
-    HANDLE_DEBUG(DEBUG_PROCS, "Proc system");
-    HANDLE_DEBUG(DEBUG_SPELLS_DAMAGE, "Spells damage and healing bonus");
+    data << uint32(strlen(pSender->GetName()) + 1);
+    data << pSender->GetName();
+    data << pTarget->GetObjectGuid();
+    data << uint32(strlen(rightText.c_str()) + 1);
+    data << rightText.c_str();
+    data << uint8(0);
+    pTarget->SendMessageToSet(&data, true);
+#else // 1.11.2 client
+    
+    if (chatType == 11 || chatType == 12 || chatType == 89 || chatType == 13 || chatType == 26)
+    {
+        data << uint32(strlen(pSender->GetName()) + 1);
+        data << pSender->GetName();
+        data << pTarget->GetObjectGuid();
+        data << uint32(strlen(rightText.c_str()) + 1);
+        data << rightText.c_str();
+        data << uint8(0);
+        pTarget->SendMessageToSet(&data, true);
+        return true;
+    }
+
+    if (chatType == 82 || chatType == 83 || chatType == 84)
+    {
+        data << pTarget->GetObjectGuid();
+        data << uint32(strlen(rightText.c_str()) + 1);
+        data << rightText.c_str();
+        data << uint8(0);
+        pTarget->SendMessageToSet(&data, true);
+        return true;
+    }
+
+    if (chatType == 14)
+    {
+        data << "Channel";
+    }
+
+    data << pTarget->GetObjectGuid();
+    data << uint32(strlen(rightText.c_str()) + 1);
+    data << rightText.c_str();
+    data << uint8(0);
+    pTarget->SendMessageToSet(&data, true);
+#endif
 
     return true;
 }
@@ -2829,6 +2891,41 @@ bool ChatHandler::HandleDebugUnitBytes2Command(char *args)
         return false;
 
     target->SetByteValue(UNIT_FIELD_BYTES_2, offset, value);
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugGetPrevPlayTimeCommand(char* args)
+{
+    Player* player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Account %s has been previously played for %s", player->GetSession()->GetUsername().c_str(), secsToTimeString(player->GetSession()->GetPreviousPlayedTime()).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugSetPrevPlayTimeCommand(char* args)
+{
+    Player* player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 seconds;
+    if (!ExtractUInt32(&args, seconds))
+        return false;
+
+    player->GetSession()->SetPreviousPlayedTime(seconds);
+    PSendSysMessage("Previous played time of account %s has been set to %s", player->GetSession()->GetUsername().c_str(), secsToTimeString(seconds).c_str());
 
     return true;
 }

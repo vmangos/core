@@ -28,6 +28,7 @@
 #include "Policies/SingletonImp.h"
 #include "Util.h"
 #include "World.h"
+#include "Log.h"
 
 #include <ace/OS_NS_dirent.h>
 
@@ -39,15 +40,15 @@ INSTANTIATE_SINGLETON_1(WardenModuleMgr);
 
 namespace
 {
-std::vector<std::string> GetModuleNames(const std::string &moduleDir)
+std::vector<std::string> GetModuleNames(std::string const& moduleDir)
 {
-    ACE_DIR *dirp = ACE_OS::opendir(ACE_TEXT(moduleDir.c_str()));
+    ACE_DIR* dirp = ACE_OS::opendir(ACE_TEXT(moduleDir.c_str()));
 
     std::vector<std::string> results;
 
     if (dirp)
     {
-        ACE_DIRENT *dp;
+        ACE_DIRENT* dp;
 
         // look only for .bin files, and assume (for now) that the corresponding .key and .cr files exist
         while (!!(dp = ACE_OS::readdir(dirp)))
@@ -69,7 +70,7 @@ WardenModuleMgr::WardenModuleMgr()
     auto const moduleDir = sWorld.GetWardenModuleDirectory();
     auto const modules = GetModuleNames(moduleDir);
 
-    for (auto const &mod : modules)
+    for (auto const& mod : modules)
     {
         auto const key = mod.substr(0, mod.length() - 3) + "key";
         auto const cr = mod.substr(0, mod.length() - 3) + "cr";
@@ -79,28 +80,30 @@ WardenModuleMgr::WardenModuleMgr()
             auto newMod = WardenModule(mod, key, cr);
 
             if (newMod.Windows())
-                _winModules.emplace_back(std::move(newMod));
+                m_winModules.emplace_back(std::move(newMod));
             else
-                _macModules.emplace_back(std::move(newMod));
+                m_macModules.emplace_back(std::move(newMod));
         }
-        catch (const std::runtime_error & e)
+        catch (std::runtime_error const& e)
         {
-            sLog.outError("Failed to load %s - %s\n", mod.c_str(), e.what());
+            sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to load %s - %s\n", mod.c_str(), e.what());
             continue;
         }
     }
 }
 
-const WardenModule *WardenModuleMgr::GetWindowsModule() const
+WardenModule const* WardenModuleMgr::GetWindowsModule() const
 {
-    MANGOS_ASSERT(!_winModules.empty());
+    if (m_winModules.empty())
+        return nullptr;
 
-    return &_winModules[urand(0, _winModules.size() - 1)];
+    return &m_winModules[urand(0, m_winModules.size() - 1)];
 }
 
-const WardenModule *WardenModuleMgr::GetMacModule() const
+WardenModule const* WardenModuleMgr::GetMacModule() const
 {
-    MANGOS_ASSERT(!_macModules.empty());
+    if (m_macModules.empty())
+        return nullptr;
 
-    return &_macModules[urand(0, _macModules.size() - 1)];
+    return &m_macModules[urand(0, m_macModules.size() - 1)];
 }

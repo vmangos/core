@@ -33,9 +33,9 @@
 BattleGroundAV::BattleGroundAV()
 {
     m_startMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
-    m_startMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_AV_START_ONE_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_AV_START_HALF_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_AV_HAS_BEGUN;
+    m_startMessageIds[BG_STARTING_EVENT_SECOND] = BCT_BG_AV_START_ONE_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = BCT_BG_AV_START_HALF_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = BCT_BG_AV_HAS_BEGUN;
 }
 
 BattleGroundAV::~BattleGroundAV()
@@ -271,7 +271,7 @@ bool BattleGroundAV::isWorldBossChallengeInvocationReady(uint32 factionId)
 
 void BattleGroundAV::HandleKillUnit(Creature* creature, Player* killer)
 {
-    DEBUG_LOG("BattleGroundAV: HandleKillUnit %i", creature->GetEntry());
+   sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: HandleKillUnit %i", creature->GetEntry());
    if (GetStatus() != STATUS_IN_PROGRESS)
         return;
     switch (creature->GetEntry())
@@ -591,7 +591,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             reputation = 1;
 /*           if (m_teamQuestStatus[teamIdx][0] == 500 || m_teamQuestStatus[teamIdx][0] == 1000 || m_teamQuestStatus[teamIdx][0] == 1500)  //25,50,75 turn ins
             {
-                DEBUG_LOG("BattleGroundAV: Quest %i completed starting with unit upgrading..", questid);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed starting with unit upgrading..", questid);
                 for (BG_AV_Nodes i = BG_AV_NODES_FIRSTAID_STATION; i <= BG_AV_NODES_FROSTWOLF_HUT; ++i)
                     if (m_nodes[i].owner == teamIdx && m_nodes[i].state == POINT_CONTROLLED)
                         PopulateNode(i);
@@ -665,9 +665,9 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             reputation = 2;
             if (m_teamQuestStatus[teamIdx][5] == 28)
             {
-                DEBUG_LOG("BattleGroundAV: Quest %i completed (need to implement some events here", questid);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed (need to implement some events here", questid);
                 if (m_teamQuestStatus[teamIdx][6] == 7)
-                    DEBUG_LOG("BattleGroundAV: Quest %i completed (need to implement some events here - ground assault ready", questid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed (need to implement some events here - ground assault ready", questid);
             }
             break;
         case BG_AV_QUEST_A_OTHER_MINE:
@@ -676,9 +676,9 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             reputation = 3;
             if (m_teamQuestStatus[teamIdx][6] == 7)
             {
-                DEBUG_LOG("BattleGroundAV: Quest %i completed (need to implement some events here", questid);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed (need to implement some events here", questid);
                 if (m_teamQuestStatus[teamIdx][5] == 20)
-                    DEBUG_LOG("BattleGroundAV: Quest %i completed (need to implement some events here - ground assault ready", questid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed (need to implement some events here - ground assault ready", questid);
             }
             break;
         case BG_AV_QUEST_A_RIDER_HIDE:
@@ -688,9 +688,9 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
 
             if (m_teamQuestStatus[teamIdx][7] == 25)
             {
-                DEBUG_LOG("BattleGroundAV: Quest %i completed (need to implement some events here", questid);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed (need to implement some events here", questid);
                 if (m_teamQuestStatus[teamIdx][8] == 25)
-                    DEBUG_LOG("BattleGroundAV: Quest %i completed (need to implement some events here - rider assault ready", questid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed (need to implement some events here - rider assault ready", questid);
             }
             break;
         case BG_AV_QUEST_A_RIDER_TAME:
@@ -732,9 +732,9 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
 
             if (m_teamQuestStatus[teamIdx][8] == 25)
             {
-                DEBUG_LOG("BattleGroundAV: Quest %i completed (need to implement some events here", questid);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed (need to implement some events here", questid);
                 if (m_teamQuestStatus[teamIdx][8] == 25)
-                    DEBUG_LOG("BattleGroundAV: Quest %i completed (need to implement some events here - rider assault ready", questid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed (need to implement some events here - rider assault ready", questid);
             }
             break;
         case 7402:
@@ -759,7 +759,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             break;
 
         default:
-            DEBUG_LOG("BattleGroundAV: Quest %i completed but is not interesting for us", questid);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: Quest %i completed but is not interesting for us", questid);
             return;
     }
     if (reputation)
@@ -783,8 +783,6 @@ void BattleGroundAV::UpdateScore(BattleGroundTeamIndex teamIdx, int32 points)
         }
         else if (!m_isInformedNearLose[teamIdx] && m_teamScores[teamIdx] < BG_AV_SCORE_NEAR_LOSE)
         {
-            // SendMessageToAll((teamIdx == BG_TEAM_HORDE) ? LANG_BG_AV_H_NEAR_LOSE : LANG_BG_AV_A_NEAR_LOSE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-            // PlaySoundToAll(BG_AV_SOUND_NEAR_LOSE);
             m_isInformedNearLose[teamIdx] = true;
         }
     }
@@ -795,7 +793,7 @@ void BattleGroundAV::UpdateScore(BattleGroundTeamIndex teamIdx, int32 points)
 
 void BattleGroundAV::ResetTamedEvent(uint32 teamIdx)
 {
-DEBUG_LOG("BattleGroundAV: TeamIdx %i ", teamIdx);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: TeamIdx %i", teamIdx);
     SpawnEvent(AV_05_TAMED+teamIdx, 2, true, false);
     SpawnEvent(AV_10_TAMED+teamIdx, 2, true, false);
     SpawnEvent(AV_15_TAMED+teamIdx, 2, true, false);
@@ -908,7 +906,7 @@ void BattleGroundAV::Update(uint32 diff)
 
 void BattleGroundAV::StartingEventCloseDoors()
 {
-    DEBUG_LOG("BattleGroundAV: entering state STATUS_WAIT_JOIN ...");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: entering state STATUS_WAIT_JOIN ...");
 }
 
 void BattleGroundAV::StartingEventOpenDoors()
@@ -960,7 +958,7 @@ void BattleGroundAV::EndBattleGround(Team winner)
             RewardReputationToTeam(faction[i], towersSurvived[i] * m_repSurviveTower, team[i]);
             RewardHonorToTeam(uint32(GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER) * GetHonorModifier()), team[i]);
         }
-        DEBUG_LOG("BattleGroundAV: EndbattleGround: bgteam: %u towers:%u honor:%u rep:%u", i, towersSurvived[i], GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER), towersSurvived[i] * BG_AV_REP_SURVIVING_TOWER);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: EndbattleGround: bgteam: %u towers:%u honor:%u rep:%u", i, towersSurvived[i], GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER), towersSurvived[i] * BG_AV_REP_SURVIVING_TOWER);
         if (gravesOwned[i])
         {
             RewardReputationToTeam(faction[i], gravesOwned[i] * m_repOwnedGrave, team[i]);
@@ -1022,7 +1020,7 @@ void BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
             //source->Unmount();
             break;
         default:
-            DEBUG_LOG("BattleGroundAV: WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
 //            source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
@@ -1059,7 +1057,7 @@ void BattleGroundAV::UpdatePlayerScore(Player* source, uint32 type, uint32 value
 
 void BattleGroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
 {
-    DEBUG_LOG("BattleGroundAV: player destroyed point node %i", node);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: player destroyed point node %i", node);
 
     MANGOS_ASSERT(m_nodes[node].owner != BG_AV_TEAM_NEUTRAL)
     BattleGroundTeamIndex ownerTeamIdx = BattleGroundTeamIndex(m_nodes[node].owner);
@@ -1267,7 +1265,7 @@ void BattleGroundAV::EventPlayerClickedOnFlag(Player* source, GameObject* target
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
-    DEBUG_LOG("BattleGroundAV: using gameobject %i", targetGo->GetEntry());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: using gameobject %i", targetGo->GetEntry());
     uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(targetGo->GetGUIDLow())).event1;
     if (event >= BG_AV_NODES_MAX)                           // not a node
         return;
@@ -1304,10 +1302,10 @@ void BattleGroundAV::EventPlayerDefendsPoint(Player* player, BG_AV_Nodes node)
         return;
     }
 
-    DEBUG_LOG("BattleGroundAV: player defends node: %i", node);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: player defends node: %i", node);
     if (m_nodes[node].prevOwner != BattleGroundAVTeamIndex(teamIdx))
     {
-        sLog.outError("BattleGroundAV: player defends point which doesn't belong to his team %i", node);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundAV: player defends point which doesn't belong to his team %i", node);
         return;
     }
 
@@ -1338,7 +1336,7 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node)
 {
     // TODO implement quest 7101, 7081
     BattleGroundTeamIndex teamIdx  = GetTeamIndexByTeamId(player->GetTeam());
-    DEBUG_LOG("BattleGroundAV: player assaults node %i", node);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: player assaults node %i", node);
     if (m_nodes[node].owner == BattleGroundAVTeamIndex(teamIdx) || BattleGroundAVTeamIndex(teamIdx) == m_nodes[node].totalOwner)
         return;
     AssaultNode(node, teamIdx);                                // update nodeinfo variables

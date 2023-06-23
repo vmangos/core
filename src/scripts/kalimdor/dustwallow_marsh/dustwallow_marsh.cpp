@@ -1070,12 +1070,15 @@ enum
 {
     QUEST_STINKYS_ESCAPE_A   = 1222,
     QUEST_STINKYS_ESCAPE_H   = 1270,
-    SAY_IGNATZ_START         = -1780190,
-    SAY_IGNATZ_1             = -1780191,
-    SAY_IGNATZ_2             = -1780192,
-    SAY_IGNATZ_3             = -1780193,
-    SAY_IGNATZ_4             = -1780194,
-    SAY_IGNATZ_END           = -1780195,
+    SAY_IGNATZ_START         = 1610,
+    SAY_IGNATZ_0             = 1611,
+    SAY_IGNATZ_1             = 1612,
+    SAY_IGNATZ_2             = 1614,
+    SAY_IGNATZ_3             = 1615,
+    SAY_IGNATZ_4             = 1617,
+    SAY_IGNATZ_END           = 1618,
+    SAY_IGNATZ_AGGRO_1       = 1630,
+    SAY_IGNATZ_AGGRO_2       = 1631,
     GOBJ_BOGBEAN_PLANT       = 20939
 };
 
@@ -1108,6 +1111,9 @@ struct npc_stinky_ignatzAI : public npc_escortAI
         {
             case 0:
                 DoScriptText(SAY_IGNATZ_START, m_creature);
+                break;;
+            case 4:
+                DoScriptText(SAY_IGNATZ_0, m_creature);
                 break;
             case 8:
                 DoScriptText(SAY_IGNATZ_1, m_creature);
@@ -1134,6 +1140,23 @@ struct npc_stinky_ignatzAI : public npc_escortAI
                 break;
         }
     }
+
+    void Aggro(Unit* pWho) override
+    {
+        // not always
+        if (urand(0, 2))
+            return;
+
+        if (currWaypoint < 15)
+        {
+            DoScriptText(SAY_IGNATZ_AGGRO_1, m_creature, pWho);
+        }
+        else
+        {
+            DoScriptText(SAY_IGNATZ_AGGRO_2, m_creature, pWho);
+        }
+    }
+
     void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

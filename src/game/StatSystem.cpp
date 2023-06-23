@@ -138,30 +138,6 @@ void Player::UpdateArmor()
         }
     }
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    // Add dummy effects from spells (check class and other conditions first for optimization)
-    if (GetClass() == CLASS_DRUID)
-    {
-        ShapeshiftForm form = GetShapeshiftForm();
-        if ((form == FORM_DIREBEAR) || (form == FORM_BEAR))
-        {
-            Unit::AuraList const& mDummy = GetAurasByType(SPELL_AURA_DUMMY);
-            for (const auto itr : mDummy)
-            {
-                // Enrage
-                if (itr->GetId() == 5229)
-                {
-                    float enrageModifier = 0.0f;
-                    enrageModifier = GetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE);
-                    enrageModifier *= itr->GetModifier()->m_amount / 100.0f;
-                    dynamic += enrageModifier;
-                    break;
-                }
-            }
-        }
-    }
-#endif
-
     m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] += dynamic;
     int32 value = GetTotalResistanceValue(SPELL_SCHOOL_NORMAL);
 
@@ -810,7 +786,7 @@ void Creature::UpdateManaRegen()
     // Mana regen from SPELL_AURA_MOD_POWER_REGEN aura
     float power_regen_mp5 = GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) / 5.0f;
     
-    m_manaRegen = uint32((sqrt(intellect) * GetRegenMPPerSpirit() * power_regen + power_regen_mp5) * ManaIncreaseRate);
+    m_manaRegen = (GetRegenMPPerSpirit() * power_regen + power_regen_mp5 + (0.6f * sqrt(intellect) / 5.0f)) * ManaIncreaseRate * 5.0f;
 }
 
 void Creature::UpdateAttackPowerAndDamage(bool ranged)
@@ -974,7 +950,7 @@ void Pet::UpdateResistances(uint32 school)
 
 void Pet::UpdateArmor()
 {
-    float amount = (GetStat(STAT_AGILITY) * 2.0f);
+    float amount = (GetStat(STAT_AGILITY) * (getPetType() == HUNTER_PET ? 2.0f : 1.0f));
 
     m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] += amount;
     int32 value = GetTotalResistanceValue(SPELL_SCHOOL_NORMAL);

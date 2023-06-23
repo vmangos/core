@@ -75,7 +75,7 @@ namespace VMAP
         void operator()(Vector3 const& point, uint32 entry)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("trying to intersect '%s'", prims[entry].name.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "trying to intersect '%s'", prims[entry].name.c_str());
     #endif
             prims[entry].intersectPoint(point, aInfo);
         }
@@ -91,7 +91,7 @@ namespace VMAP
         void operator()(Vector3 const& point, uint32 entry)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("trying to intersect '%s'", prims[entry].name.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "trying to intersect '%s'", prims[entry].name.c_str());
     #endif
             if (prims[entry].GetLocationInfo(point, locInfo))
                 result = true;
@@ -359,7 +359,7 @@ namespace VMAP
             // global model spawns
             // only non-tiled maps have them, and if so exactly one (so far at least...)
 #ifdef VMAP_DEBUG
-            DEBUG_LOG("Map isTiled: %u", static_cast<uint32>(iIsTiled));
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Map isTiled: %u", static_cast<uint32>(iIsTiled));
 #endif
 
             if (!iIsTiled)
@@ -373,7 +373,7 @@ namespace VMAP
                     if (model)
                         model->setModelFlags(spawn.flags);
                     else
-                        ERROR_LOG("StaticMapTree::LoadMapTile() could not acquire WorldModel pointer for '%s'!", spawn.name.c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "StaticMapTree::LoadMapTile() could not acquire WorldModel pointer for '%s'!", spawn.name.c_str());
 
                     // update tree
                     uint32 referencedVal;
@@ -383,7 +383,7 @@ namespace VMAP
                     {
                         if (referencedVal > iNTreeValues)
                         {
-                            ERROR_LOG("invalid tree element! (%u/%u)", referencedVal, iNTreeValues);
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "invalid tree element! (%u/%u)", referencedVal, iNTreeValues);
                             continue;
                         }
 
@@ -395,9 +395,9 @@ namespace VMAP
                         ++iLoadedSpawns[referencedVal];
 #ifdef VMAP_DEBUG
                         if (iTreeValues[referencedVal].ID != spawn.ID)
-                            DEBUG_LOG("Error: trying to load wrong spawn in node!");
+                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Error: trying to load wrong spawn in node!");
                         else if (iTreeValues[referencedVal].name != spawn.name)
-                            DEBUG_LOG("Error: name mismatch on GUID=%u", spawn.ID);
+                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Error: name mismatch on GUID=%u", spawn.ID);
 #endif
                     }
                 }
@@ -429,7 +429,7 @@ namespace VMAP
         }
         if (!iTreeValues)
         {
-            ERROR_LOG("StaticMapTree::LoadMapTile(): Tree has not been initialized! [%u,%u]", tileX, tileY);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "StaticMapTree::LoadMapTile(): Tree has not been initialized! [%u,%u]", tileX, tileY);
             return false;
         }
         bool result = true;
@@ -456,7 +456,7 @@ namespace VMAP
                     if (model)
                         model->setModelFlags(spawn.flags);
                     else
-                        ERROR_LOG("StaticMapTree::LoadMapTile() could not acquire WorldModel pointer for '%s'!", spawn.name.c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "StaticMapTree::LoadMapTile() could not acquire WorldModel pointer for '%s'!", spawn.name.c_str());
 
                     // update tree
                     uint32 referencedVal;
@@ -466,7 +466,7 @@ namespace VMAP
                     {
                         if (referencedVal > iNTreeValues)
                         {
-                            ERROR_LOG("invalid tree element! (%u/%u)", referencedVal, iNTreeValues);
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "invalid tree element! (%u/%u)", referencedVal, iNTreeValues);
                             continue;
                         }
                         iTreeValues[referencedVal] = ModelInstance(spawn, model);
@@ -477,9 +477,9 @@ namespace VMAP
                         ++iLoadedSpawns[referencedVal];
     #ifdef VMAP_DEBUG
                         if (iTreeValues[referencedVal].ID != spawn.ID)
-                            DEBUG_LOG("Error: trying to load wrong spawn in node!");
+                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Error: trying to load wrong spawn in node!");
                         else if (iTreeValues[referencedVal].name != spawn.name)
-                            DEBUG_LOG("Error: name mismatch on GUID=%u", spawn.ID);
+                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Error: name mismatch on GUID=%u", spawn.ID);
     #endif
                     }
                 }
@@ -500,7 +500,7 @@ namespace VMAP
         loadedTileMap::iterator tile = iLoadedTiles.find(tileID);
         if (tile == iLoadedTiles.end())
         {
-            ERROR_LOG("StaticMapTree::UnloadMapTile(): Trying to unload non-loaded tile. Map:%u X:%u Y:%u", iMapID, tileX, tileY);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "StaticMapTree::UnloadMapTile(): Trying to unload non-loaded tile. Map:%u X:%u Y:%u", iMapID, tileX, tileY);
             return;
         }
         if (tile->second) // file associated with tile
@@ -531,7 +531,7 @@ namespace VMAP
 
                         fread(&referencedNode, sizeof(uint32), 1, tf);
                         if (!iLoadedSpawns.count(referencedNode))
-                            ERROR_LOG("Trying to unload non-referenced model '%s' (ID:%u)", spawn.name.c_str(), spawn.ID);
+                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Trying to unload non-referenced model '%s' (ID:%u)", spawn.name.c_str(), spawn.ID);
                         else if (--iLoadedSpawns[referencedNode] == 0)
                         {
                             iTreeValues[referencedNode].setUnloaded();

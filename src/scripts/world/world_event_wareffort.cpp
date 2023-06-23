@@ -20,6 +20,7 @@
 */
 
 #include "scriptPCH.h"
+#include "CreatureEventAI.h"
 #include "world_event_wareffort.h"
 #include <array>
 
@@ -89,7 +90,7 @@ void AutoCompleteWarEffortProgress()
     if (!rate)
         return;
 
-    sLog.outInfo("[WarEffortEvent] Auto-completing war effort progress. Rate: %0.2f", rate);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[WarEffortEvent] Auto-completing war effort progress. Rate: %0.2f", rate);
 
     for (int i = 0; i < NUM_FACTION_OBJECTIVES; ++i)
     {
@@ -109,7 +110,7 @@ void AutoCompleteWarEffortProgress()
         AutoCompleteWarEffortResource(SharedObjectives[i].itemId, SharedObjectives[i].required, hordeVar, rate, TEAM_HORDE);
     }
 
-    sLog.outInfo("[WarEffortEvent] Auto-complete done");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[WarEffortEvent] Auto-complete done");
 }
 
 void AutoCompleteWarEffortResource(uint32 resourceId, uint32 required, uint32 savedVar, float rate, TeamId team)
@@ -136,7 +137,7 @@ void AutoCompleteWarEffortResource(uint32 resourceId, uint32 required, uint32 sa
     amount += increase;
 
     sObjectMgr.SetSavedVariable(savedVar, amount, true);
-    sLog.outInfo("[WarEffortEvent] %s resource %u (saved var: %u) incremented by %u to %u (goal: %u)",
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[WarEffortEvent] %s resource %u (saved var: %u) incremented by %u to %u (goal: %u)",
         teamStr.c_str(), resourceId, savedVar, increase, amount, required);
 }
 
@@ -145,7 +146,7 @@ uint32 GetSharedSavedVar(uint32 item, TeamId team)
     uint32 var = 0;
     if (team > 1)
     {
-        sLog.outError("Invalid team specified for shared War Effort stock, %u", team);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid team specified for shared War Effort stock, %u", team);
         return 0;
     }
 
@@ -171,7 +172,7 @@ uint32 GetSharedSavedVar(uint32 item, TeamId team)
                 var = VAR_WE_ALLIANCE_RUNEBANDAGE;
                 break;
             default:
-                sLog.outError("Invalid item %u for shared War Effort stock", item);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid item %u for shared War Effort stock", item);
                 break;
             }
             break;
@@ -196,7 +197,7 @@ uint32 GetSharedSavedVar(uint32 item, TeamId team)
                 var = VAR_WE_HORDE_RUNEBANDAGE;
                 break;
             default:
-                sLog.outError("Invalid item %u for shared War Effort stock", item);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid item %u for shared War Effort stock", item);
                 break;
             }
             break;
@@ -255,7 +256,7 @@ const WarEffortGossip& GetWarEffortGossip(uint32 item)
             return i;
     }
 
-    sLog.outError("Cannot find war effort gossip text for the given item %u", item);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot find war effort gossip text for the given item %u", item);
 
     return WarEffortGossipText[0];
 }
@@ -504,7 +505,7 @@ struct npc_AQwar_collectorAI : CreatureAI
         }
 
         if (!found)
-            sLog.outError("npc_AQwar_collectorAI: Unit %s has collector AI but no defined resource", m_creature->GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "npc_AQwar_collectorAI: Unit %s has collector AI but no defined resource", m_creature->GetGuidStr().c_str());
 
         return objectiveReached;
     }
@@ -882,8 +883,9 @@ const static G3D::Vector3 ironforgeInfantryOrigin = { -6969.21f, 962.33f, 11.88f
 const static G3D::Vector3 orgrimmarInfantryOrigin = { -6975.30f, 940.14f, 13.14f };
 const static G3D::Vector3 saurfangWaveIncomingPosition = { -6985.67f, 956.06f, 10.21f };
 
-enum {
-    NPC_SAURFANG = 987000
+enum
+{
+    NPC_SAURFANG = 14720
 };
 
 struct npc_infantrymanAI : ScriptedAI
@@ -1281,7 +1283,8 @@ CreatureAI* GetAI_npc_aqwar_cenarionhold_attack(Creature *pCreature)
     return new npc_aqwar_cenarionhold_attackAI(pCreature);
 }
 
-enum {
+enum
+{
     SCRIPT_SAURFANG_CH_ATTACK_WARN  = -1780300,
     SCRIPT_SAURFANG_SPEECH1         = -1780301,
     SCRIPT_SAURFANG_SPEECH2         = -1780302,
@@ -1304,7 +1307,9 @@ enum {
     SPELL_SF_THUNDERCLAP            = 23931, //?
     SPELL_SF_MORTALSTRIKE           = 12294, //?
     SPELL_SF_SAURFANGRAGE           = 26339,
-    SPELL_SF_BATTLESHOUT            = 26043  // shout to put him in combat with other units so he doesn't run off
+    SPELL_SF_BATTLESHOUT            = 26043, // shout to put him in combat with other units so he doesn't run off
+
+    FACTION_MIGHT_OF_KALIMDOR       = 777,
 };
 
 struct MovementPath {
@@ -1361,6 +1366,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
         m_movePointReached = true;
         m_movementPaused = false;
 
+        m_creature->SetFactionTemplateId(FACTION_MIGHT_OF_KALIMDOR);
         Reset();
     }
 
@@ -1574,7 +1580,10 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
 CreatureAI* GetAI_npc_aqwar_saurfang(Creature *pCreature)
 {
-    return new npc_aqwar_saurfangAI(pCreature);
+    if (pCreature->GetZoneId() == 1377)
+        return new npc_aqwar_saurfangAI(pCreature);
+
+    return new CreatureEventAI(pCreature);
 }
 
 void AddSC_war_effort()

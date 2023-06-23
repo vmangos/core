@@ -163,7 +163,7 @@ GroupQueueInfo* BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGr
     if (ginfo->groupTeam == HORDE)
         index++;                                            // BG_QUEUE_*_ALLIANCE -> BG_QUEUE_*_HORDE
 
-    DEBUG_LOG("Adding Group to BattleGroundQueue bgTypeId : %u, bracketId : %u, index : %u", bgTypeId, bracketId, index);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Adding Group to BattleGroundQueue bgTypeId : %u, bracketId : %u, index : %u", bgTypeId, bracketId, index);
 
     //add players from group to ginfo
     {
@@ -193,7 +193,7 @@ GroupQueueInfo* BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGr
                     pl_info.groupInfo = ginfo;
                     // add the pinfo to ginfo's list
                     ginfo->players[member->GetObjectGuid()] = &pl_info;
-                    sLog.out(LOG_BG, "%s:%u [%u:%s] tag BG=%u (groupLeader '%s')",
+                    sLog.Out(LOG_BG, LOG_LVL_DETAIL, "%s:%u [%u:%s] tag BG=%u (groupLeader '%s')",
                         member->GetName(),
                         member->GetGUIDLow(), member->GetSession()->GetAccountId(), member->GetSession()->GetRemoteAddress().c_str(),
                         bgTypeId, leader->GetName());
@@ -207,7 +207,7 @@ GroupQueueInfo* BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGr
             pl_info.lastOnlineTime   = 0;
             pl_info.groupInfo        = ginfo;
             ginfo->players[leader->GetObjectGuid()]  = &pl_info;
-            sLog.out(LOG_BG, "%s:%u [%u:%s] tag BG=%u",
+            sLog.Out(LOG_BG, LOG_LVL_DETAIL, "%s:%u [%u:%s] tag BG=%u",
                      leader->GetName(),
                      leader->GetGUIDLow(), leader->GetSession()->GetAccountId(), leader->GetSession()->GetRemoteAddress().c_str(),
                      bgTypeId);
@@ -306,7 +306,7 @@ void BattleGroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
     itr = m_queuedPlayers.find(guid);
     if (itr == m_queuedPlayers.end())
     {
-        sLog.outError("BattleGroundQueue: couldn't find for remove: %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue: couldn't find for remove: %s", guid.GetString().c_str());
         return;
     }
 
@@ -339,10 +339,10 @@ void BattleGroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
     //player can't be in queue without group, but just in case
     if (bracketId == -1)
     {
-        sLog.outError("BattleGroundQueue: ERROR Cannot find groupinfo for %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue: ERROR Cannot find groupinfo for %s", guid.GetString().c_str());
         return;
     }
-    DEBUG_LOG("BattleGroundQueue: Removing %s, from bracketId %u", guid.GetString().c_str(), (uint32)bracketId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundQueue: Removing %s, from bracketId %u", guid.GetString().c_str(), (uint32)bracketId);
 
     // ALL variables are correctly set
     // We can ignore leveling up in queue - it should not cause crash
@@ -439,7 +439,7 @@ bool BattleGroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, BattleGround* bg,
 
             uint32 queueSlot = player->GetBattleGroundQueueIndex(bgQueueTypeId);
 
-            DEBUG_LOG("Battleground: invited %s to BG instance %u queueindex %u bgtype %u, I can't help it if they don't press the enter battle button.",
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Battleground: invited %s to BG instance %u queueindex %u bgtype %u, I can't help it if they don't press the enter battle button.",
                       player->GetGuidStr().c_str(), bg->GetInstanceID(), queueSlot, bg->GetTypeID());
 
             // send status packet
@@ -709,7 +709,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
     BattleGround*  bgTemplate = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
     if (!bgTemplate)
     {
-        sLog.outError("Battleground: Update: bg template not found for %u", bgTypeId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground: Update: bg template not found for %u", bgTypeId);
         return;
     }
     // get the min. players per team, properly for larger arenas as well.
@@ -742,7 +742,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             std::shuffle(m_queuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].begin(),
                 m_queuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].begin() + minPlayersInQueue,
                 std::default_random_engine(seed));
-            sLog.out(LOG_BG, "Alterac queue randomized (%u alliance vs %u horde)",
+            sLog.Out(LOG_BG, LOG_LVL_DETAIL, "Alterac queue randomized (%u alliance vs %u horde)",
                 m_queuedGroups[bracketId][BG_QUEUE_NORMAL_ALLIANCE].size(),
                 m_queuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].size());
         }
@@ -770,7 +770,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             BattleGround* bg2 = sBattleGroundMgr.CreateNewBattleGround(bgTypeId, bracketId);
             if (!bg2)
             {
-                sLog.outError("BattleGroundQueue::Update - Cannot create battleground: %u", bgTypeId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue::Update - Cannot create battleground: %u", bgTypeId);
                 return;
             }
             //invite those selection pools
@@ -794,7 +794,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             BattleGround* bg2 = sBattleGroundMgr.CreateNewBattleGround(bgTypeId, bracketId);
             if (!bg2)
             {
-                sLog.outError("BattleGroundQueue::Update - Cannot create battleground: %u", bgTypeId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue::Update - Cannot create battleground: %u", bgTypeId);
                 return;
             }
 
@@ -875,7 +875,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         BattleGroundQueue &bgQueue = sBattleGroundMgr.m_battleGroundQueues[m_bgQueueTypeId];
         if (bgQueue.IsPlayerInvited(m_playerGuid, m_bgInstanceGuid, m_removeTime))
         {
-            DEBUG_LOG("Battleground: removing player %u from bg queue for instance %u because of not pressing enter battle in time.", player->GetGUIDLow(), m_bgInstanceGuid);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Battleground: removing player %u from bg queue for instance %u because of not pressing enter battle in time.", player->GetGUIDLow(), m_bgInstanceGuid);
 
             player->RemoveBattleGroundQueueId(m_bgQueueTypeId);
             bgQueue.RemovePlayer(m_playerGuid, true);
@@ -990,7 +990,7 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
             *data << uint32(time2);                         // time from bg start, milliseconds
             break;
         default:
-            sLog.outError("Unknown BG status!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unknown BG status!");
             break;
     }
 }
@@ -1049,13 +1049,15 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround *bg)
                 *data << (uint32)((BattleGroundWGScore*)score)->flagCaptures;         // Flag Captures
                 *data << (uint32)((BattleGroundWGScore*)score)->flagReturns;          // Flag Returns
                 break;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             case BATTLEGROUND_AB:
                 *data << (uint32)0x00000002;                // count of next fields
                 *data << (uint32)((BattleGroundABScore*)score)->basesAssaulted;       // Bases Asssulted
                 *data << (uint32)((BattleGroundABScore*)score)->basesDefended;        // Bases Defended
                 break;
+#endif
             default:
-                DEBUG_LOG("Unhandled MSG_PVP_LOG_DATA for BG id %u", bg->GetTypeID());
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Unhandled MSG_PVP_LOG_DATA for BG id %u", bg->GetTypeID());
                 *data << (uint32)0;
                 break;
         }
@@ -1162,7 +1164,7 @@ BattleGround* BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeId
     BattleGround *bgTemplate = GetBattleGroundTemplate(bgTypeId);
     if (!bgTemplate)
     {
-        sLog.outError("BattleGround: CreateNewBattleGround - bg template not found for %u", bgTypeId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround: CreateNewBattleGround - bg template not found for %u", bgTypeId);
         return nullptr;
     }
 
@@ -1176,9 +1178,11 @@ BattleGround* BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeId
         case BATTLEGROUND_WS:
             bg = new BattleGroundWS(*(BattleGroundWS*)bgTemplate);
             break;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case BATTLEGROUND_AB:
             bg = new BattleGroundAB(*(BattleGroundAB*)bgTemplate);
             break;
+#endif
         default:
             //error, but it is handled few lines above
             return 0;
@@ -1197,7 +1201,7 @@ BattleGround* BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeId
 }
 
 // used to create the BG templates
-uint32 BattleGroundMgr::CreateBattleGround(BattleGroundTypeId bgTypeId, uint32 minPlayersPerTeam, uint32 maxPlayersPerTeam, uint32 LevelMin, uint32 LevelMax, uint32 AllianceWinSpell, uint32 AllianceLoseSpell, uint32 HordeWinSpell, uint32 HordeLoseSpell, char const* BattleGroundName, uint32 MapID, float Team1StartLocX, float Team1StartLocY, float Team1StartLocZ, float Team1StartLocO, float Team2StartLocX, float Team2StartLocY, float Team2StartLocZ, float Team2StartLocO)
+uint32 BattleGroundMgr::CreateBattleGround(BattleGroundTypeId bgTypeId, uint32 minPlayersPerTeam, uint32 maxPlayersPerTeam, uint32 levelMin, uint32 levelMax, uint32 allianceWinSpell, uint32 allianceLoseSpell, uint32 hordeWinSpell, uint32 hordeLoseSpell, char const* battleGroundName, uint32 mapID, float team1StartLocX, float team1StartLocY, float team1StartLocZ, float team1StartLocO, float team2StartLocX, float team2StartLocY, float team2StartLocZ, float team2StartLocO, uint32 playerSkinReflootId)
 {
     // Create the BG
     BattleGround *bg = nullptr;
@@ -1209,28 +1213,31 @@ uint32 BattleGroundMgr::CreateBattleGround(BattleGroundTypeId bgTypeId, uint32 m
         case BATTLEGROUND_WS:
             bg = new BattleGroundWS;
             break;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case BATTLEGROUND_AB:
             bg = new BattleGroundAB;
             break;
+#endif
         default:
             bg = new BattleGround;
             break;                           // placeholder for non implemented BG
     }
 
-    bg->SetMapId(MapID);
+    bg->SetMapId(mapID);
     bg->SetTypeID(bgTypeId);
     bg->SetMinPlayersPerTeam(minPlayersPerTeam);
     bg->SetMaxPlayersPerTeam(maxPlayersPerTeam);
     bg->SetMinPlayers(minPlayersPerTeam * 2);
     bg->SetMaxPlayers(maxPlayersPerTeam * 2);
-    bg->SetAllianceWinSpell(AllianceWinSpell);
-    bg->SetAllianceLoseSpell(AllianceLoseSpell);
-    bg->SetHordeWinSpell(HordeWinSpell);
-    bg->SetHordeLoseSpell(HordeLoseSpell);
-    bg->SetName(BattleGroundName);
-    bg->SetTeamStartLoc(ALLIANCE, Team1StartLocX, Team1StartLocY, Team1StartLocZ, Team1StartLocO);
-    bg->SetTeamStartLoc(HORDE,    Team2StartLocX, Team2StartLocY, Team2StartLocZ, Team2StartLocO);
-    bg->SetLevelRange(LevelMin, LevelMax);
+    bg->SetAllianceWinSpell(allianceWinSpell);
+    bg->SetAllianceLoseSpell(allianceLoseSpell);
+    bg->SetHordeWinSpell(hordeWinSpell);
+    bg->SetHordeLoseSpell(hordeLoseSpell);
+    bg->SetName(battleGroundName);
+    bg->SetTeamStartLoc(ALLIANCE, team1StartLocX, team1StartLocY, team1StartLocZ, team1StartLocO);
+    bg->SetTeamStartLoc(HORDE,    team2StartLocX, team2StartLocY, team2StartLocZ, team2StartLocO);
+    bg->SetLevelRange(levelMin, levelMax);
+    bg->SetPlayerSkinRefLootId(playerSkinReflootId);
 
     // add bg to update list
     AddBattleGround(bg->GetInstanceID(), bg->GetTypeID(), bg);
@@ -1243,16 +1250,16 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
 {
     uint32 count = 0;
 
-    //                                                                0     1                       2                       3            4            5                     6                      7                  8                   9                          10
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `min_players_per_team`, `max_players_per_team`, `min_level`, `max_level`, `alliance_win_spell`, `alliance_lose_spell`, `horde_win_spell`, `horde_lose_spell`, `alliance_start_location`, `horde_start_location` FROM `battleground_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `battleground_template` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
+    //                                                                0     1                       2                       3            4            5                     6                      7                  8                   9                          10                      11
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `min_players_per_team`, `max_players_per_team`, `min_level`, `max_level`, `alliance_win_spell`, `alliance_lose_spell`, `horde_win_spell`, `horde_lose_spell`, `alliance_start_location`, `horde_start_location`, `player_loot_id` FROM `battleground_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `battleground_template` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
 
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outErrorDb(">> Loaded 0 battlegrounds. DB table `battleground_template` is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, ">> Loaded 0 battlegrounds. DB table `battleground_template` is empty.");
         return;
     }
 
@@ -1291,7 +1298,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         }
         else
         {
-            sLog.outErrorDb("Table `battleground_template` for id %u have nonexistent WorldSafeLocs.dbc id %u in field `AllianceStartLoc`. BG not created.", bgTypeID, start1);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `battleground_template` for id %u have nonexistent WorldSafeLocs.dbc id %u in field `AllianceStartLoc`. BG not created.", bgTypeID, start1);
             continue;
         }
 
@@ -1307,9 +1314,19 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         }
         else
         {
-            sLog.outErrorDb("Table `battleground_template` for id %u have non-existed WorldSafeLocs.dbc id %u in field `HordeStartLoc`. BG not created.", bgTypeID, start2);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `battleground_template` for id %u have non-existed WorldSafeLocs.dbc id %u in field `HordeStartLoc`. BG not created.", bgTypeID, start2);
             continue;
         }
+
+        uint32 playerSkinReflootId = fields[11].GetUInt32();
+        if (playerSkinReflootId && !ExistsRefLootTemplate(playerSkinReflootId))
+        {
+            playerSkinReflootId = 0;
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `battleground_template` for id %u associated with nonexistent refloot id %u. Setting to 0.", bgTypeID, playerSkinReflootId);
+        }
+
+        if (playerSkinReflootId)
+            m_usedRefloot.insert(playerSkinReflootId);
 
         uint32 mapId = GetBattleGrounMapIdByTypeId(bgTypeID);
         char const* name;
@@ -1318,20 +1335,20 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
             name = mapEntry->name;
         else
         {
-            sLog.outErrorDb("Table `battleground_template` for id %u associated with nonexistent map id %u.", bgTypeID, mapId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `battleground_template` for id %u associated with nonexistent map id %u.", bgTypeID, mapId);
             continue;
         }
 
-        //DETAIL_LOG("Creating battleground %s, %u-%u", bl->name[sWorld.GetDBClang()], MinLvl, MaxLvl);
-        if (!CreateBattleGround(bgTypeID, minPlayersPerTeam, maxPlayersPerTeam, MinLvl, MaxLvl, AllianceWinSpell, AllianceLoseSpell, HordeWinSpell, HordeLoseSpell, name, mapId, AStartLoc[0], AStartLoc[1], AStartLoc[2], AStartLoc[3], HStartLoc[0], HStartLoc[1], HStartLoc[2], HStartLoc[3]))
+        //sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Creating battleground %s, %u-%u", bl->name[sWorld.GetDBClang()], MinLvl, MaxLvl);
+        if (!CreateBattleGround(bgTypeID, minPlayersPerTeam, maxPlayersPerTeam, MinLvl, MaxLvl, AllianceWinSpell, AllianceLoseSpell, HordeWinSpell, HordeLoseSpell, name, mapId, AStartLoc[0], AStartLoc[1], AStartLoc[2], AStartLoc[3], HStartLoc[0], HStartLoc[1], HStartLoc[2], HStartLoc[3], playerSkinReflootId))
             continue;
 
         ++count;
     }
     while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u battlegrounds", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u battlegrounds", count);
 }
 
 void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattleGroundTypeId bgTypeId)
@@ -1378,11 +1395,11 @@ void BattleGroundMgr::SendToBattleGround(Player* player, uint32 instanceId, Batt
         if (player->IsAFK())
             player->ToggleAFK();
 
-        DETAIL_LOG("BATTLEGROUND: Sending %s to map %u, X %f, Y %f, Z %f, O %f", player->GetName(), mapid, x, y, z, o);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "BATTLEGROUND: Sending %s to map %u, X %f, Y %f, Z %f, O %f", player->GetName(), mapid, x, y, z, o);
         player->TeleportTo(mapid, x, y, z, o);
     }
     else
-        sLog.outError("player %u trying to port to nonexistent bg instance %u", player->GetGUIDLow(), instanceId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "player %u trying to port to nonexistent bg instance %u", player->GetGUIDLow(), instanceId);
 }
 
 BattleGroundQueueTypeId BattleGroundMgr::BgQueueTypeId(BattleGroundTypeId bgTypeId)
@@ -1460,8 +1477,8 @@ void BattleGroundMgr::LoadBattleMastersEntry()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded 0 battlemaster entries - table is empty!");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 battlemaster entries - table is empty!");
         return;
     }
 
@@ -1478,7 +1495,7 @@ void BattleGroundMgr::LoadBattleMastersEntry()
         uint32 bgTypeId  = fields[1].GetUInt32();
         if (bgTypeId >= MAX_BATTLEGROUND_TYPE_ID)
         {
-            sLog.outErrorDb("Table `battlemaster_entry` contain entry %u for nonexistent battleground type %u, ignored.", entry, bgTypeId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `battlemaster_entry` contain entry %u for nonexistent battleground type %u, ignored.", entry, bgTypeId);
             continue;
         }
 
@@ -1489,8 +1506,8 @@ void BattleGroundMgr::LoadBattleMastersEntry()
 
     delete result;
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u battlemaster entries", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u battlemaster entries", count);
 }
 
 HolidayIds BattleGroundMgr::BgTypeToWeekendHolidayId(BattleGroundTypeId bgTypeId)
@@ -1577,8 +1594,8 @@ void BattleGroundMgr::LoadBattleEventIndexes()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outErrorDb(">> Loaded 0 battleground eventindexes.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, ">> Loaded 0 battleground eventindexes.");
         return;
     }
 
@@ -1605,7 +1622,7 @@ void BattleGroundMgr::LoadBattleEventIndexes()
         // checking for nullptr - through right outer join this will mean following:
         if (fields[5].GetUInt32() != dbGuid)
         {
-            sLog.outErrorDb("BattleGroundEvent: %s with nonexistent guid %u for event: map:%u, event1:%u, event2:%u (\"%s\")",
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "BattleGroundEvent: %s with nonexistent guid %u for event: map:%u, event1:%u, event2:%u (\"%s\")",
                             (gameobject) ? "gameobject" : "creature", dbGuid, map, events.event1, events.event2, description);
             continue;
         }
@@ -1616,13 +1633,13 @@ void BattleGroundMgr::LoadBattleEventIndexes()
             // there is an event missing
             if (dbGuid == 0)
             {
-                sLog.outErrorDb("BattleGroundEvent: missing db-data for map:%u, event1:%u, event2:%u (\"%s\")", descMap, descEvent1, descEvent2, description);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "BattleGroundEvent: missing db-data for map:%u, event1:%u, event2:%u (\"%s\")", descMap, descEvent1, descEvent2, description);
                 continue;
             }
             // we have an event which shouldn't exist
             else
             {
-                sLog.outErrorDb("BattleGroundEvent: %s with guid %u is registered, for a nonexistent event: map:%u, event1:%u, event2:%u",
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "BattleGroundEvent: %s with guid %u is registered, for a nonexistent event: map:%u, event1:%u, event2:%u",
                                 (gameobject) ? "gameobject" : "creature", dbGuid, map, events.event1, events.event2);
                 continue;
             }
@@ -1638,8 +1655,8 @@ void BattleGroundMgr::LoadBattleEventIndexes()
     }
     while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u battleground eventindexes", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u battleground eventindexes", count);
     delete result;
 }
 
@@ -1685,7 +1702,7 @@ void BattleGroundQueue::PlayerLoggedOut(ObjectGuid guid)
     itr = m_queuedPlayers.find(guid);
     if (itr == m_queuedPlayers.end())
     {
-        sLog.outError("BattleGroundQueue: couldn't find for remove: %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue: couldn't find for remove: %s", guid.GetString().c_str());
         return;
     }
     itr->second.lastOnlineTime  = WorldTimer::getMSTime();

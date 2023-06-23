@@ -59,14 +59,14 @@ inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType& m)
 inline void CallAIMoveLOS(Creature* c, Unit* moving)
 {
     // Creature AI reaction
-    if (!c->HasUnitState(UNIT_STAT_LOST_CONTROL | UNIT_STAT_IGNORE_MOVE_LOS) && !c->IsInEvadeMode() && c->AI())
+    if (!c->HasUnitState(UNIT_STAT_LOST_CONTROL | UNIT_STAT_NO_SEARCH_FOR_OTHERS) && !c->IsInEvadeMode() && c->AI())
     {
         bool alert = false;
         if (moving->IsVisibleForOrDetect(c, c, true, false, &alert))
               c->AI()->MoveInLineOfSight(moving);
         else
             if (moving->GetTypeId() == TYPEID_PLAYER && moving->HasStealthAura() && alert)
-                c->AI()->TriggerAlert(moving);
+                c->AI()->OnMoveInStealth(moving);
     }
 }
 
@@ -209,7 +209,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         {
             Unit* pCasterUnit = i_dynobject.GetUnitCaster();
 
-            PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, nullptr, holder, target, pCasterUnit);
+            PersistentAreaAura* Aur = new PersistentAreaAura(i_dynobject.GetObjectGuid(), spellInfo, eff_index, holder, target, pCasterUnit);
             holder->AddAura(Aur, eff_index);
             
             target->AddAuraToModList(Aur);
@@ -231,7 +231,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         Unit* pCasterUnit = i_dynobject.GetUnitCaster();
 
         holder = CreateSpellAuraHolder(spellInfo, target, pCasterUnit, pCaster);
-        PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, nullptr, holder, target, pCasterUnit);
+        PersistentAreaAura* Aur = new PersistentAreaAura(i_dynobject.GetObjectGuid(), spellInfo, eff_index, holder, target, pCasterUnit);
         holder->AddAura(Aur, eff_index);
 
         // Debuff slots may be full, in which case holder is deleted or holder is not able to

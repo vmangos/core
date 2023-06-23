@@ -460,36 +460,37 @@ DebuffLimit = 0
 #        Default: ""             - do not create PID file
 #                 "./worldd.pid" - create PID file (recommended name)
 #
-#    LogLevel
+#    LogLevel.Console
 #        Server console level of logging
-#        0 = Minimum; 1 = Basic&Error; 2 = Detail; 3 = Full/Debug
-#        Default: 3
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
+#
+#    LogLevel.File
+#        Server file level of logging
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
+#
+#    LogLevel.DB
+#        Database level of logging
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
 #
 #    LogTime
 #        Include time in server console output [hh:mm:ss]
 #        Default: 0 (no time)
 #                 1 (print time)
 #
-#    LogFile
-#        Logfile name
-#        Default: "Server.log"
-#                 "" - Empty name disable creating log file
-#
-#    LogTimestamp
-#        Logfile with timestamp of server start in name
+#    LogFile.TimeStamp
+#        Include startup timestamp in log file names
 #        Default: 0 - no timestamp in name
 #                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#
-#    LogFileLevel
-#        Server file level of logging
-#        0 = Minimum; 1 = Error; 2 = Detail; 3 = Full/Debug
-#        Default: 0
 #
 #    LogFilter_TransportMoves
 #    LogFilter_CreatureMoves
 #    LogFilter_VisibilityChanges
 #    LogFilter_Weather
 #    LogFilter_DbStrictedCheck
+#    LogFilter_Honor
 #        Log filters (active by default)
 #        Default: 1 - not include with any log level
 #                 0 - include in log if log level permit
@@ -506,50 +507,76 @@ DebuffLimit = 0
 #        Default: 0 - include in log if log level permit
 #                 1 - not include with any log level
 #
-#    AnticheatLogFile
+#    LogFile.Basic
+#        Basic log file name
+#        Default: "Server.log"
+#                 "" - Empty name disable creating log file
+#
+#    LogFile.Anticheat
 #        Log file for anticheat check results
-#        Default: "anticheat.log"
+#        Default: "Anticheat.log"
+#                 "" - Empty name disable creating log file
 #
-#    AnticheatLogTimestamp
-#        Logfile with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
+#    LogFile.Chat
+#        Log file for player chat.
+#        Default: "Chat.log"
+#                 "" - Empty name disable creating log file
 #
-#    WardenLogFile
-#        Log file for warden check results
-#        Default: "warden.log"
+#    LogFile.Bg
+#        Log file for battlegrounds system.
+#        Default: "Bg.log"
+#                 "" - Empty name disable creating log file
 #
-#    WardenLogTimestamp
-#        Logfile with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#
-#    WorldLogFile
-#        Packet logging file for the worldserver
-#        Default: "world.log"
-#
-#    WorldLogTimestamp
-#        Logfile with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#
-#    DBErrorLogFile
-#        Log file of DB errors detected at server run
-#        Default: "DBErrors.log"
-#
-#    DBErrorFixFile
-#        Log file of SQL requests to apply to fix detected database errors
-#        Default: ""
-#
-#    CharLogFile
+#    LogFile.Char
 #        Character operations logfile name
 #        Default: "Char.log"
 #                 "" - Empty name disable creating log file
 #
-#    CharLogTimestamp
-#        Log file with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
+#    LogFile.Honor
+#        Honor information logfile name
+#        Default: "" - Empty name disable creating log file
+#
+#    LogFile.Ra
+#        Log file of RA commands
+#        Default: "Ra.log"
+#                 "" - Empty name for disable
+#
+#    Logfile.DBError
+#        Log file of DB errors detected at server run
+#        Default: "DBErrors.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.DBErrorFix
+#        Log file of SQL requests to apply to fix detected database errors
+#        Default: ""
+#
+#    LogFile.Loot
+#        Log file of loot related messages
+#        Default: "Loot.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.LevelUp
+#        Log file of levelup related messages
+#        Default: "LevelUp.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.Performance
+#        Log file of performance related messages
+#        Default: "Perf.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.Gm
+#        GM Log file of gm commands
+#        Default: "" (Disable)
+#
+#    LogFile.CriticalCommands
+#        Log file for commands marked as critical, when used on own character (same IP for example)
+#        Default: "gm_critical.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.Trades
+#        Log file of trade related messages
+#        Default: "" (Disable)
 #
 #    CharLogDump
 #        Write character dump before deleting in Char.log
@@ -558,35 +585,6 @@ DebuffLimit = 0
 #        Default: 0 - don't include dumping chars to log
 #                 1 - include dumping chars to log
 #
-#    ChatLogEnable
-#        Enable or disable logging of player chat.
-#        Default: 1
-#
-#    ChatLogFile
-#        Log file for player chat.
-#        Default: "Chat.log"
-#
-#    ChatLogTimestamp
-#        Add time stamp to logged chat messages.
-#        Default: 0
-#
-#    BgLogFile
-#        Log file for battlegrounds system.
-#        Default: "bg.log"
-#
-#    BgLogTimestamp
-#        Add time stamp to battleground logs.
-#        Default: 0
-#
-#    GmLogFile
-#        GM Log file of gm commands
-#        Default: "" (Disable)
-#
-#    GmLogTimestamp
-#        GM Logfile with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#
 #    GmLogPerAccount
 #        GM Logfiles with GM account id (Note: logs not created if GmLogFile not set)
 #        Default: 0 - add gm log data to single log file
@@ -594,26 +592,13 @@ DebuffLimit = 0
 #                     in form Logname_#ID_YYYY-MM-DD_HH-MM-SS.Ext
 #                     or form Logname_#ID.Ext
 #
-#    CriticalCommandsLogFile
-#        Log file for commands marked as critical, when used on own character (same IP for example)
-#        Default: "gm_critical.log"
-#                 "" - Empty name for disable
+#    LogMoneyThreshold
+#        Log all trades where money exceeds the specified value in copper
+#        Default: 10000
 #
-#    ExploitsLogFile
-#        Log file for possible exploits for abuse detection
-#        Default: "" - Empty name for disable
-#
-#    RaLogFile
-#        Log file of RA commands
-#        Default: "Ra.log"
-#                 "" - Empty name for disable
-#
-#    LogColors
-#        Color for messages (format "normal_color details_color debug_color error_color")
-#        Colors: 0 - BLACK, 1 - RED, 2 - GREEN,  3 - BROWN, 4 - BLUE, 5 - MAGENTA, 6 -  CYAN, 7 - GREY,
-#                8 - YELLOW, 9 - LRED, 10 - LGREEN, 11 - LBLUE, 12 - LMAGENTA, 13 - LCYAN, 14 - WHITE
-#        Default: "" - none colors
-#        Example: "13 7 11 9"
+#    LogsDB.GM
+#        Enable or disable database gm logs.
+#        Default: 0
 #
 #    LogsDB.Chat
 #        Enable or disable database chat logs.
@@ -621,6 +606,14 @@ DebuffLimit = 0
 #
 #    LogsDB.Characters
 #        Enable or disable database character logs.
+#        Default: 0
+#
+#    LogsDB.LevelUp
+#        Enable or disable database levelup logs.
+#        Default: 0
+#
+#    LogsDB.Loot
+#        Enable or disable database loot logs.
 #        Default: 0
 #
 #    LogsDB.Trades
@@ -639,11 +632,10 @@ DebuffLimit = 0
 
 LogSQL = 1
 PidFile = ""
-LogLevel = 1
+LogLevel.Console = 2
+LogLevel.File = 2
+LogLevel.DB = 2
 LogTime = 0
-LogFile = "Server.log"
-LogTimestamp = 0
-LogFileLevel = 1
 LogFilter_TransportMoves = 1
 LogFilter_CreatureMoves = 1
 LogFilter_VisibilityChanges = 1
@@ -659,46 +651,41 @@ LogFilter_SpellCast = 0
 LogFilter_DbStrictedCheck = 1
 LogFilter_Pathfinding = 0
 LogFilter_Honor = 1
-AnticheatLogFile = "anticheat.log"
-AnticheatLogTimestamp = 0
-WardenLogFile = "warden.log"
-WardenLogTimestamp = 0
-WorldLogFile = ""
-WorldLogTimestamp = 0
-HonorLogFile = ""
-HonorLogTimestamp = 0
-DBErrorLogFile = "DBErrors.log"
-DBErrorFixFile = ""
-ClientIdsLogFile = "client.log"
-LootsLogFile = "loot.log"
-LevelupLogFile = "levelup.log"
-LogMoneyTrades = "trades.log"
-LogMoneyTreshold = 10000
-CharLogFile = "Char.log"
-CharLogTimestamp = 0
-CharLogDump = 0
-ChatLogFile = "Chat.log"
-ChatLogEnable = 1
-ChatLogTimestamp = 0
-BgLogFile = "bg.log"
-BgLogTimestamp = 0
-GmLogFile = ""
-GmLogTimestamp = 0
-GmLogPerAccount = 0
-CriticalCommandsLogFile = "gm_critical.log"
-ExploitsLogFile = ""
-RaLogFile = ""
-NostalriusLogFile = "Info.log"
-NostalriusLogTimestamp = 0
-LogColors = ""
 
+LogFile.Timestamp = 0
+LogFile.Basic = "Server.log"
+LogFile.Anticheat = "Anticheat.log"
+LogFile.Chat = "Chat.log"
+LogFile.Bg = "Bg.log"
+LogFile.Char = "Char.log"
+LogFile.Honor = ""
+LogFile.Ra = "Ra.log"
+LogFile.DBError = "DBErrors.log"
+LogFile.DBErrorFix = ""
+LogFile.Loot = "Loot.log"
+LogFile.LevelUp = "LevelUp.log"
+LogFile.Performance = "Perf.log"
+LogFile.Gm = ""
+LogFile.GmCriticalCommands = "gm_critical.log"
+LogFile.Trades = "Trades.log"
+
+LogMoneyTreshold = 10000
+CharLogDump = 0
+
+GmLogPerAccount = 0
+
+LogsDB.GM                   = 0
 LogsDB.Chat                 = 0
 LogsDB.Characters           = 0
+LogsDB.LevelUp              = 0
+LogsDB.Loot                 = 0
 LogsDB.Trades               = 0
 LogsDB.Transactions         = 0
 LogsDB.Battlegrounds        = 0
+Smartlog.Death              = 0
+Smartlog.LongCombat         = 0
+Smartlog.LongCombatDuration = 1800
 
-PerformanceLog.File                     = "perf.log"
 PerformanceLog.SlowWorldUpdate          = 100
 PerformanceLog.SlowMapSystemUpdate      = 100
 PerformanceLog.SlowSessionsUpdate       = 100
@@ -823,6 +810,13 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 10 (client limitation)
 #                The number must be between 1 and 10
 #
+#    LimitPlayTime
+#        Keep track of how long player accounts have been online, and limit loot and experience after that.
+#        After 3 hours looted gold and experience gains are cut in half. After 5 hours they are prevented.
+#        This feature was only used on Chinese realms.
+#        Default: 0 (Disabled)
+#                 1 (Enabled)
+#
 #    SkipCinematics
 #        Disable in-game intro cinematic on first login of character (allows to prevent buggy intro when using custom start location)
 #        Default: 0 - show intro for each new character
@@ -849,7 +843,7 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #
 #    MinHonorKills
 #        Min kills that players must obtain to enter in weekly honor calculation
-#        Default: 15
+#        Default: 0 (auto select based on patch)
 #
 #    MaintenanceDay
 #        The day of the week on which server maintenance is performed ( currently used for Honor distribution )
@@ -998,6 +992,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        More mails increase server load but speedup mass mail process. Normal tick length: 50 msecs, so 20 ticks in sec and 200 mails in sec by default.
 #        Default: 10
 #
+#    Mail.ReturnedMail.PerTick
+#        Max amount of mail deleted or returned each tick from mails that has expired.
+#        More mails increase server load but can prevent a bottleneck where expired mails aren't handled until server restart. Normal tick length: 30 minutes.
+#        Default: 5
+#
 #    PetUnsummonAtMount
 #        Permanent pet will be unsummoned at player mount
 #        Default: 0 - not unsummon
@@ -1066,12 +1065,13 @@ WorldAvailable = 1
 CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
+LimitPlayTime = 0
 SkipCinematics = 0
 ShowHealthValues = 0
 MaxPlayerLevel = 60
 StartPlayerLevel = 1
 StartPlayerMoney = 0
-MinHonorKills = 15
+MinHonorKills = 0
 MaintenanceDay = 3
 InstantLogout = 1
 ForceLogoutDelay = 0
@@ -1103,6 +1103,7 @@ MaxGroupXPDistance = 74
 MailDeliveryDelay = 3600
 Mails.COD.ForceTag.MaxLevel = 0
 MassMailer.SendPerTick = 10
+Mail.ReturnedMail.PerTick = 5
 PetUnsummonAtMount = 0
 PetDefaultLoyalty = 1
 PlayerCommands = 1
@@ -1324,12 +1325,13 @@ GuidReserveSize.GameObject = 1000
 #        Chat protection from creating fake messages using a lot spaces (other invisible symbols),
 #        not applied to addon language messages, but can prevent old addons from working
 #        if they use normal languages for sending data to other clients.
-#        Default: 0 (disable fake messages preventing)
-#                 1 (enable fake messages preventing)
+#        Default: 1 (enable fake messages preventing)
+#                 0 (disable fake messages preventing)
 #
 #    ChatStrictLinkChecking.Severity
 #        Check chat messages for ingame links to spells, items, quests, achievements etc.
-#        Default: 0 (disable link checking)
+#        Default: 2
+#                 0 (disable link checking)
 #                 1 (check if only valid pipe commands are used. This prevents posting pictures for example)
 #                 2 (verifiy that pipe commands are used in a correct order)
 #                 3 (check if color, entry and name don't contradict each other. For correct work, please assure
@@ -1413,8 +1415,8 @@ GuidReserveSize.GameObject = 1000
 #
 ###################################################################################################################
 
-ChatFakeMessagePreventing = 0
-ChatStrictLinkChecking.Severity = 0
+ChatFakeMessagePreventing = 1
+ChatStrictLinkChecking.Severity = 2
 ChatStrictLinkChecking.Kick = 0
 ChatFlood.MessageCount = 10
 ChatFlood.MessageDelay = 1
@@ -1485,13 +1487,6 @@ Antiflood.Sanction = 8
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #
-#    Warden.DBLogLevel
-#        Description: The minimal WardenActions value of Warden check to be logged into realmd.warden_log table.
-#                     WardenActions: 0 - log, 1 - kick, 2 - ban
-#
-#        Deafult:     0 - (Logging any failed check)
-#                     3 - (Disable DB logging)
-#
 #    Warden.ModuleDir
 #        Description: Directory where warden modules are stored.
 #        Default: "warden_modules"
@@ -1507,7 +1502,6 @@ Warden.ScanFrequency         = 15
 Warden.DefaultPenalty        = 0
 Warden.BanDuration           = 86400
 Warden.DebugLog              = 0
-Warden.DBLogLevel            = 0
 Warden.ModuleDir             = "warden_modules"
 
 ###################################################################################################
@@ -1768,6 +1762,19 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
+#    Anticheat.BadFallReset.Enable
+#        Description: Check for wrong data in fall reset opcode.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.BadFallReset.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.BadFallReset.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Kick
+#
 #    Anticheat.Teleport.Enable
 #        Description: Check for players teleporting far away from their current position.
 #        Default:     1 - (Enabled)
@@ -2005,6 +2012,29 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     3 - Log, Report to GM
 #
+#    Anticheat.Botting.Enable
+#        Description: Check for bot-like movement.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.Botting.MinPeriod
+#        Description: For how long client must exibit bot-like movement to trigger penalty.
+#        Default:     300000 (5 minutes)
+#
+#    Anticheat.Botting.MinPackets
+#        Description: Minimum number of movement packets that need to have been sent.
+#        Default:     160
+#
+#    Anticheat.Botting.MinTurnsMouse
+#    Anticheat.Botting.MinTurnsKeyboard
+#    Anticheat.Botting.MinTurnsAbnormal
+#        Description: Minimum number of turns that need to happen in the given period.
+#        Default:     20, 80, 5
+#
+#    Anticheat.Botting.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     3 - Log, Report to GM
+#
 ###################################################################################################
 
 Anticheat.Enable = 1
@@ -2064,6 +2094,9 @@ Anticheat.NoFallTime.Enable = 1
 Anticheat.NoFallTime.Reject = 1
 Anticheat.NoFallTime.Threshold = 5
 Anticheat.NoFallTime.Penalty = 11
+Anticheat.BadFallReset.Enable = 1
+Anticheat.BadFallReset.Threshold = 1
+Anticheat.BadFallReset.Penalty = 11
 Anticheat.Teleport.Enable = 1
 Anticheat.Teleport.Reject = 1
 Anticheat.Teleport.Distance = 40.0
@@ -2117,9 +2150,16 @@ Anticheat.ExploreHighLevelArea.Penalty = 11
 Anticheat.ForbiddenArea.Enable = 1
 Anticheat.ForbiddenArea.Threshold = 1
 Anticheat.ForbiddenArea.Penalty = 3
+Anticheat.Botting.Enable = 1
+Anticheat.Botting.MinPeriod = 300000
+Anticheat.Botting.MinPackets = 160
+Anticheat.Botting.MinTurnsMouse = 20
+Anticheat.Botting.MinTurnsKeyboard = 80
+Anticheat.Botting.MinTurnsAbnormal = 5
+Anticheat.Botting.Penalty = 3
 
 # Time to wait for movement change ack
-Movement.PendingAckResponseTime = 2000
+Movement.PendingAckResponseTime = 4000
 
 ###################################################################################################################
 # GAME MASTER SETTINGS
@@ -2286,7 +2326,7 @@ Visibility.GroupMode               = 0
 Visibility.Distance.Continents     = 100
 Visibility.Distance.Continents.Min = 60
 Visibility.Distance.Instances      = 170
-Visibility.Distance.BG             = 533
+Visibility.Distance.BG             = 180
 Visibility.Distance.InFlight       = 100
 Visibility.Distance.Grey.Unit      = 1
 Visibility.Distance.Grey.Object    = 10
@@ -2456,7 +2496,7 @@ Visibility.ForceActiveObjects      = 1
 #    PvP.PoolSizePerFaction
 #         Defines the size of the active PvP pools of players per faction that's used to calculate standing on each
 #         honor maintenance restart. It's mathematically impossible to reach Rank 14 in low population servers, hence
-#         the need to "fake" the PvP pool.
+#         the need to "fake" the PvP pool. The minimum value is 167 for R14 to be achievable.
 #         Default: 0 (the real pool size will be used)
 #                  X (the real pool size will be overriden with X)
 #
@@ -2618,6 +2658,24 @@ Alterac.InitMaxPlayers = 0
 
 OutdoorPvp.SIEnabled = 1
 OutdoorPvp.EPEnabled = 1
+
+###################################################################################################################
+# MEETING STONE LFG CONFIG
+#
+#    LFG.Matchmaking
+#        Check talents of players in queue when making a group
+#        Default: 0 (disable - disregard talents, use class priorities, e.g. warrior - tank, paladin - healer)
+#                 1 (enable - set role based on talent tree that has more talent points)
+#
+#    LFG.MatchmakingTimer
+#        The time (in seconds) before player in LFG queue stops using matchmaking to find group faster
+#        Only works if matchmaking is enabled
+#        Default: 600 (5 minutes)
+#
+###################################################################################################################
+
+LFG.Matchmaking = 0
+LFG.MatchmakingTimer = 600
 
 ###################################################################################################################
 #

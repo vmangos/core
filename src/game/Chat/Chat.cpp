@@ -107,6 +107,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "usegobject", SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUseGObjectCommand,  "", nullptr },
         { "pause",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotPauseCommand,       "", nullptr },
         { "unpause",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnpauseCommand,     "", nullptr },
+        { "unequip",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnequipCommand,     "", nullptr },
         { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
@@ -139,6 +140,7 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand accountCommandTable[] =
     {
         { "characters",     SEC_GAMEMASTER,     true,  &ChatHandler::HandleAccountCharactersCommand,   "", nullptr },
+        { "cleardata",      SEC_PLAYER,         false, &ChatHandler::HandleAccountClearDataCommand,    "", nullptr },
         { "create",         SEC_CONSOLE,        true,  &ChatHandler::HandleAccountCreateCommand,       "", nullptr },
         { "delete",         SEC_CONSOLE,        true,  &ChatHandler::HandleAccountDeleteCommand,       "", nullptr },
         { "onlinelist",     SEC_CONSOLE,        true,  &ChatHandler::HandleAccountOnlineListCommand,   "", nullptr },
@@ -325,6 +327,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "getitemvalue",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugGetItemValueCommand,        "", nullptr },
         { "getvaluebyindex",SEC_DEVELOPER,      false, &ChatHandler::HandleDebugGetValueByIndexCommand,     "", nullptr },
         { "getvaluebyname", SEC_DEVELOPER,      false, &ChatHandler::HandleDebugGetValueByNameCommand,      "", nullptr },
+        { "getprevplaytime", SEC_DEVELOPER,     false, &ChatHandler::HandleDebugGetPrevPlayTimeCommand,     "", nullptr },
         { "moditemvalue",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugModItemValueCommand,        "", nullptr },
         { "modvalue",       SEC_DEVELOPER,      false, &ChatHandler::HandleDebugModValueCommand,            "", nullptr },
         { "play",           SEC_TICKETMASTER,   false, nullptr,                                             "", debugPlayCommandTable },
@@ -332,7 +335,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "setaurastate",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetAuraStateCommand,        "", nullptr },
         { "setitemvalue",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetItemValueCommand,        "", nullptr },
         { "setvaluebyindex",SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetValueByIndexCommand,     "", nullptr },
-        { "setvaluebyname", SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetValueByNameCommand,     "", nullptr },
+        { "setvaluebyname", SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetValueByNameCommand,      "", nullptr },
+        { "setprevplaytime", SEC_DEVELOPER,     false, &ChatHandler::HandleDebugSetPrevPlayTimeCommand,     "", nullptr },
         { "spellcheck",     SEC_CONSOLE,        true,  &ChatHandler::HandleDebugSpellCheckCommand,          "", nullptr },
         { "spellcoefs",     SEC_DEVELOPER,      true,  &ChatHandler::HandleDebugSpellCoefsCommand,          "", nullptr },
         { "spellmods",      SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSpellModsCommand,           "", nullptr },
@@ -346,7 +350,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { "unitstate",      SEC_GAMEMASTER,     false, &ChatHandler::HandleUnitStatCommand,                 "", nullptr },
         { "control",        SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugControlCommand,             "", nullptr },
         { "monster",        SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugMonsterChatCommand,         "", nullptr },
-        { "target",         SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugUnitCommand,                "", nullptr },
         { "time",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleDebugTimeCommand,                "", nullptr },
         { "moveflags",      SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugMoveFlagsCommand,           "", nullptr },
         { "movespline",     SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugMoveSplineCommand,          "", nullptr },
@@ -488,6 +491,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "all_mytalents",  SEC_DEVELOPER,      false, &ChatHandler::HandleLearnAllMyTalentsCommand,   "", nullptr },
         { "all_mytaxis",    SEC_TICKETMASTER,   false, &ChatHandler::HandleLearnAllMyTaxisCommand,     "", nullptr },
         { "all_recipes",    SEC_GAMEMASTER,     false, &ChatHandler::HandleLearnAllRecipesCommand,     "", nullptr },
+        { "all_trainer",    SEC_GAMEMASTER,     false, &ChatHandler::HandleLearnAllTrainerCommand,     "", nullptr },
         { "",               SEC_DEVELOPER,      false, &ChatHandler::HandleLearnCommand,               "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
@@ -505,6 +509,8 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { "auras",          SEC_TICKETMASTER,  false, &ChatHandler::HandleListAurasCommand,          "", nullptr },
         { "creature",       SEC_TICKETMASTER,  true,  &ChatHandler::HandleListCreatureCommand,       "", nullptr },
+        { "clicktomove",    SEC_TICKETMASTER,  true,  &ChatHandler::HandleListClickToMoveCommand,    "", nullptr },
+        { "exploredareas",  SEC_TICKETMASTER,  false, &ChatHandler::HandleListExploredAreasCommand,  "", nullptr },
         { "item",           SEC_TICKETMASTER,  true,  &ChatHandler::HandleListItemCommand,           "", nullptr },
         { "object",         SEC_TICKETMASTER,  true,  &ChatHandler::HandleListObjectCommand,         "", nullptr },
         { "talents",        SEC_TICKETMASTER,  false, &ChatHandler::HandleListTalentsCommand,        "", nullptr },
@@ -626,13 +632,17 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand creatureSpawnsSetCommandTable[] =
     {
-        { "entry",          SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetEntryCommand,    "", nullptr },
-        { "displayid",      SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetDisplayIdCommand,"", nullptr },
-        { "movetype",       SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetMoveTypeCommand, "", nullptr },
-        { "wanderdistance", SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnWanderDistCommand,  "", nullptr },
-        { "respawntime",    SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSpawnTimeCommand,   "", nullptr },
-        { "deathstate",     SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSetDeathStateCommand,    "", nullptr },
-        { nullptr,          0,                  false, nullptr,                                        "", nullptr }
+        { "entry",          SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetEntryCommand,       "", nullptr },
+        { "displayid",      SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetDisplayIdCommand,   "", nullptr },
+        { "emotestate",     SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetEmoteStateCommand,  "", nullptr },
+        { "standstate",     SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetStandStateCommand,  "", nullptr },
+        { "sheathstate",    SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetSheathStateCommand, "", nullptr },
+        { "movetype",       SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetMoveTypeCommand,    "", nullptr },
+        { "wanderdistance", SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnWanderDistCommand,     "", nullptr },
+        { "respawntime",    SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetRespawnTimeCommand, "", nullptr },
+        { "deathstate",     SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetDeathStateCommand,  "", nullptr },
+        { "auras",          SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnSetAurasCommand,       "", nullptr },
+        { nullptr,          0,                  false, nullptr,                                           "", nullptr }
     };
 
     static ChatCommand creatureSpawnsCommandTable[] =
@@ -655,7 +665,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "displayid",      SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSetDisplayIdCommand,     "", nullptr },
         { "movetype",       SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSetMoveTypeCommand,      "", nullptr },
         { "wanderdistance", SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSetWanderDistCommand,    "", nullptr },
-        { "respawntime",    SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSetSpawnTimeCommand,     "", nullptr },
+        { "respawntime",    SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSetRespawnTimeCommand,   "", nullptr },
         { "reactstate",     SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSetReactStateCommand,    "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
@@ -687,6 +697,26 @@ ChatCommand * ChatHandler::getCommandTable()
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
+    static ChatCommand unitShowCommandTable[] =
+    {
+        { "race",           SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowRaceCommand,        "", nullptr },
+        { "class",          SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowClassCommand,       "", nullptr },
+        { "gender",         SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowGenderCommand,      "", nullptr },
+        { "powertype",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowPowerTypeCommand,   "", nullptr },
+        { "form",           SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowFormCommand,        "", nullptr },
+        { "visflags",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowVisFlagsCommand,    "", nullptr },
+        { "miscflags",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowMiscFlagsCommand,   "", nullptr },
+        { "emotestate",     SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowEmoteStateCommand,  "", nullptr },
+        { "standstate",     SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowStandStateCommand,  "", nullptr },
+        { "sheathstate",    SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowSheathStateCommand, "", nullptr },
+        { "unitstate",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowUnitStateCommand,   "", nullptr },
+        { "unitflags",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowUnitFlagsCommand,   "", nullptr },
+        { "npcflags",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowNPCFlagsCommand,    "", nullptr },
+        { "moveflags",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowMoveFlagsCommand,   "", nullptr },
+        { "createspell",    SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowCreateSpellCommand, "", nullptr },
+        { nullptr,          0,                  false, nullptr,                                        "", nullptr }
+    };
+
     static ChatCommand unitCommandTable[] =
     {
         { "aiinfo",         SEC_MODERATOR,      false, &ChatHandler::HandleUnitAIInfoCommand,          "", nullptr },
@@ -694,6 +724,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "speedinfo",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitSpeedInfoCommand,       "", nullptr },
         { "statinfo",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitStatInfoCommand,        "", nullptr },
         { "ufinfo",         SEC_DEVELOPER,      false, &ChatHandler::HandleUnitUpdateFieldsInfoCommand,"", nullptr },
+        { "factioninfo",    SEC_MODERATOR,      false, &ChatHandler::HandleUnitFactionInfoCommand,     "", nullptr },
+        { "show",           SEC_MODERATOR,      false, nullptr,                                        "", unitShowCommandTable },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
@@ -1247,6 +1279,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "pet",            SEC_GAMEMASTER,     true, nullptr,                                         "", petCommandTable},
         { "channel",        SEC_MODERATOR,      false, nullptr,                                        "", channelCommandTable},
         { "log",            SEC_GAMEMASTER,     true,  &ChatHandler::HandleViewLogCommand,             "", nullptr },
+        { "sniff",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleSniffCommand,               "", nullptr },
         { "spamer",         SEC_MODERATOR,      true, nullptr,                                         "", spamerCommandTable },
         { "antispam",       SEC_TICKETMASTER,   true, nullptr,                                         "", AntiSpamCommandTable },
         { "gold",           SEC_BASIC_ADMIN,    true, nullptr,                                         "", goldCommandTable },
@@ -1486,36 +1519,36 @@ void ChatHandler::CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand)
         ChatCommand* command = &table[i];
 
         if (parentCommand && command->SecurityLevel < parentCommand->SecurityLevel)
-            sLog.outError("Subcommand '%s' of command '%s' have less access level (%hhu) that parent (%hhu)",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '%s' of command '%s' have less access level (%hhu) that parent (%hhu)",
                           command->Name, parentCommand->Name, command->SecurityLevel, parentCommand->SecurityLevel);
 
         if (!parentCommand && strlen(command->Name) == 0)
-            sLog.outError("Subcommand '' at top level");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '' at top level");
 
         if (command->ChildCommands)
         {
             if (command->Handler)
             {
                 if (parentCommand)
-                    sLog.outError("Subcommand '%s' of command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '%s' of command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
                                   command->Name, parentCommand->Name);
                 else
-                    sLog.outError("First level command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "First level command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
                                   command->Name);
             }
 
             if (parentCommand && strlen(command->Name) == 0)
-                sLog.outError("Subcommand '' of command '%s' have subcommands", parentCommand->Name);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '' of command '%s' have subcommands", parentCommand->Name);
 
             CheckIntegrity(command->ChildCommands, command);
         }
         else if (!command->Handler)
         {
             if (parentCommand)
-                sLog.outError("Subcommand '%s' of command '%s' not have handler and subcommands in same time. Must have some from its!",
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '%s' of command '%s' not have handler and subcommands in same time. Must have some from its!",
                               command->Name, parentCommand->Name);
             else
-                sLog.outError("First level command '%s' not have handler and subcommands in same time. Must have some from its!",
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "First level command '%s' not have handler and subcommands in same time. Must have some from its!",
                               command->Name);
         }
     }
@@ -1715,13 +1748,14 @@ void ChatHandler::ExecuteCommand(char const* text)
                 {
                     Player* p = m_session->GetPlayer();
                     ObjectGuid sel_guid = p->GetSelectionGuid();
-                    sLog.outCommand(GetAccountId(), "Command: %s [Player: %s (Group Leader \"%s\", Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
-                        realCommandFull.c_str(), p->GetName(), p->GetGroup() ? p->GetGroup()->GetLeaderGuid().GetString().c_str() : "NULL", GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(),
-                        sel_guid.GetString().c_str());
+                    sLog.Player(m_session, LOG_GM, LOG_LVL_BASIC,
+                        "Command: %s [Player: %s (Group Leader \"%s\", Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
+                        realCommandFull.c_str(), p->GetName(), p->GetGroup() ? p->GetGroup()->GetLeaderGuid().GetString().c_str() : "NULL",
+                        GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(), sel_guid.GetString().c_str());
                 }
                 else                                        // 0 account -> console
                 {
-                    sLog.outCommand(GetAccountId(), "Command: %s [Account: %u from %s]",
+                    sLog.Player(GetAccountId(), LOG_GM, LOG_LVL_BASIC, "Command: %s [Account: %u from %s]",
                         realCommandFull.c_str(), GetAccountId(), GetAccountId() ? "RA-connection" : "Console");
                 }
             }
@@ -1731,9 +1765,11 @@ void ChatHandler::ExecuteCommand(char const* text)
                 if (m_session && command->Flags & COMMAND_FLAGS_CRITICAL)
                 {
                     if (Unit* target = GetSelectedUnit())
-                        sLog.out(LOG_GM_CRITICAL, "%s: %s. Selected %s. Map %u", m_session->GetUsername().c_str(), realCommandFull.c_str(), target->GetObjectGuid().GetString().c_str(), target->GetMapId());
+                        sLog.Player(m_session, LOG_GM_CRITICAL, LOG_LVL_BASIC,
+                            "%s: %s. Selected %s. Map %u", m_session->GetUsername().c_str(), realCommandFull.c_str(), target->GetObjectGuid().GetString().c_str(), target->GetMapId());
                     else
-                        sLog.out(LOG_GM_CRITICAL, "%s: %s.", m_session->GetUsername().c_str(), realCommandFull.c_str());
+                        sLog.Player(m_session, LOG_GM_CRITICAL, LOG_LVL_BASIC,
+                            "%s: %s.", m_session->GetUsername().c_str(), realCommandFull.c_str());
                 }
             }
             // some commands have custom error messages. Don't send the default one in these cases.
@@ -1794,7 +1830,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, char const
         case CHAT_COMMAND_OK:
         {
             if (command->SecurityLevel != security)
-                DETAIL_LOG("Table `command` overwrite for command '%s' default security (%hhu) by %hhu",
+                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Table `command` overwrite for command '%s' default security (%hhu) by %hhu",
                            fullcommand.c_str(), command->SecurityLevel, security);
 
             command->SecurityLevel = security;
@@ -1806,14 +1842,14 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, char const
         {
             // command have subcommands, but not '' subcommand and then any data in `command` useless for it.
             if (cmdName.empty())
-                sLog.outErrorDb("Table `command` have command '%s' that only used with some subcommand selection, it can't have help or overwritten access level, skip.", cmdName.c_str());
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `command` have command '%s' that only used with some subcommand selection, it can't have help or overwritten access level, skip.", cmdName.c_str());
             else
-                sLog.outErrorDb("Table `command` have unexpected subcommand '%s' in command '%s', skip.", cmdName.c_str(), fullcommand.c_str());
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `command` have unexpected subcommand '%s' in command '%s', skip.", cmdName.c_str(), fullcommand.c_str());
             return false;
         }
         case CHAT_COMMAND_UNKNOWN:
         {
-            sLog.outErrorDb("Table `command` have nonexistent command '%s', skip.", cmdName.c_str());
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `command` have nonexistent command '%s', skip.", cmdName.c_str());
             return false;
         }
     }
@@ -2013,14 +2049,14 @@ bool ChatHandler::isValidChatMessage(char const* message)
         }
         else if (reader.get() != '|')
         {
-            DEBUG_LOG("ChatHandler::isValidChatMessage sequence aborted unexpectedly");
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage sequence aborted unexpectedly");
             return false;
         }
 
         // pipe has always to be followed by at least one char
         if (reader.peek() == '\0')
         {
-            DEBUG_LOG("ChatHandler::isValidChatMessage pipe followed by \\0");
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage pipe followed by \\0");
             return false;
         }
 
@@ -2043,14 +2079,14 @@ bool ChatHandler::isValidChatMessage(char const* message)
             }
             else
             {
-                DEBUG_LOG("ChatHandler::isValidChatMessage invalid sequence, expected %c but got %c", *validSequenceIterator, commandChar);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage invalid sequence, expected %c but got %c", *validSequenceIterator, commandChar);
                 return false;
             }
         }
         else if (validSequence != validSequenceIterator)
         {
             // no escaped pipes in sequences
-            DEBUG_LOG("ChatHandler::isValidChatMessage got escaped pipe in sequence");
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage got escaped pipe in sequence");
             return false;
         }
 
@@ -2065,7 +2101,7 @@ bool ChatHandler::isValidChatMessage(char const* message)
                     reader >> c;
                     if (!c)
                     {
-                        DEBUG_LOG("ChatHandler::isValidChatMessage got \\0 while reading color in |c command");
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage got \\0 while reading color in |c command");
                         return false;
                     }
 
@@ -2081,7 +2117,7 @@ bool ChatHandler::isValidChatMessage(char const* message)
                         color |= 10 + c - 'a';
                         continue;
                     }
-                    DEBUG_LOG("ChatHandler::isValidChatMessage got non hex char '%c' while reading color", c);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage got non hex char '%c' while reading color", c);
                     return false;
                 }
                 break;
@@ -2098,16 +2134,16 @@ bool ChatHandler::isValidChatMessage(char const* message)
                     if (reader.eof())                       // : must be
                         return false;
 
-                    linkedItem = ObjectMgr::GetItemPrototype(atoi(buffer));
+                    linkedItem = sObjectMgr.GetItemPrototype(atoi(buffer));
                     if (!linkedItem)
                     {
-                        DEBUG_LOG("ChatHandler::isValidChatMessage got invalid itemID %u in |item command", atoi(buffer));
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage got invalid itemID %u in |item command", atoi(buffer));
                         return false;
                     }
 
                     if (color != ItemQualityColors[linkedItem->Quality])
                     {
-                        DEBUG_LOG("ChatHandler::isValidChatMessage linked item has color %u, but user claims %u", ItemQualityColors[linkedItem->Quality],
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage linked item has color %u, but user claims %u", ItemQualityColors[linkedItem->Quality],
                                   color);
                         return false;
                     }
@@ -2177,7 +2213,7 @@ bool ChatHandler::isValidChatMessage(char const* message)
                 }
                 else
                 {
-                    DEBUG_LOG("ChatHandler::isValidChatMessage user sent unsupported link type '%s'", buffer);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage user sent unsupported link type '%s'", buffer);
                     return false;
                 }
                 break;
@@ -2188,7 +2224,7 @@ bool ChatHandler::isValidChatMessage(char const* message)
                     // links start with '['
                     if (reader.get() != '[')
                     {
-                        DEBUG_LOG("ChatHandler::isValidChatMessage link caption doesn't start with '['");
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage link caption doesn't start with '['");
                         return false;
                     }
                     reader.getline(buffer, 256, ']');
@@ -2302,14 +2338,14 @@ bool ChatHandler::isValidChatMessage(char const* message)
                 // no further payload
                 break;
             default:
-                DEBUG_LOG("ChatHandler::isValidChatMessage got invalid command |%c", commandChar);
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage got invalid command |%c", commandChar);
                 return false;
         }
     }
 
     // check if every opened sequence was also closed properly
     if (validSequence != validSequenceIterator)
-        DEBUG_LOG("ChatHandler::isValidChatMessage EOF in active sequence");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ChatHandler::isValidChatMessage EOF in active sequence");
 
     return validSequence == validSequenceIterator;
 }
@@ -2326,8 +2362,10 @@ void ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg msgtype, char const
     switch (msgtype)
     {
         case CHAT_MSG_MONSTER_WHISPER:
-        //case CHAT_MSG_RAID_BOSS_WHISPER:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+        case CHAT_MSG_RAID_BOSS_WHISPER:
         case CHAT_MSG_RAID_BOSS_EMOTE:
+#endif
         case CHAT_MSG_MONSTER_EMOTE:
             MANGOS_ASSERT(senderName);
             data << uint32(strlen(senderName) + 1);

@@ -113,10 +113,10 @@ void boss_omenAI::OnFireworkLaunch(Unit* pSummoner)
                     pOmen->GetMotionMaster()->InitializeNewDefault(true);
                 }, 4000);
                 
-                sLog.outInfo("[Moonglade.Omen] Summoned.");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Moonglade.Omen] Summoned.");
             }
             else
-                sLog.outInfo("[Moonglade.Omen] Summon failed.");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Moonglade.Omen] Summon failed.");
         }
     }
 }

@@ -62,7 +62,8 @@ enum MovementChangeType
 #define ATTACK_DISPLAY_DELAY 200
 
 // For this time difference is computed regen value
-#define REGEN_TIME_FULL     2000
+#define REGEN_TIME_PLAYER_FULL     2000
+#define REGEN_TIME_CREATURE_FULL   5000
 
 #define UNIT_PVP_COMBAT_TIMER 5500
 
@@ -111,6 +112,32 @@ enum UnitStandStateType
 
 #define MAX_UNIT_STAND_STATE             9
 
+static char const* UnitStandStateToString(uint32 state)
+{
+    switch (state)
+    {
+        case UNIT_STAND_STATE_STAND:
+            return "Stand";
+        case UNIT_STAND_STATE_SIT:
+            return "Sit";
+        case UNIT_STAND_STATE_SIT_CHAIR:
+            return "Sit Chair";
+        case UNIT_STAND_STATE_SLEEP:
+            return "Sleep";
+        case UNIT_STAND_STATE_SIT_LOW_CHAIR:
+            return "Sit Low Chair";
+        case UNIT_STAND_STATE_SIT_MEDIUM_CHAIR:
+            return "Sit Medium Chair";
+        case UNIT_STAND_STATE_SIT_HIGH_CHAIR:
+            return "Sit High Chair";
+        case UNIT_STAND_STATE_DEAD:
+            return "Dead";
+        case UNIT_STAND_STATE_KNEEL:
+            return "Kneel";
+    }
+    return "UNKNOWN";
+}
+
 // byte flags value (UNIT_FIELD_BYTES_1,3)
 // These flags seem to be related to visibility
 // In wotlk+ they are moved to UNIT_FIELD_BYTES_1,2
@@ -122,6 +149,20 @@ enum UnitVisFlags
     UNIT_VIS_FLAGS_ALL         = 0xFF
 };
 
+static char const* UnitVisFlagToString(uint32 state)
+{
+    switch (state)
+    {
+        case UNIT_VIS_FLAGS_GHOST:
+            return "Ghost";
+        case UNIT_VIS_FLAGS_CREEP:
+            return "Creep";
+        case UNIT_VIS_FLAGS_UNTRACKABLE:
+            return "Untrackable";
+    }
+    return "UNKNOWN";
+}
+
 // byte value (UNIT_FIELD_BYTES_2,0)
 enum SheathState
 {
@@ -131,6 +172,20 @@ enum SheathState
 };
 
 #define MAX_SHEATH_STATE    3
+
+static char const* SheathStateToString(uint32 state)
+{
+    switch (state)
+    {
+        case SHEATH_STATE_UNARMED:
+            return "Unarmed";
+        case SHEATH_STATE_MELEE:
+            return "Melee";
+        case SHEATH_STATE_RANGED:
+            return "Ranged";
+    }
+    return "UNKNOWN";
+}
 
 // byte flags value (UNIT_FIELD_BYTES_2,1)
 enum UnitBytes2_Flags
@@ -144,6 +199,30 @@ enum UnitBytes2_Flags
     UNIT_BYTE2_FLAG_UNK6        = 0x40,
     UNIT_BYTE2_FLAG_UNK7        = 0x80
 };
+
+static char const* UnitBytes2FlagsToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case UNIT_BYTE2_FLAG_PVP:
+            return "PvP";
+        case UNIT_BYTE2_FLAG_UNK1:
+            return "Unk1";
+        case UNIT_BYTE2_FLAG_FFA_PVP:
+            return "FFA PvP";
+        case UNIT_BYTE2_FLAG_UNK3:
+            return "Unk3";
+        case UNIT_BYTE2_FLAG_AURAS:
+            return "Auras";
+        case UNIT_BYTE2_FLAG_UNK5:
+            return "Unk5";
+        case UNIT_BYTE2_FLAG_UNK6:
+            return "Unk6";
+        case UNIT_BYTE2_FLAG_UNK7:
+            return "Unk7";
+    }
+    return "UNKNOWN";
+}
 
 #define CREATURE_MAX_SPELLS     4
 
@@ -334,12 +413,15 @@ enum UnitState
     UNIT_STAT_FLYING_ALLOWED        = 0x00400000,               // has gm fly mode enabled
 
     // High-level states
-    UNIT_STAT_NO_COMBAT_MOVEMENT = 0x01000000,
-    UNIT_STAT_RUNNING            = 0x02000000,
-    UNIT_STAT_IGNORE_MOVE_LOS    = 0x04000000,
+    UNIT_STAT_RUNNING            = 0x00800000,
 
-    UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x08000000, // allow movement with incomplete or partial paths
-    UNIT_STAT_ALLOW_LOS_ATTACK      = 0x10000000, // allow melee attacks without LoS
+    UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x01000000, // allow movement with incomplete or partial paths
+    UNIT_STAT_ALLOW_LOS_ATTACK      = 0x02000000, // allow melee attacks without LoS
+
+    UNIT_STAT_NO_SEARCH_FOR_OTHERS   = 0x04000000, // MoveInLineOfSight will not be called
+    UNIT_STAT_NO_BROADCAST_TO_OTHERS = 0x08000000, // ScheduleAINotify will not be called
+    UNIT_STAT_AI_USES_MOVE_IN_LOS    = 0x10000000, // AI overrides MoveInLineOfSight so always search for others
+
     // masks (only for check)
 
     // can't move currently
@@ -350,7 +432,7 @@ enum UnitState
                                 UNIT_STAT_DISTRACTED,
 
     // stay or scripted movement for effect( = in player case you can't move by client command)
-    UNIT_STAT_NO_FREE_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_FEIGN_DEATH |
+    UNIT_STAT_NO_FREE_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED |
                                 UNIT_STAT_TAXI_FLIGHT |
                                 UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
 
@@ -370,8 +452,72 @@ enum UnitState
     UNIT_STAT_MOVING          = UNIT_STAT_ROAMING_MOVE | UNIT_STAT_CHASE_MOVE | UNIT_STAT_FOLLOW_MOVE | UNIT_STAT_FLEEING_MOVE,
 
     UNIT_STAT_ALL_STATE       = 0xFFFFFFFF,
-    UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_NO_COMBAT_MOVEMENT | UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING),
+    UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING | UNIT_STAT_NO_SEARCH_FOR_OTHERS | UNIT_STAT_NO_BROADCAST_TO_OTHERS | UNIT_STAT_AI_USES_MOVE_IN_LOS),
 };
+
+static char const* UnitStateToString(uint32 state)
+{
+    switch (state)
+    {
+        case UNIT_STAT_MELEE_ATTACKING:
+            return "Melee Attacking";
+        case UNIT_STAT_NO_KILL_REWARD:
+            return "No Kill Reward";
+        case UNIT_STAT_FEIGN_DEATH:
+            return "Feign Death";
+        case UNIT_STAT_STUNNED:
+            return "Stunned";
+        case UNIT_STAT_ROOT:
+            return "Root";
+        case UNIT_STAT_ISOLATED:
+            return "Isolated";
+        case UNIT_STAT_POSSESSED:
+            return "Possessed";
+        case UNIT_STAT_TAXI_FLIGHT:
+            return "Taxi Flight";
+        case UNIT_STAT_DISTRACTED:
+            return "Distracted";
+        case UNIT_STAT_CONFUSED:
+            return "Confused";
+        case UNIT_STAT_ROAMING:
+            return "Roaming";
+        case UNIT_STAT_ROAMING_MOVE:
+            return "Roaming Move";
+        case UNIT_STAT_CHASE:
+            return "Chase";
+        case UNIT_STAT_CHASE_MOVE:
+            return "Chase Move";
+        case UNIT_STAT_FOLLOW:
+            return "Follow";
+        case UNIT_STAT_FOLLOW_MOVE:
+            return "Follow Move";
+        case UNIT_STAT_FLEEING:
+            return "Fleeing";
+        case UNIT_STAT_FLEEING_MOVE:
+            return "Fleeing Move";
+        case UNIT_STAT_IGNORE_PATHFINDING:
+            return "Ignore Pathfinding";
+        case UNIT_STAT_PENDING_ROOT:
+            return "Pending Root";
+        case UNIT_STAT_PENDING_STUNNED:
+            return "Pending Stunned";
+        case UNIT_STAT_FLYING_ALLOWED:
+            return "Flying Allowed";
+        case UNIT_STAT_RUNNING:
+            return "Running";
+        case UNIT_STAT_ALLOW_INCOMPLETE_PATH:
+            return "Allow Incomplete Path";
+        case UNIT_STAT_ALLOW_LOS_ATTACK:
+            return "Allow LoS Attack";
+        case UNIT_STAT_NO_SEARCH_FOR_OTHERS:
+            return "No Search for Others";
+        case UNIT_STAT_NO_BROADCAST_TO_OTHERS:
+            return "No Broadcast to Others";
+        case UNIT_STAT_AI_USES_MOVE_IN_LOS:
+            return "AI Uses Move in LoS";
+    }
+    return "UNKNOWN";
+}
 
 enum UnitVisibility
 {
@@ -425,6 +571,80 @@ enum UnitFlags
     UNIT_FLAG_UNK_28                = 0x10000000,
 };
 
+static char const* UnitFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case UNIT_FLAG_NONE:
+            return "None";
+        case UNIT_FLAG_UNK_0:
+            return "Unk0";
+        case UNIT_FLAG_SPAWNING:
+            return "Spawning";
+        case UNIT_FLAG_DISABLE_MOVE:
+            return "Disable Move";
+        case UNIT_FLAG_PLAYER_CONTROLLED:
+            return "Player Controlled";
+        case UNIT_FLAG_PET_RENAME:
+            return "Pet Rename";
+        case UNIT_FLAG_PET_ABANDON:
+            return "Pet Abandon";
+        case UNIT_FLAG_UNK_6:
+            return "Unk6";
+        case UNIT_FLAG_NOT_ATTACKABLE_1:
+            return "Not Attackable 1";
+        case UNIT_FLAG_IMMUNE_TO_PLAYER:
+            return "Immune To Player";
+        case UNIT_FLAG_IMMUNE_TO_NPC:
+            return "Immune To NPC";
+        case UNIT_FLAG_LOOTING:
+            return "Looting";
+        case UNIT_FLAG_PET_IN_COMBAT:
+            return "Pet In Combat";
+        case UNIT_FLAG_PVP:
+            return "PvP";
+        case UNIT_FLAG_SILENCED:
+            return "Silenced";
+        case UNIT_FLAG_UNK_14:
+            return "Unk14";
+        case UNIT_FLAG_USE_SWIM_ANIMATION:
+            return "Use Swim Animation";
+        case UNIT_FLAG_NON_ATTACKABLE_2:
+            return "Non Attackable 2";
+        case UNIT_FLAG_PACIFIED:
+            return "Pacified";
+        case UNIT_FLAG_STUNNED:
+            return "Stunned";
+        case UNIT_FLAG_IN_COMBAT:
+            return "In Combat";
+        case UNIT_FLAG_TAXI_FLIGHT:
+            return "Taxi Flight";
+        case UNIT_FLAG_DISARMED:
+            return "Disarmed";
+        case UNIT_FLAG_CONFUSED:
+            return "Confused";
+        case UNIT_FLAG_FLEEING:
+            return "Fleeing";
+        case UNIT_FLAG_POSSESSED:
+            return "Possessed";
+        case UNIT_FLAG_NOT_SELECTABLE:
+            return "Not Selectable";
+        case UNIT_FLAG_SKINNABLE:
+            return "Skinnable";
+        case UNIT_FLAG_AURAS_VISIBLE:
+            return "Auras Visible";
+        case UNIT_FLAG_UNK_28:
+            return "Unk28";
+        case UNIT_FLAG_PREVENT_ANIM:
+            return "Prvent Anim";
+        case UNIT_FLAG_SHEATHE:
+            return "Sheathe";
+        case UNIT_FLAG_IMMUNE:
+            return "Immune";
+    }
+    return "UNKNOWN";
+}
+
 /// Non Player Character flags
 enum NPCFlags
 {
@@ -444,8 +664,47 @@ enum NPCFlags
     UNIT_NPC_FLAG_AUCTIONEER            = 0x00001000,       // 100%
     UNIT_NPC_FLAG_STABLEMASTER          = 0x00002000,       // 100%
     UNIT_NPC_FLAG_REPAIR                = 0x00004000,       // 100%
-    UNIT_NPC_FLAG_OUTDOORPVP            = 0x20000000,       // custom flag for outdoor pvp creatures || Custom flag
 };
+
+static char const* NPCFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case UNIT_NPC_FLAG_NONE:
+            return "None";
+        case UNIT_NPC_FLAG_GOSSIP:
+            return "Gossip";
+        case UNIT_NPC_FLAG_QUESTGIVER:
+            return "Quest Giver";
+        case UNIT_NPC_FLAG_VENDOR:
+            return "Vendor";
+        case UNIT_NPC_FLAG_FLIGHTMASTER:
+            return "Flight Master";
+        case UNIT_NPC_FLAG_TRAINER:
+            return "Trainer";
+        case UNIT_NPC_FLAG_SPIRITHEALER:
+            return "Spirit Healer";
+        case UNIT_NPC_FLAG_SPIRITGUIDE:
+            return "Spirit Guide";
+        case UNIT_NPC_FLAG_INNKEEPER:
+            return "Innkeeper";
+        case UNIT_NPC_FLAG_BANKER:
+            return "Banker";
+        case UNIT_NPC_FLAG_PETITIONER:
+            return "Petitioner";
+        case UNIT_NPC_FLAG_TABARDDESIGNER:
+            return "Tabard Designer";
+        case UNIT_NPC_FLAG_BATTLEMASTER:
+            return "Battlemaster";
+        case UNIT_NPC_FLAG_AUCTIONEER:
+            return "Auctioneer";
+        case UNIT_NPC_FLAG_STABLEMASTER:
+            return "Stable Master";
+        case UNIT_NPC_FLAG_REPAIR:
+            return "Repair";
+    }
+    return "UNKNOWN";
+}
 
 enum AutoAttackCheckResult
 {
@@ -474,7 +733,7 @@ enum ReactStates
     REACT_AGGRESSIVE = 2
 };
 
-inline char const* ReactStateToString(uint32 reactState)
+static char const* ReactStateToString(uint32 reactState)
 {
     switch (reactState)
     {
@@ -495,6 +754,22 @@ enum CommandStates
     COMMAND_ATTACK  = 2,
     COMMAND_DISMISS = 3
 };
+
+static char const* CommandStateToString(uint32 commandState)
+{
+    switch (commandState)
+    {
+        case COMMAND_STAY:
+            return "Stay";
+        case COMMAND_FOLLOW:
+            return "Follow";
+        case COMMAND_ATTACK:
+            return "Attack";
+        case COMMAND_DISMISS:
+            return "Dismiss";
+    }
+    return "UNKNOWN";
+}
 
 enum ActionBarIndex
 {
@@ -539,20 +814,6 @@ enum AddAuraFlags
     ADD_AURA_PASSIVE = 0x04,
     ADD_AURA_PERMANENT = 0x08,
 };
-
-
-enum UnitDebugFlags
-{
-    DEBUG_SPELL_COMPUTE_RESISTS = 0x01,
-    DEBUG_PACKETS_RECV          = 0x02,
-    DEBUG_PACKETS_SEND          = 0x04,
-    DEBUG_AI                    = 0x08,
-    DEBUG_DR                    = 0x10,
-    DEBUG_CHEAT                 = 0x20,
-    DEBUG_PROCS                 = 0x40,
-    DEBUG_SPELLS_DAMAGE         = 0x80,
-};
-
 
 enum TeleportToOptions
 {

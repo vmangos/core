@@ -599,6 +599,8 @@ void OPvPCapturePointEP_CGT::LinkGraveYard(Team team)
         m_GraveyardSide = team;
         sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_Zone, team, false);
         sObjectMgr.AddGraveYardLink(EP_GraveYardId, EP_Zone, team, false);
+        sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, TFV_area, team, false);
+        sObjectMgr.AddGraveYardLink(EP_GraveYardId, TFV_area, team, false);
     }
 }
 
@@ -606,6 +608,8 @@ void OPvPCapturePointEP_CGT::UnLinkGraveYard()
 {
     sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_Zone, ALLIANCE, false);
     sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_Zone, HORDE, false);
+    sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, TFV_area, ALLIANCE, false);
+    sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, TFV_area, HORDE, false);
 }
 
 void OPvPCapturePointEP_CGT::SummonBannerAura(uint32 team)

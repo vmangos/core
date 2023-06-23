@@ -39,32 +39,40 @@ enum
 
 struct PInfoData
 {
-    uint8 race, class_;
-    uint32 accId = 0;
-    uint32 money = 0;
-    uint32 mail_gold_inbox = 0;
-    uint32 mail_gold_outbox = 0;
-    uint32 total_player_time = 0;
-    uint32 level = 0;
-    uint32 latency = 0;
-    uint32 security_flag = 0;
-    LocaleConstant loc = LOCALE_enUS;
-    ObjectGuid target_guid;
-    uint32 m_accountId;
-    bool online = false;
+    // GM who used the command
+    // needed for callback since command is async
+    uint32 m_ownAccountId = 0;
 
-    bool hasAccount = false;
-    std::string two_factor_enabled;
-    std::string username;
-    std::string last_ip;
-    AccountTypes security = SEC_PLAYER;
-    std::string last_login;
-    std::string target_name;
-    std::string warden_clock;
-    std::string warden_fingerprint;
-    std::string warden_hypervisors;
-    std::string warden_endscene;
-    std::string warden_proxifier;
+    // Character data
+    ObjectGuid m_targetGuid;
+    std::string m_targetName;
+    uint8 m_race = 0;
+    uint8 m_class = 0;
+    uint32 m_level = 0;
+    uint32 m_money = 0;
+    uint32 m_mailGoldInbox = 0;
+    uint32 m_mailGoldOutbox = 0;
+    uint32 m_totalPlayedTime = 0;
+    uint32 m_latency = 0;
+    bool m_online = false;
+
+    // Account data
+    uint32 m_accountId = 0;
+    std::string m_username;
+    LocaleConstant m_locale = LOCALE_enUS;
+    AccountTypes m_security = SEC_PLAYER;
+    uint32 m_securityFlag = 0;
+    std::string m_lastIp;
+    std::string m_lastLogin;
+    bool m_hasAccount = false;
+
+    // Warden data
+    std::string m_wardenClock;
+    std::string m_wardenFingerprint;
+    std::string m_wardenHypervisors;
+    std::string m_wardenEndscene;
+    std::string m_wardenProxifier;
+    bool m_hasUsedClickToMove = false;
 };
 
 class WorldSession;

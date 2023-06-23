@@ -54,7 +54,7 @@ stage(NONE)
 RASocket::~RASocket()
 {
     peer().close();
-    sLog.out(LOG_RA, "Connection was closed.");
+    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "Connection was closed.");
 }
 
 /// Accept an incoming connection
@@ -62,7 +62,7 @@ int RASocket::open(void* )
 {
     if (reactor ()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK) == -1)
     {
-        sLog.outError ("RASocket::open: unable to register client handler errno = %s", ACE_OS::strerror (errno));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::open: unable to register client handler errno = %s", ACE_OS::strerror (errno));
         return -1;
     }
 
@@ -70,12 +70,12 @@ int RASocket::open(void* )
 
     if (peer ().get_remote_addr (remote_addr) == -1)
     {
-        sLog.outError ("RASocket::open: peer ().get_remote_addr errno = %s", ACE_OS::strerror (errno));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::open: peer ().get_remote_addr errno = %s", ACE_OS::strerror (errno));
         return -1;
     }
 
 
-    sLog.out(LOG_RA, "Incoming connection from %s.",remote_addr.get_host_addr());
+    sLog.Out(LOG_RA, LOG_LVL_BASIC, "Incoming connection from %s.",remote_addr.get_host_addr());
 
     ///- print Motd
     sendf(sWorld.GetMotd());
@@ -89,7 +89,7 @@ int RASocket::close(int)
 {
     if(closing_)
         return -1;
-    DEBUG_LOG("RASocket::close");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "RASocket::close");
     shutdown();
 
     closing_ = true;
@@ -102,7 +102,7 @@ int RASocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
 {
     if(closing_)
         return -1;
-    DEBUG_LOG("RASocket::handle_close");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "RASocket::handle_close");
     std::unique_lock<std::mutex> lock (outBufferLock);
 
     closing_ = true;
@@ -124,7 +124,7 @@ int RASocket::handle_output (ACE_HANDLE)
     {
         if(reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK) == -1)
         {
-            sLog.outError ("RASocket::handle_output: error while cancel_wakeup");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::handle_output: error while cancel_wakeup");
             return -1;
         }
         outActive = false;
@@ -149,10 +149,10 @@ int RASocket::handle_output (ACE_HANDLE)
 /// Read data from the network
 int RASocket::handle_input(ACE_HANDLE)
 {
-    DEBUG_LOG("RASocket::handle_input");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "RASocket::handle_input");
     if(closing_)
     {
-        sLog.outError("Called RASocket::handle_input with closing_ = true");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Called RASocket::handle_input with closing_ = true");
         return -1;
     }
 
@@ -160,7 +160,7 @@ int RASocket::handle_input(ACE_HANDLE)
 
     if(readBytes <= 0)
     {
-        DEBUG_LOG("read %u bytes in RASocket::handle_input", readBytes);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "read %u bytes in RASocket::handle_input", readBytes);
         return -1;
     }
 
@@ -194,7 +194,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 if(!accId)
                 {
                     sendf("-No such user.\r\n");
-                    sLog.out(LOG_RA, "User %s does not exist.",szLogin.c_str());
+                    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "User %s does not exist.",szLogin.c_str());
                     if(bSecure)
                     {
                         handle_output();
@@ -211,7 +211,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 if (accAccessLevel < iMinLevel)
                 {
                     sendf("-Not enough privileges.\r\n");
-                    sLog.out(LOG_RA, "User %s has no privilege.",szLogin.c_str());
+                    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "User %s has no privilege.",szLogin.c_str());
                     if(bSecure)
                     {
                         handle_output();
@@ -240,14 +240,14 @@ int RASocket::handle_input(ACE_HANDLE)
                     stage=OK;
 
                     sendf("+Logged in.\r\n");
-                    sLog.out(LOG_RA, "User account %u has logged in.", accId);
+                    sLog.Out(LOG_RA, LOG_LVL_BASIC, "User account %u has logged in.", accId);
                     sendf("mangos>");
                 }
                 else
                 {
                     ///- Else deny access
                     sendf("-Wrong pass.\r\n");
-                    sLog.out(LOG_RA, "User account %u has failed to log in.", accId);
+                    sLog.Out(LOG_RA, LOG_LVL_BASIC, "User account %u has failed to log in.", accId);
                     if(bSecure)
                     {
                         handle_output();
@@ -262,7 +262,7 @@ int RASocket::handle_input(ACE_HANDLE)
             case OK:
                 if (strlen(inputBuffer))
                 {
-                    sLog.out(LOG_RA, "Got '%s' cmd.",inputBuffer);
+                    sLog.Out(LOG_RA, LOG_LVL_BASIC, "Got '%s' cmd.",inputBuffer);
                     if (strncmp(inputBuffer,"quit",4)==0)
                         return -1;
                     else
@@ -319,7 +319,7 @@ int RASocket::sendf(const char* msg)
         if (reactor ()->schedule_wakeup
             (this, ACE_Event_Handler::WRITE_MASK) == -1)
         {
-            sLog.outError ("RASocket::sendf error while schedule_wakeup");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::sendf error while schedule_wakeup");
             return -1;
         }
         outActive = true;

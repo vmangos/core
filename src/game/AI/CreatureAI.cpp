@@ -55,7 +55,7 @@ void CreatureAI::AttackedBy(Unit* attacker)
 
 void CreatureAI::AttackStart(Unit* pVictim)
 {
-    if (!pVictim || m_creature->HasReactState(REACT_PASSIVE))
+    if (m_creature->HasReactState(REACT_PASSIVE))
         return;
 
     if (m_creature->Attack(pVictim, m_bMeleeAttack))
@@ -69,121 +69,9 @@ void CreatureAI::AttackStart(Unit* pVictim)
     }
 }
 
-CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered)
+SpellCastResult CreatureAI::DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags)
 {
-    if (!pTarget)
-        return CAST_FAIL_OTHER;
-    // If not triggered, we check
-    if (!isTriggered)
-    {
-        // State does not allow
-        if (m_creature->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-            return CAST_FAIL_STATE;
-
-        if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || m_creature->CheckLockout(pSpell->GetSpellSchoolMask())))
-            return CAST_FAIL_STATE;
-
-        if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
-            return CAST_FAIL_STATE;
-
-        // Check for power (also done by Spell::CheckCast())
-        if (m_creature->GetPower((Powers)pSpell->powerType) < Spell::CalculatePowerCost(pSpell, m_creature))
-            return CAST_FAIL_POWER;
-    }
-
-    if (pSpell->Custom & SPELL_CUSTOM_BEHIND_TARGET && pTarget->HasInArc(m_creature))
-        return CAST_FAIL_OTHER;
-
-    // If the spell requires the target having a specific power type
-    if (!pSpell->IsAreaOfEffectSpell() && !pSpell->IsTargetPowerTypeValid(pTarget->GetPowerType()))
-        return CAST_FAIL_OTHER;
-
-    // Mind control abilities can't be used with just 1 attacker or mob will reset.
-    if ((m_creature->GetThreatManager().getThreatList().size() == 1) && pSpell->IsCharmSpell())
-        return CAST_FAIL_OTHER;
-
-    // If the unit is disarmed and the skill requires a weapon, it cannot be cast
-    if (m_creature->HasWeapon() && !m_creature->CanUseEquippedWeapon(BASE_ATTACK))
-    {
-        for (uint32 effect : pSpell->Effect)
-        {
-            if (effect == SPELL_EFFECT_WEAPON_DAMAGE || effect == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL)
-                return CAST_FAIL_OTHER;
-        }
-    }
-
-    if (pSpell->rangeIndex == SPELL_RANGE_IDX_SELF_ONLY)
-        return CAST_OK;
-
-    if (!(pSpell->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !m_creature->IsWithinLOSInMap(pTarget))
-        return CAST_FAIL_NOT_IN_LOS;
-
-    if (SpellRangeEntry const* pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
-    {
-        if (pTarget != m_creature)
-        {
-            // pTarget is out of range of this spell (also done by Spell::CheckCast())
-            float fDistance = m_creature->GetCombatDistance(pTarget);
-
-            if (fDistance > pSpellRange->maxRange)
-                return CAST_FAIL_TOO_FAR;
-
-            float fMinRange = pSpellRange->minRange;
-
-            if (fMinRange && fDistance < fMinRange)
-                return CAST_FAIL_TOO_CLOSE;
-        }
-
-        return CAST_OK;
-    }
-    else
-        return CAST_FAIL_OTHER;
-}
-
-CanCastResult CreatureAI::DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags, ObjectGuid uiOriginalCasterGUID)
-{
-    if (!pTarget)
-        return CAST_FAIL_OTHER;
-
-    Unit* pCaster = m_creature;
-
-    // Allowed to cast only if not casting (unless we interrupt ourself) or if spell is triggered
-    if (!pCaster->IsNonMeleeSpellCasted(false) || uiCastFlags & (CF_TRIGGERED | CF_INTERRUPT_PREVIOUS))
-    {
-        if (SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(uiSpell))
-        {
-            // If cast flag CF_AURA_NOT_PRESENT is active, check if target already has aura on them
-            if (uiCastFlags & CF_AURA_NOT_PRESENT)
-            {
-                if (pTarget->HasAura(uiSpell))
-                    return CAST_FAIL_TARGET_AURA;
-            }
-
-            // Check if cannot cast spell
-            if (!(uiCastFlags & CF_FORCE_CAST))
-            {
-                CanCastResult castResult = CanCastSpell(pTarget, pSpell, uiCastFlags & CF_TRIGGERED);
-
-                if (castResult != CAST_OK)
-                    return castResult;
-            }
-
-            // Interrupt any previous spell
-            if ((uiCastFlags & CF_INTERRUPT_PREVIOUS) && pCaster->IsNonMeleeSpellCasted(false))
-                pCaster->InterruptNonMeleeSpells(false);
-
-            if ((uiCastFlags & CF_MAIN_RANGED_SPELL) && pCaster->IsMoving())
-                pCaster->StopMoving();
-
-            pCaster->CastSpell(pTarget, pSpell, uiCastFlags & CF_TRIGGERED, nullptr, nullptr, uiOriginalCasterGUID);
-            return CAST_OK;
-        }
-
-        sLog.outErrorDb("DoCastSpellIfCan by creature entry %u attempt to cast spell %u but spell does not exist.", m_creature->GetEntry(), uiSpell);
-        return CAST_FAIL_OTHER;
-    }
-
-    return CAST_FAIL_IS_CASTING;
+    return m_creature->TryToCast(pTarget, uiSpell, uiCastFlags, 100);
 }
 
 void CreatureAI::SetSpellsList(uint32 entry)
@@ -193,7 +81,7 @@ void CreatureAI::SetSpellsList(uint32 entry)
     else if (CreatureSpellsList const* pSpellsTemplate = sObjectMgr.GetCreatureSpellsList(entry))
         SetSpellsList(pSpellsTemplate);
     else
-        sLog.outError("CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
 }
 
 void CreatureAI::SetSpellsList(CreatureSpellsList const* pSpellsList)
@@ -446,28 +334,35 @@ void CreatureAI::EnterEvadeMode()
 }
 
 // Distract creature, if player gets too close while stealthed/prowling
-void CreatureAI::TriggerAlert(Unit const* who)
+void CreatureAI::OnMoveInStealth(Unit* who)
 {
-    // If there's no target, or target isn't a player do nothing
-    if (!who || who->GetTypeId() != TYPEID_PLAYER)
-        return;
+    if (CanTriggerAlert(who))
+        TriggerAlertDirect(who);
+}
 
+bool CreatureAI::CanTriggerAlert(Unit const* who)
+{
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
     if (m_creature->GetTypeId() != TYPEID_UNIT || m_creature->IsInCombat() || m_creature->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
-        return;
+        return false;
 
     // Only alert for hostiles!
     if (m_creature->IsCivilian() || m_creature->HasReactState(REACT_PASSIVE) || !m_creature->IsValidAttackTarget(who))
-        return;
+        return false;
 
     // 10 sec cooldown for stealth warning
     if (WorldTimer::getMSTimeDiffToNow(m_uLastAlertTime) < 10000)
-        return;
+        return false;
 
     // only alert if target is within line of sight
     if (!m_creature->IsWithinLOSInMap(who))
-        return;
+        return false;
 
+    return true;
+}
+
+void CreatureAI::TriggerAlertDirect(Unit const* who)
+{
     // Send alert sound (if any) for this creature
     m_creature->SendAIReaction(AI_REACTION_ALERT);
 

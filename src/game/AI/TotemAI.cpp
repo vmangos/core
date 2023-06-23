@@ -39,7 +39,7 @@ int TotemAI::Permissible(Creature const* creature)
 
 TotemAI::TotemAI(Creature* pCreature) : CreatureAI(pCreature)
 {
-    pCreature->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
+    pCreature->AddUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
 
     if (Totem const* pTotem = pCreature->ToTotem())
     {

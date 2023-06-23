@@ -375,11 +375,8 @@ struct go_ghost_magnetAI: public GameObjectAI
         float mx, my, mz;
         me->GetPosition(mx, my, mz);
         me->GetRandomPoint(mx,my,mz, 40, x, y, z);
-        if(Creature* spectre=me->SummonCreature(NPC_MAGRAMI_SPECTRE, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000))
-        {
-            spectre->SetRespawnDelay(425000);
+        if (Creature* spectre=me->SummonCreature(NPC_MAGRAMI_SPECTRE, x, y, z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
             DefineMagramiMagnet(spectre, me->GetGUID());
-        }
     }
     void MagramiSpectreDied(uint64 guid)
     {
@@ -656,7 +653,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
             }
             else
             {
-                sLog.outError("[Desolace.GizeltonCaravan] Failed to summon caravan. Self-despawn.");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Desolace.GizeltonCaravan] Failed to summon caravan. Self-despawn.");
                 DespawnCaravan();
             }
         }

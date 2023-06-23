@@ -47,6 +47,8 @@
 #include "Chat.h"
 #include "MasterPlayer.h"
 
+#include <openssl/md5.h>
+
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
 {
@@ -60,20 +62,23 @@ static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& o
 }
 
 
-bool MapSessionFilter::Process(WorldPacket* packet)
+bool MapSessionFilter::Process(std::unique_ptr<WorldPacket> const& packet)
 {
     OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
     // let's check if our opcode can be really processed in Map::Update()
     return MapSessionFilterHelper(m_pSession, opHandle);
 }
 
+static uint32 g_sessionCounter = 0;
+
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale) :
-    m_muteTime(mute_time), m_connected(true), m_disconnectTimer(0), m_who_recvd(false), m_ah_list_recvd(false),
-    m_accountFlags(0), m_idleTime(WorldTimer::getMSTime()), _player(nullptr), m_socket(sock), m_security(sec), m_accountId(id), m_logoutTime(0), m_inQueue(false),
+    m_guid(g_sessionCounter++), m_muteTime(mute_time), m_connected(true), m_disconnectTimer(0), m_who_recvd(false), m_ah_list_recvd(false),
+    m_accountFlags(0), m_idleTime(WorldTimer::getMSTime()), _player(nullptr), m_socket(sock), m_security(sec), m_accountId(id),
+    m_exhaustionState(0), m_createTime(time(nullptr)), m_previousPlayTime(0), m_logoutTime(0), m_inQueue(false),
     m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false), m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
-    m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_gameBuild(0),
+    m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_clientPlatform(CLIENT_PLATFORM_UNKNOWN), m_gameBuild(0),
     m_charactersCount(10), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr)
 {
     if (sock)
@@ -101,12 +106,12 @@ WorldSession::~WorldSession()
     }
 
     ///- empty incoming packet queue
-    WorldPacket* packet = nullptr;
     for (auto& i : m_recvQueue)
-        while (i.next(packet))
-            delete packet;
+        i.clear();
 
-    delete m_warden;
+    if (m_warden)
+        sAnticheatMgr->RemoveWardenSession(m_warden);
+
     delete m_cheatData;
 }
 
@@ -123,7 +128,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (packet->size() > 0x8000)
     {
         // Packet will be rejected by client
-        sLog.outInfo("[NETWORK] Packet %s size %u is too large. Not sent [Account %u Player %s]", LookupOpcodeName(packet->GetOpcode()), packet->size(), GetAccountId(), GetPlayerName());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[NETWORK] Packet %s size %u is too large. Not sent [Account %u Player %s]", LookupOpcodeName(packet->GetOpcode()), packet->size(), GetAccountId(), GetPlayerName());
         return;
     }
 
@@ -192,8 +197,8 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     {
         uint64 minTime = uint64(cur_time - lastTime);
         uint64 fullTime = uint64(lastTime - firstTime);
-        DETAIL_LOG("Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
-        DETAIL_LOG("Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
 
         lastTime = cur_time;
         sendLastPacketCount = 1;
@@ -202,40 +207,50 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 
 #endif                                                  // !_DEBUG
 
-    //sLog.outString("[%s]Send packet : %u|0x%x (%s)", GetPlayerName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-    if (Player* player = GetPlayer())
-    {
-        DEBUG_UNIT_IF(packet->GetOpcode() != SMSG_MESSAGECHAT && packet->GetOpcode() != SMSG_WARDEN_DATA, player,
-            DEBUG_PACKETS_SEND, "[%s] Send packet : %u/0x%x (%s)", player->GetName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-    }
+    //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s]Send packet : %u|0x%x (%s)", GetPlayerName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
+    if (m_sniffFile)
+        m_sniffFile->WritePacket(*packet, false, time(nullptr));
 
     if (m_socket->SendPacket(*packet) == -1)
         m_socket->CloseSocket();
 }
 
 /// Add an incoming packet to the queue
-void WorldSession::QueuePacket(WorldPacket* newPacket)
+void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
 {
-    if (_player && IsMovementOpcode(newPacket->GetOpcode()))
+    if (m_sniffFile)
+        m_sniffFile->WritePacket(*newPacket, true, time(nullptr));
+
+    if (_player && MovementAnticheat::IsLoggedOpcode(newPacket->GetOpcode()))
         GetCheatData()->LogMovementPacket(true, *newPacket);
 
     OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
-    if (opHandle.packetProcessing >= PACKET_PROCESS_MAX_TYPE)
+    uint32 const processing = opHandle.packetProcessing;
+
+    if (processing >= PACKET_PROCESS_MAX_TYPE)
     {
-        sLog.outError("SESSION: opcode %s (0x%.4X) will be skipped",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped",
                       LookupOpcodeName(newPacket->GetOpcode()),
                       newPacket->GetOpcode());
         return;
     }
 
-    uint32 processing = opHandle.packetProcessing;
-    m_recvQueue[processing].add(newPacket);
+    // handle query packets in place to reduce load on world
+    // they dont access player or write anything so its safe
+    if (processing == PACKET_PROCESS_DB_QUERY)
+    {
+        // all these packets require STATUS_LOGGEDIN 
+        if (_player)
+            (this->*opHandle.handler)(*newPacket);
+    }
+    else
+        m_recvQueue[processing].add(std::move(newPacket));
 }
 
 /// Logging helper for unexpected opcodes
 void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, char const* reason)
 {
-    DEBUG_LOG("SESSION: received unexpected opcode %s (0x%.4X) %s",
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: received unexpected opcode %s (0x%.4X) %s",
                   LookupOpcodeName(packet->GetOpcode()),
                   packet->GetOpcode(),
                   reason);
@@ -244,10 +259,66 @@ void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, char const* reason)
 /// Logging helper for unexpected opcodes
 void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 {
-    sLog.outError("SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at " SIZEFMTD " from " SIZEFMTD ")",
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at " SIZEFMTD " from " SIZEFMTD ")",
                   LookupOpcodeName(packet->GetOpcode()),
                   packet->GetOpcode(),
                   packet->rpos(), packet->wpos());
+}
+
+void WorldSession::CheckPlayedTimeLimit(time_t now)
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    time_t const currentPlayed = GetConsecutivePlayTime(now);
+
+    if (currentPlayed >= PLAY_TIME_LIMIT_FULL)
+    {
+        if (m_exhaustionState < PLAY_TIME_LIMIT_FULL)
+        {
+            SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+            GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+            GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+            m_exhaustionState = PLAY_TIME_LIMIT_FULL;
+        }
+    }
+    else if (currentPlayed >= PLAY_TIME_LIMIT_APPROCHING_FULL)
+    {
+        if (m_exhaustionState < PLAY_TIME_LIMIT_APPROCHING_FULL)
+        {
+            SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+            GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+            GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+            m_exhaustionState = PLAY_TIME_LIMIT_APPROCHING_FULL;
+        }
+    }
+    else if (currentPlayed >= PLAY_TIME_LIMIT_PARTIAL)
+    {
+        if (m_exhaustionState < PLAY_TIME_LIMIT_PARTIAL)
+        {
+            SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+            GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+            GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+            m_exhaustionState = PLAY_TIME_LIMIT_PARTIAL;
+        }
+    }
+    else if (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_PARTIAL)
+    {
+        if (m_exhaustionState < PLAY_TIME_LIMIT_APPROACHING_PARTIAL)
+        {
+            SendPlayTimeWarning(PTF_APPROACHING_PARTIAL_PLAY_TIME, int32(PLAY_TIME_LIMIT_PARTIAL - currentPlayed));
+            m_exhaustionState = PLAY_TIME_LIMIT_APPROACHING_PARTIAL;
+        }
+    }
+#endif
+}
+
+void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 timeLeftInSeconds)
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    WorldPacket data(SMSG_PLAY_TIME_WARNING, sizeof(uint32) + sizeof(int32));
+    data << uint32(flag);
+    data << int32(timeLeftInSeconds);
+    SendPacket(&data);
+#endif
 }
 
 bool WorldSession::ForcePlayerLogoutDelay()
@@ -260,12 +331,11 @@ bool WorldSession::ForcePlayerLogoutDelay()
         }
         else if (sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
         {
-            sLog.out(LOG_CHAR, "Account: %d (IP: %s) Lost socket for character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName(), _player->GetGUIDLow());
-            sWorld.LogCharacter(GetPlayer(), "LostSocket");
-            GetPlayer()->OnDisconnected();
-            GetPlayer()->SaveToDB();
+            sLog.Player(this, LOG_CHAR, "LostSocket", LOG_LVL_BASIC, "");
             SetDisconnectedSession();
             m_disconnectTimer = 120000;
+            GetPlayer()->OnDisconnected();
+            GetPlayer()->SaveToDB();
             return true;
         }
     }
@@ -288,10 +358,7 @@ bool WorldSession::Update(PacketFilter& updater)
     sessionUpdateTime = WorldTimer::getMSTimeDiffToNow(sessionUpdateTime);
 
     if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_UNIQUE_SESSION_UPDATE) && sessionUpdateTime > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_UNIQUE_SESSION_UPDATE))
-        sLog.out(LOG_PERFORMANCE, "Slow session update: %ums. Account %u on IP %s", sessionUpdateTime, GetAccountId(), GetRemoteAddress().c_str());
-
-    if (m_socket && !m_socket->IsClosed() && m_warden)
-        m_warden->Update();
+        sLog.Out(LOG_PERFORMANCE, LOG_LVL_MINIMAL, "Slow session update: %ums. Account %u on IP %s", sessionUpdateTime, GetAccountId(), GetRemoteAddress().c_str());
 
     //check if we are safe to proceed with logout
     //logout procedure should happen only in World::UpdateSessions() method!!!
@@ -309,15 +376,25 @@ bool WorldSession::Update(PacketFilter& updater)
             m_socket->RemoveReference();
             m_socket = nullptr;
 
+            if (m_warden)
+            {
+                sAnticheatMgr->RemoveWardenSession(m_warden);
+                m_warden = nullptr;
+            }
+
             // Character stays IG for 2 minutes
             return ForcePlayerLogoutDelay();
         }
 
-        ///- If necessary, log the player out
+        
         time_t currTime = time(nullptr);
-        bool forceConnection = sPlayerBotMgr.ForceAccountConnection(this);
-        if (sWorld.IsStopped())
-            forceConnection = false;
+        if (sWorld.getConfig(CONFIG_BOOL_LIMIT_PLAY_TIME) &&
+            GetPlayer() && GetPlayer()->IsInWorld())
+            CheckPlayedTimeLimit(currTime);
+
+        ///- If necessary, log the player out
+        bool const forceConnection = !sWorld.IsStopped() && sPlayerBotMgr.ForceAccountConnection(this);
+
         if ((!m_socket || (ShouldLogOut(currTime) && !m_playerLoading)) && !forceConnection && m_bot == nullptr)
             LogoutPlayer(true);
 
@@ -340,12 +417,12 @@ bool WorldSession::Update(PacketFilter& updater)
 
 bool WorldSession::CanProcessPackets() const
 {
-    return ((m_socket && !m_socket->IsClosed()) || (_player && sPlayerBotMgr.IsChatBot(_player->GetGUIDLow())));
+    return ((m_socket && !m_socket->IsClosed()) || (_player && (m_bot || sPlayerBotMgr.IsChatBot(_player->GetGUIDLow()))));
 }
 
 void WorldSession::ProcessPackets(PacketFilter& updater)
 {
-    WorldPacket* packet = nullptr;
+    std::unique_ptr<WorldPacket> packet;
     m_receivedPacketType[updater.PacketProcessType()] = false;
     while (CanProcessPackets() && m_recvQueue[updater.PacketProcessType()].next(packet, updater))
     {
@@ -365,33 +442,33 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
                     {
                         // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
                         if (!m_playerRecentlyLogout)
-                            LogUnexpectedOpcode(packet, "the player has not logged in yet");
+                            LogUnexpectedOpcode(packet.get(), "the player has not logged in yet");
                     }
                     else if (_player->IsInWorld())
-                        ExecuteOpcode(opHandle, packet);
+                        ExecuteOpcode(opHandle, packet.get());
 
                     // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
                     break;
                 case STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT:
                     if (!_player && !m_playerRecentlyLogout)
-                        LogUnexpectedOpcode(packet, "the player has not logged in yet and not recently logout");
+                        LogUnexpectedOpcode(packet.get(), "the player has not logged in yet and not recently logout");
                     else
                         // not expected _player or must checked in packet hanlder
-                        ExecuteOpcode(opHandle, packet);
+                        ExecuteOpcode(opHandle, packet.get());
                     break;
                 case STATUS_TRANSFER:
                     if (!_player)
-                        LogUnexpectedOpcode(packet, "the player has not logged in yet");
+                        LogUnexpectedOpcode(packet.get(), "the player has not logged in yet");
                     else if (_player->IsInWorld())
-                        LogUnexpectedOpcode(packet, "the player is still in world");
+                        LogUnexpectedOpcode(packet.get(), "the player is still in world");
                     else
-                        ExecuteOpcode(opHandle, packet);
+                        ExecuteOpcode(opHandle, packet.get());
                     break;
                 case STATUS_AUTHED:
                     // prevent cheating with skip queue wait
                     if (m_inQueue)
                     {
-                        LogUnexpectedOpcode(packet, "the player is still in queue");
+                        LogUnexpectedOpcode(packet.get(), "the player is still in queue");
                         break;
                     }
 
@@ -399,58 +476,56 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
                     // and before other STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes.
                     m_playerRecentlyLogout = false;
 
-                    ExecuteOpcode(opHandle, packet);
+                    ExecuteOpcode(opHandle, packet.get());
                     break;
                 case STATUS_NEVER:
-                    sLog.outError("SESSION: received not allowed opcode %s (0x%.4X)",
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received not allowed opcode %s (0x%.4X)",
                                   opHandle.name,
                                   packet->GetOpcode());
                     break;
                 case STATUS_UNHANDLED:
-                    DEBUG_LOG("SESSION: received not handled opcode %s (0x%.4X)",
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: received not handled opcode %s (0x%.4X)",
                               opHandle.name,
                               packet->GetOpcode());
                     break;
                 default:
-                    sLog.outError("SESSION: received wrong-status-req opcode %s (0x%.4X)",
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received wrong-status-req opcode %s (0x%.4X)",
                                   opHandle.name,
                                   packet->GetOpcode());
                     break;
             }
             packetTime = WorldTimer::getMSTimeDiffToNow(packetTime);
             if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_PACKET) && packetTime > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_PACKET))
-                sLog.out(LOG_PERFORMANCE, "Slow packet opcode %s: %ums. Account %u on IP %s", opHandle.name, packetTime, GetAccountId(), GetRemoteAddress().c_str());
+                sLog.Out(LOG_PERFORMANCE, LOG_LVL_MINIMAL, "Slow packet opcode %s: %ums. Account %u on IP %s", opHandle.name, packetTime, GetAccountId(), GetRemoteAddress().c_str());
         }
         catch (ByteBufferException &)
         {
-            sLog.outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode:0x%x) from client %s, accountid=%i.",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::Update ByteBufferException occured while parsing a packet (opcode:0x%x) from client %s, accountid=%i.",
                           packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
             if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
             {
-                DEBUG_LOG("Dumping error causing packet:");
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Dumping error causing packet:");
                 packet->hexlike();
             }
 
             if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
             {
-                DETAIL_LOG("Disconnecting session [account id %u / address %s] for badly formatted packet.",
+                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Disconnecting session [account id %u / address %s] for badly formatted packet.",
                            GetAccountId(), GetRemoteAddress().c_str());
                 ProcessAnticheatAction("Anticrash", "ByteBufferException", CHEAT_ACTION_KICK);
             }
         }
         catch (std::runtime_error &e)
         {
-            sLog.outInfo("CATCH Exception 'ASSERT' for account %u / IP %s", GetAccountId(), GetRemoteAddress().c_str());
-            sLog.outInfo(e.what());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CATCH Exception 'ASSERT' for account %u / IP %s", GetAccountId(), GetRemoteAddress().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, e.what());
             ProcessAnticheatAction("Anticrash", "ASSERT failed", CHEAT_ACTION_KICK);
         }
         catch (...)
         {
-            sLog.outInfo("CATCH Unknown exception. Account %u / IP %s", GetAccountId(), GetRemoteAddress().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CATCH Unknown exception. Account %u / IP %s", GetAccountId(), GetRemoteAddress().c_str());
             ProcessAnticheatAction("Anticrash", "Exception raised", CHEAT_ACTION_KICK);
         }
-
-        delete packet;
     }
 }
 
@@ -458,14 +533,13 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
 void WorldSession::ClearIncomingPacketsByType(PacketProcessing type)
 {
     ASSERT(type < PACKET_PROCESS_MAX_TYPE);
-    WorldPacket* data = nullptr;
-    while (m_recvQueue[type].next(data))
-        delete data;
+    m_recvQueue[type].clear();
 }
 
 void WorldSession::SetDisconnectedSession()
 {
     m_connected = false;
+    StopSniffing();
     sWorld.SetSessionDisconnected(this);
 }
 
@@ -495,35 +569,45 @@ void WorldSession::LogoutPlayer(bool Save)
     {
         bool inWorld = _player->IsInWorld() && _player->FindMap();
 
-        sLog.out(LOG_CHAR, "Account: %d (IP: %s) Logout Character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() , _player->GetGUIDLow());
-        sWorld.LogCharacter(_player, "Logout");
+        sLog.Player(this, LOG_CHAR, "Logout", LOG_LVL_DETAIL, "");
+
         if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
             DoLootRelease(lootGuid);
 
-        ///- If the player just died before logging out, make him appear as a ghost
-        if (inWorld && _player->GetDeathTimer())
+        if (inWorld)
         {
-            _player->GetHostileRefManager().deleteReferences();
-            _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard();
+            ///- If the player just died before logging out, make him appear as a ghost
+            if (_player->GetDeathTimer())
+            {
+                _player->GetHostileRefManager().deleteReferences();
+                _player->BuildPlayerRepop();
+                _player->RepopAtGraveyard();
+            }
+            else if (_player->IsInCombat())
+            {
+                _player->CombatStop();
+                _player->GetHostileRefManager().setOnlineOfflineState(false);
+            }
+            else if (_player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+            {
+                // this will kill character by SPELL_AURA_SPIRIT_OF_REDEMPTION
+                _player->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+                //_player->SetDeathPvP(*); set at SPELL_AURA_SPIRIT_OF_REDEMPTION apply time
+                _player->KillPlayer();
+                _player->BuildPlayerRepop();
+                _player->RepopAtGraveyard();
+            }
+
+            _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LEAVE_WORLD_CANCELS);
+
         }
-        else if (inWorld && _player->IsInCombat())
+        
+
+        if (_player->IsInLFG())
+            sWorld.GetLFGQueue().GetMessager().AddMessage([playerGuid = _player->GetObjectGuid()](LFGQueue* queue)
         {
-            _player->CombatStop();
-            _player->GetHostileRefManager().setOnlineOfflineState(false);
-        }
-        else if (inWorld && _player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
-        {
-            // this will kill character by SPELL_AURA_SPIRIT_OF_REDEMPTION
-            _player->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
-            //_player->SetDeathPvP(*); set at SPELL_AURA_SPIRIT_OF_REDEMPTION apply time
-            _player->KillPlayer();
-            _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard();
-        }
-        //drop a flag if player is carrying it
-        if (BattleGround *bg = _player->GetBattleGround())
-            _player->LeaveBattleground(true);
+            queue->RemovePlayerFromQueue(playerGuid, PLAYER_SYSTEM_LEAVE);
+        });
 
         ///- Teleport to home if the player is in an invalid instance
         if (!_player->m_InstanceValid && !_player->IsGameMaster())
@@ -542,12 +626,28 @@ void WorldSession::LogoutPlayer(bool Save)
             sMapMgr.ExecuteSingleDelayedTeleport(_player); // Execute chain teleport if there are some
         }
 
+        // drop the flag if player is carrying it
+        if (BattleGround *bg = _player->GetBattleGround())
+        {
+            _player->LeaveBattleground(true);
+
+            // check for teleports both before and after leaving bg
+            // fixes exploit where you can be considered to be inside bg
+            // while you are actually outside if you kill wow process on
+            // loading screen during the teleport into bg when joining
+            while (_player->IsBeingTeleportedFar())
+            {
+                HandleMoveWorldportAckOpcode();
+                sMapMgr.ExecuteSingleDelayedTeleport(_player);
+            }
+        }
+
         // Refresh apres ca
         inWorld = _player->IsInWorld() && _player->FindMap();
         if (!inWorld)
         {
             Save = false;
-            sLog.outInfo("[CRASH] Player %s is not in world during logout.", _player->GetName());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Player %s is not in world during logout.", _player->GetName());
         }
 
         sBattleGroundMgr.PlayerLoggedOut(_player);
@@ -614,6 +714,9 @@ void WorldSession::LogoutPlayer(bool Save)
         ///- Update cached data at logout
         sObjectMgr.UpdatePlayerCache(_player);
 
+        ///- No need to create any new maps
+        sMapMgr.CancelInstanceCreationForPlayer(_player);
+
         ///- Remove the player from the world
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map
@@ -636,7 +739,7 @@ void WorldSession::LogoutPlayer(bool Save)
         WorldPacket data(SMSG_LOGOUT_COMPLETE, 0);
         SendPacket(&data);
 
-        DEBUG_LOG("SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
     }
 
     if (m_masterPlayer)
@@ -730,28 +833,28 @@ char const*  WorldSession::GetMangosString(int32 entry) const
 
 void WorldSession::Handle_NULL(WorldPacket& recvPacket)
 {
-    sLog.outError("SESSION: received unimplemented opcode %s (0x%.4X)",
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received unimplemented opcode %s (0x%.4X)",
                   LookupOpcodeName(recvPacket.GetOpcode()),
                   recvPacket.GetOpcode());
 }
 
 void WorldSession::Handle_EarlyProccess(WorldPacket& recvPacket)
 {
-    sLog.outError("SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead",
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead",
                   LookupOpcodeName(recvPacket.GetOpcode()),
                   recvPacket.GetOpcode());
 }
 
 void WorldSession::Handle_ServerSide(WorldPacket& recvPacket)
 {
-    sLog.outError("SESSION: received server-side opcode %s (0x%.4X)",
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received server-side opcode %s (0x%.4X)",
                   LookupOpcodeName(recvPacket.GetOpcode()),
                   recvPacket.GetOpcode());
 }
 
 void WorldSession::Handle_Deprecated(WorldPacket& recvPacket)
 {
-    sLog.outError("SESSION: received deprecated opcode %s (0x%.4X)",
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received deprecated opcode %s (0x%.4X)",
                   LookupOpcodeName(recvPacket.GetOpcode()),
                   recvPacket.GetOpcode());
 }
@@ -771,6 +874,124 @@ void WorldSession::SendAuthWaitQue(uint32 position)
         packet << uint32(position);
         SendPacket(&packet);
     }
+}
+
+void WorldSession::LoadGlobalAccountData()
+{
+    QueryResult* result = CharacterDatabase.PQuery("SELECT `type`, `time`, `data` FROM `account_data` WHERE `account`=%u", GetAccountId());
+    LoadAccountData(
+        result,
+        GLOBAL_CACHE_MASK
+    );
+    if (result)
+        delete result;
+}
+
+void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
+{
+    for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
+        if (mask & (1 << i))
+            m_accountData[i] = AccountData();
+
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 type = fields[0].GetUInt32();
+        if (type >= NUM_ACCOUNT_DATA_TYPES)
+        {
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have invalid account data type (%u), ignore.",
+                mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+            continue;
+        }
+
+        if ((mask & (1 << type)) == 0)
+        {
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have non appropriate for table  account data type (%u), ignore.",
+                mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+            continue;
+        }
+
+        m_accountData[type].timestamp = time_t(fields[1].GetUInt64());
+        m_accountData[type].data = fields[2].GetCppString();
+    } while (result->NextRow());
+}
+
+void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
+{
+    time_t const currentTime = time(nullptr);
+    if ((1 << type) & GLOBAL_CACHE_MASK)
+    {
+        uint32 acc = GetAccountId();
+
+        static SqlStatementID delId;
+        static SqlStatementID insId;
+
+        CharacterDatabase.BeginTransaction();
+
+        SqlStatement stmt = CharacterDatabase.CreateStatement(delId, "DELETE FROM `account_data` WHERE `account`=? AND `type`=?");
+        stmt.PExecute(acc, uint32(type));
+
+        if (!data.empty())
+        {
+            stmt = CharacterDatabase.CreateStatement(insId, "INSERT INTO `account_data` VALUES (?,?,?,?)");
+            stmt.PExecute(acc, uint32(type), uint64(currentTime), data.c_str());
+        }
+
+        CharacterDatabase.CommitTransaction();
+    }
+    else
+    {
+        // _player can be nullptr and packet received after logout but m_currentPlayerGuid still store correct guid
+        if (!m_currentPlayerGuid)
+            return;
+
+        static SqlStatementID delId;
+        static SqlStatementID insId;
+
+        CharacterDatabase.BeginTransaction();
+
+        SqlStatement stmt = CharacterDatabase.CreateStatement(delId, "DELETE FROM `character_account_data` WHERE `guid`=? AND `type`=?");
+        stmt.PExecute(m_currentPlayerGuid.GetCounter(), uint32(type));
+
+        if (!data.empty())
+        {
+            stmt = CharacterDatabase.CreateStatement(insId, "INSERT INTO `character_account_data` VALUES (?,?,?,?)");
+            stmt.PExecute(m_currentPlayerGuid.GetCounter(), uint32(type), uint64(currentTime), data.c_str());
+        }
+
+        CharacterDatabase.CommitTransaction();
+    }
+
+    m_accountData[type].timestamp = currentTime;
+    m_accountData[type].data = data;
+}
+
+void WorldSession::SendAccountDataTimes()
+{
+    WorldPacket data(SMSG_ACCOUNT_DATA_MD5, NUM_ACCOUNT_DATA_TYPES * MD5_DIGEST_LENGTH);
+    for (AccountData const& itr : m_accountData)
+    {
+        if (itr.data.empty())
+        {
+            for (int i = 0; i < MD5_DIGEST_LENGTH; i++)
+                data << uint8(0);
+        }
+        else
+        {
+            MD5_CTX md5;
+            MD5_Init(&md5);
+            MD5_Update(&md5, itr.data.c_str(), itr.data.size());
+
+            uint8 fileHash[MD5_DIGEST_LENGTH];
+            MD5_Final(fileHash, &md5);
+            data.append(fileHash, MD5_DIGEST_LENGTH);
+        }
+    }
+    SendPacket(&data);
 }
 
 void WorldSession::LoadTutorialsData()
@@ -851,11 +1072,7 @@ void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* pac
     if (_player)
         _player->SetCanDelayTeleport(true);
 
-
-    //sLog.outString("[%s] Recvd packet : %u/0x%x (%s)", GetUsername().c_str(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-    if (Player* player = GetPlayer())
-        DEBUG_UNIT(player, DEBUG_PACKETS_RECV, "[%s] Recvd packet : %u/0x%x (%s)", player->GetName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-
+    //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s] Recvd packet : %u/0x%x (%s)", GetUsername().c_str(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
     (this->*opHandle.handler)(*packet);
 
     if (_player)
@@ -961,7 +1178,15 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
         sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, detector, oss.str().c_str());
     }
     
-    sLog.outAnticheat(detector, playerDesc.c_str(), reason, action);
+    sLog.Player(this, LOG_ANTICHEAT, detector, LOG_LVL_MINIMAL, "[%s] Player %s, Cheat %s, Penalty: %s",
+        detector, playerDesc.c_str(), reason, action);
+}
+
+bool WorldSession::HasUsedClickToMove() const
+{
+    if (m_warden)
+        return m_warden->HasUsedClickToMove();
+    return false;
 }
 
 bool WorldSession::AllowPacket(uint16 opcode)
@@ -998,6 +1223,7 @@ bool WorldSession::AllowPacket(uint16 opcode)
         case MSG_PETITION_RENAME:
         case CMSG_SEND_MAIL:
         case CMSG_PLAYER_LOGIN:
+        case CMSG_GMTICKET_UPDATETEXT:
             m_floodPacketsCount[FLOOD_VERY_SLOW_OPCODES]++;
         // no break, since slow packets are also very slow packets.
         case CMSG_LOGOUT_REQUEST:
@@ -1041,7 +1267,7 @@ bool WorldSession::CharacterScreenIdleKick(uint32 currTime)
 
     if ((currTime - m_idleTime) >= (maxIdle * 1000))
     {
-        DEBUG_LOG("SESSION: Kicking session [%s] from character selection", GetRemoteAddress().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: Kicking session [%s] from character selection", GetRemoteAddress().c_str());
         return true;
     }
 

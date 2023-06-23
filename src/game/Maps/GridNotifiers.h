@@ -595,6 +595,9 @@ namespace MaNGOS
                 if (goInfo->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
                     return false;
 
+                if (!go->isSpawned())
+                    return false;
+
                 if (goInfo->spellFocus.focusId != i_focusId)
                     return false;
 
@@ -1064,7 +1067,7 @@ namespace MaNGOS
                 if (!u->CanSeeInWorld(i_funit))
                     return false;
 
-                return u->IsAlive() && u->IsHostileTo(i_funit) && i_funit->IsWithinDistInMap(u, u->GetAttackDistance(i_funit), true, false);
+                return u->IsAlive() && u->IsHostileTo(i_funit) && i_funit->IsWithinDistInMap(u, u->GetAttackDistance(i_funit), true, SizeFactor::None);
             }
         private:
             Unit* const i_funit;
@@ -1555,16 +1558,16 @@ namespace MaNGOS
             }
             bool operator()(Unit* u)
             {
+                if (!u->IsWithinDistInMap(m_me, std::min(m_me->GetAttackDistance(u), m_dist), true, SizeFactor::None))
+                    return false;
+
+                if (!u->IsTargetableBy(m_me))
+                    return false;
+
                 if (!m_me->IsHostileTo(u))
                     return false;
 
                 if (!u->IsVisibleForOrDetect(m_me, m_me, false))
-                    return false;
-
-                if (!u->IsWithinDistInMap(m_me, std::min(m_me->GetAttackDistance(u), m_dist), true, false))
-                    return false;
-
-                if (!u->IsTargetableBy(m_me))
                     return false;
 
                 if (m_ignoreCivilians && u->IsCreature() && static_cast<Creature*>(u)->IsCivilian())

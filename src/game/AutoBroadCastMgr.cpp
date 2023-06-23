@@ -30,8 +30,8 @@ void AutoBroadCastMgr::Load()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded 0 AutoBroadCast message");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 AutoBroadCast message");
         return;
     }
 
@@ -52,8 +52,8 @@ void AutoBroadCastMgr::Load()
     }
     while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u AutoBroadCast messages", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u AutoBroadCast messages", count);
 
 }
 

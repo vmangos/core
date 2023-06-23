@@ -135,7 +135,7 @@ void PoolObject::CheckEventLinkAndReport<Creature>(uint32 poolId, int16 event_id
 {
     std::map<uint32, int16>::const_iterator itr = creature2event.find(guid);
     if (itr == creature2event.end() || itr->second != event_id)
-        sLog.outErrorDb("Creature (GUID: %u) expected to be listed in `game_event_creature` for event %u as part pool %u", guid, event_id, poolId);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUID: %u) expected to be listed in `game_event_creature` for event %u as part pool %u", guid, event_id, poolId);
 }
 
 template<>
@@ -143,7 +143,7 @@ void PoolObject::CheckEventLinkAndReport<GameObject>(uint32 poolId, int16 event_
 {
     std::map<uint32, int16>::const_iterator itr = go2event.find(guid);
     if (itr == go2event.end() || itr->second != event_id)
-        sLog.outErrorDb("Gameobject (GUID: %u) expected to be listed in `game_event_gameobject` for event %u as part pool %u", guid, event_id, poolId);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (GUID: %u) expected to be listed in `game_event_gameobject` for event %u as part pool %u", guid, event_id, poolId);
 }
 
 template<>
@@ -467,7 +467,7 @@ void PoolGroup<Creature>::Spawn1Object(MapPersistentState& mapState, PoolObject*
         if (dataMap && dataMap->IsLoaded(data->position.x, data->position.y))
         {
             Creature* pCreature = new Creature;
-            //DEBUG_LOG("Spawning creature %u",obj->guid);
+            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Spawning creature %u",obj->guid);
             if (!pCreature->LoadFromDB(obj->guid, dataMap))
             {
                 delete pCreature;
@@ -510,7 +510,7 @@ void PoolGroup<GameObject>::Spawn1Object(MapPersistentState& mapState, PoolObjec
             GameObjectData const* data = sObjectMgr.GetGOData(obj->guid);
             MANGOS_ASSERT(data);
             GameObject* pGameobject = GameObject::CreateGameObject(data->id);
-            //DEBUG_LOG("Spawning gameobject %u", obj->guid);
+            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Spawning gameobject %u", obj->guid);
             if (!pGameobject->LoadFromDB(obj->guid, dataMap))
             {
                 delete pGameobject;
@@ -625,7 +625,7 @@ struct PoolMapChecker
         // pool spawns must be at single instanceable map
         if (mapEntry->Instanceable())
         {
-            sLog.outErrorDb("`%s` has %s spawned at instanceable map %u when one or several other spawned at different map %u in pool id %i, skipped.",
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` has %s spawned at instanceable map %u when one or several other spawned at different map %u in pool id %i, skipped.",
                             tableName, elementName, mapid, poolMapEntry->id, pool_id);
             return false;
         }
@@ -633,7 +633,7 @@ struct PoolMapChecker
         // pool spawns must be at single instanceable map
         if (poolMapEntry->Instanceable())
         {
-            sLog.outErrorDb("`%s` has %s spawned at map %u when one or several other spawned at different instanceable map %u in pool id %i, skipped.",
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` has %s spawned at map %u when one or several other spawned at different instanceable map %u in pool id %i, skipped.",
                             tableName, elementName, mapid, poolMapEntry->id, pool_id);
             return false;
         }
@@ -647,12 +647,12 @@ bool CheckPoolAndChance(char const* table, uint16 pool_id, float chance)
 {
     if (pool_id > sPoolMgr.GetMaxPoolId())
     {
-        sLog.outErrorDb("`%s` pool id (%i) is out of range compared to max pool id in `pool_template`, skipped.", table, pool_id);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` pool id (%i) is out of range compared to max pool id in `pool_template`, skipped.", table, pool_id);
         return false;
     }
     if (chance < 0 || chance > 100)
     {
-        sLog.outErrorDb("`%s` has an invalid chance (%f) in pool id (%i), skipped.", table, chance, pool_id);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` has an invalid chance (%f) in pool id (%i), skipped.", table, chance, pool_id);
         return false;
     }
     return true;
@@ -663,8 +663,8 @@ void PoolManager::LoadFromDB()
     QueryResult* result = WorldDatabase.PQuery("SELECT MAX(`entry`) FROM `pool_template` WHERE %u BETWEEN `patch_min` AND `patch_max`", sWorld.GetWowPatch());
     if (!result)
     {
-        sLog.outString(">> Table pool_template is empty.");
-        sLog.outString();
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Table pool_template is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         return;
     }
     else
@@ -680,8 +680,8 @@ void PoolManager::LoadFromDB()
     if (!result)
     {
         mPoolTemplate.clear();
-        sLog.outString(">> Table pool_template is empty:");
-        sLog.outString();
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Table pool_template is empty:");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         return;
     }
 
@@ -708,8 +708,8 @@ void PoolManager::LoadFromDB()
     }
     while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u objects pools", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u objects pools", count);
     delete result;
 
     PoolMapChecker mapChecker(mPoolTemplate);
@@ -731,8 +731,8 @@ void PoolManager::LoadFromDB()
         BarGoLink bar2(1);
         bar2.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded %u creatures in pools from `pool_creature`", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creatures in pools from `pool_creature`", count);
     }
     else
     {
@@ -760,7 +760,7 @@ void PoolManager::LoadFromDB()
             CreatureData const* data = sObjectMgr.GetCreatureData(guid);
             if (!data)
             {
-                sLog.outErrorDb("`%s` has a non existing creature spawn (GUID: %u) defined for pool id (%u), skipped.", table, guid, pool_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` has a non existing creature spawn (GUID: %u) defined for pool id (%u), skipped.", table, guid, pool_id);
                 continue;
             }
             // `pool_creature` and `pool_creature_template` can't have guids duplicates (in second case because entries also unique)
@@ -768,7 +768,7 @@ void PoolManager::LoadFromDB()
             // Also note: for added guid not important what case we skip from 2 tables
             if (uint16 alt_pool_id = IsPartOfAPool<Creature>(guid))
             {
-                sLog.outErrorDb("`%s` has guid %u for pool %u that already added to pool %u from `pool_creature_template` for creature entry %u, skipped.",
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` has guid %u for pool %u that already added to pool %u from `pool_creature_template` for creature entry %u, skipped.",
                                 table, guid, pool_id, alt_pool_id, entry_id);
                 continue;
             }
@@ -790,8 +790,8 @@ void PoolManager::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString();
-        sLog.outString(">> Loaded %u creatures in pools from `pool_creature` and `pool_creature_template`", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creatures in pools from `pool_creature` and `pool_creature_template`", count);
         delete result;
     }
 
@@ -810,8 +810,8 @@ void PoolManager::LoadFromDB()
         BarGoLink bar2(1);
         bar2.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded %u gameobject in pools from `pool_gameobject` and `pool_gameobject_template`", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobject in pools from `pool_gameobject` and `pool_gameobject_template`", count);
     }
     else
     {
@@ -839,7 +839,7 @@ void PoolManager::LoadFromDB()
             GameObjectData const* data = sObjectMgr.GetGOData(guid);
             if (!data)
             {
-                sLog.outErrorDb("`%s` has a non existing gameobject spawn (GUID: %u) defined for pool id (%u), skipped.", table, guid, pool_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` has a non existing gameobject spawn (GUID: %u) defined for pool id (%u), skipped.", table, guid, pool_id);
                 continue;
             }
             GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(data->id);
@@ -848,7 +848,7 @@ void PoolManager::LoadFromDB()
                     goinfo->type != GAMEOBJECT_TYPE_FISHINGHOLE &&
                     goinfo->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
             {
-                sLog.outErrorDb("`%s` has a not lootable gameobject spawn (GUID: %u, type: %u) defined for pool id (%u), skipped.", table, guid, goinfo->type, pool_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` has a not lootable gameobject spawn (GUID: %u, type: %u) defined for pool id (%u), skipped.", table, guid, goinfo->type, pool_id);
                 continue;
             }
             // `pool_gameobject` and `pool_gameobject_template` can't have guids duplicates (in second case because entries also unique)
@@ -856,7 +856,7 @@ void PoolManager::LoadFromDB()
             // Also note: for added guid not important what case we skip from 2 tables
             if (uint16 alt_pool_id = IsPartOfAPool<GameObject>(guid))
             {
-                sLog.outErrorDb("`%s` has guid %u for pool %u that already added to pool %u from `pool_gameobject_template` for gameobject entry %u, skipped.",
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`%s` has guid %u for pool %u that already added to pool %u from `pool_gameobject_template` for gameobject entry %u, skipped.",
                                 table, guid, pool_id, alt_pool_id, entry_id);
                 continue;
             }
@@ -878,8 +878,8 @@ void PoolManager::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString();
-        sLog.outString(">> Loaded %u gameobject in pools from `pool_gameobject` and `pool_gameobject_template`", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobject in pools from `pool_gameobject` and `pool_gameobject_template`", count);
         delete result;
     }
 
@@ -894,8 +894,8 @@ void PoolManager::LoadFromDB()
         BarGoLink bar2(1);
         bar2.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded %u pools in pools", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u pools in pools", count);
     }
     else
     {
@@ -914,12 +914,12 @@ void PoolManager::LoadFromDB()
 
             if (child_pool_id > max_pool_id)
             {
-                sLog.outErrorDb("`pool_pool` included pool_id (%i) is out of range compared to max pool id in `pool_template`, skipped.", child_pool_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`pool_pool` included pool_id (%i) is out of range compared to max pool id in `pool_template`, skipped.", child_pool_id);
                 continue;
             }
             if (mother_pool_id == child_pool_id)
             {
-                sLog.outErrorDb("`pool_pool` pool_id (%i) includes itself, dead-lock detected, skipped.", child_pool_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`pool_pool` pool_id (%i) includes itself, dead-lock detected, skipped.", child_pool_id);
                 continue;
             }
             if (!CheckPoolAndChance("pool_pool", mother_pool_id, chance))
@@ -969,7 +969,7 @@ void PoolManager::LoadFromDB()
                         ss << checkedPool << " ";
                     ss << "create(s) a circular reference, which can cause the server to freeze.\nRemoving the last link between mother pool "
                        << poolItr->first << " and child pool " << poolItr->second;
-                    sLog.outErrorDb("%s", ss.str().c_str());
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "%s", ss.str().c_str());
                     mPoolPoolGroups[poolItr->second].RemoveOneRelation(poolItr->first);
                     mPoolSearchMap.erase(poolItr);
                     --count;
@@ -978,8 +978,8 @@ void PoolManager::LoadFromDB()
             }
         }
 
-        sLog.outString();
-        sLog.outString(">> Loaded %u pools in mother pools", count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u pools in mother pools", count);
         delete result;
     }
 
@@ -990,7 +990,7 @@ void PoolManager::LoadFromDB()
         {
             if (!CheckPool(pool_entry))
             {
-                sLog.outErrorDb("Pool Id (%u) has all creatures or gameobjects with explicit chance sum <>100 and no equal chance defined. The pool system cannot pick one to spawn.", pool_entry);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Pool Id (%u) has all creatures or gameobjects with explicit chance sum <>100 and no equal chance defined. The pool system cannot pick one to spawn.", pool_entry);
                 mPoolTemplate[pool_entry].PoolFlags &= ~POOL_FLAG_AUTO_SPAWN;
             }
         }

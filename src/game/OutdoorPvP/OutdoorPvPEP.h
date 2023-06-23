@@ -214,6 +214,7 @@ uint32 const EP_AllianceBuffs[4] = { SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_1, 
 uint32 const EP_HordeBuffs[4] = { SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_1, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_2, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_3, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_4 };
 
 uint32 const EP_Zone = 139; // Eastern Plaguelands.
+uint32 const TFV_area = 2258; // The Fungal Vale.
 
 uint32 const EP_GraveYardId = 927;
 

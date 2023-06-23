@@ -350,7 +350,7 @@ void MotionMaster::MoveIdle()
 void MotionMaster::MoveRandom(bool use_current_position, float wander_distance, uint32 expire_time)
 {
     if (!m_owner->IsCreature())
-        sLog.outError("%s attempts to move random.", m_owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempts to move random.", m_owner->GetGuidStr().c_str());
     else
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s move random.", m_owner->GetGuidStr().c_str());
@@ -381,7 +381,12 @@ void MotionMaster::MoveTargetedHome()
     }
     else if (m_owner->IsCreature() && ((Creature*)m_owner)->GetCharmerOrOwnerGuid())
     {
-        if (Unit* target = ((Creature*)m_owner)->GetCharmerOrOwner())
+        if (m_owner->GetCharmInfo() && m_owner->GetCharmInfo()->IsAtStay())
+        {
+            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s is at stay", m_owner->GetGuidStr().c_str());
+            MoveIdle();
+        }
+        else if (Unit* target = ((Creature*)m_owner)->GetCharmerOrOwner())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
             Mutate(new FollowMovementGenerator<Creature>(*target, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE));
@@ -390,7 +395,7 @@ void MotionMaster::MoveTargetedHome()
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s attempt but fail to follow owner", m_owner->GetGuidStr().c_str());
     }
     else
-        sLog.outError("%s attempt targeted home", m_owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt targeted home", m_owner->GetGuidStr().c_str());
 }
 
 void MotionMaster::MoveConfused()
@@ -455,7 +460,7 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, uint32 option
 void MotionMaster::MoveSeekAssistance(float x, float y, float z)
 {
     if (m_owner->IsPlayer())
-        sLog.outError("%s attempt to seek assistance", m_owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt to seek assistance", m_owner->GetGuidStr().c_str());
     else
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s seek assistance (X: %f Y: %f Z: %f)",
@@ -467,7 +472,7 @@ void MotionMaster::MoveSeekAssistance(float x, float y, float z)
 void MotionMaster::MoveSeekAssistanceDistract(uint32 time)
 {
     if (m_owner->IsPlayer())
-        sLog.outError("%s attempt to call distract after assistance", m_owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt to call distract after assistance", m_owner->GetGuidStr().c_str());
     else
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s is distracted after assistance call (Time: %u)",
@@ -516,7 +521,7 @@ void MotionMaster::MoveWaypointAsDefault(uint32 startPoint /*=0*/, uint32 source
     {
         if (GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
         {
-            sLog.outError("Creature %s (Entry %u) attempt to MoveWaypoint() but creature is already using waypoint", m_owner->GetGuidStr().c_str(), m_owner->GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature %s (Entry %u) attempt to MoveWaypoint() but creature is already using waypoint", m_owner->GetGuidStr().c_str(), m_owner->GetEntry());
             return;
         }
 
@@ -546,7 +551,7 @@ void MotionMaster::MoveWaypointAsDefault(uint32 startPoint /*=0*/, uint32 source
         newWPMMgen->InitializeWaypointPath(*creature, startPoint, (WaypointPathOrigin)source, initialDelay, overwriteGuid, overwriteEntry, repeat);
     }
     else
-        sLog.outError("Non-creature %s attempt to MoveWaypoint()", m_owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Non-creature %s attempt to MoveWaypoint()", m_owner->GetGuidStr().c_str());
 }
 
 void MotionMaster::MoveWaypoint(uint32 startPoint /*=0*/, uint32 source /*=0==PATH_NO_PATH*/, uint32 initialDelay /*=0*/, uint32 overwriteGuid /*=0*/, uint32 overwriteEntry /*=0*/, bool repeat /*=true*/)
@@ -555,7 +560,7 @@ void MotionMaster::MoveWaypoint(uint32 startPoint /*=0*/, uint32 source /*=0==PA
     {
         if (GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
         {
-            sLog.outError("Creature %s (Entry %u) attempt to MoveWaypoint() but creature is already using waypoint", m_owner->GetGuidStr().c_str(), m_owner->GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature %s (Entry %u) attempt to MoveWaypoint() but creature is already using waypoint", m_owner->GetGuidStr().c_str(), m_owner->GetEntry());
             return;
         }
 
@@ -567,7 +572,7 @@ void MotionMaster::MoveWaypoint(uint32 startPoint /*=0*/, uint32 source /*=0==PA
         newWPMMgen->InitializeWaypointPath(*creature, startPoint, (WaypointPathOrigin)source, initialDelay, overwriteGuid, overwriteEntry, repeat);
     }
     else
-        sLog.outError("Non-creature %s attempt to MoveWaypoint()", m_owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Non-creature %s attempt to MoveWaypoint()", m_owner->GetGuidStr().c_str());
 }
 
 void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
@@ -582,13 +587,13 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
         }
         else
         {
-            sLog.outError("%s attempt taxi to (nonexistent Path %u node %u)",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt taxi to (nonexistent Path %u node %u)",
                           m_owner->GetGuidStr().c_str(), path, pathnode);
         }
     }
     else
     {
-        sLog.outError("%s attempt taxi to (Path %u node %u)",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt taxi to (Path %u node %u)",
                       m_owner->GetGuidStr().c_str(), path, pathnode);
     }
 }
@@ -612,7 +617,7 @@ void MotionMaster::MoveTaxiFlight()
                         debugString << "(Path " << foundPath << ")";
                     else
                     {
-                        sLog.outError("%s attempt taxi to (nonexistent Path %u)",
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt taxi to (nonexistent Path %u)",
                             m_owner->GetGuidStr().c_str(), foundPath);
                         return;
                     }
@@ -624,12 +629,12 @@ void MotionMaster::MoveTaxiFlight()
         }
         else
         {
-            sLog.outError("%s attempt taxi on an empty path", m_owner->GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt taxi on an empty path", m_owner->GetGuidStr().c_str());
         }
     }
     else
     {
-        sLog.outError("%s attempt taxi multi path", m_owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt taxi multi path", m_owner->GetGuidStr().c_str());
     }
 }
 
@@ -837,6 +842,9 @@ void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack
 
 bool MotionMaster::MoveDistance(Unit* pTarget, float distance)
 {
+    if (m_owner->GetTransport())
+        return false;
+
     float x, y, z;
     pTarget->GetNearPoint(m_owner, x, y, z, 0, distance, pTarget->GetAngle(m_owner));
     

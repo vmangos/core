@@ -1240,13 +1240,13 @@ bool ChatHandler::HandleWhispersCommand(char* args)
     // whisper on
     if (value)
     {
-        GetSession()->GetMasterPlayer()->SetAcceptWhispers(true);
+        GetSession()->GetPlayer()->SetAcceptWhispers(true);
         SendSysMessage(LANG_COMMAND_WHISPERON);
     }
     // whisper off
     else
     {
-        GetSession()->GetMasterPlayer()->SetAcceptWhispers(false);
+        GetSession()->GetPlayer()->SetAcceptWhispers(false);
         GetSession()->GetMasterPlayer()->ClearAllowedWhisperers();
         SendSysMessage(LANG_COMMAND_WHISPEROFF);
     }
@@ -1933,7 +1933,7 @@ bool ChatHandler::HandleCharacterHasItemCommand(char* args)
     if (!ExtractPlayerTarget(&args, &plTarget, &target_guid, &target_name))
         return false;
 
-    ItemPrototype const* pItem = ObjectMgr::GetItemPrototype(itemId);
+    ItemPrototype const* pItem = sObjectMgr.GetItemPrototype(itemId);
 
     if (!pItem)
     {
@@ -2542,8 +2542,8 @@ bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
 
                     // skip passives
                     if (pNewSpell->HasAttribute(SPELL_ATTR_PASSIVE) ||
-                        pNewSpell->HasAttribute(SPELL_ATTR_HIDDEN_CLIENTSIDE) ||
-                        pNewSpell->HasAttribute(SPELL_ATTR_EX2_DISPLAY_IN_STANCE_BAR))
+                        pNewSpell->HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY) ||
+                        pNewSpell->HasAttribute(SPELL_ATTR_EX2_USE_SHAPESHIFT_BAR))
                         continue;
                 } 
 
@@ -2720,6 +2720,102 @@ bool ChatHandler::HandleLearnAllMyTalentsCommand(char* /*args*/)
 
     SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
     return true;
+}
+
+bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    
+    uint32 trainerId;
+    if (ExtractUInt32(&args, trainerId))
+    {
+        if (TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId))
+            HandleLearnTrainerHelper(pPlayer, tSpells);
+        else
+        {
+            SendSysMessage("Trainer template not found!");
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+    else
+    {
+        std::set<uint32> checkedTrainerTemplates;
+        for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
+        {
+            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i);
+            if (!cInfo)
+                continue;
+
+            if (!(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
+                continue;
+
+            switch (cInfo->trainer_type)
+            {
+                case TRAINER_TYPE_CLASS:
+                {
+                    if (cInfo->trainer_class != pPlayer->GetClass())
+                        continue;
+                    break;
+                }
+                case TRAINER_TYPE_PETS:
+                {
+                    if (pPlayer->GetClass() != CLASS_HUNTER)
+                        continue;
+                    break;
+                }
+            }
+
+            if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(i))
+                HandleLearnTrainerHelper(pPlayer, cSpells);
+
+            if (trainerId = cInfo->trainer_id) // assignment
+            {
+                if (checkedTrainerTemplates.find(trainerId) != checkedTrainerTemplates.end())
+                    continue;
+
+                checkedTrainerTemplates.insert(trainerId);
+                if (TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId))
+                    HandleLearnTrainerHelper(pPlayer, tSpells);
+            }
+        }
+    }
+
+    SendSysMessage("Learned all available spells from trainers.");
+    return true;
+}
+
+void ChatHandler::HandleLearnTrainerHelper(Player* player, TrainerSpellData const* tSpells)
+{
+    // spells are not in rank order, so we need to do multiple loops to learn everything
+    bool learnedAnything;
+    do
+    {
+        learnedAnything = false;
+        for (const auto& itr : tSpells->spellList)
+        {
+            TrainerSpell const* tSpell = &itr.second;
+
+            TrainerSpellState state = player->GetTrainerSpellState(tSpell);
+            if (state != TRAINER_SPELL_GREEN)
+                continue;
+
+            for (auto const& spellId : sSpellMgr.GetSpellEntry(tSpell->spell)->EffectTriggerSpell)
+            {
+                if (!spellId)
+                    continue;
+
+                if (sSpellMgr.IsPrimaryProfessionFirstRankSpell(spellId))
+                    continue;
+
+                if (!player->IsSpellFitByClassAndRace(spellId))
+                    continue;
+
+                player->LearnSpell(spellId, false);
+                learnedAnything = true;
+            }
+        }
+    } while (learnedAnything);
 }
 
 bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
@@ -3074,9 +3170,9 @@ bool ChatHandler::HandleAddItemCommand(char* args)
     if (!plTarget)
         plTarget = pl;
 
-    DETAIL_LOG(GetMangosString(LANG_ADDITEM), itemId, count);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_ADDITEM), itemId, count);
 
-    if (!ObjectMgr::GetItemPrototype(itemId))
+    if (!sObjectMgr.GetItemPrototype(itemId))
     {
         PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
         SetSentErrorMessage(true);
@@ -3179,7 +3275,7 @@ bool ChatHandler::HandleDeleteItemCommand(char* args)
         return false;
     }
 
-    DETAIL_LOG(GetMangosString(LANG_REMOVEITEM), itemId, count);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_REMOVEITEM), itemId, count);
 
     if (player)
     {
@@ -3305,23 +3401,19 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
     if (!plTarget)
         plTarget = pl;
 
-    DETAIL_LOG(GetMangosString(LANG_ADDITEMSET), itemsetId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_ADDITEMSET), itemsetId);
 
     bool found = false;
-    for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype>(id);
-        if (!pProto)
-            continue;
-
-        if (pProto->ItemSet == itemsetId)
+        if (itr.second.ItemSet == itemsetId)
         {
             found = true;
             ItemPosCountVec dest;
-            InventoryResult msg = plTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pProto->ItemId, 1);
+            InventoryResult msg = plTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itr.second.ItemId, 1);
             if (msg == EQUIP_ERR_OK)
             {
-                Item* item = plTarget->StoreNewItem(dest, pProto->ItemId, true);
+                Item* item = plTarget->StoreNewItem(dest, itr.second.ItemId, true);
 
                 // remove binding (let GM give it to another player later)
                 if (pl == plTarget)
@@ -3333,8 +3425,8 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
             }
             else
             {
-                pl->SendEquipError(msg, nullptr, nullptr, pProto->ItemId);
-                PSendSysMessage(LANG_ITEM_CANNOT_CREATE, pProto->ItemId, 1);
+                pl->SendEquipError(msg, nullptr, nullptr, itr.second.ItemId);
+                PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itr.second.ItemId, 1);
             }
         }
     }
@@ -3363,7 +3455,7 @@ bool ChatHandler::HandleListItemCommand(char* args)
         return false;
     }
 
-    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(item_id);
+    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(item_id);
     if (!itemProto)
     {
         PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, item_id);
@@ -3585,7 +3677,7 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
     ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(player->GetClass());
     if (!cEntry)
     {
-        sLog.outError("Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
         return false;
     }
 
@@ -4289,7 +4381,9 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
     if (HasLowerSecurity(chr))
         return false;
 
-    int32 addmoney = atoi(args);
+    int32 addmoney;
+    if (!ExtractInt32(&args, addmoney))
+        return false;
 
     uint32 moneyuser = chr->GetMoney();
 
@@ -4297,7 +4391,7 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
     {
         int32 newmoney = int32(moneyuser) + addmoney;
 
-        DETAIL_LOG(GetMangosString(LANG_CURRENT_MONEY), moneyuser, addmoney, newmoney);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_CURRENT_MONEY), moneyuser, addmoney, newmoney);
         if (newmoney <= 0)
         {
             PSendSysMessage(LANG_YOU_TAKE_ALL_MONEY, GetNameLink(chr).c_str());
@@ -4329,7 +4423,7 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
             chr->LogModifyMoney(addmoney, "GM", m_session->GetPlayer()->GetObjectGuid());
     }
 
-    DETAIL_LOG(GetMangosString(LANG_NEW_MONEY), moneyuser, addmoney, chr->GetMoney());
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_NEW_MONEY), moneyuser, addmoney, chr->GetMoney());
 
     return true;
 }
@@ -4577,7 +4671,7 @@ bool ChatHandler::HandleModifyEnergyCommand(char* args)
     chr->SetMaxPower(POWER_ENERGY, energym);
     chr->SetPower(POWER_ENERGY, energy);
 
-    DETAIL_LOG(GetMangosString(LANG_CURRENT_ENERGY), chr->GetMaxPower(POWER_ENERGY));
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, GetMangosString(LANG_CURRENT_ENERGY), chr->GetMaxPower(POWER_ENERGY));
 
     return true;
 }
@@ -4868,15 +4962,11 @@ bool ChatHandler::HandleQuestAddCommand(char* args)
     }
 
     // check item starting quest (it can work incorrectly if added without item in inventory)
-    for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); ++id)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype>(id);
-        if (!pProto)
-            continue;
-
-        if (pProto->StartQuest == entry)
+        if (itr.second.StartQuest == entry)
         {
-            PSendSysMessage(LANG_COMMAND_QUEST_STARTFROMITEM, entry, pProto->ItemId);
+            PSendSysMessage(LANG_COMMAND_QUEST_STARTFROMITEM, entry, itr.second.ItemId);
             SetSentErrorMessage(true);
             return false;
         }
@@ -4996,7 +5086,7 @@ bool ChatHandler::HandleQuestStatusCommand(char* args)
     {
         rewardInfo << "item: " << questData.m_reward_choice << " ";
 
-        const auto itemProto = sItemStorage.LookupEntry<ItemPrototype>(questData.m_reward_choice);
+        const auto itemProto = sObjectMgr.GetItemPrototype(questData.m_reward_choice);
 
         if (itemProto)
         {
@@ -5343,7 +5433,7 @@ bool ChatHandler::HandleServiceDeleteCharacters(char* args)
         delete result;
     }
 
-    sLog.outString("Service: Removed %u characters", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Service: Removed %u characters", count);
     return true;
 }
 
@@ -5479,7 +5569,7 @@ bool ChatHandler::HandleGroupAddItemCommand(char* args)
     if (!ExtractUInt32(&args, itemId))
         return false;
 
-    if (!ObjectMgr::GetItemPrototype(itemId))
+    if (!sObjectMgr.GetItemPrototype(itemId))
     {
         PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
         SetSentErrorMessage(true);
@@ -5589,5 +5679,46 @@ bool ChatHandler::HandleGroupSummonCommand(char* args)
     }
 
     PSendSysMessage("Sent summon request to all group members.");
+    return true;
+}
+
+bool ChatHandler::HandleListExploredAreasCommand(char* args)
+{
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Listing explored areas by %s", pPlayer->GetName());
+    for (auto itr = sAreaStorage.begin<AreaEntry>(); itr < sAreaStorage.end<AreaEntry>(); ++itr)
+    {
+        std::string name = itr->Name;
+        sObjectMgr.GetAreaLocaleString(itr->Id, GetSessionDbLocaleIndex(), &name);
+
+        if (!itr->ExploreFlag || itr->ExploreFlag == 0xffff)
+            continue;;
+
+        int offset = itr->ExploreFlag / 32;
+        if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
+            continue;
+
+        uint32 val = (uint32)(1 << (itr->ExploreFlag % 32));
+        uint32 currFields = pPlayer->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + offset);
+        if (currFields & val)
+        {
+            int locale = GetSessionDbLocaleIndex() + 1;
+            // send area in "id - [name]" format
+            std::ostringstream ss;
+            if (m_session)
+                ss << itr->Id << " - |cffffffff|Harea:" << itr->Id << "|h[" << name << " " << localeNames[locale] << "]|h|r";
+            else
+                ss << itr->Id << " - " << name << " " << localeNames[locale];
+
+            SendSysMessage(ss.str().c_str());
+        }
+    }
     return true;
 }

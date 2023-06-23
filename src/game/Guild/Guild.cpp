@@ -112,7 +112,7 @@ bool Guild::Create(Petition* petition, Player* leader)
         if (signature->GetSignatureGuid().IsEmpty())
             continue;
 
-        AddMember(signature->GetSignatureGuid(), GetLowestRank());
+        AddMember(signature->GetSignatureGuid(), GetLowestRank(), petition->GetId());
     }
 
     return true;
@@ -132,7 +132,7 @@ bool Guild::Create(Player* leader, std::string gname)
     {
         if (a->filterMessage(gname))
         {
-            sWorld.LogChat(lSession, "Guild", "Attempt to create guild with spam name" + gname);
+            sWorld.LogChat(lSession, "Guild", "Attempt to create guild with spam name");
             return false;
         }
     }
@@ -150,7 +150,7 @@ bool Guild::Create(Player* leader, std::string gname)
     m_CreatedMonth = local.tm_mon + 1;
     m_CreatedYear  = local.tm_year + 1900;
 
-    DEBUG_LOG("GUILD: creating guild %s to leader: %s", gname.c_str(), m_LeaderGuid.GetString().c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "GUILD: creating guild %s to leader: %s", gname.c_str(), m_LeaderGuid.GetString().c_str());
 
     // gname already assigned to Guild::name, use it to encode string for DB
     CharacterDatabase.escape_string(gname);
@@ -194,7 +194,7 @@ void Guild::Rename(std::string& newName)
     CharacterDatabase.PExecute("UPDATE `guild` SET `name` = '%s' WHERE `guild_id` = '%u'", escaped.c_str(), m_Id);
 }
 
-GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
+GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank, uint32 petitionId)
 {
     Player* pl = sObjectAccessor.FindPlayerNotInWorld(plGuid);
     if (pl)
@@ -210,7 +210,7 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
 
     // remove all player signs from another petitions
     // this will be prevent attempt joining player to many guilds and corrupt guild data integrity
-    Player::RemovePetitionsAndSigns(plGuid);
+    Player::RemovePetitionsAndSigns(plGuid, petitionId);
 
     uint32 lowguid = plGuid.GetCounter();
 
@@ -241,7 +241,7 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
         if (newmember.Level < 1 || newmember.Level > PLAYER_STRONG_MAX_LEVEL ||
                 !((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE))
         {
-            sLog.outError("%s has a broken data in field `characters` table, cannot add him to guild.", plGuid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters` table, cannot add him to guild.", plGuid.GetString().c_str());
             return GuildAddStatus::PLAYER_DATA_ERROR;
         }
     }
@@ -351,7 +351,7 @@ bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
 {
     if (!guildRanksResult)
     {
-        sLog.outError("Guild %u has broken `guild_rank` data, creating new...", m_Id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Guild %u has broken `guild_rank` data, creating new...", m_Id);
         CreateDefaultGuildRanks(0);
         return true;
     }
@@ -375,7 +375,7 @@ bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
         if (guildId < m_Id)
         {
             //there is in table guild_rank record which doesn't have guild_id in guild table, report error
-            sLog.outErrorDb("Guild %u does not exist but it has a record in guild_rank table, deleting it!", guildId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Guild %u does not exist but it has a record in guild_rank table, deleting it!", guildId);
             CharacterDatabase.PExecute("DELETE FROM `guild_rank` WHERE `guild_id` = '%u'", guildId);
             continue;
         }
@@ -401,14 +401,14 @@ bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
     if (m_Ranks.size() < GUILD_RANKS_MIN_COUNT)             // if too few ranks, renew them
     {
         m_Ranks.clear();
-        sLog.outError("Guild %u has broken `guild_rank` data, creating new...", m_Id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Guild %u has broken `guild_rank` data, creating new...", m_Id);
         CreateDefaultGuildRanks(0);                         // 0 is default locale_idx
         broken_ranks = false;
     }
     // guild_rank have wrong numbered ranks, repair
     if (broken_ranks)
     {
-        sLog.outError("Guild %u has broken `guild_rank` data, repairing...", m_Id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Guild %u has broken `guild_rank` data, repairing...", m_Id);
         CharacterDatabase.BeginTransaction();
         CharacterDatabase.PExecute("DELETE FROM `guild_rank` WHERE `guild_id`='%u'", m_Id);
         for (size_t i = 0; i < m_Ranks.size(); ++i)
@@ -439,7 +439,7 @@ bool Guild::LoadMembersFromDB(QueryResult* guildMembersResult)
         if (guildId < m_Id)
         {
             // there is in table guild_member record which doesn't have guild_id in guild table, report error
-            sLog.outErrorDb("Guild %u does not exist but it has a record in guild_member table, deleting it!", guildId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Guild %u does not exist but it has a record in guild_member table, deleting it!", guildId);
             CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guild_id` = '%u'", guildId);
             continue;
         }
@@ -469,20 +469,20 @@ bool Guild::LoadMembersFromDB(QueryResult* guildMembersResult)
         // this code will remove not existing character guids from guild
         if (newmember.Level < 1 || newmember.Level > PLAYER_STRONG_MAX_LEVEL) // can be at broken `data` field
         {
-            sLog.outError("%s has a broken data in field `characters`.`data`, deleting him from guild!", newmember.guid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters`.`data`, deleting him from guild!", newmember.guid.GetString().c_str());
             CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guid` = '%u'", lowguid);
             continue;
         }
         if (!newmember.ZoneId)
         {
-            sLog.outError("%s has broken zone-data", newmember.guid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has broken zone-data", newmember.guid.GetString().c_str());
             // here it will also try the same, to get the zone from characters-table, but additional it tries to find
             // the zone through xy coords .. this is a bit redundant, but shouldn't be called often
             newmember.ZoneId = Player::GetZoneIdFromDB(newmember.guid);
         }
         if (!((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE)) // can be at broken `class` field
         {
-            sLog.outError("%s has a broken data in field `characters`.`class`, deleting him from guild!", newmember.guid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters`.`class`, deleting him from guild!", newmember.guid.GetString().c_str());
             CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guid` = '%u'", lowguid);
             continue;
         }
@@ -583,7 +583,7 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
     return members.empty();
 }
 
-void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint32 language)
+void Guild::BroadcastToGuild(WorldSession* session, char const* msg, uint32 language)
 {
     if (!session)
         return;
@@ -593,7 +593,7 @@ void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint
         return;
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg.c_str(), Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg, Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
 
     for (const auto& member : members)
     {
@@ -607,7 +607,7 @@ void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint
     }
 }
 
-void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, uint32 language)
+void Guild::BroadcastToOfficers(WorldSession* session, char const* msg, uint32 language)
 {
     if (!session)
         return;
@@ -617,7 +617,7 @@ void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, u
         return;
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg.c_str(), Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg, Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
 
     for (const auto& member : members)
     {
@@ -758,17 +758,17 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
     data << uint32(0); // members count placeholder
     spaceLeft -= sizeof(uint32);
     data << MOTD;
-    spaceLeft -= MOTD.length() + 1;
+    spaceLeft -= (MOTD.length() + 1);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GINFO;
-    spaceLeft -= GINFO.length() + 1;
+    spaceLeft -= (GINFO.length() + 1);
 #endif
 
     data << uint32(m_Ranks.size());
     spaceLeft -= sizeof(uint32);
     for (const auto& itr : m_Ranks)
         data << uint32(itr.Rights);
-    spaceLeft -= m_Ranks.size() * sizeof(uint32);
+    spaceLeft -= (m_Ranks.size() * sizeof(uint32));
 
     uint32 count = 0;
     for (const auto& itr : members)
@@ -789,7 +789,7 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
             1;                            // null byte for officer note
 
         spaceLeft -= spaceNeeded;
-        if (spaceLeft < 0)
+        if (spaceLeft <= 0)
             break;
         count++;
         
@@ -828,8 +828,6 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
         session->SendPacket(&data);
     else
         BroadcastPacket(&data);
-
-    DEBUG_LOG("WORLD: Sent (SMSG_GUILD_ROSTER)");
 }
 
 void Guild::Query(WorldSession* session)
@@ -854,7 +852,6 @@ void Guild::Query(WorldSession* session)
     data << int32(m_BackgroundColor);
 
     session->SendPacket(&data);
-    DEBUG_LOG("WORLD: Sent (SMSG_GUILD_QUERY_RESPONSE)");
 }
 
 void Guild::SetEmblem(int32 emblemStyle, int32 emblemColor, int32 borderStyle, int32 borderColor, int32 backgroundColor)
@@ -994,6 +991,4 @@ void Guild::BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 
         data << guid;
 
     BroadcastPacket(&data);
-
-    DEBUG_LOG("WORLD: Sent SMSG_GUILD_EVENT");
 }

@@ -27,224 +27,333 @@
 #include "ByteBuffer.h"
 #include "Util.h"
 #include "Auth/HMACSHA1.h"
-
+#include "Auth/Sha1.h"
 #include <openssl/sha.h>
+#include <openssl/md5.h>
 
 #include <string>
 #include <algorithm>
 #include <functional>
 
-WindowsModuleScan::WindowsModuleScan(const std::string &module, bool wanted, const std::string &comment, uint32 flags)
-    : _module(module), _wanted(wanted),
+ScanFlags operator|(ScanFlags lhs, ScanFlags rhs)
+{
+    return static_cast<ScanFlags> (
+        static_cast<std::underlying_type<ScanFlags>::type>(lhs) |
+        static_cast<std::underlying_type<ScanFlags>::type>(rhs)
+        );
+}
+
+ScanFlags operator&(ScanFlags lhs, ScanFlags rhs)
+{
+    return static_cast<ScanFlags> (
+        static_cast<std::underlying_type<ScanFlags>::type>(lhs) &
+        static_cast<std::underlying_type<ScanFlags>::type>(rhs)
+        );
+}
+
+bool operator!(ScanFlags flags)
+{
+    return !static_cast<std::underlying_type<ScanFlags>::type>(flags);
+}
+
+bool operator&&(ScanFlags lhs, ScanFlags rhs)
+{
+    return static_cast<std::underlying_type<ScanFlags>::type>(lhs) &&
+           static_cast<std::underlying_type<ScanFlags>::type>(rhs);
+}
+
+Scan::BuildT StringHashScan::GetBuilder()
+{
+    return [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
+    {
+        std::string& string = warden->m_hashString;
+
+        string.clear();
+        uint8 size = urand(1, 255);
+        string.reserve(size);
+        for (uint8 i = 0; i < size; i++)
+            string += (char)urand('a', 'z');
+
+        MANGOS_ASSERT(string.size() <= 0xFF);
+
+        scan << static_cast<uint8>(string.size());
+
+        // skip null terminator this way
+        scan.append(string.c_str(), string.size());
+    };
+}
+
+Scan::CheckT StringHashScan::GetChecker()
+{
+    return [this](Warden const* warden, ByteBuffer& buff)
+    {
+        // calculate server side hashes
+
+        uint8 serverSHA[SHA_DIGEST_LENGTH];
+        uint8 serverMD5[MD5_DIGEST_LENGTH];
+
+        static constexpr uint32 magic = 0xFEEDFACE;
+
+        Sha1Hash sha1;
+        sha1.UpdateData(warden->m_hashString);
+        if (!warden->IsUsingMaiev()) // this constant is only used if there is a module
+            sha1.UpdateData(reinterpret_cast<uint8 const*>(&magic), sizeof(magic));
+        sha1.Finalize();
+
+        memcpy(serverSHA, sha1.GetDigest(), sizeof(serverSHA));
+
+        MD5_CTX md5;
+        MD5_Init(&md5);
+        MD5_Update(&md5, warden->m_hashString.c_str(), warden->m_hashString.size());
+        MD5_Final(serverMD5, &md5);
+
+        // compare with client side hashes
+
+        uint8 clientSHA[SHA_DIGEST_LENGTH];
+        uint8 clientMD5[MD5_DIGEST_LENGTH];
+
+        buff.read(clientSHA, sizeof(clientSHA));
+        buff.read(clientMD5, sizeof(clientMD5));
+
+        return !!memcmp(clientSHA, serverSHA, sizeof(clientSHA)) || !!memcmp(clientMD5, serverMD5, sizeof(clientMD5));
+    };
+}
+
+WindowsStringHashScan::WindowsStringHashScan()
+    : StringHashScan(), WindowsScan(
+    // builder
+    GetBuilder(),
+    // checker
+    GetChecker(),
+    128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, "Maiev string hash",
+    ScanFlags::Maiev, 0, UINT16_MAX)
+{
+    
+}
+
+MacStringHashScan::MacStringHashScan(bool moduleLoaded)
+    : StringHashScan(), MacScan(
+        // builder
+        GetBuilder(),
+        // checker
+        GetChecker(),
+        128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, moduleLoaded ? "Mac string hash" : "Maiev string hash",
+        (moduleLoaded ? ScanFlags::None : ScanFlags::Maiev), 0, UINT16_MAX)
+{
+
+}
+
+WindowsModuleScan::WindowsModuleScan(std::string const& module, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_module(module), m_wanted(wanted),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
         auto const seed = static_cast<uint32>(rand32());
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_MODULE_BY_NAME] ^ winWarden->GetXor()) << seed;
 
-        HMACSHA1 hash(reinterpret_cast<const uint8 *>(&seed), sizeof(seed));
-        hash.UpdateData(this->_module);
+        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        hash.UpdateData(this->m_module);
         hash.Finalize();
 
         scan.append(hash.GetDigest(), hash.GetLength());
     },
     // checker
-    [this](const Warden *, ByteBuffer &buff)
+    [this](Warden const*, ByteBuffer& buff)
     {
         auto const found = buff.read<uint8>() == ModuleFound;
-        return found != this->_wanted;
-    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH, sizeof(uint8), comment, flags)
+        return found != this->m_wanted;
+    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH, sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
     // the game depends on uppercase module names being sent
-    std::transform(_module.begin(), _module.end(), _module.begin(), ::toupper);
+    std::transform(m_module.begin(), m_module.end(), m_module.begin(), ::toupper);
 }
 
-WindowsModuleScan::WindowsModuleScan(const std::string &module, CheckT checker, const std::string &comment, uint32 flags)
-    : _module(module),
+WindowsModuleScan::WindowsModuleScan(std::string const& module, CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_module(module),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
         auto const seed = static_cast<uint32>(rand32());
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_MODULE_BY_NAME] ^ winWarden->GetXor()) << seed;
 
-        HMACSHA1 hash(reinterpret_cast<const uint8 *>(&seed), sizeof(seed));
-        hash.UpdateData(this->_module);
+        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        hash.UpdateData(this->m_module);
         hash.Finalize();
 
         scan.append(hash.GetDigest(), hash.GetLength());
     },
-    checker, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH, sizeof(uint8), comment, flags)
+    checker, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH, sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
     // the game depends on uppercase module names being sent
-    std::transform(_module.begin(), _module.end(), _module.begin(), ::toupper);
+    std::transform(m_module.begin(), m_module.end(), m_module.begin(), ::toupper);
 }
 
-WindowsMemoryScan::WindowsMemoryScan(uint32 offset, const void *expected, size_t length, const std::string &comment, uint32 flags)
-    : _expected(length), _offset(offset),
+WindowsMemoryScan::WindowsMemoryScan(uint32 offset, void const* expected, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_expected(length), m_offset(offset),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[READ_MEMORY] ^ winWarden->GetXor())
              << static_cast<uint8>(0)   // no string associated with this form of the constructor
-             << this->_offset
-             << static_cast<uint8>(this->_expected.size());
+             << this->m_offset
+             << static_cast<uint8>(this->m_expected.size());
     },
     // checker
-    [this](const Warden *, ByteBuffer &buff)
+    [this](Warden const*, ByteBuffer& buff)
     {
         // non-zero value indicates failure
         if (!!buff.read<uint8>())
             return true;
 
-        auto const result = !!memcmp(buff.contents() + buff.rpos(), &this->_expected[0], this->_expected.size());
-        buff.rpos(buff.rpos() + this->_expected.size());
+        auto const result = !!memcmp(buff.contents() + buff.rpos(), &this->m_expected[0], this->m_expected.size());
+        buff.rpos(buff.rpos() + this->m_expected.size());
         return result;
-    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags)
+    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags, minBuild, maxBuild)
 {
     // must fit within uint8
-    MANGOS_ASSERT(_expected.size() <= 0xFF);
+    MANGOS_ASSERT(m_expected.size() <= 0xFF);
 
-    ::memcpy(&_expected[0], expected, _expected.size());
+    ::memcpy(&m_expected[0], expected, m_expected.size());
 }
 
-WindowsMemoryScan::WindowsMemoryScan(const std::string &module, uint32 offset, const void *expected, size_t length, const std::string &comment, uint32 flags)
-    : _expected(length), _offset(offset), _module(module),
+WindowsMemoryScan::WindowsMemoryScan(std::string const& module, uint32 offset, void const* expected, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_expected(length), m_offset(offset), m_module(module),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() < 0xFF);
 
-        strings.emplace_back(this->_module);
+        strings.emplace_back(this->m_module);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[READ_MEMORY] ^ winWarden->GetXor())
              << static_cast<uint8>(strings.size())
-             << this->_offset
-             << static_cast<uint8>(this->_expected.size());
+             << this->m_offset
+             << static_cast<uint8>(this->m_expected.size());
     },
     // checker
-    [this](const Warden *, ByteBuffer &buff)
+    [this](Warden const*, ByteBuffer& buff)
     {
         // non-zero value indicates failure
         if (!!buff.read<uint8>())
             return true;
 
-        auto const result = !!memcmp(buff.contents() + buff.rpos(), &this->_expected[0], this->_expected.size());
-        buff.rpos(buff.rpos() + this->_expected.size());
+        auto const result = !!memcmp(buff.contents() + buff.rpos(), &this->m_expected[0], this->m_expected.size());
+        buff.rpos(buff.rpos() + this->m_expected.size());
         return result;
-    }, module.length() + sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags)
+    }, module.length() + sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags, minBuild, maxBuild)
 {
     // must fit within uint8
-    MANGOS_ASSERT(_expected.size() <= 0xFF);
+    MANGOS_ASSERT(m_expected.size() <= 0xFF);
 
-    ::memcpy(&_expected[0], expected, _expected.size());
+    ::memcpy(&m_expected[0], expected, m_expected.size());
 
     // since this scan uses GetModuleHandle() rather than GetFirstModule()/GetNextModule(), this is case insensitive.
     // but still it seems prudent to be consistent
-    std::transform(_module.begin(), _module.end(), _module.begin(), ::toupper);
+    std::transform(m_module.begin(), m_module.end(), m_module.begin(), ::toupper);
 }
 
-WindowsMemoryScan::WindowsMemoryScan(uint32 offset, size_t length, CheckT checker, const std::string &comment, uint32 flags)
-    : _expected(length), _offset(offset),
+WindowsMemoryScan::WindowsMemoryScan(uint32 offset, size_t length, CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_expected(length), m_offset(offset),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[READ_MEMORY] ^ winWarden->GetXor())
              << static_cast<uint8>(0)   // no string associated with this form of the constructor
-             << this->_offset
-             << static_cast<uint8>(this->_expected.size());
-    }, checker, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags)
+             << this->m_offset
+             << static_cast<uint8>(this->m_expected.size());
+    }, checker, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags, minBuild, maxBuild)
 {
-    MANGOS_ASSERT(_expected.size() <= 0xFF);
+    MANGOS_ASSERT(m_expected.size() <= 0xFF);
 }
 
-WindowsMemoryScan::WindowsMemoryScan(const std::string &module, uint32 offset, size_t length, CheckT checker, const std::string &comment, uint32 flags)
-    : _expected(length), _offset(offset), _module(module),
+WindowsMemoryScan::WindowsMemoryScan(std::string const& module, uint32 offset, size_t length, CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_expected(length), m_offset(offset), m_module(module),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() < 0xFF);
 
-        strings.emplace_back(this->_module);
+        strings.emplace_back(this->m_module);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[READ_MEMORY] ^ winWarden->GetXor())
              << static_cast<uint8>(strings.size())
-             << this->_offset
-             << static_cast<uint8>(this->_expected.size());
-    }, checker, module.length() + sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags) {}
+             << this->m_offset
+             << static_cast<uint8>(this->m_expected.size());
+    }, checker, module.length() + sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags, minBuild, maxBuild) {}
 
-WindowsCodeScan::WindowsCodeScan(uint32 offset, const std::vector<uint8> &pattern, bool memImageOnly, bool wanted, const std::string &comment, uint32 flags)
-    : _offset(offset), _pattern(pattern), _memImageOnly(memImageOnly), _wanted(wanted),
+WindowsCodeScan::WindowsCodeScan(uint32 offset, std::vector<uint8> const& pattern, bool memImageOnly, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_offset(offset), m_pattern(pattern), m_memImageOnly(memImageOnly), m_wanted(wanted),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
         auto const seed = static_cast<uint32>(rand32());
 
-        scan << static_cast<uint8>(winWarden->GetModule()->opcodes[this->_memImageOnly ? FIND_MEM_IMAGE_CODE_BY_HASH : FIND_CODE_BY_HASH] ^ winWarden->GetXor())
+        scan << static_cast<uint8>(winWarden->GetModule()->opcodes[this->m_memImageOnly ? FIND_MEM_IMAGE_CODE_BY_HASH : FIND_CODE_BY_HASH] ^ winWarden->GetXor())
              << seed;
 
-        HMACSHA1 hash(reinterpret_cast<const uint8 *>(&seed), sizeof(seed));
-        hash.UpdateData(&this->_pattern[0], this->_pattern.size());
+        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        hash.UpdateData(&this->m_pattern[0], this->m_pattern.size());
         hash.Finalize();
         
         scan.append(hash.GetDigest(), hash.GetLength());
 
-        scan << this->_offset << static_cast<uint8>(this->_pattern.size());
+        scan << this->m_offset << static_cast<uint8>(this->m_pattern.size());
     },
-    [this](const Warden *, ByteBuffer &buff)
+    [this](Warden const*, ByteBuffer& buff)
     {
         auto const found = buff.read<uint8>() == PatternFound;
-        return found != this->_wanted;
-    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint32) + sizeof(uint8), sizeof(uint8), comment, flags)
+        return found != this->m_wanted;
+    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint32) + sizeof(uint8), sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
-    MANGOS_ASSERT(_pattern.size() <= 0xFF);
+    MANGOS_ASSERT(m_pattern.size() <= 0xFF);
 }
 
-WindowsFileHashScan::WindowsFileHashScan(const std::string &file, const void *expected, bool wanted, const std::string &comment, uint32 flags)
-    : _file(file), _wanted(wanted), _hashMatch(!!expected),
+WindowsFileHashScan::WindowsFileHashScan(std::string const& file, void const* expected, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_file(file), m_wanted(wanted), m_hashMatch(!!expected),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() < 0xFF);
 
-        strings.emplace_back(this->_file);
+        strings.emplace_back(this->m_file);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[HASH_CLIENT_FILE] ^ winWarden->GetXor())
              << static_cast<uint8>(strings.size());
     },
     // checker
-    [this](const Warden *, ByteBuffer &buff)
+    [this](Warden const*, ByteBuffer& buff)
     {
         auto const success = !buff.read<uint8>();
 
         // either we wanted it but didn't find it, or didn't want it but did find it
-        if (this->_wanted != success)
+        if (this->m_wanted != success)
             return true;
 
         // if we didn't want it and didn't find it, succeed
-        if (!this->_wanted && !success)
+        if (!this->m_wanted && !success)
             return false;
 
         uint8 hash[SHA_DIGEST_LENGTH];
@@ -252,30 +361,30 @@ WindowsFileHashScan::WindowsFileHashScan(const std::string &file, const void *ex
         buff.read(hash, sizeof(hash));
 
         // if a hash was given, check it (some checks may only be interested in existence)
-        return this->_hashMatch && !!memcmp(hash, this->_expected, sizeof(hash));
-    }, sizeof(uint8) + sizeof(uint8) + file.length(), sizeof(uint8) + SHA_DIGEST_LENGTH, comment, flags)
+        return this->m_hashMatch && !!memcmp(hash, this->m_expected, sizeof(hash));
+    }, sizeof(uint8) + sizeof(uint8) + file.length(), sizeof(uint8) + SHA_DIGEST_LENGTH, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
-    if (_hashMatch)
-        ::memcpy(_expected, expected, sizeof(_expected));
+    if (m_hashMatch)
+        ::memcpy(m_expected, expected, sizeof(m_expected));
 }
 
-WindowsLuaScan::WindowsLuaScan(const std::string &lua, bool wanted, const std::string &comment, uint32 flags)
-    : _lua(lua), _wanted(wanted),
+WindowsLuaScan::WindowsLuaScan(std::string const& lua, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_lua(lua), m_wanted(wanted),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() < 0xFF);
 
-        strings.emplace_back(this->_lua);
+        strings.emplace_back(this->m_lua);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[GET_LUA_VARIABLE] ^ winWarden->GetXor())
             << static_cast<uint8>(strings.size());
     },
     // checker
-    [this](const Warden *, ByteBuffer &buff)
+    [this](Warden const*, ByteBuffer& buff)
     {
         auto const found = !buff.read<uint8>();
 
@@ -286,26 +395,26 @@ WindowsLuaScan::WindowsLuaScan(const std::string &lua, bool wanted, const std::s
             buff.rpos(buff.rpos() + length);
         }
 
-        return found != this->_wanted;
-    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags) {}
+        return found != this->m_wanted;
+    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild) {}
 
-WindowsLuaScan::WindowsLuaScan(const std::string &lua, const std::string &expectedValue, const std::string &comment, uint32 flags)
-    : _lua(lua), _expectedValue(expectedValue),
+WindowsLuaScan::WindowsLuaScan(std::string const& lua, std::string const& expectedValue, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_lua(lua), m_expectedValue(expectedValue),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() < 0xFF);
 
-        strings.emplace_back(this->_lua);
+        strings.emplace_back(this->m_lua);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[GET_LUA_VARIABLE] ^ winWarden->GetXor())
             << static_cast<uint8>(strings.size());
     },
     // checker
-    [this](const Warden *, ByteBuffer &buff)
+    [this](Warden const*, ByteBuffer& buff)
     {
         auto const result = buff.read<uint8>();
 
@@ -314,107 +423,107 @@ WindowsLuaScan::WindowsLuaScan(const std::string &lua, const std::string &expect
 
         const size_t len = buff.read<uint8>();
 
-        const std::string str(reinterpret_cast<const char *>(buff.contents() + buff.rpos()), len);
+        const std::string str(reinterpret_cast<char const*>(buff.contents() + buff.rpos()), len);
 
         buff.rpos(buff.rpos() + len);
 
-        return str == this->_expectedValue;
-    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags)
+        return str == this->m_expectedValue;
+    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
     MANGOS_ASSERT(expectedValue.length() <= 0xFF);
 }
 
-WindowsLuaScan::WindowsLuaScan(const std::string &lua, CheckT checker, const std::string &comment, uint32 flags) : _lua(lua),
+WindowsLuaScan::WindowsLuaScan(std::string const& lua, CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild) : m_lua(lua),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() < 0xFF);
 
-        strings.emplace_back(this->_lua);
+        strings.emplace_back(this->m_lua);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[GET_LUA_VARIABLE] ^ winWarden->GetXor())
             << static_cast<uint8>(strings.size());
-    }, checker, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags)
+    }, checker, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
     MANGOS_ASSERT(checker);
 }
 
-WindowsHookScan::WindowsHookScan(const std::string &module, const std::string &proc, const void *hash,
-    uint32 offset, size_t length, const std::string &comment, uint32 flags)
-    : _module(module), _proc(proc), _offset(offset), _length(length),
+WindowsHookScan::WindowsHookScan(std::string const& module, std::string const& proc, void const* hash,
+    uint32 offset, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_module(module), m_proc(proc), m_offset(offset), m_length(length),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() < 0xFE);
 
-        strings.emplace_back(this->_module);
-        strings.emplace_back(this->_proc);
+        strings.emplace_back(this->m_module);
+        strings.emplace_back(this->m_proc);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
         auto const seed = static_cast<uint32>(rand32());
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[API_CHECK] ^ winWarden->GetXor()) << seed;
 
-        scan.append(this->_hash, sizeof(this->_hash));
+        scan.append(this->m_hash, sizeof(this->m_hash));
         scan << static_cast<uint8>(strings.size() - 1)
              << static_cast<uint8>(strings.size())
-             << this->_offset
-             << static_cast<uint8>(this->_length);
+             << this->m_offset
+             << static_cast<uint8>(this->m_length);
     },
     // checker
-    [](const Warden *, ByteBuffer &buff)
+    [](Warden const*, ByteBuffer& buff)
     {
         return buff.read<uint8>() == Detoured;
     },
         sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
-        sizeof(uint8), comment, flags)
+        sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
     MANGOS_ASSERT(length <= 0xFF);
-    ::memcpy(_hash, hash, sizeof(_hash));
+    ::memcpy(m_hash, hash, sizeof(m_hash));
 }
 
-WindowsDriverScan::WindowsDriverScan(const std::string &name, const std::string &targetPath, bool wanted, const std::string &comment, uint32 flags)
-    : _name(name), _wanted(wanted), _targetPath(targetPath),
+WindowsDriverScan::WindowsDriverScan(std::string const& name, std::string const& targetPath, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_name(name), m_wanted(wanted), m_targetPath(targetPath),
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() < 0xFF);
 
-        strings.emplace_back(this->_name);
+        strings.emplace_back(this->m_name);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
         auto const seed = static_cast<uint32>(rand32());
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_DRIVER_BY_NAME] ^ winWarden->GetXor()) << seed;
 
-        HMACSHA1 hash(reinterpret_cast<const uint8 *>(&seed), sizeof(seed));
-        hash.UpdateData(this->_targetPath);
+        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        hash.UpdateData(this->m_targetPath);
         hash.Finalize();
 
         scan.append(hash.GetDigest(), hash.GetLength());
         scan << static_cast<uint8>(strings.size());
     },
     // checker
-    [this](const Warden *, ByteBuffer &buff)
+    [this](Warden const*, ByteBuffer& buff)
     {
         auto const found = buff.read<uint8>() == Found;
 
-        return found != this->_wanted;
-    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint8) + name.length(), sizeof(uint8), comment, flags) {}
+        return found != this->m_wanted;
+    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint8) + name.length(), sizeof(uint8), comment, flags, minBuild, maxBuild) {}
 
-WindowsTimeScan::WindowsTimeScan(CheckT checker, const std::string &comment, uint32 flags) :
+WindowsTimeScan::WindowsTimeScan(CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild) :
     WindowsScan(
     // builder
-    [this](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[CHECK_TIMING_VALUES] ^ winWarden->GetXor());
-    }, checker, sizeof(uint8), sizeof(uint8) + sizeof(uint32), comment, flags)
+    }, checker, sizeof(uint8), sizeof(uint8) + sizeof(uint32), comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
     MANGOS_ASSERT(!!checker);
 }

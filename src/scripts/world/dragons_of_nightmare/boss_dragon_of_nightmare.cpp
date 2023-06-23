@@ -58,6 +58,9 @@ void boss_dragon_of_nightmareAI::JustDied(Unit* pKiller)
 
 void boss_dragon_of_nightmareAI::UpdateAI(uint32 const uiDiff)
 {
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+        return;
+
     if (m_uiAuraOfNatureTimer <= uiDiff)
     {
         if (DoCastSpellIfCan(m_creature, SPELL_AURA_OF_NATURE) == CAST_OK)
@@ -65,9 +68,6 @@ void boss_dragon_of_nightmareAI::UpdateAI(uint32 const uiDiff)
     }
     else
         m_uiAuraOfNatureTimer -= uiDiff;
-
-    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-        return;
 
     EnterEvadeIfOutOfHomeArea();
 
@@ -129,9 +129,7 @@ struct npc_dream_fogAI : ScriptedPetAI
 {
     explicit npc_dream_fogAI(Creature* pCreature) : ScriptedPetAI(pCreature)
     {
-        if (m_creature->GetCharmInfo())
-            m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
-
+        m_creature->SetReactState(REACT_AGGRESSIVE);
         npc_dream_fogAI::Reset();
         npc_dream_fogAI::ResetCreature();
     }

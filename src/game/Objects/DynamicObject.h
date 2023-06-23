@@ -59,6 +59,7 @@ class DynamicObject : public WorldObject
         void AddAffected(Unit* unit);
         void RemoveAffected(Unit* unit);
         void Delay(int32 delaytime);
+        char const* GetName() const final { return "DynamicObject"; }
 
         bool IsHostileTo(WorldObject const* target) const override;
         bool IsFriendlyTo(WorldObject const* target) const override;

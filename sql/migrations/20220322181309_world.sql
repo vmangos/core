@@ -1,3 +1,4 @@
+SET NAMES utf8;
 DROP PROCEDURE IF EXISTS add_migration;
 delimiter ??
 CREATE PROCEDURE `add_migration`()
@@ -7,6 +8,9 @@ SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20220322181309');
 IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20220322181309');
 -- Add your query below.
+
+
+SET NAMES utf8;
 
 -- New condition: fishing event has no winner
 INSERT INTO `conditions` VALUES (7716, 11, 30056, 0, 0, 0, 0);

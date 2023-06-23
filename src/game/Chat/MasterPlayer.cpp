@@ -231,11 +231,11 @@ void MasterPlayer::LoadMailedItems(QueryResult* result)
             continue;
         mail->AddItem(itemGuidLow, itemId);
 
-        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId);
+        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
 
         if (!proto)
         {
-            sLog.outError("Player %u has unknown item Id (ProtoType) in mailed items (GUID: %u Id: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuidLow, itemId, mail->messageID);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player %u has unknown item Id (ProtoType) in mailed items (GUID: %u Id: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuidLow, itemId, mail->messageID);
             CharacterDatabase.PExecute("INSERT INTO `character_deleted_items` (`player_guid`, `item_id`, `stack_count`) VALUES ('%u', '%u', '%u')", GetGUIDLow(), itemId, fields[2].GetUInt32());
             CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `item_guid` = '%u'", itemGuidLow);
             CharacterDatabase.PExecute("DELETE FROM `item_instance` WHERE `guid` = '%u'", itemGuidLow);
@@ -252,7 +252,7 @@ void MasterPlayer::LoadMailedItems(QueryResult* result)
 
         if (!item->LoadFromDB(itemGuidLow, GetObjectGuid(), fields, itemId))
         {
-            sLog.outError("Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, itemGuidLow);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, itemGuidLow);
             CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `item_guid` = '%u'", itemGuidLow);
             item->FSetState(ITEM_REMOVED);
             item->SaveToDB();                               // it also deletes item object !
@@ -295,7 +295,7 @@ void MasterPlayer::LoadMails(QueryResult* result)
 
         if (m->mailTemplateId && !sMailTemplateStorage.LookupEntry<MailTemplateEntry>(m->mailTemplateId))
         {
-            sLog.outError("Player::_LoadMail - Mail (%u) have nonexistent MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player::_LoadMail - Mail (%u) have nonexistent MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
             m->mailTemplateId = 0;
         }
 

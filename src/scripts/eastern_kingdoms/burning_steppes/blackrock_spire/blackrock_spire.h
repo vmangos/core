@@ -18,12 +18,12 @@ enum
     TYPE_VALTHALAK              = 4,                        // Only summon once per instance
     TYPE_EVENT_DOOR_UBRS        = 5,                        // UBRS door event
     TYPE_SOLAKAR                = 6,                        // Rookery event
-    INSTANCE_BRS_MAX_ENCOUNTER  = 7,
+    TYPE_DRAKKISATH             = 7,
+    INSTANCE_BRS_MAX_ENCOUNTER  = 8,
 
     NPC_SCARSHIELD_INFILTRATOR  = 10299,
     NPC_BLACKHAND_SUMMONER      = 9818,
     NPC_BLACKHAND_VETERAN       = 9819,
-    NPC_PYROGUARD_EMBERSEER     = 9816,
     NPC_BLACKHAND_INCANCERATOR  = 10316,
     NPC_BLACKHAND_ELITE         = 10317,
     NPC_LORD_VICTOR_NEFARIUS    = 10162,
@@ -49,6 +49,8 @@ enum
     GO_GYTH_ENTRY_DOOR          = 164726,
     GO_GYTH_COMBAT_DOOR         = 175185,                   // control in boss_script, because will auto-close after each wave
     GO_GYTH_EXIT_DOOR           = 175186,
+    GO_DRAKKISATH_DOOR1         = 175946,
+    GO_DRAKKISATH_DOOR2         = 175947,
 
     GO_BLACKROCK_ALTAR          = 175706,
 
@@ -71,15 +73,6 @@ enum
     GO_BRAZIER04                = 175531,
     GO_BRAZIER05                = 175532,
     GO_BRAZIER06                = 175533,
-
-    // Emberseer event
-    GO_EMBERSEER_RUNE01         = 175187,
-    GO_EMBERSEER_RUNE02         = 175267,
-    GO_EMBERSEER_RUNE03         = 175268,
-    GO_EMBERSEER_RUNE04         = 175269,
-    GO_EMBERSEER_RUNE05         = 175270,
-    GO_EMBERSEER_RUNE06         = 175271,
-    GO_EMBERSEER_RUNE07         = 175272,
 };
 
 class instance_blackrock_spire : public ScriptedInstance, private DialogueHelper
@@ -118,7 +111,6 @@ class instance_blackrock_spire : public ScriptedInstance, private DialogueHelper
         uint32 m_auiEncounter[INSTANCE_BRS_MAX_ENCOUNTER];
         std::string strInstData;
         
-        uint64 m_uiEmberseerGUID;
         uint64 m_uiNefariusGUID;
         uint64 m_uiGythGUID;
         uint64 m_uiInfiltratorGUID;
@@ -132,6 +124,8 @@ class instance_blackrock_spire : public ScriptedInstance, private DialogueHelper
         uint64 m_uiGythEntryDoorGUID;
         uint64 m_uiGythCombatDoorGUID;
         uint64 m_uiGythExitDoorGUID;
+        uint64 m_uiDrakkisathDoor1GUID;
+        uint64 m_uiDrakkisathDoor2GUID;
 
         uint64 m_uiFatherFlameGUID;
         uint32 m_uiFatherFlame_timer;
@@ -145,14 +139,6 @@ class instance_blackrock_spire : public ScriptedInstance, private DialogueHelper
         uint64 m_uiBrazier04GUID;
         uint64 m_uiBrazier05GUID;
         uint64 m_uiBrazier06GUID;
-
-        uint64 m_uiEmberseerRune01GUID;
-        uint64 m_uiEmberseerRune02GUID;
-        uint64 m_uiEmberseerRune03GUID;
-        uint64 m_uiEmberseerRune04GUID;
-        uint64 m_uiEmberseerRune05GUID;
-        uint64 m_uiEmberseerRune06GUID;
-        uint64 m_uiEmberseerRune07GUID;
 
         uint64 m_uiBlackRockAltarGUID;
 

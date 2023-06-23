@@ -68,7 +68,7 @@ void WorldRunnable::operator()()
         auto diff = WorldTimer::getMSTimeDiff(prevTime, currTime);
 
         if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_WORLD_UPDATE) && diff > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_WORLD_UPDATE))
-            sLog.out(LOG_PERFORMANCE, "Slow world update: %ums", diff);
+            sLog.Out(LOG_PERFORMANCE, LOG_LVL_MINIMAL, "Slow world update: %ums", diff);
 
         // ANTICRASH
         if (sWorld.GetAnticrashRearmTimer())
@@ -82,7 +82,7 @@ void WorldRunnable::operator()()
             {
                 anticrashRearmTimer = 0;
                 Master::ArmAnticrash();
-                sLog.outInfo("Anticrash rearmed");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Anticrash rearmed");
             }
             else
                 anticrashRearmTimer -= diff;
@@ -111,16 +111,16 @@ void WorldRunnable::operator()()
         #endif
     }
 
-    sLog.outString("Shutting down world...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Shutting down world...");
     sWorld.Shutdown();
 
     // unload battleground templates before different singletons destroyed
     sBattleGroundMgr.DeleteAllBattleGrounds();
 
-    sLog.outString("Stopping network threads...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stopping network threads...");
     sWorldSocketMgr->StopNetwork();
 
-    sLog.outString("Unloading all maps...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Unloading all maps...");
     sMapMgr.UnloadAll();                                    // unload all grids (including locked in memory)
 
     // End the database thread

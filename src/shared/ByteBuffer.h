@@ -23,7 +23,6 @@
 #define _BYTEBUFFER_H
 
 #include "Common.h"
-#include "Log.h"
 #include "Utilities/ByteConverter.h"
 
 class ByteBufferException
@@ -35,11 +34,7 @@ class ByteBufferException
             PrintPosError();
         }
 
-        void PrintPosError() const
-        {
-            sLog.outError("Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: " SIZEFMTD ") value with size: " SIZEFMTD,
-                (add ? "put" : "get"), pos, size, esize);
-        }
+        void PrintPosError() const;
     private:
         bool add;
         size_t pos;
@@ -264,14 +259,22 @@ class ByteBuffer
 
         ByteBuffer& operator>>(std::string& value)
         {
-            value.clear();
-            while (rpos() < size())                         // prevent crash at wrong string format in packet
+            // prevent crash at wrong string format in packet
+            if (_rpos < size())
             {
-                char c = read<char>();
-                if (c == 0)
-                    break;
-                value += c;
+                size_t startPos = _rpos;
+
+                while (_storage[_rpos] != '\0')
+                {
+                    _rpos++;
+
+                    if (_rpos + sizeof(char) > size())
+                        throw ByteBufferException(false, _rpos, sizeof(char), size());
+                }
+                value.assign((char*)(&_storage[startPos]), _rpos - startPos);
+                _rpos++;
             }
+            
             return *this;
         }
 
@@ -343,6 +346,33 @@ class ByteBuffer
             _rpos += len;
         }
 
+        // returns pointer to string inside the packet without copy while checking for null terminator
+        char* ReadCString()
+        {
+            if (_rpos + sizeof(char) > size())
+                throw ByteBufferException(false, _rpos, sizeof(char), size());
+
+            char* txt = (char*)(&_storage[_rpos]);
+
+            while (_storage[_rpos] != '\0')
+            {
+                _rpos++;
+
+                if (_rpos + sizeof(char) > size())
+                    throw ByteBufferException(false, _rpos, sizeof(char), size());
+            }
+
+            _rpos++;
+            return txt;
+        }
+
+        void ReadCString(char*& txt, size_t& txtLen)
+        {
+            size_t oldPos = _rpos;
+            txt = ReadCString();
+            txtLen = (_rpos - oldPos) - 1; // dont count null terminator
+        }
+
         uint64 readPackGUID()
         {
             uint64 guid = 0;
@@ -400,18 +430,7 @@ class ByteBuffer
             return append((uint8 const*)src, cnt * sizeof(T));
         }
 
-        void append(uint8 const* src, size_t cnt)
-        {
-            if (!cnt)
-                return;
-
-            MANGOS_ASSERT(size() < 10000000);
-
-            if (_storage.size() < _wpos + cnt)
-                _storage.resize(_wpos + cnt);
-            memcpy(&_storage[_wpos], src, cnt);
-            _wpos += cnt;
-        }
+        void append(uint8 const* src, size_t cnt);
 
         void append(ByteBuffer const& buffer)
         {
@@ -455,78 +474,7 @@ class ByteBuffer
             memcpy(&_storage[pos], src, cnt);
         }
 
-        void print_storage() const
-        {
-            if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
-                return;
-
-            std::ostringstream ss;
-            ss <<  "STORAGE_SIZE: " << size() << "\n";
-
-            if (sLog.IsIncludeTime())
-                ss << "         ";
-
-            for (size_t i = 0; i < size(); ++i)
-                ss << uint32(read<uint8>(i)) << " - ";
-
-            DEBUG_LOG(ss.str().c_str());
-        }
-
-        void textlike() const
-        {
-            if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
-                return;
-
-            std::ostringstream ss;
-            ss <<  "STORAGE_SIZE: " << size() << "\n";
-
-            if (sLog.IsIncludeTime())
-                ss << "         ";
-
-            for (size_t i = 0; i < size(); ++i)
-                ss << read<uint8>(i);
-
-            DEBUG_LOG(ss.str().c_str());
-        }
-
-        void hexlike() const
-        {
-            if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
-                return;
-
-            std::ostringstream ss;
-            ss <<  "STORAGE_SIZE: " << size() << "\n";
-
-            if (sLog.IsIncludeTime())
-                ss << "         ";
-
-            size_t j = 1, k = 1;
-
-            for (size_t i = 0; i < size(); ++i)
-            {
-                if ((i == (j * 8)) && ((i != (k * 16))))
-                {
-                    ss << "| ";
-                    ++j;
-                }
-                else if (i == (k * 16))
-                {
-                    ss << "\n";
-
-                    if (sLog.IsIncludeTime())
-                        ss << "         ";
-
-                    ++k;
-                    ++j;
-                }
-
-                char buf[4];
-                snprintf(buf, 4, "%02X", read<uint8>(i));
-                ss << buf << " ";
-
-            }
-            DEBUG_LOG(ss.str().c_str());
-        }
+        void hexlike() const;
 
     private:
         // limited for internal use because can "append" any unexpected type (like pointer and etc) with hard detection problem

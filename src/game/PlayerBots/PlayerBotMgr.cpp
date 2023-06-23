@@ -74,7 +74,7 @@ void PlayerBotMgr::Load()
                               " FROM `account`");
     if (!result)
     {
-        sLog.outError("Playerbot: unable to load max account id.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Playerbot: unable to load max account id.");
         return;
     }
     Field* fields = result->Fetch();
@@ -82,12 +82,12 @@ void PlayerBotMgr::Load()
     delete result;
 
     // 4- LoadFromDB
-    sLog.outString(">> [PlayerBotMgr] Loading Bots ...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> [PlayerBotMgr] Loading Bots ...");
     result = CharacterDatabase.PQuery(
                  "SELECT char_guid, chance, ai"
                  " FROM playerbot");
     if (!result)
-        sLog.outString("Table `playerbot` is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Table `playerbot` is empty.");
     else
     {
         do
@@ -108,7 +108,7 @@ void PlayerBotMgr::Load()
         }
         while (result->NextRow());
         delete result;
-        sLog.outString("%u bots loaded", m_bots.size());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%u bots loaded", m_bots.size());
     }
 
     // 5- Check config/DB
@@ -136,8 +136,8 @@ void PlayerBotMgr::Load()
     // 8- Show stats if debug
     if (m_confDebug)
     {
-        sLog.outString("[PlayerBotMgr] Between %u and %u bots online", m_confMinRandomBots, m_confMaxRandomBots);
-        sLog.outString("[PlayerBotMgr] %u now loading", m_stats.loadingCount);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[PlayerBotMgr] Between %u and %u bots online", m_confMinRandomBots, m_confMaxRandomBots);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[PlayerBotMgr] %u now loading", m_stats.loadingCount);
     }
 }
 
@@ -157,20 +157,20 @@ void PlayerBotMgr::DeleteAll()
     m_tempBots.clear();
 
     if (m_confDebug)
-        sLog.outString("[PlayerBotMgr] Deleting all bots [OK]");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[PlayerBotMgr] Deleting all bots [OK]");
 }
 
 void PlayerBotMgr::OnBotLogin(PlayerBotEntry *e)
 {
     e->state = PB_STATE_ONLINE;
     if (m_confDebug)
-        sLog.outString("[PlayerBot][Login]  '%s' GUID:%u Acc:%u", e->name.c_str(), e->playerGUID, e->accountId);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[PlayerBot][Login]  '%s' GUID:%u Acc:%u", e->name.c_str(), e->playerGUID, e->accountId);
 }
 void PlayerBotMgr::OnBotLogout(PlayerBotEntry *e)
 {
     e->state = PB_STATE_OFFLINE;
     if (m_confDebug)
-        sLog.outString("[PlayerBot][Logout] '%s' GUID:%u Acc:%u", e->name.c_str(), e->playerGUID, e->accountId);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[PlayerBot][Logout] '%s' GUID:%u Acc:%u", e->name.c_str(), e->playerGUID, e->accountId);
 }
 
 void PlayerBotMgr::OnPlayerInWorld(Player* player)
@@ -229,17 +229,6 @@ void PlayerBotMgr::Update(uint32 diff)
 
         if (iter->second->state == PB_STATE_ONLINE)
         {
-            if (!iter->second->m_pendingResponses.empty() &&
-                iter->second->ai && iter->second->ai->me)
-            {
-                std::vector<uint16> pendingResponses = iter->second->m_pendingResponses;
-                iter->second->m_pendingResponses.clear();
-                for (const auto opcode : pendingResponses)
-                {
-                    iter->second->ai->SendFakePacket(opcode);
-                }
-            }
-
             if (iter->second->requestRemoval)
             {
                 if (iter->second->ai && iter->second->ai->me)
@@ -288,7 +277,7 @@ void PlayerBotMgr::Update(uint32 diff)
         }
         else
         {
-            sLog.outError("PLAYERBOT: Unable to load session id %u", iter->second->accountId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "PLAYERBOT: Unable to load session id %u", iter->second->accountId);
             DeleteBot(iter);
 
             if (iter->second->customBot)
@@ -354,13 +343,13 @@ bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot, PlayerBotAI* pAI)
 
     if (!accountId)
     {
-        sLog.outError("[PlayerBotMgr] Player %u account not found!", playerGUID);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Compte du joueur %u introuvable ...", playerGUID);
         return false;
     }
 
     if (sWorld.FindSession(accountId))
     {
-        sLog.outError("[PlayerBotMgr] Account %u is already online!", accountId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PlayerBotMgr] Account %u is already online!", accountId);
         return false;
     }
 
@@ -377,7 +366,7 @@ bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot, PlayerBotAI* pAI)
     }
     else
     {
-        sLog.outInfo("[PlayerBotMgr] Adding temporary PlayerBot with GUID %u.", playerGUID);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[PlayerBotMgr] Adding temporary PlayerBot with GUID %u.", playerGUID);
         e = std::make_shared<PlayerBotEntry>();
         e->state        = PB_STATE_LOADING;
         e->playerGUID   = playerGUID;
@@ -1570,6 +1559,46 @@ bool ChatHandler::HandlePartyBotUnpauseCommand(char* args)
     return HandlePartyBotPauseHelper(args, false);
 }
 
+bool ChatHandler::HandlePartyBotUnequipCommand(char* args)
+{
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    char* cId = ExtractKeyFromLink(&args, "Hitem");
+    if (!cId)
+        return false;
+
+    uint32 itemId = 0;
+    if (!ExtractUInt32(&cId, itemId))
+        return false;
+
+    uint32 count = pTarget->GetItemCount(itemId, false);
+    if (!count)
+    {
+        SendSysMessage("Target does not have that item.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            pTarget->DestroyItemCount(itemId, count, true);
+            return true;
+        }
+    }
+
+    SendSysMessage("Target is not a party bot.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
 bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
 {
     Player* pTarget = GetSelectedPlayer();
@@ -1647,7 +1676,8 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
     uint8 botRace = SelectRandomRaceForClass(botClass, botTeam);
 
     // Spawn bot on GM Island
-    BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, 0, 16224.356f, 16284.763f, 13.175f, 4.56f, bg);
+    uint32 const instanceId = sMapMgr.GetContinentInstanceId(1, 16224.356f, 16284.763f);
+    BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, instanceId, 16224.356f, 16284.763f, 13.175f, 4.56f, bg);
     sPlayerBotMgr.AddBot(ai);
 
     if (bg == BATTLEGROUND_QUEUE_WS)

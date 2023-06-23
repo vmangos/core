@@ -22,6 +22,8 @@
 #ifndef DBCENUMS_H
 #define DBCENUMS_H
 
+#include "Platform/Define.h"
+
 // Client expected level limitation, like as used in DBC item max levels for "until max player level"
 // use as default max player level, must be fit max level for used client
 // also see MAX_LEVEL and PLAYER_STRONG_MAX_LEVEL define
@@ -76,6 +78,40 @@ enum FactionTemplateFlags
     FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS = 0x00001000,   // faction will attack players that were involved in PvP combat
 };
 
+static char const* FactionTemplateFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case FACTION_TEMPLATE_RESPOND_TO_CALL_FOR_HELP:
+            return "Respond To Call For Help";
+        case FACTION_TEMPLATE_BROADCAST_TO_ENEMIES_LOW_PRIO:
+            return "Broadcast To Enemies (Low Priority)";
+        case FACTION_TEMPLATE_BROADCAST_TO_ENEMIES_MED_PRIO:
+            return "Broadcast To Enemies (Medium Priority)";
+        case FACTION_TEMPLATE_BROADCAST_TO_ENEMIES_HIG_PRIO:
+            return "Broadcast To Enemies (High Priority)";
+        case FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_LOW_PRIO:
+            return "Search For Enemies (Low Priority)";
+        case FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_MED_PRIO:
+            return "Search For Enemies (Medium Priority)";
+        case FACTION_TEMPLATE_SEARCH_FOR_ENEMIES_HIG_PRIO:
+            return "Search For Enemies (High Priority)";
+        case FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_LOW_PRIO:
+            return "Search For Friends (Low Priority)";
+        case FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_MED_PRIO:
+            return "Search For Friends (Medium Priority)";
+        case FACTION_TEMPLATE_SEARCH_FOR_FRIENDS_HIG_PRIO:
+            return "Search For Friends (High Priority)";
+        case FACTION_TEMPLATE_FLEE_FROM_CALL_FOR_HELP:
+            return "Flee From Call For Help";
+        case FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS:
+            return "Assist Players";
+        case FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS:
+            return "Attack PvP Active Players";
+    }
+    return "UNKNOWN";
+}
+
 enum FactionMasks
 {
     FACTION_MASK_PLAYER   = 1,                              // any player
@@ -84,6 +120,22 @@ enum FactionMasks
     FACTION_MASK_MONSTER  = 8                               // aggressive creature from monster team
     // if none flags set then non-aggressive creature
 };
+
+static char const* FactionMaskToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case FACTION_MASK_PLAYER:
+            return "Player";
+        case FACTION_MASK_ALLIANCE:
+            return "Alliance";
+        case FACTION_MASK_HORDE:
+            return "Horde";
+        case FACTION_MASK_MONSTER:
+            return "Monster";
+    }
+    return "UNKNOWN";
+}
 
 enum MapTypes
 {

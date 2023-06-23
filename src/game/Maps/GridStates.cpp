@@ -52,7 +52,7 @@ IdleState::Update(Map& m, NGridType& grid, GridInfo&, uint32 const& x, uint32 co
 {
     m.ResetGridExpiry(grid);
     grid.SetGridState(GRID_STATE_REMOVAL);
-    DEBUG_LOG("Grid[%u,%u] on map %u moved to IDLE state", x, y, m.GetId());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Grid[%u,%u] on map %u moved to IDLE state", x, y, m.GetId());
 }
 
 void
@@ -65,7 +65,7 @@ RemovalState::Update(Map& m, NGridType& grid, GridInfo& info, uint32 const& x, u
         {
             if (!m.UnloadGrid(x, y, false))
             {
-                DEBUG_LOG("Grid[%u,%u] for map %u differed unloading due to players or active objects nearby", x, y, m.GetId());
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Grid[%u,%u] for map %u differed unloading due to players or active objects nearby", x, y, m.GetId());
                 m.ResetGridExpiry(grid);
             }
         }

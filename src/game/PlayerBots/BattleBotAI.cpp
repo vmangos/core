@@ -450,54 +450,6 @@ void BattleBotAI::StopMoving()
     me->GetMotionMaster()->MoveIdle();
 }
 
-void BattleBotAI::SendFakePacket(uint16 opcode)
-{
-    //printf("Bot send %s\n", LookupOpcodeName(opcode));
-    switch (opcode)
-    {
-        case CMSG_BATTLEMASTER_JOIN:
-        {
-            WorldPacket data(CMSG_BATTLEMASTER_JOIN);
-            data << me->GetObjectGuid();                       // battlemaster guid, or player guid if joining queue from BG portal
-
-            switch (m_battlegroundId)
-            {
-                case BATTLEGROUND_QUEUE_AV:
-                    data << uint32(30);
-                    break;
-                case BATTLEGROUND_QUEUE_WS:
-                    data << uint32(489);
-                    break;
-                case BATTLEGROUND_QUEUE_AB:
-                    data << uint32(529);
-                    break;
-                default:
-                    sLog.outError("BattleBot: Invalid BG queue type!");
-                    botEntry->requestRemoval = true;
-                    return;
-            }
-
-            data << uint32(0);                                 // instance id, 0 if First Available selected
-            data << uint8(0);                                  // join as group
-            me->GetSession()->HandleBattlemasterJoinOpcode(data);
-            return;
-        }
-        case CMSG_LEAVE_BATTLEFIELD:
-        {
-            WorldPacket data(CMSG_LEAVE_BATTLEFIELD);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-            data << uint8(0);                           // unk1
-            data << uint8(0);                           // BattleGroundTypeId-1 ?
-            data << uint16(0);                          // unk2 0
-#endif
-            me->GetSession()->HandleLeaveBattlefieldOpcode(data);
-            return;
-        }
-    }
-
-    CombatBotBaseAI::SendFakePacket(opcode);
-}
-
 void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
 {
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
@@ -505,9 +457,18 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
     {
         case MSG_PVP_LOG_DATA:
         {
+            if (!me)
+                return;
+
             uint8 ended = *((uint8*)(*packet).contents());
             if (ended)
-                botEntry->m_pendingResponses.push_back(CMSG_LEAVE_BATTLEFIELD);
+            {
+                std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_LEAVE_BATTLEFIELD);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+                *data << uint32(me->GetMapId());
+#endif
+                me->GetSession()->QueuePacket(std::move(data));
+            }
             return;
         }
     }
@@ -724,7 +685,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (m_receivedBgInvite)
         {
-            SendFakePacket(CMSG_BATTLEFIELD_PORT);
+            SendBattlefieldPortPacket();
             m_receivedBgInvite = false;
             return;
         }
@@ -745,19 +706,19 @@ void BattleBotAI::UpdateAI(uint32 const diff)
                     canQueue = ChatHandler(me).HandleGoArathiCommand(args);
                     break;
                 default:
-                    sLog.outError("BattleBot: Invalid BG queue type!");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");
                     botEntry->requestRemoval = true;
                     return;
             }
 
             if (!canQueue)
             {
-                sLog.outError("BattleBot: Attempt to queue for BG failed! Bot is too low level or BG is not available in this patch.");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Attempt to queue for BG failed! Bot is too low level or BG is not available in this patch.");
                 botEntry->requestRemoval = true;
                 return;
             }
 
-            SendFakePacket(CMSG_BATTLEMASTER_JOIN);
+            SendBattlemasterJoinPacket(m_battlegroundId);
             return;
         }
 

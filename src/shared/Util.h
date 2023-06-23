@@ -24,8 +24,6 @@
 
 #include "Common.h"
 #include "Duration.h"
-#include "Errors.h"
-#include "Log.h" // Zerix: Again, here we are asking for MANGOS_ASSERT to work. What's up?
 
 #include <string>
 #include <vector>
@@ -65,6 +63,7 @@ uint32 GetUInt32ValueFromArray(Tokens const& data, uint16 index);
 float GetFloatValueFromArray(Tokens const& data, uint16 index);
 
 void stripLineInvisibleChars(std::string &src);
+void stripLineInvisibleChars(char* str);
 
 std::string secsToTimeString(time_t timeInSecs, bool shortText = false, bool hoursOnly = false);
 uint32 TimeStringToSecs(std::string const& timestring);
@@ -143,6 +142,15 @@ inline float round_float(float value)
         return urand(0, 1) ? floor(value) : ceil(value);
 
     if (remainder > 0.5f)
+        return ceil(value);
+
+    return floor(value);
+}
+
+inline float round_float_chance(float value)
+{
+    float const remainder = value - floor(value);
+    if (remainder && roll_chance_f(remainder * 100.0f))
         return ceil(value);
 
     return floor(value);
@@ -414,5 +422,17 @@ int32 dither(float v);
 
 void SetByteValue(uint32& variable, uint8 offset, uint8 value);
 void SetUInt16Value(uint32& variable, uint8 offset, uint16 value);
+
+inline uint32 BatchifyTimer(uint32 timer, uint32 interval)
+{
+    uint32 value = timer / interval;
+    if (timer % interval)
+        value++;
+    return value * interval;
+}
+
+typedef char const*(*ValueToStringFunc) (uint32 value);
+
+std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc);
 
 #endif

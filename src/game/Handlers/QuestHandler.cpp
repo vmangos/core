@@ -42,11 +42,9 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recv_data)
     Object* questgiver = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
     if (!questgiver)
     {
-        DETAIL_LOG("Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver %s", guid.GetString().c_str());
         return;
     }
-
-    //DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for %s", guid.GetString().c_str());
 
     switch (questgiver->GetTypeId())
     {
@@ -72,7 +70,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recv_data)
             break;
         }
         default:
-            sLog.outError("QuestGiver called for unexpected type %u", questgiver->GetTypeId());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "QuestGiver called for unexpected type %u", questgiver->GetTypeId());
             break;
     }
 
@@ -85,13 +83,11 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_HELLO npc: %s", guid.GetString().c_str());
-
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
 
     if (!pCreature)
     {
-        DEBUG_LOG("WORLD: HandleQuestgiverHelloOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleQuestgiverHelloOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
         return;
     }
 
@@ -118,8 +114,6 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     uint32 quest;
     recv_data >> guid >> quest;
-
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_ACCEPT_QUEST giver = %s, quest = %u", guid.GetString().c_str(), quest);
 
     Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_GAMEOBJECT_PLAYER_OR_ITEM);
 
@@ -207,8 +201,6 @@ void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recv_data)
     uint32 quest;
     recv_data >> guid >> quest;
 
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_QUERY_QUEST npc = %s, quest = %u", guid.GetString().c_str(), quest);
-
     // Verify that the guid is valid and is a questgiver or involved in the requested quest
     Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_GAMEOBJECT_OR_ITEM);
     if (!pObject || (!pObject->HasQuest(quest) && !pObject->HasInvolvedQuest(quest)))
@@ -225,11 +217,183 @@ void WorldSession::HandleQuestQueryOpcode(WorldPacket& recv_data)
 {
     uint32 quest;
     recv_data >> quest;
-    DEBUG_LOG("WORLD: Received CMSG_QUEST_QUERY quest = %u", quest);
 
     Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest);
-    if (pQuest)
-        _player->PlayerTalkClass->SendQuestQueryResponse(pQuest);
+    if (!pQuest)
+        return;
+
+    char const* Title = pQuest->GetTitle().c_str();
+    size_t titleLen = pQuest->GetTitle().length();
+    char const* Details = pQuest->GetDetails().c_str();
+    size_t detailsLen = pQuest->GetDetails().length();
+    char const* Objectives = pQuest->GetObjectives().c_str();
+    size_t objectivesLen = pQuest->GetObjectives().length();
+    char const*  EndText = pQuest->GetEndText().c_str();
+    size_t endTextLen = pQuest->GetEndText().length();
+    char const* ObjectiveText[QUEST_OBJECTIVES_COUNT];
+    size_t objectiveTextLen[QUEST_OBJECTIVES_COUNT];
+
+    for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+    {
+        ObjectiveText[i] = pQuest->ObjectiveText[i].c_str();
+        objectiveTextLen[i] = pQuest->ObjectiveText[i].length();
+    }
+
+    int loc_idx = GetSessionDbLocaleIndex();
+    if (loc_idx >= 0)
+    {
+        if (QuestLocale const* ql = sObjectMgr.GetQuestLocale(pQuest->GetQuestId()))
+        {
+            if (ql->Title.size() >(size_t)loc_idx && !ql->Title[loc_idx].empty())
+            {
+                Title = ql->Title[loc_idx].c_str();
+                titleLen = ql->Title[loc_idx].length();
+            }
+            if (ql->Details.size() > (size_t)loc_idx && !ql->Details[loc_idx].empty())
+            {
+                Details = ql->Details[loc_idx].c_str();
+                detailsLen = ql->Details[loc_idx].length();
+            }
+            if (ql->Objectives.size() > (size_t)loc_idx && !ql->Objectives[loc_idx].empty())
+            {
+                Objectives = ql->Objectives[loc_idx].c_str();
+                objectivesLen = ql->Objectives[loc_idx].length();
+            }
+            if (ql->EndText.size() > (size_t)loc_idx && !ql->EndText[loc_idx].empty())
+            {
+                EndText = ql->EndText[loc_idx].c_str();
+                endTextLen = ql->EndText[loc_idx].length();
+            }
+
+            for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+            {
+                if (ql->ObjectiveText[i].size() >(size_t)loc_idx && !ql->ObjectiveText[i][loc_idx].empty())
+                {
+                    ObjectiveText[i] = ql->ObjectiveText[i][loc_idx].c_str();
+                    objectiveTextLen[i] = ql->ObjectiveText[i][loc_idx].length();
+                }
+            }
+        }
+    }
+
+    constexpr size_t questTemplateFixedSize =
+        sizeof(uint32) + // Id
+        sizeof(uint32) + // Method
+        sizeof(uint32) + // Level
+        sizeof(int32) + // ZoneOrSort
+        sizeof(uint32) + // Type
+        sizeof(uint32) + // RepObjectiveFaction
+        sizeof(uint32) + // RepObjectiveValue
+        sizeof(uint32) + // RequiredOpositeRepFaction
+        sizeof(uint32) + // RequiredOpositeRepValue
+        sizeof(uint32) + // NextQuestInChain
+        sizeof(uint32) + // RewOrReqMoney
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        sizeof(uint32) + // RewMoneyMaxLevel
+#endif
+        sizeof(uint32) + // RewSpell
+        sizeof(uint32) + // SrcItemId
+        sizeof(uint32) + // QuestFlags
+        sizeof(uint32) * QUEST_REWARDS_COUNT + // RewItemId
+        sizeof(uint32) * QUEST_REWARDS_COUNT + // RewItemCount
+        sizeof(uint32) * QUEST_REWARD_CHOICES_COUNT + // RewChoiceItemId
+        sizeof(uint32) * QUEST_REWARD_CHOICES_COUNT + // RewChoiceItemCount
+        sizeof(uint32) + // PointMapId
+        sizeof(float) + // PointX
+        sizeof(float) + // PointY
+        sizeof(uint32) + // PointOpt
+        sizeof(char) + // Title
+        sizeof(char) + // Objectives
+        sizeof(char) + // Details
+        sizeof(char) + // EndText
+        sizeof(uint32) * QUEST_OBJECTIVES_COUNT + // ReqCreatureOrGOId
+        sizeof(uint32) * QUEST_OBJECTIVES_COUNT + // ReqCreatureOrGOCount
+        sizeof(uint32) * QUEST_OBJECTIVES_COUNT + // ReqItemId
+        sizeof(uint32) * QUEST_OBJECTIVES_COUNT + // ReqItemCount
+        sizeof(char) * QUEST_OBJECTIVES_COUNT; // ObjectiveText
+
+    WorldPacket data(SMSG_QUEST_QUERY_RESPONSE, questTemplateFixedSize + titleLen + detailsLen + objectivesLen + endTextLen + objectiveTextLen[0] + objectiveTextLen[1] + objectiveTextLen[2] + objectiveTextLen[3]);
+
+    data << uint32(pQuest->GetQuestId());                   // quest id
+    data << uint32(pQuest->GetQuestMethod());               // Accepted values: 0, 1 or 2. 0==IsAutoComplete() (skip objectives/details)
+    data << uint32(pQuest->GetQuestLevel());                // may be 0, static data, in other cases must be used dynamic level: Player::GetQuestLevelForPlayer
+    data << int32(pQuest->GetZoneOrSort());                 // zone or sort to display in quest log
+
+    data << uint32(pQuest->GetType());
+    //[-ZERO] data << uint32(pQuest->GetSuggestedPlayers());
+
+    data << uint32(pQuest->GetRepObjectiveFaction());       // shown in quest log as part of quest objective
+    data << uint32(pQuest->GetRepObjectiveValue());         // shown in quest log as part of quest objective
+
+    data << uint32(0);                                      // RequiredOpositeRepFaction
+    data << uint32(0);                                      // RequiredOpositeRepValue, required faction value with another (oposite) faction (objective)
+
+    data << uint32(pQuest->GetNextQuestInChain());          // client will request this quest from NPC, if not 0
+
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+        data << uint32(0);                                  // Hide money rewarded
+    else
+        data << uint32(pQuest->GetRewOrReqMoney());
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    data << uint32(pQuest->GetRewMoneyMaxLevel());          // used in XP calculation at client
+#endif
+    data << uint32(pQuest->GetRewSpell());                  // reward spell, this spell will display (icon) (casted if RewSpellCast==0)
+
+    data << uint32(pQuest->GetSrcItemId());                 // source item id
+    data << uint32(pQuest->GetQuestFlags());                // quest flags
+
+    int iI;
+
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    {
+        for (iI = 0; iI < QUEST_REWARDS_COUNT; ++iI)
+            data << uint32(0) << uint32(0);
+        for (iI = 0; iI < QUEST_REWARD_CHOICES_COUNT; ++iI)
+            data << uint32(0) << uint32(0);
+    }
+    else
+    {
+        for (iI = 0; iI < QUEST_REWARDS_COUNT; ++iI)
+        {
+            data << uint32(pQuest->RewItemId[iI]);
+            data << uint32(pQuest->RewItemCount[iI]);
+        }
+        for (iI = 0; iI < QUEST_REWARD_CHOICES_COUNT; ++iI)
+        {
+            data << uint32(pQuest->RewChoiceItemId[iI]);
+            data << uint32(pQuest->RewChoiceItemCount[iI]);
+        }
+    }
+
+    data << pQuest->GetPointMapId();
+    data << pQuest->GetPointX();
+    data << pQuest->GetPointY();
+    data << pQuest->GetPointOpt();
+
+    data.append(Title, titleLen + 1);
+    data.append(Objectives, objectivesLen + 1);
+    data.append(Details, detailsLen + 1);
+    data.append(EndText, endTextLen + 1);
+
+    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
+    {
+        if (pQuest->ReqCreatureOrGOId[iI] < 0)
+        {
+            // client expected gameobject template id in form (id|0x80000000)
+            data << uint32((pQuest->ReqCreatureOrGOId[iI] * (-1)) | 0x80000000);
+        }
+        else
+            data << uint32(pQuest->ReqCreatureOrGOId[iI]);
+        data << uint32(pQuest->ReqCreatureOrGOCount[iI]);
+        data << uint32(pQuest->ReqItemId[iI]);
+        data << uint32(pQuest->ReqItemCount[iI]);
+    }
+
+    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
+        data.append(ObjectiveText[iI], objectiveTextLen[iI] + 1);
+
+    SendPacket(&data);
 }
 
 void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recv_data)
@@ -240,11 +404,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recv_data)
 
     if (reward >= QUEST_REWARD_CHOICES_COUNT)
     {
-        sLog.outError("Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName(), _player->GetGUIDLow(), reward);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName(), _player->GetGUIDLow(), reward);
         return;
     }
-
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_CHOOSE_REWARD npc = %s, quest = %u, reward = %u", guid.GetString().c_str(), quest, reward);
 
     WorldObject* pObject = (WorldObject*)_player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
     if (!pObject)
@@ -289,8 +451,6 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid >> quest;
 
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_REQUEST_REWARD npc = %s, quest = %u", guid.GetString().c_str(), quest);
-
     Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
     if (!pObject || !pObject->HasInvolvedQuest(quest))
         return;
@@ -319,8 +479,6 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleQuestgiverCancel(WorldPacket& /*recv_data*/)
 {
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_CANCEL");
-
     _player->PlayerTalkClass->CloseGossip();
 }
 
@@ -332,8 +490,6 @@ void WorldSession::HandleQuestLogSwapQuest(WorldPacket& recv_data)
     if (slot1 == slot2 || slot1 >= MAX_QUEST_LOG_SIZE || slot2 >= MAX_QUEST_LOG_SIZE)
         return;
 
-    DEBUG_LOG("WORLD: Received CMSG_QUESTLOG_SWAP_QUEST slot 1 = %u, slot 2 = %u", slot1, slot2);
-
     GetPlayer()->SwapQuestSlot(slot1, slot2);
 }
 
@@ -342,8 +498,6 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recv_data)
     uint8 slot;
     recv_data >> slot;
 
-    DEBUG_LOG("WORLD: Received CMSG_QUESTLOG_REMOVE_QUEST slot = %u", slot);
-
     _player->RemoveQuestAtSlot(slot);
 }
 
@@ -351,8 +505,6 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)
 {
     uint32 quest;
     recv_data >> quest;
-
-    DEBUG_LOG("WORLD: Received CMSG_QUEST_CONFIRM_ACCEPT quest = %u", quest);
 
     if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest))
     {
@@ -400,8 +552,6 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid >> quest;
 
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_COMPLETE_QUEST npc = %s, quest = %u", guid.GetString().c_str(), quest);
-
     if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest))
     {
         if (_player->GetQuestStatus(quest) != QUEST_STATUS_COMPLETE)
@@ -418,15 +568,12 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recv_data)
 
 void WorldSession::HandleQuestgiverQuestAutoLaunch(WorldPacket& /*recvPacket*/)
 {
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_QUEST_AUTOLAUNCH");
 }
 
 void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
 {
     uint32 questId;
     recvPacket >> questId;
-
-    DEBUG_LOG("WORLD: Received CMSG_PUSHQUESTTOPARTY quest = %u", questId);
 
     if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(questId))
     {
@@ -490,8 +637,6 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
     uint8 msg;
     recvPacket >> guid >> msg;
 
-    DEBUG_LOG("WORLD: Received MSG_QUEST_PUSH_RESULT");
-
     if (Player* pPlayer = ObjectAccessor::FindPlayer(_player->GetDividerGuid()))
     {
         WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
@@ -531,7 +676,7 @@ uint32 WorldSession::GetDialogStatus(Player* pPlayer, Object* questgiver, uint32
         }
         default:
             //it's impossible, but check ^)
-            sLog.outError("Warning: GetDialogStatus called for unexpected type %u", questgiver->GetTypeId());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Warning: GetDialogStatus called for unexpected type %u", questgiver->GetTypeId());
             return DIALOG_STATUS_NONE;
     }
 

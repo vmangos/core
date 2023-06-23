@@ -100,7 +100,7 @@ struct GenericSpellMob : public ScriptedAI
     {
         m_uiSpells.push_back(insertSpell);
 #ifdef DEBUG_ON
-        sLog.outString(">> Creature %u added spell %u (heal %u, range %f-%f, repeat %u-%u on target %u)", m_creature->GetEntry(),
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Creature %u added spell %u (heal %u, range %f-%f, repeat %u-%u on target %u)", m_creature->GetEntry(),
                       insertSpell.spellId, insertSpell.healValue, insertSpell.minRange, insertSpell.maxRange,
                       insertSpell.minCD, insertSpell.maxCD, insertSpell.target);
 #endif
@@ -130,7 +130,7 @@ struct GenericSpellMob : public ScriptedAI
         for (it = m_uiSpells.begin(); it != m_uiSpells.end(); ++it)
         {
 #ifdef DEBUG_ON
-            sLog.outString(">> Spell %u reset", it->spellId);
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Spell %u reset", it->spellId);
 #endif
             if (isDistanceCaster)
                 it->timer = urand(0, 3000);
@@ -173,12 +173,12 @@ struct GenericSpellMob : public ScriptedAI
 
         std::vector<GenericAISpell>::iterator it;
 #ifdef DEBUG_ON
-        sLog.outString("UpdateAI with SpellSize = %u", m_uiSpells.size());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "UpdateAI with SpellSize = %u", m_uiSpells.size());
 #endif
         for (it = m_uiSpells.begin(); it != m_uiSpells.end(); ++it)
         {
 #ifdef DEBUG_ON
-            sLog.outString("Spell %u update : timer %u", it->spellId, it->timer);
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Spell %u update : timer %u", it->spellId, it->timer);
 #endif
             if (it->timer  < uiDiff)
             {
@@ -291,13 +291,13 @@ struct GenericSpellMob : public ScriptedAI
                         }
                     }
 #ifdef DEBUG_ON
-                    sLog.outString("Casting %u on %s. CD is %u", it->spellId, target->GetName(), it->timer);
+                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Casting %u on %s. CD is %u", it->spellId, target->GetName(), it->timer);
 #endif
                 }
                 else
                 {
 #ifdef DEBUG_ON
-                    sLog.outString("Reporting cast of %u", it->spellId);
+                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Reporting cast of %u", it->spellId);
 #endif
                     it->timer = 500; // Recheck dans 500 ms
                 }
@@ -315,7 +315,7 @@ CreatureAI* GetAI_GenericSpellAI(Creature* pCreature)
     GenericSpellMob* ScriptedMob = new GenericSpellMob(pCreature);
     uint32 creatureId = pCreature->GetEntry();
 #ifdef DEBUG_ON
-    sLog.outString("GetAI for ID %u", creatureId);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "GetAI for ID %u", creatureId);
 #endif
     std::vector<MobSpellEntry>::iterator iter;
     for (iter = GenericSpellMobData.begin(); iter != GenericSpellMobData.end(); ++iter)
@@ -336,7 +336,7 @@ CreatureAI* GetAI_GenericSpellAI(Creature* pCreature)
     chez d'autres mobs.
     */
 #ifdef DEBUG_ON
-    sLog.outString("Impossible de trouver les spells du mob %u. Va essayer de les deduire ...", pCreature->GetEntry());
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Impossible de trouver les spells du mob %u. Va essayer de les deduire ...", pCreature->GetEntry());
 #endif
     bool mobFoundSpells[CREATURE_MAX_SPELLS] = {false};
     CreatureInfo const* infos = pCreature->GetCreatureInfo();
@@ -376,7 +376,7 @@ CreatureAI* GetAI_GenericSpellAI(Creature* pCreature)
         }
     }
 #ifdef DEBUG_ON
-    sLog.outString("GetAI for ID %u -- END", creatureId);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "GetAI for ID %u -- END", creatureId);
 #endif
     ScriptedMob->Finalize();
     return ScriptedMob;
@@ -394,7 +394,7 @@ GenericAISpell BuildGenericAISpell(uint32 spellId, uint32 minCD, uint32 maxCD, u
     if (!spell)
     {
 #ifdef DEBUG_ON
-        sLog.outString(">> Sort introuvable (id=%u) !", tmpSpell.spellId);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Sort introuvable (id=%u) !", tmpSpell.spellId);
 #endif
         tmpSpell.spellId = 0;
         return tmpSpell;
@@ -414,7 +414,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
     spellToModify->targetAuraState = spellInfos->TargetAuraState;
 
 #ifdef DEBUG_ON
-    sLog.outString(">> Loading Spell %s (id=%u) !", spellInfos->SpellName[2].c_str(), spellToModify->spellId);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loading Spell %s (id=%u) !", spellInfos->SpellName[2].c_str(), spellToModify->spellId);
 #endif
 
     // Check de la portee
@@ -522,7 +522,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
         }
 #ifdef DEBUG_ON
         if (spellToModify->spellFlags != 0)
-            sLog.outString("SpellFlags are 0x%x for %u", spellToModify->spellFlags, spellToModify->spellId);
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "SpellFlags are 0x%x for %u", spellToModify->spellFlags, spellToModify->spellId);
 #endif
     }
 }
@@ -531,7 +531,7 @@ void LoadGenericAISpellsData()
 {
     GenericSpellMobData.clear();
     QueryResult* pResult = WorldDatabase.PQuery("SELECT entry, spell, minCD, maxCD, target FROM creature_spells");
-    sLog.outString("Nostalrius: Loading 'creature_spells'");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Nostalrius: Loading 'creature_spells'");
 
     if (pResult)
     {
@@ -559,13 +559,13 @@ void LoadGenericAISpellsData()
 
         delete pResult;
 
-        sLog.outString("");
-        sLog.outString(">> Loaded %u spells datas", uiCount);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spells datas", uiCount);
     }
     else
     {
-        sLog.outString("");
-        sLog.outString(">> Loaded 0 mob spells datas. DB table `creature_spells` is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 mob spells datas. DB table `creature_spells` is empty.");
     }
 }
 */

@@ -234,8 +234,11 @@ void ChargeMovementGenerator<T>::Initialize(T& unit)
         unit.StopMoving();
     if (path.getPathType() & PATHFIND_NOPATH)
         return;
+
     unit.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     unit.m_movementInfo.moveFlags = unit.m_movementInfo.moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN;
+    unit.m_movementInfo.ctime = 0;
+
     Movement::MoveSplineInit init(unit, "ChargeMovementGenerator<T>::Initialize");
     init.Move(&path);
     init.SetVelocity(m_speed);

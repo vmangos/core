@@ -393,7 +393,7 @@ void DungeonResetScheduler::LoadResetTimes()
 
             if (!mapEntry || !mapEntry->IsDungeon())
             {
-                sLog.outError("MapPersistentStateManager::LoadResetTimes: invalid map Id %u in instance_reset!", mapId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MapPersistentStateManager::LoadResetTimes: invalid map Id %u in instance_reset!", mapId);
                 CharacterDatabase.DirectPExecute("DELETE FROM `instance_reset` WHERE `map` = '%u'", mapId);
                 continue;
             }
@@ -449,7 +449,7 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
         ScheduleReset(true, itr.second.second, DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, itr.second.first, itr.first));
 
         if (now > itr.second.second)
-            sLog.outInfo("[DungeonReset] Instance %u (map %u) has reset time before now, but was not cleaned up. Likely expired during load",
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[DungeonReset] Instance %u (map %u) has reset time before now, but was not cleaned up. Likely expired during load",
                 itr.first, itr.second.first);
     }
 
@@ -496,9 +496,9 @@ void DungeonResetScheduler::ScheduleReset(bool add, time_t time, DungeonResetEve
 {
     MapPersistentStateManager::PersistentStateMap::iterator itr = m_InstanceSaves.m_instanceSaveByInstanceId.find(event.instanceId);
     if (itr == m_InstanceSaves.m_instanceSaveByInstanceId.end())
-        sLog.outInfo("[DungeonReset] Instance %u [map %u]: ScheduleReset %u for unknown instance.", event.instanceId, event.mapId, event.type);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[DungeonReset] Instance %u [map %u]: ScheduleReset %u for unknown instance.", event.instanceId, event.mapId, event.type);
     else if (itr->second->GetMapId() != event.mapId)
-        sLog.outInfo("[DungeonReset] Instance %u [map %u]: ScheduleReset %u for wrong instance [map %u]", event.instanceId, event.mapId, event.type, itr->second->GetMapId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[DungeonReset] Instance %u [map %u]: ScheduleReset %u for wrong instance [map %u]", event.instanceId, event.mapId, event.type, itr->second->GetMapId());
 
     if (add)
         m_resetTimeQueue.insert(std::pair<time_t, DungeonResetEvent>(time, event));
@@ -529,7 +529,7 @@ void DungeonResetScheduler::ScheduleReset(bool add, time_t time, DungeonResetEve
             }
 
             if (itr == m_resetTimeQueue.end())
-                sLog.outError("DungeonResetScheduler::ScheduleReset: cannot cancel the reset, the event(%d,%d,%d) was not found!", event.type, event.mapId, event.instanceId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DungeonResetScheduler::ScheduleReset: cannot cancel the reset, the event(%d,%d,%d) was not found!", event.type, event.mapId, event.instanceId);
         }
     }
 }
@@ -637,13 +637,13 @@ MapPersistentState* MapPersistentStateManager::AddPersistentState(MapEntry const
     if (MapPersistentState *old_save = GetPersistentState(mapEntry->id, instanceId))
     {
         if (instanceId && old_save->GetMapId() != mapEntry->id)
-            sLog.outError("MapPersistentStateManager::AddPersistentState: instance %u has existing map ID '%u', but map to add for is '%u'. Mismatched states are loaded",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MapPersistentStateManager::AddPersistentState: instance %u has existing map ID '%u', but map to add for is '%u'. Mismatched states are loaded",
                 instanceId, old_save->GetMapId(), mapEntry->id);
 
         return old_save;
     }
 
-    DEBUG_LOG("MapPersistentStateManager::AddPersistentState: mapId = %d, instanceId = %d, reset time = %u, canRset = %u", mapEntry->id, instanceId, resetTime, canReset ? 1 : 0);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MapPersistentStateManager::AddPersistentState: mapId = %d, instanceId = %d, reset time = %u, canRset = %u", mapEntry->id, instanceId, resetTime, canReset ? 1 : 0);
 
     MapPersistentState *state;
     if (mapEntry->IsDungeon())
@@ -789,8 +789,8 @@ void MapPersistentStateManager::CleanupInstances()
     CharacterDatabase.CommitTransaction();
 
     bar.step();
-    sLog.outString();
-    sLog.outString(">> Instances cleaned up");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Instances cleaned up");
 }
 
 void MapPersistentStateManager::PackInstances()
@@ -850,8 +850,8 @@ void MapPersistentStateManager::PackInstances()
         bar.step();
     }
 
-    sLog.outString();
-    sLog.outString(">> Instance numbers remapped, next instance id is %u", InstanceNumber);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Instance numbers remapped, next instance id is %u", InstanceNumber);
 }
 
 void MapPersistentStateManager::ScheduleInstanceResets()
@@ -868,7 +868,7 @@ void MapPersistentStateManager::_ResetSave(PersistentStateMap& holder, Persisten
     lock_instLists = true;
 
     if (itr->second->IsUsedByMap())
-        sLog.outInfo("[DungeonReset] Deleting map %u instance %u used by a map !", itr->second->GetMapId(), itr->second->GetInstanceId());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[DungeonReset] Deleting map %u instance %u used by a map !", itr->second->GetMapId(), itr->second->GetInstanceId());
     delete itr->second; // Destructor will unbind groups / players
     holder.erase(itr++);
     lock_instLists = false;
@@ -876,7 +876,7 @@ void MapPersistentStateManager::_ResetSave(PersistentStateMap& holder, Persisten
 
 void MapPersistentStateManager::_ResetInstance(uint32 mapId, uint32 instanceId)
 {
-    DEBUG_LOG("MapPersistentStateManager::_ResetInstance %u, %u", mapId, instanceId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MapPersistentStateManager::_ResetInstance %u, %u", mapId, instanceId);
 
     PersistentStateMap::iterator itr = m_instanceSaveByInstanceId.find(instanceId);
     if (itr != m_instanceSaveByInstanceId.end())
@@ -884,7 +884,7 @@ void MapPersistentStateManager::_ResetInstance(uint32 mapId, uint32 instanceId)
         // delay reset until map unload for loaded map
         if (mapId != itr->second->GetMapId())
         {
-            sLog.outError("[CRASH] Instance %u is linked to two different maps, '%u' (scheduler) and '%u' (instance bind)",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[CRASH] Instance %u is linked to two different maps, '%u' (scheduler) and '%u' (instance bind)",
                 instanceId, mapId, itr->second->GetMapId());
             return;
         }
@@ -893,7 +893,7 @@ void MapPersistentStateManager::_ResetInstance(uint32 mapId, uint32 instanceId)
         {
             if (!iMap->IsDungeon())
             {
-                sLog.outInfo("[CRASH] Instance %u linked to map %u, which is not a dungeon map!", instanceId, iMap->GetId());
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Instance %u linked to map %u, which is not a dungeon map!", instanceId, iMap->GetId());
                 return;
             }
 
@@ -946,7 +946,7 @@ void MapPersistentStateManager::_ResetOrWarnAll(uint32 mapId, bool warn, uint32 
         // this is called one minute before the reset time
         if (!mapEntry->resetDelay)
         {
-            sLog.outError("MapPersistentStateManager::ResetOrWarnAll: no instance template or reset delay for map %d", mapId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MapPersistentStateManager::ResetOrWarnAll: no instance template or reset delay for map %d", mapId);
             return;
         }
 
@@ -1021,8 +1021,8 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded 0 creature respawn time.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 creature respawn time.");
         return;
     }
 
@@ -1085,8 +1085,8 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
 
     delete result;
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u creature respawn times", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creature respawn times", count);
 }
 
 void MapPersistentStateManager::LoadGameobjectRespawnTimes()
@@ -1103,8 +1103,8 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded 0 gameobject respawn time.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 gameobject respawn time.");
         return;
     }
 
@@ -1164,6 +1164,6 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
 
     delete result;
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u gameobject respawn times", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobject respawn times", count);
 }

@@ -130,7 +130,7 @@ void HonorMaintenancer::LoadStandingLists()
     std::sort(m_allianceStandingList.begin(), m_allianceStandingList.end());
     std::sort(m_hordeStandingList.begin(), m_hordeStandingList.end());
 
-    sLog.outHonor("[MAINTENANCE] Alliance: %u, Horde: %u, Inactive: %u",
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Alliance: %u, Horde: %u, Inactive: %u",
         m_allianceStandingList.size(), m_hordeStandingList.size(), m_inactiveStandingList.size());
 }
 
@@ -261,31 +261,31 @@ void HonorMaintenancer::DoMaintenance()
     if (!m_markerToStart)
         return;
 
-    sLog.outHonor("[MAINTENANCE] Honor maintenance starting.");
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Honor maintenance starting.");
 
-    sLog.outHonor("[MAINTENANCE] Load weekly players scores.");
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Load weekly players scores.");
     LoadWeeklyScores();
-    sLog.outHonor("[MAINTENANCE] Load standing lists.");
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Load standing lists.");
     LoadStandingLists();
-    sLog.outHonor("[MAINTENANCE] Distribute rank points for Alliance.");
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Distribute rank points for Alliance.");
     DistributeRankPoints(ALLIANCE);
-    sLog.outHonor("[MAINTENANCE] Distribute rank points for Horde.");
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Distribute rank points for Horde.");
     DistributeRankPoints(HORDE);
-    sLog.outHonor("[MAINTENANCE] Decay rank points for inactive players.");
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Decay rank points for inactive players.");
     InactiveDecayRankPoints();
 
     if (sWorld.getConfig(CONFIG_BOOL_ENABLE_CITY_PROTECTOR))
     {
-        sLog.outHonor("[MAINTENANCE] Assign city titles.");
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Assign city titles.");
         SetCityRanks();
     }
 
-    sLog.outHonor("[MAINTENANCE] Flush rank points.");
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Flush rank points.");
     FlushRankPoints();
 
     CreateCalculationReport();
 
-    sLog.outHonor("[MAINTENANCE] Honor maintenance finished.");
+    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Honor maintenance finished.");
 
     ToggleMaintenanceMarker();
     SetMaintenanceDays(GetNextMaintenanceDay());
@@ -293,7 +293,7 @@ void HonorMaintenancer::DoMaintenance()
 
 void HonorMaintenancer::CreateCalculationReport()
 {
-    std::string timestamp = Log::GetTimestampStr();
+    std::string timestamp = sLog.GetTimestampStr();
     std::string filename = "HCR_" + timestamp + ".txt";
     std::string path = sWorld.GetHonorPath() + filename;
 
@@ -301,7 +301,7 @@ void HonorMaintenancer::CreateCalculationReport()
     ofs.open(path.c_str());
     if (!ofs.is_open())
     {
-        sLog.outError("Can't create HCR file!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't create HCR file!");
         return;
     }
 
@@ -586,7 +586,7 @@ void HonorMaintenancer::CheckMaintenanceDay()
         if (sWorld.getConfig(CONFIG_BOOL_AUTO_HONOR_RESTART))
             sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
         else
-            sLog.outString("HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
 
         ToggleMaintenanceMarker();
     }
@@ -613,7 +613,7 @@ void HonorMaintenancer::SetMaintenanceDays(uint32 last, uint32 next)
 
 void HonorMaintenancer::Initialize()
 {
-    sLog.outString("Initialize Honor Maintenance system...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Initialize Honor Maintenance system...");
 
     QueryResult* result = CharacterDatabase.Query("SELECT `honor_last_maintenance_day`, `honor_next_maintenance_day`, `honor_maintenance_marker` FROM `saved_variables`");
     if (result)
@@ -779,10 +779,10 @@ bool HonorMgr::Add(float cp, uint8 type, Unit* source)
     bool plr = source->GetTypeId() == TYPEID_PLAYER;
 
     if (m_owner->GetMap()->IsBattleGround())
-        sLog.outHonor("[BATTLEGROUND]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[BATTLEGROUND]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",
             m_owner->GetSession()->GetPlayerName(), m_owner->GetSession()->GetAccountId(), honor, type, plr ? "player" : "unit", source->GetName(), ip.c_str());
     else
-        sLog.outHonor("[OPEN WORLD]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[OPEN WORLD]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",
             m_owner->GetSession()->GetPlayerName(), m_owner->GetSession()->GetAccountId(), honor, type, plr ? "player" : "unit", source->GetName(), ip.c_str());
 
     if (type == DISHONORABLE)

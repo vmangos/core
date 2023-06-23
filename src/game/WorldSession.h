@@ -29,6 +29,8 @@
 #include "Item.h"
 #include "GossipDef.h"
 #include "Chat/AbstractPlayer.h"
+#include "SniffFile.h"
+#include "ClientDefines.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -55,11 +57,28 @@ class MasterPlayer;
 struct OpcodeHandler;
 struct PlayerBotEntry;
 
-enum ClientOSType
+enum AccountDataType
 {
-    CLIENT_OS_UNKNOWN,
-    CLIENT_OS_WIN,
-    CLIENT_OS_MAC
+    GLOBAL_CONFIG_CACHE             = 0,                    // 0x01 g
+    PER_CHARACTER_CONFIG_CACHE      = 1,                    // 0x02 p
+    GLOBAL_BINDINGS_CACHE           = 2,                    // 0x04 g
+    PER_CHARACTER_BINDINGS_CACHE    = 3,                    // 0x08 p
+    GLOBAL_MACROS_CACHE             = 4,                    // 0x10 g
+    PER_CHARACTER_MACROS_CACHE      = 5,                    // 0x20 p
+    PER_CHARACTER_LAYOUT_CACHE      = 6,                    // 0x40 p
+    PER_CHARACTER_CHAT_CACHE        = 7,                    // 0x80 p
+    NUM_ACCOUNT_DATA_TYPES          = 8
+};
+
+#define GLOBAL_CACHE_MASK           0x15
+#define PER_CHARACTER_CACHE_MASK    0xEA
+
+struct AccountData
+{
+    AccountData() : timestamp(0), data("") {}
+
+    time_t timestamp;
+    std::string data;
 };
 
 enum PartyOperation
@@ -89,6 +108,21 @@ enum TutorialDataState
     TUTORIALDATA_UNCHANGED = 0,
     TUTORIALDATA_CHANGED   = 1,
     TUTORIALDATA_NEW       = 2
+};
+
+enum PlayTimeLimit : uint32
+{
+    PLAY_TIME_LIMIT_APPROACHING_PARTIAL = 2 * HOUR + 30 * MINUTE,
+    PLAY_TIME_LIMIT_PARTIAL = 3 * HOUR,
+    PLAY_TIME_LIMIT_APPROCHING_FULL = 4 * HOUR + 30 * MINUTE,
+    PLAY_TIME_LIMIT_FULL = 5 * HOUR,
+};
+
+enum PlayTimeFlag : uint32
+{
+    PTF_APPROACHING_PARTIAL_PLAY_TIME = 0x1000,
+    PTF_APPROACHING_NO_PLAY_TIME = 0x2000,
+    PTF_UNHEALTHY_TIME = 0x80000000,
 };
 
 enum AntifloodOpcodeExecutionSpeed
@@ -144,9 +178,9 @@ enum PacketProcessing
      * PACKET_PROCESS_DB_QUERY
      * Does not write anything. Can be processed in any environment.
      * Reads static data (usually data from World DB)
+     * Currently executed directly in the network thread.
      */
     PACKET_PROCESS_DB_QUERY,
-    PACKET_PROCESS_MASTER_SAFE,
     PACKET_PROCESS_MAX_TYPE,                                // no handler for this packet (server side, or not implemented)
     /*
      * PACKET_PROCESS_SELF_ITEMS
@@ -202,7 +236,7 @@ class PacketFilter
         explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession), m_processLogout(false), m_processType(PACKET_PROCESS_MAX_TYPE) {}
         virtual ~PacketFilter() {}
 
-        virtual bool Process(WorldPacket*) { return true; }
+        virtual bool Process(std::unique_ptr<WorldPacket> const&) { return true; }
         inline bool ProcessLogout() const { return m_processLogout; }
         inline PacketProcessing PacketProcessType() const { return m_processType; }
         inline void SetProcessType(PacketProcessing t) { m_processType = t; }
@@ -223,7 +257,7 @@ class MapSessionFilter : public PacketFilter
         }
         ~MapSessionFilter() override {}
 
-        bool Process(WorldPacket*  packet) override;
+        bool Process(std::unique_ptr<WorldPacket> const& packet) override;
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -247,6 +281,7 @@ class WorldSession
         WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale);
         ~WorldSession();
 
+        uint32 GetGUID() const { return m_guid; }
         AccountTypes GetSecurity() const { return m_security; }
         uint32 GetAccountId() const { return m_accountId; }
         std::string GetUsername() const { return m_username; }
@@ -257,6 +292,8 @@ class WorldSession
         void SetGameBuild(uint32 v) { m_gameBuild = v; }
         ClientOSType GetOS() const { return m_clientOS; }
         void SetOS(ClientOSType os) { m_clientOS = os; }
+        ClientPlatformType GetPlatform() const { return m_clientPlatform; }
+        void SetPlatform(ClientPlatformType platform) { m_clientPlatform = platform; }
         uint32 GetDialogStatus(Player* pPlayer, Object* questgiver, uint32 defstatus);
         uint32 GetAccountMaxLevel() const { return m_characterMaxLevel; }
         void SetAccountFlags(uint32 f) { m_accountFlags = f; }
@@ -285,6 +322,14 @@ class WorldSession
 
         bool CharacterScreenIdleKick(uint32 diff);
         uint32 m_idleTime;
+
+        // Played time limit
+        time_t GetCreateTime() const { return m_createTime; }
+        time_t GetConsecutivePlayTime(time_t now) const { return (now - m_createTime) + m_previousPlayTime; }
+        time_t GetPreviousPlayedTime() { return m_previousPlayTime; }
+        void SetPreviousPlayedTime(time_t playedTime) { m_previousPlayTime = playedTime; }
+        void CheckPlayedTimeLimit(time_t now);
+        void SendPlayTimeWarning(PlayTimeFlag flag, int32 timeLeftInSeconds);
 
         // Is the user engaged in a log out process?
         bool IsLogingOut() const { return m_logoutTime || m_playerLogout; }
@@ -337,6 +382,7 @@ class WorldSession
         uint32 GetFingerprint() const { return 0; } // TODO
         void CleanupFingerprintHistory() {} // TODO
         bool HasClientMovementControl() const { return !m_clientMoverGuid.IsEmpty(); }
+        bool HasUsedClickToMove() const;
         
         void SetReceivedWhoRequest(bool v) { m_who_recvd = v; }
         bool ReceivedWhoRequest() const { return m_who_recvd; }
@@ -347,12 +393,27 @@ class WorldSession
         bool m_ah_list_recvd;
 
         bool Update(PacketFilter& updater);
-        void QueuePacket(WorldPacket* new_packet);
+        void QueuePacket(std::unique_ptr<WorldPacket> new_packet);
         bool CanProcessPackets() const; // Returns true iif we can process packets (ie logged in Player, not a bot, etc ...
         void ProcessPackets(PacketFilter& updater);
         bool AllowPacket(uint16 opcode);
         void ClearIncomingPacketsByType(PacketProcessing type);
         inline bool HasRecentPacket(PacketProcessing type) const { return m_receivedPacketType[type]; }
+
+        void StartSniffing()
+        {
+            if (!m_sniffFile)
+            {
+                std::string fileName = "packet_log_" + GetUsername() + "_" + std::to_string(time(nullptr)) + ".pkt";
+                m_sniffFile = std::make_unique<SniffFile>(fileName.c_str());
+                m_sniffFile->WriteHeader();
+            }
+        }
+        void StopSniffing()
+        {
+            if (m_sniffFile)
+                m_sniffFile.reset();
+        }
 
         void SendPacket(WorldPacket const* packet);
         void SendNotification(char const* format, ...) ATTR_PRINTF(2, 3);
@@ -399,6 +460,13 @@ class WorldSession
         void SendStablePet(ObjectGuid guid);
         void SendStableResult(uint8 res);
         bool CheckStableMaster(ObjectGuid guid);
+
+        // Account Data
+        AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
+        void SetAccountData(AccountDataType type, const std::string& data);
+        void SendAccountDataTimes();
+        void LoadGlobalAccountData();
+        void LoadAccountData(QueryResult* result, uint32 mask);
 
         void LoadTutorialsData();
         void SendTutorialsData();
@@ -485,6 +553,7 @@ class WorldSession
         void HandleMoveSetRawPosition(WorldPacket& recv_data);
         void HandleWorldTeleportOpcode(WorldPacket& recv_data);
         void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
+        void HandleTeleportToUnitOpcode(WorldPacket& recvdata);
 
         void HandleInspectOpcode(WorldPacket& recvPacket);
         void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);
@@ -706,7 +775,8 @@ class WorldSession
         void HandlePushQuestToParty(WorldPacket& recvPacket);
         void HandleQuestPushResult(WorldPacket& recvPacket);
 
-        bool ProcessChatMessageAfterSecurityCheck(std::string&, uint32, uint32);
+        bool CheckChatMessageValidity(char*, uint32, uint32);
+        bool ProcessChatMessageAfterSecurityCheck(char*, uint32, uint32);
         static bool IsLanguageAllowedForChatType(uint32 lang, uint32 msgType);
         void SendPlayerNotFoundNotice(std::string const& name);
         void SendWrongFactionNotice();
@@ -799,9 +869,10 @@ class WorldSession
         void LogUnexpectedOpcode(WorldPacket* packet, char const*  reason);
         void LogUnprocessedTail(WorldPacket* packet);
 
+        uint32 const m_guid; // unique identifier for each session
         WorldSocket* m_socket;
         std::string m_address;
-        LockedQueue<WorldPacket*, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
+        LockedQueue<std::unique_ptr<WorldPacket>, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool m_receivedPacketType[PACKET_PROCESS_MAX_TYPE];
         uint32 m_floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         bool m_connected;
@@ -815,23 +886,30 @@ class WorldSession
         LocaleConstant m_sessionDbcLocale;
         int m_sessionDbLocaleIndex;
         ClientOSType    m_clientOS;
+        ClientPlatformType m_clientPlatform;
         uint32          m_gameBuild;
         std::shared_ptr<PlayerBotEntry> m_bot;
+        std::unique_ptr<SniffFile> m_sniffFile;
 
         Warden* m_warden;
         MovementAnticheat* m_cheatData;
 
         Player* _player;
+        ObjectGuid m_currentPlayerGuid;
         ObjectGuid m_clientMoverGuid;
         uint32 m_moveRejectTime;
-        time_t m_logoutTime;
+        time_t m_createTime;                                // when session was created
+        time_t m_previousPlayTime;                          // play time from previous session less than 5 hours ago
+        time_t m_logoutTime;                                // when its time to log out character
         bool m_inQueue;                                     // session wait in auth.queue
         bool m_playerLoading;                               // code processed in LoginPlayer
         bool m_playerLogout;                                // code processed in LogoutPlayer
         bool m_playerRecentlyLogout;
         bool m_playerSave;
+        uint32 m_exhaustionState;
         uint32 m_charactersCount;
         uint32 m_characterMaxLevel;
+        AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
         uint32 m_tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;
         

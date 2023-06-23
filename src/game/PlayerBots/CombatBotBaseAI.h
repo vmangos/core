@@ -82,7 +82,8 @@ public:
     }
 
     virtual void OnPacketReceived(WorldPacket const* packet) override;
-    virtual void SendFakePacket(uint16 opcode) override;
+    void SendBattlefieldPortPacket();
+    void SendBattlemasterJoinPacket(uint8 battlegroundId);
 
     void AutoAssignRole();
     void PopulateSpellData();
@@ -105,12 +106,16 @@ public:
     bool IsValidHealTarget(Unit const* pTarget, float healthPercent = 100.0f) const;
     bool IsValidHostileTarget(Unit const* pTarget) const;
     bool IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
+    bool FindAndPreHealTarget();
     bool FindAndHealInjuredAlly(float selfHealPercent = 100.0f, float groupHealPercent = 100.0f);
     bool HealInjuredTarget(Unit* pTarget);
     bool HealInjuredTargetDirect(Unit* pTarget);
     bool HealInjuredTargetPeriodic(Unit* pTarget);
     template <class T>
     SpellEntry const* SelectMostEfficientHealingSpell(Unit const* pTarget, std::set<SpellEntry const*, T>& spellList) const;
+    template <class T>
+    SpellEntry const* SelectMostEfficientHealingSpell(Unit const* pTarget, int32 missingHealth, std::set<SpellEntry const*, T>& spellList) const;
+    int32 GetIncomingdamage(Unit const* pTarget) const;
     bool AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee = true, bool checkSpells = true) const;
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);

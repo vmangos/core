@@ -29,122 +29,6 @@ EndContentData */
 
 #include "scriptPCH.h"
 
-#define WHISPER_CUSTODIAN_1     -1000217
-#define WHISPER_CUSTODIAN_2     -1000218
-#define WHISPER_CUSTODIAN_3     -1000219
-#define WHISPER_CUSTODIAN_4     -1000220
-#define WHISPER_CUSTODIAN_5     -1000221
-#define WHISPER_CUSTODIAN_6     -1000222
-#define WHISPER_CUSTODIAN_7     -1000223
-#define WHISPER_CUSTODIAN_8     -1000224
-#define WHISPER_CUSTODIAN_9     -1000225
-#define WHISPER_CUSTODIAN_10    -1000226
-#define WHISPER_CUSTODIAN_11    -1000227
-#define WHISPER_CUSTODIAN_12    -1000228
-#define WHISPER_CUSTODIAN_13    -1000229
-#define WHISPER_CUSTODIAN_14    -1000230
-
-struct npc_custodian_of_timeAI : public npc_escortAI
-{
-    npc_custodian_of_timeAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        Reset();
-    }
-
-    void WaypointReached(uint32 i) override
-    {
-        Player* pPlayer = GetPlayerForEscort();
-
-        if (!pPlayer)
-            return;
-
-        switch (i)
-        {
-            case 0:
-                DoScriptText(WHISPER_CUSTODIAN_1, m_creature, pPlayer);
-                break;
-            case 1:
-                DoScriptText(WHISPER_CUSTODIAN_2, m_creature, pPlayer);
-                break;
-            case 2:
-                DoScriptText(WHISPER_CUSTODIAN_3, m_creature, pPlayer);
-                break;
-            case 3:
-                DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer);
-                break;
-            case 5:
-                DoScriptText(WHISPER_CUSTODIAN_5, m_creature, pPlayer);
-                break;
-            case 6:
-                DoScriptText(WHISPER_CUSTODIAN_6, m_creature, pPlayer);
-                break;
-            case 7:
-                DoScriptText(WHISPER_CUSTODIAN_7, m_creature, pPlayer);
-                break;
-            case 8:
-                DoScriptText(WHISPER_CUSTODIAN_8, m_creature, pPlayer);
-                break;
-            case 9:
-                DoScriptText(WHISPER_CUSTODIAN_9, m_creature, pPlayer);
-                break;
-            case 10:
-                DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer);
-                break;
-            case 13:
-                DoScriptText(WHISPER_CUSTODIAN_10, m_creature, pPlayer);
-                break;
-            case 14:
-                DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer);
-                break;
-            case 16:
-                DoScriptText(WHISPER_CUSTODIAN_11, m_creature, pPlayer);
-                break;
-            case 17:
-                DoScriptText(WHISPER_CUSTODIAN_12, m_creature, pPlayer);
-                break;
-            case 18:
-                DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer);
-                break;
-            case 22:
-                DoScriptText(WHISPER_CUSTODIAN_13, m_creature, pPlayer);
-                break;
-            case 23:
-                DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer);
-                break;
-            case 24:
-                DoScriptText(WHISPER_CUSTODIAN_14, m_creature, pPlayer);
-                DoCastSpellIfCan(pPlayer, 34883);
-                //below here is temporary workaround, to be removed when spell works properly
-                pPlayer->AreaExploredOrEventHappens(10277);
-                break;
-        }
-    }
-
-    void MoveInLineOfSight(Unit *who) override
-    {
-        if (HasEscortState(STATE_ESCORT_ESCORTING))
-            return;
-
-        if (who->GetTypeId() == TYPEID_PLAYER)
-        {
-            if (((Player*)who)->HasAura(34877, EFFECT_INDEX_1) && ((Player*)who)->GetQuestStatus(10277) == QUEST_STATUS_INCOMPLETE)
-            {
-                float Radius = 10.0;
-
-                if (m_creature->IsWithinDistInMap(who, Radius))
-                    Start(false, who->GetGUID());
-            }
-        }
-    }
-
-    void Reset() override { }
-};
-
-CreatureAI* GetAI_npc_custodian_of_time(Creature* pCreature)
-{
-    return new npc_custodian_of_timeAI(pCreature);
-}
-
 /*####
 # npc_tooga
 ####*/
@@ -187,8 +71,9 @@ struct npc_toogaAI : public FollowerAI
         m_uiCheckSpeechTimer = urand(30000, 60000);
         m_uiPostEventTimer = 1000;
         m_uiPhasePostEvent = 0;
-
         m_tortaGuid.Clear();
+
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -380,21 +265,12 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                     extraPirateType[0] = NPC_PIRATES_1;
                     extraPirateType[1] = NPC_PIRATES_2;
 
-                    if (pirate1 = pGo->SummonCreature(NPC_PIRATES_1, -10119.85f, -4068.36f, 4.55f, 1.35f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate1 = pGo->SummonCreature(NPC_PIRATES_1, -10119.85f, -4068.36f, 4.55f, 1.35f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate1->AI()->AttackStart(pPlayer);
-                        pirate1->SetRespawnDelay(350000);
-                    }
-                    if (pirate2 = pGo->SummonCreature(NPC_PIRATES_2, -10109.80f, -4054.45f, 5.64f, 3.17f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate2 = pGo->SummonCreature(NPC_PIRATES_2, -10109.80f, -4054.45f, 5.64f, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate2->AI()->AttackStart(pPlayer);
-                        pirate2->SetRespawnDelay(350000);
-                    }
-                    if (pirate3 = pGo->SummonCreature(NPC_PIRATES_3, -10127.80f, -4047.04f, 4.50f, 5.07f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate3 = pGo->SummonCreature(NPC_PIRATES_3, -10127.80f, -4047.04f, 4.50f, 5.07f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate3->AI()->AttackStart(pPlayer);
-                        pirate3->SetRespawnDelay(350000);
-                    }
 
                     for (int & pirateEntry : extraPirateType)
                     {
@@ -411,16 +287,10 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                                 break;
                         }
                     }
-                    if (pirate4 = pGo->SummonCreature(extraPirateType[0], -10113.952148f, -4040.484375f, 5.174251f, 4.300828f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate4 = pGo->SummonCreature(extraPirateType[0], -10113.952148f, -4040.484375f, 5.174251f, 4.300828f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate4->AI()->AttackStart(pPlayer);
-                        pirate4->SetRespawnDelay(350000);
-                    }
-                    if (pirate5 = pGo->SummonCreature(extraPirateType[1], -10136.779297f, -4063.175049f, 4.787039f, 0.526417f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
+                    if (pirate5 = pGo->SummonCreature(extraPirateType[1], -10136.779297f, -4063.175049f, 4.787039f, 0.526417f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 310000))
                         pirate5->AI()->AttackStart(pPlayer);
-                        pirate5->SetRespawnDelay(350000);
-                    }
                 }
             }
         }

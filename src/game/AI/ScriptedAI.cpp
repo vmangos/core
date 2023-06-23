@@ -99,7 +99,7 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* pSource, uint32 uiSoundId)
 
     if (!sObjectMgr.GetSoundEntry(uiSoundId))
     {
-        sLog.outError("Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", uiSoundId, pSource->GetTypeId(), pSource->GetGUIDLow());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", uiSoundId, pSource->GetTypeId(), pSource->GetGUIDLow());
         return;
     }
 
@@ -121,20 +121,7 @@ Creature* ScriptedAI::DoSpawnCreature(uint32 id, float dist, uint32 type, uint32
 
 void ScriptedAI::DoResetThreat()
 {
-    if (!m_creature->CanHaveThreatList() || m_creature->GetThreatManager().isThreatListEmpty())
-    {
-        sLog.outError("DoResetThreat called for creature that either cannot have threat list or has empty threat list (m_creature entry = %d)", m_creature->GetEntry());
-        return;
-    }
-
-    ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-    for (const auto itr : tList)
-    {
-        Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid());
-
-        if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
-            m_creature->GetThreatManager().modifyThreatPercent(pUnit, -100);
-    }
+    m_creature->DoResetThreat();
 }
 
 void ScriptedAI::DoTeleportPlayer(Unit* pUnit, float fX, float fY, float fZ, float fO)
@@ -142,7 +129,7 @@ void ScriptedAI::DoTeleportPlayer(Unit* pUnit, float fX, float fY, float fZ, flo
     if (!pUnit || pUnit->GetTypeId() != TYPEID_PLAYER)
     {
         if (pUnit)
-            sLog.outError("Creature %u (Entry: %u) Tried to teleport non-player unit (Type: %u GUID: %u) to x: %f y:%f z: %f o: %f. Aborted.", m_creature->GetGUID(), m_creature->GetEntry(), pUnit->GetTypeId(), pUnit->GetGUID(), fX, fY, fZ, fO);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature %u (Entry: %u) Tried to teleport non-player unit (Type: %u GUID: %u) to x: %f y:%f z: %f o: %f. Aborted.", m_creature->GetGUID(), m_creature->GetEntry(), pUnit->GetTypeId(), pUnit->GetGUID(), fX, fY, fZ, fO);
 
         return;
     }
@@ -255,7 +242,7 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(uint32 const uiDiff)
                 return false;
             break;
         default:
-            sLog.outError("EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition.", m_creature->GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition.", m_creature->GetEntry());
             return false;
     }
 
@@ -269,20 +256,11 @@ void ScriptedAI::EnterEvadeIfOutOfHomeArea()
         return;
 
     if (m_creature->GetAreaId() != m_uiHomeArea)
-    {
-        std::ostringstream log;
-        log << "Home area left, evading.";
-        m_creature->LogScriptInfo(log);
-
         EnterEvadeMode();
-    }
 }
 
 void Scripted_NoMovementAI::AttackStart(Unit* pWho)
 {
-    if (!pWho)
-        return;
-
     if (m_creature->Attack(pWho, true))
     {
         m_creature->AddThreat(pWho);

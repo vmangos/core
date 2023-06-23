@@ -1,3 +1,4 @@
+SET NAMES utf8;
 DROP PROCEDURE IF EXISTS add_migration;
 delimiter ??
 CREATE PROCEDURE `add_migration`()
@@ -8,6 +9,8 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20220224185216');
 -- Add your query below.
 
+
+SET NAMES utf8;
 
 -- Add Flee To Windfuries (credit cmangos)
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` IN (2962, 2963, 2964, 2965);

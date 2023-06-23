@@ -82,6 +82,22 @@ enum LootSlotType
     MAX_LOOT_SLOT_TYPE,
 };
 
+enum LootError
+{
+    LOOT_ERROR_DIDNT_KILL               = 0,    // You don't have permission to loot that corpse.
+    LOOT_ERROR_TOO_FAR                  = 4,    // You are too far away to loot that corpse.
+    LOOT_ERROR_BAD_FACING               = 5,    // You must be facing the corpse to loot it.
+    LOOT_ERROR_LOCKED                   = 6,    // Someone is already looting that corpse.
+    LOOT_ERROR_NOTSTANDING              = 8,    // You need to be standing up to loot something!
+    LOOT_ERROR_STUNNED                  = 9,    // You can't loot anything while stunned!
+    LOOT_ERROR_PLAYER_NOT_FOUND         = 10,   // Player not found
+    LOOT_ERROR_PLAY_TIME_EXCEEDED       = 11,   // Maximum play time exceeded
+    LOOT_ERROR_MASTER_INV_FULL          = 12,   // That player's inventory is full
+    LOOT_ERROR_MASTER_UNIQUE_ITEM       = 13,   // Player has too many of that item already
+    LOOT_ERROR_MASTER_OTHER             = 14,   // Can't assign item to that player
+    LOOT_ERROR_ALREADY_PICKPOCKETED     = 15,   // Your target has already had its pockets picked
+    LOOT_ERROR_NOT_WHILE_SHAPESHIFTED   = 16    // You can't do that while shapeshifted.
+};
 
 class Player;
 class WorldObject;
@@ -342,7 +358,7 @@ struct Loot
     LootItem* LootItemInSlot(uint32 lootslot, uint32 playerGuid, QuestItem** qitem = nullptr, QuestItem** ffaitem = nullptr, QuestItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(uint32 playerGuid) const;
 
-    WorldObject const* GetLootTarget() const { return m_lootTarget; }
+    WorldObject const* GetLootTarget() const;
 
     // TrinityCore
     bool hasItemFor(Player* player) const;
@@ -405,9 +421,11 @@ void LoadLootTemplates_Pickpocketing();
 void LoadLootTemplates_Skinning();
 void LoadLootTemplates_Disenchant();
 
-void LoadLootTemplates_Reference();
+void LoadLootTemplates_Reference(LootIdSet& ids_set);
 
-inline void LoadLootTables()
+void CheckLootTemplates_Reference(LootIdSet& ids_set); // has to be split due to bg usage
+
+inline void LoadLootTables(LootIdSet& ids_set)
 {
     LoadLootTemplates_Creature();
     LoadLootTemplates_Fishing();
@@ -418,7 +436,9 @@ inline void LoadLootTables()
     LoadLootTemplates_Skinning();
     LoadLootTemplates_Disenchant();
 
-    LoadLootTemplates_Reference();
+    LoadLootTemplates_Reference(ids_set);
 }
+
+bool ExistsRefLootTemplate(uint32 refLootId);
 
 #endif

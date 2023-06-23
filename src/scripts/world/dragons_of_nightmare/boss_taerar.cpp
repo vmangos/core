@@ -142,9 +142,7 @@ bool boss_taerarAI::UpdateDragonAI(uint32 const uiDiff)
 
 npc_shade_of_taerarAI::npc_shade_of_taerarAI(Creature* pCreature) : ScriptedPetAI(pCreature)
 {
-    if (m_creature->GetCharmInfo())
-        m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
-
+    m_creature->SetReactState(REACT_AGGRESSIVE);
     npc_shade_of_taerarAI::Reset();
 }
 

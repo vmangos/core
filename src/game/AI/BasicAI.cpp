@@ -40,17 +40,7 @@ bool BasicAI::IsProximityAggroAllowedFor(Unit* pTarget) const
     if (m_creature->GetMap()->IsDungeon())
         return true;
 
-    if (Player* pNearPlayer = pTarget->ToPlayer())
-    {
-        if (Player* pVictimPlayer = m_creature->GetVictim()->ToPlayer())
-        {
-            if (pNearPlayer->GetGroup() &&
-                pNearPlayer->GetGroup() == pVictimPlayer->GetGroup())
-                return true;
-        }
-    }
-
-    return false;
+    return m_creature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_LEASH_EVADE);
 }
 
 void BasicAI::MoveInLineOfSight(Unit* pWho)
@@ -70,7 +60,7 @@ void BasicAI::MoveInLineOfSight(Unit* pWho)
 
     float const maxDistance = canInitiateAttack ? m_creature->GetAttackDistance(pWho) : m_creature->GetDetectionRange();
 
-    if (m_creature->IsWithinDistInMap(pWho, maxDistance, true, false) &&
+    if (m_creature->IsWithinDistInMap(pWho, maxDistance, true, SizeFactor::None) &&
         pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho) &&
         m_creature->IsWithinLOSInMap(pWho) && pWho->IsInAccessablePlaceFor(m_creature))
     {

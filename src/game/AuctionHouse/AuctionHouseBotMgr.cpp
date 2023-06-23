@@ -35,8 +35,8 @@ void AuctionHouseBotMgr::Load()
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded 0 AuctionHouseBot items");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 AuctionHouseBot items");
         return;
     }
 
@@ -60,8 +60,8 @@ void AuctionHouseBotMgr::Load()
     }
     while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u AuctionHouseBot items", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u AuctionHouseBot items", count);
 
     /* CONFIG */
     m_config                 = std::make_unique<AuctionHouseBotConfig>();
@@ -75,7 +75,7 @@ void AuctionHouseBotMgr::Load()
     m_auctionHouseEntry = sAuctionMgr.GetAuctionHouseEntry(m_config->ahfid);
     if (!m_auctionHouseEntry)
     {
-        sLog.outInfo("AHBot::Load() : No auction house for faction %u.", m_config->ahfid);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "AHBot::Load() : No auction house for faction %u.", m_config->ahfid);
         return;
     }
     m_loaded = true;
@@ -94,14 +94,14 @@ void AuctionHouseBotMgr::Update(bool force /* = false */)
 
     if (m_items.empty() ||  /*m_config->botguid==0 ||*/ m_config->botaccount == 0)
     {
-        sLog.outError("AHBot::Update() : Bad config or empty table.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AHBot::Update() : Bad config or empty table.");
         return;
     }
 
     AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(m_auctionHouseEntry);
     if (!auctionHouse)
     {
-        sLog.outError("AHBot::Update() : No auction house for faction %u.", m_config->ahfid);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AHBot::Update() : No auction house for faction %u.", m_config->ahfid);
         return;
     }
 
@@ -124,18 +124,18 @@ void AuctionHouseBotMgr::AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auc
     ItemPrototype const* prototype = sObjectMgr.GetItemPrototype(e.item);
     if (prototype == nullptr)
     {
-        sLog.outInfo("AHBot::AddItem() : Item %u does not exist.", e.item);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "AHBot::AddItem() : Item %u does not exist.", e.item);
         return;
     }
 
     Item* item = Item::CreateItem(e.item, 1);
     if (!item)
     {
-        sLog.outInfo("AHBot::AddItem() : Cannot create item.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "AHBot::AddItem() : Cannot create item.");
         return;
     }
 
-    sLog.outInfo("AHBot::AddItem() : Adding item %u.", e.item);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "AHBot::AddItem() : Adding item %u.", e.item);
 
     uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(e.item);
     if (randomPropertyId != 0)

@@ -13,7 +13,7 @@
 class SHA1Randx
 {
 public:
-    SHA1Randx(const uint8* buff, size_t size)
+    SHA1Randx(uint8 const* buff, size_t size)
     {
         auto const taken = size/2;
 

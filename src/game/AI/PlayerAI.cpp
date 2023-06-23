@@ -352,60 +352,59 @@ void PlayerControlledAI::UpdateAI(uint32 const uiDiff)
             return;
 
         UpdateTarget(victim);
+    }
 
-
-        if (uiGlobalCD < uiDiff)
+    if (uiGlobalCD < uiDiff)
+    {
+        if (me->GetClass() == CLASS_HUNTER)
         {
-            if (me->GetClass() == CLASS_HUNTER)
+            float dist = me->GetDistance(victim);
+            if (dist > 10.0f)
             {
-                float dist = me->GetDistance(victim);
-                if (dist > 10.0f)
+                if (Spell* pSpell = me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
                 {
-                    if (Spell* pSpell = me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
-                    {
-                        if (pSpell->m_spellInfo && pSpell->m_spellInfo->Id != 75) // auto shoot
-                            me->CastSpell(victim, 75, true);
-                    }
-                }
-            }
-
-            if (me->IsNonMeleeSpellCasted(true))
-                uiGlobalCD = 200;
-            else
-            {
-                // Since we are going to do something usableSpells [0, urand (0, usableSpells.size () - 1)], we must have at least one element.
-                if (usableSpells.empty())
-                    return;
-
-                uint32 spellId = usableSpells[urand(0, usableSpells.size() - 1)];
-                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
-                
-                // If its a positive spell we prioritize controller, if he's out of range,
-                // ourself, otherwise it will probably not be cast.
-                Unit* spellTarget = victim;
-                if (controller && spellInfo->IsPositiveSpell(me, controller))
-                    spellTarget = controller;
-                else if (spellInfo->IsPositiveSpell(me, me))
-                    spellTarget = me;
-
-                if (spellInfo)
-                {
-                    if (CanCastSpell(spellTarget, spellInfo, false, false))
-                    {
-                        me->CastSpell(spellTarget, spellId, false);
-                        uiGlobalCD = 1500;
-                        if (!bIsMelee)
-                            me->SetCasterChaseDistance(25.0f);
-                    }
-                    else
-                    {
-                        if (!bIsMelee)
-                            me->SetCasterChaseDistance(0.0f);
-                    }
+                    if (pSpell->m_spellInfo && pSpell->m_spellInfo->Id != 75) // auto shoot
+                        me->CastSpell(victim, 75, true);
                 }
             }
         }
+
+        if (me->IsNonMeleeSpellCasted(true))
+            uiGlobalCD = 200;
         else
-            uiGlobalCD -= uiDiff;
+        {
+            // Since we are going to do something usableSpells [0, urand (0, usableSpells.size () - 1)], we must have at least one element.
+            if (usableSpells.empty())
+                return;
+
+            uint32 spellId = usableSpells[urand(0, usableSpells.size() - 1)];
+            SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+
+            // If its a positive spell we prioritize controller, if he's out of range,
+            // ourself, otherwise it will probably not be cast.
+            Unit* spellTarget = victim;
+            if (controller && spellInfo->IsPositiveSpell(me, controller))
+                spellTarget = controller;
+            else if (spellInfo->IsPositiveSpell(me, me))
+                spellTarget = me;
+
+            if (spellInfo)
+            {
+                if (CanCastSpell(spellTarget, spellInfo, false, false))
+                {
+                    me->CastSpell(spellTarget, spellId, false);
+                    uiGlobalCD = 1500;
+                    if (!bIsMelee)
+                        me->SetCasterChaseDistance(25.0f);
+                }
+                else
+                {
+                    if (!bIsMelee)
+                        me->SetCasterChaseDistance(0.0f);
+                }
+            }
+        }
     }
+    else
+        uiGlobalCD -= uiDiff;
 }

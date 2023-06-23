@@ -36,7 +36,7 @@
 #include "Util.h"
 #include "LootMgr.h"
 #include "LFGMgr.h"
-#include "LFGHandler.h"
+#include "LFGQueue.h"
 #include "UpdateMask.h"
 
 #include <array>
@@ -89,13 +89,13 @@ Group::~Group()
 {
     if (m_bgGroup)
     {
-        DEBUG_LOG("Group::~Group: battleground group being deleted.");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Group::~Group: battleground group being deleted.");
         if (m_bgGroup->GetBgRaid(ALLIANCE) == this)
             m_bgGroup->SetBgRaid(ALLIANCE, nullptr);
         else if (m_bgGroup->GetBgRaid(HORDE) == this)
             m_bgGroup->SetBgRaid(HORDE, nullptr);
         else
-            sLog.outError("Group::~Group: battleground group is not linked to the correct battleground.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Group::~Group: battleground group is not linked to the correct battleground.");
     }
     RemoveAllInvites();
     Rolls::iterator itr;
@@ -205,8 +205,19 @@ bool Group::LoadMemberFromDB(uint32 guidLow, uint8 subgroup, bool assistant)
     if (!data)
         return false;
 
+    ObjectGuid guid = ObjectGuid(HIGHGUID_PLAYER, guidLow);
+
+    for (auto const& itr : m_memberSlots)
+    {
+        if (itr.guid == guid)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to add duplicate member into group on load.");
+            return false;
+        }
+    }
+
     MemberSlot member;
-    member.guid      = ObjectGuid(HIGHGUID_PLAYER, guidLow);
+    member.guid      = guid;
     member.name      = data->sName;
     member.group     = subgroup;
     member.assistant = assistant;
@@ -353,16 +364,6 @@ bool Group::AddMember(ObjectGuid guid, char const* name, uint8 joinMethod)
             }, 1);
         }
 
-        if (isInLFG())
-        {
-            if (joinMethod != GROUP_LFG)
-            {
-                player->GetSession()->SendMeetingstoneSetqueue(m_LFGAreaId, MEETINGSTONE_STATUS_JOINED_QUEUE);
-
-                sLFGMgr.UpdateGroup(m_Id);
-            }
-        }
-
         // Cancel instance reset
         Map* map = player->GetMap();
         if (map->IsDungeon())
@@ -423,6 +424,14 @@ bool Group::AddMember(ObjectGuid guid, char const* name, uint8 joinMethod)
                 player->SendDirectMessage(&groupDataPacket);
             }
         }
+
+        if (IsInLFG())
+        {
+            if (joinMethod != GROUP_LFG)
+            {
+                sLFGMgr.UpdateGroup(this, true, guid);
+            }
+        }
     }
 
     return true;
@@ -434,6 +443,7 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
     if (GetMembersCount() > GetMembersMinCount())
     {
         bool leaderChanged = _removeMember(guid);
+        bool leftGroup = false;
 
         if (Player* player = sObjectMgr.GetPlayer(guid))
         {
@@ -453,26 +463,34 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
                 data.Initialize(SMSG_GROUP_UNINVITE, 0);
                 player->GetSession()->SendPacket(&data);
 
-                if (isInLFG())
+                if (IsInLFG())
                 {
                     data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
                     data << 0 << uint8(MEETINGSTONE_STATUS_PARTY_MEMBER_REMOVED_PARTY_REMOVED);
-
                     BroadcastPacket(&data, true);
-                    sLFGMgr.RemoveGroupFromQueue(m_Id);
+                    leftGroup = true;
+                    sWorld.GetLFGQueue().GetMessager().AddMessage([groupId = GetId()](LFGQueue* queue)
+                    {
+                        queue->RemoveGroupFromQueue(groupId);
+                    });
 
+                    // want to make sure group is removed before player is added
+                    // send a message and add a kicked player to lfg queue
                     player->GetSession()->SendMeetingstoneSetqueue(m_LFGAreaId, MEETINGSTONE_STATUS_LOOKING_FOR_NEW_PARTY_IN_QUEUE);
                     sLFGMgr.AddToQueue(player, m_LFGAreaId);
                 }
             }
 
-            if (removeMethod == GROUP_LEAVE && isInLFG())
+            if (removeMethod == GROUP_LEAVE && IsInLFG())
             {
                 player->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
 
-                data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
-                data << m_LFGAreaId << uint8(MEETINGSTONE_STATUS_PARTY_MEMBER_LEFT_LFG);
-                BroadcastPacket(&data, true);
+                if (!leaderChanged)
+                {
+                    data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
+                    data << m_LFGAreaId << uint8(MEETINGSTONE_STATUS_PARTY_MEMBER_LEFT_LFG);
+                    BroadcastPacket(&data, true);
+                }
             }
 
             //we already removed player from group and in player->GetGroup() is his original group!
@@ -490,21 +508,26 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
 
         if (leaderChanged)
         {
+            leftGroup = true;
+
             WorldPacket data(SMSG_GROUP_SET_LEADER, (m_leaderName.size() + 1));
             data << m_leaderName;
             BroadcastPacket(&data, true);
 
-            sLFGMgr.RemoveGroupFromQueue(m_Id);
+            sWorld.GetLFGQueue().GetMessager().AddMessage([groupId = GetId()](LFGQueue* queue)
+            {
+                queue->RemoveGroupFromQueue(groupId);
+            });
         }
 
-        if (isInLFG())
-            sLFGMgr.UpdateGroup(m_Id);
+        if (!leftGroup && IsInLFG())
+            sLFGMgr.UpdateGroup(this, false, guid);
 
         SendUpdate();
     }
     // if group before remove <= 2 disband it
     else
-        Disband(true);
+        Disband(true, guid);
 
     return m_memberSlots.size();
 }
@@ -523,9 +546,10 @@ void Group::ChangeLeader(ObjectGuid guid)
     SendUpdate();
 }
 
-void Group::Disband(bool hideDestroy)
+void Group::Disband(bool hideDestroy, ObjectGuid initiator)
 {
     Player* player;
+    Player* remainingPlayer = nullptr;
 
     for (const auto& itr : m_memberSlots)
     {
@@ -574,20 +598,27 @@ void Group::Disband(bool hideDestroy)
             data << uint64(0) << uint64(0) << uint64(0);
             player->GetSession()->SendPacket(&data);
 
-            if (isInLFG())
-            {
-                sLFGMgr.RemoveGroupFromQueue(m_Id);
-
-                data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
-                data << 0 << MEETINGSTONE_STATUS_NONE;
-
-                player->GetSession()->SendPacket(&data);
-            }
+            if (IsInLFG())
+                player->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
         }
 
-        _homebindIfInstance(player);
+        // only the person who initiated the disband should be kicked from instance, as he left by choice
+        if (initiator.IsEmpty() || initiator == player->GetObjectGuid())
+            _homebindIfInstance(player);
+        else
+            remainingPlayer = player;
     }
-    RollId.clear();
+
+    if (IsInLFG())
+    {
+        sWorld.GetLFGQueue().GetMessager().AddMessage([groupId = GetId()](LFGQueue* queue)
+        {
+            queue->RemoveGroupFromQueue(groupId);
+        });
+    }
+
+    for (auto itr = RollId.begin(); itr != RollId.end(); itr = RollId.begin())
+        CountTheRoll(itr);
     m_memberSlots.clear();
 
     RemoveAllInvites();
@@ -598,6 +629,22 @@ void Group::Disband(bool hideDestroy)
         CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `group_id`='%u'", m_Id);
         CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `group_id`='%u'", m_Id);
         CharacterDatabase.CommitTransaction();
+
+        // transfer instance save to last player in dungeon
+        if (remainingPlayer)
+        {
+            BoundInstancesMap::iterator itr = m_boundInstances.find(remainingPlayer->GetMapId());
+            if (itr != m_boundInstances.end() && !itr->second.perm &&
+                !remainingPlayer->GetBoundInstance(remainingPlayer->GetMapId()))
+            {
+                remainingPlayer->BindToInstance(itr->second.state, itr->second.perm, false);
+                CharacterDatabase.PExecute("DELETE FROM `group_instance` WHERE `leader_guid` = '%u' AND `instance` = '%u'",
+                    GetLeaderGuid().GetCounter(), itr->second.state->GetInstanceId());
+                itr->second.state->RemoveGroup(this);               // save can become invalid
+                m_boundInstances.erase(itr);
+            }
+        }
+
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, nullptr);
     }
 
@@ -612,14 +659,14 @@ void Group::Disband(bool hideDestroy)
 
 void Group::CalculateLFGRoles(LFGGroupQueueInfo& data)
 {
-    uint32 m_initRoles = (LFG_ROLE_TANK | LFG_ROLE_DPS | LFG_ROLE_HEALER);
+    uint32 m_initRoles = (PLAYER_ROLE_TANK | PLAYER_ROLE_DAMAGE | PLAYER_ROLE_HEALER);
     uint32 dpsCount = 0;
 
-    static std::array<ClassRoles, 3> PotentialRoles =
+    static std::array<LfgRoles, 3> PotentialRoles =
     {
-        LFG_ROLE_TANK,
-        LFG_ROLE_HEALER,
-        LFG_ROLE_DPS
+        PLAYER_ROLE_TANK,
+        PLAYER_ROLE_HEALER,
+        PLAYER_ROLE_DAMAGE
     };
 
     std::list<ObjectGuid> processed;
@@ -627,9 +674,15 @@ void Group::CalculateLFGRoles(LFGGroupQueueInfo& data)
     for (const auto& citr : GetMemberSlots())
     {
         Classes playerClass = (Classes)sObjectMgr.GetPlayerClassByGUID(citr.guid);
-        ClassRoles lfgRole = LFGQueue::CalculateRoles(playerClass);
+        LfgRoles lfgRole;
+        Player* member = sObjectMgr.GetPlayer(citr.guid);
+        // if enabled and player is online, calculate role based on most used talent tree
+        if (member && sWorld.getConfig(CONFIG_BOOL_LFG_MATCHMAKING))
+            lfgRole = LFGMgr::CalculateTalentRoles(member);
+        else
+            lfgRole = LFGMgr::CalculateRoles(playerClass);
 
-        for (ClassRoles role : PotentialRoles)
+        for (LfgRoles role : PotentialRoles)
         {
             // We can't fulfill this role as our class, skip it
             if (!(lfgRole & role))
@@ -644,15 +697,16 @@ void Group::CalculateLFGRoles(LFGGroupQueueInfo& data)
         }
     }
 
-    data.availableRoles = (ClassRoles)m_initRoles;
+    data.availableRoles = (LfgRoles)m_initRoles;
     data.dpsCount = dpsCount;
+    data.playerCount = GetMembersCount();
 }
 
-bool Group::FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, ClassRoles requiredRole, uint32& InitRoles,
+bool Group::FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, LfgRoles requiredRole, uint32& InitRoles,
     uint32& DpsCount, std::list<ObjectGuid>& processed)
 {
     // We grant the role unless someone else in the group has higher priority for it
-    RolesPriority priority = LFGQueue::getPriority(playerClass, requiredRole);
+    LfgRolePriority priority = LFGMgr::GetPriority(playerClass, requiredRole);
 
     for (const auto& citr : GetMemberSlots())
     {
@@ -666,30 +720,30 @@ bool Group::FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, Class
         Classes memberClass = (Classes)sObjectMgr.GetPlayerClassByGUID(citr.guid);
 
         // Someone else has higher prio
-        if (priority < LFGQueue::getPriority(memberClass, requiredRole))
+        if (priority < LFGMgr::GetPriority(memberClass, requiredRole))
             return false;
     }
 
     switch (requiredRole)
     {
-        case LFG_ROLE_TANK:
+        case PLAYER_ROLE_TANK:
         {
-            InitRoles &= ~LFG_ROLE_TANK;
+            InitRoles &= ~PLAYER_ROLE_TANK;
             break;
         }
-        case LFG_ROLE_HEALER:
+        case PLAYER_ROLE_HEALER:
         {
-            InitRoles &= ~LFG_ROLE_HEALER;
+            InitRoles &= ~PLAYER_ROLE_HEALER;
             break;
         }
-        case LFG_ROLE_DPS:
+        case PLAYER_ROLE_DAMAGE:
         {
-            if (DpsCount < LFGQueue::GetMaximumDPSSlots())
+            if (DpsCount < LFGMgr::GetMaximumDPSSlots())
             {
                 ++DpsCount;
 
-                if (DpsCount >= LFGQueue::GetMaximumDPSSlots())
-                    InitRoles &= ~LFG_ROLE_DPS;
+                if (DpsCount >= LFGMgr::GetMaximumDPSSlots())
+                    InitRoles &= ~PLAYER_ROLE_DAMAGE;
             }
             break;
         }
@@ -802,10 +856,10 @@ void Group::GroupLoot(Creature* creature, Loot *loot)
         if (lootItem.freeforall)
             continue;
 
-        ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(lootItem.itemid);
+        ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(lootItem.itemid);
         if (!itemProto)
         {
-            DEBUG_LOG("Group::GroupLoot: missing item prototype for item with id: %d", lootItem.itemid);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Group::GroupLoot: missing item prototype for item with id: %d", lootItem.itemid);
             continue;
         }
 
@@ -825,10 +879,10 @@ void Group::NeedBeforeGreed(Creature* creature, Loot *loot)
         if (lootItem.freeforall)
             continue;
 
-        ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(lootItem.itemid);
+        ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(lootItem.itemid);
         if (!itemProto)
         {
-            DEBUG_LOG("Group::NeedBeforeGreed: missing item prototype for item with id: %d", lootItem.itemid);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Group::NeedBeforeGreed: missing item prototype for item with id: %d", lootItem.itemid);
             continue;
         }
 
@@ -844,7 +898,7 @@ void Group::MasterLoot(Creature* creature, Loot* loot)
 {
     for (auto& i : loot->items)
     {
-        ItemPrototype const* item = ObjectMgr::GetItemPrototype(i.itemid);
+        ItemPrototype const* item = sObjectMgr.GetItemPrototype(i.itemid);
         if (!item)
             continue;
         if (item->Quality < uint32(m_lootThreshold))
@@ -906,8 +960,8 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     if (itr == roll->playerVote.end())
         return true;                                        // result used for need iterator ++, so avoid for end of list
 
-    if (roll->getLoot())
-        if (roll->getLoot()->items.empty())
+    if (Loot* pLoot = roll->getLoot())
+        if (pLoot->items.empty())
             return false;
 
     switch (vote)
@@ -953,7 +1007,7 @@ void Group::StartLootRoll(Creature* lootTarget, LootMethod method, Loot* loot, u
 
     LootItem const& lootItem =  loot->items[itemSlot];
 
-    ItemPrototype const* item = ObjectMgr::GetItemPrototype(lootItem.itemid);
+    ItemPrototype const* item = sObjectMgr.GetItemPrototype(lootItem.itemid);
 
     Roll* r = new Roll(lootTarget->GetObjectGuid(), lootItem);
 
@@ -1063,7 +1117,7 @@ void Group::CountSingleLooterRoll(Roll* roll)
             item->is_looted = true;
             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
             --roll->getLoot()->unlootedCount;
-            sLog.out(LOG_LOOTS, "%s wins need roll for %ux%u [loot from %s]",
+            sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins need roll for %ux%u [loot from %s]",
                 player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
             if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                 player->OnReceivedItem(newItem);
@@ -1124,7 +1178,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                     item->is_looted = true;
                     roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                     --roll->getLoot()->unlootedCount;
-                    sLog.out(LOG_LOOTS, "%s wins need roll for %ux%u [loot from %s]",
+                    sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins need roll for %ux%u [loot from %s]",
                              player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
                     if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                         player->OnReceivedItem(newItem);
@@ -1175,7 +1229,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                     item->is_looted = true;
                     roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                     --roll->getLoot()->unlootedCount;
-                    sLog.out(LOG_LOOTS, "%s wins greed roll for %ux%u [loot from %s]",
+                    sLog.Player(player->GetSession(), LOG_LOOTS, LOG_LVL_MINIMAL, "%s wins greed roll for %ux%u [loot from %s]",
                              player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
                     if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                         player->OnReceivedItem(newItem);
@@ -1298,12 +1352,15 @@ void Group::SendUpdate()
         Player* player = sObjectMgr.GetPlayer(citr->guid);
         if (!player || !player->GetSession() || player->GetGroup() != this)
             continue;
+
         // guess size
         WorldPacket data(SMSG_GROUP_LIST, (1 + 1 + 1 + 4 + GetMembersCount() * 20) + 8 + 1 + 8 + 1);
         data << (uint8)m_groupType;                         // group type
         data << (uint8)(citr->group | (citr->assistant ? 0x80 : 0)); // own flags (groupid | (assistant?0x80:0))
 
-        data << uint32(GetMembersCount() - 1);
+        uint32 count = 0;
+        size_t countPos = data.wpos();
+        data << uint32(0);
         for (const auto& itr : m_memberSlots)
         {
             if (citr->guid == itr.guid)
@@ -1313,10 +1370,12 @@ void Group::SendUpdate()
             data << itr.guid;
             data << uint8(GetGroupMemberStatus(sObjectMgr.GetPlayer(itr.guid)));
             data << (uint8)(itr.group | (itr.assistant ? 0x80 : 0));
+            count++;
         }
+        data.put<uint32>(countPos, count);
 
         data << m_leaderGuid;                               // leader guid
-        if (GetMembersCount() - 1)
+        if (count)
         {
             data << uint8(m_lootMethod);                    // loot method
             if (GetLootMethod() == MASTER_LOOT)
@@ -1461,6 +1520,15 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
 
     if (!guid)
         return false;
+
+    for (auto const& itr : m_memberSlots)
+    {
+        if (itr.guid == guid)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to add duplicate member into group.");
+            return false;
+        }
+    }
 
     Player* player = sObjectMgr.GetPlayer(guid);
 
@@ -2119,7 +2187,7 @@ InstanceGroupBind* Group::BindToInstance(DungeonPersistentState* state, bool per
         bind.state = state;
         bind.perm = permanent;
         if (!load)
-            DEBUG_LOG("Group::BindToInstance: Group (Id: %d) is now bound to map %d, instance %d",
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Group::BindToInstance: Group (Id: %d) is now bound to map %d, instance %d",
                       GetId(), state->GetMapId(), state->GetInstanceId());
         return &bind;
     }

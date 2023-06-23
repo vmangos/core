@@ -303,7 +303,7 @@ namespace VMAP
             WorldModel* worldmodel = new WorldModel();
             if (!worldmodel->readFile(basepath + filename + ".vmo"))
             {
-                ERROR_LOG("VMapManager2: could not load '%s%s.vmo'!", basepath.c_str(), filename.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "VMapManager2: could not load '%s%s.vmo'!", basepath.c_str(), filename.c_str());
                 delete worldmodel;
                 return nullptr;
             }

@@ -44,6 +44,7 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 #include "PlayerBotMgr.h"
+#include "AccountMgr.h"
 
 class LoginQueryHolder : public SqlQueryHolder
 {
@@ -98,6 +99,7 @@ bool LoginQueryHolder::Initialize()
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS,  "SELECT `spell`, `spell_expire_time`, `category`, `category_expire_time`, `item_id` FROM `character_spell_cooldown` WHERE `guid` = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGUILD,           "SELECT `guild_id`, `rank` FROM `guild_member` WHERE `guid` = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBGDATA,          "SELECT `instance_id`, `team`, `join_x`, `join_y`, `join_z`, `join_o`, `join_map` FROM `character_battleground_data` WHERE `guid` = '%u'", m_guid.GetCounter());
+    res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA,     "SELECT `type`, `time`, `data` FROM `character_account_data` WHERE `guid`='%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADSKILLS,          "SELECT `skill`, `value`, `max` FROM `character_skills` WHERE `guid` = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADMAILS,           "SELECT `id`, `message_type`, `sender_guid`, `receiver_guid`, `subject`, `item_text_id`, `expire_time`, `deliver_time`, `money`, `cod`, `checked`, `stationery`, `mail_template_id`, `has_items` FROM `mail` WHERE `receiver_guid` = '%u' ORDER BY `id` DESC", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS,     "SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `mail_id`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `mail_items` JOIN `item_instance` ON `item_guid` = `guid` WHERE `receiver_guid` = '%u'", m_guid.GetCounter());
@@ -148,11 +150,11 @@ void WorldSession::HandleCharEnum(QueryResult* result)
         do
         {
             uint32 guidlow = (*result)[0].GetUInt32();
-            uint32 level   = (*result)[7].GetUInt32();
+            uint32 level   = (*result)[10].GetUInt32();
             if (m_characterMaxLevel < level)
                 m_characterMaxLevel = level;
 
-            DETAIL_LOG("Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
+            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
             if (Player::BuildEnumData(result, &data))
                 ++num;
         }
@@ -334,10 +336,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
 
         data << (uint8)CHAR_CREATE_SUCCESS;
         SendPacket(&data);
-
-        std::string IP_str = GetRemoteAddress();
-        BASIC_LOG("Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), guidLow);
-        sLog.out(LOG_CHAR, "Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), guidLow);
     }
     else
     {
@@ -380,9 +378,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
     if (accountId != GetAccountId())
         return;
 
-    std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    sLog.Player(this, LOG_CHAR, "Delete", LOG_LVL_BASIC, "Character %s guid %u", name.c_str(), guid);
 
     // If the character is online (ALT-F4 logout for example)
     if (Player* onlinePlayer = sObjectAccessor.FindPlayer(guid))
@@ -393,8 +389,6 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_CHAR_DELETE, 1);
     data << (uint8)CHAR_DELETE_SUCCESS;
     SendPacket(&data);
-
-    sWorld.LogCharacter(this, lowguid, name, "Delete");
 }
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
@@ -410,8 +404,6 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
         SendPacket(&data);
         return;
     }
-
-    DEBUG_LOG("WORLD: Recvd Player Logon Message");
 
     LoginQueryHolder *holder = new LoginQueryHolder(GetAccountId(), playerGuid);
     if (!holder->Initialize())
@@ -443,13 +435,15 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     // Session2 created, requests login, and receives 2 login callback.
     if (GetPlayer() || !m_playerLoading)
     {
-        sLog.outInfo("[CRASH] HandlePlayerLogin on session %u with player %s [loading=%u]", GetAccountId(), GetPlayerName(), m_playerLoading);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] HandlePlayerLogin on session %u with player %s [loading=%u]", GetAccountId(), GetPlayerName(), m_playerLoading);
         delete holder;
         m_playerLoading = false;
         return;
     }
+
     ObjectGuid playerGuid = holder->GetGuid();
     ASSERT(playerGuid.IsPlayer());
+    m_currentPlayerGuid = playerGuid;
 
     // If the character is online (ALT-F4 logout for example)
     Player* pCurrChar = sObjectAccessor.FindPlayer(playerGuid);
@@ -460,20 +454,33 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Hacking attempt
         if (pCurrChar->GetSession()->GetAccountId() != GetAccountId())
         {
+            ProcessAnticheatAction("PassiveAnticheat", "Attempt to login to character on different account", CHEAT_ACTION_LOG);
             KickPlayer();
             delete holder;
             m_playerLoading = false;
             return;
         }
+
+        if (pCurrChar->FindMap() != sMapMgr.FindMap(pCurrChar->GetMapId(), pCurrChar->GetInstanceId()))
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Dangling map pointer during login on character guid %u", playerGuid.GetCounter());
+            KickPlayer();
+            delete holder;
+            m_playerLoading = false;
+            return;
+        }
+
+        alreadyOnline = true;
         pCurrChar->GetSession()->SetPlayer(nullptr);
         pCurrChar->SetSession(this);
+
         // Need to attach packet bcaster to the new socket
         pCurrChar->m_broadcaster->ChangeSocket(GetSocket());
-        alreadyOnline = true;
-        // If the character had a logout request, then he is articifially stunned (cf CMSG_LOGOUT_REQUEST handler). Fix it here.
+
+        // If the character had a logout request, then he is articifially stunned (in CMSG_LOGOUT_REQUEST handler). Fix it here.
         if (pCurrChar->CanFreeMove())
         {
-            pCurrChar->SetRooted(false);
+            pCurrChar->SetRootedReal(false);
             pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
             pCurrChar->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         }
@@ -483,7 +490,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Character found online but not in world ?
         if (HashMapHolder<Player>::Find(playerGuid))
         {
-            sLog.outInfo("[CRASH] Trying to login already ingame character guid %u", playerGuid.GetCounter());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Trying to login already ingame character guid %u", playerGuid.GetCounter());
             KickPlayer();
             delete holder;
             m_playerLoading = false;
@@ -548,10 +555,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     }
     SendPacket(&data);
 
-    data.Initialize(SMSG_ACCOUNT_DATA_TIMES, 128);
-    for (int i = 0; i < 32; ++i)
-        data << uint32(0);
-    SendPacket(&data);
+    // load player specific part before send times
+    LoadAccountData(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA), PER_CHARACTER_CACHE_MASK);
+    SendAccountDataTimes();
+
+    pCurrChar->GetSocial()->SendFriendList();
+    pCurrChar->GetSocial()->SendIgnoreList();
 
     // Send MOTD (1.12.1 not have SMSG_MOTD, so do it in another way)
     {
@@ -576,8 +585,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             ChatHandler(pCurrChar).PSendSysMessage(str_motd.substr(pos).c_str());
             ++linecount;
         }
-
-        DEBUG_LOG("WORLD: Sent motd (SMSG_MOTD)");
     }
 
     if (Guild* guild = sGuildMgr.GetGuildById(pCurrChar->GetGuildId()))
@@ -587,9 +594,14 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         data << uint8(1);
         data << guild->GetMOTD();
         SendPacket(&data);
-        DEBUG_LOG("WORLD: Sent guild-motd (SMSG_GUILD_EVENT)");
 
         guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetObjectGuid(), pCurrChar->GetName());
+    }
+
+    if (char const* warning = sAccountMgr.GetWarningText(GetAccountId()))
+    {
+        ChatHandler(pCurrChar).PSendSysMessage(LANG_ACCOUNT_WARNED, warning);
+        SendNotification("WARNING: %s", warning);
     }
 
     if (!pCurrChar->IsAlive())
@@ -598,7 +610,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     pCurrChar->SendInitialPacketsBeforeAddToMap();
     GetMasterPlayer()->SendInitialActionButtons();
 
-    //Show cinematic at the first time that player login
+    // Show cinematic at the first time that player login
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST) && !sWorld.getConfig(CONFIG_BOOL_SKIP_CINEMATICS))
     {
         if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->GetRace()))
@@ -624,9 +636,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     else
         sObjectAccessor.AddObject(pCurrChar);
 
-    //DEBUG_LOG("Player %s added to Map.",pCurrChar->GetName());
-    pCurrChar->GetSocial()->SendFriendList();
-    pCurrChar->GetSocial()->SendIgnoreList();
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %s added to Map.",pCurrChar->GetName());
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
     if (alreadyOnline)
@@ -723,9 +733,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     std::string IP_str = GetRemoteAddress();
 
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Login Character:[%s] (guid: %u)%s",
-             GetAccountId(), IP_str.c_str(), pCurrChar->GetName(), pCurrChar->GetGUIDLow(), alreadyOnline ? " Player was already online" : "");
-    sWorld.LogCharacter(pCurrChar, "Login");
+    sLog.Player(this, LOG_CHAR, "Login", LOG_LVL_DETAIL, alreadyOnline ? "Player was already online" : "");
     
     if (!alreadyOnline && !pCurrChar->IsStandingUp() && !pCurrChar->HasUnitState(UNIT_STAT_STUNNED))
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
@@ -751,8 +759,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
 void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: Received CMSG_SET_FACTION_ATWAR");
-
     uint32 repListId;
     uint8  flag;
 
@@ -774,17 +780,13 @@ void WorldSession::HandleTutorialFlagOpcode(WorldPacket& recv_data)
 
     uint32 wInt = (iFlag / 32);
     if (wInt >= 8)
-    {
-        //sLog.outError("CHEATER? Account:[%d] Guid[%u] tried to send wrong CMSG_TUTORIAL_FLAG", GetAccountId(),GetGUID());
         return;
-    }
+
     uint32 rInt = (iFlag % 32);
 
     uint32 tutflag = GetTutorialInt(wInt);
     tutflag |= (1 << rInt);
     SetTutorialInt(wInt, tutflag);
-
-    //DEBUG_LOG("Received Tutorial Flag Set {%u}.", iFlag);
 }
 
 void WorldSession::HandleTutorialClearOpcode(WorldPacket& /*recv_data*/)
@@ -802,7 +804,6 @@ void WorldSession::HandleTutorialResetOpcode(WorldPacket& /*recv_data*/)
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    DEBUG_LOG("WORLD: Received CMSG_SET_WATCHED_FACTION");
     int32 repId;
     recv_data >> repId;
     GetPlayer()->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, repId);
@@ -811,7 +812,6 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: Received CMSG_SET_FACTION_INACTIVE");
     uint32 replistid;
     uint8 inactive;
     recv_data >> replistid >> inactive;
@@ -821,13 +821,11 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleShowingHelmOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_LOG("CMSG_SHOWING_HELM for %s", _player->GetName());
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
 }
 
 void WorldSession::HandleShowingCloakOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_LOG("CMSG_SHOWING_CLOAK for %s", _player->GetName());
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
 }
 
@@ -905,7 +903,9 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult* result, uin
     CharacterDatabase.PExecute("UPDATE `characters` SET `name` = '%s', `at_login_flags` = `at_login_flags` & ~ %u WHERE `guid` ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME), guidLow);
     CharacterDatabase.CommitTransaction();
 
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
+    sLog.Player(session->GetAccountId(), LOG_CHAR, LOG_LVL_BASIC,
+        "Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s",
+        session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
 
     WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + (newname.size() + 1));
     data << uint8(RESPONSE_SUCCESS);

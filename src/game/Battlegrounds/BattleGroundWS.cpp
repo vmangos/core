@@ -30,12 +30,16 @@
 #include "Language.h"
 #include "World.h"
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+#include "ScriptMgr.h"
+#endif
+
 BattleGroundWS::BattleGroundWS()
 {
     m_startMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
-    m_startMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
+    m_startMessageIds[BG_STARTING_EVENT_SECOND] = BCT_BG_WS_START_ONE_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = BCT_BG_WS_START_HALF_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = BCT_BG_WS_HAS_BEGUN;
 }
 
 BattleGroundWS::~BattleGroundWS()
@@ -119,13 +123,13 @@ void BattleGroundWS::RespawnFlag(Team team, bool captured)
 {
     if (team == ALLIANCE)
     {
-        DEBUG_LOG("Respawn Alliance flag");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Respawn Alliance flag");
         m_flagState[BG_TEAM_ALLIANCE] = BG_WS_FLAG_STATE_ON_BASE;
         SpawnEvent(WS_EVENT_FLAG_A, 0, true, true);
     }
     else
     {
-        DEBUG_LOG("Respawn Horde flag");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Respawn Horde flag");
         m_flagState[BG_TEAM_HORDE] = BG_WS_FLAG_STATE_ON_BASE;
         SpawnEvent(WS_EVENT_FLAG_H, 0, true, true);
     }
@@ -135,7 +139,11 @@ void BattleGroundWS::RespawnFlag(Team team, bool captured)
         //when map_update will be allowed for battlegrounds this code will be useless
         SpawnEvent(WS_EVENT_FLAG_A, 0, true, true);
         SpawnEvent(WS_EVENT_FLAG_H, 0, true, true);
-        SendMessageToAll(LANG_BG_WS_F_PLACED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+        SendMessageToAll(BCT_BG_WS_F_PLACED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#else
+        DoOrSimulateScriptTextForMap(BCT_BG_WS_F_PLACED, NPC_WSG_HERALD, GetBgMap());
+#endif
         PlaySoundToAll(BG_WS_SOUND_FLAGS_RESPAWNED);        // flag respawned sound...
     }
 }
@@ -147,9 +155,15 @@ void BattleGroundWS::RespawnFlagAfterDrop(Team team)
 
     RespawnFlag(team, false);
     if (team == ALLIANCE)
-        SendMessageToAll(LANG_BG_WS_ALLIANCE_FLAG_RESPAWNED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+        SendMessageToAll(BCT_BG_WS_ALLIANCE_FLAG_RESPAWNED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
     else
-        SendMessageToAll(LANG_BG_WS_HORDE_FLAG_RESPAWNED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        SendMessageToAll(BCT_BG_WS_HORDE_FLAG_RESPAWNED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+#else
+        DoOrSimulateScriptTextForMap(BCT_BG_WS_ALLIANCE_FLAG_RESPAWNED, NPC_WSG_HERALD, GetBgMap());
+    else
+        DoOrSimulateScriptTextForMap(BCT_BG_WS_HORDE_FLAG_RESPAWNED, NPC_WSG_HERALD, GetBgMap());
+#endif
 
     PlaySoundToAll(BG_WS_SOUND_FLAGS_RESPAWNED);
 
@@ -157,7 +171,7 @@ void BattleGroundWS::RespawnFlagAfterDrop(Team team)
     if (obj)
         obj->Delete();
     else
-        sLog.outError("Unknown dropped flag bg: %s", GetDroppedFlagGuid(team).GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unknown dropped flag bg: %s", GetDroppedFlagGuid(team).GetString().c_str());
 
     ClearDroppedFlagGuid(team);
     ForceFlagAreaTrigger(team);
@@ -216,9 +230,15 @@ void BattleGroundWS::EventPlayerCapturedFlag(Player* source)
     SpawnEvent(WS_EVENT_FLAG_H, 0, false, true);
 
     if (source->GetTeam() == ALLIANCE)
-        SendMessageToAll(LANG_BG_WS_CAPTURED_HF, CHAT_MSG_BG_SYSTEM_ALLIANCE, source);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+        SendMessageToAll(BCT_BG_WS_CAPTURED_HF, CHAT_MSG_BG_SYSTEM_ALLIANCE, source);
     else
-        SendMessageToAll(LANG_BG_WS_CAPTURED_AF, CHAT_MSG_BG_SYSTEM_HORDE, source);
+        SendMessageToAll(BCT_BG_WS_CAPTURED_AF, CHAT_MSG_BG_SYSTEM_HORDE, source);
+#else
+        DoOrSimulateScriptTextForMap(BCT_BG_WS_CAPTURED_HF, NPC_WSG_HERALD, GetBgMap(), nullptr, source);
+    else
+        DoOrSimulateScriptTextForMap(BCT_BG_WS_CAPTURED_AF, NPC_WSG_HERALD, GetBgMap(), nullptr, source);
+#endif
 
     UpdateFlagState(source->GetTeam(), 1);                  // flag state none
     UpdateTeamScore(source->GetTeam());
@@ -308,12 +328,20 @@ void BattleGroundWS::EventPlayerDroppedFlag(Player* source)
 
         if (source->GetTeam() == ALLIANCE)
         {
-            SendMessageToAll(LANG_BG_WS_DROPPED_HF, CHAT_MSG_BG_SYSTEM_HORDE, source);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            SendMessageToAll(BCT_BG_WS_DROPPED_HF, CHAT_MSG_BG_SYSTEM_HORDE, source);
+#else
+            DoOrSimulateScriptTextForMap(BCT_BG_WS_DROPPED_HF, NPC_WSG_HERALD, GetBgMap(), nullptr, source);
+#endif
             UpdateWorldState(BG_WS_FLAG_UNK_HORDE, uint32(-1));
         }
         else
         {
-            SendMessageToAll(LANG_BG_WS_DROPPED_AF, CHAT_MSG_BG_SYSTEM_ALLIANCE, source);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            SendMessageToAll(BCT_BG_WS_DROPPED_AF, CHAT_MSG_BG_SYSTEM_ALLIANCE, source);
+#else
+            DoOrSimulateScriptTextForMap(BCT_BG_WS_DROPPED_AF, NPC_WSG_HERALD, GetBgMap(), nullptr, source);
+#endif
             UpdateWorldState(BG_WS_FLAG_UNK_ALLIANCE, uint32(-1));
         }
 
@@ -327,7 +355,9 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
         return;
 
     int32 messageId = 0;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     ChatMsg type;
+#endif
 
     uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(targetGo->GetGUIDLow())).event1;
 
@@ -335,8 +365,10 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
     if (source->GetTeam() == HORDE && GetFlagState(ALLIANCE) == BG_WS_FLAG_STATE_ON_BASE
             && event == WS_EVENT_FLAG_A)
     {
-        messageId = LANG_BG_WS_PICKEDUP_AF;
+        messageId = BCT_BG_WS_PICKEDUP_AF;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         type = CHAT_MSG_BG_SYSTEM_HORDE;
+#endif
         PlaySoundToAll(BG_WS_SOUND_ALLIANCE_FLAG_PICKED_UP);
         SpawnEvent(WS_EVENT_FLAG_A, 0, false, true);
         SetAllianceFlagPicker(source->GetObjectGuid());
@@ -351,8 +383,10 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
     if (source->GetTeam() == ALLIANCE && GetFlagState(HORDE) == BG_WS_FLAG_STATE_ON_BASE
             && event == WS_EVENT_FLAG_H)
     {
-        messageId = LANG_BG_WS_PICKEDUP_HF;
+        messageId = BCT_BG_WS_PICKEDUP_HF;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
+#endif
         PlaySoundToAll(BG_WS_SOUND_HORDE_FLAG_PICKED_UP);
         SpawnEvent(WS_EVENT_FLAG_H, 0, false, true);
         SetHordeFlagPicker(source->GetObjectGuid());
@@ -370,8 +404,10 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
     {
         if (source->GetTeam() == ALLIANCE)
         {
-            messageId = LANG_BG_WS_RETURNED_AF;
+            messageId = BCT_BG_WS_RETURNED_AF;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
+#endif
             UpdateFlagState(HORDE, BG_WS_FLAG_STATE_WAIT_RESPAWN);
             RespawnFlag(ALLIANCE, false);
             PlaySoundToAll(BG_WS_SOUND_FLAG_RETURNED);
@@ -380,8 +416,10 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
         }
         else
         {
-            messageId = LANG_BG_WS_PICKEDUP_AF;
+            messageId = BCT_BG_WS_PICKEDUP_AF;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             type = CHAT_MSG_BG_SYSTEM_HORDE;
+#endif
             PlaySoundToAll(BG_WS_SOUND_ALLIANCE_FLAG_PICKED_UP);
             SpawnEvent(WS_EVENT_FLAG_A, 0, false, true);
             SetAllianceFlagPicker(source->GetObjectGuid());
@@ -401,8 +439,10 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
     {
         if (source->GetTeam() == HORDE)
         {
-            messageId = LANG_BG_WS_RETURNED_HF;
+            messageId = BCT_BG_WS_RETURNED_HF;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             type = CHAT_MSG_BG_SYSTEM_HORDE;
+#endif
             UpdateFlagState(ALLIANCE, BG_WS_FLAG_STATE_WAIT_RESPAWN);
             RespawnFlag(HORDE, false);
             PlaySoundToAll(BG_WS_SOUND_FLAG_RETURNED);
@@ -411,8 +451,10 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
         }
         else
         {
-            messageId = LANG_BG_WS_PICKEDUP_HF;
+            messageId = BCT_BG_WS_PICKEDUP_HF;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
+#endif
             PlaySoundToAll(BG_WS_SOUND_HORDE_FLAG_PICKED_UP);
             SpawnEvent(WS_EVENT_FLAG_H, 0, false, true);
             SetHordeFlagPicker(source->GetObjectGuid());
@@ -428,7 +470,11 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
     if (!messageId)
         return;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     SendMessageToAll(messageId, type, source);
+#else
+    DoOrSimulateScriptTextForMap(messageId, NPC_WSG_HERALD, GetBgMap(), nullptr, source);
+#endif
 }
 
 void BattleGroundWS::RemovePlayer(Player* player, ObjectGuid guid)
@@ -438,7 +484,7 @@ void BattleGroundWS::RemovePlayer(Player* player, ObjectGuid guid)
     {
         if (!player)
         {
-            sLog.outError("BattleGroundWS: Removing offline player who has the FLAG!!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundWS: Removing offline player who has the FLAG!!");
             ClearAllianceFlagPicker();
             RespawnFlag(ALLIANCE, false);
         }
@@ -449,7 +495,7 @@ void BattleGroundWS::RemovePlayer(Player* player, ObjectGuid guid)
     {
         if (!player)
         {
-            sLog.outError("BattleGroundWS: Removing offline player who has the FLAG!!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundWS: Removing offline player who has the FLAG!!");
             ClearHordeFlagPicker();
             RespawnFlag(HORDE, false);
         }
@@ -519,7 +565,7 @@ void BattleGroundWS::HandleAreaTrigger(Player* source, uint32 trigger)
           case 4629:                                          // unk4
               break; */
         default:
-            sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
             source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }

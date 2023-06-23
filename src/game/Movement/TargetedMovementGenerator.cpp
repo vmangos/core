@@ -209,7 +209,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         if (dist > speedupDistance)
         {
             Unit* pOwner = owner.GetCharmerOrOwner();
-            if (pOwner && !pOwner->IsInCombat() && !owner.IsInCombat())
+            if (pOwner && (!pOwner->IsInCombat() && !owner.IsInCombat() || pOwner->IsPlayer() && pOwner->IsMounted()))
             {
                 float distFactor = 1.0f;
                 if (pOwner->IsMounted())
@@ -280,7 +280,6 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
         return;
     // All these cases will be handled at next sync update
     if (!i_target.isValid() || !i_target->IsInWorld() || !owner.IsAlive() || owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_POSSESSED)
-            || (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && owner.HasUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT))
             || static_cast<D*>(this)->_lostTarget(owner)
             || owner.IsNoMovementSpellCasted())
         return;
@@ -303,12 +302,6 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         return true;
 
     if (owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_POSSESSED))
-    {
-        _clearUnitStateMove(owner);
-        return true;
-    }
-
-    if (owner.HasUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT))
     {
         _clearUnitStateMove(owner);
         return true;
@@ -392,7 +385,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 
     if (owner.movespline->Finalized())
     {
-        if (!owner.HasInArc(i_target.getTarget(), 0.01f))
+        if (owner.IsCreature() && !owner.HasInArc(i_target.getTarget(), 0.01f))
             owner.SetInFront(i_target.getTarget());
 
         if (m_bIsSpreading)
@@ -412,6 +405,9 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 
         if (interrupted)
             owner.StopMoving();
+
+        if (interrupted || owner.IsPlayer() && !owner.HasInArc(i_target.getTarget(), M_PI_F / 2.0f))
+            owner.SetFacingTo(owner.GetAngle(i_target.getTarget()));
 
         m_spreadTimer.Update(time_diff);
         if (m_spreadTimer.Passed())
@@ -699,7 +695,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             _reachTarget(owner);
         }
         if (interrupted)
-            owner.StopMoving();
+            owner.StopMoving(true);
     }
     else if (m_bRecalculateTravel)
         owner.GetMotionMaster()->SetNeedAsyncUpdate();

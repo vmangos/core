@@ -68,7 +68,7 @@ void freezeDetector(uint32 _delaytime)
 {
     if(!_delaytime)
         return;
-    sLog.outString("Starting up anti-freeze thread (%u seconds max stuck time)...",_delaytime/1000);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Starting up anti-freeze thread (%u seconds max stuck time)...",_delaytime/1000);
     uint32 loops = 0;
     uint32 lastchange = 0;
     while(!World::IsStopped())
@@ -76,7 +76,7 @@ void freezeDetector(uint32 _delaytime)
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
         uint32 curtime = WorldTimer::getMSTime();
-        //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
+        //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
 
         // normal work
         if (loops != World::m_worldLoopCounter)
@@ -88,13 +88,13 @@ void freezeDetector(uint32 _delaytime)
 #ifdef NDEBUG
         else if (WorldTimer::getMSTimeDiff(lastchange, curtime) > _delaytime)
         {
-            sLog.outError("World Thread hangs, kicking out server!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "World Thread hangs, kicking out server!");
             std::terminate();              // bang crash
         }
 #endif
     }
     // Fix crash au shutdown du serv. sLog n'existe plus ici.
-    //sLog.outString("Anti-freeze thread exiting without problems.");
+    //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Anti-freeze thread exiting without problems.");
 }
 
 void remoteAccess()
@@ -124,10 +124,10 @@ void remoteAccess()
 
     if (acceptor.open (listen_addr, &reactor, ACE_NONBLOCK) == -1)
     {
-        sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
     }
 
-    sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
 
     while (!reactor.reactor_event_loop_done())
     {
@@ -142,7 +142,7 @@ void remoteAccess()
             break;
         }
     }
-    sLog.outString("RARunnable thread ended");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "RARunnable thread ended");
 }
 
 void offlineChat()
@@ -173,10 +173,10 @@ void offlineChat()
 
     if (m_Acceptor.open (listen_addr, &m_Reactor, ACE_NONBLOCK) == -1)
     {
-        sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
     }
 
-    sLog.outString ("Starting offline-chat listener on port %d on %s", raport, stringip.c_str ());
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting offline-chat listener on port %d on %s", raport, stringip.c_str ());
 
     while (!m_Reactor.reactor_event_loop_done())
     {
@@ -192,7 +192,7 @@ void offlineChat()
         }
     }
     LoginDatabase.ThreadEnd();
-    sLog.outString("OfflineChatRunnable thread ended");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "OfflineChatRunnable thread ended");
 }
 
 Master::Master()
@@ -213,12 +213,12 @@ int Master::Run()
         uint32 pid = CreatePIDFile(pidfile);
         if( !pid )
         {
-            sLog.outError( "Cannot create PID file %s.\n", pidfile.c_str() );
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot create PID file %s.\n", pidfile.c_str() );
             Log::WaitBeforeContinueIfNeed();
             return 1;
         }
 
-        sLog.outString( "Daemon PID: %u\n", pid );
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Daemon PID: %u\n", pid );
     }
 
     ///- Start the databases
@@ -292,17 +292,17 @@ int Master::Run()
 
                 if(!curAff )
                 {
-                    sLog.outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for mangosd. Accessible processors bitmask (hex): %x",Aff,appAff);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Processors marked in UseProcessors bitmask (hex) %x not accessible for mangosd. Accessible processors bitmask (hex): %x",Aff,appAff);
                 }
                 else
                 {
                     if(SetProcessAffinityMask(hProcess,curAff))
-                        sLog.outString("Using processors (bitmask, hex): %x", curAff);
+                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using processors (bitmask, hex): %x", curAff);
                     else
-                        sLog.outError("Can't set used processors (hex): %x",curAff);
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set used processors (hex): %x",curAff);
                 }
             }
-            sLog.outString();
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         }
 
         bool Prio = sConfig.GetBoolDefault("ProcessPriority", false);
@@ -311,9 +311,9 @@ int Master::Run()
         if(Prio)
         {
             if(SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
-                sLog.outString("mangosd process priority class set to HIGH");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "mangosd process priority class set to HIGH");
             else
-                sLog.outError("Can't set mangosd process priority class.");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set mangosd process priority class.");
         }
     }
     #endif
@@ -352,7 +352,7 @@ int Master::Run()
 
     if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
     {
-        sLog.outError("Failed to start WorldSocket network");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to start WorldSocket network");
         Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
         // go down and shutdown the server
@@ -396,21 +396,21 @@ int Master::Run()
     }
 
     ///- Clean account database before leaving
-    sLog.outString("Cleaning character database...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Cleaning character database...");
     clearOnlineAccounts();
 
     // send all still queued mass mails (before DB connections shutdown)
-    sLog.outString("Sending queued mail...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Sending queued mail...");
     sMassMailMgr.Update(true);
 
     ///- Wait for DB delay threads to end
-    sLog.outString("Closing database connections...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Closing database connections...");
     CharacterDatabase.StopServer();
     WorldDatabase.StopServer();
     LoginDatabase.StopServer();
     LogsDatabase.StopServer();
 
-    sLog.outString("Halting process...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Halting process...");
 
     if (cliThread)
     {
@@ -471,7 +471,7 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
     int nAsyncConnections = sConfig.GetIntDefault((name + "Database.WorkerThreads").c_str(), 1);
     if (dbstring.empty())
     {
-        sLog.outError("%s database not specified in configuration file", name.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s database not specified in configuration file", name.c_str());
         return false;
     }
 
@@ -504,16 +504,16 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
     }
     else
     {
-        sLog.outError("Incorrectly formatted database connection string for database %s", name.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Incorrectly formatted database connection string for database %s", name.c_str());
         return false;
     }
 
-    sLog.outString("%s Database: %s, sync threads: %i, workers: %i", name.c_str(), dbStringLog.c_str(), nConnections, nAsyncConnections);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s Database: %s, sync threads: %i, workers: %i", name.c_str(), dbStringLog.c_str(), nConnections, nAsyncConnections);
 
     ///- Initialise the world database
     if (!database.Initialize(dbstring.c_str(), nConnections, nAsyncConnections))
     {
-        sLog.outError("Cannot connect to world database %s", name.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot connect to world database %s", name.c_str());
         return false;
     }
 
@@ -526,7 +526,7 @@ bool Master::_StartDB()
     realmID = sConfig.GetIntDefault("RealmID", 0);
     if(!realmID)
     {
-        sLog.outError("Realm ID not defined in configuration file");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Realm ID not defined in configuration file");
         return false;
     }
 
@@ -542,12 +542,12 @@ bool Master::_StartDB()
         return false;
     }
 
-    sLog.outString("Realm running as realm ID %d", realmID);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Realm running as realm ID %d", realmID);
 
     ///- Clean the database before starting
     clearOnlineAccounts();
 
-    sLog.outString();
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     return true;
 }
 
@@ -605,9 +605,9 @@ void Master::_OnSignal(int s)
             sWorld.SetAnticrashRearmTimer(sWorld.getConfig(CONFIG_UINT32_ANTICRASH_REARM_TIMER));
             uint32 anticrashOptions = sWorld.getConfig(CONFIG_UINT32_ANTICRASH_OPTIONS);
             // Log crash stack
-            sLog.outInfo("Received SIGSEGV");
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Received SIGSEGV");
             ACE_Stack_Trace st;
-            sLog.outInfo("%s", st.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str());
             if (anticrashOptions & ANTICRASH_GENERATE_COREDUMP)
                 createdump();
             if (anticrashOptions & ANTICRASH_OPTION_ANNOUNCE_PLAYERS)

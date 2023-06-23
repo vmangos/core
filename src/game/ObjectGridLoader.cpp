@@ -164,7 +164,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellPair& cell, GridRefManager<T>& 
         else
             obj = new T;
 
-        //sLog.outString("DEBUG: LoadHelper from table: %s for (guid: %u) Loading",table,guid);
+        //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DEBUG: LoadHelper from table: %s for (guid: %u) Loading",table,guid);
         if (!obj->LoadFromDB(guid, map))
         {
             delete obj;
@@ -291,7 +291,7 @@ void ObjectGridLoader::LoadN(void)
             loader.Load(i_grid(x, y), *this);
         }
     }
-    DEBUG_LOG("%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
 }
 
 void ObjectGridUnloader::MoveToRespawnN()
@@ -323,14 +323,21 @@ ObjectGridUnloader::Visit(GridRefManager<T>& m)
 
     while (!m.isEmpty())
     {
-        T* obj = m.getFirst()->getSource();
+        auto link = m.getFirst();
+        T* obj = link->getSource();
+
         // if option set then object already saved at this moment
         if (!sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATELY))
             obj->SaveRespawnTime();
-        ///- object must be out of world before delete
+
+        // object must be out of world before delete
         obj->RemoveFromWorld();
-        ///- object will get delinked from the manager when deleted
-        delete obj;
+
+        // Prevent double delete of object already in remove list. Can happen with DynamicObject.
+        if (obj->IsDeleted())
+            link->invalidate(); // unlink it manually, will be deleted later by map
+        else
+            delete obj; // object will get delinked from the manager when deleted
     }
 }
 

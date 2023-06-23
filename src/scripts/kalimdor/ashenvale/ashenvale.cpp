@@ -59,7 +59,7 @@ struct npc_ruul_snowhoofAI : public npc_escortAI
     void WaypointReached(uint32 uiPointId) override
     {
         //m_creature->MonsterYell("DEBUG : WayPoint reached", 0); //The hell, still skipping waypoints 13/02/2015
-        //sLog.outString("DEBUG : Ruul : WayPoint n° %u", uiPointId);
+        //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DEBUG : Ruul : WayPoint n° %u", uiPointId);
         switch (uiPointId)
         {
             case 13:
@@ -172,9 +172,9 @@ struct npc_torekAI : public npc_escortAI
                 break;
             case 19:
                 //TODO: verify location and creatures amount.
-                m_creature->SummonCreature(NPC_DURIEL, 1776.73f, -2049.06f, 109.83f, 1.54f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                m_creature->SummonCreature(NPC_SILVERWING_SENTINEL, 1774.64f, -2049.41f, 109.83f, 1.40f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                m_creature->SummonCreature(NPC_SILVERWING_WARRIOR, 1778.73f, -2049.50f, 109.83f, 1.67f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                m_creature->SummonCreature(NPC_DURIEL, 1776.73f, -2049.06f, 109.83f, 1.54f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                m_creature->SummonCreature(NPC_SILVERWING_SENTINEL, 1774.64f, -2049.41f, 109.83f, 1.40f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                m_creature->SummonCreature(NPC_SILVERWING_WARRIOR, 1778.73f, -2049.50f, 109.83f, 1.67f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
                 break;
             case 20:
                 DoScriptText(SAY_WIN, m_creature, pPlayer);
@@ -338,9 +338,9 @@ struct npc_feero_ironhandAI : public npc_escortAI
             case 29:
                 // Final ambush
                 DoScriptText(SAY_FINAL_AMBUSH_START, m_creature);
-                m_creature->SummonCreature(NPC_BALIZAR_THE_UMBRAGE, aEliteSummonPositions[0][0], aEliteSummonPositions[0][1], aEliteSummonPositions[0][2], aEliteSummonPositions[0][3], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
-                m_creature->SummonCreature(NPC_ALIGAR_THE_TORMENTOR, aEliteSummonPositions[1][0], aEliteSummonPositions[1][1], aEliteSummonPositions[1][2], aEliteSummonPositions[1][3], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
-                m_creature->SummonCreature(NPC_CAEDAKAR_THE_VICIOUS, aEliteSummonPositions[2][0], aEliteSummonPositions[2][1], aEliteSummonPositions[2][2], aEliteSummonPositions[2][3], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
+                m_creature->SummonCreature(NPC_BALIZAR_THE_UMBRAGE, aEliteSummonPositions[0][0], aEliteSummonPositions[0][1], aEliteSummonPositions[0][2], aEliteSummonPositions[0][3], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20000);
+                m_creature->SummonCreature(NPC_ALIGAR_THE_TORMENTOR, aEliteSummonPositions[1][0], aEliteSummonPositions[1][1], aEliteSummonPositions[1][2], aEliteSummonPositions[1][3], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20000);
+                m_creature->SummonCreature(NPC_CAEDAKAR_THE_VICIOUS, aEliteSummonPositions[2][0], aEliteSummonPositions[2][1], aEliteSummonPositions[2][2], aEliteSummonPositions[2][3], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20000);
                 break;
             case 30:
                 // Complete the quest
@@ -369,7 +369,7 @@ struct npc_feero_ironhandAI : public npc_escortAI
         float fX, fY, fZ;
         m_creature->GetNearPoint(m_creature, fX, fY, fZ, 0, fDistance, fAngle);
 
-        m_creature->SummonCreature(uiEntry, fX, fY, fZ, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
+        m_creature->SummonCreature(uiEntry, fX, fY, fZ, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20000);
     }
 
     void SummonedCreatureJustDied(Creature* pSummoned) override
@@ -440,7 +440,7 @@ enum FoulwealdTotemMoundData
 
     GO_KARANG_S_BANNER = 178205,
     GO_KARANG_LIGHT    = 178207,
-    GO_MOUND           = 300131,
+    GO_MOUND           = 178206,
 
     SPELL_CORRUPTED_STRENGTH        = 6821,
     SPELL_DESTROY_KARANG_S_BANNER_1 = 20786,
@@ -485,14 +485,14 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
         Creature* foulweald = nullptr;
         for (int i = 0; i < 2; i++)
         {
-            if (foulweald = me->SummonCreature(NPC_ENRAGED_FOULWEALD, foulwealdSpawnCoords[i][0], foulwealdSpawnCoords[i][1], foulwealdSpawnCoords[i][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 420000))
+            if (foulweald = me->SummonCreature(NPC_ENRAGED_FOULWEALD, foulwealdSpawnCoords[i][0], foulwealdSpawnCoords[i][1], foulwealdSpawnCoords[i][2], 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000))
             {
                 guidCurrentEnragedFoulweald[i] = foulweald->GetGUID();
                 float x, y, z;
                 me->GetPosition(x, y, z);
                 foulweald->GetMotionMaster()->MovePoint(1, x, y, z, true);
                 foulweald->SetHomePosition(x, y, z, 0);
-                foulweald->SetRespawnDelay(425000);
+                foulweald->SetRespawnDelay(425);
                 DefineFoulwealdMound(foulweald, me->GetGUID());
             }
             foulweald = nullptr;
@@ -519,14 +519,14 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
             if (creatureGUID == guid)
             {
                 pos = urand(0, 3);
-                if (foulweald = me->SummonCreature(NPC_ENRAGED_FOULWEALD, foulwealdSpawnCoords[pos][0], foulwealdSpawnCoords[pos][1], foulwealdSpawnCoords[pos][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 420000))
+                if (foulweald = me->SummonCreature(NPC_ENRAGED_FOULWEALD, foulwealdSpawnCoords[pos][0], foulwealdSpawnCoords[pos][1], foulwealdSpawnCoords[pos][2], 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000))
                 {
                     guid = foulweald->GetGUID();
                     float x, y, z;
                     me->GetPosition(x, y, z);
                     foulweald->GetMotionMaster()->MovePoint(1, x, y, z, true);
                     foulweald->SetHomePosition(x, y, z, 0);
-                    foulweald->SetRespawnDelay(425000);
+                    foulweald->SetRespawnDelay(425);
                     DefineFoulwealdMound(foulweald, me->GetGUID());
                 }
             }
@@ -547,13 +547,13 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
                     phaseTimer = 10000;
                     break;
                 case 3:
-                    if (Creature* murgut = me->SummonCreature(NPC_CHIEF_MURGUT, foulwealdSpawnCoords[3][0], foulwealdSpawnCoords[3][1], foulwealdSpawnCoords[3][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000))
+                    if (Creature* murgut = me->SummonCreature(NPC_CHIEF_MURGUT, foulwealdSpawnCoords[3][0], foulwealdSpawnCoords[3][1], foulwealdSpawnCoords[3][2], 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                     {
                         float x, y, z;
                         me->GetPosition(x, y, z);
                         murgut->GetMotionMaster()->MovePoint(1, x, y, z, true);
                         murgut->SetHomePosition(x, y, z, 0);
-                        murgut->SetRespawnDelay(125000);
+                        murgut->SetRespawnDelay(125);
                         if (GameObject* pGo = me->FindNearestGameObject(GO_KARANG_S_BANNER, 10))
                         {
                             pGo->GetPosition(x, y, z);
@@ -600,6 +600,7 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
             if (go_foulweald_totem_moundAI* pMoundAI = dynamic_cast<go_foulweald_totem_moundAI*>(gobj->AI()))
                 pMoundAI->EnragedFoulwealdJustDied(m_creature->GetGUID());
         }
+        m_creature->DespawnOrUnsummon(60000);
     }
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override

@@ -61,7 +61,7 @@ bool WinServiceInstall()
 
     if (!serviceControlManager)
     {
-        sLog.outError("SERVICE: No access to service control manager.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SERVICE: No access to service control manager.");
         return false;
     }
 
@@ -69,7 +69,7 @@ bool WinServiceInstall()
     if (!GetModuleFileName(0, path, sizeof(path)/sizeof(path[0])))
     {
         CloseServiceHandle(serviceControlManager);
-        sLog.outError("SERVICE: Can't get service binary filename.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SERVICE: Can't get service binary filename.");
         return false;
     }
 
@@ -93,14 +93,14 @@ bool WinServiceInstall()
     if (!service)
     {
         CloseServiceHandle(serviceControlManager);
-        sLog.outError("SERVICE: Can't register service for: %s", path);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SERVICE: Can't register service for: %s", path);
         return false;
     }
 
     advapi32 = GetModuleHandle("ADVAPI32.DLL");
     if(!advapi32)
     {
-        sLog.outError("SERVICE: Can't access ADVAPI32.DLL");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SERVICE: Can't access ADVAPI32.DLL");
         CloseServiceHandle(service);
         CloseServiceHandle(serviceControlManager);
         return false;
@@ -109,7 +109,7 @@ bool WinServiceInstall()
     ChangeService_Config2 = (CSD_T) GetProcAddress(advapi32, "ChangeServiceConfig2A");
     if (!ChangeService_Config2)
     {
-        sLog.outError("SERVICE: Can't access ChangeServiceConfig2A from ADVAPI32.DLL");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SERVICE: Can't access ChangeServiceConfig2A from ADVAPI32.DLL");
         CloseServiceHandle(service);
         CloseServiceHandle(serviceControlManager);
         return false;
@@ -146,7 +146,7 @@ bool WinServiceUninstall()
 
     if (!serviceControlManager)
     {
-        sLog.outError("SERVICE: No access to service control manager.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SERVICE: No access to service control manager.");
         return false;
     }
 
@@ -156,7 +156,7 @@ bool WinServiceUninstall()
     if (!service)
     {
         CloseServiceHandle(serviceControlManager);
-        sLog.outError("SERVICE: Service not found: %s", serviceName);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SERVICE: Service not found: %s", serviceName);
         return false;
     }
 
@@ -281,7 +281,7 @@ bool WinServiceRun()
 
     if (!StartServiceCtrlDispatcher(serviceTable))
     {
-        sLog.outError("StartService Failed. Error [%u]", ::GetLastError());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "StartService Failed. Error [%u]", ::GetLastError());
         return false;
     }
     return true;

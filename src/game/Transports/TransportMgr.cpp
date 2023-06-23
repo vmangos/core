@@ -342,7 +342,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
     TransportTemplate const* tInfo = GetTransportTemplate(entry);
     if (!tInfo)
     {
-        sLog.outErrorDb("Transport %u will not be loaded, transport template is missing", entry);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Transport %u will not be loaded, transport template is missing", entry);
         return nullptr;
     }
 
@@ -368,7 +368,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
     {
         if (mapEntry->Instanceable() != tInfo->inInstance)
         {
-            sLog.outError("Transport %u (name: %s) attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, trans->GetName(), mapId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Transport %u (name: %s) attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, trans->GetName(), mapId);
             delete trans;
             return nullptr;
         }
@@ -419,5 +419,5 @@ void TransportMgr::SpawnContinentTransports()
         delete result;
     }
 
-    sLog.outString(">> Spawned %u continent transports in %u ms", count, WorldTimer::getMSTimeDiffToNow(oldMSTime));
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Spawned %u continent transports in %u ms", count, WorldTimer::getMSTimeDiffToNow(oldMSTime));
 }

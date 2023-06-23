@@ -548,7 +548,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                             uint32 repeat_next = std::max(uint32(3750 - 25 * numSkeletons), uint32(2000));
                             events.Repeat(repeat_next);
                             ++numSkeletons;
-                            //sLog.outBasic("[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
+                            //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
                         }
                         else
                             events.Repeat(100);
@@ -559,14 +559,14 @@ struct boss_kelthuzadAI : public ScriptedAI
                 {
                     SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
                     ++numAboms;
-                    //sLog.outBasic("[%d] Spawn ABOM #%d", p1Timer, numAboms);
+                    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%d] Spawn ABOM #%d", p1Timer, numAboms);
                     break;
                 }
                 case EVENT_SOUL_WEAVER:
                 {
                     SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
                     ++numBanshees;
-                    //sLog.outBasic("[%d] Spawn SOUL #%d", p1Timer, numBanshees);
+                    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%d] Spawn SOUL #%d", p1Timer, numBanshees);
                     break;
                 }
                 case EVENT_PHASE_TWO_INTRO:
@@ -580,17 +580,17 @@ struct boss_kelthuzadAI : public ScriptedAI
                     if (numBanshees < 14)
                     {
                         SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
-                        sLog.outBasic("(post)[%d] Spawn bansh #%d, next in %dms", p1Timer, ++numBanshees, nextBanshee);
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "(post)[%d] Spawn bansh #%d, next in %dms", p1Timer, ++numBanshees, nextBanshee);
                     }
                     if (numAboms < 14)
                     {
                         SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
-                        sLog.outBasic("(post)[%d] Spawn abom #%d, next in %dms", p1Timer, ++numAboms, nextBanshee);
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "(post)[%d] Spawn abom #%d, next in %dms", p1Timer, ++numAboms, nextBanshee);
                     }
                     if (numSkeletons < 120)
                     {
                         SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN);
-                        sLog.outBasic("(post)[%d] Spawn skele #%d, next in %dms", p1Timer, ++numSkeletons, nextBanshee);
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "(post)[%d] Spawn skele #%d, next in %dms", p1Timer, ++numSkeletons, nextBanshee);
                     }
 
                     DoScriptText(urand(SAY_AGGRO1, SAY_AGGRO3), m_creature);
@@ -696,6 +696,11 @@ struct boss_kelthuzadAI : public ScriptedAI
                         events.Repeat(5000 - timeSinceLastFrostBlast);
                         break;
                     }
+                    else if (timeSinceLastShadowFissure < 5000)
+                    {
+                        events.Repeat(5000 - timeSinceLastShadowFissure);
+                        break;
+                    }
                     if (DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
                     {
                         events.Repeat(Seconds(urand(15, 17)));
@@ -707,14 +712,14 @@ struct boss_kelthuzadAI : public ScriptedAI
                 }
                 case EVENT_FROST_BLAST:
                 {
-                    if (timeSinceLastShadowFissure < 4000)
+                    if (timeSinceLastShadowFissure < 5000)
                     {
-                        events.Repeat(4000 - timeSinceLastShadowFissure);
+                        events.Repeat(5000 - timeSinceLastShadowFissure);
                         break;
                     }
-                    else if (timeSinceLastAEFrostBolt < 5000)
+                    else if (timeSinceLastAEFrostBolt < 8000)
                     {
-                        events.Repeat(5000 - timeSinceLastAEFrostBolt);
+                        events.Repeat(8000 - timeSinceLastAEFrostBolt);
                         break;
                     }
                     if (m_creature->IsNonMeleeSpellCasted())
@@ -747,9 +752,14 @@ struct boss_kelthuzadAI : public ScriptedAI
                 }
                 case EVENT_SHADOW_FISSURE:
                 {
-                    if (timeSinceLastFrostBlast < 4000)
+                    if (timeSinceLastFrostBlast < 5000)
                     {
-                        events.Repeat(4000 - timeSinceLastFrostBlast);
+                        events.Repeat(5000 - timeSinceLastFrostBlast);
+                        break;
+                    }
+                    else if (timeSinceLastAEFrostBolt < 8000)
+                    {
+                        events.Repeat(8000 - timeSinceLastAEFrostBolt);
                         break;
                     }
                     if (m_creature->IsNonMeleeSpellCasted())

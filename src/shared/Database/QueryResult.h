@@ -23,7 +23,6 @@
 #define QUERYRESULT_H
 
 #include "Common.h"
-#include "Errors.h"
 #include "Field.h"
 
 class QueryResult
@@ -75,7 +74,7 @@ class QueryNamedResult
                 if(mFieldNames[idx] == name)
                     return idx;
             }
-            MANGOS_ASSERT(false && "unknown field name");
+            throw std::runtime_error("unknown field name");
             return uint32(-1);
         }
 

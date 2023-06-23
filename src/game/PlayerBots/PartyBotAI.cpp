@@ -323,7 +323,8 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
     if (Pet* pPet = me->GetPet())
     {
         if (Unit* pPetAttacker = pPet->GetAttackerForHelper())
-            return pPetAttacker;
+            if (IsValidHostileTarget(pPetAttacker))
+                return pPetAttacker;
     }
 
     return nullptr;
@@ -363,7 +364,13 @@ Player* PartyBotAI::SelectResurrectionTarget() const
             if (pMember == me)
                 continue;
 
-            if (pMember->GetDeathState() == CORPSE)
+            if (pMember->GetDeathState() != CORPSE)
+                continue;
+
+            if (!me->IsWithinLOSInMap(pMember))
+                continue;
+
+            if (m_resurrectionSpell->IsTargetInRange(me, pMember))
                 return pMember;
         }
     }
@@ -447,29 +454,6 @@ void PartyBotAI::AddToPlayerGroup()
     } 
 }
 
-void PartyBotAI::SendFakePacket(uint16 opcode)
-{
-    switch (opcode)
-    {
-        case CMSG_LOOT_ROLL:
-        {
-            if (m_lootResponses.empty())
-                return;
-
-            auto loot = m_lootResponses.begin();
-            WorldPacket data(CMSG_LOOT_ROLL);
-            data << uint64((*loot).guid);
-            data << uint32((*loot).slot);
-            data << uint8(0); // pass
-            m_lootResponses.erase(loot);
-            me->GetSession()->HandleLootRoll(data);
-            return;
-        }
-    }
-
-    CombatBotBaseAI::SendFakePacket(opcode);
-}
-
 void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
 {
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
@@ -481,14 +465,6 @@ void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
         {
             if (m_initialized)
                 m_resetSpellData = true;
-            return;
-        }
-        case SMSG_LOOT_START_ROLL:
-        {
-            uint64 guid = *((uint64*)(*packet).contents());
-            uint32 slot = *(((uint32*)(*packet).contents())+2);
-            m_lootResponses.emplace_back(LootResponseData(guid, slot ));
-            botEntry->m_pendingResponses.push_back(CMSG_LOOT_ROLL);
             return;
         }
     }
@@ -599,7 +575,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     {
         if (m_receivedBgInvite)
         {
-            SendFakePacket(CMSG_BATTLEFIELD_PORT);
+            SendBattlefieldPortPacket();
             m_receivedBgInvite = false;
             return;
         }
@@ -665,6 +641,22 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
+    if (Spell* pCurrentSpell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+    {
+        // Interrupt pre casted heals if target is not injured.
+        if (pCurrentSpell->getState() == SPELL_STATE_PREPARING &&
+            pCurrentSpell->m_spellInfo->IsHealSpell())
+        {
+            if (Unit* pTarget = pCurrentSpell->m_targets.getUnitTarget())
+            {
+                if (pTarget->GetHealth() == pTarget->GetMaxHealth())
+                {
+                    me->InterruptSpell(CURRENT_GENERIC_SPELL, true);
+                }
+            }
+        }
+    }
+
     if (me->IsNonMeleeSpellCasted(false, false, true))
         return;
 
@@ -675,7 +667,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     {
         if (DrinkAndEat())
         {
-            if (me->IsMounted())
+            if (!me->IsWithinDistInMap(pLeader, 100.0f))
+            {
+                me->SetHealth(me->GetMaxHealth());
+                if (me->GetPowerType() == POWER_MANA)
+                    me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+            }
+            else if (me->IsMounted())
                 me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
             return;
         }
@@ -709,23 +707,19 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     }
 
     Unit* pVictim = me->GetVictim();
-    bool const isOnTransport = me->GetTransport() != nullptr;
 
-    if (m_role != ROLE_HEALER && !isOnTransport)
+    if (m_role != ROLE_HEALER)
     {
-        if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
+        if (!pVictim || !IsValidHostileTarget(pVictim))
         {
+            if (pVictim)
+                me->AttackStop();
+
             if (Unit* pVictim = SelectAttackTarget(pLeader))
             {
                 AttackStart(pVictim);
                 return;
             }
-        }
-
-        if (pVictim && !me->HasInArc(pVictim, 2 * M_PI_F / 3) && !me->IsMoving())
-        {
-            me->SetInFront(pVictim);
-            me->SendMovementPacket(MSG_MOVE_SET_FACING, false);
         }
     }
 
@@ -763,7 +757,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
                 me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
         }
-        else if (!isOnTransport)
+        else
         {
             if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
                (m_role == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
@@ -781,7 +775,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
     }
 
-    if (me->IsInCombat() && !isOnTransport)
+    if (me->IsInCombat())
         UpdateInCombatAI();
 }
 
@@ -1028,6 +1022,9 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
 
         if (FindAndHealInjuredAlly(80.0f, 90.0f))
             return;
+
+        if (FindAndPreHealTarget())
+            return;
     }
     else
     {
@@ -1264,7 +1261,13 @@ void PartyBotAI::UpdateInCombatAI_Shaman()
     }
 
     if (m_role == ROLE_HEALER)
-        FindAndHealInjuredAlly(50.0f, 90.0f);
+    {
+        if (FindAndHealInjuredAlly(50.0f, 90.0f))
+            return;
+
+        if (FindAndPreHealTarget())
+            return;
+    }
     else if (me->GetHealthPercent() < 20.0f)
         HealInjuredTarget(me);
 }
@@ -1856,7 +1859,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         DoCastSpell(me, m_spells.priest.pInnerFocus);
     }
 
-    if (m_role == ROLE_HEALER)
+    if (m_role == ROLE_HEALER || (!me->GetVictim() && me->GetShapeshiftForm() == FORM_NONE))
     {
         // Shield allies being attacked.
         if (m_spells.priest.pPowerWordShield)
@@ -1904,6 +1907,9 @@ void PartyBotAI::UpdateInCombatAI_Priest()
                 }
             }
         }
+
+        if (m_role == ROLE_HEALER && FindAndPreHealTarget())
+            return;
     }
     else if (Unit* pVictim = me->GetVictim())
     {
@@ -2959,6 +2965,9 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (DoCastSpell(me, m_spells.druid.pInnervate) == SPELL_CAST_OK)
                 return;
         }
+
+        if (m_role == ROLE_HEALER && FindAndPreHealTarget())
+            return;
 
         if (EnterCombatDruidForm())
             return;

@@ -136,7 +136,8 @@ struct HonorRankInfo
 
 typedef std::list<HonorCP> HonorCPMap;
 
-#define MIN_HONOR_KILLS 15
+#define MIN_HONOR_KILLS_PRE_1_10 25
+#define MIN_HONOR_KILLS_POST_1_10 15
 #define NEGATIVE_HONOR_RANK_COUNT 4
 #define POSITIVE_HONOR_RANK_COUNT 15
 #define HONOR_RANK_COUNT 19

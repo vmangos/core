@@ -172,7 +172,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
 
 void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target /*=nullptr*/)
 {
-    ItemPrototype const* itemProto = sItemStorage.LookupEntry<ItemPrototype >(itemId);
+    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(itemId);
     if (!itemProto)
         return;
 
@@ -222,11 +222,9 @@ bool ChatHandler::HandleLookupItemCommand(char* args)
     uint32 counter = 0;
 
     // Search in `item_template`
-    for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
-        if (!pProto)
-            continue;
+        ItemPrototype const* pProto = &itr.second;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
@@ -781,11 +779,11 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
         FILE* f = fopen("creature_export.sql", "w");
         if (!f)
         {
-            sLog.outError("File creation failed.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "File creation failed.");
             return false;
         }
         std::string exportStr = toExport.str();
-        sLog.outInfo(exportStr.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, exportStr.c_str());
         fputs(exportStr.c_str(), f);
         fclose(f);
     }
@@ -1527,6 +1525,34 @@ bool ChatHandler::HandleLookupEventCommand(char* args)
 
     if (counter == 0)
         SendSysMessage(LANG_NOEVENTFOUND);
+
+    return true;
+}
+
+bool ChatHandler::HandleListClickToMoveCommand(char* args)
+{
+    std::multimap<uint32, Player*> levelSortedList;
+    HashMapHolder<Player>::MapType const& plist = sObjectAccessor.GetPlayers();
+    for (auto const& itr : plist)
+    {
+        if (!itr.second->IsInWorld())
+            continue;
+
+        if (itr.second->GetSession()->HasUsedClickToMove())
+            levelSortedList.insert(std::make_pair(itr.second->GetLevel(), itr.second));
+    }
+
+    if (levelSortedList.empty())
+    {
+        SendSysMessage("No players found.");
+        return true;
+    }
+
+    SendSysMessage("Listing players using click to move:");
+    for (auto const& itr : levelSortedList)
+    {
+        PSendSysMessage("- Name %s IP %s Level %s", GetNameLink(itr.second).c_str(), playerLink(itr.second->GetSession()->GetRemoteAddress()).c_str(), playerLink(std::to_string(itr.first)).c_str());
+    }
 
     return true;
 }

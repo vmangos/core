@@ -50,7 +50,7 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
 
     if (!IsPositionValid())
     {
-        sLog.outError("Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
                       guidlow, x, y);
         return false;
     }
@@ -61,7 +61,7 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
 
     if (!goinfo)
     {
-        sLog.outErrorDb("Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
         return false;
     }
 
@@ -87,8 +87,6 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
     SetGoType(GameobjectTypes(goinfo->type));
 
     SetGoAnimProgress(animprogress);
-
-    SetName(goinfo->name);
 
     sObjectAccessor.AddObject(this);
     return true;
@@ -206,7 +204,7 @@ void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 {
     if (m_passengers.insert(passenger).second)
     {
-        DETAIL_LOG("Unit %s boarded transport %s.", passenger->GetName(), GetName());
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Unit %s boarded transport %s.", passenger->GetName(), GetName());
         passenger->SetTransport(this);
         passenger->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
         bool changedTransports = passenger->m_movementInfo.t_guid != GetObjectGuid();
@@ -243,7 +241,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
 
     if (erased)
     {
-        DETAIL_LOG("Unit %s removed from transport %s.", passenger->GetName(), GetName());
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Unit %s removed from transport %s.", passenger->GetName(), GetName());
         passenger->SetTransport(nullptr);
         passenger->m_movementInfo.ClearTransportData();
     }
@@ -455,7 +453,7 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
     CalculatePassengerPosition(x, y, z, &o);
     if (!MaNGOS::IsValidMapCoord(x, y, z))
     {
-        sLog.outError("[TRANSPORTS] Object %s [guid %u] has invalid position on transport.", passenger->GetName(), passenger->GetGUIDLow());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[TRANSPORTS] Object %s [guid %u] has invalid position on transport.", passenger->GetName(), passenger->GetGUIDLow());
         return;
     }
 
@@ -469,6 +467,7 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
             else
                 passenger->Relocate(x, y, z, o);
             creature->m_movementInfo.t_time = GetPathProgress();
+            passenger->m_movementInfo.ctime = 0;
             break;
         }
         case TYPEID_PLAYER:
@@ -481,6 +480,7 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
                 static_cast<Player*>(passenger)->m_movementInfo.t_guid = GetObjectGuid();
             }
             static_cast<Player*>(passenger)->m_movementInfo.t_time = GetPathProgress();
+            passenger->m_movementInfo.ctime = 0;
             break;
         default:
             break;

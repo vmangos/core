@@ -472,11 +472,6 @@ struct instance_blackrock_depths : ScriptedInstance
                     m_uiDagranTimer = 45000;    // set a timer of 45 sec to avoid Emperor Thaurissan to spam yells in case many senators are killed in a short amount of time
                 }
                 break;
-            case NPC_GRIM_PATRON:
-            case NPC_HAMMERED_PATRON:
-            case NPC_GUZZLING_PATRON:
-               HandleBarPatrons(PATRON_HOSTILE);
-               break;
             /*case NPC_THELDREN:
                 SetData(DATA_THELDREN, DONE);
                 break;*/
@@ -640,7 +635,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void CustomSpellCasted(uint32 spellId, Unit* caster, Unit* target) override
     {
-        sLog.outString("Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
         switch (spellId)
         {
             // BRD : Invocation de Theldren
@@ -728,7 +723,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void SetData(uint32 uiType, uint32 uiData) override
     {
-        sLog.outDebug("Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
 
         switch (uiType)
         {
@@ -791,7 +786,7 @@ struct instance_blackrock_depths : ScriptedInstance
                         GetCreatureListWithEntryInGrid(AnvilrageList, magmus, 8901, 400.0f);
 
                         for (const auto& it : AnvilrageList)
-                            it->SetRespawnDelay(345600);
+                            it->SetRespawnDelay(4 * DAY);
                     }
                 }
                 m_auiEncounter[TYPE_LYCEUM] = uiData;

@@ -14,8 +14,8 @@ enum
     GOBJ_FEL_FIRE           = /*179676,*/179681,
     GOBJ_DREADSTEED_PORTAL  = 179681,
     GOBJ_RITUAL_CIRCLE      = 179668,
-    GOBJ_PEDESTAL           = 300050,
-    GOBJ_DARK_CIRCLE        = 300051,
+    GOBJ_PEDESTAL           = 179701,
+    GOBJ_DARK_CIRCLE        = 179675,
 
     GOBJ_RUNE_TYPE_1        = 179669, //99776, 99779, 99782
     GOBJ_RUNE_TYPE_2        = 179670, //99775, 99778, 99781
@@ -92,7 +92,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             if (gobj = me->GetMap()->GetGameObject(guid))
                 guidGlyphTab[i] = guid;
             else
-                sLog.outString("Dreadsteed Ritual : cannot find Rune %u", guidGlyphTab[i]);
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Dreadsteed Ritual : cannot find Rune %u", guidGlyphTab[i]);
 
         }
         for (int i = 0; i < 3; i++)
@@ -103,7 +103,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                 nodes[i].up = false;
             }
             else
-                sLog.outString("Dreadsteed Ritual : cannot find Node %u", guidGlyphTab[i]);
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Dreadsteed Ritual : cannot find Node %u", guidGlyphTab[i]);
 
         }
         if (gobj = me->FindNearestGameObject(GOBJ_RITUAL_CIRCLE, 30.000000))
@@ -731,7 +731,7 @@ bool GOHello_go_ritual_node(Player* pPlayer, GameObject* pGo)
             pPedestalAI->NodeUpped(pGo);
     }
     else
-        sLog.outString("Dreadsteed Ritual : GOBJ_PEDESTAL not found");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Dreadsteed Ritual : GOBJ_PEDESTAL not found");
     return true;
 }
 

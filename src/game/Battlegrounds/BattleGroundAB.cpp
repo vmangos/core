@@ -29,15 +29,17 @@
 #include "Util.h"
 #include "WorldPacket.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+
 BattleGroundAB::BattleGroundAB()
 {
     m_buffChange = true;
     m_bgObjects.resize(BG_AB_OBJECT_MAX);
 
     m_startMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
-    m_startMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_AB_START_ONE_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_AB_START_HALF_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_AB_HAS_BEGUN;
+    m_startMessageIds[BG_STARTING_EVENT_SECOND] = BCT_BG_AB_START_ONE_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = BCT_BG_AB_START_HALF_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = BCT_BG_AB_HAS_BEGUN;
 }
 
 BattleGroundAB::~BattleGroundAB()
@@ -116,12 +118,12 @@ void BattleGroundAB::Update(uint32 diff)
                 {
                     if (team == BG_TEAM_ALLIANCE)
                     {
-                        SendMessageToAll(LANG_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        SendMessageToAll(BCT_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
                         PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_ALLIANCE);
                     }
                     else
                     {
-                        SendMessageToAll(LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        SendMessageToAll(BCT_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
                         PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_HORDE);
                     }
                     m_isInformedNearVictory = true;
@@ -203,7 +205,7 @@ void BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
         case 4021:                                          // Unk2
         //break;
         default:
-            //sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
             //source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
@@ -319,7 +321,7 @@ void BattleGroundAB::_NodeOccupied(uint8 node, Team team)
     uint8 capturedNodes = 0;
     for (uint8 i = 0; i < BG_AB_NODES_MAX; ++i)
     {
-        if (m_nodes[node] == GetTeamIndexByTeamId(team) + BG_AB_NODE_TYPE_OCCUPIED && !m_nodeTimers[i])
+        if (m_nodes[i] == GetTeamIndexByTeamId(team) + BG_AB_NODE_TYPE_OCCUPIED && !m_nodeTimers[i])
             ++capturedNodes;
     }
     if (capturedNodes >= 5)
@@ -453,7 +455,7 @@ bool BattleGroundAB::SetupBattleGround()
                 || !AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 1, g_buffEntries[1], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
                 || !AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 2, g_buffEntries[2], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
            )
-            sLog.outErrorDb("BatteGroundAB: Failed to spawn buff object!");
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "BatteGroundAB: Failed to spawn buff object!");
     }
 
     return true;
@@ -574,3 +576,5 @@ void BattleGroundAB::UpdatePlayerScore(Player* source, uint32 type, uint32 value
             break;
     }
 }
+
+#endif

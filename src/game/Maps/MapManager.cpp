@@ -109,7 +109,7 @@ void MapManager::InitializeVisibilityDistanceInfo()
 Map* MapManager::CreateMap(uint32 id, WorldObject const* obj)
 {
     MANGOS_ASSERT(obj);
-    //if (!obj->IsInWorld()) sLog.outError("GetMap: called for map %d with object (typeid %d, guid %d, mapid %d, instanceid %d) who is not in world!", id, obj->GetTypeId(), obj->GetGUIDLow(), obj->GetMapId(), obj->GetInstanceId());
+    //if (!obj->IsInWorld()) sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GetMap: called for map %d with object (typeid %d, guid %d, mapid %d, instanceid %d) who is not in world!", id, obj->GetTypeId(), obj->GetGUIDLow(), obj->GetMapId(), obj->GetInstanceId());
     Guard _guard(*this);
 
     Map* m = nullptr;
@@ -196,7 +196,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
                     // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
                     // TODO: this is not a good place to send the message
                     player->GetSession()->SendAreaTriggerMessage("You must be in a raid group to enter %s instance", mapName);
-                    DEBUG_LOG("MAP: Player '%s' must be in a raid group to enter instance of '%s'", player->GetName(), mapName);
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MAP: Player '%s' must be in a raid group to enter instance of '%s'", player->GetName(), mapName);
                     return false;
                 }
             }
@@ -205,7 +205,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         uint32 instanceId = state ? state->GetInstanceId() : 0;
         if (!player->CheckInstanceCount(instanceId))
         {
-            DEBUG_LOG("MAP: Player '%s' can't enter instance %u on map %u. Has already entered too many instances.", player->GetName(), instanceId, mapid);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MAP: Player '%s' can't enter instance %u on map %u. Has already entered too many instances.", player->GetName(), instanceId, mapid);
             player->SendTransferAborted(TRANSFER_ABORT_TOO_MANY_INSTANCES);
             return false;
         }
@@ -230,6 +230,62 @@ void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
             delete pMap;
         }
     }
+}
+
+void MapManager::ScheduleNewWorldOnFarTeleport(Player* pPlayer)
+{
+    WorldLocation const& dest = pPlayer->GetTeleportDest();
+    MapEntry const* pMapEntry = sMapStorage.LookupEntry<MapEntry>(dest.mapId);
+    MANGOS_ASSERT(pMapEntry);
+
+    if (pMapEntry->IsDungeon())
+    {
+        DungeonPersistentState* pSave = pPlayer->GetBoundInstanceSaveForSelfOrGroup(pMapEntry->id);
+        if (!pSave || !FindMap(pMapEntry->id, pSave->GetInstanceId()))
+        {
+            m_scheduledNewInstancesForPlayers.insert(pPlayer);
+            return;
+        }
+    }
+
+    // map already created
+    pPlayer->SendNewWorld();
+}
+
+void MapManager::CreateNewInstancesForPlayers()
+{
+    do
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::unordered_set<Player*> players;
+        std::swap(players, m_scheduledNewInstancesForPlayers);
+
+        for (auto const& player : players)
+        {
+            WorldLocation const& dest = player->GetTeleportDest();
+            if (!player->IsBeingTeleportedFar())
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Scheduled instance creation for map %u for player %u but he is no longer being teleported!", dest.mapId, player->GetGUIDLow());
+                continue;
+            }
+
+            MapEntry const* pMapEntry = sMapStorage.LookupEntry<MapEntry>(dest.mapId);
+            MANGOS_ASSERT(pMapEntry->IsDungeon());
+
+            DungeonMap* pMap = static_cast<DungeonMap*>(CreateInstance(dest.mapId, player));
+            if (pMap->CanEnter(player))
+            {
+                pMap->BindPlayerOrGroupOnEnter(player);
+                player->SendNewWorld();
+            } 
+            else
+            {
+                WorldLocation oldLoc;
+                player->GetPosition(oldLoc);
+                player->HandleReturnOnTeleportFail(oldLoc);
+            }
+        } 
+    } while (asyncMapUpdating);
 }
 
 void MapManager::Update(uint32 diff)
@@ -279,8 +335,10 @@ void MapManager::Update(uint32 diff)
             continentsIdx++;
         }
     }
-    i_maxContinentThread = continentsIdx;
 
+    std::thread instanceCreationThread = std::thread(&MapManager::CreateNewInstancesForPlayers, this);
+    
+    i_maxContinentThread = continentsIdx;
     i_continentUpdateFinished.store(0);
 
     if (!m_continentThreads || m_continentThreads->size() < continentsUpdaters.size())
@@ -290,8 +348,6 @@ void MapManager::Update(uint32 diff)
     }
     std::future<void> continents = m_continentThreads->processWorkload(std::move(continentsUpdaters),
                                                                        ThreadPool::Callable());
-
-    SwitchPlayersInstances();
 
     std::chrono::high_resolution_clock::time_point start;
     do {
@@ -305,11 +361,14 @@ void MapManager::Update(uint32 diff)
             break;
     }while(!sMapMgr.waitContinentUpdateFinishedUntil(start + std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE))));
 
-
     if (continents.valid())
         continents.wait();
 
+    SwitchPlayersInstances();
     asyncMapUpdating = false;
+
+    if (instanceCreationThread.joinable())
+        instanceCreationThread.join();
 
     // Execute far teleports after all map updates have finished
     ExecuteDelayedPlayerTeleports();
@@ -497,7 +556,7 @@ Map* MapManager::CreateTestMap(uint32 mapid, bool instanced, float posX, float p
     MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(mapid);
     if (!entry)
     {
-        sLog.outError("CreateTestMap: no entry for map %d", mapid);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreateTestMap: no entry for map %d", mapid);
         MANGOS_ASSERT(false);
     }
     uint32 instanceId = GenerateInstanceId();
@@ -528,11 +587,11 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPe
     MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(id);
     if (!entry)
     {
-        sLog.outError("CreateDungeonMap: no entry for map %d", id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreateDungeonMap: no entry for map %d", id);
         MANGOS_ASSERT(false);
     }
 
-    DEBUG_LOG("MapInstanced::CreateInstanceMap: %s map instance %d for %d created", save ? "" : "new ", InstanceId, id);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MapInstanced::CreateInstanceMap: %s map instance %d for %d created", save ? "" : "new ", InstanceId, id);
 
     DungeonMap *map = new DungeonMap(id, i_gridCleanUpDelay, InstanceId);
 
@@ -545,7 +604,7 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPe
 
 BattleGroundMap* MapManager::CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg)
 {
-    DEBUG_LOG("MapInstanced::CreateBattleGroundMap: instance:%d for map:%d and bgType:%d created.", InstanceId, id, bg->GetTypeID());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MapInstanced::CreateBattleGroundMap: instance:%d for map:%d and bgType:%d created.", InstanceId, id, bg->GetTypeID());
 
     BattleGroundMap *map = new BattleGroundMap(id, i_gridCleanUpDelay, InstanceId);
     MANGOS_ASSERT(map->IsBattleGround());

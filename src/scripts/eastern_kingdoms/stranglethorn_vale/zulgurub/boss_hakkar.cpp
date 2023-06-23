@@ -278,10 +278,7 @@ struct boss_hakkarAI : public ScriptedAI
             if (AspectOfArlokk_Timer < diff)
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_ASPECT_OF_ARLOKK) == CAST_OK)
-                {
-                    DoResetThreat();
                     AspectOfArlokk_Timer = urand(10000, 15000);
-                }
             }
             else
                 AspectOfArlokk_Timer -= diff;

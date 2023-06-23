@@ -111,7 +111,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
                     m_LastController = ALLIANCE;
                     m_Gathered_A = 0;
                     m_Gathered_H = 0;
-                    sLog.out(LOG_BG, "[Silithus] Under Alliance control");
+                    sLog.Out(LOG_BG, LOG_LVL_DETAIL, "[Silithus] Under Alliance control");
                     //sGameEventMgr.SetSilithusPVPEventCompleted(true);
                     //sGameEventMgr.UpdateSilithusPVP();
                 }
@@ -132,7 +132,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
                     m_LastController = HORDE;
                     m_Gathered_A = 0;
                     m_Gathered_H = 0;
-                    sLog.out(LOG_BG, "[Silithus] Under Horde control");
+                    sLog.Out(LOG_BG, LOG_LVL_DETAIL, "[Silithus] Under Horde control");
                     //sGameEventMgr.SetSilithusPVPEventCompleted(true);
                     //sGameEventMgr.UpdateSilithusPVP();
                 }
@@ -154,7 +154,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
 
     UpdateWorldState();
 
-    sLog.out(LOG_BG, "%s [%u:%u:'%s'] added a Silithyst to its faction",
+    sLog.Out(LOG_BG, LOG_LVL_DETAIL, "%s [%u:%u:'%s'] added a Silithyst to its faction",
         plr->GetName(),
         plr->GetGUIDLow(),
         plr->GetSession()->GetAccountId(),
@@ -174,7 +174,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player* plr, uint32 spellId)
 
     plr->CastSpell(plr, SILLITHUS_FLAG_DROP, true);
     {
-        sLog.out(LOG_BG, "%s [%u:%u:'%s'] dropped a silithyst",
+        sLog.Out(LOG_BG, LOG_LVL_DETAIL, "%s [%u:%u:'%s'] dropped a silithyst",
             plr->GetName(),
             plr->GetGUIDLow(),
             plr->GetSession()->GetAccountId(),

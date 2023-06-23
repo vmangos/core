@@ -33,6 +33,8 @@
 #include "ObjectGuid.h"
 #include "Chat/AbstractPlayer.h"
 #include "WorldPacket.h"
+#include "Multithreading/Messager.h"
+#include "LFGQueue.h"
 
 #include <map>
 #include <set>
@@ -208,6 +210,7 @@ enum eConfigUInt32Values
     CONFIG_UINT32_GROUP_VISIBILITY,
     CONFIG_UINT32_MAIL_DELIVERY_DELAY,
     CONFIG_UINT32_MASS_MAILER_SEND_PER_TICK,
+    CONFIG_UINT32_RETURNED_MAIL_PR_TICK,
     CONFIG_UINT32_UPTIME_UPDATE,
     CONFIG_UINT32_AUCTION_DEPOSIT_MIN,
     CONFIG_UINT32_SKILL_CHANCE_ORANGE,
@@ -295,6 +298,8 @@ enum eConfigUInt32Values
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_THRESHOLD,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_PENALTY,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_THRESHOLD,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD,
@@ -324,19 +329,25 @@ enum eConfigUInt32Values
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_PENALTY,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_THRESHOLD,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_PERIOD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_PACKETS,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_MOUSE,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_KEYBOARD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_ABNORMAL,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_PENALTY,
     CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME,
     CONFIG_UINT32_AC_WARDEN_NUM_SCANS,
     CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY,
     CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY,
     CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY,
     CONFIG_UINT32_AC_WARDEN_CLIENT_BAN_DURATION,
-    CONFIG_UINT32_AC_WARDEN_DB_LOGLEVEL,
     CONFIG_UINT32_AUTOBROADCAST_INTERVAL,
     CONFIG_UINT32_PARTY_BOT_MAX_BOTS,
     CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP,
     CONFIG_UINT32_BATTLE_BOT_AUTO_EQUIP,
     CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE,
     CONFIG_UINT32_PVP_POOL_SIZE_PER_FACTION,
+    CONFIG_UINT32_LFG_MATCHMAKING_TIMER,
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -452,14 +463,16 @@ enum eConfigBoolValues
     CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS,
     CONFIG_BOOL_GM_ALLOW_TRADES,
     CONFIG_BOOL_DIE_COMMAND_CREDIT,
+    CONFIG_BOOL_LOGSDB_GM,
     CONFIG_BOOL_LOGSDB_CHAT,
+    CONFIG_BOOL_LOGSDB_LOOT,
     CONFIG_BOOL_LOGSDB_TRADES,
     CONFIG_BOOL_LOGSDB_CHARACTERS,
+    CONFIG_BOOL_LOGSDB_LEVELUP,
     CONFIG_BOOL_LOGSDB_TRANSACTIONS,
     CONFIG_BOOL_LOGSDB_BATTLEGROUNDS,
     CONFIG_BOOL_SMARTLOG_DEATH,
     CONFIG_BOOL_SMARTLOG_LONGCOMBAT,
-    CONFIG_BOOL_SMARTLOG_SCRIPTINFO,
     CONFIG_BOOL_TERRAIN_PRELOAD_CONTINENTS,
     CONFIG_BOOL_TERRAIN_PRELOAD_INSTANCES,
     CONFIG_BOOL_CLEANUP_TERRAIN,
@@ -557,6 +570,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_REJECT,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_REJECT,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED,
@@ -580,6 +594,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_BOTTING_ENABLED,
     CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY,
     CONFIG_BOOL_AC_WARDEN_OSX_ENABLED,
     CONFIG_BOOL_AC_WARDEN_WIN_ENABLED,
@@ -588,6 +603,8 @@ enum eConfigBoolValues
     CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS,
     CONFIG_BOOL_WORLD_AVAILABLE,
     CONFIG_BOOL_GM_CHEAT_GOD,
+    CONFIG_BOOL_LFG_MATCHMAKING,
+    CONFIG_BOOL_LIMIT_PLAY_TIME,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -694,6 +711,12 @@ struct CliCommandHolder
     ~CliCommandHolder() { delete[] m_command; }
 };
 
+struct AccountPlayHistory
+{
+    time_t logoutTime;
+    time_t playedTime; // reset after 5 hours offline time
+};
+
 class ThreadPool;
 
 /// The World
@@ -780,6 +803,8 @@ class World
         void LoadConfigSettings(bool reload = false);
 
         void SendWorldText(int32 string_id, ...);
+        void SendBroadcastTextToWorld(uint32 textId);
+
          // Only for GMs with ticket notification ON
         void SendGMTicketText(int32 string_id, ...);
         void SendGMTicketText(char const* text);
@@ -881,9 +906,7 @@ class World
          * Database logs system
          */
         void LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, char const* type, uint32 dataInt);
-        void LogCharacter(Player* character, char const* action);
-        void LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, char const* action);
-        void LogChat(WorldSession* sess, char const* type, std::string const& msg, PlayerPointer target = nullptr, uint32 chanId = 0, char const* chanStr = nullptr);
+        void LogChat(WorldSession* sess, char const* type, char const* msg, PlayerPointer target = nullptr, uint32 chanId = 0, char const* chanStr = nullptr);
         void LogTransaction(PlayerTransactionData const& data);
         void Shutdown();
         void AddSessionToSessionsMap(WorldSession* sess);
@@ -917,6 +940,9 @@ class World
         time_t GetWorldUpdateTimer(WorldTimers timer);
         time_t GetWorldUpdateTimerInterval(WorldTimers timer);
 
+        Messager<World>& GetMessager() { return m_messager; }
+
+        LFGQueue& GetLFGQueue() { return m_lfgQueue; }
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -955,7 +981,7 @@ class World
 
         SessionMap m_sessions;
         SessionSet m_disconnectedSessions;
-        std::map<uint32 /*accountId*/, time_t /*last logout*/> m_accountsLastLogout;
+        std::map<uint32 /*accountId*/, AccountPlayHistory> m_accountsPlayHistory;
         bool CanSkipQueue(WorldSession const* session);
 
         uint32 m_maxActiveSessionCount = 0;
@@ -977,6 +1003,10 @@ class World
         std::string m_dataPath;
         std::string m_honorPath;
         std::string m_wardenModuleDirectory;
+
+        // Housing this here but logically it is completely asynchronous - TODO: Separate this and unify with BG queue
+        LFGQueue m_lfgQueue;
+        std::unique_ptr<std::thread> m_lfgQueueThread;
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;
@@ -1015,6 +1045,8 @@ class World
         static uint32 m_currentMSTime;
         static TimePoint m_currentTime;
         static uint32 m_currentDiff;
+
+        Messager<World> m_messager;
 };
 
 extern uint32 realmID;

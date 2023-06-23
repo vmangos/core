@@ -201,6 +201,7 @@ class FindCreatureData
 typedef std::unordered_map<uint32, FactionEntry> FactionsMap;
 typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
 typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
+typedef std::unordered_map<uint32, ItemPrototype> ItemPrototypeMap;
 
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
@@ -225,6 +226,12 @@ class FindGOData
         float i_spawnedDist;
 };
 
+struct AreaTriggerLocale
+{
+    std::vector<std::string> message;
+};
+
+typedef std::unordered_map<uint32, AreaTriggerLocale> AreaTriggerLocaleMap;
 typedef std::unordered_map<uint32,CreatureLocale> CreatureLocaleMap;
 typedef std::unordered_map<uint32,GameObjectLocale> GameObjectLocaleMap;
 typedef std::unordered_map<uint32,ItemLocale> ItemLocaleMap;
@@ -246,12 +253,12 @@ typedef std::pair<QuestRelationsMap::const_iterator, QuestRelationsMap::const_it
 
 struct PetLevelInfo
 {
-    PetLevelInfo() : health(0), mana(0), armor(0) { for (uint16 & stat : stats) stat = 0; }
-
-    uint16 stats[MAX_STATS];
-    uint16 health;
-    uint16 mana;
-    uint16 armor;
+    uint16 stats[MAX_STATS] = {};
+    uint16 health = 0;
+    uint16 mana = 0;
+    uint16 armor = 0;
+    float dmgMin = 0.0f;
+    float dmgMax = 0.0f;
 };
 
 // We assume the rate is in general the same for all three types below, but chose to keep three for scalability and customization
@@ -365,7 +372,7 @@ enum SkillRangeType
     SKILL_RANGE_NONE,                                       // 0..0 always
 };
 
-SkillRangeType GetSkillRangeType(SkillLineEntry const* pSkill, bool racial);
+SkillRangeType GetSkillRangeType(SkillLineEntry const* skill, SkillRaceClassInfoEntry const* rcEntry);
 
 #define MAX_PLAYER_NAME          12                         // max allowed by client name length
 #define MAX_INTERNAL_PLAYER_NAME 15                         // max server internal player name length ( > MAX_PLAYER_NAME for support declined names )
@@ -490,10 +497,10 @@ enum PermVariables
     EVENT_IND_WATER = 3,
 
     // Stranglethorn Fishing Extravaganza support
-    VAR_TOURNAMENT  = 30021,    // last quest completion time
-    VAR_TOURN_GOES  = 30022,    // tournament was started already
-    VAR_TOURN_OVER  = 30023,    // tournament is over
-    VAR_TOURN_WINNER = 30056,   // for gosssip menu condition
+    VAR_STV_FISHING_PREV_WIN_TIME         = 30021, // last master angler quest completion time
+    VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN  = 30022, // announce tournament start
+    VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN = 30023, // announce tournament over
+    VAR_STV_FISHING_HAS_WINNER            = 30056, // used for gosssip menu condition
 
     // War Effort shared contributions
     VAR_WE_ALLIANCE_COPPER          = 30024,
@@ -587,6 +594,7 @@ class ObjectMgr
 
         typedef std::unordered_map<uint32, AreaTriggerEntry> AreaTriggerMap;
         typedef std::map<uint32, AreaTriggerTeleport> AreaTriggerTeleportMap;
+
         typedef std::unordered_map<uint32, BattlegroundEntranceTrigger> BGEntranceTriggerMap;
 
         typedef std::unordered_map<uint32, RepRewardRate > RepRewardRateMap;
@@ -628,7 +636,19 @@ class ObjectMgr
             return sCreatureDataAddonStorage.LookupEntry<CreatureDataAddon>(lowguid);
         }
 
-        static ItemPrototype const* GetItemPrototype(uint32 id) { return sItemStorage.LookupEntry<ItemPrototype>(id); }
+        ItemPrototype const* GetItemPrototype(uint32 id) const
+        {
+            auto iter = m_itemPrototypesMap.find(id);
+            if (iter == m_itemPrototypesMap.end())
+                return nullptr;
+
+            return &iter->second;
+        }
+
+        ItemPrototypeMap const& GetItemPrototypeMap() const
+        {
+            return m_itemPrototypesMap;
+        }
 
         CreatureClassLevelStats const* GetCreatureClassLevelStats(uint32 unitClass, uint32 level) const;
 
@@ -702,7 +722,8 @@ class ObjectMgr
             return m_GameObjectForQuestSet.find(entry) != m_GameObjectForQuestSet.end();
         }
 
-        WorldSafeLocsEntry const* GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team);
+        WorldSafeLocsEntry const* GetClosestGraveYard(float x, float y, float z, uint32 mapId, Team team);
+        WorldSafeLocsEntry const* GetClosestGraveYardForArea(uint32 areaOrZoneId, float x, float y, float z, uint32 mapId, Team team);
         bool AddGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = true);
         void RemoveGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = false);
         void LoadGraveyardZones();
@@ -843,6 +864,7 @@ class ObjectMgr
         void LoadAreaTriggerTeleports();
         void LoadQuestAreaTriggers();
         void LoadTavernAreaTriggers();
+        void LoadAreaTriggerLocales();
         void LoadGameObjectForQuests();
         void LoadBattlegroundEntranceTriggers();
 
@@ -970,6 +992,13 @@ class ObjectMgr
         {
             auto itr = m_CreatureSpellsMap.find(entry);
             if (itr == m_CreatureSpellsMap.end()) return nullptr;
+            return &itr->second;
+        }
+
+        AreaTriggerLocale const* GetAreaTriggerLocale(uint32 entry) const
+        {
+            auto itr = m_AreaTriggerLocaleMap.find(entry);
+            if (itr == m_AreaTriggerLocaleMap.end()) return nullptr;
             return &itr->second;
         }
 
@@ -1184,7 +1213,7 @@ class ObjectMgr
 
         void AddVendorItem(uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, uint32 itemflags);
         bool RemoveVendorItem(uint32 entry,uint32 item);
-        bool IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 incrtime, uint32 conditionId, Player* pl = nullptr, std::set<uint32>* skip_vendors = nullptr) const;
+        bool IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 incrtime, uint32 conditionId, Player* pl = nullptr) const;
 
         int GetOrNewIndexForLocale(LocaleConstant loc);
 
@@ -1489,6 +1518,7 @@ class ObjectMgr
         MapObjectGuids m_MapObjectGuids;
         std::mutex m_MapObjectGuids_lock;
 
+        AreaTriggerLocaleMap m_AreaTriggerLocaleMap;
         CreatureDataMap m_CreatureDataMap;
         CreatureLocaleMap m_CreatureLocaleMap;
         CreatureSpellsMap m_CreatureSpellsMap;
@@ -1511,6 +1541,7 @@ class ObjectMgr
         FactionTemplatesMap m_FactionTemplatesMap;
 
         SoundEntryMap m_SoundEntriesMap;
+        ItemPrototypeMap m_itemPrototypesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;
         SkillLineAbiilityStore m_SkillLineAbilities;

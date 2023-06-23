@@ -153,8 +153,9 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction)
 
             uint32 owner_accid = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
 
-            sLog.outCommand(bidder_accId, "GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
-                            bidder_name.c_str(), bidder_accId, pItem->GetProto()->Name1, pItem->GetEntry(), pItem->GetCount(), auction->bid, owner_name.c_str(), owner_accid);
+            sLog.Player(bidder_accId, LOG_GM, LOG_LVL_BASIC, 
+                "GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
+                bidder_name.c_str(), bidder_accId, pItem->GetProto()->Name1, pItem->GetEntry(), pItem->GetCount(), auction->bid, owner_name.c_str(), owner_accid);
         }
     }
     else if (!bidder)
@@ -170,7 +171,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction)
         msgAuctionWonBody.width(16);
         msgAuctionWonBody << std::right << std::hex << auction->owner;
         msgAuctionWonBody << std::dec << ":" << auction->bid << ":" << auction->buyout;
-        DEBUG_LOG("AuctionWon body string : %s", msgAuctionWonBody.str().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "AuctionWon body string : %s", msgAuctionWonBody.str().c_str());
 
         // set owner to bidder (to prevent delete item with sender char deleting)
         // owner in `data` will set at mail receive and item extracting
@@ -220,7 +221,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction)
         auctionSuccessfulBody << std::dec << ":" << auction->bid << ":" << auction->buyout;
         auctionSuccessfulBody << ":" << auction->deposit << ":" << auctionCut;
 
-        DEBUG_LOG("AuctionSuccessful body string : %s", auctionSuccessfulBody.str().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "AuctionSuccessful body string : %s", auctionSuccessfulBody.str().c_str());
 
         uint32 profit = auction->bid + auction->deposit - auctionCut;
 
@@ -243,7 +244,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction)
     Item *pItem = GetAItem(auction->itemGuidLow);
     if (!pItem)
     {
-        sLog.outError("Auction item (GUID: %u) not found, and lost.", auction->itemGuidLow);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Auction item (GUID: %u) not found, and lost.", auction->itemGuidLow);
         return;
     }
 
@@ -351,8 +352,8 @@ void AuctionHouseMgr::LoadAuctionItems()
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString();
-        sLog.outString(">> Loaded 0 auction items");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 auction items");
         return;
     }
 
@@ -369,11 +370,11 @@ void AuctionHouseMgr::LoadAuctionItems()
         uint32 itemGuid = fields[10].GetUInt32();
         uint32 itemId = fields[11].GetUInt32();
 
-        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId);
+        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
 
         if (!proto)
         {
-            sLog.outError("AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", itemGuid, itemId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", itemGuid, itemId);
             continue;
         }
 
@@ -391,8 +392,8 @@ void AuctionHouseMgr::LoadAuctionItems()
     while (result->NextRow());
     delete result;
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u auction items", count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u auction items", count);
 }
 
 void AuctionHouseMgr::LoadAuctions()
@@ -402,8 +403,8 @@ void AuctionHouseMgr::LoadAuctions()
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString();
-        sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 auctions. DB table `auction` is empty.");
         return;
     }
 
@@ -415,8 +416,8 @@ void AuctionHouseMgr::LoadAuctions()
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString();
-        sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 auctions. DB table `auction` is empty.");
         return;
     }
 
@@ -425,8 +426,8 @@ void AuctionHouseMgr::LoadAuctions()
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString();
-        sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 auctions. DB table `auction` is empty.");
         return;
     }
 
@@ -461,7 +462,7 @@ void AuctionHouseMgr::LoadAuctions()
         if (!pItem)
         {
             auction->DeleteFromDB();
-            sLog.outError("Auction %u has not a existing item : %u, deleted", auction->Id, auction->itemGuidLow);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Auction %u has not a existing item : %u, deleted", auction->Id, auction->itemGuidLow);
             delete auction;
             continue;
         }
@@ -495,8 +496,8 @@ void AuctionHouseMgr::LoadAuctions()
     while (result->NextRow());
     delete result;
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u auctions", AuctionCount);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u auctions", AuctionCount);
 }
 
 void AuctionHouseMgr::AddAItem(Item* it)
@@ -836,7 +837,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     Item *pItem = sAuctionMgr.GetAItem(itemGuidLow);
     if (!pItem)
     {
-        sLog.outError("auction to item, that doesn't exist !!!!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "auction to item, that doesn't exist !!!!");
         return false;
     }
     data << uint32(Id);
