@@ -31,6 +31,7 @@
 // magic event-numbers
 #define BG_EVENT_NONE 255
 // those generic events should get a high event id
+#define BG_EVENT_GHOST_GATE 253
 #define BG_EVENT_DOOR 254
 
 

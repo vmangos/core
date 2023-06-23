@@ -108,6 +108,7 @@ void BattleGroundWS::StartingEventOpenDoors()
     SpawnEvent(WS_EVENT_SPIRITGUIDES_SPAWN, 0, true, true);
     SpawnEvent(WS_EVENT_FLAG_A, 0, true, true);
     SpawnEvent(WS_EVENT_FLAG_H, 0, true, true);
+    SpawnEvent(BG_EVENT_GHOST_GATE, 0, false, true);
 }
 
 void BattleGroundWS::AddPlayer(Player* player)
@@ -585,6 +586,8 @@ void BattleGroundWS::Reset()
     m_activeEvents[WS_EVENT_SPIRITGUIDES_SPAWN] = BG_EVENT_NONE;
     m_activeEvents[WS_EVENT_FLAG_A] = BG_EVENT_NONE;
     m_activeEvents[WS_EVENT_FLAG_H] = BG_EVENT_NONE;
+    // ghost gates spawned at beginning
+    m_activeEvents[BG_EVENT_GHOST_GATE] = 0;
 
     for (uint32 i = 0; i < BG_TEAMS_COUNT; ++i)
     {
