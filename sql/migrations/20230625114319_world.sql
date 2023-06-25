@@ -479,8 +479,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Stonescale Eel Swarm / Oily Blackmouth School / Floating Wreckage / Firefin Snapper School - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180712);
 UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Stonescale Eel Swarm / Oily Blackmouth School / Floating Wreckage / Firefin Snapper School - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180900);
-UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Stonescale Eel Swarm / Oily Blackmouth School / Floating Wreckage / Firefin Snapper School - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180901);
-UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Stonescale Eel Swarm / Oily Blackmouth School / Floating Wreckage / Firefin Snapper School - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180902);
+UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Stonescale Eel Swarm / Oily Blackmouth School / Floating Wreckage / Firefin Snapper School - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180901);
+UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Stonescale Eel Swarm / Oily Blackmouth School / Floating Wreckage / Firefin Snapper School - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180902);
 
 SET @OGUID = 50741;
 SET @PTEMPLATE = 3165;
