@@ -920,8 +920,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+31, @PTEMPLATE+33, 0, 'Greater Sagefish School / Floating Wreckage - Stranglethorn', 0),
 (@PTEMPLATE+32, @PTEMPLATE+33, 0, 'Greater Sagefish School / Floating Wreckage - Stranglethorn', 0);
 
-UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Greater Sagefish School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180684);
-UPDATE `pool_gameobject` SET `chance` = 60 WHERE `description` = "Greater Sagefish School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180685);
+UPDATE `pool_gameobject` SET `chance` = 60 WHERE `description` = "Greater Sagefish School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180684);
+UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Greater Sagefish School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180685);
 
 -- School of Tastyfish
 UPDATE `pool_template` SET `description`='School of Tastyfish in Strangelthorn' WHERE  `entry`=4000;
