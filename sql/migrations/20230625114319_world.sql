@@ -712,8 +712,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+27, @PTEMPLATE+28, 0, 'Oily Blackmouth School / Firefin Snapper School / Floating Wreckage - Stranglethorn', 0);
 
 UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Oily Blackmouth School / Firefin Snapper School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180682);
-UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Oily Blackmouth School / Firefin Snapper School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180683);
-UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Oily Blackmouth School / Firefin Snapper School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180685);
+UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Oily Blackmouth School / Firefin Snapper School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180683);
+UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Oily Blackmouth School / Firefin Snapper School / Floating Wreckage - Stranglethorn" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180685);
 
 SET @OGUID = 24463;
 SET @PTEMPLATE = 3614;
