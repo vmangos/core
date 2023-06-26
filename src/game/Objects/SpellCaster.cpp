@@ -382,7 +382,7 @@ SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* 
         return SPELL_MISS_NONE;
 
     // bonus from skills is 0.04% per skill Diff
-    int32 attackerWeaponSkill = (spell->EquippedItemClass == ITEM_CLASS_WEAPON) ? int32(GetWeaponSkillValue(attType, pVictim)) : GetSkillMaxForLevel();
+    int32 attackerWeaponSkill = int32(GetWeaponSkillValue(attType, pVictim));
     int32 skillDiff = attackerWeaponSkill - int32(pVictim->GetSkillMaxForLevel(this));
     int32 fullSkillDiff = attackerWeaponSkill - int32(pVictim->GetDefenseSkillValue(this));
     int32 minWeaponSkill = GetSkillMaxForLevel(pVictim) < attackerWeaponSkill ? GetSkillMaxForLevel(pVictim) : attackerWeaponSkill;
