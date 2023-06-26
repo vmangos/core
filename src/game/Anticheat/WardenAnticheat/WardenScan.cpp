@@ -27,8 +27,9 @@
 #include "ByteBuffer.h"
 #include "Util.h"
 #include "Auth/HMACSHA1.h"
-
+#include "Auth/Sha1.h"
 #include <openssl/sha.h>
+#include <openssl/md5.h>
 
 #include <string>
 #include <algorithm>
@@ -59,6 +60,87 @@ bool operator&&(ScanFlags lhs, ScanFlags rhs)
 {
     return static_cast<std::underlying_type<ScanFlags>::type>(lhs) &&
            static_cast<std::underlying_type<ScanFlags>::type>(rhs);
+}
+
+Scan::BuildT StringHashScan::GetBuilder()
+{
+    return [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
+    {
+        std::string& string = warden->m_hashString;
+
+        string.clear();
+        uint8 size = urand(1, 255);
+        string.reserve(size);
+        for (uint8 i = 0; i < size; i++)
+            string += (char)urand('a', 'z');
+
+        MANGOS_ASSERT(string.size() <= 0xFF);
+
+        scan << static_cast<uint8>(string.size());
+
+        // skip null terminator this way
+        scan.append(string.c_str(), string.size());
+    };
+}
+
+Scan::CheckT StringHashScan::GetChecker()
+{
+    return [this](Warden const* warden, ByteBuffer& buff)
+    {
+        // calculate server side hashes
+
+        uint8 serverSHA[SHA_DIGEST_LENGTH];
+        uint8 serverMD5[MD5_DIGEST_LENGTH];
+
+        static constexpr uint32 magic = 0xFEEDFACE;
+
+        Sha1Hash sha1;
+        sha1.UpdateData(warden->m_hashString);
+        if (!warden->IsUsingMaiev()) // this constant is only used if there is a module
+            sha1.UpdateData(reinterpret_cast<uint8 const*>(&magic), sizeof(magic));
+        sha1.Finalize();
+
+        memcpy(serverSHA, sha1.GetDigest(), sizeof(serverSHA));
+
+        MD5_CTX md5;
+        MD5_Init(&md5);
+        MD5_Update(&md5, warden->m_hashString.c_str(), warden->m_hashString.size());
+        MD5_Final(serverMD5, &md5);
+
+        // compare with client side hashes
+
+        uint8 clientSHA[SHA_DIGEST_LENGTH];
+        uint8 clientMD5[MD5_DIGEST_LENGTH];
+
+        buff.read(clientSHA, sizeof(clientSHA));
+        buff.read(clientMD5, sizeof(clientMD5));
+
+        return !!memcmp(clientSHA, serverSHA, sizeof(clientSHA)) || !!memcmp(clientMD5, serverMD5, sizeof(clientMD5));
+    };
+}
+
+WindowsStringHashScan::WindowsStringHashScan()
+    : StringHashScan(), WindowsScan(
+    // builder
+    GetBuilder(),
+    // checker
+    GetChecker(),
+    128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, "Maiev string hash",
+    ScanFlags::Maiev, 0, UINT16_MAX)
+{
+    
+}
+
+MacStringHashScan::MacStringHashScan(bool moduleLoaded)
+    : StringHashScan(), MacScan(
+        // builder
+        GetBuilder(),
+        // checker
+        GetChecker(),
+        128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, moduleLoaded ? "Mac string hash" : "Maiev string hash",
+        (moduleLoaded ? ScanFlags::None : ScanFlags::Maiev), 0, UINT16_MAX)
+{
+
 }
 
 WindowsModuleScan::WindowsModuleScan(std::string const& module, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
@@ -280,7 +362,7 @@ WindowsFileHashScan::WindowsFileHashScan(std::string const& file, void const* ex
 
         // if a hash was given, check it (some checks may only be interested in existence)
         return this->m_hashMatch && !!memcmp(hash, this->m_expected, sizeof(hash));
-    }, sizeof(uint8) + sizeof(uint8) + file.length(), sizeof(uint8) + SHA_DIGEST_LENGTH, comment, flags | ScanFlags::ModuleInitialized, minBuild, maxBuild)
+    }, sizeof(uint8) + sizeof(uint8) + file.length(), sizeof(uint8) + SHA_DIGEST_LENGTH, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
     if (m_hashMatch)
         ::memcpy(m_expected, expected, sizeof(m_expected));
@@ -314,7 +396,7 @@ WindowsLuaScan::WindowsLuaScan(std::string const& lua, bool wanted, std::string 
         }
 
         return found != this->m_wanted;
-    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::ModuleInitialized, minBuild, maxBuild) {}
+    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild) {}
 
 WindowsLuaScan::WindowsLuaScan(std::string const& lua, std::string const& expectedValue, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
     : m_lua(lua), m_expectedValue(expectedValue),
@@ -346,7 +428,7 @@ WindowsLuaScan::WindowsLuaScan(std::string const& lua, std::string const& expect
         buff.rpos(buff.rpos() + len);
 
         return str == this->m_expectedValue;
-    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::ModuleInitialized, minBuild, maxBuild)
+    }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
     MANGOS_ASSERT(expectedValue.length() <= 0xFF);
 }
@@ -364,7 +446,7 @@ WindowsLuaScan::WindowsLuaScan(std::string const& lua, CheckT checker, std::stri
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[GET_LUA_VARIABLE] ^ winWarden->GetXor())
             << static_cast<uint8>(strings.size());
-    }, checker, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::ModuleInitialized, minBuild, maxBuild)
+    }, checker, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
     MANGOS_ASSERT(checker);
 }
@@ -441,7 +523,7 @@ WindowsTimeScan::WindowsTimeScan(CheckT checker, std::string const& comment, Sca
     {
         auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[CHECK_TIMING_VALUES] ^ winWarden->GetXor());
-    }, checker, sizeof(uint8), sizeof(uint8) + sizeof(uint32), comment, flags | ScanFlags::ModuleInitialized, minBuild, maxBuild)
+    }, checker, sizeof(uint8), sizeof(uint8) + sizeof(uint32), comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
     MANGOS_ASSERT(!!checker);
 }

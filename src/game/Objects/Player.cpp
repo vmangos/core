@@ -7166,7 +7166,7 @@ void Player::CheckDuelDistance(time_t currTime)
 
 bool Player::IsOutdoorPvPActive() const
 {
-    return (IsAlive() && !HasInvisibilityAura() && !HasStealthAura() &&
+    return (IsAlive() && !IsGameMaster() && !HasInvisibilityAura() && !HasStealthAura() &&
             (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED) || sWorld.IsPvPRealm()) && !IsTaxiFlying());
 }
 

@@ -106,12 +106,6 @@ void WSG_AtAllianceFlag(BattleBotAI* pAI)
             {
                 pAI->ClearPath();
                 pAI->me->GetMotionMaster()->MovePoint(0, pFlag->GetPositionX(), pFlag->GetPositionY(), 353.0f);
-                pAI->me->m_Events.AddLambdaEventAtOffset([pAI]
-                {
-                    WorldPacket data(CMSG_AREATRIGGER);
-                    data << uint32(AT_SILVERWING_FLAG);
-                    pAI->me->GetSession()->HandleAreaTriggerOpcode(data);
-                }, 2000);
                 return;
             }
         }
@@ -154,12 +148,6 @@ void WSG_AtHordeFlag(BattleBotAI* pAI)
             {
                 pAI->ClearPath();
                 pAI->me->GetMotionMaster()->MovePoint(0, pFlag->GetPositionX(), pFlag->GetPositionY(), pFlag->GetPositionZ());
-                pAI->me->m_Events.AddLambdaEventAtOffset([pAI]
-                {
-                    WorldPacket data(CMSG_AREATRIGGER);
-                    data << uint32(AT_WARSONG_FLAG);
-                    pAI->me->GetSession()->HandleAreaTriggerOpcode(data);
-                }, 2000);
                 return;
             }
         }
@@ -1780,6 +1768,8 @@ void BattleBotAI::MovementInform(uint32 movementType, uint32 data)
             (*m_currentPath->at(data).pFunc)(this);
         else
             MoveToNextPoint();
+
+        ActivateNearbyAreaTrigger();
     }
 }
 

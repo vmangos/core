@@ -281,12 +281,12 @@ std::vector<std::shared_ptr<Scan const>> WardenScanMgr::GetRandomScans(ScanFlags
         if (scan->buildMin > build || scan->buildMax < build)
             continue;
 
-        // if the scan is an initial-login scan, and that wasn't explicitly requested, do not include it
-        if (!!(scan->flags & ScanFlags::InitialLogin) && !(flags & ScanFlags::InitialLogin))
+        // only send initial login scans when explicitly requested
+        if ((scan->flags & ScanFlags::InitialLogin) != (flags & ScanFlags::InitialLogin))
             continue;
 
-        // if the scan is not an initial-login scan, and that was explicitly requested, do not include it
-        if (!(scan->flags & ScanFlags::InitialLogin) && !!(flags & ScanFlags::InitialLogin))
+        // only send maiev scans when explicitly requested
+        if ((scan->flags & ScanFlags::Maiev) != (flags & ScanFlags::Maiev))
             continue;
 
         // if the scan is an in-world scan, and that wasn't explicitly requested, do not include it
@@ -294,7 +294,7 @@ std::vector<std::shared_ptr<Scan const>> WardenScanMgr::GetRandomScans(ScanFlags
         //    continue;
 
         // if the scan requires the module to be initialized, and it's not initialized, do not request it
-        if (!!(scan->flags & ScanFlags::ModuleInitialized) && !(flags & ScanFlags::ModuleInitialized))
+        if (!!(scan->flags & ScanFlags::OffsetsInitialized) && !(flags & ScanFlags::OffsetsInitialized))
             continue;
 
         matches.push_back(scan);

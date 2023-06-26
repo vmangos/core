@@ -40,10 +40,6 @@ class WardenMac final : public Warden
     private:
         bool m_fingerprintSaved;
 
-        std::string m_hashString;
-        uint8 m_hashSHA[SHA_DIGEST_LENGTH];
-        uint8 m_hashMD5[MD5_DIGEST_LENGTH];
-
         WorldPacket m_charEnum;
 
         virtual ScanFlags GetScanFlags() const;

@@ -479,8 +479,8 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 30, `spawntimesecsmax` = 30 WHERE `
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `spawn_flags` = 0 WHERE `id` = 3640;
 UPDATE `gameobject` SET `spawntimesecsmin` = 2, `spawntimesecsmax` = 2 WHERE `id` = 143980;
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 17282;
-UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `patch_min` = 8 WHERE `id` = 153556;
-UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 181098;
+UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 153556;
+UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `patch_min` = 8 WHERE `id` = 181098;
 UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800, `patch_min` = 9 WHERE `id` = 181287;
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `patch_min` = 3 WHERE `id` = 179922;
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `spawn_flags` = 0 WHERE `id` IN (178184, 178185, 178186);

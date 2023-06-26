@@ -107,10 +107,8 @@ Warden::Warden(WorldSession* session, WardenModule const* module, BigNumber cons
     m_accountId(session->GetAccountId()), m_sessionGuid(session->GetGUID()), m_clientBuild(session->GetGameBuild()), m_accountName(session->GetUsername()),
     m_sessionIP(session->GetRemoteAddress()), m_clientOS(session->GetOS()), m_clientPlatform(session->GetPlatform()),
     m_inputCrypto(KeyLength), m_outputCrypto(KeyLength), m_initialized(false), m_module(module), m_crk(nullptr),
-    m_timeoutClock(0), m_scanClock(0), m_moduleSendPending(false)
+    m_timeoutClock(0), m_scanClock(0), m_moduleSendPending(false), m_maiev(true)
 {
-    MANGOS_ASSERT(!!m_module || session->GetPlatform() != CLIENT_PLATFORM_X86);
-
     auto const kBytes = K.AsByteArray();
 
     SHA1Randx WK(kBytes.data(), kBytes.size());
@@ -129,22 +127,6 @@ Warden::Warden(WorldSession* session, WardenModule const* module, BigNumber cons
     sLog.OutWarden(this, LOG_LVL_DEBUG, "Initializing");
     sLog.OutWarden(this, LOG_LVL_DEBUG, "C->S Key: %s", ByteArrayToHexStr(inputKey, 16).c_str());
     sLog.OutWarden(this, LOG_LVL_DEBUG, "S->C Key: %s", ByteArrayToHexStr(outputKey, 16).c_str());
-
-    if (m_module)
-    {
-        ByteBuffer pkt(1 + m_module->hash.size() + m_module->key.size() + 4);
-
-        pkt << static_cast<uint8>(WARDEN_SMSG_MODULE_USE);
-
-        pkt.append(&m_module->hash[0], m_module->hash.size());
-        pkt.append(&m_module->key[0], m_module->key.size());
-
-        pkt << static_cast<uint32>(m_module->binary.size());
-
-        SendPacketDirect(pkt, session);
-
-        BeginTimeoutClock();
-    }
 }
 
 void Warden::RequestChallenge()
@@ -197,6 +179,28 @@ void Warden::HandleChallengeResponse(ByteBuffer& buff)
     sLog.OutWarden(this, LOG_LVL_DEBUG, "Challenge response validated.  Warden packet encryption initialized.");
 
     m_crk = nullptr;
+}
+
+void Warden::SendModuleUse()
+{
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Requesting module");
+    sLog.OutWarden(this, LOG_LVL_DEBUG, "Hash: %s", ByteArrayToHexStr(m_module->hash.data(), m_module->hash.size()).c_str());
+
+    ByteBuffer pkt(1 + m_module->hash.size() + m_module->key.size() + 4);
+
+    pkt << static_cast<uint8>(WARDEN_SMSG_MODULE_USE);
+
+    pkt.append(&m_module->hash[0], m_module->hash.size());
+    pkt.append(&m_module->key[0], m_module->key.size());
+
+    pkt << static_cast<uint32>(m_module->binary.size());
+
+    SendPacket(pkt);
+
+    StopScanClock();
+    BeginTimeoutClock();
+
+    m_maiev = false;
 }
 
 void Warden::SendModuleToClient()
@@ -300,7 +304,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
     // warden opcode
     buff << static_cast<uint8>(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
 
-    if (m_clientOS == CLIENT_OS_WIN)
+    if (m_clientOS == CLIENT_OS_WIN && !m_maiev)
     {
         // string table for this request
         for (auto const& s : strings)
@@ -316,7 +320,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
     // all scan requests
     buff.append(scan);
 
-    if (m_clientOS == CLIENT_OS_WIN)
+    if (m_clientOS == CLIENT_OS_WIN && !m_maiev)
     {
         // indicates to the client that there are no further requests in this packet
         buff << m_xor;
@@ -422,6 +426,11 @@ void Warden::StopTimeoutClock()
     m_timeoutClock = 0;
 }
 
+bool Warden::TimeoutClockStarted() const
+{
+    return m_timeoutClock != 0;
+}
+
 void Warden::BeginScanClock()
 {
     m_scanClock = WorldTimer::getMSTime() + 1000 * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY);
@@ -521,7 +530,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
     {
         case WARDEN_CMSG_MODULE_MISSING:
         {
-            if (!m_module)
+            if (!m_module || m_maiev)
             {
                 sLog.OutWarden(this, LOG_LVL_BASIC, "Requested module when none was offered.");
                 KickSession();
@@ -543,7 +552,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
         case WARDEN_CMSG_MODULE_OK:
         {
-            if (!m_module)
+            if (!m_module || m_maiev)
             {
                 sLog.OutWarden(this, LOG_LVL_BASIC, "Loaded module without server request.");
                 KickSession();
@@ -558,7 +567,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
         case WARDEN_CMSG_CHEAT_CHECKS_RESULT:
         {
-            if (m_clientOS == CLIENT_OS_WIN)
+            if (m_clientOS == CLIENT_OS_WIN && !m_maiev)
             {
                 // verify checksum integrity
                 uint16 length;
@@ -577,7 +586,16 @@ void Warden::HandlePacket(WorldPacket& recvData)
             ReadScanResults(recvData);
 
             StopTimeoutClock();
-            BeginScanClock();
+
+            // if we have a module, stop using maiev now
+            if (m_maiev && m_module)
+                SendModuleUse();
+            else
+                BeginScanClock();
+
+            // when there is no module, consider warden initialized after first check
+            if (m_maiev && !m_module)
+                InitializeClient();
 
             break;
         }

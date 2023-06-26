@@ -164,6 +164,7 @@ void BattleGroundAB::StartingEventOpenDoors()
         SpawnBGObject(m_bgObjects[BG_AB_OBJECT_SPEEDBUFF_STABLES + buff + i * 3], RESPAWN_IMMEDIATELY);
     }
     OpenDoorEvent(BG_EVENT_DOOR);
+    SpawnEvent(BG_EVENT_GHOST_GATE, 0, false, true);
 }
 
 void BattleGroundAB::AddPlayer(Player* player)
@@ -489,6 +490,8 @@ void BattleGroundAB::Reset()
         m_activeEvents[i] = BG_AB_NODE_TYPE_NEUTRAL;
     }
 
+    // ghost gates spawned at beginning
+    m_activeEvents[BG_EVENT_GHOST_GATE] = 0;
 }
 
 void BattleGroundAB::EndBattleGround(Team winner)

@@ -94,14 +94,16 @@ WardenModuleMgr::WardenModuleMgr()
 
 WardenModule const* WardenModuleMgr::GetWindowsModule() const
 {
-    MANGOS_ASSERT(!m_winModules.empty());
+    if (m_winModules.empty())
+        return nullptr;
 
     return &m_winModules[urand(0, m_winModules.size() - 1)];
 }
 
 WardenModule const* WardenModuleMgr::GetMacModule() const
 {
-    MANGOS_ASSERT(!m_macModules.empty());
+    if (m_macModules.empty())
+        return nullptr;
 
     return &m_macModules[urand(0, m_macModules.size() - 1)];
 }

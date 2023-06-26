@@ -3200,6 +3200,29 @@ void CombatBotBaseAI::SendBattlemasterJoinPacket(uint8 battlegroundId)
     me->GetSession()->HandleBattlemasterJoinOpcode(data);
 }
 
+void CombatBotBaseAI::SendAreaTriggerPacket(uint32 areaTriggerId)
+{
+    WorldPacket data(CMSG_AREATRIGGER);
+    data << uint32(areaTriggerId);
+    me->GetSession()->HandleAreaTriggerOpcode(data);
+}
+
+void CombatBotBaseAI::ActivateNearbyAreaTrigger()
+{
+    for (auto const& itr : sObjectMgr.GetAreaTriggersMap())
+    {
+        AreaTriggerEntry const* pTrigger = &itr.second;
+        if (!pTrigger)
+            continue;
+
+        if (!IsPointInAreaTriggerZone(pTrigger, me->GetMapId(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 5.0f))
+            continue;
+
+        SendAreaTriggerPacket(pTrigger->id);
+        break;
+    }
+}
+
 void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
 {
     // Must always check "me" player pointer here!
