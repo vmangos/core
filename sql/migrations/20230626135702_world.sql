@@ -129,7 +129,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+16, @PTEMPLATE+18, 0, 'Oily Blackmouth School / Floating Debris - Silverpine Forest', 0),
 (@PTEMPLATE+17, @PTEMPLATE+18, 0, 'Oily Blackmouth School / Floating Debris - Silverpine Forest', 0);
 
-UPDATE `pool_gameobject` SET `chance` = 30 WHERE `description` = "Oily Blackmouth School / Floating Debris - Silverpine Forest" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180582);
+UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Oily Blackmouth School / Floating Debris - Silverpine Forest" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180582);
 UPDATE `pool_gameobject` SET `chance` = 60 WHERE `description` = "Oily Blackmouth School / Floating Debris - Silverpine Forest" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180655);
 
 SET @OGUID = 19203;
@@ -259,8 +259,8 @@ UPDATE `pool_gameobject` SET `description`='Floating Debris / Sagefish School - 
 UPDATE `pool_gameobject` SET `description`='Floating Debris / Sagefish School - Silverpine Forest' WHERE  `guid`=9641;
 UPDATE `pool_pool` SET `description`='Floating Debris / Sagefish School - Silverpine Forest' WHERE  `pool_id`=2045;
 
-UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Floating Debris / Sagefish School - Silverpine Forest" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180655);
-UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Floating Debris / Sagefish School - Silverpine Forest" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180656);
+UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Floating Debris / Sagefish School - Silverpine Forest" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180655);
+UPDATE `pool_gameobject` SET `chance` = 80 WHERE `description` = "Floating Debris / Sagefish School - Silverpine Forest" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180656);
 
 
 -- End of migration.
