@@ -84,6 +84,8 @@ public:
     virtual void OnPacketReceived(WorldPacket const* packet) override;
     void SendBattlefieldPortPacket();
     void SendBattlemasterJoinPacket(uint8 battlegroundId);
+    void SendAreaTriggerPacket(uint32 areaTriggerId);
+    void ActivateNearbyAreaTrigger();
 
     void AutoAssignRole();
     void PopulateSpellData();
