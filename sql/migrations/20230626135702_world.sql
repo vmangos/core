@@ -253,7 +253,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+17, @PTEMPLATE+19, 0, 'Floating Debris / Sagefish School - Silverpine Forest', 0),
 (@PTEMPLATE+18, @PTEMPLATE+19, 0, 'Floating Debris / Sagefish School - Silverpine Forest', 0);
 
-UPDATE `gameobject` SET `id` = 180656 WHERE `guid` = 9624
+UPDATE `gameobject` SET `id` = 180656 WHERE `guid` = 9624;
 UPDATE `pool_template` SET `description`='Floating Debris / Sagefish School - Silverpine Forest' WHERE  `entry`=2045;
 UPDATE `pool_gameobject` SET `description`='Floating Debris / Sagefish School - Silverpine Forest' WHERE  `guid`=9624;
 UPDATE `pool_gameobject` SET `description`='Floating Debris / Sagefish School - Silverpine Forest' WHERE  `guid`=9641;
