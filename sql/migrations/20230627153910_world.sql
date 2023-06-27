@@ -352,6 +352,26 @@ UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Stonescale Eel
 UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Stonescale Eel Swarm / Oily Blackmouth School / Floating Wreckage / Firefin Snapper School - Tanaris" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180751);
 UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Stonescale Eel Swarm / Oily Blackmouth School / Floating Wreckage / Firefin Snapper School - Tanaris" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180752);
 
+-- Tidy
+SET @OGUID = 227;
+
+-- Muddy Churning Waters
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 180369, 309, -11890.2, -1714.73, 10.4603, 2.96704, 0, 0, 0.996194, 0.087165, 600, 600, 1, 100, 5, 10),
+(@OGUID+2, 180369, 309, -11887.7, -1643.9, 10.4603, 3.87463, 0, 0, -0.93358, 0.358368, 600, 600, 1, 100, 5, 10),
+(@OGUID+3, 180369, 309, -11700.5, -1746.49, 10.4603, 3.56047, 0, 0, -0.978148, 0.207912, 600, 600, 1, 100, 5, 10),
+(@OGUID+4, 180184, 0, -8306.6, -334.969, 143.974, 1.25664, 0, 0, 0.587785, 0.809017, 180, 180, 1, 100, 7, 10);
+
+-- Remove Redundant Pool Objects
+DELETE FROM `pool_gameobject` WHERE  `guid`=18086;
+DELETE FROM `pool_gameobject` WHERE  `guid`=18284;
+
+UPDATE `gameobject` SET `position_x`=-232.452, `position_y`=-1103.82, `position_z`=37.087, `orientation`=5.41052, `rotation0`=0, `rotation1`=0, `rotation2`=-0.422618, `rotation3`=0.906308 WHERE `guid`=38820;
+UPDATE `gameobject` SET `position_x`=-619.02, `position_y`=-769.87, `position_z`=6.30651, `orientation`=3.28124, `rotation0`=0, `rotation1`=0, `rotation2`=-0.997563, `rotation3`=0.0697661 WHERE `guid`=38811;
+UPDATE `gameobject` SET `position_x`=2509.32, `position_y`=-2855.59, `position_z`=150.072, `orientation`=3.89209, `rotation0`=0, `rotation1`=0, `rotation2`=-0.930417, `rotation3`=0.366502 WHERE `guid`=18162;
+UPDATE `gameobject` SET `position_x`=-9801.39, `position_y`=1766.6, `position_z`=0, `orientation`=6.19592, `rotation0`=0, `rotation1`=0, `rotation2`=-0.0436192, `rotation3`=0.999048 WHERE `guid`=24548;
+UPDATE `gameobject` SET `position_x`=-9801.39, `position_y`=1766.6, `position_z`=0, `orientation`=6.19592, `rotation0`=0, `rotation1`=0, `rotation2`=-0.0436192, `rotation3`=0.999048 WHERE `guid`=24570;
+
 
 -- End of migration.
 END IF;
