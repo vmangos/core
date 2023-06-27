@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20230626135523');
 
 
 SET @OGUID = 263;
-SET @PTEMPLATE = 3290;
+SET @PTEMPLATE = 4702;
 
 -- Arathi Highlands 45
 DELETE FROM `gameobject` WHERE `guid` IN (16645, 16644);
