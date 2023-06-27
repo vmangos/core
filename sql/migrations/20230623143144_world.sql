@@ -100,6 +100,15 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 -- Correct Mining Node Position
 UPDATE `gameobject` SET `position_x`=26.0743, `position_y`=-1906.15, `position_z`=84.0589, `orientation`=4.69494 WHERE  `guid`=34711;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Update Cook Ghilm Script
+DELETE FROM `creature_movement_scripts` WHERE `id`=135501;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(135501, 3, 0, 82, 10837, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Ghilm - Load Gameobject'),
+(135501, 3, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Ghilm - Emote'),
+(135501, 4, 0, 19, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Ghilm - Set Equipment'),
+(135501, 7, 0, 41, 0, 0, 0, 0, 10837, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Ghilm - Remove Object');
+
 
 -- End of migration.
 END IF;
