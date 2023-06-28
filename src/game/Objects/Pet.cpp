@@ -87,7 +87,7 @@ Pet::~Pet()
 
 void Pet::AddToWorld()
 {
-    ///- Register the pet for guid lookup
+    // Register the pet for guid lookup
     if (!IsInWorld())
         GetMap()->InsertObject<Pet>(GetObjectGuid(), this);
 
@@ -107,11 +107,11 @@ void Pet::AddToWorld()
 
 void Pet::RemoveFromWorld()
 {
-    ///- Remove the pet from the accessor
+    // Remove the pet from the accessor
     if (IsInWorld())
         GetMap()->EraseObject<Pet>(GetObjectGuid());
 
-    ///- Don't call the function for Creature, normal mobs + totems go in a different storage
+    // Don't call the function for Creature, normal mobs + totems go in a different storage
     Unit::RemoveFromWorld();
 }
 

@@ -517,7 +517,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             case 533196:
             case 533198:
                 m_alHeiganTrapGuids[2].push_back(pGo->GetObjectGuid());
-            ///case 533186:
+        //  case 533186:
         }
     }
 

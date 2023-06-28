@@ -29,7 +29,7 @@
 #include "Utilities/Callback.h"
 #include <memory>
 
-/// ---- BASE ---
+// ---- BASE ---
 
 class Database;
 class SqlConnection;
@@ -50,7 +50,7 @@ class SqlOperation
         uint32 serialId;
 };
 
-/// ---- ASYNC STATEMENTS / TRANSACTIONS ----
+// ---- ASYNC STATEMENTS / TRANSACTIONS ----
 
 class SqlPlainRequest : public SqlOperation
 {
@@ -89,13 +89,13 @@ class SqlPreparedRequest : public SqlOperation
         SqlStmtParameters* m_param;
 };
 
-/// ---- ASYNC QUERIES ----
+// ---- ASYNC QUERIES ----
 
-class SqlQuery;                                             /// contains a single async query
-class QueryResult;                                          /// the result of one
-class SqlResultQueue;                                       /// queue for thread sync
-class SqlQueryHolder;                                       /// groups several async quries
-class SqlQueryHolderEx;                                     /// points to a holder, added to the delay thread
+class SqlQuery;                                             // contains a single async query
+class QueryResult;                                          // the result of one
+class SqlResultQueue;                                       // queue for thread sync
+class SqlQueryHolder;                                       // groups several async quries
+class SqlQueryHolderEx;                                     // points to a holder, added to the delay thread
 
 class ThreadPool;
 

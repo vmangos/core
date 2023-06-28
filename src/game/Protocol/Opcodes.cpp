@@ -39,20 +39,20 @@ OpcodeHandler const Opcodes::emptyHandler =
 
 Opcodes::Opcodes()
 {
-    /// Build Opcodes map
+    // Build Opcodes map
     BuildOpcodeList();
 }
 
 Opcodes::~Opcodes()
 {
-    /// Clear Opcodes
+    // Clear Opcodes
     mOpcodeMap.clear();
 }
 
 
 void Opcodes::BuildOpcodeList()
 {
-    /// Correspondence between opcodes and their names
+    // Correspondence between opcodes and their names
     /*0x000*/  StoreOpcode(MSG_NULL_ACTION,                   "MSG_NULL_ACTION",                  STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x001*/  StoreOpcode(CMSG_BOOTME,                       "CMSG_BOOTME",                      STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x002*/  StoreOpcode(CMSG_DBLOOKUP,                     "CMSG_DBLOOKUP",                    STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);

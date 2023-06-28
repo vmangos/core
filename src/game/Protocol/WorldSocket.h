@@ -48,13 +48,13 @@ class WorldSocket: public MangosSocket<WorldSession, WorldSocket, AuthCrypt>
 
         int ProcessIncoming (WorldPacket* new_pct);
 
-        /// Called by ProcessIncoming() on CMSG_AUTH_SESSION.
+        // Called by ProcessIncoming() on CMSG_AUTH_SESSION.
         int HandleAuthSession (WorldPacket& recvPacket);
 
-        /// Called by ProcessIncoming() on CMSG_PING.
+        // Called by ProcessIncoming() on CMSG_PING.
         int HandlePing (WorldPacket& recvPacket);
 };
 
 #endif  /* _WORLDSOCKET_H */
 
-/// @}
+// @}

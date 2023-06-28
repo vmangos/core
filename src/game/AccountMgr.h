@@ -45,7 +45,7 @@ class MasterPlayer;
 
 class AccountPersistentData
 {
-/// WHISP FLOOD
+// WHISP FLOOD
 public:
     struct WhisperData
     {
@@ -63,7 +63,7 @@ public:
     typedef std::map<uint32 /*lowguid*/, WhisperData> WhispersMap;
     WhispersMap m_whisperTargets;
 
-/// MAIL FLOOD
+// MAIL FLOOD
 public:
     void JustMailed(uint32 toAccount);
     bool CanMail(uint32 targetAccount);

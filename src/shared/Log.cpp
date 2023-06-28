@@ -65,7 +65,7 @@ Log::Log() :
         logFiles[i] = nullptr;
     }
 
-    /// Common log files data
+    // Common log files data
     m_logsDir = sConfig.GetStringDefault("LogsDir", "");
     if (!m_logsDir.empty())
     {
@@ -75,7 +75,7 @@ Log::Log() :
 
     auto const log_file_timestamp = sConfig.GetBoolDefault("LogFile.TimeStamp", false);
 
-    /// Open specific log files
+    // Open specific log files
 
     // GM log settings for per account case
     m_gmlog_filename_format = sConfig.GetStringDefault("GMLogFile", "");

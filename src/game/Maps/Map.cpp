@@ -824,7 +824,7 @@ inline void Map::UpdateCells(uint32 map_diff)
         return;
     _lastCellsUpdate = now;
 
-    /// update active cells around players and active objects
+    // update active cells around players and active objects
     if (IsContinent() && m_cellThreads->status() == ThreadPool::Status::READY)
         UpdateActiveCellsAsynch(now, diff);
     else
@@ -846,7 +846,7 @@ inline void Map::UpdateCells(uint32 map_diff)
 void Map::ProcessSessionPackets(PacketProcessing type)
 {
     uint32 beginTime = WorldTimer::getMSTime();
-    /// update worldsessions for existing players
+    // update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
         Player* plr = m_mapRefIter->getSource();
@@ -925,7 +925,7 @@ void Map::Update(uint32 t_diff)
     _dynamicTree.update(t_diff);
 
     UpdateSessionsMovementAndSpellsIfNeeded();
-    /// update worldsessions for existing players
+    // update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
         Player* plr = m_mapRefIter->getSource();
@@ -939,7 +939,7 @@ void Map::Update(uint32 t_diff)
     }
     uint32 sessionsUpdateTime = WorldTimer::getMSTimeDiffToNow(updateMapTime);
 
-    /// update players at tick
+    // update players at tick
     std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
     UpdateSessionsMovementAndSpellsIfNeeded();
     UpdatePlayers();
@@ -993,7 +993,7 @@ void Map::Update(uint32 t_diff)
         }
     }
 
-    ///- Process necessary scripts
+    // Process necessary scripts
     if (m_uiScriptedEventsTimer <= t_diff)
     {
         UpdateScriptedEvents();
@@ -2450,15 +2450,15 @@ void BattleGroundMap::UnloadAll(bool pForce)
     Map::UnloadAll(pForce);
 }
 
-/// Put scripts in the execution queue
+// Put scripts in the execution queue
 void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid)
 {
-    ///- Find the script map
+    // Find the script map
     ScriptMapMap::const_iterator s = scripts.find(id);
     if (s == scripts.end())
         return;
 
-    ///- Schedule script execution for all scripts in the script map
+    // Schedule script execution for all scripts in the script map
     ScriptMap const* s2 = &(s->second);
     bool immedScript = false;
     
@@ -2565,7 +2565,7 @@ void Map::TerminateScript(ScriptAction const& step)
     }
 }
 
-/// Process queued scripts
+// Process queued scripts
 void Map::ScriptsProcess()
 {
     std::unique_lock<std::mutex> lock(m_scriptSchedule_lock);
@@ -2573,7 +2573,7 @@ void Map::ScriptsProcess()
     if (m_scriptSchedule.empty())
         return;
 
-    ///- Process overdue queued scripts
+    // Process overdue queued scripts
     ScriptScheduleMap::iterator iter = m_scriptSchedule.begin();
     // ok as multimap is a *sorted* associative container
     while (!m_scriptSchedule.empty() && (iter->first <= sWorld.GetGameTime()))
@@ -3104,7 +3104,7 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
         return false;
     }
 
-    /// Find navmesh position near source
+    // Find navmesh position near source
     float point[3] = {srcY, srcZ, srcX};
     // Warning : Coord order is Y,Z,X
     float closestPoint[3] = {0.0f, 0.0f, 0.0f};
@@ -3128,7 +3128,7 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
     }
     filter.setExcludeFlags(NAV_STEEP_SLOPES);
 
-    /// Walk on the surface found
+    // Walk on the surface found
     dtPolyRef visited[50] = {0};
     int visitedCount = 0;
     float t = 0.0f;
@@ -3150,7 +3150,7 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
     if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(visited[visitedCount - 1], endPosition, endPosition, nullptr)))
         return false;
 
-    /// Compute complete path, and at each path step, check for dynamic LoS collision
+    // Compute complete path, and at each path step, check for dynamic LoS collision
     // Rq: This is non-sense on Transports, since we are using position offsets ...
     float pathPoints[MAX_POINT_PATH_LENGTH * VERTEX_SIZE];
     int pointCount = 0;
@@ -3185,7 +3185,7 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
     if (!MaNGOS::IsValidMapCoord(destX, destY, destZ))
         return false;
 
-    /// Finalize Z-position using vmaps (more accurate)
+    // Finalize Z-position using vmaps (more accurate)
     if (transport)
         destZ += 0.5f;
     else
@@ -3359,7 +3359,7 @@ bool Map::CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, 
 void Map::CrashUnload()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Map %u (instance %u) crashed. Has players: %d", GetId(), GetInstanceId(), HavePlayers());
-    /// Logout players
+    // Logout players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
         Player* player = m_mapRefIter->getSource();

@@ -447,7 +447,7 @@ void WaypointManager::_clearPath(WaypointPath &path)
     path.clear();
 }
 
-/// - Insert at a certain point, if pointId == 0 insert last. In this case pointId will be changed to the id to which the node was added
+// Insert at a certain point, if pointId == 0 insert last. In this case pointId will be changed to the id to which the node was added
 WaypointNode const* WaypointManager::AddNode(uint32 entry, uint32 dbGuid, uint32& pointId, WaypointPathOrigin wpDest, float x, float y, float z)
 {
     // Support only normal movement tables
@@ -594,7 +594,7 @@ void WaypointManager::SetNodeOrientation(uint32 entry, uint32 dbGuid, uint32 poi
         find->second.orientation = orientation;
 }
 
-/// return true if a valid scriptId is provided
+// return true if a valid scriptId is provided
 bool WaypointManager::SetNodeScriptId(uint32 entry, uint32 dbGuid, uint32 point, int32 pathId, WaypointPathOrigin wpOrigin, uint32 scriptId)
 {
     // Support only normal movement tables

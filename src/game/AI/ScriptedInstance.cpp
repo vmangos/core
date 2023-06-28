@@ -123,7 +123,7 @@ void ScriptedInstance::LoadSaveData(char const* pStr, uint32* encounters, uint32
 }
 
 
-/// Get the first found Player* (with requested properties) in the map. Can return nullptr.
+// Get the first found Player* (with requested properties) in the map. Can return nullptr.
 Player* ScriptedInstance::GetPlayerInMap(bool bOnlyAlive /*=false*/, bool bCanBeGamemaster /*=true*/)
 {
     Map::PlayerList const& lPlayers = instance->GetPlayers();
@@ -138,7 +138,7 @@ Player* ScriptedInstance::GetPlayerInMap(bool bOnlyAlive /*=false*/, bool bCanBe
     return nullptr;
 }
 
-/// Returns a pointer to a loaded GameObject that was stored in m_mGoEntryGuidStore. Can return nullptr
+// Returns a pointer to a loaded GameObject that was stored in m_mGoEntryGuidStore. Can return nullptr
 GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
 {
     EntryGuidMap::iterator find = m_mGoEntryGuidStore.find(uiEntry);
@@ -151,7 +151,7 @@ GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
     return nullptr;
 }
 
-/// Returns a pointer to a loaded Creature that was stored in m_mGoEntryGuidStore. Can return nullptr
+// Returns a pointer to a loaded Creature that was stored in m_mGoEntryGuidStore. Can return nullptr
 Creature* ScriptedInstance::GetSingleCreatureFromStorage(uint32 uiEntry, bool bSkipDebugLog /*=false*/)
 {
     EntryGuidMap::iterator find = m_mNpcEntryGuidStore.find(uiEntry);
@@ -271,7 +271,7 @@ void DialogueHelper::StartNextDialogueText(int32 iTextEntry)
     DoNextDialogueStep();
 }
 
-/// Internal helper function to do the actual say of a DialogueEntry
+// Internal helper function to do the actual say of a DialogueEntry
 void DialogueHelper::DoNextDialogueStep()
 {
     // Last Dialogue Entry done?
@@ -327,7 +327,7 @@ void DialogueHelper::DoNextDialogueStep()
         ++m_pCurrentEntryTwoSide;
 }
 
-/// Call this function within any DialogueUpdate method. This is required for saying next steps in a dialogue
+// Call this function within any DialogueUpdate method. This is required for saying next steps in a dialogue
 void DialogueHelper::DialogueUpdate(uint32 uiDiff)
 {
     if (m_uiTimer)
