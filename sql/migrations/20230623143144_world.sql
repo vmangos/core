@@ -109,6 +109,10 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 (135501, 4, 0, 19, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Ghilm - Set Equipment'),
 (135501, 7, 0, 41, 0, 0, 0, 0, 10837, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Ghilm - Remove Object');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Stranglethorn Tigress and Shadowmaw Panther Share Spawns
+UPDATE `creature` SET `id` = 684, `id2` = 772 WHERE `id` IN (684, 772);
+
 
 -- End of migration.
 END IF;
