@@ -11,7 +11,7 @@ INSERT INTO `migrations` VALUES ('20230628181319');
 
 -- Create new pool to hold Battered Footlocker spawns in Badlands.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(411, 1, 'Battered Footlockers in Badlands', 1, 10);
+(411, 6, 'Battered Footlockers in Badlands', 1, 10);
 -- Add existing spawns to pool.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (11454, 411, 0, 'Battered Footlocker', 1, 10),
