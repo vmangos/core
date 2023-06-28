@@ -113,6 +113,30 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 -- Stranglethorn Tigress and Shadowmaw Panther Share Spawns
 UPDATE `creature` SET `id` = 684, `id2` = 772 WHERE `id` IN (684, 772);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Align Guard Respawntime
+UPDATE `creature` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` IN (
+68, -- Stormwind City Guard
+727, -- Ironforge Mountaineer
+1423, -- Stormwind Guard
+1976, -- Stormwind City Patroller
+3084, -- Bluffwatcher
+3212, -- Brave Ironhorn
+3215, -- Brave Strongbash
+3217, -- Brave Dawneagle
+3218, -- Brave Swiftwind
+3219, -- Brave Leaping Deer
+3220, -- Brave Darksky
+3221, -- Brave Rockhorn
+3222, -- Brave Wildrunner
+3223, -- Brave Rainchaser
+3224, -- Brave Cloudmane
+3296, -- Orgrimmar Grunt
+5595, -- Ironforge Guard
+5624, -- Undercity Guardian
+12996, -- Mounted Ironforge Mountaineer
+13076); -- Dun Morogh Mountaineer
+
 
 -- End of migration.
 END IF;
