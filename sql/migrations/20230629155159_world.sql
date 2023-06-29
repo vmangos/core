@@ -105,6 +105,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (30613, 456, 0, 'Mossy Footlocker', 1, 10), -- Mossy Footlockers in Sunken Temple
 (30614, 456, 0, 'Mossy Footlocker', 1, 10); -- Mossy Footlockers in Sunken Temple
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 179493;
+
 
 -- End of migration.
 END IF;
