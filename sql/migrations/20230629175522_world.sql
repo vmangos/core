@@ -61,6 +61,21 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE
 
 UPDATE `pool_template` SET `max_limit` = 9, `description`='Scarlet Footlockers In Eastern Plaguelands' WHERE  `entry`=3011;
 
+-- Correct position of Blood of Heroes in Tirisfal Glades (position is off by 9.91821e-05 yards).
+UPDATE `gameobject` SET `position_x`=1645.17, `position_y`=-710.922, `position_z`=55.3112, `orientation`=0.471238, `rotation0`=0, `rotation1`=0, `rotation2`=0.233445, `rotation3`=0.97237 WHERE `guid`=25931;
+
+-- Correct position of Blood of Heroes in Eastern Plaguelands (position is off by 0.00976563 yards).
+UPDATE `gameobject` SET `position_x`=1832.91, `position_y`=-4374.05, `position_z`=98.3339, `orientation`=5.75959, `rotation0`=0, `rotation1`=0, `rotation2`=-0.258819, `rotation3`=0.965926 WHERE `guid`=25956;
+
+-- Correct position of Blood of Heroes in Eastern Plaguelands (position is off by 0.0102539 yards).
+UPDATE `gameobject` SET `position_x`=2494.31, `position_y`=-5134.03, `position_z`=75.2775, `orientation`=3.9619, `rotation0`=0, `rotation1`=0, `rotation2`=-0.91706, `rotation3`=0.39875 WHERE `guid`=25995;
+
+-- Correct position of Blood of Heroes in Eastern Plaguelands (position is off by 0.000100136 yards).
+UPDATE `gameobject` SET `position_x`=1987.43, `position_y`=-4193.23, `position_z`=11.9174, `orientation`=2.11185, `rotation0`=0, `rotation1`=0, `rotation2`=0.870356, `rotation3`=0.492424 WHERE `guid`=25973;
+
+-- Correct position of Blood of Heroes in Eastern Plaguelands (position is off by 0.0102539 yards).
+UPDATE `gameobject` SET `position_x`=1748.16, `position_y`=-4453.14, `position_z`=74.2627, `orientation`=4.2237, `rotation0`=0, `rotation1`=0, `rotation2`=-0.857167, `rotation3`=0.515038 WHERE `guid`=25944;
+
 
 -- End of migration.
 END IF;
