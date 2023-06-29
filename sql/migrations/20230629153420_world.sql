@@ -75,6 +75,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (10240, 514, 0, 'Dented Footlocker', 1, 10), -- Dented Footlockers in Searing Gorge
 (7082, 514, 0, 'Dented Footlocker', 1, 10); -- Dented Footlockers in Searing Gorge
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 179494;
 
 -- End of migration.
 END IF;
