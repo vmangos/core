@@ -41,6 +41,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (11513, 416, 0, 'Dented Footlocker', 1, 10), -- Dented Footlockers in Badlands
 (11514, 416, 0, 'Dented Footlocker', 1, 10); -- Dented Footlockers in Badlands
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 179492;
+
 
 -- End of migration.
 END IF;
