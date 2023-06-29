@@ -85,6 +85,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (48472, 458, 0, 'Mossy Footlocker', 1, 10), -- Mossy Footlockers in Azshara
 (48484, 458, 0, 'Mossy Footlocker', 1, 10); -- Mossy Footlockers in Azshara
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 179497;
+
 
 -- End of migration.
 END IF;
