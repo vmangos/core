@@ -154,8 +154,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (31991, 177784, 1, -367.808, 2851.08, -20.9613, 3.75246, 0, 0, -0.953716, 0.300708, 120, 120, 1, 100, 0, 10), -- Closest existing guid is 31988 at 90.703789 yards.
 (31986, 177784, 1, -421.403, 2883.82, -26.2859, 4.81711, 0, 0, -0.66913, 0.743145, 120, 120, 1, 100, 0, 10); -- Closest existing guid is 31982 at 96.392052 yards.
 
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 177784;
-
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` IN (177784, 19018, 2744);
 UPDATE `pool_template` SET `max_limit`=6 WHERE  `entry`=1343;
 UPDATE `pool_template` SET `max_limit`=18 WHERE  `entry`=1344;
 UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=1345;
