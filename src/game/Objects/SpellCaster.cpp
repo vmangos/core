@@ -911,8 +911,13 @@ float SpellCaster::CalculateSpellEffectValue(Unit const* target, SpellEntry cons
         spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
         spellProto->Effect[effect_index] != SPELL_EFFECT_KNOCK_BACK &&
         (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
-        value = value * 0.25f * exp(GetLevel() * (70 - spellProto->spellLevel) / 1000.0f);
-
+    {
+        CreatureClassLevelStats const* pCLS = sObjectMgr.GetCreatureClassLevelStats(1, GetLevel());
+        float CLSPowerCreature = pCLS->melee_damage;
+        CreatureClassLevelStats const* spellCLS = sObjectMgr.GetCreatureClassLevelStats(1, spellProto->spellLevel);
+        float CLSPowerSpell = spellCLS->melee_damage;
+        value = value * (CLSPowerCreature / CLSPowerSpell);
+    }
     return value;
 }
 
