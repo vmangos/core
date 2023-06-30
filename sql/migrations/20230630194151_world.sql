@@ -50,6 +50,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (32493, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
 (32509, 9, 0, 'Hidden Strongbox', 0, 10); -- Hidden Strongboxs in Alterac Mountains
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 2039;
+
 
 -- End of migration.
 END IF;
