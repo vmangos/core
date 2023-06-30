@@ -266,6 +266,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (49631, 20028, 0, 'Battered Chest', 0, 10); -- Battered Chests (106318) - Teldrassil - The Oracle Glade
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 2850;
+
 
 -- End of migration.
 END IF;
