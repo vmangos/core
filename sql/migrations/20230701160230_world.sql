@@ -258,6 +258,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (40741, 36, 0, 'Battered Chest', 0, 10), -- Battered Chests in Stonetalon Mountains
 (40744, 36, 0, 'Battered Chest', 0, 10); -- Battered Chests in Stonetalon Mountains
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 2849;
 
 
 -- End of migration.
