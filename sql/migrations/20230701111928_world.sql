@@ -235,6 +235,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (17463, 30, 0, 'Solid Chest', 0, 10), -- Solid Chests in Tanaris
 (17466, 30, 0, 'Solid Chest', 0, 10); -- Solid Chests in Tanaris
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 4149;
+
 
 -- End of migration.
 END IF;
