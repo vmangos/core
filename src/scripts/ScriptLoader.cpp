@@ -54,15 +54,12 @@ void AddSC_boss_magmus();
 void AddSC_boss_tomb_of_seven();
 void AddSC_boss_urok();
 void AddSC_instance_blackrock_depths();
-void AddSC_boss_drakkisath();                        //blackrock_spire
 void AddSC_boss_halycon();
 void AddSC_boss_highlordomokk();
-//void AddSC_boss_mothersmolderweb();
 void AddSC_boss_overlordwyrmthalak();
 void AddSC_boss_shadowvosh();
 void AddSC_boss_thebeast();
 void AddSC_boss_warmastervoone();
-void AddSC_boss_pyroguard_emberseer();
 void AddSC_boss_razorgore();                         //blackwing_lair
 void AddSC_boss_vael();
 void AddSC_boss_broodlord();
@@ -193,7 +190,6 @@ void AddSC_instance_blackfathom_deeps();             //blackfathom_deeps
 void AddSC_boss_celebras_the_cursed();               //maraudon
 void AddSC_boss_landslide();
 void AddSC_boss_noxxion();
-void AddSC_maraudon();
 void AddSC_instance_maraudon();
 void AddSC_instance_onyxia_lair();
 void AddSC_boss_onyxia();                            //onyxias_lair
@@ -206,7 +202,6 @@ void AddSC_boss_buru();
 void AddSC_boss_kurinnaxx();
 void AddSC_boss_moam();
 void AddSC_boss_ossirian();
-void AddSC_boss_rajaxx();
 void AddSC_ruins_of_ahnqiraj();
 void AddSC_instance_ruins_of_ahnqiraj();
 void AddSC_boss_cthun();                             //temple_of_ahnqiraj
@@ -299,17 +294,14 @@ void AddScripts()
     AddSC_boss_tomb_of_seven();
     AddSC_boss_urok();
     AddSC_instance_blackrock_depths();
-    AddSC_boss_drakkisath();                                //blackrock_spire
     AddSC_boss_halycon();
     AddSC_boss_highlordomokk();
-    //AddSC_boss_mothersmolderweb();
     AddSC_boss_overlordwyrmthalak();
     AddSC_boss_shadowvosh();
     AddSC_boss_thebeast();
     AddSC_boss_warmastervoone();
 
     AddSC_instance_blackrock_spire();
-    AddSC_boss_pyroguard_emberseer();
     AddSC_boss_razorgore();                                 //blackwing_lair
     AddSC_boss_vael();
     AddSC_boss_broodlord();
@@ -437,7 +429,6 @@ void AddScripts()
     AddSC_boss_celebras_the_cursed();                       //maraudon
     AddSC_boss_landslide();
     AddSC_boss_noxxion();
-    AddSC_maraudon();
     AddSC_instance_maraudon();
     AddSC_instance_onyxia_lair();
     AddSC_boss_onyxia();                                    //onyxias_lair
@@ -450,7 +441,6 @@ void AddScripts()
     AddSC_boss_kurinnaxx();
     AddSC_boss_moam();
     AddSC_boss_ossirian();
-    AddSC_boss_rajaxx();
     AddSC_ruins_of_ahnqiraj();
     AddSC_instance_ruins_of_ahnqiraj();
     AddSC_boss_cthun();                                     //temple_of_ahnqiraj

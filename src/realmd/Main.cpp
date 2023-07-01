@@ -92,6 +92,8 @@ void usage(const char *prog)
         ,prog);
 }
 
+char const* g_mainLogFileName = "Realmd.log";
+
 /// Launch the realm server
 extern int main(int argc, char **argv)
 {

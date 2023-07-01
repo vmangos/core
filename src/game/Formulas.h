@@ -110,7 +110,6 @@ namespace MaNGOS
 
             if (pCreature->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
                 return 0;
-
             
             uint32 ownerLevel = pUnit->GetLevel();
             uint32 unitLevel = pUnit->GetLevel();

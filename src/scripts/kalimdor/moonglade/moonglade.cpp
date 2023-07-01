@@ -21,64 +21,7 @@
  SDCategory: Moonglade
  EndScriptData */
 
-/* ContentData
- npc_great_bear_spirit
- EndContentData */
-
 #include "scriptPCH.h"
-
-/*######
- ## npc_great_bear_spirit
- ######*/
-
-enum
-{
-    GOSSIP_BEAR1 = 7439,
-    GOSSIP_BEAR2 = 7442,
-    GOSSIP_BEAR3 = 7444,
-    GOSSIP_BEAR4 = 7446,
-};
-
-bool GossipHello_npc_great_bear_spirit(Player* pPlayer, Creature* pCreature)
-{
-    //ally or horde quest
-    if (pPlayer->GetQuestStatus(5929) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(5930) == QUEST_STATUS_INCOMPLETE)
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BEAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        pPlayer->SEND_GOSSIP_MENU(4719, pCreature->GetGUID());
-    }
-    else
-        pPlayer->SEND_GOSSIP_MENU(4718, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_great_bear_spirit(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BEAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            pPlayer->SEND_GOSSIP_MENU(4721, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF + 1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BEAR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(4733, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF + 2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BEAR4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(4734, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF + 3:
-            pPlayer->SEND_GOSSIP_MENU(4735, pCreature->GetGUID());
-            if (pPlayer->GetQuestStatus(5929) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->AreaExploredOrEventHappens(5929);
-            if (pPlayer->GetQuestStatus(5930) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->AreaExploredOrEventHappens(5930);
-            break;
-    }
-    return true;
-}
 
 /*######
  ## npc_keeper_remulos
@@ -1397,12 +1340,6 @@ CreatureAI* GetAI_boss_eranikus(Creature* pCreature)
 void AddSC_moonglade()
 {
     Script* pNewScript;
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_great_bear_spirit";
-    pNewScript->pGossipHello =  &GossipHello_npc_great_bear_spirit;
-    pNewScript->pGossipSelect = &GossipSelect_npc_great_bear_spirit;
-    pNewScript->RegisterSelf();
 
     pNewScript = new Script;
     pNewScript->Name = "npc_keeper_remulos";

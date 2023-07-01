@@ -205,8 +205,19 @@ bool Group::LoadMemberFromDB(uint32 guidLow, uint8 subgroup, bool assistant)
     if (!data)
         return false;
 
+    ObjectGuid guid = ObjectGuid(HIGHGUID_PLAYER, guidLow);
+
+    for (auto const& itr : m_memberSlots)
+    {
+        if (itr.guid == guid)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to add duplicate member into group on load.");
+            return false;
+        }
+    }
+
     MemberSlot member;
-    member.guid      = ObjectGuid(HIGHGUID_PLAYER, guidLow);
+    member.guid      = guid;
     member.name      = data->sName;
     member.group     = subgroup;
     member.assistant = assistant;
@@ -516,7 +527,7 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
     }
     // if group before remove <= 2 disband it
     else
-        Disband(true);
+        Disband(true, guid);
 
     return m_memberSlots.size();
 }
@@ -535,9 +546,10 @@ void Group::ChangeLeader(ObjectGuid guid)
     SendUpdate();
 }
 
-void Group::Disband(bool hideDestroy)
+void Group::Disband(bool hideDestroy, ObjectGuid initiator)
 {
     Player* player;
+    Player* remainingPlayer = nullptr;
 
     for (const auto& itr : m_memberSlots)
     {
@@ -590,7 +602,11 @@ void Group::Disband(bool hideDestroy)
                 player->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
         }
 
-        _homebindIfInstance(player);
+        // only the person who initiated the disband should be kicked from instance, as he left by choice
+        if (initiator.IsEmpty() || initiator == player->GetObjectGuid())
+            _homebindIfInstance(player);
+        else
+            remainingPlayer = player;
     }
 
     if (IsInLFG())
@@ -601,7 +617,8 @@ void Group::Disband(bool hideDestroy)
         });
     }
 
-    RollId.clear();
+    for (auto itr = RollId.begin(); itr != RollId.end(); itr = RollId.begin())
+        CountTheRoll(itr);
     m_memberSlots.clear();
 
     RemoveAllInvites();
@@ -612,6 +629,22 @@ void Group::Disband(bool hideDestroy)
         CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `group_id`='%u'", m_Id);
         CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `group_id`='%u'", m_Id);
         CharacterDatabase.CommitTransaction();
+
+        // transfer instance save to last player in dungeon
+        if (remainingPlayer)
+        {
+            BoundInstancesMap::iterator itr = m_boundInstances.find(remainingPlayer->GetMapId());
+            if (itr != m_boundInstances.end() && !itr->second.perm &&
+                !remainingPlayer->GetBoundInstance(remainingPlayer->GetMapId()))
+            {
+                remainingPlayer->BindToInstance(itr->second.state, itr->second.perm, false);
+                CharacterDatabase.PExecute("DELETE FROM `group_instance` WHERE `leader_guid` = '%u' AND `instance` = '%u'",
+                    GetLeaderGuid().GetCounter(), itr->second.state->GetInstanceId());
+                itr->second.state->RemoveGroup(this);               // save can become invalid
+                m_boundInstances.erase(itr);
+            }
+        }
+
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, nullptr);
     }
 
@@ -927,8 +960,8 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     if (itr == roll->playerVote.end())
         return true;                                        // result used for need iterator ++, so avoid for end of list
 
-    if (roll->getLoot())
-        if (roll->getLoot()->items.empty())
+    if (Loot* pLoot = roll->getLoot())
+        if (pLoot->items.empty())
             return false;
 
     switch (vote)
@@ -1319,12 +1352,15 @@ void Group::SendUpdate()
         Player* player = sObjectMgr.GetPlayer(citr->guid);
         if (!player || !player->GetSession() || player->GetGroup() != this)
             continue;
+
         // guess size
         WorldPacket data(SMSG_GROUP_LIST, (1 + 1 + 1 + 4 + GetMembersCount() * 20) + 8 + 1 + 8 + 1);
         data << (uint8)m_groupType;                         // group type
         data << (uint8)(citr->group | (citr->assistant ? 0x80 : 0)); // own flags (groupid | (assistant?0x80:0))
 
-        data << uint32(GetMembersCount() - 1);
+        uint32 count = 0;
+        size_t countPos = data.wpos();
+        data << uint32(0);
         for (const auto& itr : m_memberSlots)
         {
             if (citr->guid == itr.guid)
@@ -1334,10 +1370,12 @@ void Group::SendUpdate()
             data << itr.guid;
             data << uint8(GetGroupMemberStatus(sObjectMgr.GetPlayer(itr.guid)));
             data << (uint8)(itr.group | (itr.assistant ? 0x80 : 0));
+            count++;
         }
+        data.put<uint32>(countPos, count);
 
         data << m_leaderGuid;                               // leader guid
-        if (GetMembersCount() - 1)
+        if (count)
         {
             data << uint8(m_lootMethod);                    // loot method
             if (GetLootMethod() == MASTER_LOOT)
@@ -1482,6 +1520,15 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
 
     if (!guid)
         return false;
+
+    for (auto const& itr : m_memberSlots)
+    {
+        if (itr.guid == guid)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to add duplicate member into group.");
+            return false;
+        }
+    }
 
     Player* player = sObjectMgr.GetPlayer(guid);
 

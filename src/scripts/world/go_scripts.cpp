@@ -113,6 +113,7 @@ enum BellHourlySoundFX
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
+    LIGHTHOUSEFOGHORN  = 7197  // Lighthouses
 };
 
 enum BellHourlySoundZones
@@ -125,30 +126,36 @@ enum BellHourlySoundZones
     IRONFORGE_ZONE           = 1537,
     TELDRASSIL_ZONE          = 141,
     DARNASSUS_ZONE           = 1657,
-    ASHENVALE_ZONE           = 331,
+    ASHENVALE_ZONE           = 331
+};
+
+enum LightHouseAreas
+{
+    AREA_THERAMORE           = 513,
+    AREA_ALCAZ_ISLAND        = 2079,
+    AREA_WESTFALL_LIGHTHOUSE = 115
 };
 
 enum BellHourlyObjects
 {
     // bell gameobjects
     GO_HORDE_BELL = 175885,
-    GO_ALLIANCE_BELL = 176573,
+    GO_ALLIANCE_BELL = 176573 // Also used for lighthouse spawns
 };
 
 enum BellHourlyMisc
 {
     GAME_EVENT_HOURLY_BELLS = 78,
     EVENT_RING_BELL = 1,
-    EVENT_RESET = 2,
-    EVENT_TIME = 3
+    EVENT_TIME = 2
 };
 
 struct go_bells : public GameObjectAI
 {
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
-        uint32 zoneId = me->GetZoneId();
 
+        uint32 zoneId = me->GetZoneId();
         switch (me->GetEntry())
         {
             case GO_HORDE_BELL:
@@ -169,6 +176,12 @@ struct go_bells : public GameObjectAI
             }
             case GO_ALLIANCE_BELL:
             {
+                if (isLightHouseObject())
+                {
+                    _soundId = LIGHTHOUSEFOGHORN;
+                    return;
+                }
+
                 switch (zoneId)
                 {
                     case IRONFORGE_ZONE:
@@ -189,6 +202,25 @@ struct go_bells : public GameObjectAI
         default:
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "go_bells() called with invalid object, ID: %u", me->GetEntry());
         }
+    }
+
+    bool isLightHouseObject()
+    {
+        switch (me->GetAreaId())
+        {
+            case AREA_THERAMORE:
+            {
+                // Area is not precise enough here, since there also is an alliance bell spawn
+                // in the same area. Check if location is close to lighthouse:
+                return me->GetDistance(-3667.0f, -4754.0f, 1.8f) < 1;
+            }
+            case AREA_ALCAZ_ISLAND:
+            case AREA_WESTFALL_LIGHTHOUSE:
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     void UpdateAI(uint32 const diff) override
@@ -213,10 +245,17 @@ struct go_bells : public GameObjectAI
                     time(&rawtime);
                     struct tm * timeinfo = localtime(&rawtime);
                     uint8 _rings = (timeinfo->tm_hour) % 12;
-                    if (_rings == 0) // 00:00 and 12:00
+                    _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
+
+                    // Only play once: Dwarf horn and Lighthouse
+                    // On official servers, this sound is played once very two minutes.
+                    // This would require a additional event with a 2 minute timer.
+                    // For now, play the correct sound at least once every hour.
+                    if (_soundId == BELLTOLLDWARFGNOME || _soundId == LIGHTHOUSEFOGHORN)
                     {
-                        _rings = 12;
+                        _rings = 1;
                     }
+
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
                         m_events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
@@ -397,6 +436,39 @@ GameObjectAI* GetAI_go_lunar_festival_firecracker(GameObject* gameobject)
     return new go_lunar_festival_firecracker(gameobject);
 }
 
+/*####
+## go_containment_coffer
+####*/
+
+struct go_containment_coffer : public GameObjectAI
+{
+    go_containment_coffer(GameObject* gobj) : GameObjectAI(gobj)
+    {
+        m_despawnTimer = 20000;
+    }
+
+    uint32 m_despawnTimer;
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (!m_despawnTimer)
+            return;
+
+        if (m_despawnTimer <= diff)
+        {
+            me->Despawn();
+            m_despawnTimer = 0;
+        }
+        else
+            m_despawnTimer -= diff;
+    }
+};
+
+GameObjectAI* GetAI_go_containment_coffer(GameObject* gameobject)
+{
+    return new go_containment_coffer(gameobject);
+}
+
 void AddSC_go_scripts()
 {
     Script* newscript;
@@ -439,5 +511,10 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_firework_rocket";
     newscript->GOGetAI = &GetAI_go_firework_rocket;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_containment_coffer";
+    newscript->GOGetAI = &GetAI_go_containment_coffer;
     newscript->RegisterSelf();
 }

@@ -23,6 +23,7 @@
 #define _OBJECT_H
 
 #include "Common.h"
+#include "Log.h"
 #include "ByteBuffer.h"
 #include "UpdateFields.h"
 #include "UpdateData.h"
@@ -34,7 +35,6 @@
 #include "Timer.h"
 #include "Camera.h"
 #include "Cell.h"
-
 #include <string>
 
 class WorldPacket;
@@ -130,6 +130,64 @@ enum MovementFlags
     // this is to avoid that a jumping character that stands still triggers melee-leeway
     MOVEFLAG_MASK_XZ = MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD | MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT
 };
+
+static char const* MoveFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case MOVEFLAG_NONE:
+            return "None";
+        case MOVEFLAG_FORWARD:
+            return "Forward";
+        case MOVEFLAG_BACKWARD:
+            return "Backward";
+        case MOVEFLAG_STRAFE_LEFT:
+            return "Strafe Left";
+        case MOVEFLAG_STRAFE_RIGHT:
+            return "Strafe Right";
+        case MOVEFLAG_TURN_LEFT:
+            return "Turn Left";
+        case MOVEFLAG_TURN_RIGHT:
+            return "Turn Right";
+        case MOVEFLAG_PITCH_UP:
+            return "Pitch Up";
+        case MOVEFLAG_PITCH_DOWN:
+            return "Pitch Down";
+        case MOVEFLAG_WALK_MODE:
+            return "Walk Mode";
+        case MOVEFLAG_LEVITATING:
+            return "Levitating";
+        case MOVEFLAG_FIXED_Z:
+            return "Fixed Z";
+        case MOVEFLAG_ROOT:
+            return "Root";
+        case MOVEFLAG_JUMPING:
+            return "Jumping";
+        case MOVEFLAG_FALLINGFAR:
+            return "Falling Far";
+        case MOVEFLAG_SWIMMING:
+            return "Swimming";
+        case MOVEFLAG_SPLINE_ENABLED:
+            return "Spline Enabled";
+        case MOVEFLAG_CAN_FLY:
+            return "Can Fly";
+        case MOVEFLAG_FLYING:
+            return "Flying";
+        case MOVEFLAG_ONTRANSPORT:
+            return "On Transport";
+        case MOVEFLAG_SPLINE_ELEVATION:
+            return "Spline Elevation";
+        case MOVEFLAG_WATERWALKING:
+            return "Water Walking";
+        case MOVEFLAG_SAFE_FALL:
+            return "Safe Fall";
+        case MOVEFLAG_HOVER:
+            return "Hover";
+        case MOVEFLAG_INTERNAL:
+            return "Internal";
+    }
+    return "UNKNOWN";
+}
 
 // used in SMSG_MONSTER_MOVE
 enum SplineFlags
@@ -692,9 +750,7 @@ class WorldObject : public Object
 
         InstanceData* GetInstanceData() const;
 
-        char const* GetName() const { return m_name.c_str(); }
-        void SetName(std::string const& newname) { m_name=newname; }
-
+        virtual char const* GetName() const = 0;
         virtual char const* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
         virtual uint8 GetGender() const { return 0; } // used in chat builder
 
@@ -811,7 +867,7 @@ class WorldObject : public Object
 
         virtual void SendMessageToSetInRange(WorldPacket* data, float dist, bool self) const;
         void SendMessageToSetExcept(WorldPacket* data, Player const* skipped_receiver) const;
-        void DirectSendPublicValueUpdate(uint32 index);
+        void DirectSendPublicValueUpdate(uint32 index, uint32 count = 1);
 
         void PlayDistanceSound(uint32 sound_id, Player const* target = nullptr) const;
         void PlayDirectSound(uint32 sound_id, Player const* target = nullptr) const;
@@ -876,6 +932,7 @@ class WorldObject : public Object
 
         //obtain terrain data for map where this object belong...
         TerrainInfo const* GetTerrain() const;
+        bool HasMMapsForCurrentMap() const;
 
         void SetZoneScript();
         ZoneScript* GetZoneScript() const { return m_zoneScript; }
@@ -939,7 +996,6 @@ class WorldObject : public Object
     protected:
         explicit WorldObject();
 
-        std::string m_name;
         ZoneScript* m_zoneScript;
         bool m_isActiveObject;
         // Extra visibility distance for this unit, only used if it is an active object.

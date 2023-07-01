@@ -137,6 +137,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_UNREACHABLE_EVADE         = 0x04000000, // 67108864 Creature will not evade due to target being unreachable
     CREATURE_FLAG_EXTRA_APPEAR_DEAD                  = 0x08000000, // 134217728 Creature will have UNIT_DYNFLAG_DEAD applied
     CREATURE_FLAG_EXTRA_NO_LEASH_EVADE               = 0x10000000, // 268435456 Creature will not evade due to target running away
+    CREATURE_FLAG_EXTRA_DESPAWN_INSTANTLY            = 0x20000000, // 536870912 CREATURE_STATIC_FLAG_DESPAWN_INSTANTLY (despawn on death)
 };
 
 // Number of spells in one template
@@ -271,7 +272,7 @@ struct EquipmentInfo
     uint32  equipentry[3];
 };
 
-#define MAX_CREATURE_IDS_PER_SPAWN 4
+#define MAX_CREATURE_IDS_PER_SPAWN 5
 
 // from `creature` table
 struct CreatureData
@@ -455,6 +456,7 @@ enum CreatureStateFlag : uint16
     CSTATE_DESPAWNING            = 0x0100,
     CSTATE_TARGETED_EMOTE        = 0x0200,
     CSTATE_IMPOSED_COOLDOWN      = 0x0400,
+    CSTATE_INIT_AI_ON_UPDATE     = 0x0800,
 };
 
 // Vendors
@@ -548,7 +550,7 @@ struct TrainerSpellData
 // max different by z coordinate for creature aggro reaction
 #define CREATURE_Z_ATTACK_RANGE 3
 
-#define MAX_VENDOR_ITEMS 255                                // Limitation in item count field size in SMSG_LIST_INVENTORY
+#define MAX_VENDOR_ITEMS 128                                // Limitation in item count field size in SMSG_LIST_INVENTORY
 
 enum VirtualItemSlot
 {
@@ -585,5 +587,7 @@ enum TemporaryFactionFlags                                  // Used at real fact
     TEMPFACTION_RESTORE_REACH_HOME      = 0x04,             // ... at reaching home in home movement (evade), if not already done at CombatStop()
     TEMPFACTION_ALL,
 };
+
+#define MAX_LEVEL_DIFF_FOR_AGGRO_RANGE 25
 
 #endif

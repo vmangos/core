@@ -127,7 +127,6 @@ typedef off_t ACE_OFF_T;
 #  define I64FMT "%016I64X"
 //#  define snprintf _snprintf
 #  define vsnprintf _vsnprintf
-#  define finite(X) _finite(X)
 
 #else
 
@@ -151,7 +150,7 @@ typedef off_t ACE_OFF_T;
 
 #define SIZEFMTD ACE_SIZE_T_FORMAT_SPECIFIER
 
-inline float finiteAlways(float f) { return finite(f) ? f : 0.0f; }
+inline float finiteAlways(float f) { return std::isfinite(f) ? f : 0.0f; }
 
 #define atol(a) strtoul(a, nullptr, 10)
 
@@ -208,15 +207,18 @@ enum RealmFlags
 // Index returned by GetSessionDbcLocale.
 enum LocaleConstant
 {
-    LOCALE_enUS = 0,   // also enGB
+    LOCALE_enUS = 0, // also enGB
     LOCALE_koKR = 1,
     LOCALE_frFR = 2,
     LOCALE_deDE = 3,
     LOCALE_zhCN = 4,
     LOCALE_zhTW = 5,
     LOCALE_esES = 6,
-    LOCALE_esMX = 7,
-    LOCALE_ruRU = 8    // not in vanilla                             
+
+    // no official vanilla clients for these exist
+    // the locale strings first appear in the binary in 2.2.0
+    LOCALE_esMX = 7, // unused text column exists for this index in dbc files
+    LOCALE_ruRU = 8  // did not exist in any way, but has fan made client now (english texts replaced with russian)
 };
 
 // Index returned by GetSessionDbLocaleIndex.

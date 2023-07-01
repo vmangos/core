@@ -298,26 +298,13 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (_player->GetTypeId() == TYPEID_PLAYER)
+    // not have spell in spellbook or spell passive and not casted by client
+    if (!_player->HasActiveSpell(spellId) || spellInfo->IsPassiveSpell())
     {
-        // not have spell in spellbook or spell passive and not casted by client
-        if (!_player->HasActiveSpell(spellId) || spellInfo->IsPassiveSpell())
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "World: Player %u casts spell %u which he shouldn't have", _player->GetGUIDLow(), spellId);
-            //cheater? kick? ban?
-            recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
-            return;
-        }
-    }
-    else if (_player->GetTypeId() == TYPEID_UNIT)
-    {
-        // not have spell in spellbook or spell passive and not casted by client
-        if (!_player->HasSpell(spellId) || spellInfo->IsPassiveSpell())
-        {
-            //cheater? kick? ban?
-            recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
-            return;
-        }
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "World: Player %u casts spell %u which he shouldn't have", _player->GetGUIDLow(), spellId);
+        //cheater? kick? ban?
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
+        return;
     }
 
     // client provided targets
@@ -353,10 +340,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
             DoLootRelease(lootGuid);
     }
-
-    _player->m_castingSpell = spellId;
-    if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-        _player->m_castingSpell = _player->GetComboPoints();
 
     Spell* spell = new Spell(_player, spellInfo, false, ObjectGuid(), nullptr, targets.getUnitTarget());
 
@@ -399,7 +382,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     if (!spellInfo)
         return;
 
-    if (spellInfo->Attributes & SPELL_ATTR_CANT_CANCEL)
+    if (spellInfo->Attributes & SPELL_ATTR_NO_AURA_CANCEL)
         return;
 
     if (spellInfo->IsPassiveSpell())
@@ -428,18 +411,6 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         }
         else
             return;
-    }
-
-    // prevent last relocation opcode handling: CancelAura is handled before Mover is changed
-    // thus the last movement data is written into pMover, that should not happen
-    for (uint32 i : spellInfo->Effect)
-    {
-        // Eye of Kilrogg case
-        if (i == SPELL_EFFECT_SUMMON_POSSESSED)
-        {
-            _player->SetNextRelocationsIgnoredCount(1);
-            break;
-        }
     }
 
     // channeled spell case (it currently casted then)

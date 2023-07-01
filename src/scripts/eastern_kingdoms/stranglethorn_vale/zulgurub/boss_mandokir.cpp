@@ -139,7 +139,7 @@ struct boss_mandokirAI : public ScriptedAI
     ObjectGuid m_uiRaptorGUID;
     ObjectGuid m_uiChargedPlayerGUID;
 
-    bool m_VilebranchDead;
+    bool m_VilebranchDead = false;
 
     float m_fTargetX, m_fTargetY;
     uint64 m_uiWatchTarget;

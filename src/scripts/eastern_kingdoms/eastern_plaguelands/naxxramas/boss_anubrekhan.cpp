@@ -409,12 +409,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                     m_creature->SetTargetGuid(target->GetObjectGuid());
                     m_uiRestoreTargetTimer = 1000;
                     m_uiImpaleTimer = IMPALE_CD();
-
-                    if (Creature* pC = m_creature->SummonCreature(533003, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(target),
-                        TEMPSUMMON_TIMED_DESPAWN, 4000))
-                    {
-                        pC->CastSpell(pC, SPELL_IMPALE, true);
-                    }
+                    DoCastSpellIfCan(target, SPELL_IMPALE);
                 }
             }
             else
@@ -443,7 +438,7 @@ struct boss_anubrekhanAI : public ScriptedAI
             }
 
             // Reset cd and summon a new crypt guard at the initial possition of anub'rekhan on successfull cast
-            if (DoCastSpellIfCan(m_creature, SPELL_LOCUSTSWARM) == CanCastResult::CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_LOCUSTSWARM) == SpellCastResult::SPELL_CAST_OK)
             {
                 m_uiLocustSwarmTimer = LOCUST_SWARM_CD(false);
                 if (Creature* pCryptGuard = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[2][0], CGs[2][1], CGs[2][2], CGs[2][3],
@@ -506,7 +501,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         // Crypt guards enrage at 50%
         if (!isEnraged && m_creature->GetHealthPercent() <= 50.0f)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_ENRAGE) == CanCastResult::CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_ENRAGE) == SpellCastResult::SPELL_CAST_OK)
             {
                 DoScriptText(EMOTE_GENERIC_ENRAGE, m_creature);
                 isEnraged = true;
@@ -515,7 +510,7 @@ struct mob_cryptguardsAI : public ScriptedAI
 
         if (webTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_WEB) == CanCastResult::CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_WEB) == SpellCastResult::SPELL_CAST_OK)
             {
                 DoResetThreat();
                 webTimer = CRYPTGUARD_WEB_CD;
@@ -528,7 +523,7 @@ struct mob_cryptguardsAI : public ScriptedAI
 
         if (cleaveTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_CLEAVE) == CanCastResult::CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_CLEAVE) == SpellCastResult::SPELL_CAST_OK)
             {
                 cleaveTimer = CRYPTGUARD_CLEAVE_CD;
             }
@@ -540,7 +535,7 @@ struct mob_cryptguardsAI : public ScriptedAI
 
         if (acidSpitTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_ACID) == CanCastResult::CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_ACID) == SpellCastResult::SPELL_CAST_OK)
             {
                 acidSpitTimer = CRYPTGUARD_ACID_CD;
             }

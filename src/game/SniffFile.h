@@ -23,7 +23,7 @@
 
 struct LoggedPacket
 {
-    LoggedPacket(bool isClientPacket_, WorldPacket& packet) : isClientPacket(isClientPacket_), data(packet), timestamp(time(nullptr))
+    LoggedPacket(bool isClientPacket_, WorldPacket const& packet) : isClientPacket(isClientPacket_), data(packet), timestamp(time(nullptr))
     {
         if (!isClientPacket && !data.GetPacketTime())
             data.FillPacketTime(WorldTimer::getMSTime());
@@ -40,15 +40,19 @@ public:
     SniffFile(char const* fileName);
     ~SniffFile();
 
-    static void WriteHeader(FILE* pFile);
-    static void WritePacket(FILE* pFile, LoggedPacket const& packet);
+    void WriteHeader();
+    void WritePacket(LoggedPacket const& packet)
+    {
+        WritePacket(packet.data, packet.isClientPacket, packet.timestamp);
+    }
+    void WritePacket(WorldPacket const& packet, bool isClientPacket, time_t timestamp);
 
     template < template < class ... > class Container, class ... Args >
     void WriteToFile(Container<LoggedPacket, Args...> const& container)
     {
-        WriteHeader(m_file);
+        WriteHeader();
         for (auto const itr : container)
-            WritePacket(m_file, itr);
+            WritePacket(itr);
     }
 private:
     FILE* m_file;

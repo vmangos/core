@@ -11,6 +11,14 @@
 #include <deque>
 #include <mutex>
 
+enum TurnType
+{
+    TURN_NONE,
+    TURN_MOUSE,
+    TURN_KEYBOARD,
+    TURN_ABNORMAL
+};
+
 enum CheatType
 {
     CHEAT_TYPE_TIME_BACK,
@@ -26,6 +34,7 @@ enum CheatType
     CHEAT_TYPE_PVE_FLYHACK,
     CHEAT_TYPE_FLY_HACK_SWIM,
     CHEAT_TYPE_NO_FALL_TIME,
+    CHEAT_TYPE_BAD_FALL_RESET,
     CHEAT_TYPE_TELEPORT,
     CHEAT_TYPE_TELEPORT_TRANSPORT,
     CHEAT_TYPE_FAKE_TRANSPORT,
@@ -40,6 +49,7 @@ enum CheatType
     CHEAT_TYPE_EXPLORE,
     CHEAT_TYPE_EXPLORE_HIGH_LEVEL,
     CHEAT_TYPE_FORBIDDEN_AREA,
+    CHEAT_TYPE_BOTTING,
     CHEATS_COUNT
 };
 
@@ -73,7 +83,8 @@ class MovementAnticheat
         uint32 HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         uint32 HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         bool HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId);
-        void LogMovementPacket(bool isClientPacket, WorldPacket& packet);
+        void LogMovementPacket(bool isClientPacket, WorldPacket const& packet);
+        static bool IsLoggedOpcode(uint16 opcode);
 
         bool IsInKnockBack() const { return m_knockBack; }
 
@@ -84,13 +95,17 @@ class MovementAnticheat
         void OnFailedToAckChange();
         void OnDeath();
 
-private:
+    private:
+        bool HasEnoughBottingData();
+        void ResetBottingStats();
+        void CheckBotting(uint16 opcode, MovementInfo const& movementInfo);
         bool CheckTeleport(MovementInfo const& movementInfo) const;
         bool IsTeleportAllowed(MovementInfo const& movementInfo) const;
         bool CheckForbiddenArea(MovementInfo const& movementInfo) const;
         bool CheckMultiJump(uint16 opcode);
         bool CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const;
         bool CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode);
+        bool CheckFallReset(MovementInfo const& movementInfo) const;
         bool CheckFakeTransport(MovementInfo const& movementInfo);
         bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
@@ -118,6 +133,11 @@ private:
         uint32 m_maxClientDesync = 0;
         float m_overspeedDistance = 0.0f;
         float m_maxOverspeedDistance = 0.0f;
+
+        // Botting
+        uint32 m_bottingCheckStartTime = 0;
+        uint32 m_movementPacketsCount = 0;
+        TurnType m_turnType = TURN_NONE;
 
         Player* me = nullptr; // current player object that checks run on, changes on mind control
         WorldSession* const m_session = nullptr; // session to which the cheat data belongs, does not change

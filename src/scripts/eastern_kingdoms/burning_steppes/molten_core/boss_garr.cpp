@@ -89,25 +89,7 @@ struct boss_garrAI : ScriptedAI
     void FireswornJustDied(ObjectGuid fireswornGuid)
     {
         m_lFiresworn.remove(fireswornGuid);
-
-        std::ostringstream log;
-
-        CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CF_TRIGGERED);
-
-        if (result == CAST_OK)
-        {
-            if (auto enrageAura = m_creature->GetAura(SPELL_ENRAGE, EFFECT_INDEX_0))
-            {
-                auto amount = enrageAura->GetStackAmount();
-                log << "Enrage stacks: <" << amount << ">.";
-            }
-        }
-        else
-        {
-            log << "Failed to cast <Enrage> with reason <" << result << ">.";
-        }
-
-        m_creature->LogScriptInfo(log);
+        DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CF_TRIGGERED);
     }
 
     bool DoExplodeFiresworn() const
@@ -126,10 +108,6 @@ struct boss_garrAI : ScriptedAI
                 return true;
             }
         }
-
-        std::ostringstream log;
-        log << "Unable to access Firesworn.";
-        m_creature->LogScriptInfo(log);
 
         return false;
     }
@@ -213,20 +191,10 @@ struct mob_fireswornAI : ScriptedAI
                     pGarrAI->FireswornJustDied(m_creature->GetObjectGuid());
             }
         }
-        else
-        {
-            std::ostringstream log;
-            log << "Failed to obtain Garr from storage.";
-            m_creature->LogScriptInfo(log);
-        }
 
         if (!m_bForceExplosion)
         {
             m_creature->CastSpell(m_creature, SPELL_ADD_ERUPTION, true);
-
-            std::ostringstream log;
-            log << "Explode by myself.";
-            m_creature->LogScriptInfo(log);
         }
     }
 
@@ -234,10 +202,6 @@ struct mob_fireswornAI : ScriptedAI
     {
         if (pSpell->Id == SPELL_ERUPTION_TRIGGER)
         {
-            std::ostringstream log;
-            log << "Ordered to explode.";
-            m_creature->LogScriptInfo(log);
-
             m_bForceExplosion = true;
             m_creature->CastSpell(m_creature, SPELL_MASSIVE_ERUPTION, true);
         }
@@ -259,27 +223,11 @@ struct mob_fireswornAI : ScriptedAI
                 {
                     if (m_creature->GetDistance2d(pGarr) > 45.0f)
                     {
-                        CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_SEPARATION_ANXIETY);
-                        std::ostringstream log;
+                        SpellCastResult result = DoCastSpellIfCan(m_creature, SPELL_SEPARATION_ANXIETY);
 
                         if (result == CAST_OK)
-                        {
                             m_uiAnxietyTimer = 5000;
-                            log << "I'm in <Separation Anxiety>.";
-                        }
-                        else
-                        {
-                            log << "Failed to cast <Separation Anxiety> with reason <" << result << ">.";
-                        }
-
-                        m_creature->LogScriptInfo(log);
                     }
-                }
-                else
-                {
-                    std::ostringstream log;
-                    log << "Failed to obtain Garr from storage.";
-                    m_creature->LogScriptInfo(log);
                 }
             }
         }

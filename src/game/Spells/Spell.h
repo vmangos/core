@@ -73,8 +73,6 @@ enum SpellNotifyPushType
     PUSH_TARGET_CENTER
 };
 
-bool IsQuestTameSpell(uint32 spellId);
-
 namespace MaNGOS
 {
     struct SpellNotifierPlayer;
@@ -396,7 +394,7 @@ class Spell
         void SendInterrupted(uint8 result);
         void SendChannelUpdate(uint32 time, bool interrupted = false);
         void SendChannelStart(uint32 duration);
-        void SendResurrectRequest(Player* target);
+        void SendResurrectRequest(Player* target, bool sickness);
 
         void HandleEffects(Unit* pUnitTarget,Item *pItemTarget,GameObject* pGOTarget,SpellEffectIndex i, float DamageMultiplier = 1.0);
         void HandleThreatSpells();

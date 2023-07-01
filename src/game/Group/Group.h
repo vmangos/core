@@ -222,7 +222,7 @@ class Group
         void   SetLooterGuid(ObjectGuid guid) { m_looterGuid = guid; }
         void   UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed = false);
         void   SetLootThreshold(ItemQualities threshold) { m_lootThreshold = threshold; }
-        void   Disband(bool hideDestroy=false);
+        void   Disband(bool hideDestroy = false, ObjectGuid initiator = ObjectGuid());
 
         // properties accessories
         uint32 GetId() const { return m_Id; }

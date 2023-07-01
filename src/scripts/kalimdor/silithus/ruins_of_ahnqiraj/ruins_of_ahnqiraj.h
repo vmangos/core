@@ -29,28 +29,12 @@ enum
     TYPE_QIRAJI_GLADIATOR   = 8,
 };
 
-/* This type of data = the count of living mobs in each wave.
-     The instance counts down thanks to OnCreatureDeath  */
-#define WAVE_MAX 7
-#define WAVE_OFFSET 10
-#define WAVE_MEMBERS_INIT_COUNT 7
-enum
-{
-    TYPE_WAVE1              = WAVE_OFFSET,
-    TYPE_WAVE2              = WAVE_OFFSET+1,
-    TYPE_WAVE3              = WAVE_OFFSET+2,
-    TYPE_WAVE4              = WAVE_OFFSET+3,
-    TYPE_WAVE5              = WAVE_OFFSET+4,
-    TYPE_WAVE6              = WAVE_OFFSET+5,
-    TYPE_WAVE7              = WAVE_OFFSET+6
-};
-
 enum
 {
     DATA_KURINNAXX      = 0,
     DATA_RAJAXX         = 1,
     DATA_BURU           = 2,
-    DATA_AYAMIS         = 3,
+    DATA_AYAMISS        = 3,
     DATA_MOAM           = 4,
     DATA_OSSIRIAN       = 5,
     DATA_ANDOROV        = 6,
@@ -93,12 +77,18 @@ enum
     ANDOROV_GOSSIP_IN_PROGRESS = 7048,
     ANDOROV_GOSSIP_DONE        = 7047,
 
+    // Guids
+    ANDOROV_DB_GUID            = 301311,
+
+    // Scripts
+    ANDOROV_START_SCRIPT       = 154710,
+
     // Crystal Weaknesses
-    SPELL_FIRE_WEAKNESS         =   25177,
-    SPELL_NATURE_WEAKNESS       =   25180,
-    SPELL_FROST_WEAKNESS        =   25178,
-    SPELL_ARCANE_WEAKNESS       =   25171,
-    SPELL_SHADOW_WEAKNESS       =   25183,
+    SPELL_FIRE_WEAKNESS        =   25177,
+    SPELL_NATURE_WEAKNESS      =   25180,
+    SPELL_FROST_WEAKNESS       =   25178,
+    SPELL_ARCANE_WEAKNESS      =   25171,
+    SPELL_SHADOW_WEAKNESS      =   25183,
 
     GO_OSSIRIAN_CRYSTAL = 180619,
     CRYSTAL_TRIGGER     = 15590
@@ -147,16 +137,17 @@ public:
     void SpawnNewCrystals(ObjectGuid usedCrystal);
 
 private:
-    uint8 GetWaveFromCreature(Creature* creature);
     void SetAndorovSquadRespawnTime(uint32 nextRespawnDelay);
-    void SetAndorovSquadFaction(uint32 faction);
-    void ForceAndorovSquadDespawn(uint32 timeToDespawn);
+    void SetAndorovSquadImmunity(bool immune);
+    void GiveRepAfterRajaxxDeath(Creature* pRajaxx);
+    bool IsAnyBossInCombat();
 
     uint32 m_auiEncounter[INSTANCE_RUINS_AQ_MAX_ENCOUNTER];
-    uint32 m_uiWaveMembersCount[WAVE_MAX];
 
     uint64 m_uiKurinnaxxGUID;
     uint64 m_uiBuruGUID;
+    uint64 m_uiAyamissGUID;
+    uint64 m_uiMoamGUID;
     uint64 m_uiOssirianGUID;
     uint64 m_uiAndorovGUID;
     std::list<uint64> m_lKaldoreiElites;
@@ -182,8 +173,7 @@ private:
     uint32 m_uiRajaxxEventResetTimer;
     bool m_bRajaxxEventIsToReset;
 
-    bool m_bIsAQDoorOn;
-    ObjectGuid p_doorGuid;
+    ObjectGuid m_doorGuid;
 };
 
 #ifdef DEBUG_MODE

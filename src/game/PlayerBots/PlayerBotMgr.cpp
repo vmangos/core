@@ -229,17 +229,6 @@ void PlayerBotMgr::Update(uint32 diff)
 
         if (iter->second->state == PB_STATE_ONLINE)
         {
-            if (!iter->second->m_pendingResponses.empty() &&
-                iter->second->ai && iter->second->ai->me)
-            {
-                std::vector<uint16> pendingResponses = iter->second->m_pendingResponses;
-                iter->second->m_pendingResponses.clear();
-                for (const auto opcode : pendingResponses)
-                {
-                    iter->second->ai->SendFakePacket(opcode);
-                }
-            }
-
             if (iter->second->requestRemoval)
             {
                 if (iter->second->ai && iter->second->ai->me)
@@ -1687,7 +1676,8 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
     uint8 botRace = SelectRandomRaceForClass(botClass, botTeam);
 
     // Spawn bot on GM Island
-    BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, 0, 16224.356f, 16284.763f, 13.175f, 4.56f, bg);
+    uint32 const instanceId = sMapMgr.GetContinentInstanceId(1, 16224.356f, 16284.763f);
+    BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, instanceId, 16224.356f, 16284.763f, 13.175f, 4.56f, bg);
     sPlayerBotMgr.AddBot(ai);
 
     if (bg == BATTLEGROUND_QUEUE_WS)

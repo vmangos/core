@@ -36,6 +36,15 @@ class SpellCaster;
 
 namespace Spells
 {
+    inline SpellEffectIndex GetFirstEffectIndexInMask(uint32 mask)
+    {
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            if (mask & (1 << i))
+                return SpellEffectIndex(i);
+
+        return EFFECT_INDEX_0;
+    }
+
     SpellSpecific GetSpellSpecific(uint32 spellId);
 
     // Diminishing Returns interaction with spells
@@ -169,9 +178,41 @@ namespace Spells
         }
     }
 
+    bool IsAutocastable(uint32 spellId);
     bool IsPassiveSpell(uint32 spellId);
     bool IsPositiveSpell(uint32 spellId);
     bool IsPositiveSpell(uint32 spellId, Unit* caster, Unit* victim);
+
+    // spell target filter is TARGET_HELPFUL, TARGET_PARTY or TARGET_GROUP in cmangos
+    inline bool IsFriendlyTarget(uint32 target)
+    {
+        switch (target)
+        {
+            case TARGET_UNIT_CASTER:
+            case TARGET_UNIT_FRIEND_NEAR_CASTER:
+            case TARGET_UNIT_CASTER_PET:
+            case TARGET_PLAYER_FRIEND_NYI:
+            case TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE:
+            case TARGET_UNIT_FRIEND:
+            case TARGET_UNIT_CASTER_MASTER:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DYNOBJ_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_UNIT_PARTY:
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_UNIT_FRIEND_CHAIN_HEAL:
+            case TARGET_ENUM_UNITS_RAID_WITHIN_CASTER_RANGE:
+            case TARGET_UNIT_RAID:
+            case TARGET_UNIT_RAID_NEAR_CASTER:
+            case TARGET_ENUM_UNITS_FRIEND_IN_CONE:
+            case TARGET_UNIT_RAID_AND_CLASS:
+            case TARGET_PLAYER_RAID_NYI:
+                return true;
+        }
+        return false;
+    }
 
     inline bool IsPositiveTarget(uint32 targetA, uint32 targetB)
     {
@@ -746,12 +787,12 @@ class SpellEntry
 
         bool IsNextMeleeSwingSpell() const
         {
-            return Attributes & (SPELL_ATTR_ON_NEXT_SWING_1 | SPELL_ATTR_ON_NEXT_SWING_2);
+            return Attributes & (SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE | SPELL_ATTR_ON_NEXT_SWING);
         }
 
         bool IsRangedSpell() const
         {
-            return Attributes & SPELL_ATTR_RANGED;
+            return Attributes & SPELL_ATTR_USES_RANGED_SLOT;
         }
 
         bool IsSealSpell() const
@@ -784,30 +825,33 @@ class SpellEntry
 
         bool IsDeathOnlySpell() const
         {
-            return (AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD) || (Id == 2584);
+            return HasAttribute(SPELL_ATTR_EX3_ONLY_ON_GHOSTS) || 
+                   (Targets & (TARGET_FLAG_PVP_CORPSE | TARGET_FLAG_UNIT_CORPSE | TARGET_FLAG_CORPSE)) ||
+                   (Id == 2584);
         }
 
         bool CanTargetDeadTarget() const
         {
-            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+            return HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET) ||
+                   IsDeathOnlySpell();
         }
 
         bool CanTargetAliveState(bool alive) const
         {
-            if (HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD))
+            if (IsDeathOnlySpell())
                 return !alive;
 
-            return alive || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+            return alive || HasAttribute(SPELL_ATTR_EX2_ALLOW_DEAD_TARGET);
         }
 
         bool IsDeathPersistentSpell() const
         {
-            return HasAttribute(SPELL_ATTR_EX3_DEATH_PERSISTENT);
+            return HasAttribute(SPELL_ATTR_EX3_ALLOW_AURA_WHILE_DEAD);
         }
 
         bool IsNonCombatSpell() const
         {
-            return (Attributes & SPELL_ATTR_CANT_USED_IN_COMBAT) != 0;
+            return (Attributes & SPELL_ATTR_NOT_IN_COMBAT_ONLY_PEACEFUL) != 0;
         }
 
         bool IsPositiveSpell() const
@@ -906,9 +950,14 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_CROWD_CONTROL;
         }
 
+        bool IsAutocastable() const
+        {
+            return !(HasAttribute(SPELL_ATTR_EX_NO_AUTOCAST_AI) || HasAttribute(SPELL_ATTR_PASSIVE));
+        }
+
         bool IsAutoRepeatRangedSpell() const
         {
-            return (Attributes & SPELL_ATTR_RANGED) && (AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG);
+            return (Attributes & SPELL_ATTR_USES_RANGED_SLOT) && (AttributesEx2 & SPELL_ATTR_EX2_AUTO_REPEAT);
         }
 
         bool IsSpellRequiresRangedAP() const
@@ -918,12 +967,12 @@ class SpellEntry
 
         bool IsChanneledSpell() const
         {
-            return (AttributesEx & (SPELL_ATTR_EX_CHANNELED_1 | SPELL_ATTR_EX_CHANNELED_2));
+            return (AttributesEx & (SPELL_ATTR_EX_IS_CHANNELED | SPELL_ATTR_EX_IS_SELF_CHANNELED));
         }
 
         bool NeedsComboPoints() const
         {
-            return (AttributesEx & (SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS | SPELL_ATTR_EX_REQ_COMBO_POINTS));
+            return (AttributesEx & (SPELL_ATTR_EX_FINISHING_MOVE_DAMAGE | SPELL_ATTR_EX_FINISHING_MOVE_DURATION));
         }
 
         bool IsTotemSummonSpell() const
@@ -933,7 +982,7 @@ class SpellEntry
 
         bool HasRealTimeDuration() const
         {
-            return HasAttribute(SPELL_ATTR_EX4_REAL_TIME_DURATION);
+            return HasAttribute(SPELL_ATTR_EX4_AURA_EXPIRES_OFFLINE);
         }
 
         bool HasAuraWithSpellTriggerEffect() const
@@ -976,18 +1025,18 @@ class SpellEntry
 
         bool IsNeedCastSpellAtFormApply(ShapeshiftForm form) const
         {
-            if (!(Attributes & (SPELL_ATTR_PASSIVE | SPELL_ATTR_HIDDEN_CLIENTSIDE)) || !form)
+            if (!(Attributes & (SPELL_ATTR_PASSIVE | SPELL_ATTR_DO_NOT_DISPLAY)) || !form)
                 return false;
 
-            // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!
+            // passive spells with SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED are already active without shapeshift, do no recast!
             // Feline Swiftness Passive 2a not have 0x1 mask in Stance field in spell data as expected
             return ((Stances & (1 << (form - 1)) || (Id == 24864 && form == FORM_CAT)) &&
-                !HasAttribute(SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
+                !HasAttribute(SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED));
         }
 
         inline bool IsNeedCastSpellAtOutdoor() const
         {
-            return (HasAttribute(SPELL_ATTR_OUTDOORS_ONLY) && HasAttribute(SPELL_ATTR_PASSIVE));
+            return (HasAttribute(SPELL_ATTR_ONLY_OUTDOORS) && HasAttribute(SPELL_ATTR_PASSIVE));
         }
 
         // Spell effects require a specific power type on the target
@@ -1017,7 +1066,7 @@ class SpellEntry
         bool IsRemovedOnShapeLostSpell() const
         {
             return (Stances || Id == 24864) &&
-                !(AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) &&
+                !(AttributesEx2 & SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) &&
                 !(Attributes & SPELL_ATTR_NOT_SHAPESHIFT);
         }
 

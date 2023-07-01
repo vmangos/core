@@ -57,7 +57,7 @@ class AuthSocket: public BufferedSocket
     public:
         const static int s_BYTE_SIZE = 32;
 
-        AuthSocket();
+        AuthSocket() = default;
         ~AuthSocket();
 
         void OnAccept();
@@ -92,22 +92,22 @@ class AuthSocket: public BufferedSocket
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
 
         SRP6 srp;
-        BigNumber _reconnectProof;
+        BigNumber m_reconnectProof;
 
-        bool promptPin;
+        bool m_promptPin = false;
 
-        eStatus _status;
+        eStatus m_status = STATUS_CHALLENGE;
 
-        std::string _login;
-        std::string _safelogin;
-        std::string securityInfo;
-        std::string _lastIP;
-        std::string _email;
+        std::string m_login;
+        std::string m_safelogin;
+        std::string m_securityInfo;
+        std::string m_lastIP;
+        std::string m_email;
 
-        BigNumber serverSecuritySalt;
-        LockFlag lockFlags;
-        uint32 gridSeed;
-        uint32_t _geoUnlockPIN;
+        BigNumber m_serverSecuritySalt;
+        LockFlag m_lockFlags = NONE;
+        uint32 m_gridSeed = 0;
+        uint32 m_geoUnlockPIN = 0;
 
         static constexpr uint32 Win = 'Win';
         static constexpr uint32 OSX = 'OSX';
@@ -115,25 +115,25 @@ class AuthSocket: public BufferedSocket
         static constexpr uint32 X86 = 'x86';
         static constexpr uint32 PPC = 'PPC';
 
-        uint32 _os;
-        uint32 _platform;
-        uint32 _accountId;
-        uint32 _lastRealmListRequest;
+        uint32 m_os = 0;
+        uint32 m_platform = 0;
+        uint32 m_accountId = 0;
+        uint32 m_lastRealmListRequest = 0;
 
         // Since GetLocaleByName() is _NOT_ bijective, we have to store the locale as a string. Otherwise we can't differ
         // between enUS and enGB, which is important for the patch system
-        std::string _localizationName;
-        uint16 _build;
+        std::string m_localizationName;
+        uint16 m_build = 0;
 
         AccountTypes GetSecurityOn(uint32 realmId) const;
         void LoadAccountSecurityLevels(uint32 accountId);
         bool GeographicalLockCheck();
 
-        AccountTypes _accountDefaultSecurityLevel;
+        AccountTypes m_accountDefaultSecurityLevel = SEC_PLAYER;
         typedef std::map<uint32, AccountTypes> AccountSecurityMap;
-        AccountSecurityMap _accountSecurityOnRealm;
+        AccountSecurityMap m_accountSecurityOnRealm;
 
-        ACE_HANDLE patch_;
+        ACE_HANDLE m_patch = ACE_INVALID_HANDLE;
 
         void InitPatch();
 };

@@ -50,8 +50,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         return;
 
     // get start teleport coordinates (will used later in fail case)
-    WorldLocation old_loc;
-    GetPlayer()->GetPosition(old_loc);
+    WorldLocation oldLoc;
+    GetPlayer()->GetPosition(oldLoc);
 
     // get the teleport destination
     WorldLocation &loc = GetPlayer()->GetTeleportDest();
@@ -86,15 +86,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
                        " (map:%u, x:%f, y:%f, z:%f) Trying to port him to his previous place..",
                        GetPlayer()->GetGuidStr().c_str(), loc.mapId, loc.x, loc.y, loc.z);
 
-            GetPlayer()->SetSemaphoreTeleportFar(false);
-
-            // Teleport to previous place, if cannot be ported back TP to homebind place
-            if (!GetPlayer()->TeleportTo(old_loc))
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WorldSession::HandleMoveWorldportAckOpcode: %s cannot be ported to his previous place, teleporting him to his homebind place...",
-                           GetPlayer()->GetGuidStr().c_str());
-                GetPlayer()->TeleportToHomebind();
-            }
+            GetPlayer()->HandleReturnOnTeleportFail(oldLoc);
             return;
         }
     }
@@ -122,21 +114,11 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // while the player is in transit, for example the map may get full
     if (!GetPlayer()->GetMap()->Add(GetPlayer()))
     {
-        GetPlayer()->SetSemaphoreTeleportFar(false);
-        // if player wasn't added to map, reset his map pointer!
-        GetPlayer()->ResetMap();
-
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WorldSession::HandleMoveWorldportAckOpcode: %s was teleported far but couldn't be added to map "
                    " (map:%u, x:%f, y:%f, z:%f) Trying to port him to his previous place..",
                    GetPlayer()->GetGuidStr().c_str(), loc.mapId, loc.x, loc.y, loc.z);
 
-        // Teleport to previous place, if cannot be ported back TP to homebind place
-        if (!GetPlayer()->TeleportTo(old_loc))
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WorldSession::HandleMoveWorldportAckOpcode: %s cannot be ported to his previous place, teleporting him to his homebind place...",
-                       GetPlayer()->GetGuidStr().c_str());
-            GetPlayer()->TeleportToHomebind();
-        }
+        GetPlayer()->HandleReturnOnTeleportFail(oldLoc);
         return;
     }
     GetPlayer()->SetSemaphoreTeleportFar(false);
@@ -340,17 +322,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     else if (opcode == MSG_MOVE_FALL_LAND)
         pMover->SetJumpInitialSpeed(-9.645f);
 
-    if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
-    {
-        // Interrupt spell cast at move
-        pMover->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
-        pMover->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_MOVING_CANCELS);
-        // Fix bug after 1.11 where client doesn't send stand state update while casting.
-        // Test case: Begin eating or drinking, then start casting Hearthstone and run.
-        pMover->SetStandState(UNIT_STAND_STATE_STAND);
-        pMover->HandleEmoteState(0);
-    }
-
     HandleMoverRelocation(pMover, movementInfo);
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
@@ -369,6 +340,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
         pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
     }
+
+    // CMSG opcode has no handler in client, should not be sent to others.
+    // It is sent by client when you jump and hit something on the way up,
+    // thus stopping upward movement and causing you to descend sooner.
+    if (opcode == CMSG_MOVE_FALL_RESET)
+        return;
 
     WorldPacket data(opcode, recvData.size());
 
@@ -845,10 +822,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     if (pMover->HasPendingSplineDone())
         pMover->SetSplineDonePending(false);
     else
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleMoveSplineDoneOpcode: client sent unexpected spline done for %s", pMover->GetGuidStr().c_str());
         return;
-    }
 
     if (Player* pPlayerMover = pMover->ToPlayer())
     {
@@ -1083,33 +1057,13 @@ bool WorldSession::VerifyMovementInfo(MovementInfo const& movementInfo) const
 
 void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInfo)
 {
+    Player* const pPlayerMover = pMover->ToPlayer();
+
     movementInfo.CorrectData(pMover);
 
     // Prevent client from removing root flag.
     if (pMover->HasUnitMovementFlag(MOVEFLAG_ROOT) && !movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
         movementInfo.AddMovementFlag(MOVEFLAG_ROOT);
-
-    Player* const pPlayerMover = pMover->ToPlayer();
-
-    if (pPlayerMover)
-    {
-        // ignore current relocation if needed
-        if (pPlayerMover->IsNextRelocationIgnored())
-        {
-            pPlayerMover->DoIgnoreRelocation();
-            return;
-        }
-
-        if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
-        {
-            if (ObjectGuid const& lootGuid = pPlayerMover->GetLootGuid())
-                if (!lootGuid.IsItem())
-                    pPlayerMover->GetSession()->DoLootRelease(lootGuid);
-        }
-    }
-
-    if (!pPlayerMover)
-        pMover->GetMap()->CreatureRelocation((Creature*)pMover, movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
 
     pMover->m_movementInfo = movementInfo;
 
@@ -1142,17 +1096,19 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
         pMover->m_movementInfo.ClearTransportData();
     }
 
-    movementInfo = pMover->m_movementInfo;
-
-    if (pPlayerMover)
-        pPlayerMover->SetPosition(movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
-    else
-        pMover->GetMap()->CreatureRelocation((Creature*)pMover, movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
-
     if (pPlayerMover)
     {
+        if (pMover->m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+        {
+            if (ObjectGuid const& lootGuid = pPlayerMover->GetLootGuid())
+                if (!lootGuid.IsItem())
+                    pPlayerMover->GetSession()->DoLootRelease(lootGuid);
+        }
+
+        pPlayerMover->SetPosition(pMover->m_movementInfo.GetPos().x, pMover->m_movementInfo.GetPos().y, pMover->m_movementInfo.GetPos().z, pMover->m_movementInfo.GetPos().o);
+
         // Nostalrius - antiundermap1
-        if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR))
+        if (pMover->m_movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR))
         {
             float hauteur = pPlayerMover->GetMap()->GetHeight(pPlayerMover->GetPositionX(), pPlayerMover->GetPositionY(), pPlayerMover->GetPositionZ(), true);
             bool undermap = false;
@@ -1167,10 +1123,10 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
                     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[UNDERMAP] %s [GUID %u]. MapId:%u %f %f %f", pPlayerMover->GetName(), pPlayerMover->GetGUIDLow(), pPlayerMover->GetMapId(), pPlayerMover->GetPositionX(), pPlayerMover->GetPositionY(), pPlayerMover->GetPositionZ());
         }
         else if (pPlayerMover->CanFreeMove())
-            pPlayerMover->SaveNoUndermapPosition(movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z + 3.0f, movementInfo.GetPos().o);
+            pPlayerMover->SaveNoUndermapPosition(pMover->m_movementInfo.GetPos().x, pMover->m_movementInfo.GetPos().y, pMover->m_movementInfo.GetPos().z + 3.0f, pMover->m_movementInfo.GetPos().o);
         
         // Antiundermap2: teleport to graveyard
-        if (movementInfo.GetPos().z < -500.0f)
+        if (pMover->m_movementInfo.GetPos().z < -500.0f)
         {
             // NOTE: this is actually called many times while falling
             // even after the player has been teleported away
@@ -1196,6 +1152,11 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[UNDERMAP/Teleport] Player %s teleported.", pPlayerMover->GetName(), pPlayerMover->GetGUIDLow(), pPlayerMover->GetMapId(), pPlayerMover->GetPositionX(), pPlayerMover->GetPositionY(), pPlayerMover->GetPositionZ());
             pPlayerMover->RepopAtGraveyard();
         }
+    }
+    else
+    {
+        pMover->HandleInterruptsOnMovement(pMover->m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING)); // called inside SetPosition for players
+        pMover->GetMap()->CreatureRelocation((Creature*)pMover, pMover->m_movementInfo.GetPos().x, pMover->m_movementInfo.GetPos().y, pMover->m_movementInfo.GetPos().z, pMover->m_movementInfo.GetPos().o);
     }
 }
 

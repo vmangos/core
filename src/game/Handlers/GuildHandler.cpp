@@ -212,25 +212,23 @@ void WorldSession::HandleGuildAcceptOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleGuildDeclineOpcode(WorldPacket& /*recvPacket*/)
 {
-    if (_player->GetGuildIdInvited() != 0)
+    if (_player->GetGuildId() || !_player->GetGuildIdInvited())
+        return;
+
+    if (Guild* guild = sGuildMgr.GetGuildById(_player->GetGuildIdInvited()))
     {
-        if (Guild* guild = sGuildMgr.GetGuildById(_player->GetGuildIdInvited()))
+        if (ObjectGuid inviterGuid = guild->GetGuildInviter(_player->GetObjectGuid()))
         {
-            ObjectGuid inviterGuid = guild->GetGuildInviter(_player->GetObjectGuid());
-            if (!inviterGuid.IsEmpty())
+            if (Player const* pInviter = ObjectAccessor::FindPlayer(inviterGuid))
             {
-                if (Player const* pInviter = ObjectAccessor::FindPlayer(inviterGuid))
-                {
-                    WorldPacket data(SMSG_GUILD_DECLINE);
-                    data << _player->GetName();
-                    pInviter->GetSession()->SendPacket(&data);
-                }
+                WorldPacket data(SMSG_GUILD_DECLINE);
+                data << _player->GetName();
+                pInviter->GetSession()->SendPacket(&data);
             }
         }
     }
 
-    GetPlayer()->SetGuildIdInvited(0);
-    GetPlayer()->SetInGuild(0);
+    _player->SetGuildIdInvited(0);
 }
 
 void WorldSession::HandleGuildInfoOpcode(WorldPacket& /*recvPacket*/)

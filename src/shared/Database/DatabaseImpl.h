@@ -21,6 +21,7 @@
 
 #include "Database/Database.h"
 #include "Database/SqlOperations.h"
+#include "Log.h"
 
 /// Function body definitions for the template function members of the Database class
 

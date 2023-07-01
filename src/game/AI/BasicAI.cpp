@@ -40,17 +40,7 @@ bool BasicAI::IsProximityAggroAllowedFor(Unit* pTarget) const
     if (m_creature->GetMap()->IsDungeon())
         return true;
 
-    if (Player* pNearPlayer = pTarget->ToPlayer())
-    {
-        if (Player* pVictimPlayer = m_creature->GetVictim()->ToPlayer())
-        {
-            if (pNearPlayer->GetGroup() &&
-                pNearPlayer->GetGroup() == pVictimPlayer->GetGroup())
-                return true;
-        }
-    }
-
-    return false;
+    return m_creature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_LEASH_EVADE);
 }
 
 void BasicAI::MoveInLineOfSight(Unit* pWho)

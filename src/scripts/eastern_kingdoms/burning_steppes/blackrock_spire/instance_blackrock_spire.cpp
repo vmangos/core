@@ -150,7 +150,6 @@ static const SIDialogueEntry aStadiumDialogue[] =
 };
 
 instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance(pMap), DialogueHelper(aStadiumDialogue), 
-    m_uiEmberseerGUID(0),
     m_uiNefariusGUID(0),
     m_uiRendGUID(0),
     m_uiGythGUID(0),
@@ -178,15 +177,10 @@ instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance
     m_uiBrazier05GUID(0),
     m_uiBrazier06GUID(0),
 
-    m_uiEmberseerRune01GUID(0),
-    m_uiEmberseerRune02GUID(0),
-    m_uiEmberseerRune03GUID(0),
-    m_uiEmberseerRune04GUID(0),
-    m_uiEmberseerRune05GUID(0),
-    m_uiEmberseerRune06GUID(0),
-    m_uiEmberseerRune07GUID(0),
-
     m_uiBlackRockAltarGUID(0),
+
+    m_uiDrakkisathDoor1GUID(0),
+    m_uiDrakkisathDoor2GUID(0),
 
     m_uiUBRSDoor_Timer(0),
     m_uiUBRSDoor_Step(0),
@@ -241,7 +235,16 @@ void instance_blackrock_spire::OnObjectCreate(GameObject* pGo)
             if (GetData(TYPE_STADIUM) == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-
+        case GO_DRAKKISATH_DOOR1:
+            m_uiDrakkisathDoor1GUID = pGo->GetGUID();
+            if (GetData(TYPE_DRAKKISATH) == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
+        case GO_DRAKKISATH_DOOR2:
+            m_uiDrakkisathDoor2GUID = pGo->GetGUID();
+            if (GetData(TYPE_DRAKKISATH) == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
         case GO_ROOM_1_RUNE:
             m_auiRoomRuneGUID[0] = pGo->GetGUID();
             break;
@@ -308,28 +311,6 @@ void instance_blackrock_spire::OnObjectCreate(GameObject* pGo)
             if (GetData(TYPE_EVENT_DOOR_UBRS) == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-
-        case GO_EMBERSEER_RUNE01:
-            m_uiEmberseerRune01GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE02:
-            m_uiEmberseerRune02GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE03:
-            m_uiEmberseerRune03GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE04:
-            m_uiEmberseerRune04GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE05:
-            m_uiEmberseerRune05GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE06:
-            m_uiEmberseerRune06GUID = pGo->GetGUID();
-            break;
-        case GO_EMBERSEER_RUNE07:
-            m_uiEmberseerRune07GUID = pGo->GetGUID();
-            break;
     }
 }
 
@@ -337,9 +318,6 @@ void instance_blackrock_spire::OnCreatureCreate(Creature* pCreature)
 {
     switch (pCreature->GetEntry())
     {
-        case NPC_PYROGUARD_EMBERSEER:
-            m_uiEmberseerGUID = pCreature->GetGUID();
-            break;
         case NPC_LORD_VICTOR_NEFARIUS:
             m_uiNefariusGUID = pCreature->GetGUID();
             break;
@@ -397,20 +375,6 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[TYPE_ROOM_EVENT] = uiData;
             break;
         case TYPE_EMBERSEER:
-            if (uiData == IN_PROGRESS || uiData == FAIL)
-                DoUseDoorOrButton(m_uiEmberseerCombatDoorGUID);
-            else if (uiData == DONE)
-            {
-                DoUseDoorOrButton(m_uiEmberseerCombatDoorGUID);
-                DoUseDoorOrButton(m_uiEmberseerOutDoorGUID);
-                DoUseDoorOrButton(m_uiEmberseerRune01GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune02GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune03GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune04GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune05GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune06GUID);
-                DoUseDoorOrButton(m_uiEmberseerRune07GUID);
-            }
             m_auiEncounter[TYPE_EMBERSEER] = uiData;
             break;
         case TYPE_FLAMEWREATH:
@@ -468,6 +432,14 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
 
             m_auiEncounter[TYPE_SOLAKAR] = uiData;
             break;
+        case TYPE_DRAKKISATH:
+            if (uiData == DONE)
+            {
+                DoUseDoorOrButton(m_uiDrakkisathDoor1GUID);
+                DoUseDoorOrButton(m_uiDrakkisathDoor2GUID);
+            }
+            m_auiEncounter[TYPE_DRAKKISATH] = uiData;
+            break;
     }
 
     if (uiData == DONE)
@@ -475,7 +447,7 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " " << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5] << " " << m_auiEncounter[6];
+        saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " " << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5] << " " << m_auiEncounter[6] << " " << m_auiEncounter[7];
 
         strInstData = saveStream.str();
 
@@ -833,7 +805,7 @@ void instance_blackrock_spire::Load(char const* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-    loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6];
+    loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6] >> m_auiEncounter[7];
 
     for (uint32 & i : m_auiEncounter)
     {
@@ -855,6 +827,7 @@ uint32 instance_blackrock_spire::GetData(uint32 uiType)
         case TYPE_VALTHALAK:
         case TYPE_EVENT_DOOR_UBRS:
         case TYPE_SOLAKAR:
+        case TYPE_DRAKKISATH:
             return m_auiEncounter[uiType];
     }
     return 0;
@@ -866,8 +839,6 @@ uint64 instance_blackrock_spire::GetData64(uint32 uiType)
     {
         case GO_BLACKROCK_ALTAR:
             return m_uiBlackRockAltarGUID;
-        case NPC_PYROGUARD_EMBERSEER:
-            return m_uiEmberseerGUID;
         case NPC_LORD_VICTOR_NEFARIUS:
             return m_uiNefariusGUID;
         case NPC_REND_BLACKHAND:
@@ -988,6 +959,7 @@ struct npc_solakar_triggerAI : public ScriptedAI
 
     void Reset() override
     {
+        m_creature->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* who) override

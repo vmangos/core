@@ -595,6 +595,9 @@ namespace MaNGOS
                 if (goInfo->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
                     return false;
 
+                if (!go->isSpawned())
+                    return false;
+
                 if (goInfo->spellFocus.focusId != i_focusId)
                     return false;
 
@@ -1555,16 +1558,16 @@ namespace MaNGOS
             }
             bool operator()(Unit* u)
             {
-                if (!m_me->IsHostileTo(u))
-                    return false;
-
-                if (!u->IsVisibleForOrDetect(m_me, m_me, false))
-                    return false;
-
                 if (!u->IsWithinDistInMap(m_me, std::min(m_me->GetAttackDistance(u), m_dist), true, SizeFactor::None))
                     return false;
 
                 if (!u->IsTargetableBy(m_me))
+                    return false;
+
+                if (!m_me->IsHostileTo(u))
+                    return false;
+
+                if (!u->IsVisibleForOrDetect(m_me, m_me, false))
                     return false;
 
                 if (m_ignoreCivilians && u->IsCreature() && static_cast<Creature*>(u)->IsCivilian())

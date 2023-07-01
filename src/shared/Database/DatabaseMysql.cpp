@@ -23,6 +23,7 @@
 
 #include <errmsg.h>
 #include <mysqld_error.h>
+#include "Log.h"
 #include "Util.h"
 #include "Policies/SingletonImp.h"
 #include "Platform/Define.h"

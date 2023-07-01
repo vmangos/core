@@ -35,14 +35,6 @@
 
 INSTANTIATE_SINGLETON_1(Log);
 
-static constexpr Color logColors[] = {
-    RED,    // error
-    RESET,  // minimal
-    RESET,  // basic
-    YELLOW, // detail
-    BLUE    // debug
-};
-
 namespace
 {
 uint16 GetConsoleColor()
@@ -62,6 +54,8 @@ uint16 GetConsoleColor()
 #endif
 }
 }
+
+extern char const* g_mainLogFileName;
 
 Log::Log() :
     m_includeTime(false), m_logsTimestamp(GetTimestampStr()), m_defaultColor(GetConsoleColor())
@@ -108,8 +102,7 @@ Log::Log() :
         m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
     }
 
-    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", "Server.log", log_file_timestamp, true);
-    logFiles[LOG_WORLDPACKET] = openLogFile("LogFile.World", "world_packets.log", log_file_timestamp, true);
+    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", g_mainLogFileName, log_file_timestamp, true);
     logFiles[LOG_CHAT] = openLogFile("LogFile.Chat", "Chat.log", log_file_timestamp, false);
     logFiles[LOG_BG] = openLogFile("BgLogFile", "Bg.log", log_file_timestamp, false);
     logFiles[LOG_CHAR] = openLogFile("LogFile.Char", "Char.log", log_file_timestamp, false);
@@ -132,7 +125,6 @@ Log::Log() :
     m_consoleLevel = LogLevel(sConfig.GetIntDefault("LogLevel.Console", 2));
     m_fileLevel = LogLevel(sConfig.GetIntDefault("LogLevel.File", 2));
     m_dbLevel = LogLevel(sConfig.GetIntDefault("LogLevel.DB", 2));
-
 
     // Smartlog data
     InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
@@ -379,30 +371,59 @@ std::string Log::GetTimestampStr()
     return std::string(buf);
 }
 
-void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
+#define LOG_TO_FILE_HELPER(logLevel,logType,format,ap) \
+if (logFiles[logType] && m_fileLevel >= logLevel)                             \
+{                                                                             \
+    if (logType != LOG_DBERRFIX)                                              \
+    {                                                                         \
+        outTimestamp(logFiles[logType]);                                      \
+        if (logLevel == LOG_LVL_ERROR)                                        \
+            fputs("ERROR: ", logFiles[logType]);                              \
+    }                                                                         \
+    va_start(ap, format);                                                     \
+    vfprintf(logFiles[logType], format, ap);                                  \
+    fputs("\n", logFiles[logType]);                                           \
+    fflush(logFiles[logType]);                                                \
+    va_end(ap);                                                               \
+}                                                                             \
+
+#define LOG_TO_CONSOLE_HELPER(logLevel,logType,format,ap) \
+if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= logLevel) \
+{                                                                             \
+    auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;           \
+    SetColor(where, g_logColors[logLevel]);                                   \
+    if (m_includeTime)                                                        \
+        outTime(where);                                                       \
+    if (logLevel == LOG_LVL_ERROR)                                            \
+        fprintf(where, "ERROR: ");                                            \
+                                                                              \
+    va_start(ap, format);                                                     \
+    vutf8printf(where, format, &ap);                                          \
+    va_end(ap);                                                               \
+                                                                              \
+    ResetColor(where);                                                        \
+    fprintf(where, "\n");                                                     \
+    fflush(where);                                                            \
+                                                                              \
+    if (logType != LOG_BASIC)                                                 \
+    LOG_TO_FILE_HELPER(logLevel, LOG_BASIC, format, ap);                      \
+}                                                                             \
+
+void Log::Out(LogType logType, LogLevel logLevel, char const* format, ...)
 {
     ASSERT(logType >= 0 && logType < LOG_TYPE_MAX&& logLevel >= 0 && logLevel <= LOG_LVL_DEBUG);
 
-    if (!str)
+    if (!format)
         return;
 
     // neither console nor file gets this?  we're done
     if (m_consoleLevel < logLevel && !(logFiles[logType] && m_fileLevel >= logLevel))
         return;
 
-    // make buffer
-    char buff[4096];
-    memset(buff, 0, sizeof(buff));
-
     va_list ap;
-    va_start(ap, str);
-    vsnprintf(buff, sizeof(buff)-1, str, ap);
-    va_end(ap);
 
-    std::string const log(buff);
-
-    OutConsole(logType, logLevel, log);
-    OutFile(logType, logLevel, log);
+    LOG_TO_CONSOLE_HELPER(logLevel, logType, format, ap);
+    LOG_TO_FILE_HELPER(logLevel, logType, format, ap);
 }
 
 void Log::OutConsole(LogType logType, LogLevel logLevel, std::string const& log) const
@@ -416,7 +437,7 @@ void Log::OutConsole(LogType logType, LogLevel logLevel, std::string const& log)
 
     auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;
 
-    SetColor(where, logColors[logLevel]);
+    SetColor(where, g_logColors[logLevel]);
 
     if (m_includeTime)
         outTime(where);
@@ -457,32 +478,13 @@ void Log::OutFile(LogType logType, LogLevel logLevel, std::string const& str) co
     fflush(logFiles[logType]);
 }
 
-void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
-    char const* opcodeName, ByteBuffer const* packet,
-    bool incoming)
+#ifndef USE_ANTICHEAT
+
+void Log::OutWarden(Warden const* /*warden*/, LogLevel /*logLevel*/, char const* /*format*/, ...)
 {
-    if (!logFiles[LOG_WORLDPACKET])
-        return;
-
-    outTimestamp(logFiles[LOG_WORLDPACKET]);
-
-    fprintf(logFiles[LOG_WORLDPACKET],
-        "\n%s:\nSOCKET: %p\nLENGTH: %zu\nOPCODE: %s (0x%.4X)\nDATA:\n",
-        incoming ? "CLIENT" : "SERVER", socketHandle, packet->size(),
-        opcodeName, opcode);
-
-    size_t p = 0;
-    while (p < packet->size())
-    {
-        for (size_t j = 0; j < 16 && p < packet->size(); ++j)
-            fprintf(logFiles[LOG_WORLDPACKET], "%.2X ", (*packet)[p++]);
-
-        fprintf(logFiles[LOG_WORLDPACKET], "\n");
-    }
-
-    fprintf(logFiles[LOG_WORLDPACKET], "\n\n");
-    fflush(logFiles[LOG_WORLDPACKET]);
 }
+
+#endif
 
 bool Log::IsSmartLog(uint32 entry, uint32 guid) const
 {

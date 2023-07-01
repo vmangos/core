@@ -204,11 +204,6 @@ void MovementPacketSender::SendTeleportToController(Unit* unit, float x, float y
 void MovementPacketSender::SendTeleportToObservers(Unit* unit, float x, float y, float z, float ang)
 {
     Player* mover = unit->GetPlayerMovingMe();
-    if (!mover)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendTeleportToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
-        return;
-    }
 
     WorldPacket data(MSG_MOVE_TELEPORT, 64);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

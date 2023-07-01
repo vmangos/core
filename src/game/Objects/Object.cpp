@@ -343,12 +343,22 @@ void Object::SendCreateUpdateToPlayer(Player* player)
     upd.Send(player->GetSession());
 }
 
-void WorldObject::DirectSendPublicValueUpdate(uint32 index)
+void WorldObject::DirectSendPublicValueUpdate(uint32 index, uint32 count)
 {
     // Do we need an update ?
-    if (m_uint32Values_mirror[index] == m_uint32Values[index])
+    bool abort = true;
+    for (int i = 0; i < count; i++)
+    {
+        if (m_uint32Values_mirror[index + i] != m_uint32Values[index + i])
+        {
+            abort = false;
+            m_uint32Values_mirror[index + i] = m_uint32Values[index + i];
+        }
+    }
+
+    if (abort)
         return;
-    m_uint32Values_mirror[index] = m_uint32Values[index];
+
     UpdateData data;
     ByteBuffer buf(50);
     buf << uint8(UPDATETYPE_VALUES);
@@ -360,11 +370,13 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index)
 
     UpdateMask updateMask;
     updateMask.SetCount(m_valuesCount);
-    updateMask.SetBit(index);
+    for (int i = 0; i < count; i++)
+        updateMask.SetBit(index + i);
 
     buf << (uint8)updateMask.GetBlockCount();
     buf.append(updateMask.GetMask(), updateMask.GetLength());
-    buf << uint32(m_uint32Values[index]);
+    for (int i = 0; i < count; i++)
+        buf << uint32(m_uint32Values[index + i]);
 
     data.AddUpdateBlock(buf);
     WorldPacket packet;
@@ -723,15 +735,17 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                 // RAID ally-horde - Faction
                 else if (index == UNIT_FIELD_FACTIONTEMPLATE)
                 {
-                    Player* owner = ((Unit*)this)->GetCharmerOrOwnerPlayerOrPlayerItself();
+                    Unit const* owner = ((Unit*)this)->GetCharmerOrOwner();
+                    if (!owner)
+                        owner = ToPlayer();
                     bool forceFriendly = false;
-                    if (owner)
+                    if (owner && owner->IsPlayer())
                     {
                         FactionTemplateEntry const* ft1,* ft2;
                         ft1 = owner->GetFactionTemplateEntry();
                         ft2 = target->GetFactionTemplateEntry();
-                        if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && owner->IsInSameRaidWith(target))
-                            if (owner->IsInInterFactionMode() && target->IsInInterFactionMode())
+                        if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && static_cast<Player const*>(owner)->IsInSameRaidWith(target))
+                            if (static_cast<Player const*>(owner)->IsInInterFactionMode() && target->IsInInterFactionMode())
                                 forceFriendly = true;
                     }
                     uint32 faction = m_uint32Values[index];
@@ -1362,7 +1376,10 @@ void Object::ExecuteDelayedActions()
 
 bool WorldObject::IsWithinLootXPDist(WorldObject const* objToLoot) const
 {
-    if (objToLoot && IsInMap(objToLoot) && objToLoot->GetMap()->IsRaid())
+    if (!IsInMap(objToLoot))
+        return false;
+
+    if (objToLoot->GetMap()->IsRaid())
         return true;
 
     // Bosses have increased loot distance.
@@ -1370,7 +1387,7 @@ bool WorldObject::IsWithinLootXPDist(WorldObject const* objToLoot) const
     if (objToLoot->IsCreature() && (static_cast<Creature const*>(objToLoot)->GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS))
         lootDistance += 150.0f;
 
-    return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, lootDistance, false);
+    return _IsWithinDist(objToLoot, lootDistance, false);
 }
 
 float WorldObject::GetVisibilityModifier() const
@@ -1577,7 +1594,7 @@ bool WorldObject::IsWithinDist2d(float x, float y, float dist2compare, SizeFacto
 
 bool WorldObject::IsInMap(WorldObject const* obj) const
 {
-    return IsInWorld() && obj->IsInWorld() && (GetMap() == obj->GetMap());
+    return IsInWorld() && obj->IsInWorld() && (FindMap() == obj->FindMap());
 }
 
 bool WorldObject::_IsWithinDist(WorldObject const* obj, float const dist2compare, const bool is3D, SizeFactor distcalc) const
@@ -1843,13 +1860,12 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         rand_z = z;
         return true;
     }
-    ASSERT(FindMap());
-    Map const* map = GetMap();
+    
+    Map const* pMap = GetMap();
+    Unit const* pUnit = ToUnit();
 
-    bool is_air_ok   = isType(TYPEMASK_UNIT) ? ((Unit*)this)->CanFly() : false;
-
-    // 1er cas on peut voler => Position en l'air, facile.
-    if (is_air_ok)
+    // 1st case we can fly => Position in the air, easy.
+    if (pUnit && pUnit->CanFly())
     {
         float randAngle1 = rand_norm_f() * 2 * M_PI;
         float randAngle2 = rand_norm_f() * 2 * M_PI;
@@ -1860,25 +1876,44 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         // May happen in the border of the map
         if (!MaNGOS::IsValidMapCoord(x, y, z) || !MaNGOS::IsValidMapCoord(rand_x, rand_y, rand_z))
             return false;
-        map->GetLosHitPosition(x, y, z, rand_x, rand_y, rand_z, -0.5f);
+        pMap->GetLosHitPosition(x, y, z, rand_x, rand_y, rand_z, -0.5f);
         return true;
     }
-    else
+
+    // Get swimming position using just vmaps.
+    if (pUnit && pUnit->CanSwim() && pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION))
     {
-        // Sinon, on trouve une position au sol, ou dans l'eau, ou dans la lave (pas pour les joueurs)
+        GridMapLiquidData liquid_status;
+        GridMapLiquidStatus res = pMap->GetTerrain()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
+        if (res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER))
+        {
+            rand_x = x;
+            rand_y = y;
+            rand_z = z;
+            if (pMap->GetSwimRandomPosition(rand_x, rand_y, rand_z, distance, liquid_status, true))
+            {
+                pMap->GetLosHitPosition(x, y, z, rand_x, rand_y, rand_z, -0.5f);
+                return true;
+            }
+        }
+    }
+    
+    {
+        // Otherwise, we find a position on the ground, or in water, or in lava (not for players)
         uint32 moveAllowed = NAV_GROUND | NAV_WATER;
         if (GetTypeId() != TYPEID_PLAYER)
             moveAllowed |= NAV_MAGMA | NAV_SLIME;
         rand_x = x;
         rand_y = y;
         rand_z = z;
-        if (map->GetWalkRandomPosition(GetTransport(), rand_x, rand_y, rand_z, distance, moveAllowed))
+        if (pMap->GetWalkRandomPosition(GetTransport(), rand_x, rand_y, rand_z, distance, moveAllowed))
         {
             // Giant type creatures walk underwater
-            if ((isType(TYPEMASK_UNIT) && !ToUnit()->CanSwim()) ||
-                (IsCreature() && ToCreature()->GetCreatureInfo()->type == CREATURE_TYPE_GIANT))
+            if ((pUnit && !pUnit->CanSwim()) ||
+                (IsCreature() && !pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION)))
                 return true;
-            // La position renvoyee par le pathfinding est tout au fond de l'eau. On randomise ca un peu ...
+
+            // The position returned by the pathfinding is at the bottom of the water. We're randomizing it a bit...
             float ground = 0.0f;
             float waterSurface = GetTerrain()->GetWaterLevel(x, y, z, &ground);
             if (waterSurface == VMAP_INVALID_HEIGHT_VALUE)
@@ -1888,7 +1923,7 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
             rand_z += rand_norm_f() * distance / 2.0f;
             if (rand_z < ground)
                 rand_z = ground;
-            // Ici 'is_air_ok' = false, donc on reste SOUS l'eau.
+            // Flying case checked before that, so we stay UNDER water.
             if (rand_z > waterSurface)
                 rand_z = waterSurface;
             return true;

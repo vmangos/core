@@ -786,7 +786,7 @@ struct instance_blackrock_depths : ScriptedInstance
                         GetCreatureListWithEntryInGrid(AnvilrageList, magmus, 8901, 400.0f);
 
                         for (const auto& it : AnvilrageList)
-                            it->SetRespawnDelay(345600);
+                            it->SetRespawnDelay(4 * DAY);
                     }
                 }
                 m_auiEncounter[TYPE_LYCEUM] = uiData;

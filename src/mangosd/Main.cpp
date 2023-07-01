@@ -78,6 +78,8 @@ void usage(const char *prog)
         ,prog);
 }
 
+char const* g_mainLogFileName = "Server.log";
+
 /// Launch the mangos server
 extern int main(int argc, char **argv)
 {

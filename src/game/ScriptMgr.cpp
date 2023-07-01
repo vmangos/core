@@ -750,6 +750,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 break;
             }
             case SCRIPT_COMMAND_START_SCRIPT:
+            case SCRIPT_COMMAND_START_SCRIPT_ON_GROUP:
             {
                 if (100 < (tmp.startScript.chance[0] + tmp.startScript.chance[1] + tmp.startScript.chance[2] + tmp.startScript.chance[3]))
                 {
@@ -1153,14 +1154,13 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 }
                 break;
             }
-            case SCRIPT_COMMAND_LOAD_GAMEOBJECT:
+            case SCRIPT_COMMAND_LOAD_GAMEOBJECT_SPAWN:
             {
-                GameObjectData const* data = sObjectMgr.GetGOData(tmp.GetGOGuid());
-                if (!data)
+                if (!sObjectMgr.GetGOData(tmp.GetGOGuid()))
                 {
                     if (!sObjectMgr.IsExistingGameObjectGuid(tmp.GetGOGuid()))
                     {
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_LOAD_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_LOAD_GAMEOBJECT_SPAWN for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
                         continue;
                     }
                     else
@@ -1187,6 +1187,39 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 {
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` using invalid anim id in datalong (%u) in SCRIPT_COMMAND_PLAY_CUSTOM_ANIM for script id %u",
                         tablename, tmp.setGoState.state, tmp.id);
+                    continue;
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_LOAD_CREATURE_SPAWN:
+            {
+                if (!sObjectMgr.GetCreatureData(tmp.loadCreature.dbGuid))
+                {
+                    if (!sObjectMgr.IsExistingCreatureGuid(tmp.loadCreature.dbGuid))
+                    {
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` using invalid creature guid in datalong (%u) in SCRIPT_COMMAND_LOAD_CREATURE_SPAWN for script id %u",
+                            tablename, tmp.loadCreature.dbGuid, tmp.id);
+                        continue;
+                    }
+                    else
+                    {
+                        DisableScriptAction(tmp);
+                        break;
+                    }
+                }
+                
+                break;
+            }
+            case SCRIPT_COMMAND_START_SCRIPT_ON_ZONE:
+            {
+                if (!tmp.startScriptOnZone.scriptId)
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has no provided script id in SCRIPT_COMMAND_START_SCRIPT_ON_ZONE for script id %u.", tablename, tmp.id);
+                    continue;
+                }
+                if (!tmp.startScriptOnZone.zoneId)
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has no provided zone id in SCRIPT_COMMAND_START_SCRIPT_ON_ZONE for script id %u.", tablename, tmp.id);
                     continue;
                 }
                 break;
@@ -2357,8 +2390,8 @@ void ScriptMgr::CollectPossibleGenericIds(std::set<uint32>& genericIds)
     Field* fields;
     for (const auto& script_table : script_tables)
     {
-        // From SCRIPT_COMMAND_START_SCRIPT.
-        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command`=39", script_table));
+        // From SCRIPT_COMMAND_START_SCRIPT and SCRIPT_COMMAND_START_SCRIPT_ON_GROUP.
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command` IN (39, 90)", script_table));
 
         if (result)
         {
@@ -2394,8 +2427,8 @@ void ScriptMgr::CollectPossibleGenericIds(std::set<uint32>& genericIds)
             } while (result->NextRow());
         }
 
-        // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL.
-        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command`=68 && `datalong`!=0", script_table));
+        // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL and SCRIPT_COMMAND_START_SCRIPT_ON_ZONE.
+        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command` IN (68, 92) && `datalong`!=0", script_table));
 
         if (result)
         {
@@ -2589,7 +2622,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
             if (chatType == CHAT_TYPE_ZONE_YELL)
             {
                 if (Map* pZone = pSource->GetMap())
-                    pZone->PlayDirectSoundToMap(soundId);
+                    pZone->PlayDirectSoundToMap(soundId, pZone->IsContinent() ? pSource->GetZoneId() : 0);
             }
             else
                 pSource->PlayDirectSound(soundId);

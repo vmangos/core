@@ -35,14 +35,15 @@ EndContentData */
 enum
 {
     QUEST_EXTINGUISHING_THE_IDOL = 3525,
-    SAY_BELNISTRASZ_READY = -1129005,
-    SAY_BELNISTRASZ_START_RIT = -1129006,
-    SAY_BELNISTRASZ_AGGRO_1 = -1129007,
-    SAY_BELNISTRASZ_AGGRO_2 = -1129008,
-    SAY_BELNISTRASZ_3_MIN = -1129009,
-    SAY_BELNISTRASZ_2_MIN = -1129010,
-    SAY_BELNISTRASZ_1_MIN = -1129011,
-    SAY_BELNISTRASZ_FINISH = -1129012,
+
+    SAY_BELNISTRASZ_READY     = 4493,
+    SAY_BELNISTRASZ_START_RIT = 4501,
+    SAY_BELNISTRASZ_AGGRO_1   = 9008,
+    SAY_BELNISTRASZ_AGGRO_2   = 9007,
+    SAY_BELNISTRASZ_3_MIN     = 4504,
+    SAY_BELNISTRASZ_2_MIN     = 4505,
+    SAY_BELNISTRASZ_1_MIN     = 4506,
+    SAY_BELNISTRASZ_FINISH    = 4507,
 
     NPC_IDOL_ROOM_SPAWNER = 8611,
     NPC_WITHERED_BATTLE_BOAR = 7333,
@@ -128,11 +129,9 @@ struct npc_belnistraszAI : public npc_escortAI
 
     void SpawnerSummon(Creature* pSummoner)
     {
-        Creature * crea = nullptr;
         if (m_uiRitualPhase > 7)
         {
-            if(crea = pSummoner->SummonCreature(NPC_PLAGUEMAW_THE_ROTTING, pSummoner->GetPositionX(), pSummoner->GetPositionY(), pSummoner->GetPositionZ(), pSummoner->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-               crea->SetRespawnDelay(600000);
+            pSummoner->SummonCreature(NPC_PLAGUEMAW_THE_ROTTING, pSummoner->GetPositionX(), pSummoner->GetPositionY(), pSummoner->GetPositionZ(), pSummoner->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
             return;
         }
 
@@ -156,8 +155,7 @@ struct npc_belnistraszAI : public npc_escortAI
                     uiEntry = NPC_DEATHS_HEAD_GEOMANCER;
                     break;
             }
-            if (crea = pSummoner->SummonCreature(uiEntry, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-                crea->SetRespawnDelay(600000);
+            pSummoner->SummonCreature(uiEntry, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
         }
     }
 
@@ -169,8 +167,7 @@ struct npc_belnistraszAI : public npc_escortAI
     void DoSummonRandom()
     {
         uint32 type = urand(0, 2);
-        if(Creature * crea = m_creature->SummonCreature(NPC_IDOL_ROOM_SPAWNER, m_fSpawnerCoord[type][0], m_fSpawnerCoord[type][1], m_fSpawnerCoord[type][2], m_fSpawnerCoord[type][3], TEMPSUMMON_TIMED_DESPAWN, 10000))
-            crea->SetRespawnDelay(600000);
+        m_creature->SummonCreature(NPC_IDOL_ROOM_SPAWNER, m_fSpawnerCoord[type][0], m_fSpawnerCoord[type][1], m_fSpawnerCoord[type][2], m_fSpawnerCoord[type][3], TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 10000);
     }
 
     void WaypointReached(uint32 uiPointId) override
@@ -329,6 +326,6 @@ void AddSC_razorfen_downs()
 
     newscript = new Script;
     newscript->Name = "go_gong";
-    newscript->pGOHello =           &GOHello_go_gong;
+    newscript->pGOHello = &GOHello_go_gong;
     newscript->RegisterSelf();
 }

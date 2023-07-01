@@ -250,6 +250,11 @@ enum ConditionType
                                                             // Requirement: Unit Target
                                                             // Value1: 0, 1, or 2 (0: any, 1: hostile, 2: friendly)
                                                             // Value2: search_radius
+    CONDITION_CREATURE_GROUP_MEMBER = 57,                   // Checks if creature is part of a group.
+                                                            // Requirement: Creature Source
+                                                            // Value1: leader_guid (optional)
+    CONDITION_CREATURE_GROUP_DEAD   = 58,                   // Checks if creature's group is dead.
+                                                            // Requirement: Creature Source
 };
 
 enum ConditionFlags

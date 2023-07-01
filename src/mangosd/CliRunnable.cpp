@@ -24,15 +24,11 @@
 /// \file
 
 #include "Common.h"
-#include "Log.h"
 #include "World.h"
 #include "Config/Config.h"
 #include "Util.h"
 #include "CliRunnable.h"
-#include "Chat.h"
-#include "Chat/AsyncCommandHandlers.h"
-
-#include <iterator>
+#include "Database/DatabaseEnv.h"
 
 void utf8print(void* /*arg*/, const char* str)
 {
@@ -89,14 +85,12 @@ void CliRunnable::operator()()
     char commandbuf[256];
 
     ///- Display the list of available CLI functions then beep
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-
     if (sConfig.GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
     // print this here the first time
     // later it will be printed after command queue updates
-    printf("mangos>");
+    printf("\nmangos>");
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
