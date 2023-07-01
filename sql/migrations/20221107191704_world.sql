@@ -38,9 +38,8 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11019, 17, 10660, 0, 0, 0, 0), -- Condition to return true if the player has learnt Tribal Leatherworking
 (11020, 17, 10658, 0, 0, 0, 0), -- Condition to return true if the player has learnt Elemental Leatherworking
 (11021, 17, 10656, 0, 0, 0, 0), -- Condition to return true if the player has learnt Dragonscale Leatherworking
-(11022, -2, 11019, 11020, 11021, 0, 0), -- Condition to return true if the player has learnt Tribal, Elemental, OR Dragonscale Leatherworking
-(11027, -3, 11022, 0, 0, 0, 0), -- Negates the above condition
-(11023, -1, 11009, 11018, 11027, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
+(11022, -2, 11019, 11020, 11021, 0, 1), -- Condition to return true if the player has learnt Tribal, Elemental, OR Dragonscale Leatherworking
+(11023, -1, 11009, 11018, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
 (11024, -1, 11023, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
 (11025, -3, 11007, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
 (11026, -2, 11025, 11008, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies includes if both requirements are met (Uses engineering text for now because I have no idea what is correct)
