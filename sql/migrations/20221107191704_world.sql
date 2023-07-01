@@ -35,12 +35,12 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11016, 8, 5146, 0, 0, 0, 0), -- Condition for completing Elemental Leatherworking (horde side)
 (11017, -2, 11014, 11015, 11016, 0, 0), -- Condition to return true if any of the above quests are complete
 (11018, -2, 11013, 11017, 0, 0, 0), -- Condition to return true if either of the two above OR conditions are true
-(11019, 17, 10660, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Tribal Leatherworking
-(11020, 17, 10658, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Elemental Leatherworking
-(11021, 17, 10656, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Dragonscale Leatherworking
-(11022, -1, 11019, 11020, 11021, 0, 0), -- Condition to return true if the player has NOT learnt Tribal, Elemental, AND Dragonscale Leatherworking
+(11019, 17, 10660, 0, 0, 0, 0), -- Condition to return true if the player has learnt Tribal Leatherworking
+(11020, 17, 10658, 0, 0, 0, 0), -- Condition to return true if the player has learnt Elemental Leatherworking
+(11021, 17, 10656, 0, 0, 0, 0), -- Condition to return true if the player has learnt Dragonscale Leatherworking
+(11022, -2, 11019, 11020, 11021, 0, 1), -- Condition to return true if the player has learnt NEITHER Tribal, Elemental, NOR Dragonscale Leatherworking
 (11023, -1, 11009, 11018, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
-(11024, -1, 11023, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
+(11024, -1, 11023, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
 (11025, -3, 11007, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
 (11026, -2, 11025, 11008, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies includes if both requirements are met (Uses engineering text for now because I have no idea what is correct)
 
