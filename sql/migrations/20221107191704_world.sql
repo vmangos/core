@@ -23,8 +23,8 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11004, -1, 11001, 10996, 393, 10994, 0), -- Same as above (missing patch requirement) but requires specifically completing Show Your Work (gnomish engineering - horde side) or Show Your Work (goblin engineering) for gossip option
 (11005, -1, 11003, 4018, 0, 0, 0), -- Add patch requirement to alliance-side gossip condition
 (11006, -1, 11004, 4018, 0, 0, 0), -- Add patch requirement to horde-side gossip condition
-(11007, -1, 11002, 11023, 0, 0, 1), -- NAND gate for Leatherworking and Engineering requirements for Book "Soothsaying for Dummies" gossip (If the conditions for both Leatherworking and Engineering gossips are met then this condition allows to easily decide what should be displayed)
-(11008, -1, 11002, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
+(11027, -1, 11002, 11023, 0, 0, 1), -- NAND gate for Leatherworking and Engineering requirements for Book "Soothsaying for Dummies" gossip (If the conditions for both Leatherworking and Engineering gossips are met then this condition allows to easily decide what should be displayed)
+(11028, -1, 11002, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
 (11009, 7, 165, 225, 0, 0, 0), -- Condition for Leatherworking skill of 225
 (11010, 8, 5141, 0, 0, 0, 0), -- Condition for completing Dragonscale Leatherworking (alliance side)
 (11011, 8, 5143, 0, 0, 0, 0), -- Condition for completing Tribal Leatherworking (alliance side)
@@ -40,9 +40,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11021, 17, 10656, 0, 0, 0, 0), -- Condition to return true if the player has learnt Dragonscale Leatherworking
 (11022, -2, 11019, 11020, 11021, 0, 1), -- Condition to return true if the player has learnt Tribal, Elemental, OR Dragonscale Leatherworking
 (11023, -1, 11009, 11018, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
-(11024, -1, 11023, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
-(11025, -3, 11007, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
-(11026, -2, 11025, 11008, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies includes if both requirements are met (Uses engineering text for now because I have no idea what is correct)
+(11034, -1, 11023, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
+(11035, -3, 11027, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
+(11036, -2, 11035, 11028, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies includes if both requirements are met (Uses engineering text for now because I have no idea what is correct)
 
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES 
 (21000, 11880, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -60,8 +60,8 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (1469, 21000, 0, 11002), -- Gossip for Nixx Sprocketspring
 (1468, 21001, 0, 11005), -- Gossip for Tinkmaster Overspark
 (1467, 21002, 0, 11006), -- Gossip for Oglethorpe Obnoticus
-(7058, 21003, 0, 11026), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
-(7058, 21007, 0, 11024), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
+(7058, 21003, 0, 11036), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
+(7058, 21007, 0, 11034), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
 (22000, 21004, 0, 0), -- Gossip sub-menu for Dragonscale Leatherworking (male)
 (22001, 21005, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (male)
 (22002, 21006, 0, 0), -- Gossip sub-menu for Tribal Leatherworking (male)
