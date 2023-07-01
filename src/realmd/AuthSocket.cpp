@@ -1321,7 +1321,7 @@ void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
 
 bool AuthSocket::GeographicalLockCheck()
 {
-    if (!sConfig.GetBoolDefault("GeoLocking"), false)
+    if (!sConfig.GetBoolDefault("GeoLocking", false))
     {
         return false;
     }
