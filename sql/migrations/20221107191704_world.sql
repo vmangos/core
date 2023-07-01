@@ -38,7 +38,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11019, 17, 10660, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Tribal Leatherworking
 (11020, 17, 10658, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Elemental Leatherworking
 (11021, 17, 10656, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Dragonscale Leatherworking
-(11022, -2, 11019, 11021, 0, 0, 0), -- Condition to return true if the player has NOT learnt Tribal, Elemental, OR Dragonscale Leatherworking
+(11022, -1, 11019, 11020, 11021, 0, 0), -- Condition to return true if the player has NOT learnt Tribal, Elemental, AND Dragonscale Leatherworking
 (11023, -1, 11009, 11018, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
 (11024, -1, 11023, 11007, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
 (11025, -3, 11007, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
