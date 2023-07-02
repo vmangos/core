@@ -137,6 +137,27 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 111095;
 
+-- Create new pool to hold Alliance Chest spawns in Hillsbrad Foothills.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(70, 2, 'Alliance Chests in Hillsbrad Foothills', 0, 10);
+-- Add existing spawns to pool.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(29650, 70, 0, 'Alliance Chest', 0, 10),
+(30032, 70, 0, 'Alliance Chest', 0, 10);
+
+-- Missing Alliance Chest spawns in Hillsbrad Foothills.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(30264, 4096, 0, -1290.25, -1224.9, 22.957, 5.00909, 0, 0, -0.594823, 0.803857, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 30032 at 73.315445 yards.
+(29663, 4096, 0, -801.115, 65.3181, 8.89202, 0.785397, 0, 0, 0.382683, 0.92388, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 29650 at 42.744179 yards.
+(29664, 4096, 0, -722.055, 131.321, 21.1245, 4.31097, 0, 0, -0.833885, 0.551938, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 29650 at 142.692291 yards.
+(30265, 4096, 0, -1296.34, -1172.98, 38.0041, 1.5708, 0, 0, 0.707107, 0.707107, 7200, 7200, 1, 100, 0, 10); -- Closest existing guid is 30032 at 95.762459 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(30264, 70, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Hillsbrad Foothills
+(29663, 70, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Hillsbrad Foothills
+(29664, 70, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Hillsbrad Foothills
+(30265, 70, 0, 'Alliance Chest', 0, 10); -- Alliance Chests in Hillsbrad Foothills
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 4096;
 
 -- End of migration.
 END IF;
