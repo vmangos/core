@@ -178,6 +178,44 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 105581;
 
+-- Create new pool to hold Alliance Chest spawns in Alterac Mountains.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(76, 2, 'Alliance Chests in Alterac Mountains', 0, 10);
+-- Add existing spawns to pool.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(32213, 76, 0, 'Alliance Chest', 0, 10),
+(33181, 76, 0, 'Alliance Chest', 0, 10);
+
+-- Create new pool to hold Alliance Chest spawns in Arathi Highlands.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(75, 1, 'Alliance Chests in Arathi Highlands', 0, 10);
+-- Add existing spawns to pool.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(16787, 75, 0, 'Alliance Chest', 0, 10);
+
+-- Missing Alliance Chest spawns in Alterac Mountains.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(33188, 105579, 0, 424.828, 221.755, 42.888, 0.663223, 0, 0, 0.325567, 0.945519, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 33181 at 56.035671 yards.
+(32515, 105579, 0, 96.9252, 367.759, 43.922, 3.97935, 0, 0, -0.913545, 0.406738, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 32213 at 89.992744 yards.
+(32516, 105579, 0, 58.7195, 276.344, 41.9076, 5.13127, 0, 0, -0.544639, 0.838671, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 32213 at 188.771606 yards.
+(33191, 105579, 0, 335.954, 185.797, 42.9273, 4.69494, 0, 0, -0.71325, 0.70091, 7200, 7200, 1, 100, 0, 10); -- Closest existing guid is 33181 at 54.145618 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(33188, 76, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Alterac Mountains
+(32515, 76, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Alterac Mountains
+(32516, 76, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Alterac Mountains
+(33191, 76, 0, 'Alliance Chest', 0, 10); -- Alliance Chests in Alterac Mountains
+
+-- Missing Alliance Chest spawns in Arathi Highlands.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(16906, 105579, 0, -1047.6, -2811.98, 42.197, 3.85718, 0, 0, -0.936671, 0.35021, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 16787 at 125.762589 yards.
+(16912, 105579, 0, -1106.34, -2921.2, 42.197, 4.66003, 0, 0, -0.725374, 0.688355, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 16787 at 22.387850 yards.
+(16919, 105579, 0, -1007.02, -2896.23, 62.8136, 3.38594, 0, 0, -0.992546, 0.12187, 7200, 7200, 1, 100, 0, 10); -- Closest existing guid is 16787 at 89.249290 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(16906, 75, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Arathi Highlands
+(16912, 75, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Arathi Highlands
+(16919, 75, 0, 'Alliance Chest', 0, 10); -- Alliance Chests in Arathi Highlands
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 105579;
 
 -- End of migration.
 END IF;
