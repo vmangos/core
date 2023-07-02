@@ -168,13 +168,13 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 -- Missing Alliance Chest spawns in Arathi Highlands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(17031, 105581, 0, -1544.81, -1751.48, 68.1662, 1.11701, 0, 0, 0.529919, 0.848048, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 16992 at 134.963043 yards.
-(17032, 105581, 0, -1601.2, -1645, 68.1097, 2.9845, 0, 0, 0.996917, 0.0784664, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 16992 at 69.362106 yards.
-(17035, 105581, 0, -1509.78, -1689.98, 68.8217, 4.90438, 0, 0, -0.636078, 0.771625, 7200, 7200, 1, 100, 0, 10); -- Closest existing guid is 16992 at 150.650986 yards.
+(55400, 105581, 0, -1544.81, -1751.48, 68.1662, 1.11701, 0, 0, 0.529919, 0.848048, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 16992 at 134.963043 yards.
+(55401, 105581, 0, -1601.2, -1645, 68.1097, 2.9845, 0, 0, 0.996917, 0.0784664, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 16992 at 69.362106 yards.
+(55402, 105581, 0, -1509.78, -1689.98, 68.8217, 4.90438, 0, 0, -0.636078, 0.771625, 7200, 7200, 1, 100, 0, 10); -- Closest existing guid is 16992 at 150.650986 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(17031, 74, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Arathi Highlands
-(17032, 74, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Arathi Highlands
-(17035, 74, 0, 'Alliance Chest', 0, 10); -- Alliance Chests in Arathi Highlands
+(55400, 74, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Arathi Highlands
+(55401, 74, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Arathi Highlands
+(55402, 74, 0, 'Alliance Chest', 0, 10); -- Alliance Chests in Arathi Highlands
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 105581;
 
