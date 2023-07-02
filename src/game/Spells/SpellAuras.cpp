@@ -1808,11 +1808,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
-                    case 29154:
+                    case 29153: // Gargoyle Stoneform Visual
                     {
-                        Unit* caster = GetCaster();
-                        if (!caster) break;
-                        caster->HandleEmote(EMOTE_STATE_SUBMERGED);
+                        // using stand state 9 in sniff
+                        target->SetStandState(MAX_UNIT_STAND_STATE);
+                        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         break;
                     }
                     case 29705: // Midsummer Pole Dancing
@@ -2062,6 +2062,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             {
                 if (target->HasAura(29660))
                     target->RemoveAurasDueToSpell(29660);
+                break;
+            }
+            case 29153: // Gargoyle Stoneform Visual
+            {
+                target->SetStandState(UNIT_STAND_STATE_STAND);
+                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 break;
             }
         }
