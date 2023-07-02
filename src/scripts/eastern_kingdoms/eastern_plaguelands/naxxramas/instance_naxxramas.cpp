@@ -1495,47 +1495,56 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
     }
 };
 
+enum
+{
+    SPELL_INVISIBILITY_AND_STEALTH_DETECTION = 18950,
+    SPELL_STONESKIN = 28995, // Periodic Heal and Damage Immunity
+    SPELL_GARGOYLE_STONEFORM_VISUAL = 29153, // Dummy Aura
+    SPELL_ACID_VOLLEY = 29325,
+
+    BCT_STRANGE_NOISE = 10755, // %s emits a strange noise.
+};
+
 struct mob_naxxramasGarboyleAI : public ScriptedAI
 {
-    mob_naxxramasGarboyleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    mob_naxxramasGarboyleAI(Creature* pCreature)
+        : ScriptedAI(pCreature)
     {
         Reset();
-        goStoneform();
+        EnterStoneform();
 
         if (m_creature->GetDefaultMovementType() == IDLE_MOTION_TYPE && m_creature->GetEntry() == 16168)
-            m_creature->CastSpell(m_creature, 18950, true); // stealth detection
+            m_creature->CastSpell(m_creature, SPELL_INVISIBILITY_AND_STEALTH_DETECTION, true);
     }
 
-    void goStoneform()
+    void EnterStoneform()
     {
         if (m_creature->GetDefaultMovementType() == IDLE_MOTION_TYPE && m_creature->GetEntry() == 16168)
-        {
-            m_creature->CastSpell(m_creature, 29154, true);
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
-        }
+            m_creature->CastSpell(m_creature, SPELL_GARGOYLE_STONEFORM_VISUAL, true);
     }
 
-    uint32 acidVolleyTimer;
+    uint32 m_uiAcidVolleyTimer;
 
     void Reset() override
     {
-        acidVolleyTimer = 4000;
+        m_uiAcidVolleyTimer = urand(2800, 6500);
     }
 
     void JustReachedHome() override
     {
-        goStoneform();
+        EnterStoneform();
     }
 
     void MoveInLineOfSight(Unit* pWho) override
     {
-        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING))
+        if (m_creature->HasAura(SPELL_GARGOYLE_STONEFORM_VISUAL))
         {
             if (pWho->GetTypeId() == TYPEID_PLAYER
                 && !m_creature->IsInCombat()
                 && m_creature->IsWithinDistInMap(pWho, 17.0f)
+                && m_creature->IsWithinLOSInMap(pWho)
                 && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH)
-                && m_creature->IsWithinLOSInMap(pWho))
+                && !pWho->HasAuraType(SPELL_AURA_MOD_UNATTACKABLE))
             {
                 AttackStart(pWho);
             }
@@ -1548,10 +1557,8 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
 
     void Aggro(Unit*) override
     {
-        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING))
-        {
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
-        }
+        if (m_creature->HasAura(SPELL_GARGOYLE_STONEFORM_VISUAL))
+            m_creature->RemoveAurasDueToSpellByCancel(SPELL_GARGOYLE_STONEFORM_VISUAL);
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1559,27 +1566,27 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(28995))
+        if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(SPELL_STONESKIN))
         {
-            if (DoCastSpellIfCan(m_creature, 28995) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_STONESKIN) == CAST_OK)
             {
-                m_creature->CastSpell(m_creature, 28995, true); // Stoneskin
-                DoScriptText(10755, m_creature); // %s emits a strange noise.
+                m_creature->CastSpell(m_creature, SPELL_STONESKIN, true);
+                DoScriptText(BCT_STRANGE_NOISE, m_creature);
             }
         }
 
-        if (acidVolleyTimer < diff && !m_creature->IsNonMeleeSpellCasted())
+        if (m_uiAcidVolleyTimer < diff && !m_creature->IsNonMeleeSpellCasted())
         {
             // supposedly the first gargoyle in plague wing did not do the acid volley, so
             // hackfix here to skip him
             if (m_creature->GetDBTableGUIDLow() != 88095)
             {
-                if (DoCastSpellIfCan(m_creature, 29325) == CAST_OK) // acid volley
-                    acidVolleyTimer = 8000;
+                if (DoCastSpellIfCan(m_creature, SPELL_ACID_VOLLEY) == CAST_OK) // acid volley
+                    m_uiAcidVolleyTimer = 8000;
             }
         }
         else
-            acidVolleyTimer -= diff;
+            m_uiAcidVolleyTimer -= diff;
 
         DoMeleeAttackIfReady();
     }
