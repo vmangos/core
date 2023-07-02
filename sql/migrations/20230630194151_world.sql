@@ -8,16 +8,6 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20230630194151');
 -- Add your query below.
 
-
--- Create new pool to hold Hidden Strongbox spawns in Alterac Mountains.
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(9, 6, 'Hidden Strongboxs in Alterac Mountains', 0, 10);
--- Add existing spawns to pool.
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(32179, 9, 0, 'Hidden Strongbox', 0, 10),
-(32183, 9, 0, 'Hidden Strongbox', 0, 10),
-(32184, 9, 0, 'Hidden Strongbox', 0, 10);
-
 -- Missing Hidden Strongbox spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (32346, 2039, 0, 475.848, 258.451, 43.3263, 2.58308, 0, 0, 0.961261, 0.27564, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 32184 at 139.037186 yards.
@@ -34,21 +24,9 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (32492, 2039, 0, 63.5124, 268.543, 43.1233, 0.331611, 0, 0, 0.165047, 0.986286, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 32183 at 264.393341 yards.
 (32493, 2039, 0, 298.736, 186.098, 42.6336, 2.30383, 0, 0, 0.913545, 0.406738, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 32183 at 22.190643 yards.
 (32509, 2039, 0, 444.879, 196.229, 43.7402, 3.38594, 0, 0, -0.992546, 0.12187, 7200, 7200, 1, 100, 0, 10); -- Closest existing guid is 32184 at 82.155258 yards.
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(32346, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32361, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32362, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32454, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32455, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32459, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32460, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32470, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32471, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32479, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32485, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32492, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32493, 9, 0, 'Hidden Strongbox', 0, 10), -- Hidden Strongboxs in Alterac Mountains
-(32509, 9, 0, 'Hidden Strongbox', 0, 10); -- Hidden Strongboxs in Alterac Mountains
+
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
+(2039, 6, 'Alterac Mountains - Hidden Strongbox');
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 2039;
 
