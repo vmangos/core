@@ -70,6 +70,25 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 3715;
 
+-- Create new pool to hold Horde Chest spawns in Arathi Highlands.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(65, 2, 'Horde Chests in Arathi Highlands', 0, 10);
+-- Add existing spawns to pool.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(16947, 65, 0, 'Horde Chest', 0, 10);
+
+-- Missing Horde Chest spawns in Arathi Highlands.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(16970, 105578, 0, -1487.69, -3124.46, 13.3643, 5.48033, 0, 0, -0.390731, 0.920505, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 16947 at 94.587196 yards.
+(16971, 105578, 0, -1542.43, -3033.22, 12.9804, 6.23083, 0, 0, -0.0261765, 0.999657, 7200, 7200, 1, 100, 0, 10), -- Closest existing guid is 16947 at 67.309319 yards.
+(16972, 105578, 0, -1466.3, -3081.7, 13.2939, 2.89725, 0, 0, 0.992546, 0.12187, 7200, 7200, 1, 100, 0, 10); -- Closest existing guid is 16947 at 51.763432 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(16970, 65, 0, 'Horde Chest', 0, 10), -- Horde Chests in Arathi Highlands
+(16971, 65, 0, 'Horde Chest', 0, 10), -- Horde Chests in Arathi Highlands
+(16972, 65, 0, 'Horde Chest', 0, 10); -- Horde Chests in Arathi Highlands
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 105578;
+
 
 -- End of migration.
 END IF;
