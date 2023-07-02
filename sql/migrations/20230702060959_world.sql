@@ -89,6 +89,54 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 105578;
 
+-- Create new pool to hold Alliance Chest spawns in The Barrens.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(66, 2, 'Alliance Chests in The Barrens', 0, 10);
+-- Add existing spawns to pool.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(15748, 66, 0, 'Alliance Chest', 0, 10);
+
+-- Create new pool to hold Alliance Chest spawns in Silverpine Forest.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(67, 3, 'Alliance Chests in Silverpine Forest', 0, 10);
+-- Add existing spawns to pool.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(35449, 67, 0, 'Alliance Chest', 0, 10),
+(35481, 67, 0, 'Alliance Chest', 0, 10),
+(35489, 67, 0, 'Alliance Chest', 0, 10);
+
+-- Missing Alliance Chest spawns in The Barrens.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(15752, 111095, 1, -2009.53, -3600.92, 21.7593, 3.56047, 0, 0, -0.978148, 0.207912, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 15748 at 156.407181 yards.
+(15763, 111095, 1, -2214.52, -3689.79, 93.4471, 5.49779, 0, 0, -0.382683, 0.92388, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 15748 at 128.947769 yards.
+(15764, 111095, 1, -2101.53, -3646.35, 61.716, 0.0523589, 0, 0, 0.0261765, 0.999657, 3600, 3600, 1, 100, 0, 10); -- Closest existing guid is 15748 at 86.649811 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(15752, 66, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in The Barrens
+(15763, 66, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in The Barrens
+(15764, 66, 0, 'Alliance Chest', 0, 10); -- Alliance Chests in The Barrens
+
+-- Missing Alliance Chest spawns in Silverpine Forest.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(35563, 111095, 0, -83.4207, 802.136, 63.7815, 5.32326, 0, 0, -0.461748, 0.887011, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 35489 at 56.640015 yards.
+(35482, 111095, 0, -470.033, 826.422, 96.8248, 5.67232, 0, 0, -0.300705, 0.953717, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 35481 at 245.915451 yards.
+(35565, 111095, 0, -71.4637, 808.973, 64.8878, 3.14159, 0, 0, -1, 0, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 35489 at 70.286011 yards.
+(35568, 111095, 0, -348.764, 949.185, 129.781, 0.767944, 0, 0, 0.374606, 0.927184, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 35481 at 195.435898 yards.
+(35475, 111095, 0, 73.6614, 767.879, 63.6439, 4.88692, 0, 0, -0.642787, 0.766045, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 35449 at 56.494854 yards.
+(35601, 111095, 0, 62.7082, 789.352, 64.0437, 2.42601, 0, 0, 0.936672, 0.350207, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 35449 at 39.882446 yards.
+(35607, 111095, 0, 38.3443, 792.112, 64.9459, 6.16101, 0, 0, -0.0610485, 0.998135, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 35449 at 15.406877 yards.
+(35613, 111095, 0, -105.879, 810.486, 63.712, 0.087266, 0, 0, 0.0436192, 0.999048, 3600, 3600, 1, 100, 0, 10); -- Closest existing guid is 35489 at 42.950706 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(35563, 67, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Silverpine Forest
+(35482, 67, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Silverpine Forest
+(35565, 67, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Silverpine Forest
+(35568, 67, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Silverpine Forest
+(35475, 67, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Silverpine Forest
+(35601, 67, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Silverpine Forest
+(35607, 67, 0, 'Alliance Chest', 0, 10), -- Alliance Chests in Silverpine Forest
+(35613, 67, 0, 'Alliance Chest', 0, 10); -- Alliance Chests in Silverpine Forest
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id`= 111095;
+
 
 -- End of migration.
 END IF;
