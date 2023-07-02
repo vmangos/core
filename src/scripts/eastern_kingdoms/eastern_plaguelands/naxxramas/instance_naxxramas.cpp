@@ -1561,7 +1561,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
             m_creature->RemoveAurasDueToSpellByCancel(SPELL_GARGOYLE_STONEFORM_VISUAL);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
