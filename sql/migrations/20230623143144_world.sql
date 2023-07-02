@@ -148,6 +148,14 @@ UPDATE `creature_template` SET `trainer_spell`= 0 WHERE `entry` IN (7406, 7944);
 UPDATE `gossip_menu_option` SET `condition_id` = 1368 WHERE `menu_id` = 1467 AND `id` = 0;
 UPDATE `gossip_menu_option` SET `condition_id` = 1368 WHERE `menu_id` = 1468 AND `id` = 0;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Missing Creature
+INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `orientation`, `wander_distance`, `patch_min`, `patch_max`)
+VALUES (222222, 16123, -14457.221680, 448.084534, 20.406971, 6.115618, 0, 8, 10);
+UPDATE `creature_template` SET `npc_flags` = 1, `auras` = '27614' WHERE `entry` = 16123;
+INSERT INTO `creature_addon` (`guid`, `patch`, `mount_display_id`, `auras`)VALUES 
+(0222222, 8, 0, 27614);
+
 
 -- End of migration.
 END IF;
