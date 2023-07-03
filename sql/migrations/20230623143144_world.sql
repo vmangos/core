@@ -156,6 +156,8 @@ UPDATE `creature_template` SET `npc_flags` = 1, `auras` = '27614' WHERE `entry` 
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount_display_id`, `auras`)VALUES 
 (0222222, 8, 0, 27614);
 
+UPDATE `creature` SET `wander_distance`='5' WHERE  `guid`=4185;
+DELETE FROM creature_movement_template WHERE entry = 468;
 
 -- End of migration.
 END IF;
