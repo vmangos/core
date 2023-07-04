@@ -156,8 +156,38 @@ UPDATE `creature_template` SET `npc_flags` = 1, `auras` = '27614' WHERE `entry` 
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount_display_id`, `auras`)VALUES 
 (0222222, 8, 0, 27614);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 UPDATE `creature` SET `wander_distance`='5' WHERE  `guid`=4185;
-DELETE FROM creature_movement_template WHERE entry = 468;
+DELETE FROM `creature_movement_template` WHERE `entry` = 468;
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Corrections to Rogue Class Quests
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1886, `NextQuestInChain` = 0 WHERE `entry` = 1885;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1886;
+
+UPDATE `quest_template` SET `BreadcrumbForQuestId` = 1963, `NextQuestInChain` = 0 WHERE `entry` = 1859;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1963;
+UPDATE `quest_template` SET `RequiredRaces` = 130 WHERE `entry` = 1859;
+
+UPDATE `quest_template` SET `NextQuestId`= 0, `BreadcrumbForQuestId` = 2238, `NextQuestInChain` = 0, `QuestFlags` = 0 WHERE `entry` = 2218;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry` = 2238;
+
+UPDATE `quest_template` SET `NextQuestId` = 0, `BreadcrumbForQuestId` = 2206 WHERE `entry` = 2205;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2206;
+
+UPDATE `quest_template` SET `NextQuestId` = 0, `BreadcrumbForQuestId` = 2242 WHERE `entry` = 2241;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2242;
+
+REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
+(805, -2, 804, 803, 802, 0, 1),
+(804, 22, 2206, 0, 0, 0, 1),
+(803, 22, 2238, 0, 0, 0, 1),
+(802, 22, 2242, 0, 0, 0, 1);
+
+UPDATE `quest_template` SET `RequiredCondition` = 805 WHERE `entry` IN (2218, 2205, 2241);
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
