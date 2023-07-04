@@ -64,7 +64,7 @@ void PlayerBotFleeingAI::OnPlayerLogin()
     me->SetCheatGod(true);
 }
 
-/// MageOrgrimmarAttackerAI event
+// MageOrgrimmarAttackerAI event
 enum
 {
     SPELL_FROST_NOVA = 122,
@@ -142,7 +142,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
     PlayerBotAI::UpdateAI(diff);
     if (me->GetLevel() != 60)
         me->GiveLevel(60);
-    /// DEATH
+    // DEATH
     if (!me->IsAlive())
     {
         sPlayerBotMgr.DeleteBot(me->GetGUIDLow());
@@ -162,7 +162,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         */
         return;
     }
-    /// COMBAT AI
+    // COMBAT AI
     if (me->IsNonMeleeSpellCasted(false) || (me->HasAura(AURA_REGEN_MANA) && me->GetPower(POWER_MANA) != me->GetMaxPower(POWER_MANA)))
         return;
     float range = me->IsInCombat() ? 30.0f : frand(15, 30);
@@ -217,7 +217,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         me->CastSpell(target, spellId, false);
         return;
     }
-    /// OUT OF COMBAT REGEN
+    // OUT OF COMBAT REGEN
     if (!me->IsInCombat() && me->GetPower(POWER_MANA) < 150)
     {
         if (!me->movespline->Finalized())
@@ -225,7 +225,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         me->CastSpell(target, AURA_REGEN_MANA, false);
         return;
     }
-    /// MOVEMENT AI
+    // MOVEMENT AI
     float x, y, z = 0; // Where to go
     float r = 10;
     if (me->movespline->Finalized())

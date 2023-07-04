@@ -647,7 +647,7 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTem
 void AuctionHouseObject::Update()
 {
     time_t curTime = sWorld.GetGameTime();
-    ///- Handle expired auctions
+    // Handle expired auctions
     AuctionEntryMap::iterator next;
     // Store a ref to the entry and use it rather than derefencing the itr.
     // Also required to properly erase the itr and delete the entry if
@@ -663,10 +663,10 @@ void AuctionHouseObject::Update()
         ++next;
         if (curTime > (entry->expireTime))
         {
-            ///- Either cancel the auction if there was no bidder
+            // Either cancel the auction if there was no bidder
             if (entry->bidder == 0)
                 sAuctionMgr.SendAuctionExpiredMail(entry);
-            ///- Or perform the transaction
+            // Or perform the transaction
             else
             {
                 PlayerTransactionData data;
@@ -687,7 +687,7 @@ void AuctionHouseObject::Update()
                 sAuctionMgr.SendAuctionWonMail(entry);
             }
 
-            ///- In any case clear the auction
+            // In any case clear the auction
             entry->DeleteFromDB();
             sAuctionMgr.RemoveAItem(entry->itemGuidLow);
             // Invalidates the ref to itr, cannot call delete on itr->second
@@ -870,7 +870,7 @@ uint32 AuctionEntry::GetAuctionCut() const
     return uint32(auctionHouseEntry->cutPercent * bid * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_CUT) / 100.0f);
 }
 
-/// the sum of outbid is (1% from current bid)*5, if bid is very small, it is 1c
+// The sum of outbid is (1% from current bid)*5, if bid is very small, it is 1c
 uint32 AuctionEntry::GetAuctionOutBid() const
 {
     uint32 outbid = (bid / 100) * 5;

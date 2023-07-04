@@ -353,7 +353,7 @@ void PlayerSearchHandler::ShowPlayerListHelper(QueryResult* result, ChatHandler&
     if (result)
     {
         LocaleConstant locale = chatHandler.GetSession() ? chatHandler.GetSession()->GetSessionDbcLocale() : LOCALE_enUS;
-        ///- Circle through them. Display username and GM level
+        // Circle through them. Display username and GM level
         do
         {
             // check limit
@@ -439,7 +439,7 @@ void AccountSearchHandler::HandleAccountLookupResult(QueryResult* result, uint32
 
 void AccountSearchHandler::ShowAccountListHelper(QueryResult* result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
 {
-    ///- Display the list of account/characters online
+    // Display the list of account/characters online
     if (!chatHandler.GetSession() && title)                                // not output header for online case
     {
         chatHandler.SendSysMessage(LANG_ACCOUNT_LIST_BAR);
@@ -447,7 +447,7 @@ void AccountSearchHandler::ShowAccountListHelper(QueryResult* result, ChatHandle
         chatHandler.SendSysMessage(LANG_ACCOUNT_LIST_BAR);
     }
 
-    ///- Circle through accounts
+    // Circle through accounts
     AccountTypes sessionAccess = chatHandler.GetSession() ? chatHandler.GetSession()->GetSecurity() : SEC_CONSOLE;
     do
     {

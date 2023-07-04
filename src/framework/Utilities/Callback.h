@@ -47,7 +47,7 @@
 
 //empty struct to use in templates instead of void type
 struct null { null() {} };
-/// ------------ BASE CLASSES ------------
+// ------------ BASE CLASSES ------------
 
 namespace MaNGOS
 {
@@ -181,7 +181,7 @@ namespace MaNGOS
             }
     };
 
-    /// ---- Statics ----
+    // ---- Statics ----
 
     template<typename ParamType1 = void, typename ParamType2 = void, typename ParamType3 = void, typename ParamType4 = void>
     class _SCallback
@@ -308,7 +308,7 @@ namespace MaNGOS
     };
 }
 
-/// --------- GENERIC CALLBACKS ----------
+// --------- GENERIC CALLBACKS ----------
 
 namespace MaNGOS
 {
@@ -405,7 +405,7 @@ namespace MaNGOS
     };
 }
 
-/// ---------- QUERY CALLBACKS -----------
+// ---------- QUERY CALLBACKS -----------
 
 class QueryResult;
 
@@ -496,7 +496,7 @@ namespace MaNGOS
             }
     };
 
-    /// ---- Statics ----
+    // ---- Statics ----
 
     template<typename ParamType1 = void, typename ParamType2 = void, typename ParamType3 = void>
     class SQueryCallback : public _IQueryCallback<_SCallback<QueryResult*, ParamType1, ParamType2, ParamType3> >

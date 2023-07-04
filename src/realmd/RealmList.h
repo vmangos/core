@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup realmd
-/// @{
-/// \file
+// \addtogroup realmd
+// @{
+// \file
 
 #ifndef _REALMLIST_H
 #define _REALMLIST_H
@@ -48,7 +48,7 @@ extern std::vector<RealmBuildInfo> ExpectedRealmdClientBuilds;
 
 typedef std::set<uint32> RealmBuilds;
 
-/// Storage object for a realm
+// Storage object for a realm
 struct Realm
 {
     std::string address;
@@ -62,7 +62,7 @@ struct Realm
     RealmBuildInfo realmBuildInfo;                          // build info for show version in list
 };
 
-/// Storage object for the list of realms on the server
+// Storage object for the list of realms on the server
 class RealmList
 {
     public:
@@ -85,7 +85,7 @@ class RealmList
         void UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const std::string& builds);
         void LoadAllowedClients();
     private:
-        RealmMap m_realms;                                  ///< Internal map of realms
+        RealmMap m_realms;                                  // Internal map of realms
         uint32   m_UpdateInterval;
         time_t   m_NextUpdateTime;
 };
@@ -93,4 +93,4 @@ class RealmList
 #define sRealmList RealmList::Instance()
 
 #endif
-/// @}
+// @}

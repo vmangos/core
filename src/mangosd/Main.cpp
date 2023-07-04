@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup mangosd Mangos Daemon
-/// @{
-/// \file
+// \addtogroup mangosd Mangos Daemon
+// @{
+// \file
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
@@ -52,14 +52,14 @@ int m_ServiceStatus = -1;
 #include "PosixDaemon.h"
 #endif
 
-DatabaseType WorldDatabase;                                 ///< Accessor to the world database
-DatabaseType CharacterDatabase;                             ///< Accessor to the character database
-DatabaseType LoginDatabase;                                 ///< Accessor to the realm/login database
-DatabaseType LogsDatabase;                                  ///< Accessor to the logs database
+DatabaseType WorldDatabase;                                 // Accessor to the world database
+DatabaseType CharacterDatabase;                             // Accessor to the character database
+DatabaseType LoginDatabase;                                 // Accessor to the realm/login database
+DatabaseType LogsDatabase;                                  // Accessor to the logs database
 
-uint32 realmID;                                             ///< Id of the realm
+uint32 realmID;                                             // Id of the realm
 
-/// Print out the usage string for this program on the console.
+// Print out the usage string for this program on the console.
 void usage(const char *prog)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Usage: \n %s [<options>]\n"
@@ -80,10 +80,10 @@ void usage(const char *prog)
 
 char const* g_mainLogFileName = "Server.log";
 
-/// Launch the mangos server
+// Launch the mangos server
 extern int main(int argc, char **argv)
 {
-    ///- Command line parsing
+    // Command line parsing
     char const* cfg_file = _MANGOSD_CONFIG;
 
 
@@ -210,11 +210,11 @@ extern int main(int argc, char **argv)
 
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using ACE: %s", ACE_VERSION);
 
-    ///- Set progress bars show mode
+    // Set progress bars show mode
     BarGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));
 
-    ///- and run the 'Master'
-    /// \todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?
+    // and run the 'Master'
+    // TODO: Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?
     return sMaster.Run();
 
     // at sMaster return function exist with codes
@@ -223,4 +223,4 @@ extern int main(int argc, char **argv)
     // 2 - restart command used, this code can be used by restarter for restart mangosd
 }
 
-/// @}
+// @}

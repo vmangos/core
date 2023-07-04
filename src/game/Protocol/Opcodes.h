@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup u2w
-/// @{
-/// \file
+// \addtogroup u2w
+// @{
+// \file
 
 #ifndef _OPCODES_H
 #define _OPCODES_H
@@ -34,22 +34,22 @@
 //       table opcodeTable in source when Opcode.h included but WorldSession.h not included
 #include "WorldSession.h"
 
-/// List of Opcodes
+// List of Opcodes
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
 #include "Opcodes_1_12_1.h"
 #else
 #include "Opcodes_1_8_0.h"
 #endif
 
-/// Player state
+// Player state
 enum SessionStatus
 {
-    STATUS_AUTHED = 0,                                      ///< Player authenticated (_player==nullptr, m_playerRecentlyLogout = false or will be reset before handler call)
-    STATUS_LOGGEDIN,                                        ///< Player in game (_player!=nullptr, inWorld())
-    STATUS_TRANSFER,                                        ///< Player transferring to another map (_player!=nullptr, !inWorld())
-    STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT,                  ///< _player!= nullptr or _player==nullptr && m_playerRecentlyLogout)
-    STATUS_NEVER,                                           ///< Opcode not accepted from client (deprecated or server side only)
-    STATUS_UNHANDLED                                        ///< We don' handle this opcode yet
+    STATUS_AUTHED = 0,                                      // Player authenticated (_player==nullptr, m_playerRecentlyLogout = false or will be reset before handler call)
+    STATUS_LOGGEDIN,                                        // Player in game (_player!=nullptr, inWorld())
+    STATUS_TRANSFER,                                        // Player transferring to another map (_player!=nullptr, !inWorld())
+    STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT,                  // _player!= nullptr or _player==nullptr && m_playerRecentlyLogout)
+    STATUS_NEVER,                                           // Opcode not accepted from client (deprecated or server side only)
+    STATUS_UNHANDLED                                        // We don' handle this opcode yet
 };
 
 class WorldPacket;
@@ -80,7 +80,7 @@ class Opcodes
             ref.handler = handler;
         }
 
-        /// Lookup opcode
+        // Lookup opcode
         inline OpcodeHandler const* LookupOpcode(uint16 id) const
         {
             OpcodeMap::const_iterator itr = mOpcodeMap.find(id);
@@ -89,7 +89,7 @@ class Opcodes
             return nullptr;
         }
 
-        /// compatible with other mangos branches access
+        // compatible with other mangos branches access
 
         inline OpcodeHandler const& operator[] (uint16 id) const
         {
@@ -107,7 +107,7 @@ class Opcodes
 
 #define opcodeTable MaNGOS::Singleton<Opcodes>::Instance()
 
-/// Lookup opcode name for human understandable logging
+// Lookup opcode name for human understandable logging
 inline char const* LookupOpcodeName(uint16 id)
 {
     if (OpcodeHandler const* op = opcodeTable.LookupOpcode(id))
@@ -116,4 +116,4 @@ inline char const* LookupOpcodeName(uint16 id)
 }
 
 #endif
-/// @}
+// @}

@@ -503,7 +503,7 @@ class SpellEntry
         SpellEntry() = default;
         ~SpellEntry() = default;
 
-        /// DBC DATA:
+        // DBC DATA:
         uint32    Id = 0;                                          // 0
         uint32    School = 0;                                      // 1
         uint32    Category = 0;                                    // 2
@@ -597,7 +597,7 @@ class SpellEntry
       //uint32    MinReputation;                                   // 174 not used
       //uint32    RequiredAuraVision;                              // 175 not used
 
-        /// CUSTOM FIELDS:
+        // CUSTOM FIELDS:
         uint32 MinTargetLevel = 0;                                 // 162
         uint32 Custom = 0;                                         // 176
         uint32 Internal = 0;                                       // Assigned by the core.

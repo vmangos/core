@@ -390,7 +390,7 @@ bool ChatHandler::HandleServerPLimitCommand(char *args)
     return true;
 }
 
-/// Triggering corpses expire check in world
+// Triggering corpses expire check in world
 bool ChatHandler::HandleServerCorpsesCommand(char* /*args*/)
 {
     sObjectAccessor.RemoveOldCorpses();
@@ -490,7 +490,7 @@ bool ChatHandler::HandleServerIdleShutDownCommand(char* args)
     return true;
 }
 
-/// Close RA connection
+// Close RA connection
 bool ChatHandler::HandleQuitCommand(char* /*args*/)
 {
     // processed in RASocket
@@ -498,7 +498,7 @@ bool ChatHandler::HandleQuitCommand(char* /*args*/)
     return true;
 }
 
-/// Exit the realm
+// Exit the realm
 bool ChatHandler::HandleServerExitCommand(char* /*args*/)
 {
     SendSysMessage(LANG_COMMAND_EXIT);
@@ -522,7 +522,7 @@ bool ChatHandler::HandleViewLogCommand(char* args)
     return true;
 }
 
-/// Set the filters of logging
+// Set the filters of logging
 bool ChatHandler::HandleServerLogFilterCommand(char* args)
 {
     if (!*args)
@@ -569,7 +569,7 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
     return false;
 }
 
-/// Set the level of logging
+// Set the level of logging
 bool ChatHandler::HandleServerLogLevelCommand(char *args)
 {
     if (!*args)
@@ -1146,7 +1146,7 @@ bool ChatHandler::HandleReloadQuestTemplateCommand(char* /*args*/)
     sObjectMgr.LoadQuests();
     SendSysMessage("DB table `quest_template` (quest definitions) reloaded.");
 
-    /// dependent also from `gameobject` but this table not reloaded anyway
+    // dependent also from `gameobject` but this table not reloaded anyway
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading GameObjects for quests...");
     sObjectMgr.LoadGameObjectForQuests();
     SendSysMessage("Data GameObjects for quests reloaded.");

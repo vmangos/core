@@ -142,7 +142,7 @@ template <class T, class LockType, typename StorageType=std::deque<T> >
         {
             return _queue.empty();
         }
-        ///! Checks if we're empty or not with locks held
+        // Checks if we're empty or not with locks held
         bool empty()
         {
             std::unique_lock<LockType> g(this->_lock);

@@ -19,20 +19,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup mangosd
-/// @{
-/// \file
+// \addtogroup mangosd
+// @{
+// \file
 
 #ifndef __WORLDRUNNABLE_H
 #define __WORLDRUNNABLE_H
 
 #include "Common.h"
 
-/// Heartbeat thread for the World
+// Heartbeat thread for the World
 class WorldRunnable
 {
     public:
         void operator()();
 };
 #endif
-/// @}
+// @}

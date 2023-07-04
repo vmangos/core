@@ -31,7 +31,7 @@ class UpdateData;
 class WorldPacket;
 class Player;
 
-/// Camera - object-receiver. Receives broadcast packets from nearby worldobjects, object visibility changes and sends them to client
+// Camera - object-receiver. Receives broadcast packets from nearby worldobjects, object visibility changes and sends them to client
 class Camera
 {
     friend class ViewPoint;
@@ -79,7 +79,7 @@ class Camera
         GridReference<Camera> m_gridRef;
 };
 
-/// Object-observer, notifies farsight object state to cameras that attached to it
+// Object-observer, notifies farsight object state to cameras that attached to it
 class ViewPoint
 {
     friend class Camera;
