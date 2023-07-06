@@ -17,7 +17,6 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (32555, 32554, 32553, 32551, 32550
 DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (32555, 32554, 32553, 32551, 32550, 32549, 32547, 32546, 32545, 32544, 32543, 32784, 32681, 32679, 32674, 32670));
 DELETE FROM `gameobject_scripts` WHERE `id` IN (32555, 32554, 32553, 32551, 32550, 32549, 32547, 32546, 32545, 32544, 32543, 32784, 32681, 32679, 32674, 32670);
 DELETE FROM `generic_scripts` WHERE `id`=176582;
-UPDATE `gameobject_template` SET `displayId` = 0 WHERE `entry` = 176592;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 176635, 1, -2111.39, 3341.36, -48.6987, 4.57276, 0, 0, -0.754709, 0.656059, 180, 180, 100, 1, 0, 0, 0, 10),
