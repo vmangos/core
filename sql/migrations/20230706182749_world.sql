@@ -318,7 +318,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 DELETE FROM `gameobject` WHERE `guid` IN (44131, 44179);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (44131, 44179);
 DELETE FROM `pool_template` WHERE `entry` = 4737;
-DELETE FROM pool_pool` WHERE `pool_id` = 4737;
+DELETE FROM `pool_pool` WHERE `pool_id` = 4737;
 
 
 -- End of migration.
