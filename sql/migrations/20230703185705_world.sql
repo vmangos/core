@@ -346,7 +346,6 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+39, @PTEMPLATE+41, 0, 'Resonite Crystal - Stonetalon Mountains', 0),
 (@PTEMPLATE+40, @PTEMPLATE+41, 0, 'Resonite Crystal - Stonetalon Mountains', 0);
 
-UPDATE `gameobject_template` SET `name`='Resonite Crystal (Trap)', `displayId`= 0 WHERE  `entry` = 178124;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+121, 178124, 1, -14.578, 452.385, 104.226, 2.56563, 0, 0, 0.95882, 0.284015, 300, 300, 100, 1, 8, 0, 0, 10),
 (@OGUID+122, 178124, 1, -140.639, 377.375, 95.3397, 5.46288, 0, 0, -0.398748, 0.91706, 180, 180, 100, 1, 0, 0, 0, 10),
