@@ -12,9 +12,9 @@ INSERT INTO `migrations` VALUES ('20230703185905');
 SET @OGUID = 232257;
 SET @PTEMPLATE = 21677;
 
+DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (13305, 13309, 13310, 48651, 48765, 48774));
 DELETE FROM `gameobject` WHERE `guid` IN (13305, 13309, 13310, 48651, 48765, 48774);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (13305, 13309, 13310, 48651, 48765, 48774);
-DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (13305, 13309, 13310, 48651, 48765, 48774));
 
 -- Barrens
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
