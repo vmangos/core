@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20230706171920');
 -- Add your query below.
 
 
-SET @OGUID = 32783;
+SET @OGUID = 5922;
 SET @PTEMPLATE = 4434;
 
 -- 130 Silverpine Forest 3693 / 3705 / Food Crate / Barrel of Milk
