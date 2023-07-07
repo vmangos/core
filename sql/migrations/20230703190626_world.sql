@@ -13,9 +13,9 @@ SET @OGUID = 17034;
 SET @PTEMPLATE = 76;
 
 -- 3 Badlands 3706 / 3707 Barrel of Sweet Nectar / Food Crate
+DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (11476, 11448, 11441, 11439, 11430, 11426));
 DELETE FROM `gameobject` WHERE `guid` IN (11476, 11448, 11441, 11439, 11430, 11426);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (11476, 11448, 11441, 11439, 11430, 11426);
-DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (11476, 11448, 11441, 11439, 11430, 11426));
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 3706, 0, -7003.62, -3349.16, 241.669, 0.174533, 0, 0, 0.087156, 0.996195, 180, 180, 100, 1, 0, 0, 0, 10),
