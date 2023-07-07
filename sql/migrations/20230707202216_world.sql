@@ -76,7 +76,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 3707, 1, -2649.03, -3515.22, 33.4671, 5.37562, 0, 0, -0.438371, 0.898794, 180, 180, 1, 100, 0, 10), -- Closest existing guid is 14675 at 245.760773 yards.
 (@OGUID+2, 3707, 1, -3150.93, -2880.38, 33.781, 4.06662, 0, 0, -0.894934, 0.446199, 180, 180, 1, 100, 0, 10), -- Closest existing guid is 13144 at 60.182327 yards.
-(@OGUID+3, 3707, 1, -3150.93, -2880.38, 33.781, 4.06662, 0, 0, -0.894934, 0.446199, 180, 180, 1, 100, 0, 10), -- Closest existing guid is 13144 at 60.182327 yards.
 (@OGUID+4, 3707, 1, -2673.81, -4211.31, -0.035784, 1.06465, 0, 0, 0.507538, 0.861629, 180, 180, 1, 100, 0, 10), -- Closest existing guid is 9097 at 202.033051 yards.
 (@OGUID+5, 3707, 1, -2533.51, -3826.51, -0.050045, 6.10865, 0, 0, -0.0871553, 0.996195, 180, 180, 1, 100, 0, 10); -- Closest existing guid is 9097 at 211.817322 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
@@ -100,7 +99,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (@OGUID+6, 153470, 1, -3373.84, -2834.7, 33.9843, 3.45576, 0, 0, -0.987688, 0.156436, 180, 180, 1, 100, 0, 10), -- Closest existing guid is 30214 at 559.647644 yards.
 (@OGUID+7, 153470, 1, -4019.69, -3809.7, 40.56, 0.0523589, 0, 0, 0.0261765, 0.999657, 180, 180, 1, 100, 0, 10), -- Closest existing guid is 14932 at 234.179855 yards.
-(@OGUID+8, 153470, 1, -3373.84, -2834.7, 33.9843, 3.45576, 0, 0, -0.987688, 0.156436, 180, 180, 1, 100, 0, 10); -- Closest existing guid is 30214 at 559.647644 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (@OGUID+6, @PTEMPLATE+2, 0, 'Food Crate', 0, 10), -- Food Crates in Dustwallow Marsh
 (@OGUID+7, @PTEMPLATE+2, 0, 'Food Crate', 0, 10), -- Food Crates in Dustwallow Marsh
