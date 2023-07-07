@@ -81,7 +81,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, @PTEMPLATE+1, 0, 'Food Crate', 0, 10), -- Food Crates in Dustwallow Marsh
 (@OGUID+2, @PTEMPLATE+1, 0, 'Food Crate', 0, 10), -- Food Crates in Dustwallow Marsh
-(@OGUID+3, @PTEMPLATE+1, 0, 'Food Crate', 0, 10), -- Food Crates in Dustwallow Marsh
 (@OGUID+4, @PTEMPLATE+1, 0, 'Food Crate', 0, 10), -- Food Crates in Dustwallow Marsh
 (@OGUID+5, @PTEMPLATE+1, 0, 'Food Crate', 0, 10); -- Food Crates in Dustwallow Marsh
 
@@ -98,11 +97,10 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 -- Missing Food Crate spawns in Dustwallow Marsh.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (@OGUID+6, 153470, 1, -3373.84, -2834.7, 33.9843, 3.45576, 0, 0, -0.987688, 0.156436, 180, 180, 1, 100, 0, 10), -- Closest existing guid is 30214 at 559.647644 yards.
-(@OGUID+7, 153470, 1, -4019.69, -3809.7, 40.56, 0.0523589, 0, 0, 0.0261765, 0.999657, 180, 180, 1, 100, 0, 10), -- Closest existing guid is 14932 at 234.179855 yards.
+(@OGUID+7, 153470, 1, -4019.69, -3809.7, 40.56, 0.0523589, 0, 0, 0.0261765, 0.999657, 180, 180, 1, 100, 0, 10); -- Closest existing guid is 14932 at 234.179855 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (@OGUID+6, @PTEMPLATE+2, 0, 'Food Crate', 0, 10), -- Food Crates in Dustwallow Marsh
-(@OGUID+7, @PTEMPLATE+2, 0, 'Food Crate', 0, 10), -- Food Crates in Dustwallow Marsh
-(@OGUID+8, @PTEMPLATE+2, 0, 'Food Crate', 0, 10); -- Food Crates in Dustwallow Marsh
+(@OGUID+7, @PTEMPLATE+2, 0, 'Food Crate', 0, 10); -- Food Crates in Dustwallow Marsh
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -167,7 +165,6 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180  WHER
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 17 Barrens 3690 / 3691 / 3693 / 3695
-
 -- Missing Food Crate spawns in The Barrens.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (@OGUID+17, 3690, 1, 1367.86, -3556.09, 93.9161, 0.366518, 0, 0, 0.182235, 0.983255, 3600, 3600, 1, 100, 0, 10); -- Closest existing guid is 13440 at 76.870895 yards.
