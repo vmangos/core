@@ -13,9 +13,9 @@ SET @OGUID = 28198;
 SET @PTEMPLATE = 2047;
 
 -- 10 Duskwood 3659 / 3695 Barrel of Melon Juice / Food Crate
+DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (16615, 16612, 16607, 16590, 16583, 15770, 15768, 15762, 15746, 15744, 15743, 15742));
 DELETE FROM `gameobject` WHERE `guid` IN (16615, 16612, 16607, 16590, 16583, 15770, 15768, 15762, 15746, 15744, 15743, 15742);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (16615, 16612, 16607, 16590, 16583, 15770, 15768, 15762, 15746, 15744, 15743, 15742);
-DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (16615, 16612, 16607, 16590, 16583, 15770, 15768, 15762, 15746, 15744, 15743, 15742));
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 3659, 0, -11148.2, -849.795, 77.2473, 1.46608, 0, 0, 0.669131, 0.743145, 180, 180, 100, 1, 0, 0, 0, 10),
