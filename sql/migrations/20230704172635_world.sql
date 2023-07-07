@@ -13,9 +13,9 @@ SET @OGUID = 38825;
 SET @PTEMPLATE = 2647;
 
 -- 11 Wetlands 3659 / 3695 / Barrel of Melon Juice / Food Crate
+DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (15194, 15124, 15051, 14905, 14890, 14859, 14858, 14857, 14856, 14853, 14657, 14655, 14654, 14631, 14565));
 DELETE FROM `gameobject` WHERE `guid` IN (15194, 15124, 15051, 14905, 14890, 14859, 14858, 14857, 14856, 14853, 14657, 14655, 14654, 14631, 14565);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (15194, 15124, 15051, 14905, 14890, 14859, 14858, 14857, 14856, 14853, 14657, 14655, 14654, 14631, 14565);
-DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (15194, 15124, 15051, 14905, 14890, 14859, 14858, 14857, 14856, 14853, 14657, 14655, 14654, 14631, 14565));
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 3659, 0, -4182.13, -2372.79, 209.707, -2.58309, 0, 0, 0.961262, -0.275637, 180, 180, 100, 1, 0, 0, 0, 10),
