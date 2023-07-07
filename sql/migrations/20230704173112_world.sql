@@ -13,9 +13,9 @@ SET @OGUID = 46838;
 SET @PTEMPLATE = 4122;
 
 -- 17 Barrens 3705 / 3662   Food Crate / Barrel of Milk
+DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (13314, 13315, 13317, 13318, 13319, 13320, 13321, 13322, 13323, 13324, 13498, 13499, 13500, 13501, 13502, 13503, 13504, 13505, 13506, 13507, 13508, 13509, 13510, 42434));
 DELETE FROM `gameobject` WHERE `guid` IN (13314, 13315, 13317, 13318, 13319, 13320, 13321, 13322, 13323, 13324, 13498, 13499, 13500, 13501, 13502, 13503, 13504, 13505, 13506, 13507, 13508, 13509, 13510, 42434);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (13314, 13315, 13317, 13318, 13319, 13320, 13321, 13322, 13323, 13324, 13498, 13499, 13500, 13501, 13502, 13503, 13504, 13505, 13506, 13507, 13508, 13509, 13510, 42434);
-DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (13314, 13315, 13317, 13318, 13319, 13320, 13321, 13322, 13323, 13324, 13498, 13499, 13500, 13501, 13502, 13503, 13504, 13505, 13506, 13507, 13508, 13509, 13510, 42434));
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 3662, 1, -4087.37, -2362.9, 108.909, 5.99774, 0, 0, 0.142237, -0.989833, 180, 180, 0, 1, 0, 0, 0, 10),
