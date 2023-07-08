@@ -211,12 +211,21 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+4, 3689, 1, -4084.18, -2386.98, 124.743, -2.56563, 0, 0, 0.95882, -0.284015, 180, 180, 100, 1, 0, 0, 0, 10),
 (@OGUID+5, 3689, 1, -4061.65, -2371.05, 118.075, 4.67748, 0, 0, -0.719339, 0.694659, 180, 180, 100, 1, 0, 0, 0, 10),
 (@OGUID+6, 3689, 1, -4049.41, -2361.03, 135.856, 3.52557, 0, 0, -0.981627, 0.190812, 180, 180, 100, 1, 0, 0, 0, 10),
-(@OGUID+7, 3695, 1, -4070.11, -2380.71, 110.297, 2.04204, 0, 0, 0.85264, 0.522499, 180, 180, 100, 1, 0, 0, 0, 10),
-(@OGUID+8, 3695, 1, -4049.89, -2390.31, 126.13, 3.00195, 0, 0, 0.997563, 0.0697661, 180, 180, 100, 1, 0, 0, 0, 10),
-(@OGUID+9, 3695, 1, -4075.58, -2349.89, 108.909, -1.0821, 0, 0, 0.515038, -0.857167, 180, 180, 100, 1, 0, 0, 0, 10),
-(@OGUID+10, 3695, 1, -4084.18, -2386.98, 124.743, -2.56563, 0, 0, 0.95882, -0.284015, 180, 180, 100, 1, 0, 0, 0, 10),
-(@OGUID+11, 3695, 1, -4061.65, -2371.05, 118.075, 4.67748, 0, 0, -0.719339, 0.694659, 180, 3600, 100, 1, 0, 0, 0, 10),
-(@OGUID+12, 3695, 1, -4049.41, -2361.03, 135.856, 3.52557, 0, 0, -0.981627, 0.190812, 180, 180, 100, 1, 0, 0, 0, 10);
+(@OGUID+7, 3689, 1, -4086.92, -2363.17, 108.909, 5.98648, 0, 0, -0.147809, 0.989016, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 3695, 1, -4070.11, -2380.71, 110.297, 2.04204, 0, 0, 0.85264, 0.522499, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 3695, 1, -4049.89, -2390.31, 126.13, 3.00195, 0, 0, 0.997563, 0.0697661, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 3695, 1, -4075.58, -2349.89, 108.909, -1.0821, 0, 0, 0.515038, -0.857167, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+11, 3695, 1, -4084.18, -2386.98, 124.743, -2.56563, 0, 0, 0.95882, -0.284015, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+12, 3695, 1, -4061.65, -2371.05, 118.075, 4.67748, 0, 0, -0.719339, 0.694659, 180, 3600, 100, 1, 0, 0, 0, 10),
+(@OGUID+13, 3695, 1, -4049.41, -2361.03, 135.856, 3.52557, 0, 0, -0.981627, 0.190812, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+14, 3695, 1, -4086.92, -2363.17, 108.909, 5.98648, 0, 0, -0.147809, 0.989016, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+15, 3702, 1, -4070.11, -2380.71, 110.297, 2.04204, 0, 0, 0.85264, 0.522499, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+16, 3702, 1, -4049.89, -2390.31, 126.13, 3.00195, 0, 0, 0.997563, 0.0697661, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+17, 3702, 1, -4075.58, -2349.89, 108.909, -1.0821, 0, 0, 0.515038, -0.857167, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+18, 3702, 1, -4084.18, -2386.98, 124.743, -2.56563, 0, 0, 0.95882, -0.284015, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+19, 3702, 1, -4061.65, -2371.05, 118.075, 4.67748, 0, 0, -0.719339, 0.694659, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+20, 3702, 1, -4049.41, -2361.03, 135.856, 3.52557, 0, 0, -0.981627, 0.190812, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+21, 3702, 1, -4086.92, -2363.17, 108.909, 5.98648, 0, 0, -0.147809, 0.989016, 180, 180, 100, 1, 0, 0, 0, 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+1, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
@@ -224,7 +233,8 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `
 (@PTEMPLATE+3, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
 (@PTEMPLATE+4, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
 (@PTEMPLATE+5, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
-(@PTEMPLATE+6, 1, 'Food Crate / Armor Crate - Barrens', 0, 10);
+(@PTEMPLATE+6, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@PTEMPLATE+7, 1, 'Food Crate / Armor Crate - Barrens', 0, 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
 (@OGUID+1, @PTEMPLATE+1, 'Food Crate / Armor Crate - Barrens', 0, 10),
@@ -233,12 +243,21 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`,
 (@OGUID+4, @PTEMPLATE+4, 'Food Crate / Armor Crate - Barrens', 0, 10),
 (@OGUID+5, @PTEMPLATE+5, 'Food Crate / Armor Crate - Barrens', 0, 10),
 (@OGUID+6, @PTEMPLATE+6, 'Food Crate / Armor Crate - Barrens', 0, 10),
-(@OGUID+7, @PTEMPLATE+1, 'Food Crate / Armor Crate - Barrens', 0, 10),
-(@OGUID+8, @PTEMPLATE+2, 'Food Crate / Armor Crate - Barrens', 0, 10),
-(@OGUID+9, @PTEMPLATE+3, 'Food Crate / Armor Crate - Barrens', 0, 10),
-(@OGUID+10, @PTEMPLATE+4, 'Food Crate / Armor Crate - Barrens', 0, 10),
-(@OGUID+11, @PTEMPLATE+5, 'Food Crate / Armor Crate - Barrens', 0, 10),
-(@OGUID+12, @PTEMPLATE+6, 'Food Crate / Armor Crate - Barrens', 0, 10);
+(@OGUID+7, @PTEMPLATE+7, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+8, @PTEMPLATE+1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+9, @PTEMPLATE+2, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+10, @PTEMPLATE+3, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+11, @PTEMPLATE+4, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+12, @PTEMPLATE+5, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+13, @PTEMPLATE+6, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+14, @PTEMPLATE+7, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+15, @PTEMPLATE+1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+16, @PTEMPLATE+2, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+17, @PTEMPLATE+3, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+18, @PTEMPLATE+4, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+19, @PTEMPLATE+5, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+20, @PTEMPLATE+6, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+21, @PTEMPLATE+7, 'Food Crate / Armor Crate - Barrens', 0, 10);
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800 WHERE `guid` IN (32624, 32254, 32253);
 
