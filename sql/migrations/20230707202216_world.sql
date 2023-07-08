@@ -246,7 +246,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+13, 3702, 48, -295.378, 316.711, -52.3953, 2.23402, 0, 0, 0.898793, 0.438373, 604800, 604800, 100, 1, 0, 0, 0, 10);
 
 SET @OGUID = 280;
-SET @PTEMPLATE = 3008;
+SET @PTEMPLATE = 2990;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+1, 3662, 36, -144.899, -891.56, 4.30954, 1.51844, 0, 0, 0.688355, 0.725374, 604800, 604800, 100, 1, 0, 0, 0, 10),
