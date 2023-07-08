@@ -180,6 +180,105 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+20, 3695, 1, -4061.65, -2371.05, 118.075, 4.67748, 0, 0, -0.719339, 0.694659, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 13455 at 28.387096 yards.
 (@OGUID+21, 3695, 1, -4049.41, -2361.03, 135.856, 3.52557, 0, 0, -0.981627, 0.190812, 3600, 3600, 1, 100, 0, 10); -- Closest existing guid is 13455 at 44.786751 yards.
 
+SET @OGUID = 278;
+SET @PTEMPLATE = 241;
+
+REPLACE INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 3659, 0, 11.3366, -337.718, 131.157, 3.89209, 0, 0, -0.930417, 0.366502, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 3695, 0, 11.3366, -337.718, 131.157, 3.89209, 0, 0, -0.930417, 0.366502, 180, 180, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Barrel of Melon Juice / Food Crate - Alterac Mountains', 0, 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Barrel of Melon Juice / Food Crate - Alterac Mountains', 0, 10),
+(@OGUID+2, @PTEMPLATE+1, 'Barrel of Melon Juice / Food Crate - Alterac Mountains', 0, 10);
+
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, 2990, 0, 'Barrel of Melon Juice / Food Crate - Alterac Mountains', 0);
+
+
+SET @OGUID = 280;
+SET @PTEMPLATE = 242;
+
+DELETE FROM `gameobject` WHERE `guid` IN (196, 195, 13438, 13435, 13455, 82074, 82075);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (196, 195, 13438, 13435, 13455, 82074, 82075);
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 3689, 1, -4070.11, -2380.71, 110.297, 2.04204, 0, 0, 0.85264, 0.522499, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 3689, 1, -4049.89, -2390.31, 126.13, 3.00195, 0, 0, 0.997563, 0.0697661, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 3689, 1, -4075.58, -2349.89, 108.909, -1.0821, 0, 0, 0.515038, -0.857167, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 3689, 1, -4084.18, -2386.98, 124.743, -2.56563, 0, 0, 0.95882, -0.284015, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 3689, 1, -4061.65, -2371.05, 118.075, 4.67748, 0, 0, -0.719339, 0.694659, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 3689, 1, -4049.41, -2361.03, 135.856, 3.52557, 0, 0, -0.981627, 0.190812, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 3695, 1, -4070.11, -2380.71, 110.297, 2.04204, 0, 0, 0.85264, 0.522499, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 3695, 1, -4049.89, -2390.31, 126.13, 3.00195, 0, 0, 0.997563, 0.0697661, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 3695, 1, -4075.58, -2349.89, 108.909, -1.0821, 0, 0, 0.515038, -0.857167, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 3695, 1, -4084.18, -2386.98, 124.743, -2.56563, 0, 0, 0.95882, -0.284015, 180, 180, 100, 1, 0, 0, 0, 10),
+(@OGUID+11, 3695, 1, -4061.65, -2371.05, 118.075, 4.67748, 0, 0, -0.719339, 0.694659, 180, 3600, 100, 1, 0, 0, 0, 10),
+(@OGUID+12, 3695, 1, -4049.41, -2361.03, 135.856, 3.52557, 0, 0, -0.981627, 0.190812, 180, 180, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@PTEMPLATE+2, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@PTEMPLATE+3, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@PTEMPLATE+4, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@PTEMPLATE+5, 1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@PTEMPLATE+6, 1, 'Food Crate / Armor Crate - Barrens', 0, 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+2, @PTEMPLATE+2, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+3, @PTEMPLATE+3, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+4, @PTEMPLATE+4, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+5, @PTEMPLATE+5, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+6, @PTEMPLATE+6, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+7, @PTEMPLATE+1, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+8, @PTEMPLATE+2, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+9, @PTEMPLATE+3, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+10, @PTEMPLATE+4, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+11, @PTEMPLATE+5, 'Food Crate / Armor Crate - Barrens', 0, 10),
+(@OGUID+12, @PTEMPLATE+6, 'Food Crate / Armor Crate - Barrens', 0, 10);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800 WHERE `guid` IN (32624, 32254, 32253);
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+13, 3702, 48, -295.378, 316.711, -52.3953, 2.23402, 0, 0, 0.898793, 0.438373, 604800, 604800, 100, 1, 0, 0, 0, 10);
+
+SET @OGUID = 280;
+SET @PTEMPLATE = 3008;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 3662, 36, -144.899, -891.56, 4.30954, 1.51844, 0, 0, 0.688355, 0.725374, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 3662, 36, -103.57, -723.359, 8.49449, 0.698132, 0, 0, 0.34202, 0.939693, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 3662, 36, -37.0586, -720.381, 8.35814, 3.00195, 0, 0, 0.997563, 0.0697661, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 3662, 36, -89.3315, -682.574, 7.42373, -2.63545, 0, 0, 0.968148, -0.25038, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 3662, 36, -43.7597, -733.648, 9.18536, 1.18682, 0, 0, 0.559193, 0.829038, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 3705, 36, -144.899, -891.56, 4.30954, 1.51844, 0, 0, 0.688355, 0.725374, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 3705, 36, -103.57, -723.359, 8.49449, 0.698132, 0, 0, 0.34202, 0.939693, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 3705, 36, -37.0586, -720.381, 8.35814, 3.00195, 0, 0, 0.997563, 0.0697661, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 3705, 36, -89.3315, -682.574, 7.42373, -2.63545, 0, 0, 0.968148, -0.25038, 604800, 604800, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 3705, 36, -43.7597, -733.648, 9.18536, 1.18682, 0, 0, 0.559193, 0.829038, 604800, 604800, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@PTEMPLATE+2, 1, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@PTEMPLATE+3, 1, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@PTEMPLATE+4, 1, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@PTEMPLATE+5, 1, 'Food Crate / Barrel of Milk - Deadmines', 0, 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+2, @PTEMPLATE+2, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+3, @PTEMPLATE+3, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+4, @PTEMPLATE+4, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+5, @PTEMPLATE+5, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+6, @PTEMPLATE+1, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+7, @PTEMPLATE+2, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+8, @PTEMPLATE+3, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+9, @PTEMPLATE+4, 'Food Crate / Barrel of Milk - Deadmines', 0, 10),
+(@OGUID+10, @PTEMPLATE+5, 'Food Crate / Barrel of Milk - Deadmines', 0, 10);
+
 
 -- End of migration.
 END IF;
