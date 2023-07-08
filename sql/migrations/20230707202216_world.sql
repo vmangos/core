@@ -245,7 +245,7 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@OGUID+13, 3702, 48, -295.378, 316.711, -52.3953, 2.23402, 0, 0, 0.898793, 0.438373, 604800, 604800, 100, 1, 0, 0, 0, 10);
 
-SET @OGUID = 280;
+SET @OGUID = 442;
 SET @PTEMPLATE = 2990;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
