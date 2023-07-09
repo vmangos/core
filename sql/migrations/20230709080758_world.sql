@@ -231,14 +231,14 @@ UPDATE `pool_template` SET `max_limit` = 32 WHERE `entry`=1630;
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `guid`=127;
 DELETE FROM `pool_gameobject` WHERE  `guid` IN ( 220813, 220814, 220815, 220816, 220817, 220818, 220819, 220820);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
-(220813, 146, 'Mithril Deposit'),
-(220814, 146, 'Mithril Deposit'),
-(220815, 146, 'Mithril Deposit'),
-(220816, 146, 'Mithril Deposit'),
-(220817, 146, 'Mithril Deposit'),
-(220818, 146, 'Mithril Deposit'),
-(220819, 146, 'Mithril Deposit'),
-(220820, 146, 'Mithril Deposit'),
+(220813, 1146, 'Mithril Deposit'),
+(220814, 1146, 'Mithril Deposit'),
+(220815, 1146, 'Mithril Deposit'),
+(220816, 1146, 'Mithril Deposit'),
+(220817, 1146, 'Mithril Deposit'),
+(220818, 1146, 'Mithril Deposit'),
+(220819, 1146, 'Mithril Deposit'),
+(220820, 1146, 'Mithril Deposit'),
 (25454, 1141, 'Iron Deposit');
 UPDATE `pool_template` SET `max_limit`= 15  WHERE  `entry`=1141;
 
