@@ -101,7 +101,7 @@ INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUE
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
 (99, 9, 'UnGoro Crater - Dinosaur Bone', 0, 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
-(0000, 99, 'UnGoro Crater - Dinosaur Bone');
+(161527, 99, 'UnGoro Crater - Dinosaur Bone');
 
 -- Create new pool to hold Equipment Boxes spawns in Tirisfal Glades.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
