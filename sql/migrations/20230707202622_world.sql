@@ -376,7 +376,7 @@ INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `descripti
 
 -- Create new pool to hold Blood of Heroes spawns in Western Plaguelands.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(9, 16, 'Western Plaguelands - Blood of Heroess', 0, 10);
+(9, 16, 'Western Plaguelands - Blood of Heroes', 0, 10);
 -- Add existing spawns to pool.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (25918, 9, 0, 'Blood of Heroes', 0, 10),
@@ -420,7 +420,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 -- Create new pool to hold Blood of Heroes spawns in Eastern Plaguelands.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(38, 36, 'Eastern Plaguelands - Blood of Heroess', 0, 10);
+(38, 36, 'Eastern Plaguelands - Blood of Heroes', 0, 10);
 -- Add existing spawns to pool.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (25927, 38, 0, 'Blood of Heroes', 0, 10),
@@ -500,6 +500,9 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (55370, 38, 0, 'Blood of Heroes', 0, 10),
 (55371, 38, 0, 'Blood of Heroes', 0, 10),
 (55372, 38, 0, 'Blood of Heroes', 0, 10);
+
+DELETE FROM `pool_gameobject_template` WHERE `pool_entry` = 1634;
+DELETE FROM `pool_template` WHERE `entry` = 1634;
 
 -- Correct position of Un'Goro Dirt Pile in Un'Goro Crater (position is off by 0.00100708 yards).
 UPDATE `gameobject` SET `position_x`=-6537.01, `position_y`=-878.389, `position_z`=-272.13, `orientation`=2.28638, `rotation0`=0, `rotation1`=0, `rotation2`=0.909961, `rotation3`=0.414694 WHERE `guid`=11181;
