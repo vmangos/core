@@ -251,6 +251,8 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (44016, 44077);
 DELETE FROM `pool_template` WHERE `entry` = 3823;
 DELETE FROM `gameobject` WHERE `guid`=26002;
 UPDATE `gameobject` SET `spawntimesecsmin` = 60, `spawntimesecsmax` = 60 WHERE `id` IN (2083, 2086, 2087);
+DELETE FROM `game_event_gameobject` WHERE `guid` =12093 AND `event`=38;
+
 
 -- End of migration.
 END IF;
