@@ -277,6 +277,16 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (32493, 156, 0, 'Hidden Strongbox', 0, 10),
 (32509, 156, 0, 'Hidden Strongbox', 0, 10);
 
+-- Missing Alliance Chest spawns in Arathi Highlands.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(55403, 105581, 0, -1544.81, -1751.48, 68.1662, 1.11701, 0, 0, 0.529919, 0.848048, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 55402 at 70.779816 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(55403, 74, 0, 'Alliance Chest', 0, 10); -- 
+
+UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 75;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(74, 2, 'Alliance Chests in Arathi Highlands');
+
 
 -- End of migration.
 END IF;
