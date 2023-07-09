@@ -17,9 +17,9 @@ INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUE
 
 -- Create new pool to hold Calcified Elven Gem spawns in Arathi Highlands.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(41, 7, 'Arathi Highlands - Calcified Elven Gems', 0, 10);
+(21551, 7, 'Arathi Highlands - Calcified Elven Gems', 0, 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
-(2712, 41, 'Arathi Highlands - Calcified Elven Gems');
+(2712, 21551, 'Arathi Highlands - Calcified Elven Gems');
 UPDATE `gameobject` SET `spawntimesecsmax` = 180, `spawntimesecsmin` = 180 WHERE `id` = 2712;
 DELETE FROM `gameobject` WHERE `guid` = 55630;
 
@@ -45,9 +45,9 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE
 
 -- Create new pool to hold Taillasher Eggs spawns in Durotar.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(74, 13, 'Durotar - Taillasher Eggs', 0, 10);
+(21552, 13, 'Durotar - Taillasher Eggs', 0, 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
-(3240, 74, 'Durotar - Taillasher Eggs');
+(3240, 21552, 'Durotar - Taillasher Eggs');
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 3240;
 
 -- Create new pool to hold Stolen Supply Sack spawns in Durotar.
@@ -138,9 +138,9 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE
 
 -- Create new pool to hold Crossroads' Supply Crates spawns in The Barrens.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(146, 6, 'Barrens - Crossroads Supply Crates', 0, 10);
+(21553, 6, 'Barrens - Crossroads Supply Crates', 0, 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
-(175708, 146, 'Barrens - Crossroads Supply Crates');
+(175708, 21553, 'Barrens - Crossroads Supply Crates');
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 175708;
 
 -- Create new pool to hold Keepsake of Remembrance spawns in Arathi Highlands.
