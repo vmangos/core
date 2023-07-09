@@ -291,6 +291,10 @@ DELETE FROM `pool_gameobject` WHERE  `guid` = 68803;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (68803, 1265, 'Plaguebloom');
 
+DELETE FROM `gameobject` WHERE `guid` IN (25360, 25357);
+UPDATE `pool_gameobject` SET `pool_entry` = 38 WHERE  `guid` IN (25931, 25934);
+
+
 -- End of migration.
 END IF;
 END??
