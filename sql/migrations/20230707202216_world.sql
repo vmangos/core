@@ -198,7 +198,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+1, 2990, 0, 'Barrel of Melon Juice / Food Crate - Alterac Mountains', 0);
 
 
-SET @OGUID = 280;
+SET @OGUID = 44664;
 SET @PTEMPLATE = 242;
 
 DELETE FROM `gameobject` WHERE `guid` IN (196, 195, 13438, 13435, 13455, 82074, 82075);
