@@ -294,6 +294,9 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 DELETE FROM `gameobject` WHERE `guid` IN (25360, 25357);
 UPDATE `pool_gameobject` SET `pool_entry` = 38 WHERE  `guid` IN (25931, 25934);
 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(420, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Western Plaguelands');
+
 
 -- End of migration.
 END IF;
