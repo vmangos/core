@@ -63,6 +63,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
 (22246, 96, 'Desolace - Tear of Theradras');
 
+UPDATE `gameobject` SET `spawntimesecsmax` = 60, `spawntimesecsmin` = 60 WHERE `id` IN (11713, 11714);
 UPDATE `gameobject` SET `spawntimesecsmax` = 60, `spawntimesecsmin` = 60 WHERE `id` = 2867;
 UPDATE `gameobject` SET `spawntimesecsmax` = 60, `spawntimesecsmin` = 60 WHERE `id` = 179908;
 UPDATE `gameobject` SET `spawntimesecsmax` = 60, `spawntimesecsmin` = 60 WHERE `id` = 175928;
