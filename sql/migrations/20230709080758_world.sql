@@ -242,7 +242,7 @@ UPDATE `pool_template` SET `max_limit`= 15  WHERE  `entry`=1141;
 
 -- Remove Empty Pools
 DELETE FROM `pool_template` WHERE `entry` IN ( 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010, 9274, 9273, 9271, 9270, 9269, 9268, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 1631, 1632, 1633, 151, 2511);
-
+DELETE FROM `gameobject_requirement` WHERE  `guid` = 361752;
 
 -- End of migration.
 END IF;
