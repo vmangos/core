@@ -287,6 +287,9 @@ UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 75;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (74, 2, 'Alliance Chests in Arathi Highlands');
 
+DELETE FROM `pool_gameobject` WHERE  `guid` = 68803;
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
+(68803, 1265, 'Plaguebloom');
 
 -- End of migration.
 END IF;
