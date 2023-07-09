@@ -253,6 +253,36 @@ DELETE FROM `gameobject` WHERE `guid`=26002;
 UPDATE `gameobject` SET `spawntimesecsmin` = 60, `spawntimesecsmax` = 60 WHERE `id` IN (2083, 2086, 2087);
 DELETE FROM `game_event_gameobject` WHERE `guid` =12093 AND `event`=38;
 
+-- Missing Alliance Strongbox spawns in The Barrens.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(25434, 3714, 1, -4040.54, -2384.23, 125.298, 1.95477, 0, 0, 0.829038, 0.559193, 3600, 3600, 1, 100, 0, 10); -- Closest existing guid is 25433 at 109.995834 yards.
+
+-- Create new pool to hold Alliance Strongbox spawns in Alterac Mountains.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(151, 5, 'Alliance Strongboxs in Alterac Mountains', 0, 10);
+-- Add existing spawns to pool.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(25432, 151, 0, 'Alliance Strongbox', 0, 10);
+
+-- Missing Alliance Strongbox spawns in Alterac Mountains.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(25435, 105570, 0, 58.7195, 276.344, 41.9076, 5.13127, 0, 0, -0.544639, 0.838671, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 25432 at 345.082672 yards.
+(25436, 105570, 0, 17.3519, 435.146, 43.7572, 6.14356, 0, 0, -0.0697556, 0.997564, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 25432 at 452.272766 yards.
+(25448, 105570, 0, 96.9252, 367.759, 43.922, 3.97935, 0, 0, -0.913545, 0.406738, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 25432 at 348.657684 yards.
+(25449, 105570, 0, 121.878, 454.223, 44.0955, 0.0349062, 0, 0, 0.0174522, 0.999848, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 25432 at 384.491577 yards.
+(25464, 105570, 0, 424.828, 221.755, 42.888, 0.663223, 0, 0, 0.325567, 0.945519, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 25432 at 56.035671 yards.
+(25465, 105570, 0, 335.954, 185.797, 42.9273, 4.69494, 0, 0, -0.71325, 0.70091, 3600, 3600, 1, 100, 0, 10), -- Closest existing guid is 25432 at 54.145618 yards.
+(25466, 105570, 0, 443.818, 288.769, 42.4809, 5.72468, 0, 0, -0.275637, 0.961262, 3600, 3600, 1, 100, 0, 10); -- Closest existing guid is 25432 at 123.146584 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(25435, 151, 0, 'Alliance Strongbox', 0, 10), -- Alliance Strongboxs in Alterac Mountains
+(25436, 151, 0, 'Alliance Strongbox', 0, 10), -- Alliance Strongboxs in Alterac Mountains
+(25448, 151, 0, 'Alliance Strongbox', 0, 10), -- Alliance Strongboxs in Alterac Mountains
+(25449, 151, 0, 'Alliance Strongbox', 0, 10), -- Alliance Strongboxs in Alterac Mountains
+(25464, 151, 0, 'Alliance Strongbox', 0, 10), -- Alliance Strongboxs in Alterac Mountains
+(25465, 151, 0, 'Alliance Strongbox', 0, 10), -- Alliance Strongboxs in Alterac Mountains
+(25466, 151, 0, 'Alliance Strongbox', 0, 10); -- Alliance Strongboxs in Alterac Mountains
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` = 105570;
+
 
 -- End of migration.
 END IF;
