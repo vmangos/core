@@ -253,6 +253,30 @@ DELETE FROM `gameobject` WHERE `guid`=26002;
 UPDATE `gameobject` SET `spawntimesecsmin` = 60, `spawntimesecsmax` = 60 WHERE `id` IN (2083, 2086, 2087);
 DELETE FROM `game_event_gameobject` WHERE `guid` =12093 AND `event`=38;
 
+DELETE FROM `pool_gameobject_template` WHERE  `id` = 2039;
+-- Create new pool to hold Hidden Strongbox spawns in Alterac Mountains.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(156, 1, 'Hidden Strongboxs in Alterac Mountains', 0, 10);
+-- Add existing spawns to pool.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(32179, 156, 0, 'Hidden Strongbox', 0, 10),
+(32183, 156, 0, 'Hidden Strongbox', 0, 10),
+(32184, 156, 0, 'Hidden Strongbox', 0, 10),
+(32346, 156, 0, 'Hidden Strongbox', 0, 10),
+(32361, 156, 0, 'Hidden Strongbox', 0, 10),
+(32362, 156, 0, 'Hidden Strongbox', 0, 10),
+(32454, 156, 0, 'Hidden Strongbox', 0, 10),
+(32455, 156, 0, 'Hidden Strongbox', 0, 10),
+(32459, 156, 0, 'Hidden Strongbox', 0, 10),
+(32460, 156, 0, 'Hidden Strongbox', 0, 10),
+(32470, 156, 0, 'Hidden Strongbox', 0, 10),
+(32471, 156, 0, 'Hidden Strongbox', 0, 10),
+(32479, 156, 0, 'Hidden Strongbox', 0, 10),
+(32485, 156, 0, 'Hidden Strongbox', 0, 10),
+(32492, 156, 0, 'Hidden Strongbox', 0, 10),
+(32493, 156, 0, 'Hidden Strongbox', 0, 10),
+(32509, 156, 0, 'Hidden Strongbox', 0, 10);
+
 
 -- End of migration.
 END IF;
