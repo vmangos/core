@@ -302,6 +302,114 @@ UPDATE `pool_gameobject` SET `pool_entry` = 14446 WHERE `guid` = 84124;
 
 DELETE FROM `pool_pool` WHERE  `pool_id` IN (3823, 21401, 21402, 21403, 21404, 21405, 21406, 21407, 21408, 21409, 21410, 21411, 21412, 21413, 21414, 21415, 21451, 21452, 21453, 21454, 21455, 21456, 21457, 21458, 21459, 21460, 21461, 21462, 21463, 21464, 21465, 21466, 21467, 21468, 21469, 21470, 21471, 21472, 21473, 21474, 21475, 21476, 21477, 21478, 21554, 21555, 21556, 21557, 21558, 21559, 21560, 21561, 21562, 21563, 21564, 21565, 21566, 21567, 21568, 21569, 21570, 21601, 21602, 21603, 21604, 21605, 21606, 21607, 21608, 21609, 21610, 21611, 21612, 21613, 21614, 21615, 21651, 21652, 21653, 21654, 21655, 21656, 21657, 34921, 34922);
 
+-- Barrens / 3714 / 3715
+SET @OGUID = 100086;
+SET @PTEMPLATE = 43535;
+
+DELETE FROM `gameobject` WHERE `guid` IN (13528, 13539, 13545, 25433);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (13528, 13539, 13545, 25433);
+DELETE FROM `pool_template` WHERE `entry` = 60;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 3714, 1, -4040.54, -2384.23, 125.298, 1.95477, 0, 0, 0.829038, 0.559193, 300, 300, 100, 1, 0, 0, 0, 10), 
+(@OGUID+2, 3714, 1, -4033.6, -2404.29, 126.131, -2.70526, 0, 0, 0.976296, -0.21644, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 3714, 1, -4065.35, -2417.5, 126.133, 3.57793, 0, 0, -0.976295, 0.216442, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 3714, 1, -4113.86, -2302.24, 126.262, 5.61996, 0, 0, -0.325567, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 3715, 1, -4040.54, -2384.23, 125.298, 1.95477, 0, 0, 0.829038, 0.559193, 300, 300, 100, 1, 0, 0, 0, 10), 
+(@OGUID+6, 3715, 1, -4033.6, -2404.29, 126.131, -2.70526, 0, 0, 0.976296, -0.21644, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 3715, 1, -4065.35, -2417.5, 126.133, 3.57793, 0, 0, -0.976295, 0.216442, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 3715, 1, -4113.86, -2302.24, 126.262, 5.61996, 0, 0, -0.325567, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@PTEMPLATE+2, 1, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@PTEMPLATE+3, 1, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@PTEMPLATE+4, 1, 'Alliance Chest / Alliance Strongbox - Barrens', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@OGUID+5, @PTEMPLATE+1, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@OGUID+6, @PTEMPLATE+2, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@OGUID+7, @PTEMPLATE+3, 'Alliance Chest / Alliance Strongbox - Barrens', 10),
+(@OGUID+8, @PTEMPLATE+4, 'Alliance Chest / Alliance Strongbox - Barrens', 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+5, 2, 'Barrens - Alliance Chest / Alliance Strongbox (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, @PTEMPLATE+5, 0, 'Alliance Chest / Alliance Strongbox - Barrens', 0),
+(@PTEMPLATE+2, @PTEMPLATE+5, 0, 'Alliance Chest / Alliance Strongbox - Barrens', 0),
+(@PTEMPLATE+3, @PTEMPLATE+5, 0, 'Alliance Chest / Alliance Strongbox - Barrens', 0),
+(@PTEMPLATE+4, @PTEMPLATE+5, 0, 'Alliance Chest / Alliance Strongbox - Barrens', 0);
+
+-- Alterac Mountains / 105570 / 105579
+SET @OGUID = 112738;
+SET @PTEMPLATE = 43157;
+
+DELETE FROM `gameobject` WHERE `guid` IN (33191, 32516, 32515, 33188, 32213, 33181, 25432);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (33191, 32516, 32515, 33188, 32213, 33181, 25432);
+DELETE FROM `pool_template` WHERE `entry` = 76;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 105570, 0, 389.558, 178.222, 41.9383, 3.26377, 0, 0, -0.998135, 0.0610518, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 105570, 0, 58.7195, 276.344, 41.9076, 5.13127, 0, 0, -0.544639, 0.838671, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 105570, 0, 17.3519, 435.146, 43.7572, 6.14356, 0, 0, -0.0697556, 0.997564, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 105570, 0, 96.9252, 367.759, 43.922, 3.97935, 0, 0, -0.913545, 0.406738, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 105570, 0, 121.878, 454.223, 44.0955, 0.0349062, 0, 0, 0.0174522, 0.999848, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 105570, 0, 424.828, 221.755, 42.888, 0.663223, 0, 0, 0.325567, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 105570, 0, 335.954, 185.797, 42.9273, 4.69494, 0, 0, -0.71325, 0.70091, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 105570, 0, 443.818, 288.769, 42.4809, 5.72468, 0, 0, -0.275637, 0.961262, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 105579, 0, 389.558, 178.222, 41.9383, 3.26377, 0, 0, -0.998135, 0.0610518, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 105579, 0, 58.7195, 276.344, 41.9076, 5.13127, 0, 0, -0.544639, 0.838671, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+11, 105579, 0, 17.3519, 435.146, 43.7572, 6.14356, 0, 0, -0.0697556, 0.997564, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+12, 105579, 0, 96.9252, 367.759, 43.922, 3.97935, 0, 0, -0.913545, 0.406738, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+13, 105579, 0, 121.878, 454.223, 44.0955, 0.0349062, 0, 0, 0.0174522, 0.999848, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+14, 105579, 0, 424.828, 221.755, 42.888, 0.663223, 0, 0, 0.325567, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+15, 105579, 0, 335.954, 185.797, 42.9273, 4.69494, 0, 0, -0.71325, 0.70091, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+16, 105579, 0, 443.818, 288.769, 42.4809, 5.72468, 0, 0, -0.275637, 0.961262, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@PTEMPLATE+2, 1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@PTEMPLATE+3, 1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@PTEMPLATE+4, 1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@PTEMPLATE+5, 1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@PTEMPLATE+6, 1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@PTEMPLATE+7, 1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@PTEMPLATE+8, 1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+6, @PTEMPLATE+6, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+7, @PTEMPLATE+7, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+8, @PTEMPLATE+8, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+9, @PTEMPLATE+1, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+10, @PTEMPLATE+2, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+11, @PTEMPLATE+3, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+12, @PTEMPLATE+4, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+13, @PTEMPLATE+5, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+14, @PTEMPLATE+6, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+15, @PTEMPLATE+7, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10),
+(@OGUID+16, @PTEMPLATE+8, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+9, 3, 'Alterac Mountains - Alliance Chest / Alliance Strongbox (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0),
+(@PTEMPLATE+2, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0),
+(@PTEMPLATE+3, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0),
+(@PTEMPLATE+4, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0),
+(@PTEMPLATE+5, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0),
+(@PTEMPLATE+6, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0),
+(@PTEMPLATE+7, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0),
+(@PTEMPLATE+8, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0);
+
 
 -- End of migration.
 END IF;
