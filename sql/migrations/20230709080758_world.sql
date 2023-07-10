@@ -417,6 +417,47 @@ INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUE
 (142191, 41, 'Hinterlands - Horde Supply Crate');
 UPDATE `gameobject` SET `spawntimesecsmin` = 60, `spawntimesecsmax` = 60 WHERE `id` = 142191;
 
+-- Missing Silverleaf spawns in Teldrassil.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(49637, 1617, 1, 10400, 1534.33, 1305.91, 3.94445, 0, 0, -0.920505, 0.390732, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 49635 at 80.792198 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(49637, 1003, 0, 'Silverleaf', 0, 10); -- Silverleaf in Teldrassil
+
+-- Missing Goldthorn spawns in Swamp of Sorrows.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(42423, 2046, 0, -10588, -2737.17, 34.8652, 2.26893, 0, 0, 0.906307, 0.422619, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 42360 at 4.599496 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(42423, 1313, 0, 'Goldthorn', 0, 10); -- Goldthorn in Swamp of Sorrows
+
+-- Missing Purple Lotus spawns in Dire Maul.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+(66946, 142140, 1, -3651.92, 1213.45, 149.229, 2.87979, 0, 0, 0.991445, 0.130528, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 66939 at 156.249222 yards.
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(66946, 1324, 0, 'Purple Lotus', 0, 10); -- Purple Lotus in Feralas
+
+SET @OGUID = 3244;
+SET @PTEMPLATE = 21553;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 1733, 0, -869.414, -3911.16, 141.44, 2.07694, 0, 0, 0.861629, 0.507539, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 1734, 0, -869.414, -3911.16, 141.44, 2.07694, 0, 0, 0.861629, 0.507539, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 1735, 0, -869.414, -3911.16, 141.44, 2.07694, 0, 0, 0.861629, 0.507539, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Silver Vein / Gold Vein / Iron Deposit - Arathi Highlands', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Silver Vein / Gold Vein / Iron Deposit - Arathi Highlands', 10),
+(@OGUID+2, @PTEMPLATE+1, 'Silver Vein / Gold Vein / Iron Deposit - Arathi Highlands', 10),
+(@OGUID+3, @PTEMPLATE+1, 'Silver Vein / Gold Vein / Iron Deposit - Arathi Highlands', 10);
+
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, 323, 0, 'Arathi Highlands - Silver Vein / Gold Vein / Iron Deposit', 0);
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+4, 2055, 0, -8774.09, -1973.63, 129.718, 2.11185, 0, 0, 0.870356, 0.492424, 300, 300, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
+(@OGUID+4, 1128, 'Copper Vein');
+
 
 -- End of migration.
 END IF;
