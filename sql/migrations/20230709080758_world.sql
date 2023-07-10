@@ -410,6 +410,13 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+7, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0),
 (@PTEMPLATE+8, @PTEMPLATE+9, 0, 'Alliance Chest / Alliance Strongbox - Alterac Mountains', 0);
 
+-- Create new pool to hold Horde Supply Crate spawns in The Hinterlands.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(41, 4, 'Hinterlands - Horde Supply Crate', 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
+(142191, 41, 'Hinterlands - Horde Supply Crate');
+UPDATE `gameobject` SET `spawntimesecsmin` = 60, `spawntimesecsmax` = 60 WHERE `id` = 142191;
+
 
 -- End of migration.
 END IF;
