@@ -10,9 +10,9 @@ INSERT INTO `migrations` VALUES ('20230710150027');
 
 
 -- Add and Update Book Objects
-INSERT INTO `gameobject_unique` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (3225, 175738, 0, -8339.45, 398.575, 122.274, 5.77704, 0, 0, -0.25038, 0.968148, 180, 180, 100, 1, 0, 0, 0, 10),
-(3226, 179707, 450, 242.978, 87.1378, 25.8042, 4.90438, 0, 0, -0.636078, 0.771625, 180, 180, 100, 1, 0, 0, 0, 10),
+(3226, 179707, 450, 242.978, 87.1378, 25.8042, 4.90438, 0, 0, -0.636078, 0.771625, 180, 180, 100, 1, 0, 0, 0, 10);
 
 DELETE FROM `gameobject` WHERE `guid` = 3998633;
 
