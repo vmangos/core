@@ -256,7 +256,7 @@ DELETE FROM `game_event_gameobject` WHERE `guid` =12093 AND `event`=38;
 DELETE FROM `pool_gameobject_template` WHERE  `id` = 2039;
 -- Create new pool to hold Hidden Strongbox spawns in Alterac Mountains.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(156, 1, 'Hidden Strongboxs in Alterac Mountains', 0, 10);
+(156, 6, 'Hidden Strongboxs in Alterac Mountains', 0, 10);
 -- Add existing spawns to pool.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (32179, 156, 0, 'Hidden Strongbox', 0, 10),
