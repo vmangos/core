@@ -95,6 +95,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             switch (spellid)
             {
                 case REACT_PASSIVE:                         //passive
+                    pCharmedUnit->InterruptNonMeleeSpells(false);
                     pCharmedUnit->AttackStop();
                 // no break
                 case REACT_DEFENSIVE:                       //recovery
