@@ -256,10 +256,10 @@ void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
     {
         if (data.procFlagsAttacker)
             if (Unit* pUnit = ToUnit())
-                pUnit->ProcSkillsAndReactives(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType);
+                pUnit->ProcSkillsAndReactives(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType, data.procSpell);
 
         if (data.procFlagsVictim && data.pVictim && data.pVictim->IsAlive())
-            data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
+            data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType, data.procSpell);
     }
 
     // Always execute On Kill procs instantly. Fixes Improved Drain Soul talent.
@@ -381,8 +381,9 @@ SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* 
     if (spell->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_EXECUTE>() && spell->Id != 20647)
         return SPELL_MISS_NONE;
 
+    // Hammer of Wrath should not use weapon skill, but Bloodthirst should.
     // bonus from skills is 0.04% per skill Diff
-    int32 attackerWeaponSkill = int32(GetWeaponSkillValue(attType, pVictim));
+    int32 attackerWeaponSkill = (spell->rangeIndex == SPELL_RANGE_IDX_COMBAT) ? int32(GetWeaponSkillValue(attType, pVictim)) : GetSkillMaxForLevel();
     int32 skillDiff = attackerWeaponSkill - int32(pVictim->GetSkillMaxForLevel(this));
     int32 fullSkillDiff = attackerWeaponSkill - int32(pVictim->GetDefenseSkillValue(this));
     int32 minWeaponSkill = GetSkillMaxForLevel(pVictim) < attackerWeaponSkill ? GetSkillMaxForLevel(pVictim) : attackerWeaponSkill;
