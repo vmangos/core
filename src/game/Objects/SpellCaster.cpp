@@ -256,10 +256,10 @@ void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
     {
         if (data.procFlagsAttacker)
             if (Unit* pUnit = ToUnit())
-                pUnit->ProcSkillsAndReactives(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType);
+                pUnit->ProcSkillsAndReactives(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType, data.procSpell);
 
         if (data.procFlagsVictim && data.pVictim && data.pVictim->IsAlive())
-            data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
+            data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType, data.procSpell);
     }
 
     // Always execute On Kill procs instantly. Fixes Improved Drain Soul talent.
@@ -381,8 +381,9 @@ SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* 
     if (spell->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_EXECUTE>() && spell->Id != 20647)
         return SPELL_MISS_NONE;
 
+    // Physical abilities should use weapon skill unless they are ranged abilities that don't require a ranged weapon such as Hammer of Wrath.
     // bonus from skills is 0.04% per skill Diff
-    int32 attackerWeaponSkill = (spell->SpellFamilyName == SPELLFAMILY_PALADIN && attType == RANGED_ATTACK) ? GetSkillMaxForLevel() : int32(GetWeaponSkillValue(attType, pVictim));
+    int32 attackerWeaponSkill = (attType == RANGED_ATTACK && spell->EquippedItemClass != ITEM_CLASS_WEAPON) ? GetSkillMaxForLevel() : int32(GetWeaponSkillValue(attType, pVictim));
     int32 skillDiff = attackerWeaponSkill - int32(pVictim->GetSkillMaxForLevel(this));
     int32 fullSkillDiff = attackerWeaponSkill - int32(pVictim->GetDefenseSkillValue(this));
     int32 minWeaponSkill = GetSkillMaxForLevel(pVictim) < attackerWeaponSkill ? GetSkillMaxForLevel(pVictim) : attackerWeaponSkill;
