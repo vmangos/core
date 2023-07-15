@@ -657,6 +657,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+80, 175535, 329, 4113.99, -3383.44, 117.806, 2.98451, 0, 0, 0.996917, 0.078459, 604800, 604800, 100, 1, 0, 0, 0, 10);
 
 UPDATE `gameobject_template` SET `script_name`='' WHERE  `entry`=176304 AND `patch`=0;
+DELETE FROM `gameobject_requirement` WHERE `guid` = 27888;
 
 
 -- End of migration.
