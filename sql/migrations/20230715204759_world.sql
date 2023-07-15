@@ -280,6 +280,34 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (181598, 76, 0, 'Silithyst Geyser', 10, 10);
 
+INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
+(@OGUID+1, 103),
+(@OGUID+2, 103),
+(@OGUID+3, 103),
+(@OGUID+4, 103),
+(@OGUID+5, 103),
+(@OGUID+6, 103),
+(@OGUID+7, 103),
+(@OGUID+8, 103),
+(@OGUID+9, 103),
+(@OGUID+10, 103),
+(@OGUID+11, 103),
+(@OGUID+12, 103),
+(@OGUID+13, 103),
+(@OGUID+14, 103),
+(@OGUID+15, 103),
+(@OGUID+16, 103),
+(@OGUID+17, 103),
+(@OGUID+18, 103),
+(@OGUID+19, 103),
+(@OGUID+20, 103),
+(@OGUID+21, 103),
+(@OGUID+22, 103),
+(@OGUID+23, 103),
+(@OGUID+24, 103),
+(@OGUID+25, 103),
+(@OGUID+26, 103);
+
 
 -- End of migration.
 END IF;
