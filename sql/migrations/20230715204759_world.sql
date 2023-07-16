@@ -275,10 +275,10 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 
 -- Create new pool to hold Silithyst Geyser spawns in Silithus.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(76, 19, 'Silithyst Geysers in Silithus', 10, 10);
+(76, 19, 'Silithus - Silithyst Geyser', 10, 10);
 -- Add existing spawns to pool.
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(181598, 76, 0, 'Silithyst Geyser', 10, 10);
+(181598, 76, 0, 'Silithus - Silithyst Geyser', 10, 10);
 
 INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (@OGUID+1, 103),
