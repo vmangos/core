@@ -17,10 +17,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (130, 25622, 0, 'Dark Iron Ore', 0, 10);
 
 -- Dark Iron Deposits in Molten Core
-DELETE FROM `gameobject` WHERE  `guid` IN (232213, 232214, 232215, 232216, 232217, 232218, 43157, 43158, 43159, 43160, 43161, 232212, 43725, 43690, 43720, 43713);
-DELETE FROM `pool_gameobject` WHERE  `guid` IN (232213, 232214, 232215, 232216, 232217, 232218, 43157, 43158, 43159, 43160, 43161, 232212, 43725, 43690, 43720, 43713);
-
-UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800 WHERE `guid` IN (3998297, 361786, 35665, 43163, 43165, 234778);
+DELETE FROM `gameobject` WHERE  `guid` IN (43713, 43725, 43720, 43690);
+DELETE FROM `pool_gameobject` WHERE  `guid` IN (43713, 43725, 43720, 43690);
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (881, 165658, 409, 1082.8, -833.75, -147.884, 1.85005, 0, 0, 0.798635, 0.601815, 604800, 604800, 100, 1, 0, 0, 0, 10),
