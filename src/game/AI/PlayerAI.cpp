@@ -24,13 +24,7 @@
 #include "MotionMaster.h"
 #include "Spell.h"
 
-// Misc spells we dont want players to cast
-static std::vector<uint32> priestSkipSpells =
-{
-    453,8123,8192,8193,10953,10954,  // mind soothe
-    1150,2096,2097,10909,10910,      // mind vision
-    1265,9580,9581,9593,10943,10944, // fade
-};
+// Part of code to make hunters always use Auto shot
 static std::vector<uint32> hunterSkipSpells =
 {
     75, // auto shot
@@ -132,6 +126,8 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
             continue;
         if (spellInfo->Attributes & (SPELL_ATTR_PASSIVE | 0x80))
             continue;
+        if (spellInfo->AttributesEx & SPELL_ATTR_EX_NO_AUTOCAST_AI)
+            continue;
         if (spellInfo->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
             continue;
         if (Spells::IsPositiveSpell(spell.first) && !enablePositiveSpells)
@@ -145,19 +141,16 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
         case CLASS_SHAMAN:
         case CLASS_MAGE:
         case CLASS_WARLOCK:
+        case CLASS_PRIEST:
             break;
         case CLASS_HUNTER:
             if (std::find(hunterSkipSpells.begin(), hunterSkipSpells.end(), spell.first) != hunterSkipSpells.end())
                 continue;
             break;
-        case CLASS_PRIEST:
-            if (std::find(priestSkipSpells.begin(), priestSkipSpells.end(), spell.first) != priestSkipSpells.end())
-                continue;
-            break;
         }
         usableSpells.push_back(spell.first);
     }
-    // Suppression des sorts dont on a deja des rangs superieurs
+    // Ignore non-max rank
     for (std::vector<uint32>::iterator it = usableSpells.begin(); it != usableSpells.end();)
     {
         bool foundSupRank = false;
@@ -169,7 +162,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
             {
                 if (Spells::CompareAuraRanks(pCurrSpell_1->Id, pCurrSpell_2->Id) < 0) // pCurrSpell_1 < pCurrSpell_2
                 {
-                    // Donc on supprime pCurrSpell_1
+                    // So we ignore pCurrSpell_1
                     foundSupRank = true;
                     break;
                 }
@@ -356,7 +349,7 @@ void PlayerControlledAI::UpdateAI(uint32 const uiDiff)
 
     if (uiGlobalCD < uiDiff)
     {
-        if (me->GetClass() == CLASS_HUNTER)
+        if (me->GetClass() == CLASS_HUNTER) // TODO: If hunter, use ONLY autoshoot and nothing else?
         {
             float dist = me->GetDistance(victim);
             if (dist > 10.0f)
