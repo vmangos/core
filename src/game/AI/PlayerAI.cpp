@@ -24,12 +24,6 @@
 #include "MotionMaster.h"
 #include "Spell.h"
 
-// Part of code to make hunters always use Auto shot
-static std::vector<uint32> hunterSkipSpells =
-{
-    75, // auto shot
-};
-
 void PlayerAI::Remove()
 {
     me->SetAI(nullptr);
@@ -132,22 +126,6 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
             continue;
         if (Spells::IsPositiveSpell(spell.first) && !enablePositiveSpells)
             continue;
-        switch (pPlayer->GetClass())
-        {
-        case CLASS_WARRIOR:
-        case CLASS_ROGUE:
-        case CLASS_PALADIN:
-        case CLASS_DRUID:
-        case CLASS_SHAMAN:
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-        case CLASS_PRIEST:
-            break;
-        case CLASS_HUNTER:
-            if (std::find(hunterSkipSpells.begin(), hunterSkipSpells.end(), spell.first) != hunterSkipSpells.end())
-                continue;
-            break;
-        }
         usableSpells.push_back(spell.first);
     }
     // Ignore non-max rank
@@ -349,19 +327,6 @@ void PlayerControlledAI::UpdateAI(uint32 const uiDiff)
 
     if (uiGlobalCD < uiDiff)
     {
-        if (me->GetClass() == CLASS_HUNTER) // TODO: If hunter, use ONLY autoshoot and nothing else?
-        {
-            float dist = me->GetDistance(victim);
-            if (dist > 10.0f)
-            {
-                if (Spell* pSpell = me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
-                {
-                    if (pSpell->m_spellInfo && pSpell->m_spellInfo->Id != 75) // auto shoot
-                        me->CastSpell(victim, 75, true);
-                }
-            }
-        }
-
         if (me->IsNonMeleeSpellCasted(true))
             uiGlobalCD = 200;
         else
