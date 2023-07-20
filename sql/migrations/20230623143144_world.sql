@@ -149,7 +149,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 1368 WHERE `menu_id` = 1467 AND
 UPDATE `gossip_menu_option` SET `condition_id` = 1368 WHERE `menu_id` = 1468 AND `id` = 0;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Add Missing Creature Gremnik Rizzlesprang (note: gossip is still missing)
+-- Add Missing Creature Gremnik Rizzlesprang (note: gossip is still missing) Credit Azerothcore
 INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `orientation`, `wander_distance`, `patch_min`, `patch_max`)
 VALUES (222222, 16123, -14457.221680, 448.084534, 20.406971, 6.115618, 0, 8, 10);
 UPDATE `creature_template` SET `npc_flags` = 1, `auras` = '27614' WHERE `entry` = 16123;
