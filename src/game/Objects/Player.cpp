@@ -6377,7 +6377,8 @@ void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
                         break;
                     case SKILL_RANGE_LEVEL:
                     {
-                        uint16 newSkillValue = 1;
+                        uint16 newSkillValue = (sWorld.getConfig(CONFIG_BOOL_ALWAYS_MAX_SKILL_FOR_LEVEL) || (rcInfo->flags & SKILL_FLAG_ALWAYS_MAX_VALUE))
+                                                ? GetSkillMaxForLevel() : 1;
 
                         // World of Warcraft Client Patch 1.11.0 (2006-06-20)
                         // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
@@ -6386,13 +6387,14 @@ void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
                         if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
                         {
-                            const auto savedValue = m_forgottenSkills.find(pSkill->id);
+                            const auto savedValue = m_mForgottenSkills.find(pSkill->id);
 
-                            if (savedValue != m_forgottenSkills.end())
+                            if (savedValue != m_mForgottenSkills.end())
                                 if (savedValue->second <= GetSkillMaxForLevel())
                                     newSkillValue = savedValue->second;
                         }
-                        SetSkill(skillId, newSkillValue, GetSkillMaxForLevel());
+#endif
+                        SetSkill(uint16(pSkill->id), newSkillValue, GetSkillMaxForLevel());
                         break;
                     }
                     case SKILL_RANGE_MONO:
