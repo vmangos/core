@@ -5985,8 +5985,8 @@ SkillRaceClassInfoEntry const* Player::GetSkillInfo(uint16 id, std::function<boo
     if (!id)
         return nullptr;
 
-    uint32 raceMask = getRaceMask();
-    uint32 classMask = getClassMask();
+    uint32 raceMask = GetRaceMask();
+    uint32 classMask = GetClassMask();
 
     auto bounds = sSpellMgr.GetSkillRaceClassInfoMapBounds(id);
 
@@ -6116,15 +6116,6 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step/* = 
             break;
         }
     }
-}
-
-bool Player::HasSkill(uint16 id) const
-{
-    if (!id)
-        return false;
-
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
-    return (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED);
 }
 
 uint16 Player::GetSkill(uint16 id, bool bonusPerm, bool bonusTemp, bool max/* = false*/) const
