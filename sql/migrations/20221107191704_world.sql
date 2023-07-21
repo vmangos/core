@@ -42,7 +42,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11023, -1, 11009, 11018, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
 (11034, -1, 11023, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
 (11035, -3, 11027, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
-(11036, -2, 11035, 11028, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies includes if both requirements are met (Uses engineering text for now because I have no idea what is correct)
+(11036, -2, 11035, 11028, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies if both requirements are met (Uses engineering text with this implementation. Can be checked for correct text, although properly accounting for the case of someone being able to relearn both a leatherworking and an engineering specialisation at this book is absurd)
 
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES 
 (21000, 11880, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -88,15 +88,27 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3072, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22004, 0, 0, 0, 0, '', 0, 11023), -- I don't know why it skips 3071
 (3073, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 0, 0, 0, '', 0, 11023);
 
+-- Remove deprecated field trainer spell that is preventing proper implementation
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7406 AND `patch` = 0; -- Trainer gossip for Oglethorpe Obnoticus (Gnomish Engineering - Horde)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7866 AND `patch` = 0; -- Trainer gossip for Peter Galen (Dragonscale Leatherworking - Alliance)
-UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7867 AND `patch` = 0; -- Trainer gossip for Thorkaf Dragoneye (Dragonscale Leatherworking - Alliance)
+UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7867 AND `patch` = 0; -- Trainer gossip for Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7868 AND `patch` = 0; -- Trainer gossip for Sarah Tanner (Elemental Leatherworking - Alliance)
-UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7868 AND `patch` = 0; -- Trainer gossip for Brumn Winterhoof (Elemental Leatherworking - Alliance)
+UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7868 AND `patch` = 0; -- Trainer gossip for Brumn Winterhoof (Elemental Leatherworking - Horde)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7870 AND `patch` = 0; -- Trainer gossip for Caryssia Moonhunter (Tribal Leatherworking - Alliance)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7871 AND `patch` = 0; -- Trainer gossip for Se'Jib (Tribal Leatherworking - Horde)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7944 AND `patch` = 0; -- Trainer gossip for Tinkmaster Overspark (Gnomish Engineering - Alliance)
-UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 8126 AND `patch` = 0; -- Trainer gossip for Oglethorpe Obnoticus (Goblin Engineering)
+UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 8126 AND `patch` = 0; -- Trainer gossip for Nixx Sprocketspring (Goblin Engineering)
+
+-- Add missing trainer gossip menu options
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
+(3068, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, 0, NULL, 0, 11021), -- Trainer gossip menu option for Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
+(3069, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, 0, NULL, 0, 11020), -- Trainer gossip menu option for Brumn Winterhoof (Elemental Leatherworking - Horde)
+
+-- Update condition for existing trainer gossip menu options
+UPDATE `gossip_menu_option` SET `condition_id` = 11021 WHERE `menu_id` = 3067 AND `id` = 0; -- Condition for trainer gossip for Peter Galen (Dragonscale Leatherworking - Alliance)
+UPDATE `gossip_menu_option` SET `condition_id` = 11020 WHERE `menu_id` = 3070 AND `id` = 0; -- Trainer gossip for Sarah Tanner (Elemental Leatherworking - Alliance)
+UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3072 AND `id` = 0; -- Condition for trainer gossip for Caryssia Moonhunter (Tribal Leatherworking - Alliance)
+UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3073 AND `id` = 0; -- Condition for trainer gossip for Se'Jib (Tribal Leatherworking - Horde)
 
 -- End of migration.
 END IF;
