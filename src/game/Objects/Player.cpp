@@ -5980,6 +5980,42 @@ void Player::UpdateSkillsToMaxSkillsForLevel()
     }
 }
 
+SkillRaceClassInfoEntry const* Player::GetSkillInfo(uint16 id, std::function<bool (SkillRaceClassInfoEntry const&)> filterfunc/* = nullptr*/) const
+{
+    if (!id)
+        return nullptr;
+
+    uint32 raceMask = getRaceMask();
+    uint32 classMask = getClassMask();
+
+    auto bounds = sSpellMgr.GetSkillRaceClassInfoMapBounds(id);
+
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+    {
+        SkillRaceClassInfoEntry const* entry = itr->second;
+
+        if (!(entry->raceMask & raceMask))
+            continue;
+
+        if (!(entry->classMask & classMask))
+            continue;
+
+        if (filterfunc == nullptr || filterfunc(*entry))
+            return entry;
+    }
+
+    return nullptr;
+}
+
+bool Player::HasSkill(uint16 id) const
+{
+    if (!id)
+        return false;
+
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
+    return (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED);
+}
+
 // This functions sets a skill line value (and adds if doesn't exist yet)
 // To "remove" a skill line, set it's values to zero
 void Player::SetSkill(SkillStatusMap::iterator itr, uint16 currVal, uint16 maxVal, uint16 step/* = 0*/)
@@ -6122,6 +6158,91 @@ uint16 Player::GetSkill(uint16 id, bool bonusPerm, bool bonusTemp, bool max/* = 
     return uint16(std::max(0, value));
 }
 
+uint16 Player::GetSkill(uint16 id, bool bonusPerm, bool bonusTemp, bool max/* = false*/) const
+{
+    if (!id)
+        return 0;
+
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
+    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
+        return 0;
+
+    SkillStatusData const& skillStatus = itr->second;
+
+    uint32 field = GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(skillStatus.pos));
+
+    // Pure value
+    int32 value = (max ? SKILL_MAX(field) : SKILL_VALUE(field));
+
+    // Bonus values
+    if (bonusPerm || bonusTemp)
+    {
+        uint32 bonus = GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(skillStatus.pos));
+
+        if (bonusPerm)
+            value += SKILL_PERM_BONUS(bonus);
+
+        if (bonusTemp)
+            value += SKILL_TEMP_BONUS(bonus);
+    }
+
+    return uint16(std::max(0, value));
+}
+
+void Player::SetSkillStep(uint16 id, uint16 step)
+{
+    if (!id || step > MAX_SKILL_STEP)
+        return;
+
+    if (step)   // Set step
+    {
+        uint16 val = 0;
+        uint16 max = 0;
+
+        auto filterfunc = [&] (SkillRaceClassInfoEntry const& entry)
+        {
+            if (entry.skillTierId)
+            {
+                if (SkillTiersEntry const* steps = sSkillTiersStore.LookupEntry(entry.skillTierId))
+                {
+                    val = uint16(steps->skillValue[(step - 1)]);
+                    max = uint16(steps->maxSkillValue[(step - 1)]);
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        bool maxed = false;
+
+        if (SkillRaceClassInfoEntry const* entry = GetSkillInfo(id, filterfunc))
+            maxed = (entry->flags & SKILL_FLAG_MAXIMIZED);
+
+        if (max)
+        {
+            // Note: Some SkillTiers entries contain 0 as starting value for first step, needs investigation (sanitized for now)
+            const uint16 value = std::max(uint16(1), uint16(maxed ? max : GetSkillValuePure(id)));
+            SetSkill(id, value, max, step);
+        }
+    }
+    else        // Unlearn
+        SetSkill(id, 0, 0);
+}
+
+uint16 Player::GetSkillStep(uint16 id) const
+{
+    if (!id)
+        return 0;
+
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
+    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
+        return 0;
+
+    SkillStatusData const& skillStatus = itr->second;
+
+    return PAIR32_HIPART(GetUInt32Value(PLAYER_SKILL_INDEX(skillStatus.pos)));
+}
+
 bool Player::ModifySkillBonus(uint16 id, int16 diff, bool permanent/* = false*/)
 {
     if (!id || !diff)
@@ -6206,126 +6327,110 @@ void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
 {
     if (SpellLearnSkillNode const* skillLearnInfo = sSpellMgr.GetSpellLearnSkill(spellId))
     {
+        // Specifically defined: no checks needed
         if (apply)
-        {
-            uint16 value = std::max(skillLearnInfo->value, GetSkillValuePure(skillLearnInfo->skill));
-            uint16 max = std::max((!skillLearnInfo->maxvalue ? GetSkillMaxForLevel() : skillLearnInfo->maxvalue), GetSkillMaxPure(skillLearnInfo->skill));
-            SetSkill(skillLearnInfo->skill, value, max, skillLearnInfo->step);
-        }
-        else
-        {
-            uint32 prev_spell = sSpellMgr.GetPrevSpellInChain(spellId);
-            if (!prev_spell)                                    // first rank, remove skill
-                SetSkill(skillLearnInfo->skill, 0, 0);
-            else
-            {
-                // search prev. skill setting by spell ranks chain
-                SpellLearnSkillNode const* prevSkill = sSpellMgr.GetSpellLearnSkill(prev_spell);
-                while (!prevSkill && prev_spell)
-                {
-                    prev_spell = sSpellMgr.GetPrevSpellInChain(prev_spell);
-                    prevSkill = sSpellMgr.GetSpellLearnSkill(sSpellMgr.GetFirstSpellInChain(prev_spell));
-                }
-
-                if (!prevSkill)                                 // not found prev skill setting, remove skill
-                    SetSkill(skillLearnInfo->skill, 0, 0);
-                else                                            // set to prev. skill setting values
-                {
-                    uint16 value = std::min(prevSkill->value, GetSkillValuePure(prevSkill->skill));
-                    uint16 max = std::min((!prevSkill->maxvalue ? GetSkillMaxForLevel() : prevSkill->maxvalue), GetSkillMaxPure(prevSkill->skill));
-                    SetSkill(prevSkill->skill, value, max, prevSkill->step);
-                }
-            }
-        }
+            SetSkillStep(skillLearnInfo->skill, skillLearnInfo->step);
+        else if (HasSkill(skillLearnInfo->skill))
+            SetSkillStep(skillLearnInfo->skill, (skillLearnInfo->step ? (skillLearnInfo->step - 1) : 0));
     }
     else
     {
-        SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellId);
+        // Detect obtained child spells of specific skills
+        auto bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellId);
+
         for (auto itr = bounds.first; itr != bounds.second; ++itr)
         {
-            SkillLineAbilityEntry const* skillAbility = itr->second;
-            SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skillAbility->skillId);
+            SkillLineAbilityEntry const* info = itr->second;
+
+            SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(info->skillId);
             if (!pSkill)
                 continue;
 
+            const uint16 skillId = uint16(pSkill->id);
+
+            switch (skillId)            // Legacy workarounds:
+            {
+                case SKILL_POISONS:     // Poisons/lockpicking special case: no ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
+                case SKILL_LOCKPICKING:
+                    if (info->max_value)
+                        continue;
+                    break;
+                default:                // Spells obtained via ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL only
+                    if (info->learnOnGetSkill != ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL)
+                        continue;
+            }
+
             if (apply)
             {
-                if (HasSkill(uint16(pSkill->id)))
+                if (HasSkill(skillId))
                     continue;
 
-                SkillRaceClassInfoEntry const* rcInfo = GetSkillRaceClassInfo(pSkill->id, GetRace(), GetClass());
-                if (!rcInfo)
+                // Check if obtainable
+                auto entry = GetSkillInfo(skillId);
+                if (!entry)
                     continue;
 
-                if (skillAbility->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL ||
-                    // learn associated class spec skills
-                    rcInfo->flags == (SKILL_FLAG_ALWAYS_MAX_VALUE | SKILL_FLAG_MONO_VALUE) ||
-                    // poison special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
-                    ((pSkill->id == SKILL_POISONS) && (skillAbility->max_value == 0)) ||
-                    // lockpicking special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
-                    ((pSkill->id == SKILL_LOCKPICKING) && (skillAbility->max_value == 0)))
+                switch (GetSkillRangeType(pSkill, info->racemask != 0))
                 {
-                    switch (GetSkillRangeType(pSkill, rcInfo))
+                    case SKILL_RANGE_LANGUAGE:
+                        SetSkill(skillId, 300, 300);
+                        break;
+                    case SKILL_RANGE_LEVEL:
                     {
-                        case SKILL_RANGE_LANGUAGE:
-                            SetSkill(uint16(pSkill->id), 300, 300);
-                            break;
-                        case SKILL_RANGE_LEVEL:
-                        {
-                            uint16 newSkillValue = (sWorld.getConfig(CONFIG_BOOL_ALWAYS_MAX_SKILL_FOR_LEVEL) || (rcInfo->flags & SKILL_FLAG_ALWAYS_MAX_VALUE))
-                                                    ? GetSkillMaxForLevel() : 1;
+                        uint16 newSkillValue = 1;
 
-                            // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-                            // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
-                            //   with these two weapons will now be retained if you decide to unspend
-                            //   this talent point and return to it later.
+                        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+                        // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
+                        //   with these two weapons will now be retained if you decide to unspend
+                        //   this talent point and return to it later.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-                            if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
-                            {
-                                const auto savedValue = m_mForgottenSkills.find(pSkill->id);
+                        if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
+                        {
+                            const auto savedValue = m_forgottenSkills.find(pSkill->id);
 
-                                if (savedValue != m_mForgottenSkills.end())
-                                    if (savedValue->second <= GetSkillMaxForLevel())
-                                        newSkillValue = savedValue->second;
-                            }
-#endif
-                            SetSkill(uint16(pSkill->id), newSkillValue, GetSkillMaxForLevel());
-                            break;
+                            if (savedValue != m_forgottenSkills.end())
+                                if (savedValue->second <= GetSkillMaxForLevel())
+                                    newSkillValue = savedValue->second;
                         }
-                        case SKILL_RANGE_MONO:
-                            SetSkill(uint16(pSkill->id), 1, 1);
-                            break;
-                        default:
-                            break;
+                        SetSkill(skillId, newSkillValue, GetSkillMaxForLevel());
+                        break;
                     }
+                    case SKILL_RANGE_MONO:
+                        if (entry->flags & SKILL_FLAG_MAXIMIZED)
+                            SetSkill(skillId, GetSkillMaxForLevel(), GetSkillMaxForLevel());
+                        else
+                            SetSkill(skillId, 1, 1);
+                        break;
+                    default:
+                        break;
                 }
             }
             else
             {
-                if ((skillAbility->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL &&
-                    pSkill->categoryId != SKILL_CATEGORY_CLASS) ||// not unlearn class skills (spellbook/talent pages)
-                                                                  // poisons/lockpicking special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
-                    ((pSkill->id == SKILL_POISONS || pSkill->id == SKILL_LOCKPICKING) && skillAbility->max_value == 0))
+                switch (pSkill->categoryId)         // Legacy workarounds:
                 {
-                    // not reset skills for professions and racial abilities
-                    if ((pSkill->categoryId == SKILL_CATEGORY_SECONDARY || pSkill->categoryId == SKILL_CATEGORY_PROFESSION) &&
-                        (IsProfessionSkill(pSkill->id) || skillAbility->racemask != 0))
+                    case SKILL_CATEGORY_CLASS:      // not unlearn class skills (spellbook/talent pages)
                         continue;
+                    case SKILL_CATEGORY_SECONDARY:  // not reset skills for professions and racial abilities
+                    case SKILL_CATEGORY_PROFESSION:
+                        if (IsProfessionSkill(skillId) || info->racemask != 0)
+                            continue;
 
-                    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-                    // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
-                    //   with these two weapons will now be retained if you decide to unspend
-                    //   this talent point and return to it later.
+                        SetSkill(skillId, 0, 0);
+                        break;
+
+                    default:
+                        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+                        // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
+                        //   with these two weapons will now be retained if you decide to unspend
+                        //   this talent point and return to it later.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-                    if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
-                        if (GetSkillValuePure(pSkill->id) > m_mForgottenSkills[pSkill->id])
-                            m_mForgottenSkills[pSkill->id] = GetSkillValuePure(pSkill->id);
-#endif
+                        if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
+                            if (GetSkillValuePure(pSkill->id) > m_forgottenSkills[pSkill->id])
+                                m_forgottenSkills[pSkill->id] = GetSkillValuePure(pSkill->id);
 
-                    SetSkill(uint16(pSkill->id), 0, 0);
-
-                    if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
-                        AutoUnequipWeaponsIfNeed();  
+                        SetSkill(skillId, 0, 0);
+                        break;
                 }
             }
         }
