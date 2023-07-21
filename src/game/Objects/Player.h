@@ -1761,7 +1761,6 @@ class Player final: public Unit
         int16 GetSkillBonus(uint16 id, bool permanent = false) const;
         inline int16 GetSkillBonusPermanent(uint16 id) const { return GetSkillBonus(id, true); }    // skill perm. bonus
         inline int16 GetSkillBonusTemporary(uint16 id) const { return GetSkillBonus(id); }          // skill temp bonus
-        void UpdateSkillsForLevel(bool maximize = false);
 
         void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
 
