@@ -6337,7 +6337,8 @@ void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
                         break;
                     case SKILL_RANGE_LEVEL:
                     {
-                        uint16 newSkillValue = 1;
+                        uint16 newSkillValue = (sWorld.getConfig(CONFIG_BOOL_ALWAYS_MAX_SKILL_FOR_LEVEL) || (rcEntry->flags & SKILL_FLAG_ALWAYS_MAX_VALUE))
+                                                ? GetSkillMaxForLevel() : 1;
 
                         // World of Warcraft Client Patch 1.11.0 (2006-06-20)
                         // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
