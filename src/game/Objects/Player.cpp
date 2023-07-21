@@ -6158,37 +6158,6 @@ uint16 Player::GetSkill(uint16 id, bool bonusPerm, bool bonusTemp, bool max/* = 
     return uint16(std::max(0, value));
 }
 
-uint16 Player::GetSkill(uint16 id, bool bonusPerm, bool bonusTemp, bool max/* = false*/) const
-{
-    if (!id)
-        return 0;
-
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
-    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
-        return 0;
-
-    SkillStatusData const& skillStatus = itr->second;
-
-    uint32 field = GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(skillStatus.pos));
-
-    // Pure value
-    int32 value = (max ? SKILL_MAX(field) : SKILL_VALUE(field));
-
-    // Bonus values
-    if (bonusPerm || bonusTemp)
-    {
-        uint32 bonus = GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(skillStatus.pos));
-
-        if (bonusPerm)
-            value += SKILL_PERM_BONUS(bonus);
-
-        if (bonusTemp)
-            value += SKILL_TEMP_BONUS(bonus);
-    }
-
-    return uint16(std::max(0, value));
-}
-
 void Player::SetSkillStep(uint16 id, uint16 step)
 {
     if (!id || step > MAX_SKILL_STEP)
@@ -6216,7 +6185,7 @@ void Player::SetSkillStep(uint16 id, uint16 step)
         bool maxed = false;
 
         if (SkillRaceClassInfoEntry const* entry = GetSkillInfo(id, filterfunc))
-            maxed = (entry->flags & SKILL_FLAG_MAXIMIZED);
+            maxed = (entry->flags & SKILL_FLAG_ALWAYS_MAX_VALUE);
 
         if (max)
         {
@@ -6398,7 +6367,7 @@ void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
                         break;
                     }
                     case SKILL_RANGE_MONO:
-                        if (entry->flags & SKILL_FLAG_MAXIMIZED)
+                        if (entry->flags & SKILL_FLAG_ALWAYS_MAX_VALUE)
                             SetSkill(skillId, GetSkillMaxForLevel(), GetSkillMaxForLevel());
                         else
                             SetSkill(skillId, 1, 1);
@@ -6428,10 +6397,14 @@ void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
                         //   this talent point and return to it later.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
                         if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
-                            if (GetSkillValuePure(pSkill->id) > m_forgottenSkills[pSkill->id])
-                                m_forgottenSkills[pSkill->id] = GetSkillValuePure(pSkill->id);
-
+                            if (GetSkillValuePure(pSkill->id) > m_mForgottenSkills[pSkill->id])
+                                m_mForgottenSkills[pSkill->id] = GetSkillValuePure(pSkill->id);
+#endif
                         SetSkill(skillId, 0, 0);
+
+                        if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
+                            AutoUnequipWeaponsIfNeed();
+
                         break;
                 }
             }
