@@ -1745,6 +1745,8 @@ class Player final: public Unit
 
         void UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence);
 
+        SkillRaceClassInfoEntry const* GetSkillInfo(uint16 id, std::function<bool (SkillRaceClassInfoEntry const&)> filterfunc = nullptr) const;
+        bool HasSkill(uint16 id) const;
         void SetSkill(SkillStatusMap::iterator itr, uint16 currVal, uint16 maxVal, uint16 step = 0);
         void SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step = 0);
         uint16 GetSkill(uint16 id, bool bonusPerm, bool bonusTemp, bool max = false) const;
@@ -1753,11 +1755,15 @@ class Player final: public Unit
         inline uint16 GetSkillValuePure(uint16 id) const { return GetSkill(id, false, false); }     // skill value
         inline uint16 GetSkillMax(uint16 id) const { return GetSkill(id, true, true, true); }       // skill max + perm. bonus + temp bonus
         inline uint16 GetSkillMaxPure(uint16 id) const { return GetSkill(id, false, false, true); } // skill max
+        void SetSkillStep(uint16 id, uint16 step);
+        uint16 GetSkillStep(uint16 id) const;
         bool ModifySkillBonus(uint16 id, int16 diff, bool permanent = false);
         int16 GetSkillBonus(uint16 id, bool permanent = false) const;
         inline int16 GetSkillBonusPermanent(uint16 id) const { return GetSkillBonus(id, true); }    // skill perm. bonus
         inline int16 GetSkillBonusTemporary(uint16 id) const { return GetSkillBonus(id); }          // skill temp bonus
-        bool HasSkill(uint16 id) const;
+        void UpdateSkillsForLevel(bool maximize = false);
+        void UpdateSkillTrainedSpells(uint16 id, uint16 currVal);                                   // learns/unlearns spells dependent on a skill
+        void UpdateSpellTrainedSkills(uint32 spellId, bool apply);                                  // learns/unlearns skills dependent on a spell
 
         void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
 
