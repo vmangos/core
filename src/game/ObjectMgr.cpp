@@ -9854,20 +9854,39 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u areas for fishing base skill level", count);
 }
 
-SkillRangeType GetSkillRangeType(SkillLineEntry const* skill, SkillRaceClassInfoEntry const* rcEntry)
+SkillRangeType GetSkillRangeType(SkillLineEntry const* pSkill, bool racial)
 {
-    if (sSkillTiersStore.LookupEntry(rcEntry->skillTierId))
-        return SKILL_RANGE_RANK;
-
-    switch (skill->categoryId)
+    switch (pSkill->categoryId)
     {
-        case SKILL_CATEGORY_ARMOR:
+        case SKILL_CATEGORY_LANGUAGES: return SKILL_RANGE_LANGUAGE;
+        case SKILL_CATEGORY_WEAPON:
+        {
+            if (pSkill->id != SKILL_FIST_WEAPONS)
+                return SKILL_RANGE_LEVEL;
             return SKILL_RANGE_MONO;
-        case SKILL_CATEGORY_LANGUAGES:
-            return SKILL_RANGE_LANGUAGE;
+        }
+        case SKILL_CATEGORY_ARMOR:
+        case SKILL_CATEGORY_CLASS:
+        {
+            if (pSkill->id != SKILL_POISONS && pSkill->id != SKILL_LOCKPICKING)
+                return SKILL_RANGE_MONO;
+            return SKILL_RANGE_LEVEL;
+        }
+        case SKILL_CATEGORY_SECONDARY:
+        case SKILL_CATEGORY_PROFESSION:
+        {
+            // not set skills for professions and racial abilities
+            if (IsProfessionOrRidingSkill(pSkill->id))
+                return SKILL_RANGE_RANK;
+            if (racial)
+                return SKILL_RANGE_NONE;
+            return SKILL_RANGE_MONO;
+        }
+        default:
+        case SKILL_CATEGORY_ATTRIBUTES:                     // not found in dbc
+        case SKILL_CATEGORY_GENERIC:                        // only GENERIC(DND)
+            return SKILL_RANGE_NONE;
     }
-
-    return SKILL_RANGE_LEVEL;
 }
 
 void ObjectMgr::LoadGameTele()
