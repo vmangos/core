@@ -23,7 +23,7 @@ enum
 
 void DefineGoChallenge(Creature * crea, uint64 gobjGUID);
 
-/// Script du GameObject de challenge (GO_CHALLENGE_UROK)
+// Challenge GameObject Script (GO_CHALLENGE_UROK)
 struct go_urok_challengeAI: public GameObjectAI
 {
     go_urok_challengeAI(GameObject* go) : GameObjectAI(go), _actived(true), _step(0), _timer(0), _spellTimer(0)

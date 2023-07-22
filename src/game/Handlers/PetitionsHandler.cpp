@@ -423,10 +423,10 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OFFER PETITION: petition %u to %s", petitionGuid, playerGuid.GetString().c_str());
 
-    /// Get petition signs count
+    // Get petition signs count
     uint8 signs = petition->GetSignatureCount();
 
-    /// Send response
+    // Send response
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << ObjectGuid(itemGuid);                           // item guid
     data << ObjectGuid(_player->GetObjectGuid());           // owner guid
@@ -457,7 +457,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
         return;
     }
 
-    /// Collect petition info data
+    // Collect petition info data
     if (_player->GetGuildId())
     {
         WorldPacket data(SMSG_TURN_IN_PETITION_RESULTS, 4);

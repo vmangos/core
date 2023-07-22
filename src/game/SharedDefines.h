@@ -1556,7 +1556,7 @@ enum ResponseCodes
     CHAR_NAME_SUCCESS,
 };
 
-/// Ban function modes
+// Ban function modes
 enum BanMode
 {
     BAN_ACCOUNT,
@@ -1564,7 +1564,7 @@ enum BanMode
     BAN_IP
 };
 
-/// Ban function return codes
+// Ban function return codes
 enum BanReturn
 {
     BAN_SUCCESS,

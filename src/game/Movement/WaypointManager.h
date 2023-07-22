@@ -124,7 +124,7 @@ class WaypointManager
         void DeletePath(uint32 id);
 
         // Toolbox for .wp add command
-        /// Add a node as position pointId. If pointId == 0 then as last point
+        // Add a node as position pointId. If pointId == 0 then as last point
         WaypointNode const* AddNode(uint32 entry, uint32 dbGuid, uint32& pointId, WaypointPathOrigin wpDest, float x, float y, float z);
 
         // Toolbox for .wp modify command

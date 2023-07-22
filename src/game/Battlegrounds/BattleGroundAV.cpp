@@ -1181,8 +1181,8 @@ void BattleGroundAV::PopulateMineNode(uint8 mine, BattleGroundAVTeamIndex teamId
     }
 }
 
-/// will spawn and despawn creatures around a node
-/// more a wrapper around spawnevent cause graveyards are special
+// will spawn and despawn creatures around a node
+// more a wrapper around spawnevent cause graveyards are special
 void BattleGroundAV::PopulateNode(BG_AV_Nodes node)
 {
     ASSERT(node < BG_AV_NODES_MAX);
@@ -1261,7 +1261,7 @@ void BattleGroundAV::PopulateNode(BG_AV_Nodes node)
 }
 
 
-/// called when using a banner
+// called when using a banner
 void BattleGroundAV::EventPlayerClickedOnFlag(Player* source, GameObject* targetGo)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)

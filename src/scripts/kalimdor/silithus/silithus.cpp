@@ -150,7 +150,7 @@ struct go_pierre_ventsAI: public GameObjectAI
 
         bool playerHasAura = true;
 
-        ///- Check if allowed to use the stone ?
+        // Check if allowed to use the stone ?
         switch (GetStoneType())
         {
             // Pierre SUP
@@ -211,7 +211,7 @@ struct go_pierre_ventsAI: public GameObjectAI
         uint32 summonEntry = 0;
         uint32 textId = 0;
 
-        ///- Let's find out which mob we have to summon.
+        // Let's find out which mob we have to summon.
         switch (stoneType)
         {
             case GO_TYPE_PIERRE_SUP:
@@ -249,7 +249,7 @@ struct go_pierre_ventsAI: public GameObjectAI
         if (!summonEntry)
             return true;
 
-        ///- Destroy required items.
+        // Destroy required items.
         if (!player->ToPlayer()->IsGameMaster())
         {
             switch (stoneType)
@@ -268,7 +268,7 @@ struct go_pierre_ventsAI: public GameObjectAI
             }
         }
 
-        ///- Summon the creature
+        // Summon the creature
         if (Creature* pInvoc = me->SummonCreature(summonEntry, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), me->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3600000, false, 5000))
         {
             player->CastSpell(player, SPELL_RED_LIGHTNING, true);
@@ -278,7 +278,7 @@ struct go_pierre_ventsAI: public GameObjectAI
                 pInvoc->MonsterSay(textId, 0, player);
         }
 
-        ///- Mark stone as used.
+        // Mark stone as used.
         me->UseDoorOrButton();
         if (stoneType == GO_TYPE_PIERRE_SUP)
             me->SetRespawnTime(3600);

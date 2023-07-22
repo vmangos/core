@@ -198,7 +198,7 @@ Object::~Object()
 {
     if (IsInWorld())
     {
-        ///- Do NOT call RemoveFromWorld here, if the object is a player it will crash
+        // Do NOT call RemoveFromWorld here, if the object is a player it will crash
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Object::~Object (GUID: %u TypeId: %u) deleted but still in world!!", GetGUIDLow(), GetTypeId());
         MANGOS_ASSERT(false);
     }

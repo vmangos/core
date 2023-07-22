@@ -323,12 +323,12 @@ void ObjectAccessor::RemoveObject(MasterPlayer* player)
     HashMapHolder<MasterPlayer>::Remove(player);
     playerNameToMasterPlayerPointer.erase(player->GetName());
 }
-/// Define the static member of HashMapHolder
+// Define the static member of HashMapHolder
 
 template <class T> typename HashMapHolder<T>::MapType HashMapHolder<T>::m_objectMap;
 template <class T> std::shared_timed_mutex HashMapHolder<T>::i_lock;
 
-/// Global definitions for the hashmap storage
+// Global definitions for the hashmap storage
 
 template class HashMapHolder<Player>;
 template class HashMapHolder<Corpse>;

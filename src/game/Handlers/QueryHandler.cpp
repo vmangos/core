@@ -149,7 +149,7 @@ void WorldSession::HandleQueryTimeOpcode(WorldPacket& /*recv_data*/)
     SendQueryTimeResponse();
 }
 
-/// Only _static_ data send in this packet !!!
+// Only _static_ data send in this packet !!!
 void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
 {
     uint32 entry;
@@ -235,7 +235,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
     }
 }
 
-/// Only _static_ data send in this packet !!!
+// Only _static_ data send in this packet !!!
 void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recv_data)
 {
     uint32 entryID;

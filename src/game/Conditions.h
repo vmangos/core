@@ -202,8 +202,10 @@ enum ConditionType
                                                             // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_IS_IN_COMBAT          = 43,                   // Checks if the target is currently in combat.
                                                             // Requirement: Unit Target
-    CONDITION_IS_HOSTILE_TO         = 44,                   // Returns true if the target is hostile to the source.
+    CONDITION_REACTION              = 44,                   // Returns true if the target's reaction to the source matches the criteria.
                                                             // Requirement: WorldObject Source, WorldObject Target
+                                                            // Value1: reaction (see enum ReputationRank)
+                                                            // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_IS_IN_GROUP           = 45,                   // Returns true if the player is in a group.
                                                             // Requirement: Player Target
     CONDITION_IS_ALIVE              = 46,                   // Returns true if the target is alive.

@@ -41,10 +41,10 @@ bool ChatHandler::HandleAccountCommand(char* args)
     return true;
 }
 
- /// Set/Unset the expansion level for an account
+ // Set/Unset the expansion level for an account
 bool ChatHandler::HandleAccountSetAddonCommand(char* args)
 {
-    ///- Get the command line arguments
+    // Get the command line arguments
     char* accountStr = ExtractOptNotLastArg(&args);
 
     std::string account_name;
@@ -78,7 +78,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
     if (!targetAccountId)
         return false;
 
-    /// only target player different from self allowed
+    // only target player different from self allowed
     if (GetAccountId() == targetAccountId)
         return false;
 
@@ -93,12 +93,12 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
         return false;
     }
 
-    /// can set security level only for target with less security and to less security that we have
-    /// This is also reject self apply in fact
+    // can set security level only for target with less security and to less security that we have
+    // This is also reject self apply in fact
     if (HasLowerSecurityAccount(nullptr, targetAccountId, true))
         return false;
 
-    /// account can't set security to same or grater level, need more power GM or console
+    // account can't set security to same or grater level, need more power GM or console
     AccountTypes plSecurity = GetAccessLevel();
     if (AccountTypes(gm) >= plSecurity)
     {
@@ -119,10 +119,10 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
     return true;
 }
 
-/// Set password for account
+// Set password for account
 bool ChatHandler::HandleAccountSetPasswordCommand(char* args)
 {
-    ///- Get the command line arguments
+    // Get the command line arguments
     std::string account_name;
     uint32 targetAccountId = ExtractAccountId(&args, &account_name);
     if (!targetAccountId)
@@ -134,8 +134,8 @@ bool ChatHandler::HandleAccountSetPasswordCommand(char* args)
     if (!szPassword1 || !szPassword2)
         return false;
 
-    /// can set password only for target with less security
-    /// This is also reject self apply in fact
+    // can set password only for target with less security
+    // This is also reject self apply in fact
     if (HasLowerSecurityAccount(nullptr, targetAccountId, true))
         return false;
 
@@ -170,10 +170,10 @@ bool ChatHandler::HandleAccountSetPasswordCommand(char* args)
     return true;
 }
 
-/// Set locked status for account
+// Set locked status for account
 bool ChatHandler::HandleAccountSetLockedCommand(char* args)
 {
-    ///- Get the command line arguments
+    // Get the command line arguments
     char* accountStr = ExtractOptNotLastArg(&args);
 
     std::string account_name;
@@ -208,17 +208,17 @@ bool ChatHandler::HandleAccountSetLockedCommand(char* args)
     return true;
 }
 
-/// Output list of character for account
+// Output list of character for account
 bool ChatHandler::HandleAccountCharactersCommand(char* args)
 {
-    ///- Get the command line arguments
+    // Get the command line arguments
     std::string account_name;
     Player* target = nullptr;                                  // only for triggering use targeted player account
     uint32 account_id = ExtractAccountId(&args, &account_name, &target);
     if (!account_id)
         return false;
 
-    ///- Get the characters for account id
+    // Get the characters for account id
     CharacterDatabase.AsyncPQuery(&PlayerSearchHandler::HandlePlayerCharacterLookupResult,
         GetAccountId(), 100u,
         "SELECT `guid`, `name`, `race`, `class`, `level` FROM `characters` WHERE `account` = %u",
@@ -235,10 +235,10 @@ bool ChatHandler::HandleAccountClearDataCommand(char* args)
     return true;
 }
 
-/// Create an account
+// Create an account
 bool ChatHandler::HandleAccountCreateCommand(char* args)
 {
-    ///- %Parse the command line arguments
+    // %Parse the command line arguments
     char *szAcc = ExtractQuotedOrLiteralArg(&args);
     char *szPassword = ExtractQuotedOrLiteralArg(&args);
     if (!szAcc || !szPassword)
@@ -275,8 +275,8 @@ bool ChatHandler::HandleAccountCreateCommand(char* args)
     return true;
 }
 
-/// Delete a user account and all associated characters in this realm
-/// \todo This function has to be enhanced to respect the login/realm split (delete char, delete account chars in realm, delete account chars in realm then delete account
+// Delete a user account and all associated characters in this realm
+// TODO: This function has to be enhanced to respect the login/realm split (delete char, delete account chars in realm, delete account chars in realm then delete account
 bool ChatHandler::HandleAccountDeleteCommand(char* args)
 {
     if (!*args)
@@ -287,9 +287,9 @@ bool ChatHandler::HandleAccountDeleteCommand(char* args)
     if (!account_id)
         return false;
 
-    /// Commands not recommended call from chat, but support anyway
-    /// can delete only for account with less security
-    /// This is also reject self apply in fact
+    // Commands not recommended call from chat, but support anyway
+    // can delete only for account with less security
+    // This is also reject self apply in fact
     if (HasLowerSecurityAccount (nullptr, account_id, true))
         return false;
 
@@ -316,14 +316,14 @@ bool ChatHandler::HandleAccountDeleteCommand(char* args)
     return true;
 }
 
-/// Display info on users currently in the realm
+// Display info on users currently in the realm
 bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 {
     uint32 limit;
     if (!ExtractOptUInt32(&args, limit, 100))
         return false;
 
-    ///- Get the list of accounts ID logged to the realm
+    // Get the list of accounts ID logged to the realm
     //                                                  0     1           2          3          4
     QueryResult* result = LoginDatabase.PQuery("SELECT `id`, `username`, `last_ip`, `gmlevel`, `expansion` FROM `account` WHERE `current_realm` = %u LIMIT %u", realmID, limit);
     if (!result)

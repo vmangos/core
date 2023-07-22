@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup realmd Realm Daemon
-/// @{
-/// \file
+// \addtogroup realmd Realm Daemon
+// @{
+// \file
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
@@ -69,11 +69,11 @@ bool StartDB();
 void UnhookSignals();
 void HookSignals();
 
-bool stopEvent = false;                                     ///< Setting it to true stops the server
+bool stopEvent = false;                                     // Setting it to true stops the server
 
-DatabaseType LoginDatabase;                                 ///< Accessor to the realm server database
+DatabaseType LoginDatabase;                                 // Accessor to the realm server database
 
-/// Print out the usage string for this program on the console.
+// Print out the usage string for this program on the console.
 void usage(const char *prog)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Usage: \n %s [<options>]\n"
@@ -94,10 +94,10 @@ void usage(const char *prog)
 
 char const* g_mainLogFileName = "Realmd.log";
 
-/// Launch the realm server
+// Launch the realm server
 extern int main(int argc, char **argv)
 {
-    ///- Command line parsing
+    // Command line parsing
     char const* cfg_file = _REALMD_CONFIG;
 
     char const *options = ":c:s:";
@@ -196,7 +196,7 @@ extern int main(int argc, char **argv)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "<Ctrl-C> to stop.\n" );
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s.", cfg_file);
 
-    ///- Check the version of the configuration file
+    // Check the version of the configuration file
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);
     if (confVersion < _REALMDCONFVERSION)
     {
@@ -233,7 +233,7 @@ extern int main(int argc, char **argv)
 
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Max allowed open files is %d", ACE::max_handles());
 
-    /// realmd PID file creation
+    // realmd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
     if(!pidfile.empty())
     {
@@ -248,7 +248,7 @@ extern int main(int argc, char **argv)
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Daemon PID: %u\n", pid );
     }
 
-    ///- Initialize the database connection
+    // Initialize the database connection
     if(!StartDB())
     {
         Log::WaitBeforeContinueIfNeed();
@@ -267,7 +267,7 @@ extern int main(int argc, char **argv)
         }
     }
 
-    ///- Get the list of realms for the server
+    // Get the list of realms for the server
     sRealmList.Initialize(sConfig.GetIntDefault("RealmsStateUpdateDelay", 20));
     if (sRealmList.size() == 0)
     {
@@ -289,7 +289,7 @@ extern int main(int argc, char **argv)
     LoginDatabase.Execute("DELETE FROM `ip_banned` WHERE `unbandate`<=UNIX_TIMESTAMP() AND `unbandate`<>`bandate`");
     LoginDatabase.CommitTransaction();
 
-    ///- Launch the listening network socket
+    // Launch the listening network socket
     ACE_Acceptor<AuthSocket, ACE_SOCK_Acceptor> acceptor;
 
     uint16 rmport = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
@@ -304,10 +304,10 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
-    ///- Catch termination signals
+    // Catch termination signals
     HookSignals();
 
-    ///- Handle affinity for multiple processors and process priority on Windows
+    // Handle affinity for multiple processors and process priority on Windows
     #ifdef WIN32
     {
         HANDLE hProcess = GetCurrentProcess();
@@ -360,7 +360,7 @@ extern int main(int argc, char **argv)
     #ifndef WIN32
     detachDaemon();
     #endif
-    ///- Wait for termination signal
+    // Wait for termination signal
     while (!stopEvent)
     {
         // dont move this outside the loop, the reactor will modify it
@@ -381,17 +381,17 @@ extern int main(int argc, char **argv)
 #endif
     }
 
-    ///- Wait for the delay thread to exit
+    // Wait for the delay thread to exit
     LoginDatabase.HaltDelayThread();
 
-    ///- Remove signal handling before leaving
+    // Remove signal handling before leaving
     UnhookSignals();
 
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Halting process..." );
     return 0;
 }
 
-/// Handle termination signals
+// Handle termination signals
 /** Put the global variable stopEvent to 'true' if a termination signal is caught **/
 void OnSignal(int s)
 {
@@ -411,7 +411,7 @@ void OnSignal(int s)
     signal(s, OnSignal);
 }
 
-/// Initialize connection to the database
+// Initialize connection to the database
 bool StartDB()
 {
     std::string dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
@@ -463,7 +463,7 @@ bool StartDB()
 
     if (!LoginDatabase.CheckRequiredMigrations(MIGRATIONS_LOGON))
     {
-        ///- Wait for already started DB delay threads to end
+        // Wait for already started DB delay threads to end
         LoginDatabase.HaltDelayThread();
         return false;
     }
@@ -471,7 +471,7 @@ bool StartDB()
     return true;
 }
 
-/// Define hook 'OnSignal' for all termination signals
+// Define hook 'OnSignal' for all termination signals
 void HookSignals()
 {
     signal(SIGINT, OnSignal);
@@ -481,7 +481,7 @@ void HookSignals()
     #endif
 }
 
-/// Unhook the signals before leaving
+// Unhook the signals before leaving
 void UnhookSignals()
 {
     signal(SIGINT, 0);
@@ -491,4 +491,4 @@ void UnhookSignals()
     #endif
 }
 
-/// @}
+// @}

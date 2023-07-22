@@ -486,8 +486,8 @@ uint32 MapManager::GetNumPlayersInInstances()
     return ret;
 }
 
-///// returns a new or existing Instance
-///// in case of battlegrounds it will only return an existing map, those maps are created by bg-system
+// returns a new or existing Instance
+// in case of battlegrounds it will only return an existing map, those maps are created by bg-system
 Map* MapManager::CreateInstance(uint32 id, Player* player)
 {
     Guard _guard(*this);
