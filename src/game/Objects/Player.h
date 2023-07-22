@@ -1724,7 +1724,7 @@ class Player final: public Unit
         void UpdateSkillTrainedSpells(uint16 id, uint16 currVal);                                   // learns/unlearns spells dependent on a skill
         void UpdateSpellTrainedSkills(uint32 spellId, bool apply);                                  // learns/unlearns skills dependent on a spell
         void UpdateOldRidingSkillToNew(bool hasEpicMount);
-        void UpdateSkillsForLevel();
+        void UpdateSkillsForLevel(bool maximize = false);
         SkillStatusMap mSkillStatus;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         std::unordered_map<uint16, uint16> m_mForgottenSkills;
