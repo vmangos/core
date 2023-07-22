@@ -20625,7 +20625,7 @@ void Player::_LoadSkills(QueryResult* result)
             }
 
             // set fixed skill ranges
-            switch (GetSkillRangeType(pSkill, rcEntry))
+            switch (GetSkillRangeType(pSkill, false))
             {
                 case SKILL_RANGE_LANGUAGE:                      // 300..300
                     value = max = 300;
