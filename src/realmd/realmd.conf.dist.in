@@ -148,6 +148,10 @@ ConfVersion=2020010501
 #        The SendGrid template GUID for geolocking emails
 #        Default: ""
 #
+#    BannedLocale
+#        List of banned locales as a comma-separated string
+# 	 Default: ""
+#
 ###################################################################################################################
 
 LoginDatabaseInfo = "127.0.0.1;3306;mangos;mangos;realmd"
@@ -179,3 +183,4 @@ MailFrom = ""
 MailCertChecks = 1
 SendGridKey = ""
 GeolockGUID = ""
+BannedLocale = ""
