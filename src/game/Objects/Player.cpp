@@ -5902,6 +5902,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         }
     }
 }
+
 void Player::UpdateSkillsForLevel(bool maximize/* = false*/)
 {
     if (!maximize)
@@ -5932,7 +5933,7 @@ void Player::UpdateSkillsForLevel(bool maximize/* = false*/)
         if (!maxed)
         {
             if (SkillRaceClassInfoEntry const* entry = GetSkillInfo(skillId))
-                maxed = (entry->flags & SKILL_FLAG_MAXIMIZED);
+                maxed = (entry->flags & SKILL_FLAG_ALWAYS_MAX_VALUE);
         }
 
         const uint32 data = GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(skillStatus.pos));
