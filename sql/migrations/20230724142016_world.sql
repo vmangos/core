@@ -300,7 +300,7 @@ INSERT INTO `spell_group_stack_rules` (`group_id`, `build`, `stack_rule`) VALUES
 INSERT INTO `spell_group` (`group_id`, `group_spell_id`, `spell_id`, `build_min`, `build_max`) VALUES
 (1030, 0, 26681, 5086, 5875),
 (1030, 1, 26682, 5086, 5875);
-INSERT INTO `spell_group_stack_rules` (`group_id`, `build`, `stack_rule`) VALUES (1050, 0, 1);
+INSERT INTO `spell_group_stack_rules` (`group_id`, `build`, `stack_rule`) VALUES (1030, 0, 1);
 
 -- Debuff groups:
 -- Demoralizing shout + Demoralizing roar
