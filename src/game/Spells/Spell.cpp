@@ -3375,6 +3375,10 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     y = (y - srcY) * t + srcY;
                     z = waterLevel;
                 }
+
+                if (!MapManager::IsValidMapCoord(unitTarget->GetMapId(), x, y, z))
+                    break;
+
                 pUnitTarget->GetMap()->GetLosHitPosition(srcX, srcY, srcZ, x, y, z, -0.5f);
                 ground = pUnitTarget->GetMap()->GetHeight(x, y, z);
                 if (ground < z)
