@@ -1351,6 +1351,8 @@ bool ChatHandler::HandleNpcSpawnSetMoveTypeCommand(char* args)
         move_type = RANDOM_MOTION_TYPE;
     else if (strncmp(type_str, "waypoint", strlen(type_str)) == 0)
         move_type = WAYPOINT_MOTION_TYPE;
+    else if (strncmp(type_str, "cyclic", strlen(type_str)) == 0)
+        move_type = CYCLIC_MOTION_TYPE;
     else
         return false;
 
@@ -1393,6 +1395,8 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
         move_type = RANDOM_MOTION_TYPE;
     else if (strncmp(type_str, "waypoint", strlen(type_str)) == 0)
         move_type = WAYPOINT_MOTION_TYPE;
+    else if (strncmp(type_str, "cyclic", strlen(type_str)) == 0)
+        move_type = CYCLIC_MOTION_TYPE;
     else
         return false;
 

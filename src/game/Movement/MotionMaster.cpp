@@ -32,6 +32,7 @@
 #include "PointMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
 #include "WaypointMovementGenerator.h"
+#include "CyclicMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 
 #include "MoveSpline.h"
@@ -59,8 +60,16 @@ void MotionMaster::Initialize()
         MovementGenerator* movement = FactorySelector::selectMovementGenerator(static_cast<Creature*>(m_owner));
         push(movement == nullptr ? &si_idleMovement : movement);
         top()->Initialize(*m_owner);
-        if (top()->GetMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
-            (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(static_cast<Creature*>(m_owner)), 0, PATH_NO_PATH, 0, 0, 0, true);
+
+        switch (top()->GetMovementGeneratorType())
+        {
+            case WAYPOINT_MOTION_TYPE:
+                (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(static_cast<Creature*>(m_owner)), 0, PATH_NO_PATH, 0, 0, 0, true);
+                break;
+            case CYCLIC_MOTION_TYPE:
+                (static_cast<CyclicMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(static_cast<Creature*>(m_owner)), PATH_NO_PATH, 0, 0);
+                break;
+        }
     }
     else
         push(&si_idleMovement);
@@ -112,8 +121,16 @@ void MotionMaster::InitializeNewDefault(bool alwaysReplace)
                 new_default = movement->GetMovementGeneratorType();
             push(movement == nullptr ? &si_idleMovement : movement);
             top()->Initialize(*m_owner);
-            if (top()->GetMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
-                (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(pCreature), 0, PATH_NO_PATH, 100, 0, 0, true);
+
+            switch (top()->GetMovementGeneratorType())
+            {
+                case WAYPOINT_MOTION_TYPE:
+                    (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(static_cast<Creature*>(m_owner)), 0, PATH_NO_PATH, 0, 0, 0, true);
+                    break;
+                case CYCLIC_MOTION_TYPE:
+                    (static_cast<CyclicMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(static_cast<Creature*>(m_owner)), PATH_NO_PATH, 0, 0);
+                    break;
+            }
         }
         else
             push(&si_idleMovement);
@@ -575,6 +592,27 @@ void MotionMaster::MoveWaypoint(uint32 startPoint /*=0*/, uint32 source /*=0==PA
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Non-creature %s attempt to MoveWaypoint()", m_owner->GetGuidStr().c_str());
 }
 
+void MotionMaster::MoveCyclicWaypoint(uint32 source, uint32 overwriteGuid, uint32 overwriteEntry)
+{
+    if (m_owner->IsCreature())
+    {
+        if (GetCurrentMovementGeneratorType() == CYCLIC_MOTION_TYPE)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature %s (Entry %u) attempt to MoveCyclicWaypoint() but creature is already using cyclic waypoint", m_owner->GetGuidStr().c_str(), m_owner->GetEntry());
+            return;
+        }
+
+        Creature* creature = (Creature*)m_owner;
+
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature %s (Entry %u) start MoveCyclicWaypoint()", m_owner->GetGuidStr().c_str(), m_owner->GetEntry());
+        CyclicMovementGenerator<Creature>* newWPMMgen = new CyclicMovementGenerator<Creature>(*creature);
+        Mutate(newWPMMgen);
+        newWPMMgen->InitializeWaypointPath(*creature, (WaypointPathOrigin)source, overwriteGuid, overwriteEntry);
+    }
+    else
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Non-creature %s attempt to MoveCyclicWaypoint()", m_owner->GetGuidStr().c_str());
+}
+
 void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
 {
     if (m_owner->IsPlayer())
@@ -709,6 +747,8 @@ char const* MotionMaster::GetMovementGeneratorTypeName(MovementGeneratorType gen
             return "RANDOM_MOTION_TYPE";
         case WAYPOINT_MOTION_TYPE:
             return "WAYPOINT_MOTION_TYPE";
+        case CYCLIC_MOTION_TYPE:
+            return "CYCLIC_MOTION_TYPE";
         case MAX_DB_MOTION_TYPE:
             return "MAX_DB_MOTION_TYPE";
         case CONFUSED_MOTION_TYPE:

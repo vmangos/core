@@ -33,6 +33,7 @@
 #include "MovementGeneratorImpl.h"
 #include "CreatureAIRegistry.h"
 #include "WaypointMovementGenerator.h"
+#include "CyclicMovementGenerator.h"
 
 namespace AIRegistry
 {
@@ -51,6 +52,7 @@ void Initialize()
 
     (new MovementGeneratorFactory<RandomMovementGenerator>(RANDOM_MOTION_TYPE))->RegisterSelf();
     (new MovementGeneratorFactory<WaypointMovementGenerator<Creature> >(WAYPOINT_MOTION_TYPE))->RegisterSelf();
+    (new MovementGeneratorFactory<CyclicMovementGenerator<Creature> >(CYCLIC_MOTION_TYPE))->RegisterSelf();
     (new MovementGeneratorFactory<PatrolMovementGenerator>(PATROL_MOTION_TYPE))->RegisterSelf();
 }
 }
