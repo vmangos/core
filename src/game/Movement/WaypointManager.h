@@ -44,9 +44,10 @@ struct WaypointNode
     uint32 delay;
     float wander_distance;
     uint32 script_id;
-    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), wander_distance(0.0f), script_id(0) {}
-    WaypointNode(float _x, float _y, float _z, float _o, uint32 _delay, float _wander_distance, uint32 _script_id)
-      : x(_x), y(_y), z(_z), orientation(_o), delay(_delay), wander_distance(_wander_distance), script_id(_script_id) {}
+    uint32 path_id;
+    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), wander_distance(0.0f), script_id(0), path_id(0) {}
+    WaypointNode(float _x, float _y, float _z, float _o, uint32 _delay, float _wander_distance, uint32 _script_id, uint32 _path_id)
+      : x(_x), y(_y), z(_z), orientation(_o), delay(_delay), wander_distance(_wander_distance), script_id(_script_id), path_id(_path_id) {}
 };
 
 typedef std::map < uint32 /*pointId*/, WaypointNode > WaypointPath;
