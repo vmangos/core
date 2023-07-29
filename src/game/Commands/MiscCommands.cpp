@@ -197,10 +197,10 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
     return true;
 }
 
-/// Display the list of GMs
+// Display the list of GMs
 bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 {
-    ///- Get the accounts with GM Level >0
+    // Get the accounts with GM Level >0
     QueryResult* result = LoginDatabase.PQuery("SELECT `username`, `account_access`.`gmlevel` FROM `account`, `account_access` "
         "WHERE `account_access`.`id` = `account`.`id` AND `account_access`.`gmlevel` > 0 AND `RealmID`=%u", realmID);
     if (result)
@@ -210,7 +210,7 @@ bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
         SendSysMessage(LANG_GMLIST_HEADER);
         SendSysMessage("========================");
 
-        ///- Circle through them. Display username and GM level
+        // Circle through them. Display username and GM level
         do
         {
             Field* fields = result->Fetch();
@@ -227,7 +227,7 @@ bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 
 bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
 {
-    std::list< std::pair<std::string, bool> > names;
+    std::vector< std::pair<std::string, bool> > names;
 
     {
         HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
@@ -902,8 +902,7 @@ bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
 
     // extract items
     typedef std::pair<uint32, uint32> ItemPair;
-    typedef std::list< ItemPair > ItemPairs;
-    ItemPairs items;
+    std::vector<ItemPair> items;
 
     // get from tail next item str
     while (char* itemStr = ExtractArg(&args))
@@ -1025,7 +1024,7 @@ bool ChatHandler::HandleSendMassItemsCommand(char* args)
 
 bool ChatHandler::HandleSendMoneyHelper(MailDraft& draft, char* args)
 {
-    /// format: "subject text" "mail text" money
+    // format: "subject text" "mail text" money
 
     char* msgSubject = ExtractQuotedArg(&args);
     if (!msgSubject)
@@ -1050,7 +1049,7 @@ bool ChatHandler::HandleSendMoneyHelper(MailDraft& draft, char* args)
 
 bool ChatHandler::HandleSendMoneyCommand(char* args)
 {
-    /// format: name "subject text" "mail text" money
+    // format: name "subject text" "mail text" money
 
     Player* receiver;
     ObjectGuid receiver_guid;
@@ -1076,7 +1075,7 @@ bool ChatHandler::HandleSendMoneyCommand(char* args)
 
 bool ChatHandler::HandleSendMassMoneyCommand(char* args)
 {
-    /// format: raceMask "subject text" "mail text" money
+    // format: raceMask "subject text" "mail text" money
 
     uint32 raceMask = 0;
     char const* name = nullptr;
@@ -1129,21 +1128,21 @@ bool ChatHandler::HandleSendMailCommand(char* args)
     return true;
 }
 
-/// Send a message to a player in game
+// Send a message to a player in game
 bool ChatHandler::HandleSendMessageCommand(char* args)
 {
-    ///- Find the player
+    // Find the player
     Player* rPlayer;
     if (!ExtractPlayerTarget(&args, &rPlayer))
         return false;
 
-    ///- message
+    // message
     if (!*args)
         return false;
 
     WorldSession* rPlayerSession = rPlayer->GetSession();
 
-    ///- Check that he is not logging out.
+    // Check that he is not logging out.
     if (rPlayerSession->IsLogingOut())
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -1151,8 +1150,8 @@ bool ChatHandler::HandleSendMessageCommand(char* args)
         return false;
     }
 
-    ///- Send the message
-    //Use SendAreaTriggerMessage for fastest delivery.
+    // Send the message
+    // Use SendAreaTriggerMessage for fastest delivery.
     rPlayerSession->SendAreaTriggerMessage("%s", args);
     rPlayerSession->SendAreaTriggerMessage("|cffff0000[Message from administrator]:|r");
 

@@ -74,20 +74,20 @@ RealmList& sRealmList
     return realmlist;
 }
 
-/// Load the realm list from the database
+// Load the realm list from the database
 void RealmList::Initialize(uint32 updateInterval)
 {
     m_UpdateInterval = updateInterval;
 
     LoadAllowedClients();
 
-    ///- Get the content of the realmlist table in the database
+    // Get the content of the realmlist table in the database
     UpdateRealms(true);
 }
 
 void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const std::string& builds)
 {
-    ///- Create new if not exist or update existed
+    // Create new if not exist or update existed
     Realm& realm = m_realms[name];
 
     realm.m_ID       = ID;
@@ -119,7 +119,7 @@ void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::stri
             if (bInfo->build == first_build)
                 realm.realmBuildInfo = *bInfo;
 
-    ///- Append port to IP address.
+    // Append port to IP address.
     std::ostringstream ss;
     ss << address << ":" << port;
     realm.address   = ss.str();
@@ -151,7 +151,7 @@ void RealmList::UpdateRealms(bool init)
         "`allowedSecurityLevel`, `population`, `realmbuilds` FROM `realmlist` "
         "WHERE (`realmflags` & 1) = 0 ORDER BY `name`");
 
-    ///- Circle through results and add them to the realm map
+    // Circle through results and add them to the realm map
     if(result)
     {
         do

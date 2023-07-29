@@ -1088,11 +1088,11 @@ class ChatHandler
          */
         struct DeletedInfo
         {
-            uint32      lowguid;                            ///< the low GUID from the character
-            std::string name;                               ///< the character name
-            uint32      accountId;                          ///< the account id
-            std::string accountName;                        ///< the account name
-            time_t      deleteDate;                         ///< the date at which the character has been deleted
+            uint32      lowguid;                            // the low GUID from the character
+            std::string name;                               // the character name
+            uint32      accountId;                          // the account id
+            std::string accountName;                        // the account name
+            time_t      deleteDate;                         // the date at which the character has been deleted
         };
 
         typedef std::list<DeletedInfo> DeletedInfoList;

@@ -38,6 +38,7 @@ void WaypointManager::Load()
     uint32 total_nodes = 0;
     uint32 total_behaviors = 0;
 
+    std::set<uint32> specialPathSet;
     std::set<uint32> movementScriptSet;
 
     for (const auto& itr : sCreatureMovementScripts)
@@ -78,8 +79,8 @@ void WaypointManager::Load()
 
         delete result;
 
-        //                                    0     1        2             3             4             5           6                  7            8
-        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation` FROM `creature_movement`");
+        //                                    0     1        2             3             4             5           6                  7            8              9
+        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation`, `path_id` FROM `creature_movement`");
 
         BarGoLink barRow((int)result->GetRowCount());
 
@@ -107,7 +108,7 @@ void WaypointManager::Load()
             if (!cData)
             {
                 if (!sObjectMgr.IsExistingCreatureGuid(id))
-                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table creature_movement contain path for creature guid %u, but this creature guid does not exist. Skipping.", id);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table creature_movement contains path for creature guid %u, but this creature guid does not exist. Skipping.", id);
                 continue;
             }
 
@@ -125,6 +126,10 @@ void WaypointManager::Load()
             node.delay          = fields[5].GetUInt32();
             node.wander_distance = fields[6].GetFloat();
             node.script_id      = fields[7].GetUInt32();
+            node.path_id        = fields[9].GetUInt32();
+
+            if (node.path_id)
+                specialPathSet.insert(node.path_id);
 
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
@@ -196,8 +201,8 @@ void WaypointManager::Load()
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Path templates loaded");
 
-        //                                    0        1        2             3             4             5           6                  7            8
-        result = WorldDatabase.Query("SELECT `entry`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation` FROM `creature_movement_template`");
+        //                                    0        1        2             3             4             5           6                  7            8              9
+        result = WorldDatabase.Query("SELECT `entry`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation`, `path_id` FROM `creature_movement_template`");
 
         BarGoLink bar(result->GetRowCount());
 
@@ -244,6 +249,10 @@ void WaypointManager::Load()
             node.delay          = fields[5].GetUInt32();
             node.wander_distance = fields[6].GetFloat();
             node.script_id      = fields[7].GetUInt32();
+            node.path_id        = fields[9].GetUInt32();
+
+            if (node.path_id)
+                specialPathSet.insert(node.path_id);
 
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
@@ -307,8 +316,8 @@ void WaypointManager::Load()
 
         delete result;
 
-        //                                    0     1        2             3             4             5           6                  7            8
-        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation` FROM `creature_movement_special`");
+        //                                    0     1        2             3             4             5           6                  7            8              9
+        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation`, `path_id` FROM `creature_movement_special`");
 
         BarGoLink barRow((int)result->GetRowCount());
 
@@ -345,6 +354,10 @@ void WaypointManager::Load()
             node.delay          = fields[5].GetUInt32();
             node.wander_distance = fields[6].GetFloat();
             node.script_id      = fields[7].GetUInt32();
+            node.path_id        = fields[9].GetUInt32();
+
+            if (node.path_id)
+                specialPathSet.insert(node.path_id);
 
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
@@ -371,11 +384,14 @@ void WaypointManager::Load()
         delete result;
     }
 
-    if (!movementScriptSet.empty())
+    for (auto const& id : specialPathSet)
     {
-        for (const auto itr : movementScriptSet)
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `creature_movement_scripts` contain unused script, id %u.", itr);
+        if (m_pathSpecialMap.find(id) == m_pathSpecialMap.end())
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Path id %u from `creature_movement_special` is referenced as sub path id, but does not exist!", id);
     }
+
+    for (auto const& id : movementScriptSet)
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `creature_movement_scripts` contains unused script, id %u.", id);
 }
 
 void WaypointManager::Cleanup()
@@ -447,7 +463,7 @@ void WaypointManager::_clearPath(WaypointPath &path)
     path.clear();
 }
 
-/// - Insert at a certain point, if pointId == 0 insert last. In this case pointId will be changed to the id to which the node was added
+// Insert at a certain point, if pointId == 0 insert last. In this case pointId will be changed to the id to which the node was added
 WaypointNode const* WaypointManager::AddNode(uint32 entry, uint32 dbGuid, uint32& pointId, WaypointPathOrigin wpDest, float x, float y, float z)
 {
     // Support only normal movement tables
@@ -467,7 +483,7 @@ WaypointNode const* WaypointManager::AddNode(uint32 entry, uint32 dbGuid, uint32
         pointId = path.rbegin()->first + 1;
 
     uint32 nextPoint = pointId;
-    WaypointNode temp = WaypointNode(x, y, z, 100, 0, 0, 0);
+    WaypointNode temp = WaypointNode(x, y, z, 100, 0, 0, 0, 0);
     WaypointPath::iterator find = path.find(nextPoint);
     if (find != path.end())                                 // Point already exists
     {
@@ -594,7 +610,7 @@ void WaypointManager::SetNodeOrientation(uint32 entry, uint32 dbGuid, uint32 poi
         find->second.orientation = orientation;
 }
 
-/// return true if a valid scriptId is provided
+// return true if a valid scriptId is provided
 bool WaypointManager::SetNodeScriptId(uint32 entry, uint32 dbGuid, uint32 point, int32 pathId, WaypointPathOrigin wpOrigin, uint32 scriptId)
 {
     // Support only normal movement tables

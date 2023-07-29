@@ -126,7 +126,7 @@ class Database
         //stop worker thread
         virtual void HaltDelayThread();
 
-        /// Synchronous DB queries
+        // Synchronous DB queries
         inline QueryResult* Query(char const* sql)
         {
             SqlConnection::Lock guard(getQueryConnection());
@@ -153,7 +153,7 @@ class Database
 
         bool DirectPExecute(char const* format,...) ATTR_PRINTF(2,3);
 
-        /// Async queries and query holders, implemented in DatabaseImpl.h
+        // Async queries and query holders, implemented in DatabaseImpl.h
 
         // Query / member
         template<class Class>
@@ -309,7 +309,7 @@ class Database
         typedef ACE_TSS<Database::TransHelper> DBTransHelperTSS;
         Database::DBTransHelperTSS m_TransStorage;
 
-        ///< DB connections
+        // DB connections
 
         //round-robin connection selection
         SqlConnection* getQueryConnection();
@@ -323,8 +323,8 @@ class Database
         bool DirectExecuteStmt(SqlStatementID const& id, SqlStmtParameters* params);
 
         //connection helper counters
-        int m_nQueryConnPoolSize;                               //current size of query connection pool
-        std::atomic<int> m_nQueryCounter;  //counter for connection selection
+        int m_nQueryConnPoolSize;                                           // Current size of query connection pool
+        std::atomic<int> m_nQueryCounter;                                   // Counter for connection selection
 
         //lets use pool of connections for sync queries
         typedef std::vector< SqlConnection* > SqlConnectionContainer;
@@ -334,12 +334,12 @@ class Database
 
         SqlConnection* m_pAsyncConn;
 
-        SqlResultQueue*     m_pResultQueue;                  ///< Transaction queues from diff. threads
+        SqlResultQueue*     m_pResultQueue;                                 // Transaction queues from diff. threads
         uint32              m_numAsyncWorkers;
-        std::vector<std::shared_ptr<SqlDelayThread>>    m_threadsBodies;                  ///< Pointer to delay sql executer (owned by m_delayThread)
-        std::vector<std::thread> m_delayThreads;                   ///< Pointer to executer thread
+        std::vector<std::shared_ptr<SqlDelayThread>>    m_threadsBodies;    // Pointer to delay sql executer (owned by m_delayThread)
+        std::vector<std::thread> m_delayThreads;                            // Pointer to executer thread
 
-        bool m_bAllowAsyncTransactions;                      ///< flag which specifies if async transactions are enabled
+        bool m_bAllowAsyncTransactions;                                     // Flag which specifies if async transactions are enabled
 
         //PREPARED STATEMENT REGISTRY
         using LOCK_TYPE = std::mutex;
@@ -348,7 +348,7 @@ class Database
         mutable LOCK_TYPE m_stmtGuard;
 
         typedef std::unordered_map<std::string, int> PreparedStmtRegistry;
-        PreparedStmtRegistry m_stmtRegistry;                 ///<
+        PreparedStmtRegistry m_stmtRegistry;
 
         int m_iStmtIndex;
 

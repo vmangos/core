@@ -339,9 +339,7 @@ class Guild
         MemberList members;
 
         /** These are actually ordered lists. The first element is the oldest entry.*/
-        typedef std::list<GuildEventLogEntry> GuildEventLog;
-        GuildEventLog m_GuildEventLog;
-
+        std::list<GuildEventLogEntry> m_GuildEventLog;
         uint32 m_GuildEventLogNextGuid;
 
     private:

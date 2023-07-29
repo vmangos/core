@@ -171,7 +171,7 @@ void WorldSession::HandleCharEnum(QueryResult* result)
 
 void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
 {
-    /// get all the data necessary for loading all characters (along with their pets) on the account
+    // get all the data necessary for loading all characters (along with their pets) on the account
     CharacterDatabase.AsyncPQuery(&chrHandler, &CharacterHandler::HandleCharEnumCallback, GetAccountId(),
                                   //           0                    1                    2                    3                     4                      5                    6                    7                          8                          9                           10
                                   "SELECT `characters`.`guid`, `characters`.`name`, `characters`.`race`, `characters`.`class`, `characters`.`gender`, `characters`.`skin`, `characters`.`face`, `characters`.`hair_style`, `characters`.`hair_color`, `characters`.`facial_hair`, `characters`.`level`, "
@@ -303,7 +303,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
 
     if (!AllowTwoSideAccounts)
     {
-        std::list<PlayerCacheData const*> characters;
+        std::vector<PlayerCacheData const*> characters;
         sObjectMgr.GetPlayerDataForAccount(GetAccountId(), characters);
 
         if (!characters.empty())

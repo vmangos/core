@@ -256,10 +256,10 @@ void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
     {
         if (data.procFlagsAttacker)
             if (Unit* pUnit = ToUnit())
-                pUnit->ProcSkillsAndReactives(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType);
+                pUnit->ProcSkillsAndReactives(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType, data.procSpell);
 
         if (data.procFlagsVictim && data.pVictim && data.pVictim->IsAlive())
-            data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
+            data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType, data.procSpell);
     }
 
     // Always execute On Kill procs instantly. Fixes Improved Drain Soul talent.
@@ -372,17 +372,16 @@ float SpellCaster::MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType,
 // Melee based spells hit result calculations
 SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr)
 {
-    WeaponAttackType attType = BASE_ATTACK;
-
-    if (spell->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
-        attType = RANGED_ATTACK;
+    WeaponAttackType attType = spell->DmgClass == SPELL_DAMAGE_CLASS_RANGED ? RANGED_ATTACK : BASE_ATTACK;
 
     // Warrior spell Execute (5308) should never dodge, miss, resist ... Only the trigger can (20647)
     if (spell->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_EXECUTE>() && spell->Id != 20647)
         return SPELL_MISS_NONE;
 
+    // Hammer of Wrath should not use weapon skill, but Bloodthirst should.
     // bonus from skills is 0.04% per skill Diff
-    int32 attackerWeaponSkill = (spell->EquippedItemClass == ITEM_CLASS_WEAPON) ? int32(GetWeaponSkillValue(attType, pVictim)) : GetSkillMaxForLevel();
+    int32 attackerWeaponSkill = (spell->rangeIndex == SPELL_RANGE_IDX_COMBAT || spell->EquippedItemClass == ITEM_CLASS_WEAPON) ?
+                                int32(GetWeaponSkillValue(attType, pVictim)) : GetSkillMaxForLevel();
     int32 skillDiff = attackerWeaponSkill - int32(pVictim->GetSkillMaxForLevel(this));
     int32 fullSkillDiff = attackerWeaponSkill - int32(pVictim->GetDefenseSkillValue(this));
     int32 minWeaponSkill = GetSkillMaxForLevel(pVictim) < attackerWeaponSkill ? GetSkillMaxForLevel(pVictim) : attackerWeaponSkill;
@@ -911,8 +910,13 @@ float SpellCaster::CalculateSpellEffectValue(Unit const* target, SpellEntry cons
         spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
         spellProto->Effect[effect_index] != SPELL_EFFECT_KNOCK_BACK &&
         (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
-        value = value * 0.25f * exp(GetLevel() * (70 - spellProto->spellLevel) / 1000.0f);
-
+    {
+        CreatureClassLevelStats const* pCLS = sObjectMgr.GetCreatureClassLevelStats(1, GetLevel());
+        float CLSPowerCreature = pCLS->melee_damage;
+        CreatureClassLevelStats const* spellCLS = sObjectMgr.GetCreatureClassLevelStats(1, spellProto->spellLevel);
+        float CLSPowerSpell = spellCLS->melee_damage;
+        value = value * (CLSPowerCreature / CLSPowerSpell);
+    }
     return value;
 }
 
@@ -1792,7 +1796,7 @@ void SpellCaster::FinishSpell(CurrentSpellTypes spellType, bool ok /*= true*/)
 
 void SpellCaster::GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut) const
 {
-    for (auto const& guid : m_dynObjGUIDs)
+    for (auto const& guid : m_spellDynObjects)
     {
         DynamicObject* dynObj = GetMap()->GetDynamicObject(guid);
         if (!dynObj)
@@ -1805,7 +1809,7 @@ void SpellCaster::GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, st
 
 DynamicObject* SpellCaster::GetDynObject(uint32 spellId, SpellEffectIndex effIndex) const
 {
-    for (auto const& guid : m_dynObjGUIDs)
+    for (auto const& guid : m_spellDynObjects)
     {
         DynamicObject* dynObj = GetMap()->GetDynamicObject(guid);
         if (!dynObj)
@@ -1819,7 +1823,7 @@ DynamicObject* SpellCaster::GetDynObject(uint32 spellId, SpellEffectIndex effInd
 
 DynamicObject* SpellCaster::GetDynObject(uint32 spellId) const
 {
-    for (auto const& guid : m_dynObjGUIDs)
+    for (auto const& guid : m_spellDynObjects)
     {
         DynamicObject* dynObj = GetMap()->GetDynamicObject(guid);
         if (!dynObj)
@@ -1833,37 +1837,49 @@ DynamicObject* SpellCaster::GetDynObject(uint32 spellId) const
 
 void SpellCaster::AddDynObject(DynamicObject* dynObj)
 {
-    m_dynObjGUIDs.push_back(dynObj->GetObjectGuid());
+    m_spellDynObjects.push_back(dynObj->GetObjectGuid());
     dynObj->SetWorldMask(GetWorldMask()); // Nostalrius : phasing
 }
 
 void SpellCaster::RemoveDynObject(uint32 spellid)
 {
-    if (m_dynObjGUIDs.empty())
+    if (m_spellDynObjects.empty())
         return;
-    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
+
+    for (auto i = m_spellDynObjects.begin(); i != m_spellDynObjects.end();)
     {
         DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
         if (!dynObj)
-            i = m_dynObjGUIDs.erase(i);
+            i = m_spellDynObjects.erase(i);
         else if (spellid == 0 || dynObj->GetSpellId() == spellid)
         {
             dynObj->Delete();
-            i = m_dynObjGUIDs.erase(i);
+            i = m_spellDynObjects.erase(i);
         }
         else
             ++i;
     }
 }
 
+void SpellCaster::RemoveDynObjectWithGUID(ObjectGuid guid)
+{
+    for (auto itr = m_spellDynObjects.begin(); itr != m_spellDynObjects.end();)
+    {
+        if ((*itr) == guid)
+            itr = m_spellDynObjects.erase(itr);
+        else
+            ++itr;
+    }
+}
+
 void SpellCaster::RemoveAllDynObjects()
 {
-    while (!m_dynObjGUIDs.empty())
+    for (auto const& guid : m_spellDynObjects)
     {
-        if (DynamicObject* dynObj = GetMap()->GetDynamicObject(*m_dynObjGUIDs.begin()))
+        if (DynamicObject* dynObj = GetMap()->GetDynamicObject(guid))
             dynObj->Delete();
-        m_dynObjGUIDs.erase(m_dynObjGUIDs.begin());
     }
+    m_spellDynObjects.clear();
 }
 
 SpellCastResult SpellCaster::CastSpell(SpellCaster* pTarget, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)

@@ -55,6 +55,7 @@ struct instance_sunken_temple : public ScriptedInstance
 
     uint64 m_luiProtectorGUIDs[6];  // Jammalan door handling
     uint8 m_uiStatueCounter;        // Atalarion Statue Event
+    uint8 m_uiFlameCounter;         // Avatar of Hakkar Event
     uint64 m_uiShadeHakkarGUID;
     uint64 m_uiAtalarionGUID;
     uint64 m_uiJammalanBarrierGUID;
@@ -80,6 +81,7 @@ struct instance_sunken_temple : public ScriptedInstance
         memset(&m_luiBigLightGUIDs, 0, sizeof(m_luiBigLightGUIDs));
 
         m_uiStatueCounter = 0;
+        m_uiFlameCounter = 0;
         m_uiShadeHakkarGUID = 0;
         m_uiAtalarionGUID = 0;
         m_uiJammalanBarrierGUID = 0;
@@ -493,6 +495,9 @@ struct instance_sunken_temple : public ScriptedInstance
                     mobsEntries.clear();
                 }
                 break;
+            case TYPE_ETERNAL_FLAME:
+                m_uiFlameCounter = uiData;
+                break;
         }
 
         if (uiData == DONE)
@@ -555,6 +560,8 @@ struct instance_sunken_temple : public ScriptedInstance
                 return m_auiEncounter[4];
             case TYPE_ERANIKUS:
                 return m_auiEncounter[5];
+            case TYPE_ETERNAL_FLAME:
+                return m_uiFlameCounter;
             default:
                 return 0;
         }

@@ -645,7 +645,7 @@ static char const* UnitFlagToString(uint32 flag)
     return "UNKNOWN";
 }
 
-/// Non Player Character flags
+// Non Player Character flags
 enum NPCFlags
 {
     UNIT_NPC_FLAG_NONE                  = 0x00000000,

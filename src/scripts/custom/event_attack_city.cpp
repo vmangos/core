@@ -78,7 +78,7 @@ public:
 
 // TODO : Deplacer ces fonctions pour qu'elles soient accessibles
 // de tous les scripts SD0
-typedef std::list<uint64> MobsGUIDList;
+typedef std::vector<uint64> MobsGUIDList;
 typedef MobsGUIDList::iterator MobsGUIDListIter;
 
 void SetAttackable(Unit* pCreature, bool Attackable)

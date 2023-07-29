@@ -183,8 +183,8 @@ struct boss_mandokirAI : public ScriptedAI
 
         m_uiPlayerToRez = 0;
 
-        m_creature->ResetStats();
         m_creature->SetLevel(63);
+        m_creature->ResetStats();
 
         DoCastSpellIfCan(m_creature, SPELL_MOUNT);
         DespawnRaptor();

@@ -52,20 +52,20 @@ enum WeatherState
 
 struct WeatherZoneChances;
 
-/// Weather for one zone
+// Weather for one zone
 class Weather
 {
     public:
         Weather(uint32 zone, WeatherZoneChances const* weatherChances);
         ~Weather() {};
 
-        /// Send Weather to one player
+        // Send Weather to one player
         void SendWeatherUpdateToPlayer(Player* player);
-        /// Set the weather
+        // Set the weather
         void SetWeather(WeatherType type, float grade, Map const* _map, bool isPermanent);
-        /// Update the weather in this zone, when the timer is expired the weather will be rolled again
+        // Update the weather in this zone, when the timer is expired the weather will be rolled again
         bool Update(uint32 diff, Map const* _map);
-        /// Check if a type is valid
+        // Check if a type is valid
         static bool IsValidWeatherType(uint32 type)
         {
             switch (type)
@@ -82,11 +82,11 @@ class Weather
 
     private:
         uint32 GetSound();
-        /// Send SMSG_WEATHER to all players in the zone
+        // Send SMSG_WEATHER to all players in the zone
         bool SendWeatherForPlayersInZone(Map const* _map);
-        /// Calculate new weather
+        // Calculate new weather
         bool ReGenerate();
-        /// Calculate state based on type and grade
+        // Calculate state based on type and grade
         WeatherState GetWeatherState() const;
         // Helper to get the grade between 0..1
         void NormalizeGrade();
@@ -105,7 +105,7 @@ class Weather
 //         Weather information hold on one map
 // ---------------------------------------------------------
 
-/// Weathers for one map
+// Weathers for one map
 class WeatherSystem
 {
     public:

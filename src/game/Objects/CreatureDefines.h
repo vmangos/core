@@ -517,7 +517,7 @@ enum VendorItemFlags
     VENDOR_ITEM_FLAG_DYNAMIC_RESTOCK  = 0x02,
 };
 
-typedef std::list<VendorItemCount> VendorItemCounts;
+typedef std::vector<VendorItemCount> VendorItemCounts;
 
 struct TrainerSpell
 {

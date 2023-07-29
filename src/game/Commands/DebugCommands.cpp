@@ -2049,7 +2049,7 @@ bool ChatHandler::HandleVideoTurn(char*)
     float constexpr angleBegin = 0.0f;
     float constexpr angleEnd = 10 * M_PI_F;
     float constexpr moveSpeed = 30.0f;
-    std::list<Creature*> targets;
+
     Unit* selection = GetSelectedUnit();
     if (!selection)
     {
@@ -2530,8 +2530,6 @@ bool ChatHandler::HandleMmapConnection(char* args)
     fclose(fOffmeshFile);
     return true;
 }
-
-typedef std::list<Creature*> MmapTestUnitList;
 
 bool ChatHandler::HandleMmapTestArea(char* args)
 {

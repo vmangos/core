@@ -20,19 +20,19 @@
 
 #include <chrono>
 
-/// Milliseconds shorthand typedef.
+// Milliseconds shorthand typedef.
 typedef std::chrono::milliseconds Milliseconds;
 
-/// Seconds shorthand typedef.
+// Seconds shorthand typedef.
 typedef std::chrono::seconds Seconds;
 
-/// Minutes shorthand typedef.
+// Minutes shorthand typedef.
 typedef std::chrono::minutes Minutes;
 
-/// Hours shorthand typedef.
+// Hours shorthand typedef.
 typedef std::chrono::hours Hours;
 
-/// Makes std::chrono_literals globally available.
+// Makes std::chrono_literals globally available.
 // ToDo: Enable this when TC supports C++14.
 // using namespace std::chrono_literals;
 

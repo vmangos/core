@@ -48,13 +48,13 @@ public:
     typedef std::set<Player*> PlayerSet;
     PassengerSet& GetPassengers() { return m_passengers; }
 
-    /// This method transforms supplied transport offsets into global coordinates
+    // This method transforms supplied transport offsets into global coordinates
     void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const
     {
         CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
     }
 
-    /// This method transforms supplied global coordinates into local offsets
+    // This method transforms supplied global coordinates into local offsets
     void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const
     {
         CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());

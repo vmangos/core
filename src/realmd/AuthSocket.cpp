@@ -183,7 +183,7 @@ typedef struct AuthHandler
 
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
-/// Close patch file descriptor before leaving
+// Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
 {
     if(m_patch != ACE_INVALID_HANDLE)
@@ -198,13 +198,13 @@ AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
     return it->second;
 }
 
-/// Accept the connection and set the s random value for SRP6
+// Accept the connection and set the s random value for SRP6
 void AuthSocket::OnAccept()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", get_remote_address().c_str());
 }
 
-/// Read the packet from the client
+// Read the packet from the client
 void AuthSocket::OnRead()
 {
     // benchmarking has demonstrated that this lookup method is faster than std::map
@@ -228,7 +228,7 @@ void AuthSocket::OnRead()
 
         size_t i;
 
-        ///- Circle through known commands and call the correct command handler
+        // Circle through known commands and call the correct command handler
         for (i = 0; i < AUTH_TOTAL_COMMANDS; ++i)
         {
             if (table[i].cmd != _cmd)
@@ -255,7 +255,7 @@ void AuthSocket::OnRead()
             break;
         }
 
-        ///- Report unknown commands in the debug log
+        // Report unknown commands in the debug log
         if (i == AUTH_TOTAL_COMMANDS)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] got unknown packet %u", (uint32)_cmd);
@@ -301,14 +301,14 @@ void AuthSocket::SendProof(Sha1Hash sha)
     }
 }
 
-/// Logon Challenge command handler
+// Logon Challenge command handler
 bool AuthSocket::_HandleLogonChallenge()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleLogonChallenge");
     if (recv_len() < sizeof(sAuthLogonChallenge_C))
         return false;
 
-    ///- Read the first 4 bytes (header) to get the length of the remaining of the packet
+    // Read the first 4 bytes (header) to get the length of the remaining of the packet
     std::vector<uint8> buf;
     buf.resize(4);
 
@@ -321,15 +321,15 @@ bool AuthSocket::_HandleLogonChallenge()
     if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (recv_len() < remaining))
         return false;
 
-    ///- Session is closed unless overriden
+    // Session is closed unless overriden
     m_status = STATUS_CLOSED;
 
-    //No big fear of memory outage (size is int16, i.e. < 65536)
+    // No big fear of memory outage (size is int16, i.e. < 65536)
     buf.resize(remaining + buf.size() + 1);
     buf[buf.size() - 1] = 0;
     sAuthLogonChallenge_C *ch = (sAuthLogonChallenge_C*)&buf[0];
 
-    ///- Read the remaining of the packet
+    // Read the remaining of the packet
     recv((char *)&buf[4], remaining);
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] got full packet, %#04x bytes", ch->size);
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] name(%d): '%s'", ch->I_len, ch->I);
@@ -356,18 +356,18 @@ bool AuthSocket::_HandleLogonChallenge()
     std::reverse(ch->platform, ch->platform + 3);
     memcpy(&m_platform, ch->platform, sizeof(m_platform));
 
-    ///- Normalize account name
-    //utf8ToUpperOnlyLatin(m_login); -- client already send account in expected form
+    // Normalize account name
+    // utf8ToUpperOnlyLatin(m_login); -- client already send account in expected form
 
-    //Escape the user login to avoid further SQL injection
-    //Memory will be freed on AuthSocket object destruction
+    // Escape the user login to avoid further SQL injection
+    // Memory will be freed on AuthSocket object destruction
     m_safelogin = m_login;
     LoginDatabase.escape_string(m_safelogin);
 
     pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
     pkt << (uint8) 0x00;
 
-    ///- Verify that this IP is not in the ip_banned table
+    // Verify that this IP is not in the ip_banned table
     // No SQL injection possible (paste the IP address as passed by the socket)
     std::string address = get_remote_address();
     LoginDatabase.escape_string(address);
@@ -382,7 +382,7 @@ bool AuthSocket::_HandleLogonChallenge()
     }
     else
     {
-        ///- Get the account details from the account table
+        // Get the account details from the account table
         // No SQL injection (escaped user name)
         //                                     0     1         2          3    4    5           6              7              8       9
         result = LoginDatabase.PQuery("SELECT `id`, `locked`, `last_ip`, `v`, `s`, `security`, `email_verif`, `geolock_pin`, `email`, UNIX_TIMESTAMP(`joindate`) FROM `account` WHERE `username` = '%s'",m_safelogin.c_str ());
@@ -410,7 +410,7 @@ bool AuthSocket::_HandleLogonChallenge()
                 return true;
             }
 
-            ///- If the IP is 'locked', check that the player comes indeed from the correct IP address
+            // If the IP is 'locked', check that the player comes indeed from the correct IP address
             bool locked = false;
             m_lockFlags = (LockFlag)(*result)[1].GetUInt32();
             m_securityInfo = (*result)[5].GetCppString();
@@ -457,7 +457,7 @@ bool AuthSocket::_HandleLogonChallenge()
             if ((!locked || (locked && (m_lockFlags & FIXED_PIN || m_lockFlags & TOTP))) && !broken)
             {
                 uint32 account_id = fields[0].GetUInt32();
-                ///- If the account is banned, reject the logon attempt
+                // If the account is banned, reject the logon attempt
                 QueryResult *banresult = LoginDatabase.PQuery("SELECT `bandate`, `unbandate` FROM `account_banned` WHERE "
                     "`id` = %u AND `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `unbandate` = `bandate`) LIMIT 1", account_id);
                 if (banresult)
@@ -484,7 +484,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
                     srp.CalculateHostPublicEphemeral();
 
-                    ///- Fill the response packet with the result
+                    // Fill the response packet with the result
                     pkt << uint8(WOW_SUCCESS);
 
                     // B may be calculated < 32B so we force minimal length to 32B
@@ -531,7 +531,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
                     m_accountId = account_id;
 
-                    ///- All good, await client's proof
+                    // All good, await client's proof
                     m_status = STATUS_LOGON_PROOF;
                 }
             }
@@ -546,14 +546,14 @@ bool AuthSocket::_HandleLogonChallenge()
     return true;
 }
 
-/// Logon Proof command handler
+// Logon Proof command handler
 bool AuthSocket::_HandleLogonProof()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleLogonProof");
 
     sAuthLogonProof_C_1_11 lp;
     
-    ///- Read the packet
+    // Read the packet
     if (m_build < 5428)        // before version 1.11.0 (exclusive)
     {
         if (!recv((char *)&lp, sizeof(sAuthLogonProof_C_Base)))
@@ -574,19 +574,19 @@ bool AuthSocket::_HandleLogonProof()
             return false;
     }
 
-    ///- Check if the client has one of the expected version numbers
+    // Check if the client has one of the expected version numbers
     bool valid_version = FindBuildInfo(m_build) != nullptr;
 
-    ///- Session is closed unless overriden
+    // Session is closed unless overriden
     m_status = STATUS_CLOSED;
 
-    /// <ul><li> If the client has no valid version
+    // <ul><li> If the client has no valid version
     if(!valid_version)
     {
         if (this->m_patch != ACE_INVALID_HANDLE)
             return false;
 
-        ///- Check if we have the apropriate patch on the disk
+        // Check if we have the apropriate patch on the disk
         // file looks like: 65535enGB.mpq
         char tmp[256];
 
@@ -642,16 +642,16 @@ bool AuthSocket::_HandleLogonProof()
 
         return true;
     }
-    /// </ul>
+    // </ul>
 
-    ///- Continue the SRP6 calculation based on data received from the client
+    // Continue the SRP6 calculation based on data received from the client
     if (!srp.CalculateSessionKey(lp.A, 32))
         return false;
 
     srp.HashSessionKey();
     srp.CalculateProof(m_login);
 
-    ///- Check PIN data is correct
+    // Check PIN data is correct
     bool pinResult = true;
 
     if (m_promptPin && !lp.securityFlags)
@@ -688,7 +688,7 @@ bool AuthSocket::_HandleLogonProof()
         }
     }
 
-    ///- Check if SRP6 results match (password is correct), else send an error
+    // Check if SRP6 results match (password is correct), else send an error
     if (!srp.Proof(lp.M1, 20) && pinResult)
     {
         if (!VerifyVersion(lp.A, sizeof(lp.A), lp.crc_hash, false))
@@ -758,7 +758,7 @@ bool AuthSocket::_HandleLogonProof()
 
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' successfully authenticated", m_login.c_str(), get_remote_address().c_str());
 
-        ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
+        // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
         const char* K_hex = srp.GetStrongSessionKey().AsHexStr();
         const char *os = reinterpret_cast<char *>(&m_os); // no injection as there are only two possible values
@@ -768,7 +768,7 @@ bool AuthSocket::_HandleLogonProof()
         delete result;
         OPENSSL_free((void*)K_hex);
 
-        ///- Finish SRP6 and send the final result to the client
+        // Finish SRP6 and send the final result to the client
         Sha1Hash sha;
         srp.Finalize(sha);
 
@@ -832,14 +832,14 @@ bool AuthSocket::_HandleLogonProof()
     return true;
 }
 
-/// Reconnect Challenge command handler
+// Reconnect Challenge command handler
 bool AuthSocket::_HandleReconnectChallenge()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleReconnectChallenge");
     if (recv_len() < sizeof(sAuthLogonChallenge_C))
         return false;
 
-    ///- Read the first 4 bytes (header) to get the length of the remaining of the packet
+    // Read the first 4 bytes (header) to get the length of the remaining of the packet
     std::vector<uint8> buf;
     buf.resize(4);
 
@@ -852,7 +852,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (recv_len() < remaining))
         return false;
 
-    ///- Session is closed unless overriden
+    // Session is closed unless overriden
     m_status = STATUS_CLOSED;
 
     //No big fear of memory outage (size is int16, i.e. < 65536)
@@ -860,7 +860,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     buf[buf.size() - 1] = 0;
     sAuthLogonChallenge_C *ch = (sAuthLogonChallenge_C*)&buf[0];
 
-    ///- Read the remaining of the packet
+    // Read the remaining of the packet
     recv((char *)&buf[4], remaining);
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[ReconnectChallenge] got full packet, %#04x bytes", ch->size);
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[ReconnectChallenge] name(%d): '%s'", ch->I_len, ch->I);
@@ -895,10 +895,10 @@ bool AuthSocket::_HandleReconnectChallenge()
     m_accountId = fields[1].GetUInt32();
     delete result;
 
-    ///- All good, await client's proof
+    // All good, await client's proof
     m_status = STATUS_RECON_PROOF;
 
-    ///- Sending response
+    // Sending response
     ByteBuffer pkt;
     pkt << (uint8)  CMD_AUTH_RECONNECT_CHALLENGE;
     pkt << (uint8)  0x00;
@@ -909,16 +909,16 @@ bool AuthSocket::_HandleReconnectChallenge()
     return true;
 }
 
-/// Reconnect Proof command handler
+// Reconnect Proof command handler
 bool AuthSocket::_HandleReconnectProof()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleReconnectProof");
-    ///- Read the packet
+    // Read the packet
     sAuthReconnectProof_C lp;
     if(!recv((char *)&lp, sizeof(sAuthReconnectProof_C)))
         return false;
 
-    ///- Session is closed unless overriden
+    // Session is closed unless overriden
     m_status = STATUS_CLOSED;
 
     BigNumber K = srp.GetStrongSessionKey();
@@ -945,7 +945,7 @@ bool AuthSocket::_HandleReconnectProof()
             return true;
         }
 
-        ///- Sending response
+        // Sending response
         ByteBuffer pkt;
         pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
         pkt << uint8(WOW_SUCCESS);
@@ -962,7 +962,7 @@ bool AuthSocket::_HandleReconnectProof()
     }
 }
 
-/// %Realm List command handler
+// %Realm List command handler
 bool AuthSocket::_HandleRealmList()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleRealmList");
@@ -988,10 +988,10 @@ bool AuthSocket::_HandleRealmList()
         return false;
     }
 
-    ///- Update realm list if need
+    // Update realm list if need
     sRealmList.UpdateIfNeed();
 
-    ///- Circle through realms in the RealmList and construct the return packet (including # of user characters in each realm)
+    // Circle through realms in the RealmList and construct the return packet (including # of user characters in each realm)
     ByteBuffer pkt;
     LoadRealmlist(pkt);
 
@@ -1120,7 +1120,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
     }
 }
 
-/// Resume patch transfer
+// Resume patch transfer
 bool AuthSocket::_HandleXferResume()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferResume");
@@ -1158,7 +1158,7 @@ bool AuthSocket::_HandleXferResume()
     return true;
 }
 
-/// Cancel patch transfer
+// Cancel patch transfer
 bool AuthSocket::_HandleXferCancel()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferCancel");
@@ -1169,7 +1169,7 @@ bool AuthSocket::_HandleXferCancel()
     return true;
 }
 
-/// Accept patch transfer
+// Accept patch transfer
 bool AuthSocket::_HandleXferAccept()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferAccept");
@@ -1181,7 +1181,7 @@ bool AuthSocket::_HandleXferAccept()
     return true;
 }
 
-/// Verify PIN entry data
+// Verify PIN entry data
 bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
 {
     // remap the grid to match the client's layout
@@ -1321,7 +1321,7 @@ void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
 
 bool AuthSocket::GeographicalLockCheck()
 {
-    if (!sConfig.GetBoolDefault("GeoLocking"), false)
+    if (!sConfig.GetBoolDefault("GeoLocking", false))
     {
         return false;
     }

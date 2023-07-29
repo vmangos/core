@@ -1351,6 +1351,8 @@ bool ChatHandler::HandleNpcSpawnSetMoveTypeCommand(char* args)
         move_type = RANDOM_MOTION_TYPE;
     else if (strncmp(type_str, "waypoint", strlen(type_str)) == 0)
         move_type = WAYPOINT_MOTION_TYPE;
+    else if (strncmp(type_str, "cyclic", strlen(type_str)) == 0)
+        move_type = CYCLIC_MOTION_TYPE;
     else
         return false;
 
@@ -1393,6 +1395,8 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
         move_type = RANDOM_MOTION_TYPE;
     else if (strncmp(type_str, "waypoint", strlen(type_str)) == 0)
         move_type = WAYPOINT_MOTION_TYPE;
+    else if (strncmp(type_str, "cyclic", strlen(type_str)) == 0)
+        move_type = CYCLIC_MOTION_TYPE;
     else
         return false;
 
@@ -1697,7 +1701,7 @@ bool ChatHandler::HandleNpcGroupLinkCommand(char * args)
     return true;
 }
 
-/// Helper function
+// Helper function
 inline Creature* Helper_CreateWaypointFor(Creature* wpOwner, WaypointPathOrigin wpOrigin, int32 pathId, uint32 wpId, WaypointNode const* wpNode, CreatureInfo const* waypointInfo)
 {
     TemporarySummonWaypoint* wpCreature = new TemporarySummonWaypoint(wpOwner->GetObjectGuid(), wpId+1, pathId, (uint32)wpOrigin);
@@ -1768,9 +1772,9 @@ bool ChatHandler::HandleWpAddCommand(char* args)
         return false;                                       // must exist as normal creature in mangos.sql 'creature_template'
 
     Creature* targetCreature = GetSelectedCreature();
-    WaypointPathOrigin wpDestination = PATH_NO_PATH;        ///< into which storage
-    int32 wpPathId = 0;                                     ///< along which path
-    uint32 wpPointId = 0;                                   ///< pointId if a waypoint was selected, in this case insert after
+    WaypointPathOrigin wpDestination = PATH_NO_PATH;        // into which storage
+    int32 wpPathId = 0;                                     // along which path
+    uint32 wpPointId = 0;                                   // pointId if a waypoint was selected, in this case insert after
     Creature* wpOwner;
 
     if (targetCreature)
@@ -2171,7 +2175,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
     char* subCmd_str = ExtractLiteralArg(&args);
     if (!subCmd_str)
         return false;
-    std::string subCmd = subCmd_str;                        ///< info, on, off, first, last
+    std::string subCmd = subCmd_str;                        // info, on, off, first, last
 
     uint32 dbGuid = 0;
     int32 wpPathId = 0;
@@ -2355,7 +2359,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
     return false;
 }                                                           // HandleWpShowCommand
 
-                                                            /// [Guid if no selected unit] <filename> [pathId [wpOrigin] ]
+                                                            // [Guid if no selected unit] <filename> [pathId [wpOrigin] ]
 bool ChatHandler::HandleWpExportCommand(char* args)
 {
     if (!*args)

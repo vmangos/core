@@ -3261,8 +3261,8 @@ void Spell::EffectDispel(SpellEffectIndex effIdx)
     // Ok if exist some buffs for dispel try dispel it
     if (!dispelList.empty())
     {
-        std::list<std::pair<SpellAuraHolder*, uint32> > successList; // (spellId,casterGuid)
-        std::list < uint32 > failList; // spellId
+        std::vector<std::pair<SpellAuraHolder*, uint32> > successList; // (spellId,casterGuid)
+        std::vector < uint32 > failList; // spellId
 
         // some spells have effect value = 0 and all from its by meaning expect 1
         if (!damage)

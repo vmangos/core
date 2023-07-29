@@ -404,7 +404,7 @@ public:
     DynamicObject* GetDynObject(uint32 spellId) const;
     void AddDynObject(DynamicObject* dynObj);
     void RemoveDynObject(uint32 spellid);
-    void RemoveDynObjectWithGUID(ObjectGuid guid) { m_dynObjGUIDs.remove(guid); }
+    void RemoveDynObjectWithGUID(ObjectGuid guid);
     void RemoveAllDynObjects();
 
     // cooldown system
@@ -436,8 +436,7 @@ protected:
     LockoutMap        m_lockoutMap;
     CooldownContainer m_cooldownMap;
 
-    typedef std::list<ObjectGuid> DynObjectGUIDs;
-    DynObjectGUIDs m_dynObjGUIDs;
+    std::vector<ObjectGuid> m_spellDynObjects;
 
     uint32 m_procsUpdateTimer = 0;
     std::vector<ProcSystemArguments> m_pendingProcChecks;

@@ -250,8 +250,8 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
     if (spellProto->Id == 14076 || spellProto->Id == 14094 || spellProto->Id == 14095)
         return SPELL_PROC_TRIGGER_FAILED;
 
-    /// [TODO]
-    /// Delete all these spells, and manage it via the DB (spell_proc_event)
+    // [TODO]
+    // Delete all these spells, and manage it via the DB (spell_proc_event)
     if (procSpell && !(procExtra & PROC_EX_CAST_END))
     {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

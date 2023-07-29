@@ -196,7 +196,7 @@ struct boss_venoxisAI : public ScriptedAI
 
         if (!m_bPhaseTwo)
         {
-            /// Phase 1
+            // Phase 1
             if (m_uiHolyNova_Timer < uiDiff)
             {
                 DoCastSpellIfCan(m_creature, SPELL_HOLY_NOVA);

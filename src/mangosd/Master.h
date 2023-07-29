@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup mangosd
-/// @{
-/// \file
+// \addtogroup mangosd
+// @{
+// \file
 
 #ifndef _MASTER_H
 #define _MASTER_H
@@ -29,7 +29,7 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 
-/// Start the server
+// Start the server
 class Master
 {
     public:
@@ -53,4 +53,4 @@ class Master
 
 #define sMaster MaNGOS::Singleton<Master>::Instance()
 #endif
-/// @}
+// @}

@@ -857,7 +857,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recv_data)
 
     recv_data >> itemTextId >> mailId >> unk;
 
-    ///TODO: some check needed, if player has item with guid mailId, or has mail with id mailId
+    // TODO: some check needed, if player has item with guid mailId, or has mail with id mailId
 
     WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4 + 10)); // guess size
     data << itemTextId;

@@ -54,13 +54,13 @@ class CreatureAI
 
         virtual ~CreatureAI();
 
-        ///== Information about AI ========================
+        // == Information about AI ========================
 
         virtual void GetAIInformation(ChatHandler& /*reader*/) {}
 
         virtual uint32 GetData(uint32 /*type*/) { return 0; }
 
-        ///== Reactions At =================================
+        // == Reactions At =================================
 
         // Called when an unit moves within visibility distance
         virtual void MoveInLineOfSight(Unit*) {}
@@ -146,7 +146,7 @@ class CreatureAI
         // called when the corpse of this creature gets removed
         virtual void CorpseRemoved(uint32& /*respawnDelay*/) {}
 
-        ///== Triggered Actions Requested ==================
+        // == Triggered Actions Requested ==================
 
         // Called when creature attack expected (if creature can and no have current victim)
         // Note: for reaction at hostile action must be called AttackedBy function.
@@ -164,7 +164,7 @@ class CreatureAI
         // Will auto attack if the swing timer is ready.
         bool DoMeleeAttackIfReady();
         
-        ///== State checks =================================
+        // == State checks =================================
 
         // Is corpse looting allowed ?
         virtual bool CanBeLooted() const { return true; }
@@ -178,7 +178,7 @@ class CreatureAI
         // Does the creature melee attack.
         bool IsMeleeAttackEnabled() const { return m_bMeleeAttack; }
 
-        ///== Helper functions =============================
+        // == Helper functions =============================
 
         // Attempts to cast a spell and returns the result.
         SpellCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0);
@@ -211,7 +211,7 @@ class CreatureAI
     protected:
         bool CanTriggerAlert(Unit const* who);
         void TriggerAlertDirect(Unit const* who);
-        ///== Fields =======================================
+        // == Fields =======================================
         bool   m_bUseAiAtControl;
         bool   m_bMeleeAttack;                                  // If we allow melee auto attack
         bool   m_bCombatMovement;                               // If we allow targeted movement gen (chasing target)

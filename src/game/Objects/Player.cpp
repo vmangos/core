@@ -1164,7 +1164,7 @@ uint32 Player::EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage)
     return damage;
 }
 
-///The player sobers by 256 every 10 seconds
+// The player sobers by 256 every 10 seconds
 void Player::HandleSobering()
 {
     m_drunkTimer = 0;
@@ -2582,9 +2582,9 @@ void Player::ProcessDelayedOperations()
 
 void Player::AddToWorld()
 {
-    ///- Do not add/remove the player from the object storage
-    ///- It will crash when updating the ObjectAccessor
-    ///- The player should only be added when logging in
+    // Do not add/remove the player from the object storage
+    // It will crash when updating the ObjectAccessor
+    // The player should only be added when logging in
     Unit::AddToWorld();
 
     for (int i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
@@ -2602,7 +2602,7 @@ void Player::RemoveFromWorld()
 
     if (IsInWorld())
     {
-        ///- Release charmed creatures, unsummon totems and remove pets/guardians
+        // Release charmed creatures, unsummon totems and remove pets/guardians
         UnsummonAllTotems();
         RemoveMiniPet();
         sZoneScriptMgr.HandlePlayerLeaveZone(this, m_zoneUpdateId);
@@ -2619,12 +2619,12 @@ void Player::RemoveFromWorld()
     }
 
     // remove duel before calling Unit::RemoveFromWorld
-    // otherwise there will be an existing duel flag pointer but no entry in m_gameObj
+    // otherwise there will be an existing duel flag pointer but no entry in m_spellGameObjects
     DuelComplete(DUEL_INTERRUPTED);
 
-    ///- Do not add/remove the player from the object storage
-    ///- It will crash when updating the ObjectAccessor
-    ///- The player should only be removed when logging out
+    // Do not add/remove the player from the object storage
+    // It will crash when updating the ObjectAccessor
+    // The player should only be removed when logging out
     if (IsInWorld())
         GetCamera().ResetView();
 
@@ -3293,8 +3293,8 @@ bool Player::IsInSameGroupWith(Player const* p) const
                           GetGroup()->SameSubGroup((Player*)this, (Player*)p)));
 }
 
-///- If the player is invited, remove him. If the group if then only 1 person, disband the group.
-/// \todo Shouldn't we also check if there is no other invitees before disbanding the group?
+// If the player is invited, remove him. If the group if then only 1 person, disband the group.
+// TODO: Shouldn't we also check if there is no other invitees before disbanding the group?
 void Player::UninviteFromGroup()
 {
     Group* group = GetGroupInvite();
@@ -5933,17 +5933,17 @@ void Player::UpdateSkillsForLevel()
         uint32 max = SKILL_MAX(data);
         uint32 val = SKILL_VALUE(data);
 
-        /// update only level dependent max skill values
+        // update only level dependent max skill values
         if (max != 1)
         {
-            /// maximize skill always
+            // maximize skill always
             if (alwaysMaxSkill || (rcEntry->flags & SKILL_FLAG_ALWAYS_MAX_VALUE))
             {
                 SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(maxSkill, maxSkill));
                 if (itr->second.uState != SKILL_NEW)
                     itr->second.uState = SKILL_CHANGED;
             }
-            else if (max != maxconfskill)                   /// update max skill value if current max skill not maximized
+            else if (max != maxconfskill)                   // update max skill value if current max skill not maximized
             {
                 SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(val, maxSkill));
                 if (itr->second.uState != SKILL_NEW)
@@ -14634,9 +14634,9 @@ void Player::SendQuestReward(Quest const* pQuest, uint32 XP) const
     GetSession()->SendPacket(&data);
 }
 
-/// Sent when a quest is failed to be given off at questtaker. Specifically handled reasons:
-/// INVALIDREASON_QUEST_FAILED_INVENTORY_FULL=4 (or 50)
-/// INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM=17
+// Sent when a quest is failed to be given off at questtaker. Specifically handled reasons:
+// INVALIDREASON_QUEST_FAILED_INVENTORY_FULL=4 (or 50)
+// INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM=17
 void Player::SendQuestFailedAtTaker(uint32 quest_id, uint32 reason) const
 {
     if (quest_id)
@@ -16291,7 +16291,7 @@ void Player::SendSavedInstances() const
 #endif
 }
 
-/// convert the player's binds to the group
+// convert the player's binds to the group
 void Player::ConvertInstancesToGroup(Player* player, Group* group, ObjectGuid player_guid)
 {
     bool has_binds = false;
@@ -17345,7 +17345,7 @@ void Player::SendResetFailedNotify()
     ChatHandler(this).SendSysMessage(LANG_LEAVE_TO_RESET_INSTANCE);
 }
 
-/// Reset all solo instances and optionally send a message on success for each
+// Reset all solo instances and optionally send a message on success for each
 void Player::ResetInstances(InstanceResetMethod method)
 {
     // method can be INSTANCE_RESET_ALL, INSTANCE_RESET_GROUP_JOIN
@@ -20142,12 +20142,12 @@ uint32 Player::GetBaseWeaponSkillValue(WeaponAttackType attType) const
 
 void Player::ResurectUsingRequestData()
 {
-    /// Teleport before resurrecting by player, otherwise the player might get attacked from creatures near his corpse
+    // Teleport before resurrecting by player, otherwise the player might get attacked from creatures near his corpse
     if (m_resurrectGuid.IsPlayer())
         TeleportTo(m_resurrectMap, m_resurrectX, m_resurrectY, m_resurrectZ, GetOrientation());
 
-    //we cannot resurrect player when we triggered any kind of teleport
-    //player will be resurrected upon teleportation (in MSG_MOVE_TELEPORT_ACK handler)
+    // We cannot resurrect player when we triggered any kind of teleport
+    // Player will be resurrected upon teleportation (in MSG_MOVE_TELEPORT_ACK handler)
     if (IsBeingTeleported())
     {
         ScheduleDelayedOperation(DELAYED_RESURRECT_PLAYER);
@@ -21898,7 +21898,7 @@ void Player::RewardHonorOnDeath()
     for (const auto& itr : damagePerGroup)
     {
         Group* g = itr.first;
-        std::list<Player*> rewarded;
+        std::vector<Player*> rewarded;
         for (const auto& grItr : g->GetMemberSlots())
             if (Player* pl = GetMap()->GetPlayer(grItr.guid))
                 if (pl->IsAtGroupRewardDistance(this) && pl->IsAlive() && pl->GetTeam() != GetTeam())

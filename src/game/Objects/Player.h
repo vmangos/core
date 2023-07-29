@@ -197,7 +197,7 @@ struct PlayerCreateInfoItem
     uint32 item_amount;
 };
 
-typedef std::list<PlayerCreateInfoItem> PlayerCreateInfoItems;
+typedef std::vector<PlayerCreateInfoItem> PlayerCreateInfoItems;
 
 struct PlayerClassLevelInfo
 {
@@ -215,7 +215,7 @@ struct PlayerLevelInfo
     uint8 stats[MAX_STATS] = { 0 };
 };
 
-typedef std::list<uint32> PlayerCreateInfoSpells;
+typedef std::vector<uint32> PlayerCreateInfoSpells;
 
 struct PlayerCreateInfoAction
 {
@@ -227,7 +227,7 @@ struct PlayerCreateInfoAction
     uint32 action = 0;
 };
 
-typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
+typedef std::vector<PlayerCreateInfoAction> PlayerCreateInfoActions;
 
 struct PlayerInfo
 {
@@ -665,7 +665,7 @@ enum DuelCompleteType
     DUEL_FLED        = 2
 };
 
-/// Type of environmental damages
+// Type of environmental damages
 enum EnvironmentalDamageType
 {
     DAMAGE_EXHAUSTED = 0,
@@ -821,22 +821,22 @@ class PlayerTaxi
 
 std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
 
-/// Holder for BattleGround data
+// Holder for BattleGround data
 struct BGData
 {
-    uint32 bgInstanceID = 0;                                ///< This variable is set to bg->m_InstanceID, saved
-                                                            ///  when player is teleported to BG - (it is battleground's GUID)
+    uint32 bgInstanceID = 0;                                // This variable is set to bg->m_InstanceID, saved
+                                                            // when player is teleported to BG - (it is battleground's GUID)
     BattleGroundTypeId bgTypeID = BATTLEGROUND_TYPE_NONE;
 
     std::set<uint32>   bgAfkReporter;
     uint8              bgAfkReportedCount = 0;
     time_t             bgAfkReportedTimer = 0;
 
-    Team bgTeam = TEAM_NONE;                                ///< What side the player will be added to, saved
+    Team bgTeam = TEAM_NONE;                                // What side the player will be added to, saved
 
-    WorldLocation joinPos;                                  ///< From where player entered BG, saved
+    WorldLocation joinPos;                                  // From where player entered BG, saved
 
-    bool m_needSave = false;                                ///< true, if saved to DB fields modified after prev. save (marked as "saved" above)
+    bool m_needSave = false;                                // true, if saved to DB fields modified after prev. save (marked as "saved" above)
 };
 
 struct TransactionPart;
@@ -2530,7 +2530,7 @@ class Player final: public Unit
         bool CanSpeak() const;
         bool FallGround(uint8 fallMode);
 
-        /// Anticheat
+        // Anticheat
         MovementAnticheat* GetCheatData() const { return m_session->GetCheatData(); }
         void OnDisconnected();
         void RelocateToLastClientPosition();

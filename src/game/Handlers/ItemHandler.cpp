@@ -329,12 +329,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->RequiredSkill;
         data << pProto->RequiredSkillRank;
         data << pProto->RequiredSpell;
-        // Item de style insigne
-        if (pProto->Spells[0].SpellId != 0)
-            data << uint32(0);
-        else
-            data << pProto->RequiredHonorRank;
-
+        data << pProto->RequiredHonorRank;
         data << pProto->RequiredCityRank;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << pProto->RequiredReputationFaction;

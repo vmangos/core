@@ -347,7 +347,7 @@ class Group
         bool IsInLFG()                   { return (m_LFGAreaId > 0) ? true : false; }
 
         void CalculateLFGRoles(LFGGroupQueueInfo& data);
-        bool FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, LfgRoles requiredRole, uint32& InitRoles, uint32& DpsCount, std::list<ObjectGuid>& processed);
+        bool FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, LfgRoles requiredRole, uint32& InitRoles, uint32& DpsCount, std::vector<ObjectGuid>& processed);
 
         /*********************************************************/
         /***                   LOOT SYSTEM                     ***/

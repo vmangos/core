@@ -30,8 +30,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 (1439202, 16, 4, 13, 0, 0, 0, 0, 251492, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Activate Rallying Call 4'),
 (1439202, 16, 5, 13, 0, 0, 0, 0, 251493, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Activate Rallying Call 5'),
 (1439202, 16, 6, 13, 0, 0, 0, 0, 251494, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Activate Rallying Call 6'),
-(1439202, 16, 7, 92, 21002, 1637, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Add Aura Rallying Cry of the Dragonslayer to Players in Orgrimmar'),
-(1439202, 16, 2, 10, 14392, 1000, 0, 0, 0, 0, 0, 0, 18, 21001, -1, 3, -462.147, -2650.28, 90.637, 0, 0, 'Overlord Runthak - Summon Overlord Runthak Copy in Crossroads');
+(1439202, 16, 7, 92, 21002, 1637, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Add Aura Rallying Cry of the Dragonslayer to Players in Orgrimmar');
 DELETE FROM `creature_movement_scripts` WHERE `id`=1439203;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1439203, 0, 0, 20, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Overlord Runthak - Move Idle'),
@@ -58,8 +57,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 (1472002, 16, 4, 13, 0, 0, 0, 0, 251492, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Overlord Saurfang - Activate Rallying Call 4'),
 (1472002, 16, 5, 13, 0, 0, 0, 0, 251493, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Overlord Saurfang - Activate Rallying Call 5'),
 (1472002, 16, 6, 13, 0, 0, 0, 0, 251494, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Overlord Saurfang - Activate Rallying Call 6'),
-(1472002, 16, 7, 92, 21002, 1637, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Overlord Saurfang - Add Aura Rallying Cry of the Dragonslayer to Players in Orgrimmar'),
-(1472002, 16, 2, 10, 14720, 1000, 0, 0, 0, 0, 0, 0, 18, 21001, -1, 3, -462.147, -2650.28, 90.637, 0, 0, 'High Overlord Saurfang - Summon High Overlord Saurfang Copy in Crossroads');
+(1472002, 16, 7, 92, 21002, 1637, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Overlord Saurfang - Add Aura Rallying Cry of the Dragonslayer to Players in Orgrimmar');
 DELETE FROM `creature_movement_scripts` WHERE `id`=1472004;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1472004, 0, 0, 20, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Overlord Saurfang - Move Idle'),
@@ -76,6 +74,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 
 -- Remove custom creature Horde Rallying Cry Generator.
 DELETE FROM `creature_template` WHERE `entry`=21001;
+DELETE FROM `generic_scripts` WHERE `id`=21001;
 
 -- Assign Orgrimmar faction to Rallying Call.
 UPDATE `gameobject_template` SET `faction`=85 WHERE `entry`=179557;
@@ -130,10 +129,16 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (251487, 179560, 0, -8523, 848.78, 106.519, 0.268148, 0, 0, 0.133673, 0.991026, 30, 30, 1, 100),
 (251488, 179560, 0, -8424, 619.94, 95.5044, 0.268148, 0, 0, 0.133673, 0.991026, 30, 30, 1, 100);
 
+-- 72: Target's Reaction To Source Is Equal Or Greater Than Friendly
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (72, 44, 4, 1, 0, 0, 0);
+
+-- 1001: (72: Target's Reaction To Source Is Equal Or Greater Than Friendly) And (1000: Source Is Alive)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1001, -1, 72, 1000, 0, 0, 0);
+
 -- Script to add Rallying Cry of the Dragonslayer to alive players.
 DELETE FROM `generic_scripts` WHERE `id`=21002;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(21002, 0, 0, 74, 22888, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 'Player - Add Aura Rallying Cry of the Dragonslayer');
+(21002, 0, 0, 74, 22888, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1001, 'Player - Add Aura Rallying Cry of the Dragonslayer');
 
 -- Remove custom creature Alliance Rallying Cry Generator.
 DELETE FROM `creature_template` WHERE `entry`=21002;
@@ -181,7 +186,7 @@ UPDATE `creature_template` SET `unit_flags`=768, `movement_type`=1 WHERE `entry`
 -- Script to add Warchief's Blessing to alive players.
 DELETE FROM `generic_scripts` WHERE `id`=21003;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(21003, 0, 0, 74, 16609, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 'Player - Add Aura Warchief\'s Blessing');
+(21003, 0, 0, 74, 16609, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1001, 'Player - Add Aura Warchief\'s Blessing');
 
 -- Remove custom creature Warchief Blessing Generator.
 DELETE FROM `creature_template` WHERE `entry`=21003;
