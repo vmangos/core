@@ -166,11 +166,6 @@ REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value
 
 UPDATE `quest_template` SET `RequiredCondition` = 805 WHERE `entry` IN (2218, 2205, 2241);
 
--- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Remove Duplicate Blood of Heroes
-DELETE FROM `gameobject` WHERE `guid` IN (25981, 25918, 25962, 25972);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (25981, 25918, 25962, 25972);
-
 
 -- End of migration.
 END IF;
