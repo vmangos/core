@@ -768,11 +768,7 @@ namespace MMAP
                     {
                         // If terrain is under wmo, mark terrain as unwalkable
                         // If there are less than 1.5y between terrain and m2 then mark the terrain as unwalkable
-                        if (!isM2)
-                        {
-                            terrainInsideModelsVerts[t] = inDist;
-                        }
-                        else if (inDist < 1.5f)
+                        if (!isM2 || inDist < 1.5f)
                         {
                             terrainInsideModelsVerts[t] = inDist;
                         }
