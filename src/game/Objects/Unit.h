@@ -194,7 +194,7 @@ struct SpellImmune
     uint32 spellId;
 };
 
-typedef std::list<SpellImmune> SpellImmuneList;
+typedef std::vector<SpellImmune> SpellImmuneList;
 
 #define UNIT_ACTION_BUTTON_ACTION(X) (uint32(X) & 0x00FFFFFF)
 #define UNIT_ACTION_BUTTON_TYPE(X)   ((uint32(X) & 0xFF000000) >> 24)
@@ -338,7 +338,6 @@ class Unit : public SpellCaster
         typedef std::pair<SpellAuraHolderMap::const_iterator, SpellAuraHolderMap::const_iterator> SpellAuraHolderConstBounds;
         typedef std::list<SpellAuraHolder*> SpellAuraHolderList;
         typedef std::list<Aura*> AuraList;
-        typedef std::list<DiminishingReturn> Diminishing;
         typedef std::set<uint32> ComboPointHolderSet;
         typedef std::map<SpellEntry const*, ObjectGuid> SingleCastSpellTargetMap;
 
@@ -628,15 +627,14 @@ class Unit : public SpellCaster
         /*********************************************************/
 
     private:
-        Diminishing m_Diminishing;
+        std::vector<DiminishingReturn> m_Diminishing;
     protected:
         SpellAuraHolderMap m_spellAuraHolders;
         SpellAuraHolderMap::iterator m_spellAuraHoldersUpdateIterator; // != end() in Unit::m_spellAuraHolders update and point to next element
         AuraList m_deletedAuras;                                       // auras removed while in ApplyModifier and waiting deleted
         SpellAuraHolderList m_deletedHolders;
         SingleCastSpellTargetMap m_singleCastSpellTargets;  // casted by unit single per-caster auras
-        typedef std::list<GameObject*> GameObjectList;
-        GameObjectList m_gameObj;
+        std::vector<GameObject*> m_spellGameObjects;
         AuraList m_modAuras[TOTAL_AURAS];
         uint32 m_lastManaUseSpellId;
         uint32 m_lastManaUseTimer;

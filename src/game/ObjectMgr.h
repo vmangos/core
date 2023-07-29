@@ -1274,7 +1274,7 @@ class ObjectMgr
         PlayerCacheData* GetPlayerDataByGUID(uint32 lowGuid);
         PlayerCacheData const* GetPlayerDataByGUID(uint32 lowGuid) const;
         PlayerCacheData const* GetPlayerDataByName(std::string const& name) const;
-        void GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData const*>& data) const;
+        void GetPlayerDataForAccount(uint32 accountId, std::vector<PlayerCacheData const*>& data) const;
         PlayerCacheData* InsertPlayerInCache(Player* pPlayer);
         PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, std::string const& name, uint32 level, uint32 zoneId);
         void DeletePlayerFromCache(uint32 lowGuid);

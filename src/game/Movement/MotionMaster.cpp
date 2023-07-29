@@ -230,8 +230,7 @@ void MotionMaster::DirectClean(bool reset, bool all)
     // Nostalrius: We need to clean top mvt gens, and call Finalize once it's done
     // because Finalize calls CreatureAI::MovementInform that can call MovePoint / ...
 
-    typedef std::list<MovementGenerator*> MvtGenList;
-    MvtGenList mvtGensToFinalize;
+    std::vector<MovementGenerator*> mvtGensToFinalize;
     while (all ? !empty() : size() > 1)
     {
         MovementGenerator* curr = top();
@@ -245,11 +244,11 @@ void MotionMaster::DirectClean(bool reset, bool all)
         MANGOS_ASSERT(!empty());
         top()->Reset(*m_owner);
     }
-    for (MvtGenList::iterator it = mvtGensToFinalize.begin(); it != mvtGensToFinalize.end(); ++it)
+    for (auto const& itr : mvtGensToFinalize)
     {
-        (*it)->Finalize(*m_owner);
-        if (!isStatic((*it)))
-            delete(*it);
+        itr->Finalize(*m_owner);
+        if (!isStatic(itr))
+            delete(itr);
     }
 }
 
@@ -265,21 +264,20 @@ void MotionMaster::DelayedClean(bool reset, bool all)
 
     if (!m_expList)
         m_expList = new ExpireList();
-
-    typedef std::list<MovementGenerator*> MvtGenList;
-    MvtGenList mvtGensToFinalize;
+;
+    std::vector<MovementGenerator*> mvtGensToFinalize;
     while (all ? !empty() : size() > 1)
     {
         MovementGenerator* curr = top();
         pop();
         mvtGensToFinalize.push_back(curr);
     }
-    for (const auto& it : mvtGensToFinalize)
+    for (auto const& itr : mvtGensToFinalize)
     {
-        it->Finalize(*m_owner);
+        itr->Finalize(*m_owner);
 
-        if (!isStatic(it))
-            m_expList->push_back(it);
+        if (!isStatic(itr))
+            m_expList->push_back(itr);
     }
 }
 
@@ -292,18 +290,17 @@ void MotionMaster::DirectExpire(bool reset)
     pop();
 
     // also drop stored under top() targeted motions
-    typedef std::list<MovementGenerator*> MvtGenList;
-    MvtGenList mvtGensToFinalize;
+    std::vector<MovementGenerator*> mvtGensToFinalize;
     while (!empty() && (top()->GetMovementGeneratorType() == CHASE_MOTION_TYPE || top()->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE) && (curr->GetMovementGeneratorType() != DISTANCING_MOTION_TYPE))
     {
         MovementGenerator* temp = top();
         pop();
         mvtGensToFinalize.push_back(temp);
     }
-    for (MvtGenList::iterator it = mvtGensToFinalize.begin(); it != mvtGensToFinalize.end(); ++it)
+    for (auto const& itr : mvtGensToFinalize)
     {
-        (*it)->Finalize(*m_owner);
-        delete(*it);
+        itr->Finalize(*m_owner);
+        delete(itr);
     }
     // Store current top MMGen, as Finalize might push a new MMGen
     MovementGenerator* nowTop = empty() ? nullptr : top();
@@ -338,18 +335,17 @@ void MotionMaster::DelayedExpire(bool reset)
         m_expList = new ExpireList();
 
     // also drop stored under top() targeted motions
-    typedef std::list<MovementGenerator*> MvtGenList;
-    MvtGenList mvtGensToFinalize;
+    std::vector<MovementGenerator*> mvtGensToFinalize;
     while (!empty() && (top()->GetMovementGeneratorType() == CHASE_MOTION_TYPE || top()->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE) && (curr->GetMovementGeneratorType() != DISTANCING_MOTION_TYPE))
     {
         MovementGenerator* temp = top();
         pop();
         mvtGensToFinalize.push_back(temp);
     }
-    for (const auto& it : mvtGensToFinalize)
+    for (auto const& itr : mvtGensToFinalize)
     {
-        it->Finalize(*m_owner);
-        m_expList->push_back(it);
+        itr->Finalize(*m_owner);
+        m_expList->push_back(itr);
     }
 
     curr->Finalize(*m_owner);

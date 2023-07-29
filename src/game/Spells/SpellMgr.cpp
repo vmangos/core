@@ -639,7 +639,7 @@ void SpellMgr::LoadSpellGroupStackRules()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell group stack rules", count);
 }
 
-bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) const
+bool SpellMgr::ListMorePowerfulSpells(uint32 spellId, std::vector<uint32>& list) const
 {
     std::vector<uint32> spellGroupIds;
     std::vector<uint32>::iterator spellGroupIdsIt;
@@ -682,7 +682,7 @@ bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) 
     return !list.empty();
 }
 
-bool SpellMgr::ListLessPowerfullSpells(uint32 spellId, std::list<uint32>& list) const
+bool SpellMgr::ListLessPowerfulSpells(uint32 spellId, std::vector<uint32>& list) const
 {
     std::vector<uint32> spellGroupIds;
     std::vector<uint32>::iterator spellGroupIdsIt;

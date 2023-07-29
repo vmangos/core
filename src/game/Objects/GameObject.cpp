@@ -105,7 +105,7 @@ GameObject::~GameObject()
     delete i_AI;
     delete m_model;
 
-    MANGOS_ASSERT(m_dynObjGUIDs.empty());
+    MANGOS_ASSERT(m_spellDynObjects.empty());
 }
 
 GameObject* GameObject::CreateGameObject(uint32 entry)

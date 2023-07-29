@@ -227,7 +227,7 @@ bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 
 bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
 {
-    std::list< std::pair<std::string, bool> > names;
+    std::vector< std::pair<std::string, bool> > names;
 
     {
         HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
@@ -902,8 +902,7 @@ bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
 
     // extract items
     typedef std::pair<uint32, uint32> ItemPair;
-    typedef std::list< ItemPair > ItemPairs;
-    ItemPairs items;
+    std::vector<ItemPair> items;
 
     // get from tail next item str
     while (char* itemStr = ExtractArg(&args))
