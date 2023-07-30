@@ -248,20 +248,9 @@ struct MouthAI : public ScriptedAI
                     if (CreatureGroup* group = m_creature->GetCreatureGroup())
                     {
                         for (const auto& itr : group->GetMembers())
-                        {
-                            CreatureGroupMember* pCreatureGroupMember = itr.second;
-
-                            if (!pCreatureGroupMember)
-                                continue;
-
-                            Creature* pCreature = m_creature->GetMap()->GetCreature(itr.first);
-
-                            if (!pCreature)
-                                continue;
-
-                            if (!pCreature->IsDespawned() && pCreature->IsAlive())
-                                REMAINING++;
-                        }
+                            if (Creature* pCreature = m_creature->GetMap()->GetCreature(itr.first))
+                                if (pCreature->IsInWorld() && pCreature->IsAlive() && !pCreature->IsDespawned())
+                                    REMAINING++;
                     }
 
                     if (!REMAINING)

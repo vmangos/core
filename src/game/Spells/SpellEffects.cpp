@@ -2148,6 +2148,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
     else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
         sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, effIdx, (Creature*)unitTarget);
 }
+}
 
 void Spell::EffectTriggerSpell(SpellEffectIndex effIdx)
 {

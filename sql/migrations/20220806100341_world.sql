@@ -15,15 +15,15 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     SET @NPC_FLAMESHOCKER_GUID                                      = 66900;
     SET @NPC_MOUTH_OF_KELTHUZAD_GUID                                = 31274;
     SET @NPC_NECROPOLIS_HEALTH_GUID                                 = 16207;
-    SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 35028;
+    SET @GOBJ_BUTTRESS_SPAWNER_GUID                                 = 51201;
     SET @GOBJ_ZONES_GUID                                            = 82090; -- 474 Entries
 
-    SET @GOBJ_SKULLPILE_WINTERSPRING_GUID                           = 52495; -- 648 Entries
-    SET @GOBJ_SKULLPILE_TANARIS_GUID                                = 53143; -- 648 Entries
-    SET @GOBJ_SKULLPILE_AZSHARA_GUID                                = 53791; -- 432 Entries
-    SET @GOBJ_SKULLPILE_BLASTED_LANDS_GUID                          = 54223; -- 428 Entries
-    SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 54949; -- 432 Entries
-    SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 56119; -- 432 Entries
+    SET @GOBJ_SKULLPILE_WINTERSPRING_GUID                           = 60126; -- 648 Entries
+    SET @GOBJ_SKULLPILE_TANARIS_GUID                                = 60774; -- 648 Entries
+    SET @GOBJ_SKULLPILE_AZSHARA_GUID                                = 61422; -- 432 Entries
+    SET @GOBJ_SKULLPILE_BLASTED_LANDS_GUID                          = 61854; -- 428 Entries
+    SET @GOBJ_SKULLPILE_EASTERN_PLAGUELANDS_GUID                    = 62282; -- 432 Entries
+    SET @GOBJ_SKULLPILE_BURNING_STEPPES_GUID                        = 62714; -- 432 Entries
 
     SET @POOL_TEMPLATE_SKULLPILE_WINTERSPRING_ENTRY                 = 43858; -- 162 Entries
     SET @POOL_TEMPLATE_SKULLPILE_TANARIS_ENTRY                      = 44020; -- 162 Entries
@@ -278,68 +278,68 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
 -- 4. CONDITIONS
 
-    -- 601: Source's Guid Is 66917(Pallid Horror in Stormwind City Cathedral of Light)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (601, 52, 66917, 0, 0, 0, 0);
+    -- 601: Source's Guid Is 66917 (Pallid Horror in Stormwind City Cathedral of Light)
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99601, 52, 66917, 0, 0, 0, 0);
 
-    -- 602: Source's Guid Is 66931(Pallid Horror in Undercity Canals)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (602, 52, 66931, 0, 0, 0, 0);
+    -- 602: Source's Guid Is 66931 (Pallid Horror in Undercity Canals)
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99602, 52, 66931, 0, 0, 0, 0);
 
-    -- 603: Source's Guid Is 66945(Pallid Horror in Undercity Sewers)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (603, 52, 66945, 0, 0, 0, 0);
+    -- 603: Source's Guid Is 66945 (Pallid Horror in Undercity Sewers)
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99603, 52, 66945, 0, 0, 0, 0);
 
-    -- 604: Source's Guid Is 66945(Patchwork Terror in Stormwind City)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (604, 52, 66961, 0, 0, 0, 0);
+    -- 604: Source's Guid Is 66945 (Patchwork Terror in Stormwind City)
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99604, 52, 66961, 0, 0, 0, 0);
 
     -- 605: Source's Guid Is 66901 Or 66903 Or 66902(Flameshockers in Stormwind City Mage Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (605, 52, 66901, 66903, 66902, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99605, 52, 66901, 66903, 66902, 0, 0);
 
     -- 606: Source's Guid Is 66904 Or 66905 Or 66906 Or 66907(Flameshockers in Stormwind City Trade District)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (606, 52, 66904, 66905, 66906, 66907, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99606, 52, 66904, 66905, 66906, 66907, 0);
 
     -- 607: Source's Guid Is 66908 Or 66909 Or 66910(Flameshockers in Stormwind City The Park)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (607, 52, 66908, 66909, 66910, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99607, 52, 66908, 66909, 66910, 0, 0);
 
     -- 608: Source's Guid Is 66911 Or 66912 Or 66913(Flameshockers in Stormwind City Old Town)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (608, 52, 66911, 66912, 66913, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99608, 52, 66911, 66912, 66913, 0, 0);
 
     -- 609: Source's Guid Is 66920 Or 66920 Or 66922(Flameshockers in Stormwind City Dwarven District)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (609, 52, 66920, 66921, 66922, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99609, 52, 66920, 66921, 66922, 0, 0);
 
     -- 610: Source's Guid Is 66923 Or 66924 Or 66925 Or 66926(Flameshockers in Undercity Rogues Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (610, 52, 66923, 66924, 66925, 66926, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99610, 52, 66923, 66924, 66925, 66926, 0);
 
     -- 611: Source's Guid Is 66927 Or 66930 Or 66935(Flameshockers in Undercity Rogues Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (611, 52, 66927, 66930, 66935, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99611, 52, 66927, 66930, 66935, 0, 0);
 
     -- 612:(610: Source's Guid Is 66923 Or 66924 Or 66925 Or 66926) Or(611: Source's Guid Is 66927 Or 66930 Or 66935)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (612, -2, 610, 611, 0, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99612, -2, 99610, 99611, 0, 0, 0);
 
     -- 613: Source's Guid Is 66936 Or 66937 Or 66938 Or 66939(Flameshockers in Undercity Trade Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (613, 52, 66936, 66937, 66938, 66939, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99613, 52, 66936, 66937, 66938, 66939, 0);
 
     -- 614: Source's Guid Is 66940(Flameshockers in Undercity Trade Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (614, 52, 66940, 0, 0, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99614, 52, 66940, 0, 0, 0, 0);
 
     -- 615:(613: Source's Guid Is 66936 Or 66937 Or 66938 Or 66939) Or(614: Source's Guid Is 66940)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (615, -2, 613, 614, 0, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99615, -2, 99613, 99614, 0, 0, 0);
 
     -- 616: Source's Guid Is 66951 Or 66953 Or 66955 Or 66956(Flameshockers in Undercity Magic Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (616, 52, 66951, 66953, 66955, 66956, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99616, 52, 66951, 66953, 66955, 66956, 0);
 
     -- 617: Source's Guid Is 66958 Or 66960(Flameshockers in Undercity Magic Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (617, 52, 66958, 66960, 0, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99617, 52, 66958, 66960, 0, 0, 0);
 
     -- 618:(616: Source's Guid Is 66951 Or 66953 Or 66955 Or 66956) Or(617: Source's Guid Is 66958 Or 66960)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (618, -2, 616, 617, 0, 0, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99618, -2, 99616, 99617, 0, 0, 0);
 
     -- 619: Source's Guid Is 66952 Or 66954 Or 66957 Or 66959(Flameshockers in Undercity War Quarter)
-    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (619, 52, 66952, 66954, 66957, 66959, 0);
+    INSERT INTO `conditions`(`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99619, 52, 66952, 66954, 66957, 66959, 0);
 
     -- 620: (601: Source's Guid Is 66917) Or (604: Source's Guid Is 66961)
-    INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (620, -2, 601, 604, 0, 0, 0);
+    INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99620, -2, 99601, 99604, 0, 0, 0);
 
     -- 621: (602: Source's Guid Is 66931) Or (603: Source's Guid Is 66945)
-    INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (621, -2, 602, 603, 0, 0, 0);
+    INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (99621, -2, 99602, 99603, 0, 0, 0);
 
     -- 16143:  Not (Source Is Player)
     REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16143, 28, 0, 0, 0, 0, 1);
@@ -351,7 +351,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16394011, 47, 1639401, 121, 0, 0, 0);
 
     -- 16394012: (604: Source's Guid Is 66961) And (16394010: Scripted Map Event 1639401 Is Active) And (16394011: Extra Targets Of Scripted Map Event 1639401 Satisfy Condition (121:  Not (Target Is Alive)))
-    INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16394012, -1, 604, 16394010, 16394011, 0, 0);
+    INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16394012, -1, 99604, 16394010, 16394011, 0, 0);
 
     -- 16394020: Scripted Map Event 1639402 Is Active
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16394020, 36, 1639402, 0, 0, 0, 0);
@@ -360,7 +360,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16394021, 47, 1639402, 121, 0, 0, 0);
 
     -- 16394022: (603: Source's Guid Is 66945) And (16394020: Scripted Map Event 1639402 Is Active) And (16394021: Extra Targets Of Scripted Map Event 1639402 Satisfy Condition (121:  Not (Target Is Alive)))
-    INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16394022, -1, 603, 16394020, 16394021, 0, 0);
+    INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16394022, -1, 99603, 16394020, 16394021, 0, 0);
 
 
 -- 5. EVENTAI
@@ -465,15 +465,15 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639403;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639403, 0, 0, 39, 1639404, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 602, 'Pallid Horror - Start Script: Undercity Canals'),
-    (1639403, 0, 0, 39, 1639406, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 604, 'Pallid Horror - Start Script: Stormwind The Park'),
-    (1639403, 0, 0, 39, 1639405, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 603, 'Pallid Horror - Start Script: Undercity Sewers'),
-    (1639403, 0, 0, 39, 1639403, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 601, 'Pallid Horror - Start Script: Stormwind Cathedral of Light');
+    (1639403, 0, 0, 39, 1639404, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99602, 'Pallid Horror - Start Script: Undercity Canals'),
+    (1639403, 0, 0, 39, 1639406, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99604, 'Pallid Horror - Start Script: Stormwind The Park'),
+    (1639403, 0, 0, 39, 1639405, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99603, 'Pallid Horror - Start Script: Undercity Sewers'),
+    (1639403, 0, 0, 39, 1639403, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99601, 'Pallid Horror - Start Script: Stormwind Cathedral of Light');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639404;
     INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1639404, 0, 1, 15, 28424, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 620, 'Pallid Horror - Summon Cracked Necrotic Crystal'),
-    (1639404, 0, 1, 15, 28699, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 621, 'Pallid Horror - Summon Faint Necrotic Crystal'),
+    (1639404, 0, 1, 15, 28424, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99620, 'Pallid Horror - Summon Cracked Necrotic Crystal'),
+    (1639404, 0, 1, 15, 28699, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99621, 'Pallid Horror - Summon Faint Necrotic Crystal'),
     (1639404, 0, 2, 18, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pallid Horror - Despawn 5 seconds after Death');
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1639405;
@@ -723,15 +723,15 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638304;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1638304, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flameshocker - Set Phase 1'),
-    (1638304, 0, 0, 39, 1638315, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 605, 'Flameshocker - Start Script Stormwind Mage Quarter'), -- 90442, 90445, 79820
-    (1638304, 0, 0, 39, 1638316, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 606, 'Flameshocker - Start Script Stormwind Trade District'), -- 79688, 79723, 79680, 79695
-    (1638304, 0, 0, 39, 1638314, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 607, 'Flameshocker - Start Script Stormwind The Park'), -- 90452, 90477, 90479, 90480
-    (1638304, 0, 0, 39, 1638313, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 608, 'Flameshocker - Start Script Stormwind Old Town'), -- 79770, 79746, 79788
-    (1638304, 0, 0, 39, 1638312, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 609, 'Flameshocker - Start Script Stormwind Dwarven District'), -- 5169, 48358, 48424
-    (1638304, 0, 0, 39, 1638311, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 612, 'Flameshocker - Start Script Undercity Rogues Quarter'), -- 31882, 31883, 38104, 38097, 31888
-    (1638304, 0, 0, 39, 1638310, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 615, 'Flameshocker - Start Script Undercity Trade Quarter'), -- 38402, 38057, 38407
-    (1638304, 0, 0, 39, 1638309, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 618, 'Flameshocker - Start Script Undercity Magic Quarter'), -- 38423, 31860, 38415, 38070
-    (1638304, 0, 0, 39, 1638308, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 619, 'Flameshocker - Start Script Undercity War Quarter'); -- 38428, 38435, 38105, 38433
+    (1638304, 0, 0, 39, 1638315, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99605, 'Flameshocker - Start Script Stormwind Mage Quarter'), -- 90442, 90445, 79820
+    (1638304, 0, 0, 39, 1638316, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99606, 'Flameshocker - Start Script Stormwind Trade District'), -- 79688, 79723, 79680, 79695
+    (1638304, 0, 0, 39, 1638314, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99607, 'Flameshocker - Start Script Stormwind The Park'), -- 90452, 90477, 90479, 90480
+    (1638304, 0, 0, 39, 1638313, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99608, 'Flameshocker - Start Script Stormwind Old Town'), -- 79770, 79746, 79788
+    (1638304, 0, 0, 39, 1638312, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99609, 'Flameshocker - Start Script Stormwind Dwarven District'), -- 5169, 48358, 48424
+    (1638304, 0, 0, 39, 1638311, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99612, 'Flameshocker - Start Script Undercity Rogues Quarter'), -- 31882, 31883, 38104, 38097, 31888
+    (1638304, 0, 0, 39, 1638310, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99615, 'Flameshocker - Start Script Undercity Trade Quarter'), -- 38402, 38057, 38407
+    (1638304, 0, 0, 39, 1638309, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99618, 'Flameshocker - Start Script Undercity Magic Quarter'), -- 38423, 31860, 38415, 38070
+    (1638304, 0, 0, 39, 1638308, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 99619, 'Flameshocker - Start Script Undercity War Quarter'); -- 38428, 38435, 38105, 38433
 
     DELETE FROM `creature_ai_scripts` WHERE `id`=1638305;
     INSERT INTO `creature_ai_scripts`(`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
