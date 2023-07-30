@@ -66,8 +66,8 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (@CGUID+6, 18);
 
 -- Remove Duplicate Blood of Heroes
-DELETE FROM `gameobject` WHERE `guid` IN (25981, 25918, 25962, 25972);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (25981, 25918, 25962, 25972);
+DELETE FROM `gameobject` WHERE `guid` IN (25981, 25918, 25962, 25972, 55363);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (25981, 25918, 25962, 25972, 55363);
 
 
 -- End of migration.
