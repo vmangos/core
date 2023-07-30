@@ -81,6 +81,12 @@ UPDATE `gameobject` SET `position_x` = -8403.57, `position_y` = 576.764, `positi
 UPDATE `gameobject` SET `position_x` = -8403.31, `position_y` = 576.532, `position_z` = 91.5694, `orientation` = 5.32326, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.461748, `rotation3` = 0.887011 WHERE `guid` = 190086;
 UPDATE `gameobject` SET `position_x` = -8402.93, `position_y` = 576.101, `position_z` = 92.1175, `orientation` = 5.32326, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.461748, `rotation3` = 0.887011 WHERE `guid` = 190085;
 
+-- Remove TBC Spawns From Stormwind Keep War Room
+DELETE FROM `gameobject` WHERE `guid` IN ( 190068, 190070, 190066, 190069, 190067);
+DELETE FROM `game_event_gameobject` WHERE `guid` IN ( 190068, 190070, 190066, 190069, 190067);
+DELETE FROM `creature` WHERE `guid` IN ( 190154, 190155, 190153, 190152, 190157, 190156);
+DELETE FROM `game_event_creature` WHERE `guid` IN ( 190154, 190155, 190153, 190152, 190157, 190156);
+
 
 -- End of migration.
 END IF;
