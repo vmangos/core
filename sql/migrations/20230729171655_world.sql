@@ -69,6 +69,18 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 DELETE FROM `gameobject` WHERE `guid` IN (25981, 25918, 25962, 25972, 55363);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (25981, 25918, 25962, 25972, 55363);
 
+-- Dont Use TBC Postitions For PVP Signposts
+-- AB 180398
+UPDATE `gameobject` SET `position_x` = -8403.36, `position_y` = 576.668, `position_z` = 91.5761, `orientation` = 2.18166, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.887011, `rotation3` = 0.461749 WHERE `guid` = 190088;
+
+-- WSG 180397
+UPDATE `gameobject` SET `position_x` = -8404.05, `position_y` = 577.197, `position_z` = 91.9778, `orientation` = 5.28835, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.477159, `rotation3` = 0.878817 WHERE `guid` = 190084;
+UPDATE `gameobject` SET `position_x` = -8403.57, `position_y` = 576.764, `position_z` = 93.0165, `orientation` = 5.28835, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.477159, `rotation3` = 0.878817 WHERE `guid` = 190087;
+
+-- AV 180397
+UPDATE `gameobject` SET `position_x` = -8403.31, `position_y` = 576.532, `position_z` = 91.5694, `orientation` = 5.32326, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.461748, `rotation3` = 0.887011 WHERE `guid` = 190086;
+UPDATE `gameobject` SET `position_x` = -8402.93, `position_y` = 576.101, `position_z` = 92.1175, `orientation` = 5.32326, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.461748, `rotation3` = 0.887011 WHERE `guid` = 190085;
+
 
 -- End of migration.
 END IF;
