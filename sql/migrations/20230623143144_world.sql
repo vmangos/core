@@ -166,6 +166,10 @@ REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value
 
 UPDATE `quest_template` SET `RequiredCondition` = 805 WHERE `entry` IN (2218, 2205, 2241);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Ancient of War Does Not Have Gossip
+UPDATE `creature_template` SET `npc_flags` = 0 WHERE `entry`=3469;
+
 
 -- End of migration.
 END IF;
