@@ -7369,33 +7369,32 @@ void Unit::TauntFadeOut(Unit* taunter)
 
 //======================================================================
 
+void Unit::RemoveTauntCaster(ObjectGuid guid)
+{
+    // remove only 1 occurance, starting from the front
+    // since guids are pushed back on taunt aura apply
+    for (auto itr = m_tauntGuids.begin(); itr != m_tauntGuids.end(); ++itr)
+    {
+        if ((*itr) == guid)
+        {
+            m_tauntGuids.erase(itr);
+            return;
+        }
+    }
+}
+
+//======================================================================
+
 Unit* Unit::GetTauntTarget() const
 {
-    AuraList const& tauntAuras = GetAurasByType(SPELL_AURA_MOD_TAUNT);
-    if (tauntAuras.empty())
-        return nullptr;
-
-    Unit* caster = nullptr;
-
-    // The last taunt aura caster is alive an we are happy to attack him
-    if ((caster = tauntAuras.back()->GetCaster()) && IsValidAttackTarget(caster))
-        return caster;
-    else if (tauntAuras.size() > 1)
+    // taunters are pushed back, last caster will be at the end
+    for (auto itr = m_tauntGuids.rbegin(); itr != m_tauntGuids.rend(); ++itr)
     {
-        // We do not have last taunt aura caster but we have more taunt auras,
-        // so find first available target
-
-        // Auras are pushed_back, last caster will be on the end
-        AuraList::const_iterator aura = --tauntAuras.end();
-        do
+        if (Unit* pTaunter = GetMap()->GetUnit(*itr))
         {
-            --aura;
-            if ((caster = (*aura)->GetCaster()) && caster->IsInMap(this) && IsValidAttackTarget(caster))
-            {
-                return caster;
-                break;
-            }
-        } while (aura != tauntAuras.begin());
+            if (IsValidAttackTarget(pTaunter))
+                return pTaunter;
+        }
     }
 
     return nullptr;
@@ -7403,21 +7402,21 @@ Unit* Unit::GetTauntTarget() const
 
 bool Unit::SelectHostileTarget()
 {
-    //function provides main threat functionality
-    //next-victim-selection algorithm and evade mode are called
-    //threat list sorting etc.
+    // function provides main threat functionality
+    // next-victim-selection algorithm and evade mode are called
+    // threat list sorting etc.
 
     MANGOS_ASSERT(IsCreature());
 
-    if (!this->IsAlive())
+    if (!IsAlive())
         return false;
 
-    //This function only useful once AI has been initialized
+    // This function is only useful once AI has been initialized
     if (!((Creature*)this)->AI())
         return false;
 
-    // Nostalrius: delai de 5 sec avant attaque apres spawn.
-    if (ToCreature()->IsTempPacified())
+    // Nostalrius: 5 sec delay before attack after spawn.
+    if (((Creature*)this)->IsTempPacified())
         return false;
 
     Unit* target = GetTauntTarget();
