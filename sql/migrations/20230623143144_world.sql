@@ -172,7 +172,7 @@ UPDATE `creature_template` SET `npc_flags` = 0 WHERE `entry`=3469;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Update Some Creature Group Angles
-UPDATE `creature_groups` SET `angle` = 3.12 WHERE `member_guid` IN (42898, 60006, 287);
+UPDATE `creature_groups` SET `angle` = 3.12 WHERE `member_guid` IN (42898, 60006, 287, 153);
 UPDATE `creature_groups` SET `angle` = 3.12 WHERE `member_guid` = 3477;
 UPDATE `creature_groups` SET `angle` = 3.23 WHERE `member_guid` = 3560;
 
