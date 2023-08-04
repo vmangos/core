@@ -122,6 +122,17 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11020 WHERE `menu_id` = 3070 AN
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3072 AND `id` = 0; -- Condition for trainer gossip for Caryssia Moonhunter (Tribal Leatherworking - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3073 AND `id` = 0; -- Condition for trainer gossip for Se'Jib (Tribal Leatherworking - Horde)
 
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
+(11040, 30, 46, 5999, 0, 0, 0), -- Condition to check if the player has less than 6000 Armorsmithing reputation
+(11041, 30, 289, 5999, 0, 0, 0), -- Condition to check if the player has less than 6000 Weaponsmithing reputation
+-- Note: Condition 178 corresponds to a condition checking if the player is level 40 or higher
+-- Note: Condition 368 corresponds to a condition checking if the player has a Blacksmithing skill of 200
+(11042, -1, 178, 368, 11040, 11041, 0); -- Condition for gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde)
+
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5284; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Alliance)
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5302; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Horde)
 
 -- End of migration.
 END IF;
