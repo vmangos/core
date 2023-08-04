@@ -22,7 +22,6 @@ EndScriptData */
 #define FULFILLMENT_RANGE           90.0f
 #define SPELL_TF_HASTE              2313
 #define SPELL_TF_MOD_HEAL           26525
-#define SPELL_TF_IMMUNITY           26526
 #define SPELL_TF_CANCEL             26589
 
 #define SPELL_BLINK_0               4801
@@ -112,7 +111,6 @@ struct boss_skeramAI : public ScriptedAI
             FulfilledPlayer->RemoveAurasDueToSpellByCancel(SPELL_TRUE_FULFILLMENT);
             FulfilledPlayer->RemoveAurasDueToSpellByCancel(SPELL_TF_HASTE);
             FulfilledPlayer->RemoveAurasDueToSpellByCancel(SPELL_TF_MOD_HEAL);
-            FulfilledPlayer->RemoveAurasDueToSpellByCancel(SPELL_TF_IMMUNITY);
         }
     }
 
@@ -248,7 +246,6 @@ struct boss_skeramAI : public ScriptedAI
 
                     m_creature->CastSpell(target, SPELL_TF_HASTE, true);
                     m_creature->CastSpell(target, SPELL_TF_MOD_HEAL, true);
-                    m_creature->CastSpell(target, SPELL_TF_IMMUNITY, true);
 
                     FullFillment_Timer = urand(20500, 25000);
                     ControlledPlayerGUID = target->GetObjectGuid();
