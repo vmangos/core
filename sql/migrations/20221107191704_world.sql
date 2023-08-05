@@ -159,18 +159,18 @@ DELETE FROM `gossip_scripts` WHERE `id`=318201;
 DELETE FROM `gossip_scripts` WHERE `id`=318202;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (318201, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Art of the Armorsmith (Horde) - Cast Reputation - Armorsmithing'),
-(318201, 0, 0, 1, 30, 0, 0, 0, 11177, 0, 9, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Turn'),
-(318201, 3, 0, 1, 29, 0, 0, 0, 11177, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Point'),
-(318201, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6491, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Chat'),
+(318201, 0, 1, 1, 30, 0, 0, 0, 11177, 0, 9, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Turn'),
+(318201, 3, 3, 1, 29, 0, 0, 0, 11177, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Point'),
+(318201, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6491, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Chat'),
 (318202, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Way of the Weaponsmith (Horde) - Cast Reputation - Weaponsmithing'),
-(318202, 0, 0, 1, 1, 0, 0, 0, 11178, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Horde) NPC Talk'),
-(318202, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Horde) NPC Chat'),
+(318202, 0, 1, 1, 30, 0, 0, 0, 11178, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Horde) NPC Turn'),
+(318202, 3, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Horde) NPC Chat'),
 (318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Armorsmith'),
 (318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Weaponsmith'),
 (318205, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Art of the Armorsmith (Alliance) - Cast Reputation - Armorsmithing'),
-(318205, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6487, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Alliance) NPC Chat'),
+(318205, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6487, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Alliance) NPC Chat'),
 (318206, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Way of the Weaponsmith (Alliance) - Cast Reputation - Armorsmithing'),
-(318206, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6486, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Alliance) NPC Chat');
+(318206, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6486, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Alliance) NPC Chat');
 
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 (3182, 2, 0, 'Myolor, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8892, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11048),
