@@ -122,15 +122,21 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11020 WHERE `menu_id` = 3070 AN
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3072 AND `id` = 0; -- Condition for trainer gossip for Caryssia Moonhunter (Tribal Leatherworking - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3073 AND `id` = 0; -- Condition for trainer gossip for Se'Jib (Tribal Leatherworking - Horde)
 
-DELETE FROM `conditions` WHERE `condition_entry` = 1356;
 DELETE FROM `conditions` WHERE `condition_entry` = 1357;
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
-(11040, 30, 46, 5999, 0, 0, 0), -- Condition to check if the player has less than 6000 Armorsmithing reputation
-(11041, 30, 289, 5999, 0, 0, 0), -- Condition to check if the player has less than 6000 Weaponsmithing reputation
+(11040, 30, 46, 2999, 0, 0, 0), -- Condition to check if the player has less than 3000 Armorsmithing reputation
+(11041, 30, 289, 2999, 0, 0, 0), -- Condition to check if the player has less than 3000 Weaponsmithing reputation
 -- Note: Condition 178 corresponds to a condition checking if the player is level 40 or higher
 -- Note: Condition 368 corresponds to a condition checking if the player has a Blacksmithing skill of 200
-(1357, -1, 178, 368, 11040, 11041, 0); -- Condition for gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde)
+(1357, -1, 178, 368, 11040, 11041, 0), -- Condition for first specialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde)
+(11042, 8, 5283, 0, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Alliance)
+(11043, 8, 5284, 0, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Alliance)
+(11044, 8, 5301, 0, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Horde)
+(11045, 8, 5302, 0, 0, 0, 0), -- Condition to check if the player has completed "The Way of the Weaponsmith" (Horde)
+(11046, -2, 11042, 11043, 11044, 11045, 0), -- Condition to return true if the player has completed any of the above quests
+-- Note: Condition 1356 corresponds to a condition checking if the player has NOT learnt Armorsmith AND has NOT learnt Weaponsmith
+(11047, -1,178, 368, 11046, 0, 0); -- Condition for first respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde)
 
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
