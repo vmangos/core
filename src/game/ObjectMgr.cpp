@@ -911,7 +911,7 @@ void ObjectMgr::ChangePlayerNameInCache(uint32 guidLow, std::string const& oldNa
     }
 }
 
-void ObjectMgr::GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData const*>& data) const
+void ObjectMgr::GetPlayerDataForAccount(uint32 accountId, std::vector<PlayerCacheData const*>& data) const
 {
     for (const auto& iter : m_playerCacheData)
     {

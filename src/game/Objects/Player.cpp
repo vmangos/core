@@ -2619,7 +2619,7 @@ void Player::RemoveFromWorld()
     }
 
     // remove duel before calling Unit::RemoveFromWorld
-    // otherwise there will be an existing duel flag pointer but no entry in m_gameObj
+    // otherwise there will be an existing duel flag pointer but no entry in m_spellGameObjects
     DuelComplete(DUEL_INTERRUPTED);
 
     // Do not add/remove the player from the object storage
@@ -21905,7 +21905,7 @@ void Player::RewardHonorOnDeath()
     for (const auto& itr : damagePerGroup)
     {
         Group* g = itr.first;
-        std::list<Player*> rewarded;
+        std::vector<Player*> rewarded;
         for (const auto& grItr : g->GetMemberSlots())
             if (Player* pl = GetMap()->GetPlayer(grItr.guid))
                 if (pl->IsAtGroupRewardDistance(this) && pl->IsAlive() && pl->GetTeam() != GetTeam())

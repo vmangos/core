@@ -197,7 +197,7 @@ struct PlayerCreateInfoItem
     uint32 item_amount;
 };
 
-typedef std::list<PlayerCreateInfoItem> PlayerCreateInfoItems;
+typedef std::vector<PlayerCreateInfoItem> PlayerCreateInfoItems;
 
 struct PlayerClassLevelInfo
 {
@@ -215,7 +215,7 @@ struct PlayerLevelInfo
     uint8 stats[MAX_STATS] = { 0 };
 };
 
-typedef std::list<uint32> PlayerCreateInfoSpells;
+typedef std::vector<uint32> PlayerCreateInfoSpells;
 
 struct PlayerCreateInfoAction
 {
@@ -227,7 +227,7 @@ struct PlayerCreateInfoAction
     uint32 action = 0;
 };
 
-typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
+typedef std::vector<PlayerCreateInfoAction> PlayerCreateInfoActions;
 
 struct PlayerInfo
 {

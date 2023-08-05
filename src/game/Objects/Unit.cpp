@@ -117,8 +117,6 @@ Unit::Unit()
     m_canModifyStats = false;
     m_modelCollisionHeight = 2.f;
 
-    for (auto& immunityList : m_spellImmune)
-        immunityList.clear();
     for (auto& modifier : m_auraModifiersGroup)
     {
         modifier[BASE_VALUE] = 0.0f;
@@ -201,8 +199,8 @@ Unit::~Unit()
     delete movespline;
 
     // those should be already removed at "RemoveFromWorld()" call
-    MANGOS_ASSERT(m_gameObj.empty());
-    MANGOS_ASSERT(m_dynObjGUIDs.empty());
+    MANGOS_ASSERT(m_spellGameObjects.empty());
+    MANGOS_ASSERT(m_spellDynObjects.empty());
     MANGOS_ASSERT(m_deletedAuras.empty());
     MANGOS_ASSERT(m_deletedHolders.empty());
     MANGOS_ASSERT(!m_needUpdateVisibility);
@@ -2746,22 +2744,20 @@ void Unit::_UpdateSpells(uint32 time)
             ++iter;
     }
 
-    if (!m_gameObj.empty())
+    if (!m_spellGameObjects.empty())
     {
-        GameObjectList::iterator ite1, dnext1;
-        for (ite1 = m_gameObj.begin(); ite1 != m_gameObj.end(); ite1 = dnext1)
+        for (auto i = m_spellGameObjects.begin(); i != m_spellGameObjects.end();)
         {
-            dnext1 = ite1;
             //(*i)->Update(difftime);
-            if (!(*ite1)->isSpawned())
+            if (!(*i)->isSpawned())
             {
-                (*ite1)->SetOwnerGuid(ObjectGuid());
-                (*ite1)->SetRespawnTime(0);
-                (*ite1)->Delete();
-                dnext1 = m_gameObj.erase(ite1);
+                (*i)->SetOwnerGuid(ObjectGuid());
+                (*i)->SetRespawnTime(0);
+                (*i)->Delete();
+                i = m_spellGameObjects.erase(i);
             }
             else
-                ++dnext1;
+                ++i;
         }
     }
 }
@@ -3492,9 +3488,9 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
         if (rule != SPELL_GROUP_STACK_RULE_DEFAULT)
         {
             // Attempt to add apply less powerfull spell
-            if (rule == SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN && sSpellMgr.IsMorePowerfullSpell(i_spellId, spellId, spellGroup))
+            if (rule == SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN && sSpellMgr.IsMorePowerfulSpell(i_spellId, spellId, spellGroup))
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK][DB] Powerfull chain %u > %u (group %u). Aura %u will not be applied.", i_spellId, spellId, spellGroup, spellId);
+                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK][DB] Powerful chain %u > %u (group %u). Aura %u will not be applied.", i_spellId, spellId, spellGroup, spellId);
                 return false;
             }
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK][DB] Unable to stack %u and %u. %u will be removed.", spellId, i_spellId, i_spellId);
@@ -3607,9 +3603,9 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
         }
     }
     // Sorts moins puissants :
-    std::list<uint32> lessPowerfullSpells;
-    if (sSpellMgr.ListLessPowerfullSpells(spellId, lessPowerfullSpells))
-        for (const auto& it : lessPowerfullSpells)
+    std::vector<uint32> lessPowerfulSpells;
+    if (sSpellMgr.ListLessPowerfulSpells(spellId, lessPowerfulSpells))
+        for (const auto& it : lessPowerfulSpells)
             RemoveAurasDueToSpell(it);
     return true;
 }
@@ -4092,7 +4088,7 @@ bool Unit::HasAura(uint32 spellId, SpellEffectIndex effIndex) const
 
 GameObject* Unit::GetGameObject(uint32 spellId) const
 {
-    for (const auto& i : m_gameObj)
+    for (const auto& i : m_spellGameObjects)
         if (i->GetSpellId() == spellId)
             return i;
 
@@ -4102,7 +4098,7 @@ GameObject* Unit::GetGameObject(uint32 spellId) const
 void Unit::AddGameObject(GameObject* pGo)
 {
     MANGOS_ASSERT(pGo && !pGo->GetOwnerGuid());
-    m_gameObj.push_back(pGo);
+    m_spellGameObjects.push_back(pGo);
     pGo->SetOwnerGuid(GetObjectGuid());
     pGo->SetWorldMask(GetWorldMask());
 
@@ -4140,7 +4136,13 @@ void Unit::RemoveGameObject(GameObject* pGo, bool del)
 
     }
 
-    m_gameObj.remove(pGo);
+    for (auto itr = m_spellGameObjects.begin(); itr != m_spellGameObjects.end();)
+    {
+        if ((*itr) == pGo)
+            itr = m_spellGameObjects.erase(itr);
+        else
+            ++itr;
+    }
 
     if (del)
     {
@@ -4151,12 +4153,11 @@ void Unit::RemoveGameObject(GameObject* pGo, bool del)
 
 void Unit::RemoveGameObject(uint32 spellid, bool del)
 {
-    if (m_gameObj.empty())
+    if (m_spellGameObjects.empty())
         return;
-    GameObjectList::iterator i, next;
-    for (i = m_gameObj.begin(); i != m_gameObj.end(); i = next)
+
+    for (auto i = m_spellGameObjects.begin(); i != m_spellGameObjects.end();)
     {
-        next = i;
         if (spellid == 0 || (*i)->GetSpellId() == spellid)
         {
             (*i)->SetOwnerGuid(ObjectGuid());
@@ -4166,23 +4167,23 @@ void Unit::RemoveGameObject(uint32 spellid, bool del)
                 (*i)->Delete();
             }
 
-            next = m_gameObj.erase(i);
+            i = m_spellGameObjects.erase(i);
         }
         else
-            ++next;
+            ++i;
     }
 }
 
 void Unit::RemoveAllGameObjects()
 {
     // remove references to unit
-    for (GameObjectList::iterator i = m_gameObj.begin(); i != m_gameObj.end();)
+    for (auto const& pGo : m_spellGameObjects)
     {
-        (*i)->SetOwnerGuid(ObjectGuid());
-        (*i)->SetRespawnTime(0);
-        (*i)->Delete();
-        i = m_gameObj.erase(i);
+        pGo->SetOwnerGuid(ObjectGuid());
+        pGo->SetRespawnTime(0);
+        pGo->Delete();
     }
+    m_spellGameObjects.clear();
 }
 
 void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo, AuraType auraTypeOverride) const
@@ -7368,33 +7369,32 @@ void Unit::TauntFadeOut(Unit* taunter)
 
 //======================================================================
 
+void Unit::RemoveTauntCaster(ObjectGuid guid)
+{
+    // remove only 1 occurance, starting from the front
+    // since guids are pushed back on taunt aura apply
+    for (auto itr = m_tauntGuids.begin(); itr != m_tauntGuids.end(); ++itr)
+    {
+        if ((*itr) == guid)
+        {
+            m_tauntGuids.erase(itr);
+            return;
+        }
+    }
+}
+
+//======================================================================
+
 Unit* Unit::GetTauntTarget() const
 {
-    AuraList const& tauntAuras = GetAurasByType(SPELL_AURA_MOD_TAUNT);
-    if (tauntAuras.empty())
-        return nullptr;
-
-    Unit* caster = nullptr;
-
-    // The last taunt aura caster is alive an we are happy to attack him
-    if ((caster = tauntAuras.back()->GetCaster()) && IsValidAttackTarget(caster))
-        return caster;
-    else if (tauntAuras.size() > 1)
+    // taunters are pushed back, last caster will be at the end
+    for (auto itr = m_tauntGuids.rbegin(); itr != m_tauntGuids.rend(); ++itr)
     {
-        // We do not have last taunt aura caster but we have more taunt auras,
-        // so find first available target
-
-        // Auras are pushed_back, last caster will be on the end
-        AuraList::const_iterator aura = --tauntAuras.end();
-        do
+        if (Unit* pTaunter = GetMap()->GetUnit(*itr))
         {
-            --aura;
-            if ((caster = (*aura)->GetCaster()) && caster->IsInMap(this) && IsValidAttackTarget(caster))
-            {
-                return caster;
-                break;
-            }
-        } while (aura != tauntAuras.begin());
+            if (IsValidAttackTarget(pTaunter))
+                return pTaunter;
+        }
     }
 
     return nullptr;
@@ -7402,21 +7402,21 @@ Unit* Unit::GetTauntTarget() const
 
 bool Unit::SelectHostileTarget()
 {
-    //function provides main threat functionality
-    //next-victim-selection algorithm and evade mode are called
-    //threat list sorting etc.
+    // function provides main threat functionality
+    // next-victim-selection algorithm and evade mode are called
+    // threat list sorting etc.
 
     MANGOS_ASSERT(IsCreature());
 
-    if (!this->IsAlive())
+    if (!IsAlive())
         return false;
 
-    //This function only useful once AI has been initialized
+    // This function is only useful once AI has been initialized
     if (!((Creature*)this)->AI())
         return false;
 
-    // Nostalrius: delai de 5 sec avant attaque apres spawn.
-    if (ToCreature()->IsTempPacified())
+    // Nostalrius: 5 sec delay before attack after spawn.
+    if (((Creature*)this)->IsTempPacified())
         return false;
 
     Unit* target = GetTauntTarget();
@@ -10335,11 +10335,11 @@ SpellAuraHolder* Unit::RefreshAura(uint32 spellId, int32 duration)
 
 bool Unit::HasMorePowerfulSpellActive(SpellEntry const* spell) const
 {
-    std::list<uint32> morePowerfullSpells;
-    if (!sSpellMgr.ListMorePowerfullSpells(spell->Id, morePowerfullSpells))
+    std::vector<uint32> morePowerfulSpells;
+    if (!sSpellMgr.ListMorePowerfulSpells(spell->Id, morePowerfulSpells))
         return false;
     for (const auto& i : m_spellAuraHolders)
-        for (const auto& it : morePowerfullSpells)
+        for (const auto& it : morePowerfulSpells)
             if (it == i.first)
                 return true;
     return false;

@@ -93,11 +93,11 @@ struct instance_blackrock_depths : ScriptedInstance
     uint32 m_uiThunderbrewCount;
     uint32 m_uiRelicCofferDoorCount;
 
-    std::list<uint64> m_lRibblySCronyMobGUIDList;
-    std::list<uint64> m_lArenaSpectatorMobGUIDList;
-    std::list<uint64> m_lArgelmachProtectorsMobGUIDList;
-    std::list<uint64> m_sBarPatronNpcGuids;
-    std::list<uint64> m_sBarPatrolGuids;
+    std::vector<uint64> m_lRibblySCronyMobGUIDList;
+    std::vector<uint64> m_lArenaSpectatorMobGUIDList;
+    std::vector<uint64> m_lArgelmachProtectorsMobGUIDList;
+    std::vector<uint64> m_sBarPatronNpcGuids;
+    std::vector<uint64> m_sBarPatrolGuids;
 
     bool m_bDoorDughalOpened;
     bool m_bDoorTobiasOpened;

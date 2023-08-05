@@ -217,7 +217,21 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
 
     WaypointNode const& nextNode = currPoint->second;
     Movement::MoveSplineInit init(creature, "WaypointMovementGenerator<Creature>::StartMove");
-    init.MoveTo(nextNode.x, nextNode.y, nextNode.z, (m_PathOrigin == PATH_FROM_SPECIAL) ? MOVE_STRAIGHT_PATH : MOVE_PATHFINDING);
+
+    if (WaypointPath const* pSubpath = (nextNode.path_id ? sWaypointMgr.GetPathFromOrigin(nextNode.path_id, 0, 0, PATH_FROM_SPECIAL) : nullptr))
+    {
+        PointsArray genPath;
+        genPath.resize(pSubpath->size());
+        for (auto const& node : *pSubpath)
+            genPath[node.first] = G3D::Vector3(node.second.x, node.second.y, node.second.z);
+
+        if (creature.CanFly())
+            init.SetFly();
+
+        init.MovebyPath(genPath);
+    }
+    else
+        init.MoveTo(nextNode.x, nextNode.y, nextNode.z, (m_PathOrigin == PATH_FROM_SPECIAL) ? MOVE_STRAIGHT_PATH : MOVE_PATHFINDING);
 
     if (nextNode.orientation != 100 && nextNode.delay != 0)
         init.SetFacing(nextNode.orientation);

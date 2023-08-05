@@ -100,7 +100,8 @@ class MovementAnticheat
         void ResetBottingStats();
         void CheckBotting(uint16 opcode, MovementInfo const& movementInfo);
         bool CheckTeleport(MovementInfo const& movementInfo) const;
-        bool IsTeleportAllowed(MovementInfo const& movementInfo) const;
+        bool IsTeleportAllowed3D(MovementInfo const& movementInfo) const;
+        bool IsInTransportArea() const;
         bool CheckForbiddenArea(MovementInfo const& movementInfo) const;
         bool CheckMultiJump(uint16 opcode);
         bool CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const;

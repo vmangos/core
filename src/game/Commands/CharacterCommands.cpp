@@ -1332,14 +1332,14 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
 
                 LoginDatabase.escape_string(searchString);
                 QueryResult* result = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), searchString.c_str());
-                std::list<uint32> list;
+                std::vector<uint32> list;
                 if (result)
                 {
                     do
                     {
                         Field* fields = result->Fetch();
-                        uint32 acc_id = fields[0].GetUInt32();
-                        list.push_back(acc_id);
+                        uint32 accId = fields[0].GetUInt32();
+                        list.push_back(accId);
                     } while (result->NextRow());
 
                     delete result;

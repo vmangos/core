@@ -78,19 +78,16 @@ struct boss_ironayaAI : public ScriptedAI
         if (!hasCastedKnockaway && m_creature->GetHealthPercent() < 50.0f)
         {
             m_creature->CastSpell(m_creature->GetVictim(), SPELL_KNOCKAWAY, false);
+            m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
 
             // current aggro target is knocked away pick new target
-            Unit* Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
+            Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
 
-            if (!Target || Target == m_creature->GetVictim())
-            {
-                Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
-            }
+            if (!pTarget || pTarget == m_creature->GetVictim())
+                pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
 
-            if (Target)
-            {
-                m_creature->TauntApply(Target);
-            }
+            if (pTarget)
+                AttackStart(pTarget);
 
             //Shouldn't cast this again
             hasCastedKnockaway = true;

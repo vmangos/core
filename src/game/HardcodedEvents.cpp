@@ -1651,7 +1651,7 @@ void WarEffortEvent::DisableAndStopEvent(uint16 event_id)
 void WarEffortEvent::UpdateHiveColossusEvents()
 {
     uint32 colossusMask = sObjectMgr.GetSavedVariable(VAR_WE_HIVE_REWARD, 0);
-    std::list<WarEffortGameEvents> events;
+    std::vector<WarEffortGameEvents> events;
 
     if (colossusMask & WAR_EFFORT_ASHI_REWARD)
         events.push_back(EVENT_WAR_EFFORT_BATTLE_ASHI);

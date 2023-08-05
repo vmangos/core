@@ -23,6 +23,7 @@ enum
 {
     SUNKENTEMPLE_MAX_ENCOUNTER = 6,
     MAX_STATUES                = 6,
+    MAX_FLAMES                 = 4,
 
     // Don't change types 1,2 and 3 (handled in ACID)
     TYPE_ATALARION_OBSOLET= 1,
@@ -35,6 +36,7 @@ enum
     TYPE_MALFURION        = 7,
     TYPE_AVATAR           = 8,
     TYPE_ERANIKUS         = 9,
+    TYPE_ETERNAL_FLAME    = 10,
 
     NPC_ATALARION         = 8580,
     NPC_DREAMSCYTH        = 5721,
