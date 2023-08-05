@@ -140,10 +140,10 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11048, -1, 178, 368, 11046, 0, 0), -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously armorsmiths
 (11049, -1, 178, 368, 11047, 0, 0); -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously weaponsmiths
 
-UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
-UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
-UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5284; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Alliance)
-UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000,  WHERE `entry` = 5302; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Horde)
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000  WHERE `entry` = 5284; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Alliance)
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000  WHERE `entry` = 5302; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Horde)
 
 UPDATE `gossip_scripts` SET `datalong` = 17451, `comment` = 'Cast Reputation - Armorsmithing' WHERE `id` = 318201;
 UPDATE `gossip_scripts` SET `datalong` = 17452, `comment` = 'Cast Reputation - Weaponsmithing' WHERE `id` = 318202;
