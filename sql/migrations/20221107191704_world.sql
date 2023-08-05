@@ -155,11 +155,22 @@ UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` 
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000  WHERE `entry` = 5284; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Alliance)
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000  WHERE `entry` = 5302; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Horde)
 
-UPDATE `gossip_scripts` SET `datalong` = 17451, `condition_id` = 11055, `comments` = 'Cast Reputation - Armorsmithing' WHERE `id` = 318201;
-UPDATE `gossip_scripts` SET `datalong` = 17452, `condition_id` = 11055, `comments` = 'Cast Reputation - Weaponsmithing' WHERE `id` = 318202;
-INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
+DELETE FROM `gossip_scripts` WHERE `id`=318201;
+DELETE FROM `gossip_scripts` WHERE `id`=318202;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(318201, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Art of the Armorsmith (Horde) - Cast Reputation - Armorsmithing'),
+(318201, 0, 0, 1, 30, 0, 0, 0, 11177, 0, 9, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Turn'),
+(318201, 3, 0, 1, 29, 0, 0, 0, 11177, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Point'),
+(318201, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6491, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Chat'),
+(318202, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Way of the Weaponsmith (Horde) - Cast Reputation - Weaponsmithing'),
+(318202, 0, 0, 1, 1, 0, 0, 0, 11178, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Horde) NPC Talk'),
+(318202, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Horde) NPC Chat'),
 (318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Armorsmith'),
-(318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Weaponsmith');
+(318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Weaponsmith'),
+(318205, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Art of the Armorsmith (Alliance) - Cast Reputation - Armorsmithing'),
+(318205, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6487, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Alliance) NPC Chat'),
+(318206, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Way of the Weaponsmith (Alliance) - Cast Reputation - Armorsmithing'),
+(318206, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6486, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Alliance) NPC Chat');
 
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 (3182, 2, 0, 'Myolor, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8892, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11048),
@@ -171,11 +182,11 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3187, 4, 0, 'Krathok, I was once an armorsmith and wish to instead learn the ways of the weaponsmith. Will you train me?', 10897, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11048),
 (3187, 5, 0, 'Krathok, I was once a weaponsmith and wish to instead learn the ways of the armorsmith. Will you train me?', 10898, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11049);
 
--- Update first specialisation gossip and scripts to new condition
-UPDATE `gossip_menu_option` SET `condition_id` = 11055 WHERE `menu_id` = 3182 AND `id` = 0;
-UPDATE `gossip_menu_option` SET `condition_id` = 11055 WHERE `menu_id` = 3182 AND `id` = 1;
-UPDATE `gossip_menu_option` SET `condition_id` = 11055 WHERE `menu_id` = 3187 AND `id` = 0;
-UPDATE `gossip_menu_option` SET `condition_id` = 11055 WHERE `menu_id` = 3187 AND `id` = 1;
+-- Update first specialisation gossip and scripts to new condition and new scripts
+UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318205 WHERE `menu_id` = 3182 AND `id` = 0; -- Armorsmith Alliance
+UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318206 WHERE `menu_id` = 3182 AND `id` = 1; -- Weaponsmith Alliance
+UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318201 WHERE `menu_id` = 3187 AND `id` = 0; -- Armorsmith Horde
+UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318202 WHERE `menu_id` = 3187 AND `id` = 1; -- Weaponsmith Horde
 
 -- Update respecialisation gossip for sub-specialisations only for respecialisation
 UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6089 AND `id` = 0;
