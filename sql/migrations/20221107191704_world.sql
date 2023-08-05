@@ -145,8 +145,8 @@ UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` 
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000  WHERE `entry` = 5284; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Alliance)
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue` = 6000  WHERE `entry` = 5302; -- Add Weaponsmithing reputation requirement for "The Way of the Weaponsmith" (Horde)
 
-UPDATE `gossip_scripts` SET `datalong` = 17451, `comment` = 'Cast Reputation - Armorsmithing' WHERE `id` = 318201;
-UPDATE `gossip_scripts` SET `datalong` = 17452, `comment` = 'Cast Reputation - Weaponsmithing' WHERE `id` = 318202;
+UPDATE `gossip_scripts` SET `datalong` = 17451, `comments` = 'Cast Reputation - Armorsmithing' WHERE `id` = 318201;
+UPDATE `gossip_scripts` SET `datalong` = 17452, `comments` = 'Cast Reputation - Weaponsmithing' WHERE `id` = 318202;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1357, 'Cast Artisan Armorsmith'),
 (318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1357, 'Cast Artisan Weaponsmith');
