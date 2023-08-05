@@ -161,6 +161,21 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3187, 4, 0, 'Krathok, I was once an armorsmith and wish to instead learn the ways of the weaponsmith. Will you train me?', 10897, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11048),
 (3187, 5, 0, 'Krathok, I was once a weaponsmith and wish to instead learn the ways of the armorsmith. Will you train me?', 10898, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11049);
 
+-- Correct Reward spells for quest templates for specialisations
+UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `id` = 5283; -- Armorsmithing (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `id` = 5301; -- Armorsmithing (Horde)
+UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `id` = 5284; -- Weaponsmithing (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `id` = 5302; -- Weaponsmithing (Horde)
+UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `id` = 5143; -- Tribal Leatherworking (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `id` = 5148; -- Tribal Leatherworking (Horde)
+UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `id` = 5144; -- Elemental Leatherworking (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `id` = 5146; -- Elemental Leatherworking (Horde)
+UPDATE `quest_template` SET `RewSpell` = 10656  WHERE `id` = 5141; -- Dragonscale Leatherworking (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 10656  WHERE `id` = 5145; -- Dragonscale Leatherworking (Horde)
+UPDATE `quest_template` SET `RewSpell` = 20222  WHERE `id` = 3639; -- Goblin Engineering
+UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `id` = 3641; -- Gnomish Engineering
+UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `id` = 3639; -- Gnomish Engineering
+
 -- End of migration.
 END IF;
 END??
