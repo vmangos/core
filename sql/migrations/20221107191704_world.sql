@@ -138,7 +138,15 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11047, -2, 11043, 11045, 0, 0, 0), -- Condition to check if the player has completed "The Way of the Weaponsmith" (Both factions)
 -- Note: Condition 1356 corresponds to a condition checking if the player has NOT learnt Armorsmith AND has NOT learnt Weaponsmith
 (11048, -1, 178, 368, 11046, 0, 0), -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously armorsmiths
-(11049, -1, 178, 368, 11047, 0, 0); -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously weaponsmiths
+(11049, -1, 178, 368, 11047, 0, 0), -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously weaponsmiths
+(11050, 8, 5305, 0, 0, 0, 0), -- Condition to check if the player has completed "Sweet Serenity" (Hammersmith sub-specialisation)
+(11051, 8, 5306, 0, 0, 0, 0), -- Condition to check if the player has completed "Snakestone of the Shadow Huntress" (Axesmith sub-specialisation)
+(11052, 8, 5307, 0, 0, 0, 0), -- Condition to check if the player has completed "Corruption" (Swordsmith sub-specialisation)
+(11053, -2, 11050, 11051, 11052, 0, 0), -- Condition to check if the player has completed any of the above quests
+-- Note: Condition 1351 corresponds to a condition checking if the player has a Blacksmithing skill of 250
+-- Note: Condition 1352 corresponds to a condition checking if the player has learnt Artisan Weaponsmith
+-- Note: Condition 1364 corresponds to a condition checking if the player has NOT learnt any of the weaponsmith sub-specialisations
+(11054, -1, 1351, 1352, 1364, 11053, 0); -- Condition for respecialisation for weaponsmith sub-specialisations
 
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
@@ -162,19 +170,19 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3187, 5, 0, 'Krathok, I was once a weaponsmith and wish to instead learn the ways of the armorsmith. Will you train me?', 10898, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11049);
 
 -- Correct Reward spells for quest templates for specialisations
-UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `id` = 5283; -- Armorsmithing (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `id` = 5301; -- Armorsmithing (Horde)
-UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `id` = 5284; -- Weaponsmithing (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `id` = 5302; -- Weaponsmithing (Horde)
-UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `id` = 5143; -- Tribal Leatherworking (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `id` = 5148; -- Tribal Leatherworking (Horde)
-UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `id` = 5144; -- Elemental Leatherworking (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `id` = 5146; -- Elemental Leatherworking (Horde)
-UPDATE `quest_template` SET `RewSpell` = 10656  WHERE `id` = 5141; -- Dragonscale Leatherworking (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 10656  WHERE `id` = 5145; -- Dragonscale Leatherworking (Horde)
-UPDATE `quest_template` SET `RewSpell` = 20222  WHERE `id` = 3639; -- Goblin Engineering
-UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `id` = 3641; -- Gnomish Engineering
-UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `id` = 3639; -- Gnomish Engineering
+UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `entry` = 5283; -- Armorsmithing (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `entry` = 5301; -- Armorsmithing (Horde)
+UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `entry` = 5284; -- Weaponsmithing (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `entry` = 5302; -- Weaponsmithing (Horde)
+UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `entry` = 5143; -- Tribal Leatherworking (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `entry` = 5148; -- Tribal Leatherworking (Horde)
+UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `entry` = 5144; -- Elemental Leatherworking (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `entry` = 5146; -- Elemental Leatherworking (Horde)
+UPDATE `quest_template` SET `RewSpell` = 10656  WHERE `entry` = 5141; -- Dragonscale Leatherworking (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 10656  WHERE `entry` = 5145; -- Dragonscale Leatherworking (Horde)
+UPDATE `quest_template` SET `RewSpell` = 20222  WHERE `entry` = 3639; -- Goblin Engineering
+UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `entry` = 3641; -- Gnomish Engineering (Alliance)
+UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `entry` = 3639; -- Gnomish Engineering (Horde)
 
 -- End of migration.
 END IF;
