@@ -169,11 +169,19 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3187, 4, 0, 'Krathok, I was once an armorsmith and wish to instead learn the ways of the weaponsmith. Will you train me?', 10897, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11048),
 (3187, 5, 0, 'Krathok, I was once a weaponsmith and wish to instead learn the ways of the armorsmith. Will you train me?', 10898, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11049);
 
+-- Update respecialisation gossip for sub-specialisations only for respecialisation
+UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6089 AND `id` = 0;
+UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6090 AND `id` = 0;
+UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6091 AND `id` = 0;
+
 -- Correct Reward spells for quest templates for specialisations
 UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `entry` = 5283; -- Armorsmithing (Alliance)
 UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `entry` = 5301; -- Armorsmithing (Horde)
 UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `entry` = 5284; -- Weaponsmithing (Alliance)
 UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `entry` = 5302; -- Weaponsmithing (Horde)
+UPDATE `quest_template` SET `RewSpell` = 17040, `RewSpellCast` = 17044  WHERE `entry` = 5305; -- Hammersmithing
+UPDATE `quest_template` SET `RewSpell` = 17041, `RewSpellCast` = 17043  WHERE `entry` = 5306; -- Axesmithing
+UPDATE `quest_template` SET `RewSpell` = 17039, `RewSpellCast` = 17042  WHERE `entry` = 5307; -- Swordsmithing
 UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `entry` = 5143; -- Tribal Leatherworking (Alliance)
 UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `entry` = 5148; -- Tribal Leatherworking (Horde)
 UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `entry` = 5144; -- Elemental Leatherworking (Alliance)
