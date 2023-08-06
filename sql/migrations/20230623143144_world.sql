@@ -241,6 +241,10 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=852401;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (852401, 0, 0, 15, 16567, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cursed Mage - Cast Spell Tainted Mind');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Set Southshore Guard Default Movement to Wander
+UPDATE `creature_template` SET `movement_type` = 1 WHERE `entry` = 2386;
+
 
 -- End of migration.
 END IF;
