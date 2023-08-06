@@ -231,6 +231,10 @@ UPDATE `quest_template` SET `CompleteEmote` = 1 WHERE `entry` = 8551 AND `patch`
 DELETE FROM `quest_template` WHERE `entry` = 614 AND `patch` = 7;
 UPDATE `creature_questrelation` SET `patch_max` = 6 WHERE `id` = 2500 AND `quest` = 614;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Incorrect Creatures
+DELETE FROM `creature` WHERE `guid` IN (21707, 21708);
+
 
 -- End of migration.
 END IF;
