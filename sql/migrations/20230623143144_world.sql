@@ -179,14 +179,14 @@ UPDATE `creature_groups` SET `angle` = 3.23 WHERE `member_guid` = 3560;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Script For Quest Frostmaw
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`) VALUES
-(96, 19875, 0, 263.424, -268.076, 145.521, 4.34587, 0, 0, -0.824126, 0.566406, -180, -180, 1, 100),
-(131, 965, 0, 263.262, -267.665, 145.024, 4.57276, 0, 0, -0.754709, 0.656059, -180, -180, 1, 100);
+(2557, 19875, 0, 263.424, -268.076, 145.521, 4.34587, 0, 0, -0.824126, 0.566406, -180, -180, 1, 100),
+(2558, 965, 0, 263.262, -267.665, 145.024, 4.57276, 0, 0, -0.754709, 0.656059, -180, -180, 1, 100);
 
 DELETE FROM `event_scripts` WHERE `id`=727;
 INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (727, 0, 0, 10, 4504, 0, 1, 0, 0, 0, 0, 0, 8, 0, -1, 7, 234.227, -239.227, 141.325, 2.84489, 0, 'Frostmaw: Summon Creature Frostmaw'),
-(727, 0, 0, 9, 96, 180, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw: Respawn GameObject Fresh Lion Carcass'),
-(727, 0, 0, 9, 131, 180, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw: Respawn GameObject Black Smoke - scale 2');
+(727, 0, 0, 9, 2557, 180, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw: Respawn GameObject Fresh Lion Carcass'),
+(727, 0, 0, 9, 2558, 180, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw: Respawn GameObject Black Smoke - scale 2');
 
 DELETE FROM `creature_movement_template` WHERE `entry` = 4504;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
@@ -207,8 +207,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 DELETE FROM `creature_movement_scripts` WHERE `id`=450401;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (450401, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1464, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw - Talk'),
-(450401, 5, 0, 81, 131, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw - Remove Object'),
-(450401, 5, 0, 81, 96, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw - Remove Object');
+(450401, 5, 0, 81, 2558, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw - Remove Object'),
+(450401, 5, 0, 81, 2557, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw - Remove Object');
 
 DELETE FROM `creature_movement_scripts` WHERE `id`=450402;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -216,6 +216,10 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 (450402, 2, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostmaw - Despawn');
 
 UPDATE `creature_template` SET `movement_type` = 2 WHERE `entry` = 4504;
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- All Humanoids Should Swim
+UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `type` = 7 AND `inhabit_type` = 1;
 
 
 -- End of migration.
