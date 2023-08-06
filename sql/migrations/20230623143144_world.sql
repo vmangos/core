@@ -225,6 +225,12 @@ UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `type` = 7 AND `inhabit_
 -- Holy Spring Does Not Require Quest To Loot
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `entry` = 938 AND `item` = 737;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Corrections to The Captain's Chest Patch Progression
+UPDATE `quest_template` SET `CompleteEmote` = 1 WHERE `entry` = 8551 AND `patch`=7;
+DELETE FROM `quest_template` WHERE `entry` = 614 AND `patch` = 7;
+UPDATE `creature_questrelation` SET `patch_max` = 6 WHERE `id` = 2500 AND `quest` = 614;
+
 
 -- End of migration.
 END IF;
