@@ -1441,6 +1441,18 @@ enum ShapeshiftForm
     FORM_SPIRITOFREDEMPTION = 0x20
 };
 
+inline bool IsTankingForm(ShapeshiftForm form)
+{
+    switch (form)
+    {
+        case FORM_BEAR:
+        case FORM_DIREBEAR:
+        case FORM_DEFENSIVESTANCE:
+            return true;
+    }
+    return false;
+}
+
 enum ShapeshiftFlags
 {
     SHAPESHIFT_FLAG_STANCE                  = 0x00000001,   // Form allows various player activities, which normally cause "You can't X while shapeshifted." errors (npc/go interaction, item use, etc)

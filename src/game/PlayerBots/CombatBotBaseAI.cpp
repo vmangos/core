@@ -3144,9 +3144,9 @@ bool CombatBotBaseAI::UseItemEffect(Item* pItem)
     return false;
 }
 
-bool CombatBotBaseAI::IsWearingShield() const
+bool CombatBotBaseAI::IsWearingShield(Player* pPlayer) const
 {
-    Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+    Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
     if (!pItem)
         return false;
 
