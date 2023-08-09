@@ -26,6 +26,7 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
+#include "GridNotifiersImpl.h"
 #include <random>
 
 enum PartyBotSpells
@@ -265,10 +266,51 @@ bool PartyBotAI::ShouldAutoRevive() const
 
 bool PartyBotAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const
 {
-    if (pSpellEntry->IsAreaOfEffectSpell() && !m_marksToCC.empty())
+    if (!CombatBotBaseAI::CanTryToCastSpell(pTarget, pSpellEntry))
         return false;
 
-    return CombatBotBaseAI::CanTryToCastSpell(pTarget, pSpellEntry);
+    if (pSpellEntry->IsAreaOfEffectSpell() && !pSpellEntry->IsPositiveSpell())
+    {
+        if (!m_marksToCC.empty())
+            return false;
+
+        // do not cast aoe if it will pull aggro
+        if (m_role != ROLE_TANK)
+        {
+            float radius;
+            if (pSpellEntry->EffectRadiusIndex[0])
+                radius = Spells::GetSpellRadius(sSpellRadiusStore.LookupEntry(pSpellEntry->EffectRadiusIndex[0]));
+            else if (pSpellEntry->EffectRadiusIndex[1])
+                radius = Spells::GetSpellRadius(sSpellRadiusStore.LookupEntry(pSpellEntry->EffectRadiusIndex[1]));
+            else if (pSpellEntry->EffectRadiusIndex[2])
+                radius = Spells::GetSpellRadius(sSpellRadiusStore.LookupEntry(pSpellEntry->EffectRadiusIndex[2]));
+            else
+                radius = 10.0f;
+
+            std::list<Unit*> targets;
+            MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(pTarget, me, radius);
+            MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+            Cell::VisitAllObjects(pTarget, searcher, radius);
+
+            for (auto const& pEnemy : targets)
+            {
+                if (((pEnemy->GetLevel() + 5) > me->GetLevel()) &&
+                    ((pEnemy->GetHealth() * 4) > me->GetHealth()) &&
+                    pEnemy->GetVictim() && pEnemy->GetVictim() != me &&
+                    pEnemy->IsValidAttackTarget(me) &&
+                    pEnemy->CanHaveThreatList())
+                {
+                    float const myThreat = pEnemy->GetThreatManager().getThreat(me);
+                    float const victimThreat = pEnemy->GetThreatManager().getThreat(pEnemy->GetVictim());
+                    
+                    if (victimThreat < (myThreat + me->GetMaxHealth()))
+                        return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 bool PartyBotAI::CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget) const
