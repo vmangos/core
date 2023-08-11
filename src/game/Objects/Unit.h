@@ -1107,7 +1107,8 @@ class Unit : public SpellCaster
         HostileRefManager const& GetHostileRefManager() const { return m_HostileRefManager; }
 
         // Script Helpers
-        uint8 GetEnemyCountInRadiusAround(Unit* pTarget, float radius) const;
+        uint8 GetEnemyCountInRadiusAround(Unit const* pTarget, float radius) const;
+        void GetEnemyListInRadiusAround(Unit const* pTarget, float radius, std::list<Unit*>& targets) const;
         Unit* SelectNearestTarget(float dist) const;
         Unit* SelectRandomUnfriendlyTarget(Unit* except = nullptr, float radius = ATTACK_DISTANCE, bool inFront = false, bool isValidAttackTarget = false) const;
         Unit* SelectRandomFriendlyTarget(Unit* except = nullptr, float radius = ATTACK_DISTANCE, bool inCombat = false) const;
@@ -1178,6 +1179,7 @@ class Unit : public SpellCaster
         void SetPvP(bool state);
         bool IsPvPContested() const;
         void SetPvPContested(bool state);
+        bool CanAttackWithoutEnablingPvP(Unit const* pTarget) const;
 
         void SetTargetGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_TARGET, targetGuid); }
         ObjectGuid const& GetTargetGuid() const { return GetGuidValue(UNIT_FIELD_TARGET); }

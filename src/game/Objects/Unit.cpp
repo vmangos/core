@@ -9273,13 +9273,20 @@ void Unit::UpdateReactives(uint32 p_time)
     }
 }
 
-uint8 Unit::GetEnemyCountInRadiusAround(Unit* pTarget, float radius) const
+uint8 Unit::GetEnemyCountInRadiusAround(Unit const* pTarget, float radius) const
 {
     std::list<Unit*> targets;
     MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(pTarget, this, radius);
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
     Cell::VisitAllObjects(pTarget, searcher, radius);
     return targets.size();
+}
+
+void Unit::GetEnemyListInRadiusAround(Unit const* pTarget, float radius, std::list<Unit*>& targets) const
+{
+    MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(pTarget, this, radius);
+    MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+    Cell::VisitAllObjects(pTarget, searcher, radius);
 }
 
 Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= nullptr*/, float radius /*= ATTACK_DISTANCE*/, bool inFront /*= false*/, bool isValidAttackTarget /*= false*/) const
@@ -9751,6 +9758,16 @@ void Unit::SetPvPContested(bool state)
         else
             RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
     }
+}
+
+bool Unit::CanAttackWithoutEnablingPvP(Unit const* pTarget) const
+{
+    if (Player* attackedPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (Player* casterPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+            if (!casterPlayer->IsPvP() && !(casterPlayer->IsFFAPvP() && attackedPlayer->IsFFAPvP()) && !casterPlayer->IsInDuelWith(attackedPlayer))
+                return false;
+
+    return true;
 }
 
 struct StopAttackFactionHelper

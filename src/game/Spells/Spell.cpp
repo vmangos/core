@@ -8603,10 +8603,8 @@ public:
                             continue;
 
                         // Negative AoE from non flagged players cannot target other players
-                        if (Player* attackedPlayer = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
-                            if (Player* casterPlayer = casterUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
-                                if (!casterPlayer->IsPvP() && !(casterPlayer->IsFFAPvP() && attackedPlayer->IsFFAPvP()) && !casterPlayer->IsInDuelWith(attackedPlayer))
-                                    continue;
+                        if (!casterUnit->CanAttackWithoutEnablingPvP(unit))
+                            continue;
                     }
                     else if (GameObject* gobj = i_originalCaster->ToGameObject())
                     {
