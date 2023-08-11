@@ -126,8 +126,8 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3073 AN
 DELETE FROM `conditions` WHERE `condition_entry` = 1357;
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
-(11040, 30, 46, 5999, 0, 0, 0), -- Condition to check if the player has less than 6000 Armorsmithing reputation
-(11041, 30, 289, 5999, 0, 0, 0), -- Condition to check if the player has less than 6000 Weaponsmithing reputation
+(11040, 30, 46, 4, 0, 0, 0), -- Condition to check if the player has less than 6000 Armorsmithing reputation
+(11041, 30, 289, 4, 0, 0, 0), -- Condition to check if the player has less than 6000 Weaponsmithing reputation
 -- Note: Condition 178 corresponds to a condition checking if the player is level 40 or higher
 -- Note: Condition 368 corresponds to a condition checking if the player has a Blacksmithing skill of 200
 (11042, 8, 5283, 0, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Alliance)
