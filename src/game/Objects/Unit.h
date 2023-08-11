@@ -1178,6 +1178,7 @@ class Unit : public SpellCaster
         void SetPvP(bool state);
         bool IsPvPContested() const;
         void SetPvPContested(bool state);
+        bool CanAttackWithoutEnablingPvP(Unit* pTarget) const;
 
         void SetTargetGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_TARGET, targetGuid); }
         ObjectGuid const& GetTargetGuid() const { return GetGuidValue(UNIT_FIELD_TARGET); }

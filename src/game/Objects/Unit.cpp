@@ -9753,6 +9753,16 @@ void Unit::SetPvPContested(bool state)
     }
 }
 
+bool Unit::CanAttackWithoutEnablingPvP(Unit* pTarget) const
+{
+    if (Player* attackedPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (Player* casterPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+            if (!casterPlayer->IsPvP() && !(casterPlayer->IsFFAPvP() && attackedPlayer->IsFFAPvP()) && !casterPlayer->IsInDuelWith(attackedPlayer))
+                return false;
+
+    return true;
+}
+
 struct StopAttackFactionHelper
 {
     explicit StopAttackFactionHelper(uint32 _faction_id) : faction_id(_faction_id) {}
