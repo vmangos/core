@@ -147,8 +147,8 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Note: Condition 1352 corresponds to a condition checking if the player has learnt Artisan Weaponsmith
 -- Note: Condition 1364 corresponds to a condition checking if the player has NOT learnt any of the weaponsmith sub-specialisations
 (11054, -1, 1351, 1352, 1364, 11053, 0), -- Condition for respecialisation for weaponsmith sub-specialisations
-(11055, -1, 178, 368, 11040, 11041, 0); -- Condition for first specialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde)
-(11056, -2, 11048, 11049, 0, 0, 0), -- Condition to check if the player meets requirements for respecialisation
+(11055, -1, 178, 368, 11040, 11041, 0), -- Condition for first specialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde)
+(11056, -2, 11048, 11049, 0, 0, 0); -- Condition to check if the player meets requirements for respecialisation
 
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
