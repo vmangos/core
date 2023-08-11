@@ -183,6 +183,9 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3187, 5, 0, 'Krathok, I was once a weaponsmith and wish to instead learn the ways of the armorsmith. Will you train me?', 10898, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11049);
 
 -- Update first specialisation gossip and scripts to new condition and new scripts
+UPDATE `gossip_menu` SET `condition_id` = 11055 WHERE `entry` = 3187 AND `text_id` = 3953;
+UPDATE `gossip_menu` SET `condition_id` = 11055 WHERE `entry` = 3182 AND `text_id` = 3938;
+UPDATE `gossip_menu` SET `condition_id` = 11055 WHERE `entry` = 597 AND `text_id` = 1136;
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318205 WHERE `menu_id` = 3182 AND `id` = 0; -- Armorsmith Alliance
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318206 WHERE `menu_id` = 3182 AND `id` = 1; -- Weaponsmith Alliance
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318201 WHERE `menu_id` = 3187 AND `id` = 0; -- Armorsmith Horde
