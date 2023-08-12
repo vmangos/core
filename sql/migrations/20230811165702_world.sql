@@ -48,11 +48,13 @@ UPDATE `gameobject` SET `position_x` = 581.241, `position_y` = 524.321, `positio
 -- Add Scripts
 UPDATE `quest_template` SET `CompleteScript` = 5525 WHERE `entry` = 7429;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(5525, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Emote'),
+(5525, 0, 0, 9, 396410, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Respawn'),
+(5525, 0, 0, 81, 396421, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Despawn Object'),
 (5525, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9346, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Talk'),
 (5525, 0, 0, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Modify Flags'),
-(5525, 0, 0, 81, 396421, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Despawn Object'),
-(5525, 0, 0, 9, 396410, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Respawn');
+(5525, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Emote'),
+(5525, 6, 0, 3, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 500.42, 540.966, -25.3846, 2.72271, 0, 'Free Knot!: Knot Thimblejack - Move'),
+(5525, 15, 0, 18, 0, 7200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Free Knot!: Knot Thimblejack - Despawn');
 
 
 -- End of migration.
