@@ -158,13 +158,11 @@ UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue`
 DELETE FROM `gossip_scripts` WHERE `id`=318201;
 DELETE FROM `gossip_scripts` WHERE `id`=318202;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(318201, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Art of the Armorsmith (Horde) - Cast Reputation - Armorsmithing'),
-(318201, 0, 1, 1, 30, 0, 0, 0, 11177, 0, 9, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Turn'),
-(318201, 3, 3, 1, 29, 0, 0, 0, 11177, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Point'),
-(318201, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6491, 0, 0, 0, 0, 0, 0, 0, 0, 'The Art of the Armorsmith (Horde) NPC Chat'),
-(318202, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Way of the Weaponsmith (Horde) - Cast Reputation - Weaponsmithing'),
-(318202, 0, 1, 1, 30, 0, 0, 0, 11178, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Horde) NPC Turn'),
-(318202, 3, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 0, 0, 'The Way of the Weaponsmith (Horde) NPC Chat'),
+(318201, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 93.99607, 11056, 'The Art of the Armorsmith (Horde) - Cast Reputation - Armorsmithing'),
+(318201, 3, 2, 1, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 93.99607, 0, 'The Art of the Armorsmith (Horde) NPC Point'),
+(318201, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6491, 0, 0, 0, 0, 0, 0, 93.99607, 0, 'The Art of the Armorsmith (Horde) NPC Chat'),
+(318202, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94.64184, 11056, 'The Way of the Weaponsmith (Horde) - Cast Reputation - Weaponsmithing'),
+(318202, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 94.64184, 0, 'The Way of the Weaponsmith (Horde) NPC Chat'),
 (318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Armorsmith'),
 (318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Weaponsmith'),
 (318205, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'The Art of the Armorsmith (Alliance) - Cast Reputation - Armorsmithing'),
