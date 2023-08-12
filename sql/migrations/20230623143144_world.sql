@@ -253,6 +253,10 @@ UPDATE `creature` SET `position_x`= -33.3555, `position_y`= -927.892, `position_
 -- Add Roland Geardabbler Aura
 UPDATE `creature_template` SET `auras` = '12508' WHERE `entry`=8394 AND `patch`=0;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Mai'Zoth Aura
+UPDATE `creature_template` SET `auras` = '12544' WHERE `entry`=818 AND `patch`=0;
+
 
 -- End of migration.
 END IF;
