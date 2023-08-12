@@ -269,6 +269,10 @@ INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `descripti
 -- Correct Patch Min
 UPDATE `pool_template` SET `patch_min`= 0 WHERE  `entry` IN (21603, 21604);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Creatures Should Wander
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` IN (6782, 6784, 6787, 6790, 6797, 6794);
+
 
 -- End of migration.
 END IF;
