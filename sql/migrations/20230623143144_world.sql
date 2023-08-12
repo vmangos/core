@@ -261,9 +261,9 @@ UPDATE `creature_template` SET `auras` = '12544' WHERE `entry`=818 AND `patch`=0
 -- Pool Alien Egg
 UPDATE `gameobject` SET `spawntimesecsmin` = 10, `spawntimesecsmax` = 10 WHERE `id` = 175565;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(252, 1, 'Thousand Needles - Alien Egg', 0, 10);
+(264, 1, 'Thousand Needles - Alien Egg', 0, 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(175565, 252, 0, 'Thousand Needles - Alien Egg', 0, 10);
+(175565, 264, 0, 'Thousand Needles - Alien Egg', 0, 10);
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct Patch Min
