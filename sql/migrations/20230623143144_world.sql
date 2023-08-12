@@ -247,9 +247,13 @@ UPDATE `creature_template` SET `movement_type` = 1 WHERE `entry` = 2386;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct High Executor Darthalia Spawn Position
-UPDATE `creature` SET `position_x`=-33.3555, `position_y`=-927.892, `position_z`=54.5261, `orientation`=1.54421 WHERE `guid` = 15542
+UPDATE `creature` SET `position_x`= -33.3555, `position_y`= -927.892, `position_z`= 54.5261, `orientation`= 1.54421 WHERE `guid` = 15542;
 
-  
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Roland Geardabbler Aura
+UPDATE `creature_template` SET `auras` = '12508' WHERE `entry`=8394 AND `patch`=0;
+
+
 -- End of migration.
 END IF;
 END??
