@@ -245,7 +245,11 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 -- Set Southshore Guard Default Movement to Wander
 UPDATE `creature_template` SET `movement_type` = 1 WHERE `entry` = 2386;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct High Executor Darthalia Spawn Position
+UPDATE `creature` SET `position_x`=-33.3555, `position_y`=-927.892, `position_z`=54.5261, `orientation`=1.54421 WHERE `guid` = 15542
 
+  
 -- End of migration.
 END IF;
 END??
