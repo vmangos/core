@@ -910,7 +910,7 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -20 WHERE `entry`=32
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct Quest Complete Text For Dawn's Gambit (credit cmangos)
-UPDATE `quest_template` SET `OfferRewardText` = 'You did it! Vectus is defeated! And Dawn\\'s Gambit... did it work?$B$BHm... maybe my device wasn\'t the success I had hoped, but I\'m glad you were able to handle things anyway. Well done, $N!$B$BThe Argent Dawn, and the good people of Azeroth, are in your debt.' WHERE  `entry` = 4771;
+UPDATE `quest_template` SET `OfferRewardText` = "You did it! Vectus is defeated! And Dawn's Gambit... did it work?$B$BHm... maybe my device wasn't the success I had hoped, but I'm glad you were able to handle things anyway. Well done, $N!$B$BThe Argent Dawn, and the good people of Azeroth, are in your debt." WHERE  `entry` = 4771;
 
 
 -- End of migration.
