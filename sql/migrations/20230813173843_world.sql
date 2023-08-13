@@ -8,8 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20230813173843');
 -- Add your query below.
 
-INSERT INTO `warden_scans` (`id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `build_min`, `build_max`, `comment`) VALUES (97, 4, 'World\\KhazModan\\Blackrock\\PassiveDoodads\\Doors\\BlackRockDoorSingle.m2', NULL, 0, 0, '2A43947CA91F92B6698A5286A7B883EFF967D6B4', 0, -1, 4297, 6005, 'UBRS door');
-INSERT INTO `warden_scans` (`id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `build_min`, `build_max`, `comment`) VALUES (98, 4, 'World\\KhazModan\\Blackrock\\PassiveDoodads\\Doors\\BlackRockDoorSingle.m2', NULL, 0, 0, '316585218E8E5EEE32A46CEEB77A489AF410A69C', 0, -1, 6141, 6141, 'UBRS door');
+INSERT INTO `warden_scans` (`id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `build_min`, `build_max`, `comment`) VALUES (97, 4, 'World\\KhazModan\\Blackrock\\PassiveDoodads\\Doors\\BlackRockDoorSingle.m2', NULL, 0, 0, '2A43947CA91F92B6698A5286A7B883EFF967D6B4', 0, -1, 4297, 6141, 'UBRS door');
 
 -- End of migration.
 END IF;
