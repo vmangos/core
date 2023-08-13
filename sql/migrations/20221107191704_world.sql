@@ -158,21 +158,27 @@ UPDATE `quest_template` SET `RequiredMinRepFaction` = 289, `RequiredMinRepValue`
 DELETE FROM `gossip_scripts` WHERE `id`=318201;
 DELETE FROM `gossip_scripts` WHERE `id`=318202;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(318201, 0, 0, 35, 0, 0, 0, 0, 11177, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Krathok Moltenfist - Set Orientation (Armorsmithing)'),
-(318201, 0, 1, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11055, 'Krathok Moltenfist - Cast Reputation - Armorsmithing'),
+(318201, 0, 1, 35, 0, 0, 0, 0, 11177, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Krathok Moltenfist - Set Orientation (Armorsmithing)'),
+(318201, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11055, 'Krathok Moltenfist - Cast Reputation - Armorsmithing'),
 (318201, 3, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Krathok Moltenfist - Emote (Armorsmithing)'),
 (318201, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6491, 0, 0, 0, 0, 0, 0, 0, 0, 'Krathok Moltenfist - Talk (Armorsmithing)'),
 (318201, 6, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.95157, 0, 'Krathok Moltenfist - Set Orientation'),
-(318202, 0, 0, 35, 0, 0, 0, 0, 11178, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Krathok Moltenfist - Set Orientation (Weaponsmithing)'),
-(318202, 0, 1, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94.6418, 11055, 'Krathok Moltenfist - Cast Reputation - Weaponsmithing'),
-(318202, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 94.6418, 0, 'Krathok Moltenfist - Talk (Weaponsmithing)'),
+(318202, 0, 1, 35, 0, 0, 0, 0, 11178, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Krathok Moltenfist - Set Orientation (Weaponsmithing)'),
+(318202, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11055, 'Krathok Moltenfist - Cast Reputation - Weaponsmithing'),
+(318202, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 0, 0, 'Krathok Moltenfist - Talk (Weaponsmithing)'),
 (318202, 6, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.95157, 0, 'Krathok Moltenfist - Set Orientation'),
 (318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Armorsmith'),
 (318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Weaponsmith'),
 (318205, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11055, 'Myolor Sunderfury - Cast Reputation - Armorsmithing'),
+(318205, 0, 1, 35, 0, 0, 0, 0, 5164, 20, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Myolor Sunderfury - Set Orientation (Armorsmithing)'),
 (318205, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6487, 0, 0, 0, 0, 0, 0, 0, 0, 'Myolor Sunderfury - Talk (Armorsmithing)'),
-(318206, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11055, 'The Way of the Weaponsmith (Alliance) - Cast Reputation - Weaponsmithing'),
-(318206, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6486, 0, 0, 0, 0, 0, 0, 0, 0, 'Myolor Sunderfury - Talk (Weaponsmithing)');
+(318205, 3, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Myolor Sunderfury - Emote (Armorsmithing)'),
+(318205, 6, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.48033, 0, 'Myolor Sunderfury - Set Orientation'),
+(318206, 0, 0, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11055, 'Myolor Sunderfury - Cast Reputation - Weaponsmithing'),
+(318206, 0, 1, 35, 0, 0, 0, 0, 11146, 20, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Myolor Sunderfury - Set Orientation (Weaponsmithing)'),
+(318206, 3, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Myolor Sunderfury - Emote (Weaponsmithing)'),
+(318206, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6486, 0, 0, 0, 0, 0, 0, 0, 0, 'Myolor Sunderfury - Talk (Weaponsmithing)'),
+(318206, 6, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.48033, 0, 'Myolor Sunderfury - Set Orientation');
 
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 (3182, 2, 0, 'Myolor, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8892, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11048),
