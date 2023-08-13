@@ -519,90 +519,6 @@ UnitMoveType MovementAnticheat::GetMoveTypeForMovementInfo(MovementInfo const& m
     return type;
 }
 
-
-bool IsAnyMoveAckOpcode(uint16 opcode)
-{
-    switch (opcode)
-    {
-        case MSG_MOVE_TELEPORT_ACK:
-        case MSG_MOVE_WORLDPORT_ACK:
-        case MSG_MOVE_SET_RAW_POSITION_ACK:
-        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_MOVE_ROOT_ACK:
-        case CMSG_FORCE_MOVE_UNROOT_ACK:
-        case CMSG_MOVE_KNOCK_BACK_ACK:
-        case CMSG_MOVE_HOVER_ACK:
-        case CMSG_MOVE_FEATHER_FALL_ACK:
-        case CMSG_MOVE_WATER_WALK_ACK:
-        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
-            return true;
-    }
-
-    return false;
-}
-
-bool IsFlagAckOpcode(uint16 opcode)
-{
-    switch (opcode)
-    {
-        case CMSG_FORCE_MOVE_ROOT_ACK:
-        case CMSG_FORCE_MOVE_UNROOT_ACK:
-        case CMSG_MOVE_WATER_WALK_ACK:
-        case CMSG_MOVE_HOVER_ACK:
-        case CMSG_MOVE_FEATHER_FALL_ACK:
-            return true;
-    }
-
-    return false;
-}
-
-bool IsSpeedAckOpcode(uint16 opcode)
-{
-    switch (opcode)
-    {
-        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
-        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
-            return true;
-    }
-
-    return false;
-}
-
-bool IsStopOpcode(uint16 opcode)
-{
-    switch (opcode)
-    {
-        case MSG_MOVE_STOP:
-        case MSG_MOVE_STOP_STRAFE:
-        case MSG_MOVE_STOP_TURN:
-        case MSG_MOVE_STOP_PITCH:
-        case MSG_MOVE_STOP_SWIM:
-            return true;
-    }
-
-    return false;
-}
-
-bool IsFallEndOpcode(uint16 opcode)
-{
-    switch (opcode)
-    {
-        case MSG_MOVE_FALL_LAND:
-        case MSG_MOVE_START_SWIM:
-            return true;
-    }
-
-    return false;
-}
-
 bool ShouldRejectMovement(uint32 cheatFlags)
 {
     if ((cheatFlags & (1 << CHEAT_TYPE_OVERSPEED_JUMP)) &&
@@ -822,7 +738,7 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
     if ((currentMoveFlags & MOVEFLAG_ROOT) &&
         !(GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT) &&
         !me->HasPendingMovementChange(ROOT) &&
-        !me->HasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) &&
+        !me->HasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_ROOT_ON_LANDING) &&
         (opcode != CMSG_FORCE_MOVE_ROOT_ACK))
     {
         APPEND_CHEAT(CHEAT_TYPE_SELF_ROOT);
@@ -1373,8 +1289,6 @@ void MovementAnticheat::CheckBotting(uint16 opcode, MovementInfo const& movement
 bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED) ||
-        me->GetPositionX() == 0.0f || me->GetPositionY() == 0.0f || me->GetPositionZ() == 0.0f ||
-        movementInfo.GetPos().x == 0.0f || movementInfo.GetPos().y == 0.0f || movementInfo.GetPos().z == 0.0f ||
         me->IsLaunched() || me->IsTaxiFlying() || me->IsBeingTeleported())
         return false;
 
@@ -1394,8 +1308,10 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
         if (distance2d > 1.0f)
             return true;
 
-        if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR) &&
-            !movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+        // swimming flag only included in check because of 1.14
+        // vanilla clients do not have a descend/ascend flag
+        if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING) &&
+            !movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING))
         {
             float const distanceZ = movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ?
                 std::abs(GetLastMovementInfo().t_pos.z - movementInfo.t_pos.z) :

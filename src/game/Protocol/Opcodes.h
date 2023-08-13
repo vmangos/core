@@ -41,6 +41,89 @@
 #include "Opcodes_1_8_0.h"
 #endif
 
+inline bool IsAnyMoveAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case MSG_MOVE_TELEPORT_ACK:
+        case MSG_MOVE_WORLDPORT_ACK:
+        case MSG_MOVE_SET_RAW_POSITION_ACK:
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_MOVE_ROOT_ACK:
+        case CMSG_FORCE_MOVE_UNROOT_ACK:
+        case CMSG_MOVE_KNOCK_BACK_ACK:
+        case CMSG_MOVE_HOVER_ACK:
+        case CMSG_MOVE_FEATHER_FALL_ACK:
+        case CMSG_MOVE_WATER_WALK_ACK:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+            return true;
+    }
+
+    return false;
+}
+
+inline bool IsFlagAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case CMSG_FORCE_MOVE_ROOT_ACK:
+        case CMSG_FORCE_MOVE_UNROOT_ACK:
+        case CMSG_MOVE_WATER_WALK_ACK:
+        case CMSG_MOVE_HOVER_ACK:
+        case CMSG_MOVE_FEATHER_FALL_ACK:
+            return true;
+    }
+
+    return false;
+}
+
+inline bool IsSpeedAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+            return true;
+    }
+
+    return false;
+}
+
+inline bool IsStopOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case MSG_MOVE_STOP:
+        case MSG_MOVE_STOP_STRAFE:
+        case MSG_MOVE_STOP_TURN:
+        case MSG_MOVE_STOP_PITCH:
+        case MSG_MOVE_STOP_SWIM:
+            return true;
+    }
+
+    return false;
+}
+
+inline bool IsFallEndOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case MSG_MOVE_FALL_LAND:
+        case MSG_MOVE_START_SWIM:
+            return true;
+    }
+
+    return false;
+}
+
 // Player state
 enum SessionStatus
 {

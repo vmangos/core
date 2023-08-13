@@ -1776,6 +1776,12 @@ void Player::OnDisconnected()
             }, 1);
         }
 
+        if (HasUnitState(UNIT_STAT_ROOT_ON_LANDING))
+        {
+            SetRootedReal(ShouldBeRooted());
+            ClearUnitState(UNIT_STAT_ROOT_ON_LANDING);
+        }
+
         // Update position after bot takes over
         // And remove movement flags, so he doesn't run into the void
         if (!GetMover()->HasUnitState(UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED | UNIT_STAT_TAXI_FLIGHT))

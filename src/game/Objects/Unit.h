@@ -1301,6 +1301,7 @@ class Unit : public SpellCaster
         void SetRooted(bool apply);
         void SetRootedReal(bool apply);
         bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
+        bool ShouldBeRooted() const { return GetDeathState() == CORPSE || HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT); }
 
         void SetWaterWalking(bool apply);
         void SetWaterWalkingReal(bool apply);

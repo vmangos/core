@@ -6825,12 +6825,14 @@ Player* Unit::GetPlayerMovingMe()
 
 bool Unit::IsMovedByPlayer() const
 {
+    if (!movespline->Finalized())
+        return false;
+
     if (Player* pPossessor = GetPossessor())
         if (pPossessor->GetCharmGuid() == GetObjectGuid())
             return true;
 
     return IsPlayer() &&
-           movespline->Finalized() &&
            static_cast<Player const*>(this)->IsControlledByOwnClient() &&
            !static_cast<Player const*>(this)->IsBot();
 }
@@ -7062,7 +7064,8 @@ void Unit::SetSpeedRateReal(UnitMoveType mtype, float rate)
 void Unit::SetRooted(bool apply)
 {
     // do nothing if the unit is already in the required state
-    if (apply == HasUnitMovementFlag(MOVEFLAG_ROOT) && !HasPendingMovementChange(ROOT))
+    if (apply == (HasUnitMovementFlag(MOVEFLAG_ROOT) || HasUnitState(UNIT_STAT_ROOT_ON_LANDING)) &&
+        !HasPendingMovementChange(ROOT))
         return;
 
     if (apply)
@@ -8871,8 +8874,11 @@ void Unit::StopMoving(bool force)
     if (!force && movespline->IsUninterruptible())
         return;
 
-    ClearUnitState(UNIT_STAT_MOVING);
-    RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING);
+    if (!IsMovedByPlayer() || !IsInWorld() || force)
+    {
+        ClearUnitState(UNIT_STAT_MOVING);
+        RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING);
+    }
 
     // not need send any packets if not in world
     if (!IsInWorld())
@@ -8885,9 +8891,9 @@ void Unit::StopMoving(bool force)
             init.SetTransport(t->GetGUIDLow());
         init.SetStop(); // Will trigger CMSG_MOVE_SPLINE_DONE from client.
         init.Launch();
-    }
 
-    DisableSpline();
+        DisableSpline();
+    }
 }
 
 void Unit::SetFleeing(bool apply, ObjectGuid casterGuid, uint32 spellId, uint32 time)

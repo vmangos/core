@@ -408,19 +408,20 @@ enum UnitState
     // MMAPS
     UNIT_STAT_IGNORE_PATHFINDING    = 0x00080000,               // do not use pathfinding in any MovementGenerator
 
-    UNIT_STAT_PENDING_ROOT          = 0x00100000,
-    UNIT_STAT_PENDING_STUNNED       = 0x00200000,
-    UNIT_STAT_FLYING_ALLOWED        = 0x00400000,               // has gm fly mode enabled
+    UNIT_STAT_PENDING_ROOT          = 0x00100000,               // apply root on finishing charge
+    UNIT_STAT_PENDING_STUNNED       = 0x00200000,               // apply stun on finishing charge
+    UNIT_STAT_ROOT_ON_LANDING       = 0x00400000,               // used to verify modern client behavior on root while falling
+    UNIT_STAT_FLYING_ALLOWED        = 0x00800000,               // has gm fly mode enabled
 
     // High-level states
-    UNIT_STAT_RUNNING            = 0x00800000,
+    UNIT_STAT_RUNNING            = 0x01000000,
 
-    UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x01000000, // allow movement with incomplete or partial paths
-    UNIT_STAT_ALLOW_LOS_ATTACK      = 0x02000000, // allow melee attacks without LoS
+    UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x02000000, // allow movement with incomplete or partial paths
+    UNIT_STAT_ALLOW_LOS_ATTACK      = 0x04000000, // allow melee attacks without LoS
 
-    UNIT_STAT_NO_SEARCH_FOR_OTHERS   = 0x04000000, // MoveInLineOfSight will not be called
-    UNIT_STAT_NO_BROADCAST_TO_OTHERS = 0x08000000, // ScheduleAINotify will not be called
-    UNIT_STAT_AI_USES_MOVE_IN_LOS    = 0x10000000, // AI overrides MoveInLineOfSight so always search for others
+    UNIT_STAT_NO_SEARCH_FOR_OTHERS   = 0x08000000, // MoveInLineOfSight will not be called
+    UNIT_STAT_NO_BROADCAST_TO_OTHERS = 0x10000000, // ScheduleAINotify will not be called
+    UNIT_STAT_AI_USES_MOVE_IN_LOS    = 0x20000000, // AI overrides MoveInLineOfSight so always search for others
 
     // masks (only for check)
 
@@ -501,6 +502,8 @@ static char const* UnitStateToString(uint32 state)
             return "Pending Root";
         case UNIT_STAT_PENDING_STUNNED:
             return "Pending Stunned";
+        case UNIT_STAT_ROOT_ON_LANDING:
+            return "Root on Landing";
         case UNIT_STAT_FLYING_ALLOWED:
             return "Flying Allowed";
         case UNIT_STAT_RUNNING:
