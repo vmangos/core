@@ -137,8 +137,8 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11046, -2, 11042, 11044, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Both factions)
 (11047, -2, 11043, 11045, 0, 0, 0), -- Condition to check if the player has completed "The Way of the Weaponsmith" (Both factions)
 -- Note: Condition 1356 corresponds to a condition checking if the player has NOT learnt Armorsmith AND has NOT learnt Weaponsmith
-(11048, -1, 178, 368, 11046, 0, 0), -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously armorsmiths
-(11049, -1, 178, 368, 11047, 0, 0), -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously weaponsmiths
+(11048, -1, 178, 368, 1356, 11046, 0), -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously armorsmiths
+(11049, -1, 178, 368, 1356, 11047, 0), -- Condition for respecialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for players who were previously weaponsmiths
 (11050, 8, 5305, 0, 0, 0, 0), -- Condition to check if the player has completed "Sweet Serenity" (Hammersmith sub-specialisation)
 (11051, 8, 5306, 0, 0, 0, 0), -- Condition to check if the player has completed "Snakestone of the Shadow Huntress" (Axesmith sub-specialisation)
 (11052, 8, 5307, 0, 0, 0, 0), -- Condition to check if the player has completed "Corruption" (Swordsmith sub-specialisation)
