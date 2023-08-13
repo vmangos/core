@@ -390,6 +390,20 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 -- Purify
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (1152, 8, 0, 0);
 
+-- Seal of Command R1
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20375, 20, 0, 0);
+-- Seal of Command R2
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20915, 30, 0, 0);
+-- Seal of Command R3
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20918, 40, 0, 0);
+-- Seal of Command R4
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20919, 50 0, 0);
+-- Seal of Command R5
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20920, 60, 0, 0);
+
+-- Repentance
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20066, 40, 0, 0);
+
 -- Ghost Wolf
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (2645, 20, 0, 0);
 
