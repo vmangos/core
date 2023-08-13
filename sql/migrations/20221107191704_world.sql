@@ -166,7 +166,7 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (318202, 0, 0, 35, 0, 0, 0, 0, 11178, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Krathok Moltenfist - Set Orientation (Weaponsmithing)'),
 (318202, 0, 1, 15, 17452, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94.6418, 11055, 'Krathok Moltenfist - Cast Reputation - Weaponsmithing'),
 (318202, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6490, 0, 0, 0, 0, 0, 0, 94.6418, 0, 'Krathok Moltenfist - Talk (Weaponsmithing)'),
-(318202, 6, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.95157, 0, 'Krathok Moltenfist - Set Orientation');
+(318202, 6, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.95157, 0, 'Krathok Moltenfist - Set Orientation'),
 (318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Armorsmith'),
 (318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11056, 'Cast Artisan Weaponsmith'),
 (318205, 0, 0, 15, 17451, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11055, 'Myolor Sunderfury - Cast Reputation - Armorsmithing'),
