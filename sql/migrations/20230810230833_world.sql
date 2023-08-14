@@ -96,11 +96,11 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (976, 30, 0, 0);
 -- Shadow Protection R2
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (10957, 42, 0, 0);
--- Shadow Protection R3´
+-- Shadow Protection R3Â´
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (10958, 56, 0, 0);
 
 -- Prayer of Shadow Protection
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (27683, 56, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (27683, 56, 0, 0, 5302);
 
 -- Power Word: Fortitude R1
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (1243, 1, 0, 0);
@@ -152,9 +152,9 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 -- Polymorph R4
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (12826, 120, 0, 0);
 -- Polymorph Pig
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28272, 120, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (28272, 120, 0, 0, 5464);
 -- Polymorph Turtle
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28271, 120, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (28271, 120, 0, 0, 5464);
 
 -- Frost Armor R1
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (168, 1, 0, 0);
@@ -175,7 +175,7 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (10157, 56, 0, 0);
 
 -- Arcane Brilliance R1
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (23028, 56, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (23028, 56, 0, 0, 4375);
 
 -- Amplify Magic R1
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (1008, 18, 0, 0);
@@ -217,11 +217,11 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (10174, 60, 0, 0);
 
 -- Mage Armor R1
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (6117, 34, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (6117, 34, 0, 0, 4297);
 -- Mage Armor R2
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (22782, 46, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (22782, 46, 0, 0, 4297);
 -- Mage Armor R3
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (22783, 58, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (22783, 58, 0, 0, 4297);
 
 -- Ice Barrier has same threat for all ranks
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (11426, 53.5, 0, 0);
@@ -256,7 +256,7 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 -- Frost Ward R4
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (10177, 52, 0, 0);
 -- Frost Ward R5
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28609, 60, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (28609, 60, 0, 0, 5464);
 
 -- Frost Ward R1
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (543, 20, 0, 0);
@@ -410,7 +410,7 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 -- Seal of Command R3
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20918, 40, 0, 0);
 -- Seal of Command R4
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20919, 50 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20919, 50, 0, 0);
 -- Seal of Command R5
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (20920, 60, 0, 0);
 
@@ -524,7 +524,7 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 -- Shadow Ward R3
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (11740, 52, 0, 0);
 -- Shadow Ward R4
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28610, 60, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (28610, 60, 0, 0, 5464);
 
 -- Eye of Kilrogg
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (126, 22, 0, 0);
@@ -535,7 +535,7 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (18647, 96, 0, 0);
 
 -- Barkskin
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (22812, 44, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (22812, 44, 0, 0, 4297);
 
 -- Correct Faerie Fire R1
 UPDATE `spell_threat` SET `Threat` = 36, `multiplier` = 0 WHERE `entry` = 770;
@@ -602,7 +602,7 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (9885, 60, 0, 0);
 
 -- Innervate
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (29166, 40, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`) VALUES (29166, 40, 0, 0, 5464);
 
 
 -- End of migration.
