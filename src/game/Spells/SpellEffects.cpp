@@ -1845,9 +1845,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         case 19266:
                             spellId = 19254;
                             break; // Rank 6
-                        case 25461:
-                            spellId = 25460;
-                            break; // Rank 7
                         default:
                             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectDummy: Spell 28598 triggered by unhandeled spell %u", m_triggeredByAuraSpell->Id);
                             return;
