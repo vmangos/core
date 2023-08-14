@@ -120,6 +120,19 @@ INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES 
 -- Prayer of Fortitude R2
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (21564, 60, 0, 0);
 
+-- Hex of Weakness R1 
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (9035, 20, 0, 0);
+-- Hex of Weakness R2
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (19281, 40, 0, 0);
+-- Hex of Weakness R3
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (19282, 60, 0, 0);
+-- Hex of Weakness R4
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (19283, 80, 0, 0);
+-- Hex of Weakness R5
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (19284, 100, 0, 0);
+-- Hex of Weakness R6
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (19285, 120, 0, 0);
+
 -- Blind
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (2094, 68, 0, 0);
 
