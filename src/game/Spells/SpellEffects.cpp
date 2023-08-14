@@ -1162,15 +1162,26 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    // Need remove self if Lightning Shield not active
-                    Unit::SpellAuraHolderMap const& auras = unitTarget->GetSpellAuraHolderMap();
-                    for (const auto& aura : auras)
+                    if (!m_triggeredBySpellInfo)
+                        return;
+
+                    switch (m_triggeredBySpellInfo->Id)
                     {
-                        SpellEntry const* spell = aura.second->GetSpellProto();
-                        if (spell->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_LIGHTNING_SHIELD>())
-                            return;
+                        case 28820: // Shaman T3 8-Piece Bonus
+                        {
+                            // Need remove self if Lightning Shield not active
+                            Unit::SpellAuraHolderMap const& auras = unitTarget->GetSpellAuraHolderMap();
+                            for (const auto& aura : auras)
+                            {
+                                SpellEntry const* spell = aura.second->GetSpellProto();
+                                if (spell->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_LIGHTNING_SHIELD>())
+                                    return;
+                            }
+                            unitTarget->RemoveAurasDueToSpell(28820);
+                            break;
+                        }
                     }
-                    unitTarget->RemoveAurasDueToSpell(28820);
+                    
                     return;
                 }
                 case 19411:                                 // Lava Bomb
@@ -6440,7 +6451,12 @@ void Spell::EffectDispelMechanic(SpellEffectIndex effIdx)
         next = iter;
         ++next;
         SpellEntry const* spell = iter->second->GetSpellProto();
-        if (iter->second->HasMechanic(mechanic))
+
+        // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+        // - Escape Artist works with Frost Nova and Frost Trap again.
+        if (iter->second->HasMechanic(mechanic) &&
+            // attribute removed from Frost Nova in 1.7, which likely means this effect ignores it
+           !spell->HasAttribute(SPELL_ATTR_NO_AURA_CANCEL))
         {
             unitTarget->RemoveAurasDueToSpell(spell->Id);
             if (Auras.empty())

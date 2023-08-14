@@ -341,6 +341,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
     }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     // this is here to accommodate 1.14 client behavior
     // it does not interrupt falling when rooted
     // verify that root is applied after having landed
@@ -358,6 +359,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             return;
         }
     }
+#endif
 
     // CMSG opcode has no handler in client, should not be sent to others.
     // It is sent by client when you jump and hit something on the way up,
@@ -745,6 +747,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         }
     } while (false);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (applyReceived && !movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
     {
         // workaround to fix anticheat false positives when using 1.14 client
@@ -764,8 +767,10 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         }
     }
 
+
     // we need to always clear this on root packet for 1.14
     pMover->ClearUnitState(UNIT_STAT_ROOT_ON_LANDING);
+#endif
 
     pMover->SetRootedReal(applyReceived);
     MovementPacketSender::SendMovementFlagChangeToObservers(pMover, MOVEFLAG_ROOT, applyReceived);
