@@ -3089,17 +3089,20 @@ void Aura::HandleModPossess(bool apply, bool Real)
         pTarget->m_Events.AddLambdaEventAtOffset([pTarget, pCaster, apply, removeMode, schoolMask]
         {
             pCaster->ModPossess(pTarget, apply, removeMode);
-            pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, schoolMask);
+            pTarget->AddThreat(pCaster, pTarget->GetMaxHealth(), false, schoolMask);
         }, 500);
     }
     else
 #endif
     {
         pCaster->ModPossess(pTarget, apply, m_removeMode);
-        if (apply && pCaster->IsPlayer())
-        {
-            Player* pPlayerCaster = static_cast<Player*>(pCaster);
+        
+    }
 
+    if (apply)
+    {
+        if (Player* pPlayerCaster = pCaster->ToPlayer())
+        {
             UpdateData newData;
             pTarget->BuildValuesUpdateBlockForPlayerWithFlags(newData, pPlayerCaster, UF_FLAG_OWNER_ONLY);
             if (newData.HasData())
@@ -3109,26 +3112,27 @@ void Aura::HandleModPossess(bool apply, bool Real)
                 pPlayerCaster->SendDirectMessage(&newDataPacket);
             }
         }
-        pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
     }
-
-    if (!apply && GetId() == 24937) // Controlling Steam Tonk
+    else
     {
-        pTarget->CastSpell(pTarget, 27771, true); // Cast Damaged Tonk
-        pCaster->CastSpell(pCaster, 9179, true); // Cast 3 sec Stun on self
-        pCaster->RemoveAurasDueToSpell(24935); // Unroot player
-
-        // Reset Tonk Control Console
-        if (GameObject* pConsole = pCaster->FindNearestGameObject(180524, INTERACTION_DISTANCE))
+        if (GetId() == 24937) // Controlling Steam Tonk
         {
-            pConsole->SetGoState(GO_STATE_READY);
-            pConsole->SetLootState(GO_READY);
-            pConsole->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+            pTarget->CastSpell(pTarget, 27771, true); // Cast Damaged Tonk
+            pCaster->CastSpell(pCaster, 9179, true); // Cast 3 sec Stun on self
+            pCaster->RemoveAurasDueToSpell(24935); // Unroot player
+
+            // Reset Tonk Control Console
+            if (GameObject* pConsole = pCaster->FindNearestGameObject(180524, INTERACTION_DISTANCE))
+            {
+                pConsole->SetGoState(GO_STATE_READY);
+                pConsole->SetLootState(GO_READY);
+                pConsole->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+            }
         }
     }
 }
 
-void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
+void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode removeMode, SpellEntry const* pSpellProto)
 {
     // Cannot possess yourself.
     if (pTarget == this)
@@ -3162,6 +3166,8 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         pCaster->SetMover(pTarget);
 
         pTarget->CombatStop(true);
+        pTarget->DeleteThreatList();
+        pTarget->GetHostileRefManager().deleteReferences();
 
         if (CharmInfo *charmInfo = pTarget->InitCharmInfo(pTarget))
         {
@@ -3211,7 +3217,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         pCaster->RemovePetActionBar();
 
         // On delete only do caster related effects.
-        if (m_removeMode == AURA_REMOVE_BY_DELETE)
+        if (removeMode == AURA_REMOVE_BY_DELETE)
             return;
 
         pTarget->ClearUnitState(UNIT_STAT_POSSESSED);
@@ -3242,9 +3248,12 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
             else
                 canAttack = true;
 
-            if (canAttack && m_removeMode != AURA_REMOVE_BY_DEATH &&
+            if (canAttack && removeMode != AURA_REMOVE_BY_DEATH &&
                 pCaster->IsValidAttackTarget(pCreature))
+            {
                 pCreature->AttackedBy(pCaster);
+                pCreature->AddThreat(pCaster, pTarget->GetMaxHealth(), false, pSpellProto ? pSpellProto->GetSpellSchoolMask() : SPELL_SCHOOL_MASK_NONE, pSpellProto);
+            }
 
             // remove pvp flag on charm end if creature is not pvp flagged by default
             if (pCreature->IsPvP() && !pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_PVP))
@@ -3562,7 +3571,10 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
             if (canAttack && m_removeMode != AURA_REMOVE_BY_DEATH &&
                 caster && caster->IsValidAttackTarget(pCreatureTarget))
+            {
                 pCreatureTarget->AttackedBy(caster);
+                pCreatureTarget->AddThreat(caster, pCreatureTarget->GetMaxHealth(), false, GetSpellProto()->GetSpellSchoolMask(), GetSpellProto());
+            }
         }
         else if (pPlayerTarget)
         {

@@ -700,7 +700,7 @@ class Unit : public SpellCaster
 
         // Apply SpellEffects::EffectSummonPet after ressurecting in BG.
         ObjectGuid EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLevel);
-        void ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode = AURA_REMOVE_BY_DEFAULT);
+        void ModPossess(Unit* target, bool apply, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT, SpellEntry const* pSpellProto = nullptr);
 
     private:
         void CleanupDeletedAuras();
