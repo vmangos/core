@@ -3085,18 +3085,16 @@ void Aura::HandleModPossess(bool apply, bool Real)
     {
         pTarget->CombatStop(true);
         AuraRemoveMode removeMode = m_removeMode;
-        SpellSchoolMask schoolMask = GetSpellProto()->GetSpellSchoolMask();
-        pTarget->m_Events.AddLambdaEventAtOffset([pTarget, pCaster, apply, removeMode, schoolMask]
+        SpellEntry const* pSpellProto = GetSpellProto();
+        pTarget->m_Events.AddLambdaEventAtOffset([pTarget, pCaster, apply, removeMode, pSpellProto]
         {
-            pCaster->ModPossess(pTarget, apply, removeMode);
-            pTarget->AddThreat(pCaster, pTarget->GetMaxHealth(), false, schoolMask);
+            pCaster->ModPossess(pTarget, apply, removeMode, pSpellProto);
         }, 500);
     }
     else
 #endif
     {
-        pCaster->ModPossess(pTarget, apply, m_removeMode);
-        
+        pCaster->ModPossess(pTarget, apply, m_removeMode, GetSpellProto());
     }
 
     if (apply)
