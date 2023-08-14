@@ -222,6 +222,15 @@ UPDATE `quest_template` SET `RewSpell` = 20222  WHERE `entry` = 3639; -- Goblin 
 UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `entry` = 3641; -- Gnomish Engineering (Alliance)
 UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `entry` = 3639; -- Gnomish Engineering (Horde)
 
+-- Correct specialisations teaching artisan of profession
+DELETE FROM `spell_chain` WHERE `spell_id` = 9787; -- Correct for Weaponsmithing
+DELETE FROM `spell_chain` WHERE `spell_id` = 9788; -- Correct for Armorsmithing
+DELETE FROM `spell_chain` WHERE `spell_id` = 10656; -- Correct for Dragonscale leatherworking
+DELETE FROM `spell_chain` WHERE `spell_id` = 10658; -- Correct for Elemental leatherworking
+DELETE FROM `spell_chain` WHERE `spell_id` = 10660; -- Correct for Tribal leatherworking
+DELETE FROM `spell_chain` WHERE `spell_id` = 20219; -- Correct for Gnomish engineering
+DELETE FROM `spell_chain` WHERE `spell_id` = 20222; -- Correct for Goblin engineering
+
 -- End of migration.
 END IF;
 END??
