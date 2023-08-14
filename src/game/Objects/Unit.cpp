@@ -1857,7 +1857,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
     else
         *resist = 0;
 
-    auto HandleAbsorb = [&]()
+    auto HandleSchoolAbsorb = [&]()
     {
         // Need remove expired auras after
         bool existExpired = false;
@@ -1912,7 +1912,10 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
                     ++i;
             }
         }
+    };
 
+    auto HandleManaShield = [&]()
+    {
         // absorb by mana cost
         AuraList const& vManaShield = GetAurasByType(SPELL_AURA_MANA_SHIELD);
         for (AuraList::const_iterator i = vManaShield.begin(), next; i != vManaShield.end() && remainingDamage > 0; i = next)
@@ -1954,7 +1957,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
         }
     };
 
-    auto HandleSplit = [&]()
+    auto HandleSplitDamage = [&]()
     {
         AuraList const& vSplitDamageFlat = GetAurasByType(SPELL_AURA_SPLIT_DAMAGE_FLAT);
         for (AuraList::const_iterator i = vSplitDamageFlat.begin(), next; i != vSplitDamageFlat.end() && remainingDamage >= 0; i = next)
@@ -2023,14 +2026,23 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
         }
     };
 
+    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+    // - Mana Shield - Damage taken will now be absorbed by other absorb spells
+    //   (e.g. Ice Barrier, Power Word: Shield) before being absorbed by Mana Shield.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    HandleSchoolAbsorb();
+    HandleManaShield();
+    HandleSplitDamage();
     // World of Warcraft Client Patch 1.7.0 (2005 - 09 - 13)
     // - Damage absorption is now applied before damage splitting effects.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    HandleAbsorb();
-    HandleSplit();
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    HandleManaShield();
+    HandleSchoolAbsorb();
+    HandleSplitDamage();
 #else
-    HandleSplit();
-    HandleAbsorb();
+    HandleSplitDamage();
+    HandleManaShield();
+    HandleSchoolAbsorb();
 #endif
 
     *absorb = damage - remainingDamage - *resist;
