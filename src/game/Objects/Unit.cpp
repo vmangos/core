@@ -5187,8 +5187,14 @@ void Unit::SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, 
     data << GetObjectGuid();
     data << uint8(type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
     data << uint32(damage);
+    
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Absorbed and resisted environmental damage is now shown in the combat log.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     data << uint32(absorb);
     data << int32(resist);
+#endif
+
     SendMessageToSet(&data, true);
 }
 
