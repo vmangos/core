@@ -1310,7 +1310,9 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
         case RANGED_ATTACK:
             damageInfo->procAttacker = PROC_FLAG_DEAL_RANGED_ATTACK;
             damageInfo->procVictim   = PROC_FLAG_TAKE_RANGED_ATTACK;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             damageInfo->HitInfo      = HITINFO_UNK3;             // test (dev note: test what? HitInfo flag possibly not confirmed.)
+#endif
             break;
         default:
             break;

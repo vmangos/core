@@ -248,6 +248,7 @@ enum VictimState
 
 enum HitInfo
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     HITINFO_NORMALSWING         = 0x00000000,
     HITINFO_UNK0                = 0x00000001,               // req correct packet structure
     HITINFO_AFFECTS_VICTIM      = 0x00000002,               // no being hit animation on victim without it
@@ -256,17 +257,26 @@ enum HitInfo
     HITINFO_MISS                = 0x00000010,
     HITINFO_ABSORB              = 0x00000020,               // plays absorb sound
     HITINFO_RESIST              = 0x00000040,               // resisted atleast some damage
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     HITINFO_CRITICALHIT         = 0x00000080,
-#else
-    HITINFO_CRITICALHIT         = 0x00000008,
-#endif
     HITINFO_UNK8                = 0x00000100,               // wotlk?
     HITINFO_UNK9                = 0x00002000,               // wotlk?
     HITINFO_GLANCING            = 0x00004000,
     HITINFO_CRUSHING            = 0x00008000,
     HITINFO_NOACTION            = 0x00010000,
     HITINFO_SWINGNOHITSOUND     = 0x00080000
+#else
+    HITINFO_NORMALSWING         = 0x00000000,
+    HITINFO_MISS                = 0x00000001,
+    HITINFO_AFFECTS_VICTIM      = 0x00000002,               // no being hit animation on victim without it
+    HITINFO_CRITICALHIT         = 0x00000008,
+    HITINFO_LEFTSWING           = 0x00000200,
+    HITINFO_NOACTION            = 0x00001000,
+    HITINFO_ABSORB              = 0x00010000,               // plays absorb sound
+    HITINFO_RESIST              = 0x00020000,               // resisted atleast some damage
+    HITINFO_GLANCING            = 0x00100000,
+    HITINFO_CRUSHING            = 0x00200000,
+    HITINFO_SWINGNOHITSOUND     = 0x00800000
+#endif
 };
 
 //i would like to remove this: (it is defined in item.h
