@@ -126,17 +126,6 @@ UPDATE `creature` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `
 13076); -- Dun Morogh Mountaineer
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Convert Engineer Trainers to Use Conditions
-UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` IN (8738, 8126);
-UPDATE `gossip_menu_option` SET `condition_id` = 1367 WHERE `menu_id` = 1469 AND `id` = 0;
-UPDATE `gossip_menu_option` SET `condition_id` = 1367 WHERE `menu_id` = 1465 AND `id` = 0;
-UPDATE `gossip_menu_option` SET `option_broadcast_text`= 4551 WHERE `menu_id` = 1465 AND `id` = 0;
-
-UPDATE `creature_template` SET `trainer_spell`= 0 WHERE `entry` IN (7406, 7944);
-UPDATE `gossip_menu_option` SET `condition_id` = 1368 WHERE `menu_id` = 1467 AND `id` = 0;
-UPDATE `gossip_menu_option` SET `condition_id` = 1368 WHERE `menu_id` = 1468 AND `id` = 0;
-
--- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 UPDATE `creature` SET `wander_distance`='5' WHERE  `guid`=4185;
 DELETE FROM `creature_movement_template` WHERE `entry` = 468;
 
