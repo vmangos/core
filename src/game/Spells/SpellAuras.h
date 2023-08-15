@@ -234,6 +234,8 @@ class SpellAuraHolder
 
         void SetTriggered(bool t) { m_spellTriggered = t; }
         bool IsTriggered() const { return m_spellTriggered; }
+        void SetReflected(bool reflected) { m_isReflected = reflected; }
+        bool IsReflected() const { return m_isReflected; }
 
         ~SpellAuraHolder();
     private:
@@ -268,6 +270,7 @@ class SpellAuraHolder
         bool m_isChanneled:1;
         bool m_makesTargetSecondaryFocus;
         bool m_spellTriggered;                              // applied by a triggered spell (used in debuff priority computation)
+        bool m_isReflected;                                 // applied by a reflected spell (used to prevent death in duel)
 
         uint32 m_in_use;                                    // > 0 while in SpellAuraHolder::ApplyModifiers call/SpellAuraHolder::Update/etc
 };

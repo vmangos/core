@@ -54,7 +54,7 @@ enum MeleeHitOutcome
 struct SpellNonMeleeDamage {
     SpellNonMeleeDamage(SpellCaster* _attacker, Unit* _target, uint32 _SpellID, SpellSchools _school)
         : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
-        absorb(0), resist(0), periodicLog(false), unused(false), blocked(0), HitInfo(0), spell(nullptr)
+        absorb(0), resist(0), periodicLog(false), reflected(false), blocked(0), HitInfo(0), spell(nullptr)
     {}
 
     Unit* target;
@@ -65,7 +65,7 @@ struct SpellNonMeleeDamage {
     uint32 absorb;
     int32 resist;
     bool   periodicLog;
-    bool   unused;
+    bool   reflected;
     uint32 blocked;
     uint32 HitInfo;
     Spell* spell;
@@ -386,7 +386,7 @@ public:
     float MeleeDamageBonusDone(Unit* pVictim, float damage, WeaponAttackType attType, SpellEntry const* spellProto = nullptr, SpellEffectIndex effectIndex = EFFECT_INDEX_0, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
     virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
     float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
-    virtual uint32 DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell = nullptr);
+    virtual uint32 DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell = nullptr, bool reflected = false);
     void DealDamageMods(Unit* pVictim, uint32& damage, uint32* absorb);
     void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
     void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log) const;

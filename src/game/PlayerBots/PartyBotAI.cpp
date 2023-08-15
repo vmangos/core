@@ -26,7 +26,6 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
-#include "GridNotifiersImpl.h"
 #include <random>
 
 enum PartyBotSpells
@@ -288,9 +287,7 @@ bool PartyBotAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpell
                 radius = 10.0f;
 
             std::list<Unit*> targets;
-            MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(pTarget, me, radius);
-            MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
-            Cell::VisitAllObjects(pTarget, searcher, radius);
+            me->GetEnemyListInRadiusAround(pTarget, radius, targets);
 
             for (auto const& pEnemy : targets)
             {

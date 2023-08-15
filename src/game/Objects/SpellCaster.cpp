@@ -166,8 +166,11 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     if (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
         return SPELL_MISS_EVADE;
 
-    // Check for immune (use charges)
-    if (pVictim != this && !spell->HasAttribute(SPELL_ATTR_NO_IMMUNITIES) &&
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Effects that make players immune to physical will no longer be immune
+    //   to the "Recently Bandaged" effect from First Aid.
+    if (/* pVictim != this && */ /* commented out due to above patch notes */
+        !spell->HasAttribute(SPELL_ATTR_NO_IMMUNITIES) &&
         pVictim->IsImmuneToSpell(spell, pVictim == this))
         return SPELL_MISS_IMMUNE;
 
@@ -519,9 +522,25 @@ int32 SpellCaster::MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, S
         return 10000;
 
     SpellSchoolMask schoolMask = spell->GetSpellSchoolMask();
+
     // PvP - PvE spell misschances per leveldif > 2
     int32 lchance = pVictim->GetTypeId() == TYPEID_PLAYER ? 7 : 11;
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Debuffs and area effect spells now use their actual cast level rather
+    //   than effective cast level for calculating periodic resistance.
+    // - Fixed a bug where area of effect periodic damage spells were being
+    //   resisted more frequently than they should have been when casting
+    //   lower level ranks of the spell (affected spells were Blizzard,
+    //   Consecration,Explosive Trap, Flamestrike, Hurricane, Rain of Fire and
+    //   Volley).
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     int32 leveldif = int32(pVictim->GetLevelForTarget(this)) - int32(GetLevelForTarget(pVictim));
+#else
+    int32 leveldif = (!spellPtr && spell->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA)) ?
+        int32(pVictim->GetLevelForTarget(this)) - std::max<int32>(1, spell->spellLevel) :
+        int32(pVictim->GetLevelForTarget(this)) - int32(GetLevelForTarget(pVictim));
+#endif
 
     // Base hit chance from attacker and victim levels
     float modHitChance;
@@ -796,7 +815,7 @@ void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log) const
     data << uint32(log->absorb);                            // AbsorbedDamage
     data << int32(log->resist);                             // resist
     data << uint8(log->periodicLog);                        // if 1, then client show spell name (example: %s's ranged shot hit %s for %u school or %s suffers %u school damage from %s's spell_name
-    data << uint8(log->unused);                             // unused
+    data << uint8(false);                                   // unused
     data << uint32(log->blocked);                           // blocked
     data << uint32(log->HitInfo);
     data << uint8(0);                                       // flag to use extend data
@@ -1552,16 +1571,16 @@ void SpellCaster::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabili
 
     // Call default DealDamage (send critical in hit info for threat calculation)
     CleanDamage cleanDamage(0, BASE_ATTACK, damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT ? MELEE_HIT_CRIT : MELEE_HIT_NORMAL, damageInfo->absorb, damageInfo->resist);
-    DealDamage(pVictim, damageInfo->damage, &cleanDamage, spellProto->HasAttribute(SPELL_ATTR_EX3_TREAT_AS_PERIODIC) ? DOT : SPELL_DIRECT_DAMAGE, GetSchoolMask(damageInfo->school), spellProto, durabilityLoss, damageInfo->spell);
+    DealDamage(pVictim, damageInfo->damage, &cleanDamage, spellProto->HasAttribute(SPELL_ATTR_EX3_TREAT_AS_PERIODIC) ? DOT : SPELL_DIRECT_DAMAGE, GetSchoolMask(damageInfo->school), spellProto, durabilityLoss, damageInfo->spell, damageInfo->reflected);
 }
 
-uint32 SpellCaster::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell)
+uint32 SpellCaster::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell, bool reflected)
 {
     // Should never happen since DealDamage is overriden in Unit class.
     if (pVictim == this)
         return 0;
 
-    return pVictim->DealDamage(pVictim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto, durabilityLoss, spell);
+    return pVictim->DealDamage(pVictim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto, durabilityLoss, spell, reflected);
 }
 
 bool SpellCaster::CheckAndIncreaseCastCounter()
