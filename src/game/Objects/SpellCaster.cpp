@@ -1956,8 +1956,6 @@ SpellCastResult SpellCaster::CastSpell(SpellCaster* pTarget, SpellEntry const* s
         // as soon as the target dies or leaves the area of the effect
         if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
             targets.setDestination(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
-        // handle specific case of weapons that apply positive auras on hit like Ravager and Bonereaver's Edge
-        else if (spellInfo->Targets == TARGET_FLAG_SELF && spellInfo->Custom & SPELL_CUSTOM_POSITIVE) {}
         else if (Unit* pUnitTarget = pTarget->ToUnit())
             targets.setUnitTarget(pUnitTarget);
         else if (GameObject* pGoTarget = pTarget->ToGameObject())

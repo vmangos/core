@@ -359,6 +359,12 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
             return SPELL_PROC_TRIGGER_FAILED;
         }
 
+        // Ravager Whirlwind should allow triggered spells
+        if (procSpell->Id == 9633)
+        {
+            isSpellTriggeredByAuraOrItem = false;
+        }
+
         // World of Warcraft Client Patch 1.10.0 (2006-03-28)
         // - Execute - This ability will now work with Sweeping Strikes again. If
         //   the second victim is below 20 % health, they will be hit with the full
