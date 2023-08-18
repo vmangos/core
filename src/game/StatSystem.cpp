@@ -525,11 +525,9 @@ void Player::UpdateAllCritPercentages()
     float value = GetMeleeCritFromAgility();
 
     SetBaseModValue(CRIT_PERCENTAGE, PCT_MOD, value);
-    SetBaseModValue(OFFHAND_CRIT_PERCENTAGE, PCT_MOD, value);
     SetBaseModValue(RANGED_CRIT_PERCENTAGE, PCT_MOD, value);
 
     UpdateCritPercentage(BASE_ATTACK);
-    UpdateCritPercentage(OFF_ATTACK);
     UpdateCritPercentage(RANGED_ATTACK);
 }
 
