@@ -27,6 +27,7 @@
 #include "Map.h"
 #include "ByteBuffer.h"
 #include "ObjectGuid.h"
+#include "WorldStates.h"
 
 // magic event-numbers
 #define BG_EVENT_NONE 255
@@ -648,22 +649,19 @@ class BattleGround
 // helper functions for world state list fill
 inline void FillInitialWorldState(ByteBuffer& data, uint32& count, uint32 state, uint32 value)
 {
-    data << uint32(state);
-    data << uint32(value);
+    WriteInitialWorldStatePair(data, state, value);
     ++count;
 }
 
 inline void FillInitialWorldState(ByteBuffer& data, uint32& count, uint32 state, int32 value)
 {
-    data << uint32(state);
-    data << int32(value);
+    WriteInitialWorldStatePair(data, state, value);
     ++count;
 }
 
 inline void FillInitialWorldState(ByteBuffer& data, uint32& count, uint32 state, bool value)
 {
-    data << uint32(state);
-    data << uint32(value?1:0);
+    WriteInitialWorldStatePair(data, state, value ? 1 : 0);
     ++count;
 }
 
@@ -677,8 +675,7 @@ inline void FillInitialWorldState(ByteBuffer& data, uint32& count, WorldStatePai
 {
     for(WorldStatePair const* itr = array; itr->state; ++itr)
     {
-        data << uint32(itr->state);
-        data << uint32(itr->value);
+        WriteInitialWorldStatePair(data, itr->state, itr->value);
         ++count;
     }
 }

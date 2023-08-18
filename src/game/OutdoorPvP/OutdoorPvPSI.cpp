@@ -37,27 +37,27 @@ OutdoorPvPSI::OutdoorPvPSI()
 
 uint32 OutdoorPvPSI::FillInitialWorldStates(WorldPacket& data)
 {
-    data << SI_GATHERED_A << m_Gathered_A;
-    data << SI_GATHERED_H << m_Gathered_H;
-    data << SI_SILITHYST_MAX << m_MaxRessources;
+    WriteInitialWorldStatePair(data, WS_OPVP_SI_GATHERED_A, m_Gathered_A);
+    WriteInitialWorldStatePair(data, WS_OPVP_SI_GATHERED_H, m_Gathered_H);
+    WriteInitialWorldStatePair(data, WS_OPVP_SI_SILITHYST_MAX, m_MaxRessources);
     return 3;
 }
 
 void OutdoorPvPSI::SendRemoveWorldStates(Player* plr)
 {
-    plr->SendUpdateWorldState(SI_GATHERED_A, 0);
-    plr->SendUpdateWorldState(SI_GATHERED_H, 0);
-    plr->SendUpdateWorldState(SI_SILITHYST_MAX, 0);
+    plr->SendUpdateWorldState(WS_OPVP_SI_GATHERED_A, 0);
+    plr->SendUpdateWorldState(WS_OPVP_SI_GATHERED_H, 0);
+    plr->SendUpdateWorldState(WS_OPVP_SI_SILITHYST_MAX, 0);
 }
 
 void OutdoorPvPSI::UpdateWorldState()
 {
-    SendUpdateWorldState(SI_GATHERED_A, m_Gathered_A);
-    SendUpdateWorldState(SI_GATHERED_H, m_Gathered_H);
-    SendUpdateWorldState(SI_SILITHYST_MAX, m_MaxRessources);
-    sObjectMgr.SetSavedVariable(uint32(SI_GATHERED_A),    m_Gathered_A);
-    sObjectMgr.SetSavedVariable(uint32(SI_GATHERED_H),    m_Gathered_H);
-    sObjectMgr.SetSavedVariable(uint32(SI_SILITHYST_MAX), m_MaxRessources);
+    SendUpdateWorldState(WS_OPVP_SI_GATHERED_A, m_Gathered_A);
+    SendUpdateWorldState(WS_OPVP_SI_GATHERED_H, m_Gathered_H);
+    SendUpdateWorldState(WS_OPVP_SI_SILITHYST_MAX, m_MaxRessources);
+    sObjectMgr.SetSavedVariable(uint32(WS_OPVP_SI_GATHERED_A),    m_Gathered_A);
+    sObjectMgr.SetSavedVariable(uint32(WS_OPVP_SI_GATHERED_H),    m_Gathered_H);
+    sObjectMgr.SetSavedVariable(uint32(WS_OPVP_SI_SILITHYST_MAX), m_MaxRessources);
 }
 
 bool OutdoorPvPSI::SetupZoneScript()
@@ -65,7 +65,7 @@ bool OutdoorPvPSI::SetupZoneScript()
     for (uint32 i : OutdoorPvPSIBuffZones)
         RegisterZone(i);
     // On reprend les donnees precedentes (avant dernier reboot)
-    m_MaxRessources = sObjectMgr.GetSavedVariable(uint32(SI_SILITHYST_MAX), SI_MAX_RESOURCES_DEFAULT);
+    m_MaxRessources = sObjectMgr.GetSavedVariable(uint32(WS_OPVP_SI_SILITHYST_MAX), SI_MAX_RESOURCES_DEFAULT);
 
     m_Gathered_A = 0;
     m_Gathered_H = 0;

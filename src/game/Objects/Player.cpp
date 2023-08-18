@@ -8438,11 +8438,10 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot) const
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendUpdateWorldState(uint32 field, uint32 value) const
+void Player::SendUpdateWorldState(uint32 state, uint32 value) const
 {
     WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
-    data << field;
-    data << value;
+    WriteUpdateWorldStatePair(data, state, value);
     GetSession()->SendPacket(&data);
 }
 
@@ -8571,45 +8570,47 @@ void Player::SendInitWorldStates(uint32 zoneid) const
     uint32 count = 1; // count of world states in packet, 1 extra for the terminator
 
     WorldPacket data(SMSG_INIT_WORLD_STATES, (4 + 4 + 2 + 6));
-    data << uint32(mapid);                              // mapid
+    data << uint32(mapid);                              // map id
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     data << uint32(zoneid);                             // zone id
+#endif
+
     size_t count_pos = data.wpos();
     data << uint16(0);                                  // count of uint32 blocks, placeholder
 
     // Scourge Invasion - Patch 1.11
     if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
     {
-        int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
-        int REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
-        int REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
-        int REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
-        int REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING);
-        int REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
-        int REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
+        int victories = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
+        int remainingAzshara = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
+        int remainingBlastedLands = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+        int remainingBurningSteppes = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+        int remainingEasternPlaguelands = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING);
+        int remainingTanaris = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
+        int remainingWinterspring = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
-        data << uint32(WORLDSTATE_AZSHARA)              << uint32(REMAINING_AZSHARA > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_BLASTED_LANDS)        << uint32(REMAINING_BLASTED_LANDS > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_BURNING_STEPPES)      << uint32(REMAINING_BURNING_STEPPES > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS)  << uint32(REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_TANARIS)              << uint32(REMAINING_TANARIS > 0 ? 1 : 0);
-        data << uint32(WORLDSTATE_WINTERSPRING)         << uint32(REMAINING_WINTERSPRING > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WS_SI_AZSHARA_INVADED,             remainingAzshara > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WS_SI_BLASTED_LANDS_INVADED,       remainingBlastedLands > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WS_SI_BURNING_STEPPES_INVADED,     remainingBurningSteppes > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WS_SI_EASTERN_PLAGUELANDS_INVADED, remainingEasternPlaguelands > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WS_SI_TANARIS_INVADED,             remainingTanaris > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WS_SI_WINTERSPRING_INVADED,        remainingWinterspring > 0 ? 1 : 0);
 
         // Battles & remaining necropolisses
-        data << uint32(WORLDSTATE_SI_BATTLES_WON) << uint32(VICTORIES);
-        data << uint32(WORLDSTATE_SI_AZSHARA_REMAINING) << uint32(REMAINING_AZSHARA);
-        data << uint32(WORLDSTATE_SI_BLASTED_LANDS_REMAINING) << uint32(REMAINING_BLASTED_LANDS);
-        data << uint32(WORLDSTATE_SI_BURNING_STEPPES_REMAINING) << uint32(REMAINING_BURNING_STEPPES);
-        data << uint32(WORLDSTATE_SI_EASTERN_PLAGUELANDS) << uint32(REMAINING_EASTERN_PLAGUELANDS);
-        data << uint32(WORLDSTATE_SI_TANARIS) << uint32(REMAINING_TANARIS);
-        data << uint32(WORLDSTATE_SI_WINTERSPRING) << uint32(REMAINING_WINTERSPRING);
+        WriteInitialWorldStatePair(data, WS_SI_BATTLES_WON,               victories);
+        WriteInitialWorldStatePair(data, WS_SI_AZSHARA_REMAINING,         remainingAzshara);
+        WriteInitialWorldStatePair(data, WS_SI_BLASTED_LANDS_REMAINING,   remainingBlastedLands);
+        WriteInitialWorldStatePair(data, WS_SI_BURNING_STEPPES_REMAINING, remainingBurningSteppes);
+        WriteInitialWorldStatePair(data, WS_SI_PLAGUELANDS_REMAINING,     remainingEasternPlaguelands);
+        WriteInitialWorldStatePair(data, WS_SI_TANARIS_REMAINING,         remainingTanaris);
+        WriteInitialWorldStatePair(data, WS_SI_WINTERSPRING_REMAINING,    remainingWinterspring);
 
         count += 13;
     }
 
     for (WorldStatePair const* itr = def_world_states; itr->state; ++itr)
     {
-        data << uint32(itr->state);
-        data << uint32(itr->value);
+        WriteInitialWorldStatePair(data, itr->state, itr->value);
         ++count;
     }
 
