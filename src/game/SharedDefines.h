@@ -1161,6 +1161,8 @@ enum CorpseDynFlags
 };
 
 // Passive Spell codes explicit used in code
+#define SPELL_ID_LOGIN_EFFECT                   836
+#define SPELL_ID_DAZE                           1604
 #define SPELL_ID_PASSIVE_BATTLE_STANCE          2457
 #define SPELL_ID_PASSIVE_RESURRECTION_SICKNESS  15007
 

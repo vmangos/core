@@ -1644,26 +1644,34 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     {
         // -probability is between 0% and 40%
         // 20% base chance
-        uint32 VictimDefense = pVictim->GetDefenseSkillValue();
-        uint32 AttackerMeleeSkill = GetUnitMeleeSkill();
+        uint32 victimDefense = pVictim->GetDefenseSkillValue();
+        uint32 attackerMeleeSkill = GetUnitMeleeSkill();
 
-        float Probability = 0.0f;
+        float probability = 0.0f;
 
-        //there is a newbie protection, at level 10 just 7% base chance; assuming linear function
+        // there is a newbie protection, at level 10 just 7% base chance; assuming linear function
         if (pVictim->GetLevel() < 30)
-            Probability = 0.65f * pVictim->GetLevel() + 0.5f + ((float)AttackerMeleeSkill - (float)VictimDefense) * 0.2f;
+            probability = 0.65f * pVictim->GetLevel() + 0.5f + ((float)attackerMeleeSkill - (float)victimDefense) * 0.2f;
         else
-            Probability = 20.0f + ((float)AttackerMeleeSkill - (float)VictimDefense) * 0.2f;
+            probability = 20.0f + ((float)attackerMeleeSkill - (float)victimDefense) * 0.2f;
 
-        if (Probability > 40.0f)
-            Probability = 40.0f;
+        if (probability > 40.0f)
+            probability = 40.0f;
 
         if (Player* pPlayer = pVictim->ToPlayer())
             if (pPlayer->IsGod())
-                Probability = 0.0f;
+                probability = 0.0f;
 
-        if (roll_chance_f(Probability))
-            CastSpell(pVictim, 1604, true);
+        if (roll_chance_f(probability))
+        {
+            uint32 spellId = SPELL_ID_DAZE;
+
+            if (pVictim->IsPlayer())
+                if (ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(pVictim->GetRace()))
+                    spellId = raceEntry->dazeSpellId;
+
+            CastSpell(pVictim, spellId, true);
+        }
     }
 
     // update at damage Judgement aura duration that applied by attacker at victim

@@ -19306,7 +19306,9 @@ void Player::SendInitialPacketsAfterAddToMap(bool login)
     {
         m_Events.AddLambdaEventAtOffset([this]
         {
-            CastSpell(this, 836, true); // LOGINEFFECT
+            ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(GetRace());
+            uint32 const spellId = raceEntry ? raceEntry->loginSpellId : SPELL_ID_LOGIN_EFFECT;
+            CastSpell(this, spellId, true); // LOGINEFFECT
         }, 1);
     }
 
