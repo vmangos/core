@@ -769,7 +769,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_FINISHING_MOVE_DAMAGE         = 0x00100000,            // 20 Uses combo points
     SPELL_ATTR_EX_THREAT_ONLY_ON_MISS           = 0x00200000,            // 21
     SPELL_ATTR_EX_FINISHING_MOVE_DURATION       = 0x00400000,            // 22 Uses combo points (in 4.x not required combo point target selected)
-    SPELL_ATTR_EX_UNK23                         = 0x00800000,            // 23 Different in vanilla
+    SPELL_ATTR_EX_IGNORE_CASTER_AND_TARGET_RESTRICTIONS = 0x00800000,    // 23 Skips all cast checks, moved to AttributesEx3 after 1.10 (100% correlation)
     SPELL_ATTR_EX_SPECIAL_SKILLUP               = 0x01000000,            // 24 Only fishing spells
     SPELL_ATTR_EX_UNK25                         = 0x02000000,            // 25 Different in vanilla
     SPELL_ATTR_EX_REQUIRE_ALL_TARGETS           = 0x04000000,            // 26
@@ -846,7 +846,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_TREAT_AS_PERIODIC            = 0x02000000,            // 25 Does not cause spell pushback
     SPELL_ATTR_EX3_CAN_PROC_FROM_PROCS          = 0x04000000,            // 26 Auras with this attribute can proc off procced spells (periodic triggers etc)
     SPELL_ATTR_EX3_ONLY_PROC_ON_CASTER          = 0x08000000,            // 27
-    SPELL_ATTR_EX3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS = 0x10000000,   // 28 Skips all cast checks
+    SPELL_ATTR_EX3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS = 0x10000000,   // 28 Skips all cast checks, moved from AttributesEx after 1.10 (100% correlation)
     SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS      = 0x20000000,            // 29
     SPELL_ATTR_EX3_DO_NOT_DISPLAY_RANGE         = 0x40000000,            // 30
     SPELL_ATTR_EX3_NOT_ON_AOE_IMMUNE            = 0x80000000             // 31
