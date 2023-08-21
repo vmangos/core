@@ -320,7 +320,7 @@ struct boss_chromaggusAI : public ScriptedAI
                     break;
             }
 
-            for (int i = 0; i < 15; ++i) // Affliction is applied 15 times per cast. Creatures such as pets can be targetted
+            for (int i = 0; i < urand(11, 15); ++i) // Affliction is applied 11-15 times per cast. Creatures such as pets can be targetted
             {
                 if (Unit* afflictionTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
