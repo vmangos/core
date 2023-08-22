@@ -159,7 +159,11 @@ enum EnchantmentSlot
     MAX_ENCHANTMENT_SLOT        = 7
 };
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
 #define MAX_VISIBLE_ITEM_OFFSET       12
+#else
+#define MAX_VISIBLE_ITEM_OFFSET       11
+#endif
 
 enum EnchantmentOffset
 {
