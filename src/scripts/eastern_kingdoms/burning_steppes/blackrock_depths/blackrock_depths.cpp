@@ -444,6 +444,7 @@ struct npc_grimstoneAI : public npc_escortAI
                     case 12:
                         DoCastSpellIfCan(m_creature, SPELL_GRIMSTONE_TELEPORT);
                         Event_Timer = 2000;
+                        break;
                     case 13:
                         m_creature->SetVisibility(VISIBILITY_OFF);
                         SummonRingBoss();
