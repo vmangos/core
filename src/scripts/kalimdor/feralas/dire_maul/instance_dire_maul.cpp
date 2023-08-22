@@ -1068,7 +1068,7 @@ struct GordokBruteAI : public ScriptedAI
     GordokBruteAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         /** Save current equipment of the creature */
-        m_uiEquipment_id = m_creature->GetEquipmentId();
+        m_uiEquipment_id = m_creature->GetCurrentEquipmentId();
         Reset();
     }
 

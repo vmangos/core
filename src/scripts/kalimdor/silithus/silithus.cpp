@@ -1374,6 +1374,8 @@ enum
     EMOTE_ANACHRONOS_PICKUP = -1000782,
     SAY_ANACHRONOS_EPILOGUE_8 = -1000783,
 
+    ITEM_SCEPTER_OF_THE_SHIFTING_SANDS = 20738,
+
     // The transform spell for Anachronos was removed from DBC
     //DISPLAY_ID_BRONZE_DRAGON = 15500,
 
@@ -2155,23 +2157,24 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         m_uiEventTimer = 15000;
                         break;
                     case 40:
-                        // ToDo: Make Fandral equip the scepter
+                        m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, ITEM_SCEPTER_OF_THE_SHIFTING_SANDS);
                         if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
                             DoScriptText(EMOTE_ANACHRONOS_SCEPTER, m_creature, pFandral);
-                        m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        m_uiEventTimer = 3000;
+                        m_uiEventTimer = 1500;
                         break;
                     case 41:
+                        m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
+                        m_creature->HandleEmote(EMOTE_ONESHOT_BEG);
+                        m_uiEventTimer = 1500;
+                        break;
+                    case 42:
                         if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
                         {
+                            pFandral->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, ITEM_SCEPTER_OF_THE_SHIFTING_SANDS);
                             pFandral->SetStandState(UNIT_STAND_STATE_STAND);
                             DoScriptText(SAY_FANDRAL_EPILOGUE_4, pFandral);
                         }
                         m_uiEventTimer = 3000;
-                        break;
-                    case 42:
-                        m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-                        m_uiEventTimer = 4000;
                         break;
                     case 43:
                         if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
@@ -2183,6 +2186,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         {
                             pFandral->CastSpell(pFandral, SPELL_SHATTER_HAMMER, false);
                             DoScriptText(EMOTE_FANDRAL_SHATTER, pFandral);
+                            pFandral->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
                         }
                         m_uiEventTimer = 3000;
                         break;

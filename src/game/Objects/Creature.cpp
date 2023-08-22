@@ -351,21 +351,7 @@ bool Creature::InitEntry(uint32 entry, GameEventCreatureData const* eventData /*
     SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, minfo->gender);
 
     // Load creature equipment
-    if (eventData && eventData->equipment_id)
-    {
-        // use event equipment if any for active event
-        LoadEquipment(eventData->equipment_id);
-    }
-    else if (m_creatureDataAddon && m_creatureDataAddon->equipment_id >= 0)
-    {
-        // override with per spawn data
-        LoadEquipment(m_creatureDataAddon->equipment_id, true);
-    }
-    else
-    {
-        // use default from the template
-        LoadEquipment(cinfo->equipment_id, true);
-    }
+    LoadDefaultEquipment(eventData);
 
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
@@ -671,12 +657,12 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 if (newCreatureId != m_originalEntry)
                     m_originalEntry = newCreatureId;
 
+                // need to preserve game event state
+                GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(GetGUIDLow());
                 if (newCreatureId != GetEntry())
-                {
-                    // need to preserve game event state
-                    GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(GetGUIDLow());
                     UpdateEntry(newCreatureId, eventData);
-                }
+                else
+                    LoadDefaultEquipment(eventData);
 
                 SelectLevel(m_creatureData ? m_creatureData->health_percent : 100.0f, m_creatureData ? m_creatureData->mana_percent : 100.0f);
                 UpdateAllStats();
@@ -1839,9 +1825,9 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
     return true;
 }
 
-void Creature::LoadEquipment(uint32 equip_entry, bool force)
+void Creature::LoadEquipment(uint32 equipmentId, bool force)
 {
-    if (equip_entry == 0)
+    if (equipmentId == 0)
     {
         if (force)
         {
@@ -1852,11 +1838,33 @@ void Creature::LoadEquipment(uint32 equip_entry, bool force)
         return;
     }
 
-    if (EquipmentInfo const* einfo = sObjectMgr.GetEquipmentInfo(equip_entry))
+    if (EquipmentTemplate const* pEquipTemplate = sObjectMgr.GetEquipmentTemplate(equipmentId))
     {
-        m_equipmentId = equip_entry;
-        for (uint8 i = 0; i < MAX_VIRTUAL_ITEM_SLOT; ++i)
-            SetVirtualItem(VirtualItemSlot(i), einfo->equipentry[i]);
+        m_equipmentId = equipmentId;
+        if (EquipmentEntry const* pEquipEntry = pEquipTemplate->ChooseEquipmentEntry())
+        {
+            for (uint8 i = 0; i < MAX_VIRTUAL_ITEM_SLOT; ++i)
+                SetVirtualItem(VirtualItemSlot(i), pEquipEntry->item[i]);
+        }
+    }
+}
+
+void Creature::LoadDefaultEquipment(GameEventCreatureData const* eventData)
+{
+    if (eventData && eventData->equipment_id)
+    {
+        // use event equipment if any for active event
+        LoadEquipment(eventData->equipment_id);
+    }
+    else if (m_creatureDataAddon && m_creatureDataAddon->equipment_id >= 0)
+    {
+        // override with per spawn data
+        LoadEquipment(m_creatureDataAddon->equipment_id, true);
+    }
+    else
+    {
+        // use default from the template
+        LoadEquipment(m_creatureInfo->equipment_id, true);
     }
 }
 

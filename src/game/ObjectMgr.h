@@ -127,6 +127,7 @@ struct SoundEntriesEntry
 
 typedef std::unordered_map<uint32, CreatureSpellsList> CreatureSpellsMap;
 typedef std::unordered_map<uint32, std::vector<CreatureClassLevelStats>> CreatureCLSMap;
+typedef std::unordered_map<uint32, EquipmentTemplate> CreatureEquipmentMap;
 
 typedef std::map<uint32/*player guid*/,uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
@@ -630,7 +631,13 @@ class ObjectMgr
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoAddon(uint32 display_id);
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoRandomGender(uint32 display_id);
 
-        EquipmentInfo const* GetEquipmentInfo(uint32 entry);
+        EquipmentTemplate const* GetEquipmentTemplate(uint32 entry)
+        {
+            auto itr = m_CreatureEquipmentMap.find(entry);
+            if (itr != m_CreatureEquipmentMap.end())
+                return &itr->second;
+            return nullptr;
+        }
         static CreatureDataAddon const* GetCreatureAddon(uint32 lowguid)
         {
             return sCreatureDataAddonStorage.LookupEntry<CreatureDataAddon>(lowguid);
@@ -1523,6 +1530,7 @@ class ObjectMgr
         CreatureLocaleMap m_CreatureLocaleMap;
         CreatureSpellsMap m_CreatureSpellsMap;
         CreatureCLSMap m_CreatureCLSMap;
+        CreatureEquipmentMap m_CreatureEquipmentMap;
         GameObjectDataMap m_GameObjectDataMap;
         GameObjectLocaleMap m_GameObjectLocaleMap;
         ItemLocaleMap m_ItemLocaleMap;

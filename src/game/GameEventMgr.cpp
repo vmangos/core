@@ -496,7 +496,7 @@ void GameEventMgr::LoadFromDB()
             newData.spell_id_start = fields[5].GetUInt32();
             newData.spell_id_end = fields[6].GetUInt32();
 
-            if (newData.equipment_id && !sObjectMgr.GetEquipmentInfo(newData.equipment_id))
+            if (newData.equipment_id && !sObjectMgr.GetEquipmentTemplate(newData.equipment_id))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_creature_data` have creature (Guid: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", guid, newData.equipment_id);
                 newData.equipment_id = 0;

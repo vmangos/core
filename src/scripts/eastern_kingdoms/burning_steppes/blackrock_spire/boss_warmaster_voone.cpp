@@ -29,6 +29,7 @@ EndScriptData */
 #define SPELL_MORTALSTRIKE      15708
 #define SPELL_PUMMEL            15615
 #define SPELL_THROWAXE          16075
+#define SPELL_UNARMED_PASSIVE   16076
 
 struct boss_warmastervooneAI : public ScriptedAI
 {
@@ -37,21 +38,47 @@ struct boss_warmastervooneAI : public ScriptedAI
         Reset();
     }
 
-    uint32 Snapkick_Timer;
-    uint32 Cleave_Timer;
-    uint32 Uppercut_Timer;
-    uint32 MortalStrike_Timer;
-    uint32 Pummel_Timer;
-    uint32 ThrowAxe_Timer;
+    uint32 m_snapKickTimer;
+    uint32 m_cleaveTimer;
+    uint32 m_uppercutTimer;
+    uint32 m_mortalStrikeTimer;
+    uint32 m_pummelTimer;
+    uint32 m_throwAxeTimer;
+    uint32 m_axesThrownCount;
 
     void Reset() override
     {
-        Snapkick_Timer = 8000;
-        Cleave_Timer = 14000;
-        Uppercut_Timer = 20000;
-        MortalStrike_Timer = 12000;
-        Pummel_Timer = 32000;
-        ThrowAxe_Timer = 1000;
+        m_snapKickTimer = 8000;
+        m_cleaveTimer = 14000;
+        m_uppercutTimer = 20000;
+        m_mortalStrikeTimer = 12000;
+        m_pummelTimer = 32000;
+        m_throwAxeTimer = 1000;
+        m_axesThrownCount = 0;
+    }
+
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpellEntry) override
+    {
+        if (pSpellEntry->Id == SPELL_THROWAXE)
+        {
+            switch (m_axesThrownCount)
+            {
+                case 0:
+                {
+                    m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 12348);
+                    m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
+                    break;
+                }
+                case 1:
+                {
+                    m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
+                    m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
+                    m_creature->CastSpell(m_creature, SPELL_UNARMED_PASSIVE, true);
+                    break;
+                }
+            }
+            m_axesThrownCount++;
+        }
     }
 
     void UpdateAI(uint32 const diff) override
@@ -60,53 +87,56 @@ struct boss_warmastervooneAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        //Snapkick_Timer
-        if (Snapkick_Timer < diff)
+        //m_snapKickTimer
+        if (m_snapKickTimer < diff)
         {
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SNAPKICK);
-            Snapkick_Timer = 6000;
+            m_snapKickTimer = 6000;
         }
-        else Snapkick_Timer -= diff;
+        else m_snapKickTimer -= diff;
 
-        //Cleave_Timer
-        if (Cleave_Timer < diff)
+        //m_cleaveTimer
+        if (m_cleaveTimer < diff)
         {
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
-            Cleave_Timer = 12000;
+            m_cleaveTimer = 12000;
         }
-        else Cleave_Timer -= diff;
+        else m_cleaveTimer -= diff;
 
-        //Uppercut_Timer
-        if (Uppercut_Timer < diff)
+        //m_uppercutTimer
+        if (m_uppercutTimer < diff)
         {
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UPPERCUT);
-            Uppercut_Timer = 14000;
+            m_uppercutTimer = 14000;
         }
-        else Uppercut_Timer -= diff;
+        else m_uppercutTimer -= diff;
 
-        //MortalStrike_Timer
-        if (MortalStrike_Timer < diff)
+        //m_mortalStrikeTimer
+        if (m_mortalStrikeTimer < diff)
         {
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALSTRIKE);
-            MortalStrike_Timer = 10000;
+            m_mortalStrikeTimer = 10000;
         }
-        else MortalStrike_Timer -= diff;
+        else m_mortalStrikeTimer -= diff;
 
-        //Pummel_Timer
-        if (Pummel_Timer < diff)
+        //m_pummelTimer
+        if (m_pummelTimer < diff)
         {
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL);
-            Pummel_Timer = 16000;
+            m_pummelTimer = 16000;
         }
-        else Pummel_Timer -= diff;
+        else m_pummelTimer -= diff;
 
-        //ThrowAxe_Timer
-        if (ThrowAxe_Timer < diff)
+        if (!m_creature->HasAura(SPELL_UNARMED_PASSIVE))
         {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THROWAXE);
-            ThrowAxe_Timer = 8000;
+            //m_throwAxeTimer
+            if (m_throwAxeTimer < diff)
+            {
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THROWAXE);
+                m_throwAxeTimer = 8000;
+            }
+            else m_throwAxeTimer -= diff;
         }
-        else ThrowAxe_Timer -= diff;
 
         DoMeleeAttackIfReady();
     }

@@ -29,7 +29,6 @@ char const CreatureInfodstfmt[] = "iiiiiffffiiiiiissiiiiifffffiffffffiiiiiiiiiii
 char const CreatureDataAddonInfofmt[] = "iiiibbis";
 char const CreatureDisplayInfoAddonfmt[] = "iffffbi";
 char const GameObjectDisplayInfoAddonfmt[] = "iffffff";
-char const EquipmentInfofmt[] = "iiii";
 char const GameObjectInfosrcfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiis";
 char const GameObjectInfodstfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiii";
 char const PageTextfmt[] = "isi";
@@ -45,7 +44,6 @@ SQLStorage sCreatureStorage(CreatureInfosrcfmt, CreatureInfodstfmt, "entry", "cr
 SQLStorage sCreatureDataAddonStorage(CreatureDataAddonInfofmt, "guid", "creature_addon");
 SQLStorage sCreatureDisplayInfoAddonStorage(CreatureDisplayInfoAddonfmt, "display_id", "creature_display_info_addon");
 SQLStorage sGameObjectDisplayInfoAddonStorage(GameObjectDisplayInfoAddonfmt, "display_id", "gameobject_display_info_addon");
-SQLStorage sEquipmentStorage(EquipmentInfofmt, "entry", "creature_equip_template");
 SQLStorage sPageTextStore(PageTextfmt, "entry", "page_text");
 SQLStorage sMapStorage(MapEntrysrcfmt, MapEntrydstfmt, "entry", "map_template");
 SQLStorage sConditionStorage(ConditionsSrcFmt, ConditionsDstFmt, "condition_entry", "conditions");
