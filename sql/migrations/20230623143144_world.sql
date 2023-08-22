@@ -911,6 +911,7 @@ DELETE FROM `creature` WHERE `guid` = 189;
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` = 1319);
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 1319;
 DELETE FROM `pool_template` WHERE `entry` = 1319;
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `guid`=2223;
 
 
 -- End of migration.
