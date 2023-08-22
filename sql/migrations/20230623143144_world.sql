@@ -906,6 +906,12 @@ UPDATE `quest_template` SET `OfferRewardText` = "You did it! Vectus is defeated!
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 79840;
 DELETE FROM `creature` WHERE `guid` = 189;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Duplicate Gameobjects
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` = 1319);
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = 1319;
+DELETE FROM `pool_template` WHERE `entry` = 1319;
+
 
 -- End of migration.
 END IF;
