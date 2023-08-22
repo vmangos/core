@@ -864,11 +864,15 @@ void HonorMgr::Update()
     // RANK (Patent)
     m_owner->SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_HONOR_RANK, m_rank.rank);
 
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is now a progress bar on the Honor tab of your character window that displays how close you are to your next rank.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     uint32 honorBar = uint32(m_rankPoints >= 0.0f ? m_rankPoints : -1 * m_rankPoints);
     honorBar = uint8(((honorBar - m_rank.minRP) / (m_rank.maxRP - m_rank.minRP)) * (m_rank.positive ? 255 : -255));
 
     // PLAYER_FIELD_HONOR_BAR
     m_owner->SetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR, honorBar);
+#endif
 
     // TODAY
     m_owner->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0, todayHK);
@@ -878,9 +882,13 @@ void HonorMgr::Update()
     m_owner->SetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS, yesterdayKills);
     m_owner->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, uint32(yesterdayCP > 0.0f ? yesterdayCP : 0.0f));
 
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // THIS WEEK
     m_owner->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS, thisWeekKills);
     m_owner->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION, uint32(thisWeekCP > 0.0f ? thisWeekCP : 0.0f));
+#endif
 
     // LAST WEEK
     m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_KILLS, m_lastWeekHK);
