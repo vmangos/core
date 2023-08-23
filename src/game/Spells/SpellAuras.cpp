@@ -290,7 +290,7 @@ Aura::Aura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBas
     if (IsLastAuraOnHolder() && !m_positive)
     {
         // Exclude passive spells.
-        if (holder->IsNeedVisibleSlot(caster))
+        if (holder->IsNeedSlot(caster))
             holder->CalculateForDebuffLimit();
 
         holder->CalculateHeartBeat(caster, target);
@@ -6849,7 +6849,7 @@ void SpellAuraHolder::_AddSpellAuraHolder()
 
     // Lookup free slot
     // will be < MAX_AURAS slot (if find free) with !secondaura
-    if (IsNeedVisibleSlot(caster))
+    if (IsNeedSlot(caster))
     {
         if (IsPositive())                                   // empty positive slot
         {
@@ -7153,70 +7153,25 @@ bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) co
     return ref->GetCastItemGuid() && ref->GetCastItemGuid() != GetCastItemGuid();
 }
 
-bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
+bool SpellAuraHolder::IsNeedSlot(Unit const* caster) const
 {
+    /*
+    This is the check for whether an aura takes a buff/debuff slot server-side or not. Spells can take a slot even if not visible to the player in the aura bar.
+    This is the case for spells that have the attribute SPELL_ATTR_EX_NO_AURA_ICON such as persistent area effects, warrior stances, arcane missiles.
+    This attribute is implemented entirely client side. The server still sends packets of these auras to the client.
+    The client will then hide them from the aura bar, but will still show their visual effect and scrolling combat text application.
+    https://web.archive.org/web/20210228165946/https://us.forums.blizzard.com/en/wow/t/buff-cap-and-hidden-auras/297178
+    */
+
     // Custom spells cannot be displayed on aura bar.
     if (m_spellProto->IsCustomSpell())
         return false;
 
     bool totemAura = caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->IsTotem();
 
-    // Check for persistent area auras that only do damage. If it has a secondary effect, it takes
-    // up a slot
-    bool persistent = m_spellProto->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_PERSISTENT_AREA_AURA;
-    bool persistentWithSecondaryEffect = false;
-
-    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
-    {
-        // Check for persistent aura here since the effect aura is applied to the holder
-        // by a dynamic object as the target passes through the object field, meaning
-        // m_auras will be unset when this method is called (initialization)
-        if (!m_auras[i] && !persistent)
-            continue;
-
-        // special area auras cases
-        switch (m_spellProto->Effect[i])
-        {
-            case SPELL_EFFECT_APPLY_AREA_AURA_PET:
-            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-                // passive auras (except totem auras) do not get placed in caster slot
-                return (m_target != caster || totemAura || !m_isPassive) && m_auras[i]->GetModifier()->m_auraname != SPELL_AURA_NONE;
-
-                break;
-            case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-                // If spell aura applies something other than plain damage, it takes
-                // up a debuff slot.
-                if (m_spellProto->EffectApplyAuraName[i] != SPELL_AURA_PERIODIC_DAMAGE)
-                    persistentWithSecondaryEffect = true;
-
-                break;
-            default:
-                break;
-        }
-    }
-
-    /*  Persistent area auras such as Blizzard/RoF/Volley do not get require debuff slots
-        since they just do area damage with no additional effects. However, spells like
-        Hurricane do since they have a secondary effect attached to them. There are enough
-        persistent area spells in-game that making a switch for all of them is a bit
-        unreasonable. Any spell with a secondary affect should take up a slot. Note
-        that most (usable) persistent spells only deal damage.
-
-        It was considered whether spells with secondary effects should still deal damage,
-        even if there is no room for the other effect, however the debuff tooltip states
-        that the spell causes damage AND slows, therefore it must take a debuff slot.
-     */
-    if (persistent && !persistentWithSecondaryEffect)
-    {
-        return false;
-    }
-
-    // necessary for some spells, e.g. Immolate visual passive 28330
-    if (m_spellProto->SpellVisual)
-        return true;
-
-    // passive auras (except totem auras) do not get placed in the slots
-    return !m_isPassive || totemAura;
+    // passive auras (except totem auras and auras with a visual effect) do not get sent to client
+    // passive auras are defined as either auras with SPELL_ATTR_PASSIVE or auras with SPELL_ATTR_DO_NOT_DISPLAY and DurationIndex == 21
+    return !m_isPassive || totemAura || m_spellProto->SpellVisual;
 }
 
 void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
