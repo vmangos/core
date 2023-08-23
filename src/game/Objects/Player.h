@@ -2182,7 +2182,7 @@ class Player final: public Unit
         void SendMessageToSetInRange(WorldPacket* data, float fist, bool self) const override;
         void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool own_team_only) const;
         void SendInitWorldStates(uint32 zone) const;
-        void SendUpdateWorldState(uint32 field, uint32 value) const;
+        void SendUpdateWorldState(uint32 state, uint32 value) const;
         void SendDirectMessage(WorldPacket* data) const;
 
         uint32 GetTotalPlayedTime() const { return m_playedTime[PLAYED_TIME_TOTAL]; }

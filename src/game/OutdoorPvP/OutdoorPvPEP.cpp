@@ -157,13 +157,13 @@ void OPvPCapturePointEP_EWT::SendChangePhase()
 
 uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
 {
-    data << WS_EASTWALL_TOWER_ALLIANCE << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE));
-    data << WS_EASTWALL_TOWER_HORDE << uint32(bool(m_TowerState & TOWERSTATE_HORDE));
-    data << WS_EASTWALL_TOWER_ALLIANCE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
-    data << WS_EASTWALL_TOWER_HORDE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
-    data << WS_EASTWALL_TOWER_ALLIANCE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
-    data << WS_EASTWALL_TOWER_HORDE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
-    data << WS_EASTWALL_TOWER_NEUTRAL << uint32(bool(m_TowerState & TOWERSTATE_NEUTRAL));
+    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
     return 7;
 }
 
@@ -404,13 +404,13 @@ void OPvPCapturePointEP_NPT::SendChangePhase()
 
 uint32 OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
 {
-    data << WS_NORTHPASS_TOWER_ALLIANCE << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE));
-    data << WS_NORTHPASS_TOWER_HORDE << uint32(bool(m_TowerState & TOWERSTATE_HORDE));
-    data << WS_NORTHPASS_TOWER_ALLIANCE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
-    data << WS_NORTHPASS_TOWER_HORDE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
-    data << WS_NORTHPASS_TOWER_ALLIANCE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
-    data << WS_NORTHPASS_TOWER_HORDE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
-    data << WS_NORTHPASS_TOWER_NEUTRAL << uint32(bool(m_TowerState & TOWERSTATE_NEUTRAL));
+    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
     return 7;
 }
 
@@ -625,13 +625,13 @@ void OPvPCapturePointEP_CGT::SendChangePhase()
 
 uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
 {
-    data << WS_CROWN_GUARD_TOWER_ALLIANCE << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE));
-    data << WS_CROWN_GUARD_TOWER_HORDE << uint32(bool(m_TowerState & TOWERSTATE_HORDE));
-    data << WS_CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
-    data << WS_CROWN_GUARD_TOWER_HORDE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
-    data << WS_CROWN_GUARD_TOWER_ALLIANCE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
-    data << WS_CROWN_GUARD_TOWER_HORDE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
-    data << WS_CROWN_GUARD_TOWER_NEUTRAL << uint32(bool(m_TowerState & TOWERSTATE_NEUTRAL));
+    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
     return 7;
 }
 
@@ -864,13 +864,13 @@ void OPvPCapturePointEP_PWT::SendChangePhase()
 
 uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
 {
-    data << WS_PLAGUEWOOD_TOWER_ALLIANCE << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE));
-    data << WS_PLAGUEWOOD_TOWER_HORDE << uint32(bool(m_TowerState & TOWERSTATE_HORDE));
-    data << WS_PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
-    data << WS_PLAGUEWOOD_TOWER_HORDE_PROGRESSING << uint32(bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
-    data << WS_PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
-    data << WS_PLAGUEWOOD_TOWER_HORDE_CONTESTED << uint32(bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
-    data << WS_PLAGUEWOOD_TOWER_NEUTRAL << uint32(bool(m_TowerState & TOWERSTATE_NEUTRAL));
+    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
     return 7;
 }
 
@@ -1053,11 +1053,11 @@ void OutdoorPvPEP::BuffTeams()
 
 uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
 {
-    data << WS_UI_TOWER_COUNT_ALLIANCE << m_AllianceTowersControlled;
-    data << WS_UI_TOWER_COUNT_HORDE << m_HordeTowersControlled;
-    data << WS_UI_TOWER_SLIDER_DISPLAY << uint32(0);
-    data << WS_UI_TOWER_SLIDER_POSITION << uint32(50);
-    data << WS_UI_TOWER_SLIDER_N << uint32(100);
+    WriteInitialWorldStatePair(data, WS_UI_TOWER_COUNT_ALLIANCE, m_AllianceTowersControlled);
+    WriteInitialWorldStatePair(data, WS_UI_TOWER_COUNT_HORDE, m_HordeTowersControlled);
+    WriteInitialWorldStatePair(data, WS_UI_TOWER_SLIDER_DISPLAY, 0);
+    WriteInitialWorldStatePair(data, WS_UI_TOWER_SLIDER_POSITION, 50);
+    WriteInitialWorldStatePair(data, WS_UI_TOWER_SLIDER_N, 100);
     uint32 count = 5;
     for (const auto& itr : m_capturePoints)
         count += itr.second->FillInitialWorldStates(data);

@@ -4288,8 +4288,13 @@ void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
     target->ApplySpellImmune(GetId(), IMMUNITY_SCHOOL, m_modifier.m_miscvalue, apply);
 
     // remove all flag auras (they are positive, but they must be removed when you are immune)
-    if (apply && GetSpellProto()->HasAttribute(SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT)
-              && GetSpellProto()->HasAttribute(SPELL_ATTR_EX2_FAIL_ON_ALL_TARGETS_IMMUNE)
+    if (apply
+        // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+        // Offensive use of damage immunities no longer causes the flag to drop
+        // in Warsong Gulch.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+              && IsPositive()
+#endif
               && target->IsPlayer() && !target->IsCharmed())
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS);
 

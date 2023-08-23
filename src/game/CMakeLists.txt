@@ -253,6 +253,7 @@ set (game_SRCS
     Weather.h
     World.h
     WorldSession.h
+    WorldStates.h
     AI/BasicAI.h
     AI/CreatureAI.h
     AI/CreatureAIImpl.h

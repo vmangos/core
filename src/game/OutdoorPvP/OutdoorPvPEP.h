@@ -19,50 +19,9 @@
 #define OUTDOOR_PVP_EP_
 
 #include "ZoneScript.h"
+#include "WorldStates.h"
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-
-enum WorldStates 
-{
-    WS_EASTWALL_TOWER_ALLIANCE                  = 2354, // Blue Tower icon on map
-    WS_EASTWALL_TOWER_HORDE                     = 2356, // Red Tower icon on map
-    WS_EASTWALL_TOWER_ALLIANCE_PROGRESSING      = 2357, // Blue Tower icon on map
-    WS_EASTWALL_TOWER_HORDE_PROGRESSING         = 2358, // Red Tower icon on map
-    WS_EASTWALL_TOWER_ALLIANCE_CONTESTED        = 2359, // Grey Tower icon on map
-    WS_EASTWALL_TOWER_HORDE_CONTESTED           = 2360, // Grey Tower icon on map
-    WS_EASTWALL_TOWER_NEUTRAL                   = 2361, // Grey Tower icon on map
-
-    WS_NORTHPASS_TOWER_ALLIANCE                 = 2372, // Blue Tower icon on map
-    WS_NORTHPASS_TOWER_HORDE                    = 2373, // Red Tower icon on map
-    WS_NORTHPASS_TOWER_ALLIANCE_PROGRESSING     = 2364, // Blue Tower icon on map
-    WS_NORTHPASS_TOWER_HORDE_PROGRESSING        = 2365, // Red Tower icon on map
-    WS_NORTHPASS_TOWER_ALLIANCE_CONTESTED       = 2362, // Grey Tower icon on map
-    WS_NORTHPASS_TOWER_HORDE_CONTESTED          = 2363, // Grey Tower icon on map
-    WS_NORTHPASS_TOWER_NEUTRAL                  = 2352, // Grey Tower icon on map
-
-    WS_PLAGUEWOOD_TOWER_ALLIANCE                = 2370, // Blue Tower icon on map
-    WS_PLAGUEWOOD_TOWER_HORDE                   = 2371, // Red Tower icon on map
-    WS_PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING    = 2368, // Blue Tower icon on map
-    WS_PLAGUEWOOD_TOWER_HORDE_PROGRESSING       = 2369, // Red Tower icon on map
-    WS_PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED      = 2366, // Grey Tower icon on map
-    WS_PLAGUEWOOD_TOWER_HORDE_CONTESTED         = 2367, // No Tower icon on map, 2367 is not working client side ".debug send worldstate 2367 1"
-    WS_PLAGUEWOOD_TOWER_NEUTRAL                 = 2353, // Grey Tower icon on map
-
-    WS_CROWN_GUARD_TOWER_ALLIANCE               = 2378, // Blue Tower icon on map
-    WS_CROWN_GUARD_TOWER_HORDE                  = 2379, // Red Tower icon on map
-    WS_CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING   = 2376, // Blue Tower icon on map
-    WS_CROWN_GUARD_TOWER_HORDE_PROGRESSING      = 2377, // Red Tower icon on map
-    WS_CROWN_GUARD_TOWER_ALLIANCE_CONTESTED     = 2374, // Grey Tower icon on map
-    WS_CROWN_GUARD_TOWER_HORDE_CONTESTED        = 2375, // Grey Tower icon on map
-    WS_CROWN_GUARD_TOWER_NEUTRAL                = 2355, // Grey Tower icon on map
-
-    WS_UI_TOWER_SLIDER_DISPLAY                  = 2426,
-    WS_UI_TOWER_SLIDER_POSITION                 = 2427,
-    WS_UI_TOWER_SLIDER_N                        = 2428,
-
-    WS_UI_TOWER_COUNT_ALLIANCE                  = 2327,
-    WS_UI_TOWER_COUNT_HORDE                     = 2328
-};
 
 enum BroadCastTexts
 {

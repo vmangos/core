@@ -1429,7 +1429,7 @@ void ObjectMgr::CheckCreatureTemplates()
 
         if (cInfo->equipment_id > 0)                         // 0 no equipment
         {
-            if (!GetEquipmentInfo(cInfo->equipment_id))
+            if (!GetEquipmentTemplate(cInfo->equipment_id))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `creature_template` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", cInfo->entry, cInfo->equipment_id);
                 sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `equipment_id`=0 WHERE `entry`=%u;", cInfo->entry);
@@ -1525,7 +1525,7 @@ void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entry
 
         if (addon->equipment_id > 0)
         {
-            if (!GetEquipmentInfo(addon->equipment_id))
+            if (!GetEquipmentTemplate(addon->equipment_id))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (%s %u) have invalid equipment id (%i) defined in `%s`.", entryName, addon->guid, addon->equipment_id, creatureaddons.GetTableName());
                 const_cast<CreatureDataAddon*>(addon)->equipment_id = -1;
@@ -1566,36 +1566,71 @@ void ObjectMgr::LoadCreatureAddons()
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUID: %u) does not exist but has a record in `creature_addon`", addon->guid);
 }
 
-EquipmentInfo const* ObjectMgr::GetEquipmentInfo(uint32 entry)
-{
-    return sEquipmentStorage.LookupEntry<EquipmentInfo>(entry);
-}
-
 void ObjectMgr::LoadEquipmentTemplates()
 {
-    sEquipmentStorage.LoadProgressive(sWorld.GetWowPatch(), "patch", true);
+    m_CreatureEquipmentMap.clear(); // need for reload case
 
-    for (uint32 i = 0; i < sEquipmentStorage.GetMaxEntry(); ++i)
+    //                                                                0        1              2        3        4
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `probability`, `item1`, `item2`, `item3` FROM `creature_equip_template` WHERE %u BETWEEN `patch_min` AND `patch_max`", sWorld.GetWowPatch()));
+
+    if (!result)
     {
-        EquipmentInfo const* eqInfo = sEquipmentStorage.LookupEntry<EquipmentInfo>(i);
+        BarGoLink bar(1);
+        bar.step();
 
-        if (!eqInfo)
-            continue;
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 creature equipment templates. DB table `creature_equip_template` is empty.");
+        return;
+    }
 
-        for (uint8 j = 0; j < 3; ++j)
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        bar.step();
+        Field* fields = result->Fetch();
+
+        uint32 entry = fields[0].GetUInt32();
+        EquipmentEntry equipEntry;
+        equipEntry.probability = fields[1].GetUInt32();
+        equipEntry.item[0] = fields[2].GetUInt32();
+        equipEntry.item[1] = fields[3].GetUInt32();
+        equipEntry.item[2] = fields[4].GetUInt32();
+
+        auto itr = m_CreatureEquipmentMap.find(entry);
+        if (itr != m_CreatureEquipmentMap.end())
         {
-            if (!eqInfo->equipentry[j])
-                continue;
+            itr->second.totalProbability += equipEntry.probability;
+            itr->second.equipment.push_back(equipEntry);
+        }
+        else
+        {
+            EquipmentTemplate equipTemplate;
+            equipTemplate.totalProbability = equipEntry.probability;
+            equipTemplate.equipment.push_back(equipEntry);
+            m_CreatureEquipmentMap.insert(std::make_pair(entry, equipTemplate));
+        }
 
-            ItemPrototype const* itemProto = GetItemPrototype(eqInfo->equipentry[j]);
-            if (!itemProto)
+    } while (result->NextRow());
+
+    for (auto& itrTemplate : m_CreatureEquipmentMap)
+    {
+        for (auto& itrEntry : itrTemplate.second.equipment)
+        {
+            for (uint8 j = 0; j < 3; ++j)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Unknown item (entry=%u) in creature_equip_template.equipentry%u for entry = %u, forced to 0.", eqInfo->equipentry[j], j + 1, i);
-                const_cast<EquipmentInfo*>(eqInfo)->equipentry[j] = 0;
-                continue;
-            }
+                if (!itrEntry.item[j])
+                    continue;
 
-            if (itemProto->InventoryType != INVTYPE_WEAPON &&
+                ItemPrototype const* itemProto = GetItemPrototype(itrEntry.item[j]);
+                if (!itemProto)
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Unknown item (entry=%u) in creature_equip_template.item%u for entry = %u, forced to 0.", itrEntry.item[j], j + 1, itrTemplate.first);
+                    itrEntry.item[j] = 0;
+                    continue;
+                }
+
+                if (itemProto->InventoryType != INVTYPE_WEAPON &&
                     itemProto->InventoryType != INVTYPE_SHIELD &&
                     itemProto->InventoryType != INVTYPE_RANGED &&
                     itemProto->InventoryType != INVTYPE_2HWEAPON &&
@@ -1605,14 +1640,15 @@ void ObjectMgr::LoadEquipmentTemplates()
                     itemProto->InventoryType != INVTYPE_THROWN &&
                     itemProto->InventoryType != INVTYPE_RANGEDRIGHT &&
                     itemProto->InventoryType != INVTYPE_RELIC)
-            {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Item (entry=%u) in creature_equip_template.equipentry%u for entry = %u is not equipable in a hand, forced to 0.", eqInfo->equipentry[j], j + 1, i);
-                const_cast<EquipmentInfo*>(eqInfo)->equipentry[j] = 0;
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Item (entry=%u) in creature_equip_template.item%u for entry = %u is not equipable in a hand, forced to 0.", itrEntry.item[j], j + 1, itrTemplate.first);
+                    itrEntry.item[j] = 0;
+                }
             }
         }
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u equipment template", sEquipmentStorage.GetRecordCount());
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u equipment template", (uint32)m_CreatureEquipmentMap.size());
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
 }
 

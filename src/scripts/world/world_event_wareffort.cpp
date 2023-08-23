@@ -31,12 +31,12 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
     {
         uint32 amount = sObjectMgr.GetSavedVariable(AllianceObjectives[i].currentVar, 0);
 
-        data << AllianceObjectives[i].wsCurrent << amount;
-        data << AllianceObjectives[i].wsRequired << AllianceObjectives[i].required;
+        WriteInitialWorldStatePair(data, AllianceObjectives[i].wsCurrent, amount);
+        WriteInitialWorldStatePair(data, AllianceObjectives[i].wsRequired, AllianceObjectives[i].required);
 
         amount = sObjectMgr.GetSavedVariable(HordeObjectives[i].currentVar, 0);
-        data << HordeObjectives[i].wsCurrent << amount;
-        data << HordeObjectives[i].wsRequired << HordeObjectives[i].required;
+        WriteInitialWorldStatePair(data, HordeObjectives[i].wsCurrent, amount);
+        WriteInitialWorldStatePair(data, HordeObjectives[i].wsRequired, HordeObjectives[i].required);
 
         count += 4;
     }
@@ -46,9 +46,9 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
         uint32 allianceContrib = GetTeamStock(SharedObjectives[i].itemId, TEAM_ALLIANCE);
         uint32 hordeContrib = GetTeamStock(SharedObjectives[i].itemId, TEAM_HORDE);
 
-        data << SharedObjectives[i].wsAllianceCurrent << allianceContrib;
-        data << SharedObjectives[i].wsHordeCurrent << hordeContrib;
-        data << SharedObjectives[i].wsRequired << SharedObjectives[i].required;
+        WriteInitialWorldStatePair(data, SharedObjectives[i].wsAllianceCurrent, allianceContrib);
+        WriteInitialWorldStatePair(data, SharedObjectives[i].wsHordeCurrent, hordeContrib);
+        WriteInitialWorldStatePair(data, SharedObjectives[i].wsRequired, SharedObjectives[i].required);
 
         count += 3;
     }
@@ -74,7 +74,7 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
                 daysRemaining = 1;
         }
 
-        data << WORLDSTATE_TRANSITION_DAYS_REMAINING << daysRemaining;
+        WriteInitialWorldStatePair(data, WS_WE_TRANSITION_DAYS_REMAINING, daysRemaining);
         ++count;
     }
 

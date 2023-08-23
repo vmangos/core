@@ -109,7 +109,8 @@ class Creature : public Unit
         CreatureClassLevelStats const* GetClassLevelStats() const;
         void SelectLevel(float percentHealth = 100.0f, float percentMana = 100.0f);
         void InitStatsForLevel(float percentHealth = 100.0f, float percentMana = 100.0f);
-        void LoadEquipment(uint32 equip_entry, bool force=false);
+        void LoadEquipment(uint32 equipmentId, bool force = false);
+        void LoadDefaultEquipment(GameEventCreatureData const* eventData = nullptr);
 
         bool HasStaticDBSpawnData() const;                  // listed in `creature` table and have fixed in DB guid
         uint32 GetDBTableGUIDLow() const;
@@ -121,7 +122,6 @@ class Creature : public Unit
 
         virtual void RegenerateAll(uint32 update_diff, bool skipCombatCheck = false);
         void GetRespawnCoord(float &x, float &y, float &z, float* ori = nullptr, float* dist = nullptr) const;
-        uint32 GetEquipmentId() const { return m_equipmentId; }
 
         void SaveHomePosition() { SetHomePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
         void SetHomePosition(float x, float y, float z, float o);
