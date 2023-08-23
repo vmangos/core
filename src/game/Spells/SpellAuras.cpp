@@ -7171,7 +7171,7 @@ bool SpellAuraHolder::IsNeedSlot(Unit const* caster) const
 
     // passive auras (except totem auras and auras with a visual effect) do not get sent to client
     // passive auras are defined as either auras with SPELL_ATTR_PASSIVE or auras with SPELL_ATTR_DO_NOT_DISPLAY and DurationIndex == 21
-    return !m_isPassive || totemAura || m_spellProto->SpellVisual;
+    return !m_isPassive || totemAura || (m_spellProto->SpellVisual && m_spellProto->SpellIconID != 1);
 }
 
 void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
