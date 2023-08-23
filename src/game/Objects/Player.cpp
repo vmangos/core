@@ -701,6 +701,10 @@ Player::Player(WorldSession* session) : Unit(),
 
     m_lastFromClientCastedSpellID = 0;
 
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
+    m_resurrectionSpellId = 0;
+#endif
+
     // Anti undermap
     m_undermapPosValid = false;
     session->InitCheatData(this);
@@ -1933,12 +1937,18 @@ void Player::SetDeathState(DeathState s)
         if (ObjectGuid lootGuid = GetLootGuid())
             GetSession()->DoLootRelease(lootGuid);
 
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - Self-resurrection spells show their name on the button in the release spirit dialog.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
         // save value before aura remove in Unit::SetDeathState
         ressSpellId = GetUInt32Value(PLAYER_SELF_RES_SPELL);
+#else
+        ressSpellId = GetResurrectionSpellId();
+#endif
 
         // passive spell
         if (!ressSpellId)
-            ressSpellId = GetResurrectionSpellId();
+            ressSpellId = SelectResurrectionSpellId();
 
         if (m_zoneScript)
             m_zoneScript->OnPlayerDeath(this);
@@ -1948,12 +1958,24 @@ void Player::SetDeathState(DeathState s)
 
     // restore resurrection spell id for player after aura remove
     if (s == JUST_DIED && cur && ressSpellId)
+    {
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
         SetUInt32Value(PLAYER_SELF_RES_SPELL, ressSpellId);
+#else
+        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_CAN_SELF_RESURRECT);
+        SetResurrectionSpellId(ressSpellId);
+#endif
+    }
 
     if (IsAlive() && !cur)
     {
-        //clear aura case after resurrection by another way (spells will be applied before next death)
+        //clear self-resurrection state after resurrection by another way (spells will be applied before next death)
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
         SetUInt32Value(PLAYER_SELF_RES_SPELL, 0);
+#else
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_CAN_SELF_RESURRECT);
+        SetResurrectionSpellId(0);
+#endif
 
         UpdatePvPContested(false, true);
     }
@@ -20010,7 +20032,7 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
     }
 }
 
-uint32 Player::GetResurrectionSpellId() const
+uint32 Player::SelectResurrectionSpellId() const
 {
     // search priceless resurrection possibilities
     uint32 prio = 0;

@@ -496,6 +496,9 @@ void WorldSession::HandleCancelChanneling(WorldPacket& recv_data)
 
 void WorldSession::HandleSelfResOpcode(WorldPacket& /*recv_data*/)
 {
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - Self-resurrection spells show their name on the button in the release spirit dialog.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     if (_player->GetUInt32Value(PLAYER_SELF_RES_SPELL))
     {
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL));
@@ -504,4 +507,15 @@ void WorldSession::HandleSelfResOpcode(WorldPacket& /*recv_data*/)
 
         _player->SetUInt32Value(PLAYER_SELF_RES_SPELL, 0);
     }
+#else
+    if (_player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CAN_SELF_RESURRECT))
+    {
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(_player->GetResurrectionSpellId());
+        if (spellInfo)
+            _player->CastSpell(_player, spellInfo, false);
+
+        _player->SetResurrectionSpellId(0);
+        _player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_CAN_SELF_RESURRECT);
+    }
+#endif
 }

@@ -1108,8 +1108,15 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
         DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "SET JUST_DIED");
         pVictim->SetDeathState(JUST_DIED);
 
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - Self-resurrection spells show their name on the button in the release spirit dialog.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
         if (pPlayerVictim && pVictim->GetUInt32Value(PLAYER_SELF_RES_SPELL))
             pVictim->DirectSendPublicValueUpdate(PLAYER_SELF_RES_SPELL);
+#else
+        if (pPlayerVictim && pVictim->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CAN_SELF_RESURRECT))
+            pVictim->DirectSendPublicValueUpdate(PLAYER_FLAGS);
+#endif
         // Nostalrius: Instantly send values update for health
         pVictim->DirectSendPublicValueUpdate(UNIT_FIELD_HEALTH);
     }
@@ -1136,15 +1143,27 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
     if (spiritOfRedemtionTalentImmune)
     {
         // save value before aura remove
-        uint32 ressSpellId = pVictim->GetUInt32Value(PLAYER_SELF_RES_SPELL);
+        uint32 ressSpellId = 0;
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+        ressSpellId = pVictim->GetUInt32Value(PLAYER_SELF_RES_SPELL);
         if (!ressSpellId)
+            ressSpellId = ((Player*)pVictim)->SelectResurrectionSpellId();
+#else
+        if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CAN_SELF_RESURRECT))
             ressSpellId = ((Player*)pVictim)->GetResurrectionSpellId();
+#endif
 
         //Remove all expected to remove at death auras (most important negative case like DoT or periodic triggers)
         pVictim->RemoveAllAurasOnDeath();
 
         // restore for use at real death
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
         pVictim->SetUInt32Value(PLAYER_SELF_RES_SPELL, ressSpellId);
+#else
+        pPlayerVictim->SetResurrectionSpellId(ressSpellId);
+        if (ressSpellId)
+            SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_CAN_SELF_RESURRECT);
+#endif
 
         // FORM_SPIRITOFREDEMPTION and related auras
         pVictim->AddAura(27827, ADD_AURA_NO_OPTION, pVictim);
