@@ -1107,9 +1107,10 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
         pVictim->SetHealth(0);
         DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "SET JUST_DIED");
         pVictim->SetDeathState(JUST_DIED);
-        // Nostalrius: Instantly send values update for health
+
         if (pPlayerVictim && pVictim->GetUInt32Value(PLAYER_SELF_RES_SPELL))
             pVictim->DirectSendPublicValueUpdate(PLAYER_SELF_RES_SPELL);
+        // Nostalrius: Instantly send values update for health
         pVictim->DirectSendPublicValueUpdate(UNIT_FIELD_HEALTH);
     }
     else
