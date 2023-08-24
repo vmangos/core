@@ -1145,22 +1145,9 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 {
     npc_Emissary_RomankhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-        pCreature->SetVisibility(VISIBILITY_OFF);
-
-        OverlordCount = 0;
-        if (Creature* add = pCreature->SummonCreature(15288, -7233.39f, 906.415f, -1.76649f, 1.81259f, TEMPSUMMON_DEAD_DESPAWN, 0))   // Aluntir
-            add->JoinCreatureGroup(pCreature, 0, 0, OPTION_RESPAWN_TOGETHER);
-        if (Creature* add = pCreature->SummonCreature(15286, -7212.16f, 911.711f, -1.76649f, 2.58543f, TEMPSUMMON_DEAD_DESPAWN, 0))   // Xil'xix
-            add->JoinCreatureGroup(pCreature, 0, 0, OPTION_RESPAWN_TOGETHER);
-        if (Creature* add = pCreature->SummonCreature(15290, -7210.3f, 895.014f, -1.76649f, 0.544185f, TEMPSUMMON_DEAD_DESPAWN, 0))   // Arakis
-            add->JoinCreatureGroup(pCreature, 0, 0, OPTION_RESPAWN_TOGETHER);
         Reset();
     }
 
-    int OverlordCount;
     uint32 m_uiWiltTimer;
     uint32 m_uiSchockTimer;
     uint32 m_uiSanityTimer;
@@ -1181,18 +1168,6 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
         for (uint64 & guid : PlayerGuids)
             guid = 0;
-    }
-
-    void SummonedCreatureJustDied(Creature* unit) override
-    {
-        ++OverlordCount;
-        if (OverlordCount >= 3)
-        {
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-            m_creature->SetVisibility(VISIBILITY_ON);
-        }
     }
 
     void Aggro(Unit* pWho) override
