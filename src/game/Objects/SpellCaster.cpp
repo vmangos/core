@@ -923,7 +923,21 @@ float SpellCaster::CalculateSpellEffectValue(Unit const* target, SpellEntry cons
     if (pUnit)
     {
         if (Player* modOwner = pUnit->GetSpellModOwner())
+        {
             modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_ALL_EFFECTS, value, spell);
+
+            // Apply speed aura mods at cast time.
+            // Fixes Curse of Exhaustion not removing Amplify Curse.
+            switch (spellProto->EffectApplyAuraName[effect_index])
+            {
+                case SPELL_AURA_MOD_INCREASE_SPEED:
+                case SPELL_AURA_MOD_SPEED_ALWAYS:
+                case SPELL_AURA_MOD_SPEED_NOT_STACK:
+                case SPELL_AURA_MOD_DECREASE_SPEED:
+                    modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_SPEED, value, spell);
+                    break;
+            }
+        }
     }
 
     if (spellProto->HasAttribute(SPELL_ATTR_SCALES_WITH_CREATURE_LEVEL) && spellProto->spellLevel &&
