@@ -918,6 +918,39 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE
 DELETE FROM `creature` WHERE `guid` = 5608;
 
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Script For Suspicious Hoofprints
+UPDATE `quest_template` SET `CompleteScript` = 1284 WHERE `entry`=1284;
+DELETE FROM `quest_end_scripts` WHERE `id`=1284;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1284, 0, 0, 1, 1, 0, 0, 0, 4944, 30, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Captain Garran Vimes - Emote OneShotTalk'),
+(1284, 0, 0, 0, 0, 0, 0, 0, 4944, 30, 8, 2, 1753, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Captain Garran Vimes - Say Text'),
+(1284, 1, 0, 10, 5088, 30297, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -3715.15, -4523.85, 25.917, 4.76475, 0, 'Suspicious Hoofprints: Summon Creature Falgran Hastil'),
+(1284, 3, 0, 3, 0, 3162, 1, 2, 5088, 50, 8, 2, 0, 0, 0, 0, -3714.11, -4531.68, 25.8337, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Move'),
+(1284, 5, 0, 3, 0, 3864, 1, 2, 5088, 50, 8, 2, 0, 0, 0, 0, -3714.36, -4537.47, 25.8337, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Move'),
+(1284, 6, 0, 3, 0, 4620, 1, 2, 5088, 50, 8, 2, 0, 0, 0, 0, -3717.07, -4542.72, 25.8337, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Move'),
+(1284, 6, 0, 0, 0, 0, 0, 0, 4948, 30, 8, 2, 1754, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Adjutant Tesoran - Say Text'),
+(1284, 6, 0, 1, 1, 0, 0, 0, 4948, 30, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Adjutant Tesoran - Emote OneShotTalk'),
+(1284, 10, 0, 3, 0, 4548, 1, 2, 5088, 50, 8, 2, 0, 0, 0, 0, -3724.38, -4545.64, 25.8337, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Move'),
+(1284, 14, 0, 35, 1, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 3.92117, 0, 'Suspicious Hoofprints: Falgran Hastil - Set Orientation'),
+(1284, 16, 0, 1, 16, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Emote OneShotKneel'),
+(1284, 19, 0, 1, 1, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Emote OneShotTalk'),
+(1284, 19, 0, 0, 0, 0, 0, 0, 5088, 50, 8, 2, 1752, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Say Text'),
+(1284, 23, 0, 1, 66, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Emote OneShotSalute'),
+(1284, 24, 0, 25, 1, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Run'),
+(1284, 26, 0, 60, 2, 0, 0, 0, 5088, 50, 8, 2, 0, 5088, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Start Waypoints'),
+(1284, 30, 0, 18, 0, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Despawn');
+
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(5088, 1, -3717.860107, -4542.540039, 26.083700, 100, 0, 0, 0),
+(5088, 2, -3714.360107, -4539.790039, 26.083700, 100, 0, 0, 0),
+(5088, 3, -3712.860107, -4535.540039, 26.083700, 100, 0, 0, 0),
+(5088, 4, -3714.110107, -4528.790039, 26.083700, 100, 0, 0, 0),
+(5088, 5, -3714.360107, -4527.790039, 26.083700, 100, 0, 0, 0),
+(5088, 6, -3714.610107, -4526.540039, 26.083700, 100, 0, 0, 0),
+(5088, 7, -3714.830078, -4524.939941, 25.833700, 100, 0, 0, 0);
+
+
 -- End of migration.
 END IF;
 END??
