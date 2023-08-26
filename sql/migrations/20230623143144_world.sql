@@ -904,7 +904,7 @@ UPDATE `quest_template` SET `OfferRewardText` = "You did it! Vectus is defeated!
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Update Stormwind Guards
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 79840;
-DELETE FROM `creature` WHERE `guid` = 189;
+DELETE FROM `creature` WHERE `guid` IN (189, 190);
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Remove Duplicate Gameobjects
