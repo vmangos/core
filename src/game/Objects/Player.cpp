@@ -3756,8 +3756,10 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // one form stealth modified bytes
     RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_VIS_FLAG, UNIT_VIS_FLAGS_ALL);
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // restore if need some important flags
     SetUInt32Value(PLAYER_FIELD_BYTES2, 0);                 // flags empty by default
+#endif
 
     if (reapplyMods)                                        //reapply stats values only on .reset stats (level) command
         _ApplyAllStatBonuses();

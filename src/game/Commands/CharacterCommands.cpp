@@ -2278,8 +2278,12 @@ bool ChatHandler::HandleHonorShow(char* /*args*/)
     uint32 today_dishonorable_kills = target->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 1);
     uint32 yesterday_kills          = target->GetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS);
     uint32 yesterday_honor          = target->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     uint32 this_week_kills          = target->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS);
     uint32 this_week_honor          = target->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
+#endif
     uint32 last_week_kills          = target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_KILLS);
     uint32 last_week_honor          = target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
     uint32 last_week_standing       = target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
@@ -2360,7 +2364,9 @@ bool ChatHandler::HandleHonorShow(char* /*args*/)
     PSendSysMessage(LANG_RANK, target->GetName(), rank_name, honor_rank);
     PSendSysMessage(LANG_HONOR_TODAY, today_honorable_kills, today_dishonorable_kills);
     PSendSysMessage(LANG_HONOR_YESTERDAY, yesterday_kills, yesterday_honor);
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     PSendSysMessage(LANG_HONOR_THIS_WEEK, this_week_kills, this_week_honor);
+#endif
     PSendSysMessage(LANG_HONOR_LAST_WEEK, last_week_kills, last_week_honor, last_week_standing);
     PSendSysMessage(LANG_HONOR_LIFE, target->GetHonorMgr().GetRankPoints(), honorable_kills, dishonorable_kills, highest_rank, hrank_name);
 
@@ -2432,8 +2438,13 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
     {
         if (amount < 0 || amount > 255)
             return false;
+
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is now a progress bar on the Honor tab of your character window that displays how close you are to your next rank.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
         // rank points is sent to client with same size of uint8(255) for each rank
         target->SetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR, amount);
+#endif
     }
     else if (hasStringAbbr(field, "rank"))
     {
@@ -2447,10 +2458,14 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
         target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS, (uint32)amount);
     else if (hasStringAbbr(field, "yesterdayhonor"))
         target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, (uint32)amount);
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     else if (hasStringAbbr(field, "thisweekkills"))
         target->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS, (uint32)amount);
     else if (hasStringAbbr(field, "thisweekhonor"))
         target->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION, (uint32)amount);
+#endif
     else if (hasStringAbbr(field, "lastweekkills"))
         target->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_KILLS, (uint32)amount);
     else if (hasStringAbbr(field, "lastweekhonor"))

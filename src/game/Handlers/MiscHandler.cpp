@@ -1040,7 +1040,31 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     if (_player->IsValidAttackTarget(pTarget))
         return;
 
-    WorldPacket data(MSG_INSPECT_HONOR_STATS, (8 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
+    WorldPacket data(MSG_INSPECT_HONOR_STATS, (
+        8
+        + 1
+        + 4
+        + 4
+        + 4
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+        + 4
+#endif
+        + 4
+        + 4
+        + 4
+        + 4
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+        + 4
+#endif
+        + 4
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is now a progress bar on the Honor tab of your character window that displays how close you are to your next rank.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+        + 1
+#endif
+    ));
 
     // player guid
     data << guid;
@@ -1063,11 +1087,13 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     // Unknown (deprecated, last week dishonourable?)
     data << (uint16)0;
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // This Week Honorable kills
     data << pTarget->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
 
     // Unknown (deprecated, this week dishonourable?)
     data << (uint16)0;
+#endif
 
     // Lifetime Honorable Kills
     data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
@@ -1081,14 +1107,18 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     // Last Week Honor
     data << pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // This Week Honor
     data << pTarget->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
+#endif
 
     // Last Week Standing
     data << pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // Rank progress bar
     data << (uint8)pTarget->GetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR);
+#endif
 
     SendPacket(&data);
 }

@@ -3847,8 +3847,12 @@ void Aura::HandleModStealth(bool apply, bool Real)
         if (Real)
         {
             target->SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_VIS_FLAG, UNIT_VIS_FLAGS_CREEP);
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
             if (target->GetTypeId() == TYPEID_PLAYER)
                 target->SetByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_STEALTH);
+#endif
+
             // apply only if not in GM invisibility (and overwrite invisibility state)
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
@@ -3886,8 +3890,12 @@ void Aura::HandleModStealth(bool apply, bool Real)
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
                 target->RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_VIS_FLAG, UNIT_VIS_FLAGS_CREEP);
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
                 if (target->GetTypeId() == TYPEID_PLAYER)
                     target->RemoveByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_STEALTH);
+#endif
+
                 // restore invisibility if any
                 if (target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
                 {
@@ -3910,11 +3918,13 @@ void Aura::HandleInvisibility(bool apply, bool Real)
         target->m_invisibilityMask |= (1 << m_modifier.m_miscvalue);
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_STEALTH_INVIS_CANCELS);
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
         if (Real && target->GetTypeId() == TYPEID_PLAYER)
         {
             // apply glow vision
             target->SetByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
         }
+#endif
 
         // apply only if not in GM invisibility and not stealth
         if (target->GetVisibility() == VISIBILITY_ON)
@@ -3935,9 +3945,11 @@ void Aura::HandleInvisibility(bool apply, bool Real)
         // only at real aura remove and if not have different invisibility auras.
         if (Real && target->m_invisibilityMask == 0)
         {
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
             // remove glow vision
             if (target->GetTypeId() == TYPEID_PLAYER)
                 target->RemoveByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
+#endif
             // apply only if not in GM invisibility & not stealthed while invisible
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
@@ -3969,10 +3981,14 @@ void Aura::HandleInvisibilityDetect(bool apply, bool Real)
 
 void Aura::HandleDetectAmore(bool apply, bool /*real*/)
 {
+// World of Warcraft Client Patch 1.9.3 (2006-02-07)
+// - Love is in the Air added.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     if (!GetTarget()->IsPlayer())
         return;
 
     GetTarget()->ApplyModByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_DETECT_AMORE, apply);
+#endif
 }
 
 void Aura::HandleAuraModRoot(bool apply, bool Real)
