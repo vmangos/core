@@ -938,8 +938,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (1284, 19, 0, 0, 0, 0, 0, 0, 5088, 50, 8, 2, 1752, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Say Text'),
 (1284, 23, 0, 1, 66, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Emote OneShotSalute'),
 (1284, 24, 0, 25, 1, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Run'),
-(1284, 26, 0, 60, 2, 0, 0, 0, 5088, 50, 8, 2, 0, 5088, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Start Waypoints'),
-(1284, 30, 0, 18, 0, 0, 0, 0, 5088, 50, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Despawn');
+(1284, 26, 0, 60, 2, 0, 0, 0, 5088, 50, 8, 2, 0, 5088, 0, 0, 0, 0, 0, 0, 0, 'Suspicious Hoofprints: Falgran Hastil - Start Waypoints');
 
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (5088, 1, -3717.860107, -4542.540039, 26.083700, 100, 0, 0, 0),
