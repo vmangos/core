@@ -954,7 +954,7 @@ REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `
 (1210, 'Westfall - Defias Pathstalker', 7159, 65, 1, 0, 0, 0, 1, 7, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Add Eliza Spawn Text
+-- Add Eliza Spawn Text and Spawn Position
 DELETE FROM `creature_ai_scripts` WHERE `id`=31403;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (31403, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 111, 0, 0, 0, 0, 0, 0, 0, 0, 'Eliza - Say Text');
@@ -965,6 +965,10 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
 (31413, 314, 0, 11, 0, 100, 0, 0, 0, 0, 0, 31413, 0, 0, 'Eliza - Say on Spawn');
+
+DELETE FROM `quest_end_scripts` WHERE `id`=254;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(254, 1, 0, 10, 314, 3000000, 0, 0, 0, 0, 0, 0, 8, 0, -1, 1, -10270, 53.9225, 41.8903, 6.15428, 0, 'Digging Through the Dirt: Summon Creature');
 
 
 -- End of migration.
