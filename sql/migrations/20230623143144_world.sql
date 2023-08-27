@@ -970,6 +970,11 @@ DELETE FROM `quest_end_scripts` WHERE `id`=254;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (254, 1, 0, 10, 314, 3000000, 0, 0, 0, 0, 0, 0, 8, 0, -1, 1, -10270, 53.9225, 41.8903, 6.15428, 0, 'Digging Through the Dirt: Summon Creature');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct Some Creature Loot (Credit TrinityCore)
+DELETE FROM `creature_loot_template` WHERE `entry` IN (4625, 11374);
+UPDATE `creature_template` SET `loot_id` = 0, `skinning_loot_id` = 0 WHERE `entry` IN (4625, 11374);
+
 
 -- End of migration.
 END IF;
