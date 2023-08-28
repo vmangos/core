@@ -983,6 +983,21 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (290701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1925, 1926, 0, 0, 0, 0, 0, 0, 0, 'Dustbelcher Mystic - Talk');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Events list for Blackrock Scout
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(406402, 4064, 0, 4, 0, 10, 0, 0, 0, 0, 0, 406402, 0, 0, 'Blackrock Scout - Talk on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(406402, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1874, 1875, 0, 0, 0, 0, 0, 0, 0, 'Blackrock Scout - Talk');
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct respawn time
+-- Tethis 420 600
+-- King Bangalash 420 600
+-- Bhag'thera 420 600
+-- Mai'Zoth 1800 1800
+UPDATE `creature` SET `spawntimesecsmin` = 240, `spawntimesecsmax` = 360 WHERE `id` IN (730,731,728,818);
+
 
 -- End of migration.
 END IF;
