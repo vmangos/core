@@ -975,6 +975,14 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 DELETE FROM `creature_loot_template` WHERE `entry` IN (4625, 11374);
 UPDATE `creature_template` SET `loot_id` = 0, `skinning_loot_id` = 0 WHERE `entry` IN (4625, 11374);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Events list for Dustbelcher Mystic
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 2907;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(290701, 2907, 0, 4, 0, 10, 0, 0, 0, 0, 0, 290701, 0, 0, 'Dustbelcher Mystic - Talk on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(290701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1925, 1926, 0, 0, 0, 0, 0, 0, 0, 'Dustbelcher Mystic - Talk');
+
 
 -- End of migration.
 END IF;
