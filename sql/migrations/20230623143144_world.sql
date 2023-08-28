@@ -998,6 +998,18 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 -- Mai'Zoth 1800 1800
 UPDATE `creature` SET `spawntimesecsmin` = 240, `spawntimesecsmax` = 360 WHERE `id` IN (730,731,728,818);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct Injured Stockades Guard
+INSERT INTO `creature_addon` (`guid`, `mount_display_id`, `stand_state`, `auras`) VALUES
+(79581, 0, 1, NULL);
+UPDATE `creature_template` SET `script_name`='' WHERE `entry`=4996 AND `patch`=0;
+UPDATE `creature` SET `position_x` = -8767.58, `position_y` = 819.59, `position_z` = 97.718, `orientation` = 5.00909 WHERE `guid` = 79581;
+UPDATE `creature` SET `position_x` = -8764.93, `position_y` = 815.262, `position_z` = 97.718, `orientation` = 0.593412 WHERE `guid` = 79550;
+UPDATE `creature` SET `position_x` = -8763.87, `position_y` = 813.766, `position_z` = 97.718, `orientation` = 0.645772 WHERE `guid` = 79580;
+UPDATE `creature` SET `position_x` = -8762.81, `position_y` = 812.356, `position_z` = 97.718, `orientation` = 0.715585 WHERE `guid` = 79522;
+UPDATE `creature` SET `position_x` = -8757.44, `position_y` = 812.397, `position_z` = 97.718, `orientation` = 2.28638 WHERE `guid` = 79558;
+UPDATE `creature` SET `position_x` = -8756.31, `position_y` = 813.461, `position_z` = 97.718, `orientation` = 2.44346 WHERE `guid` = 90457;
+
 
 -- End of migration.
 END IF;
