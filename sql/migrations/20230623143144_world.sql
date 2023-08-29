@@ -1010,6 +1010,10 @@ UPDATE `creature` SET `position_x` = -8762.81, `position_y` = 812.356, `position
 UPDATE `creature` SET `position_x` = -8757.44, `position_y` = 812.397, `position_z` = 97.718, `orientation` = 2.28638 WHERE `guid` = 79558;
 UPDATE `creature` SET `position_x` = -8756.31, `position_y` = 813.461, `position_z` = 97.718, `orientation` = 2.44346 WHERE `guid` = 90457;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Objects Should Not Despawn On Use
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id` IN (149481, 149480, 149482, 149483);
+
 
 -- End of migration.
 END IF;
