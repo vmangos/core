@@ -448,6 +448,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
             }
             case SPELLFAMILY_WARLOCK:
             {
+                /* Vanilla Reforged - Conflagrate redesign
                 // Conflagrate - consumes Immolate
                 if (m_spellInfo->IsFitToFamilyMask<CF_WARLOCK_CONFLAGRATE>())
                 {
@@ -463,7 +464,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             break;
                         }
                     }
-                }
+                }*/
                 break;
             }
             case SPELLFAMILY_DRUID:
