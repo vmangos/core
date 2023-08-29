@@ -1014,6 +1014,10 @@ UPDATE `creature` SET `position_x` = -8756.31, `position_y` = 813.461, `position
 -- Objects Should Not Despawn On Use
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id` IN (149481, 149480, 149482, 149483);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Incorrect Aura
+UPDATE `creature_template` SET `auras` = '' WHERE  `entry` = 6508;
+
 
 -- End of migration.
 END IF;
