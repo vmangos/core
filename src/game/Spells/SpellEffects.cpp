@@ -3967,6 +3967,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
     {
         if (newSummon->getPetType() == SUMMON_PET)
         {
+            /* Vanilla Reforged - Demonic Sacrifice redesign
             // Remove Demonic Sacrifice auras (known pet)
             Unit::AuraList const& auraClassScripts = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
             for (Unit::AuraList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end();)
@@ -3978,7 +3979,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
                 }
                 else
                     ++itr;
-            }
+            }*/
         }
         return newSummon->GetObjectGuid();
     }
