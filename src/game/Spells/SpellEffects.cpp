@@ -973,6 +973,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     ((Creature*)unitTarget)->ForcedDespawn(100);
                     return;
                 }
+                /* Vanilla Reforged - Deep Wounds redesign
                 case 12162:                                 // Deep wounds
                 case 12850:                                 // (now good common check for this spells)
                 case 12868:
@@ -1008,6 +1009,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     m_casterUnit->CastCustomSpell(unitTarget, 12721, deepWoundsDotBasePoints0, {}, {}, true, nullptr);
                     return;
                 }
+                */
                 case 12975:                                 //Last Stand
                 {
                     if (!m_casterUnit)
