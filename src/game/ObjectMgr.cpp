@@ -2568,7 +2568,7 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
     CellObjectGuids& cell_guids = m_MapObjectGuids[data->position.mapId][cell_id];
     cell_guids.gameobjects.erase(guid);
 }
-
+/* Vanilla Reforged - Spell migrations at build and patch change removed
 // In order to keep database item template data correct for each patch, fix changed spell effects used by some items here.
 // For cases where the spell data itself changed and we need to use a substitute spell id in later clients to recreate old item version.
 void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
@@ -3625,7 +3625,7 @@ void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
     }
 #endif
 }
-
+*/
 void ObjectMgr::CorrectItemDisplayIds(uint32 itemId, uint32& displayId)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
@@ -3960,9 +3960,10 @@ void ObjectMgr::LoadItemPrototypes()
         {
             for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
             {
+                /* Vanilla Reforged - Spell migrations at build and patch change removed
                 if (proto->Spells[j].SpellId)
                     CorrectItemEffects(proto->ItemId, const_cast<ItemPrototype*>(proto)->Spells[j]);
-                
+                */
                 if (proto->Spells[j].SpellTrigger >= MAX_ITEM_SPELLTRIGGER)
                 {
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Item (Entry: %u) has wrong item spell trigger value in spelltrigger_%d (%u)", i, j + 1, proto->Spells[j].SpellTrigger);
