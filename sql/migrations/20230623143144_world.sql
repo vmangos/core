@@ -1018,6 +1018,10 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id
 -- Remove Incorrect Aura
 UPDATE `creature_template` SET `auras` = '' WHERE  `entry` = 6508;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Incorrect Creature
+DELETE FROM `creature` WHERE `guid` = 23898;
+
 
 -- End of migration.
 END IF;
