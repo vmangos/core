@@ -4141,7 +4141,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
         return;
     if (!unitTarget->IsAlive())
         return;
-
+    /* Vanilla Reforged - Stormstrike redesign
     if (m_spellInfo->Id == 17364) // Courroux naturel
     {
         if (!m_casterUnit->IsAlive()) // CalculateMeleeDamage does not work in that case.
@@ -4169,6 +4169,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
         m_damage = 0.f;
         return;
     }
+    */
 
     // multiple weapon dmg effect workaround
     // execute only the last weapon damage
