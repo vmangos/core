@@ -31,6 +31,7 @@
 #include "Chat/AbstractPlayer.h"
 #include "SniffFile.h"
 #include "ClientDefines.h"
+#include "Auth/BigNumber.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -374,7 +375,8 @@ class WorldSession
         void SetBot(std::shared_ptr<PlayerBotEntry> const& b) { m_bot = b; }
 
         // Warden / Anticheat
-        void InitWarden(BigNumber* K);
+        void InitWarden();
+        void SetSessionKey(BigNumber const& sessionKey) { m_sessionKey = sessionKey; }
         Warden* GetWarden() const { return m_warden; }
         void InitCheatData(Player* pPlayer);
         MovementAnticheat* GetCheatData();
@@ -909,6 +911,7 @@ class WorldSession
         uint32 m_exhaustionState;
         uint32 m_charactersCount;
         uint32 m_characterMaxLevel;
+        BigNumber m_sessionKey;
         AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
         uint32 m_tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;

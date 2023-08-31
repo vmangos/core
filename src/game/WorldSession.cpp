@@ -1088,9 +1088,10 @@ void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* pac
         LogUnprocessedTail(packet);
 }
 
-void WorldSession::InitWarden(BigNumber* k)
+void WorldSession::InitWarden()
 {
-    m_warden = sAnticheatMgr->CreateWardenFor(this, k);
+    MANGOS_ASSERT(!m_warden);
+    m_warden = sAnticheatMgr->CreateWardenFor(this, &m_sessionKey);
 }
 
 void WorldSession::InitCheatData(Player* pPlayer)
