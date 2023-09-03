@@ -71,9 +71,9 @@ DELETE FROM `spell_threat` WHERE  `entry`=19742;
 -- Feral Charge
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (16979, 52, 0, 0);
 
--- Bash R3
+-- Bash R1
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (5211, 42, 0, 0);
--- Bash R3
+-- Bash R2
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (6798, 90, 0, 0);
 -- Bash R3
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (8983, 138, 0, 0);
