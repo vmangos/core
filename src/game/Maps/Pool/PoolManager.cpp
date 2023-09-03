@@ -233,7 +233,6 @@ PoolObject* PoolGroup<T>::RollOne(SpawnedPoolData& spawns, uint32 triggerFrom)
 
     if (!EqualChanced.empty())
     {
-        uint32 index = urand(0, EqualChanced.size() - 1);
         // Fill a list of possible rolls
         std::vector<uint32> possible_rolls;
         for (int i = 0; i < EqualChanced.size(); ++i)
@@ -241,7 +240,7 @@ PoolObject* PoolGroup<T>::RollOne(SpawnedPoolData& spawns, uint32 triggerFrom)
                 possible_rolls.push_back(i);
         if (!possible_rolls.empty())
         {
-            index = urand(0, possible_rolls.size() - 1);
+            uint32 index = urand(0, possible_rolls.size() - 1);
             return &EqualChanced[possible_rolls[index]];
         }
     }
