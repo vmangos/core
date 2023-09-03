@@ -1022,6 +1022,10 @@ UPDATE `creature_template` SET `auras` = '' WHERE  `entry` = 6508;
 -- Remove Incorrect Creature
 DELETE FROM `creature` WHERE `guid` = 23898;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Fix Creature Stuck in Tree
+UPDATE `creature` SET `position_x` = 1610.617, position_y = -5611.91, `position_z` = 101.6521, `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 56554;
+
 
 -- End of migration.
 END IF;
