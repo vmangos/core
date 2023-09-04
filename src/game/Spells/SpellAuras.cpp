@@ -1786,6 +1786,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         m_modifier.periodictime = 5 * IN_MILLISECONDS; // expected to tick with 5 sec period
                         return;
                     }
+                    case 16739: // Orb of Deception (before patch 1.7)
+                        return HandleAuraTransform(apply, Real);
                     case 21827: // Frostwolf Aura DND
                     case 21863: // Alterac Ram Aura DND
                     {
@@ -1966,6 +1968,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
+            case 16739: // Orb of Deception (before patch 1.7)
+                return HandleAuraTransform(apply, Real);
             case 20939: // Undying Soul - Dummy aura used for Unstuck command
             {
                 if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
