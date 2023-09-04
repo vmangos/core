@@ -335,6 +335,10 @@ struct CreatureData
 
         return creatureId;
     }
+    bool HasCreatureId(uint32 id) const
+    {
+        return std::find(creature_id.begin(), creature_id.end(), id) != creature_id.end();
+    }
     uint32 GetCreatureIdCount() const
     {
         uint32 creatureIdCount = 0;

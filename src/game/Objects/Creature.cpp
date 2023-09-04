@@ -231,7 +231,9 @@ void Creature::AddToWorld()
     if (!IsInWorld() && GetObjectGuid().GetHigh() == HIGHGUID_UNIT)
         GetMap()->InsertObject<Creature>(GetObjectGuid(), this);
 
-    sCreatureGroupsManager->LoadCreatureGroup(this, m_creatureGroup);
+    if (!m_creatureGroup && HasStaticDBSpawnData())
+        sCreatureGroupsManager->LoadCreatureGroup(GetObjectGuid(), m_creatureGroup);
+
     if (m_creatureGroup)
     {
         if (m_creatureGroup->IsFormation())
@@ -652,7 +654,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 RemoveAllAuras();
 
                 // pick a new creature id if db spawn has multiple
-                uint32 const newCreatureId = m_creatureData ? m_creatureData->ChooseCreatureId() : m_originalEntry;
+                uint32 const newCreatureId = m_creatureData ? (m_creatureGroup ? m_creatureGroup->ChooseCreatureId(GetObjectGuid(), m_creatureData, GetMap()) : m_creatureData->ChooseCreatureId()) : m_originalEntry;
 
                 if (newCreatureId != m_originalEntry)
                     m_originalEntry = newCreatureId;
@@ -1724,10 +1726,12 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
     if (!force && (data->spawn_flags & SPAWN_FLAG_DISABLED))
         return false;
 
+    ObjectGuid fullGuid = ObjectGuid(HIGHGUID_UNIT, data->creature_id[0], guidlow);
     m_creatureData = data;
     m_creatureDataAddon = sObjectMgr.GetCreatureAddon(guidlow);
+    sCreatureGroupsManager->LoadCreatureGroup(fullGuid, m_creatureGroup);
 
-    uint32 const creatureId = data->ChooseCreatureId();
+    uint32 const creatureId = m_creatureGroup ? m_creatureGroup->ChooseCreatureId(fullGuid, data, map) : data->ChooseCreatureId();
     CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(creatureId);
     if (!cinfo)
     {
@@ -1738,7 +1742,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
     GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(guidlow);
 
     // Creature can be loaded already in map if grid has been unloaded while creature walk to another grid
-    if (map->GetCreature(cinfo->GetObjectGuid(guidlow)))
+    if (map->GetCreature(fullGuid))
         return false;
 
     CreatureCreatePos pos(map, data->position.x, data->position.y, data->position.z, data->position.o);
