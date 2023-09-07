@@ -1106,6 +1106,76 @@ UPDATE `quest_template` SET `PrevQuestId`=0 WHERE  `entry`=7822 AND `patch`=3;
 UPDATE `quest_template` SET `PrevQuestId`=0 WHERE  `entry`=7831 AND `patch`=3;
 UPDATE `quest_template` SET `PrevQuestId`=0 WHERE  `entry`=7835 AND `patch`=3;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Dream Bough Creatures Should be Grouped
+UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0 WHERE `guid` IN (51280, 51259, 51237, 51285, 51241, 51262, 51289, 51266, 51245, 51291, 51268, 51247, 51293, 51270, 51249, 51250, 51294, 51271, 51292, 51248, 51269, 51298, 51255, 51276, 51283, 51282, 51239, 51281, 51238, 51260, 51296, 51252, 51273, 51254, 51275, 51297, 51253, 51274, 51278);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51273;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51273, 51252, 4, 2.35619, 11),
+(51273, 51296, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51260;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51260, 51281, 4, 2.35619, 11),
+(51260, 51238, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51239;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51239, 51283, 4, 2.35619, 11),
+(51239, 51282, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51276;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51276, 51255, 4, 2.35619, 11),
+(51276, 51298, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51269;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51269, 51248, 4, 2.35619, 11),
+(51269, 51292, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51271;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51271, 51294, 4, 2.35619, 11),
+(51271, 51250, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51293;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51293, 51270, 4, 2.35619, 11),
+(51293, 51249, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51247;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51247, 51268, 4, 2.35619, 11),
+(51247, 51291, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51289;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51289, 51266, 4, 2.35619, 11),
+(51289, 51245, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51262;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51262, 51241, 4, 2.35619, 11),
+(51262, 51285, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51280;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51280, 51259, 4, 2.35619, 11),
+(51280, 51237, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51254;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51254, 51275, 4, 2.35619, 11),
+(51254, 51297, 4, 3.92699, 11);
+
+UPDATE `creature` SET `position_x` = -3009.146, `position_y` = 2113.024, `position_z` = 30.851 WHERE `guid` IN (51253, 51274, 51278);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51253;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51253, 51274, 4, 2.35619, 11),
+(51253, 51278, 4, 3.92699, 11);
+
 
 -- End of migration.
 END IF;
