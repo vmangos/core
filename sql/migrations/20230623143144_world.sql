@@ -1176,6 +1176,10 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (51253, 51274, 4, 2.35619, 11),
 (51253, 51278, 4, 3.92699, 11);
 
+-- Remove Duplicate Object
+DELETE FROM `gameobject` WHERE `guid` = 42329;
+DELETE FROM `pool_gameobject` WHERE `guid` = 42329;
+
 
 -- End of migration.
 END IF;
