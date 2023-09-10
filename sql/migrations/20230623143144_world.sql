@@ -1180,6 +1180,14 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 DELETE FROM `gameobject` WHERE `guid` = 42329;
 DELETE FROM `pool_gameobject` WHERE `guid` = 42329;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Dusty Reliquary Does Not Despawn on Use
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` = 49372;
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Rock Stalker and Stonelash Flayer Share Spawns
+UPDATE `creature` SET `id` = 11737, `id2` = 11739 WHERE `id` IN (11737, 11739);
+
 
 -- End of migration.
 END IF;
