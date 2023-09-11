@@ -1208,6 +1208,21 @@ UPDATE `creature` SET `id` = 11735, `id2` = 11738 WHERE `id` IN (11735, 11738);
 -- Cenarion Outrider Should Spawn at Patch 7
 UPDATE `creature` SET `patch_min` = 7 WHERE `id` = 15545;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Script For Hive Ashi Pod
+UPDATE `creature_template` SET `spawn_spell_id` = 10389 WHERE `entry` = 13301;
+DELETE FROM `creature` WHERE `guid` IN (300179, 300178);
+
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(49376, 0, 0, 10, 13301, 180000, 2, 0, 0, 0, 0, 0, 8, 4937601, 0, 1, -7183.78, 439.759, 64.2477, 6.14356, 0, 'Hive Ashi Pod - Summon Creature'),
+(49376, 0, 0, 10, 13301, 180000, 2, 0, 0, 0, 0, 0, 8, 4937602, 0, 1, -7176.54, 441.411, 64.1541, 3.45575, 0, 'Hive Ashi Pod - Summon Creature');
+
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(4937601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8675, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive Ashi Ambusher - Talk');
+
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(4937602, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8676, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive Ashi Ambusher - Talk');
+
 
 -- End of migration.
 END IF;
