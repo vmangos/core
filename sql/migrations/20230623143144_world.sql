@@ -1200,6 +1200,14 @@ UPDATE `creature` SET `id` = 11880, `id2` = 15213 WHERE `guid` IN (43078, 43079,
 -- Creatures Should Wander
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (41059, 41061, 41058, 41039);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Stonelash Scorpid and Sand Skitterer Share Spawns
+UPDATE `creature` SET `id` = 11735, `id2` = 11738 WHERE `id` IN (11735, 11738);
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Cenarion Outrider Should Spawn at Patch 7
+UPDATE `creature` SET `patch_min` = 7 WHERE `id` = 15545;
+
 
 -- End of migration.
 END IF;
