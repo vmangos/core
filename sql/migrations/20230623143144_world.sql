@@ -1223,6 +1223,11 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (4937602, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8676, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive Ashi Ambusher - Talk');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Quests 4508 and 4509 are Alliance / Horde Only
+UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` = 4508;
+UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4509;
+
 
 -- End of migration.
 END IF;
