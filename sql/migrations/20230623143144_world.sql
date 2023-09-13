@@ -1228,6 +1228,10 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` = 4508;
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4509;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Plaguehound Runt and Plaguebat Share Spawns
+UPDATE `creature` SET `id` = 8596, `id2` = 8600 WHERE `id` IN (8596, 8600);
+
 
 -- End of migration.
 END IF;
