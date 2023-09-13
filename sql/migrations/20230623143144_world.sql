@@ -1232,6 +1232,13 @@ UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4509;
 -- Plaguehound Runt and Plaguebat Share Spawns
 UPDATE `creature` SET `id` = 8596, `id2` = 8600 WHERE `id` IN (8596, 8600);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Create new pool to hold Small Lockbox spawns in Western Plaguelands.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(330, 9, 'Western Plaguelands - Small Lockbox', 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
+(175802, 330, 'Western Plaguelands - Small Lockbox');
+
 
 -- End of migration.
 END IF;
