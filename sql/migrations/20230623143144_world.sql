@@ -1246,6 +1246,12 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
 (175407, 3588, 'Winterspring - Moontouched Feather');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Duplicate Object
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` = 417);
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = 417;
+DELETE FROM `pool_pool` WHERE `pool_id` = 417;
+
 
 -- End of migration.
 END IF;
