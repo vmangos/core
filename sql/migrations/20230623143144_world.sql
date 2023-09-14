@@ -1252,6 +1252,12 @@ DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` W
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 417;
 DELETE FROM `pool_pool` WHERE `pool_id` = 417;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Scarlet Mage and Scarlet Knight Share Spawns
+UPDATE `creature` SET `id` = 1826, `id2` = 1833 WHERE `id` IN (1826, 1833);
+-- Except
+UPDATE `creature` SET `id` = 1833, `id2` = 0 WHERE `guid` IN (45381,45377, 47157, 45379, );
+
 
 -- End of migration.
 END IF;
