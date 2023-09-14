@@ -1235,16 +1235,16 @@ UPDATE `creature` SET `id` = 8596, `id2` = 8600 WHERE `id` IN (8596, 8600);
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Create new pool to hold Small Lockbox spawns in Western Plaguelands.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(3585, 9, 'Western Plaguelands - Small Lockbox', 0, 10);
+(3587, 9, 'Western Plaguelands - Small Lockbox', 0, 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
-(175802, 3585, 'Western Plaguelands - Small Lockbox');
+(175802, 3587, 'Western Plaguelands - Small Lockbox');
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Create new pool to hold Moontouched Feather spawns in Winterspring
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(3586, 30, 'Winterspring - Moontouched Feather', 0, 10);
+(3588, 30, 'Winterspring - Moontouched Feather', 0, 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `description`) VALUES
-(175407, 3586, 'Winterspring - Moontouched Feather');
+(175407, 3588, 'Winterspring - Moontouched Feather');
 
 
 -- End of migration.
