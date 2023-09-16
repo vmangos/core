@@ -1274,6 +1274,10 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1129602, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7209, 7210, 7211, 7212, 0, 0, 0, 0, 0, 'Darrowshire Poltergeist - Talk');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Duplicate Object
+DELETE FROM `gameobject` WHERE `guid` = 12043;
+
 
 -- End of migration.
 END IF;
