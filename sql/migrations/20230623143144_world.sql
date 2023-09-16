@@ -1264,6 +1264,16 @@ UPDATE `creature` SET `id` = 8529, `id2` = 8532, `id3` = 8542, `id4` = 8545 WHER
 -- Shared Spawns At Browman Mill / The Noxious Glade
 UPDATE `creature` SET `id` = 8528, `id2` = 8529, `id3` = 8532, `id4` = 8542 WHERE `guid` IN (92810, 92809, 92474, 92547, 92654, 92653, 92650, 92651, 92652, 92476, 92562, 92475, 92561, 92777, 92776, 92681, 92677, 92678, 92676, 92675, 92473, 92667, 92666, 92663, 92660, 92683, 92659, 92680, 92679, 92808);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Events list for Darrowshire Poltergeist
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 11296;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(1129601, 11296, 0, 1, 0, 100, 1, 10000, 30000, 30000, 60000, 1129601, 1129602, 0, 'Darrowshire Poltergeist - Talk - OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1129601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7205, 7206, 7207, 7208, 0, 0, 0, 0, 0, 'Darrowshire Poltergeist - Talk');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1129602, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7209, 7210, 7211, 7212, 0, 0, 0, 0, 0, 'Darrowshire Poltergeist - Talk');
+
 
 -- End of migration.
 END IF;
