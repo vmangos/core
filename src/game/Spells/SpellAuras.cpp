@@ -5191,7 +5191,6 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
     if (GetSpellProto()->EquippedItemClass == -1)
     {
         ((Player*)target)->HandleBaseModValue(CRIT_PERCENTAGE,         FLAT_MOD, m_modifier.m_amount, apply);
-        ((Player*)target)->HandleBaseModValue(OFFHAND_CRIT_PERCENTAGE, FLAT_MOD, m_modifier.m_amount, apply);
         ((Player*)target)->HandleBaseModValue(RANGED_CRIT_PERCENTAGE,  FLAT_MOD, m_modifier.m_amount, apply);
     }
     else

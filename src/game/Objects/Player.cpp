@@ -7524,10 +7524,8 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attac
     switch (attackType)
     {
         case BASE_ATTACK:
-            mod = CRIT_PERCENTAGE;
-            break;
         case OFF_ATTACK:
-            mod = OFFHAND_CRIT_PERCENTAGE;
+            mod = CRIT_PERCENTAGE;
             break;
         case RANGED_ATTACK:
             mod = RANGED_CRIT_PERCENTAGE;
