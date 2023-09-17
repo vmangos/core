@@ -632,7 +632,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                                 if (Player* player = pCreature->GetMap()->GetPlayer(((TemporarySummon*)pCreature)->GetSummonerGuid()))
                                 {
                                     pCreature->GetThreatManager().addThreat(player, 1.0f);
-                                    // DoScriptText(PickRandomValue(12420, 12421, 12422, 12243), pCreature, player, CHAT_TYPE_SAY);
+                                    DoScriptText(PickRandomValue(12420, 12421, 12422, 12243), pCreature, player, CHAT_TYPE_SAY);
                                 }
                             }
                         }, 1);
