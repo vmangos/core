@@ -455,7 +455,7 @@ bool rcRasterizeTriangles(rcContext* ctx, const float* verts, const unsigned cha
 }
 
 // Following code is not part of the standard recast library - and used by vmangos movemapgen
-// See PR #### for more details
+// See PR 2197 for more details
 
 struct Face {
 	int indices[3];
