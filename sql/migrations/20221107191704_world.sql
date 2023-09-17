@@ -225,16 +225,16 @@ UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `entry` = 3641; -- Gnomish
 UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `entry` = 3639; -- Gnomish Engineering (Horde)
 
 -- Correct specialisations teaching artisan of profession
-UPDATE `spell_chain` WHERE `spell_id` = 9787 SET `prev_spell` = 3538, `rank` = 4; -- Correct for Weaponsmithing
-UPDATE `spell_chain` WHERE `spell_id` = 9788 SET `prev_spell` = 3538, `rank` = 4; -- Correct for Armorsmithing
-UPDATE`spell_chain` WHERE `spell_id` = 10656 SET `prev_spell` = 3811, `rank` = 4; -- Correct for Dragonscale leatherworking
-UPDATE `spell_chain` WHERE `spell_id` = 10658 SET `prev_spell` = 3811, `rank` = 4; -- Correct for Elemental leatherworking
-UPDATE `spell_chain` WHERE `spell_id` = 10660 SET `prev_spell` = 3811, `rank` = 4; -- Correct for Tribal leatherworking
-UPDATE `spell_chain` WHERE `spell_id` = 20219 SET `prev_spell` = 4038, `rank` = 4; -- Correct for Gnomish engineering
-UPDATE `spell_chain` WHERE `spell_id` = 20222 SET `prev_spell` = 4038, `rank` = 4; -- Correct for Goblin engineering
-UPDATE `spell_chain` WHERE `spell_id` = 17039 SET `rank` = 5; -- Correct for Swordsmithing
-UPDATE `spell_chain` WHERE `spell_id` = 17040 SET `rank` = 5; -- Correct for Hammersmithing
-UPDATE `spell_chain` WHERE `spell_id` = 17041 SET `rank` = 5; -- Correct for Axesmithing
+UPDATE `spell_chain` SET `prev_spell` = 3538, `rank` = 4 WHERE `spell_id` = 9787; -- Correct for Weaponsmithing
+UPDATE `spell_chain` SET `prev_spell` = 3538, `rank` = 4 WHERE `spell_id` = 9788; -- Correct for Armorsmithing
+UPDATE`spell_chain` SET `prev_spell` = 3811, `rank` = 4 WHERE `spell_id` = 10656; -- Correct for Dragonscale leatherworking
+UPDATE `spell_chain` SET `prev_spell` = 3811, `rank` = 4 WHERE `spell_id` = 10658; -- Correct for Elemental leatherworking
+UPDATE `spell_chain` SET `prev_spell` = 3811, `rank` = 4 WHERE `spell_id` = 10660; -- Correct for Tribal leatherworking
+UPDATE `spell_chain` SET `prev_spell` = 4038, `rank` = 4 WHERE `spell_id` = 20219; -- Correct for Gnomish engineering
+UPDATE `spell_chain` SET `prev_spell` = 4038, `rank` = 4 WHERE `spell_id` = 20222; -- Correct for Goblin engineering
+UPDATE `spell_chain` SET `rank` = 5 WHERE `spell_id` = 17039; -- Correct for Swordsmithing
+UPDATE `spell_chain` SET `rank` = 5 WHERE `spell_id` = 17040; -- Correct for Hammersmithing
+UPDATE `spell_chain` SET `rank` = 5 WHERE `spell_id` = 17041; -- Correct for Axesmithing
 
 -- End of migration.
 END IF;
