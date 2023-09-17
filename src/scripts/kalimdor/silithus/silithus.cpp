@@ -1145,22 +1145,9 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 {
     npc_Emissary_RomankhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-        pCreature->SetVisibility(VISIBILITY_OFF);
-
-        OverlordCount = 0;
-        if (Creature* add = pCreature->SummonCreature(15288, -7233.39f, 906.415f, -1.76649f, 1.81259f, TEMPSUMMON_DEAD_DESPAWN, 0))   // Aluntir
-            add->JoinCreatureGroup(pCreature, 0, 0, OPTION_RESPAWN_TOGETHER);
-        if (Creature* add = pCreature->SummonCreature(15286, -7212.16f, 911.711f, -1.76649f, 2.58543f, TEMPSUMMON_DEAD_DESPAWN, 0))   // Xil'xix
-            add->JoinCreatureGroup(pCreature, 0, 0, OPTION_RESPAWN_TOGETHER);
-        if (Creature* add = pCreature->SummonCreature(15290, -7210.3f, 895.014f, -1.76649f, 0.544185f, TEMPSUMMON_DEAD_DESPAWN, 0))   // Arakis
-            add->JoinCreatureGroup(pCreature, 0, 0, OPTION_RESPAWN_TOGETHER);
         Reset();
     }
 
-    int OverlordCount;
     uint32 m_uiWiltTimer;
     uint32 m_uiSchockTimer;
     uint32 m_uiSanityTimer;
@@ -1181,18 +1168,6 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
         for (uint64 & guid : PlayerGuids)
             guid = 0;
-    }
-
-    void SummonedCreatureJustDied(Creature* unit) override
-    {
-        ++OverlordCount;
-        if (OverlordCount >= 3)
-        {
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-            m_creature->SetVisibility(VISIBILITY_ON);
-        }
     }
 
     void Aggro(Unit* pWho) override
@@ -1373,6 +1348,8 @@ enum
     EMOTE_ANACHRONOS_DISPPOINTED = -1000781,
     EMOTE_ANACHRONOS_PICKUP = -1000782,
     SAY_ANACHRONOS_EPILOGUE_8 = -1000783,
+
+    ITEM_SCEPTER_OF_THE_SHIFTING_SANDS = 20738,
 
     // The transform spell for Anachronos was removed from DBC
     //DISPLAY_ID_BRONZE_DRAGON = 15500,
@@ -2155,23 +2132,24 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         m_uiEventTimer = 15000;
                         break;
                     case 40:
-                        // ToDo: Make Fandral equip the scepter
+                        m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, ITEM_SCEPTER_OF_THE_SHIFTING_SANDS);
                         if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
                             DoScriptText(EMOTE_ANACHRONOS_SCEPTER, m_creature, pFandral);
-                        m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        m_uiEventTimer = 3000;
+                        m_uiEventTimer = 1500;
                         break;
                     case 41:
+                        m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
+                        m_creature->HandleEmote(EMOTE_ONESHOT_BEG);
+                        m_uiEventTimer = 1500;
+                        break;
+                    case 42:
                         if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
                         {
+                            pFandral->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, ITEM_SCEPTER_OF_THE_SHIFTING_SANDS);
                             pFandral->SetStandState(UNIT_STAND_STATE_STAND);
                             DoScriptText(SAY_FANDRAL_EPILOGUE_4, pFandral);
                         }
                         m_uiEventTimer = 3000;
-                        break;
-                    case 42:
-                        m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-                        m_uiEventTimer = 4000;
                         break;
                     case 43:
                         if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
@@ -2183,6 +2161,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         {
                             pFandral->CastSpell(pFandral, SPELL_SHATTER_HAMMER, false);
                             DoScriptText(EMOTE_FANDRAL_SHATTER, pFandral);
+                            pFandral->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
                         }
                         m_uiEventTimer = 3000;
                         break;

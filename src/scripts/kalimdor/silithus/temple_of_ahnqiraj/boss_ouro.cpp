@@ -67,18 +67,16 @@ enum
 };
 
 /*
- * Sand Blast timers are based on June 2006 values (17-22s) as shown in
- * https://www.youtube.com/watch?v=REmX3uRTFkQ Sweep timers based on the
- * same video. No known nerfs.
+ * Sand Blast and sweep timers are based on June 2006 values (20-25s) as shown in
+ * https://www.youtube.com/watch?v=REmX3uRTFkQ. The video is slightly sped up, so time was counted by the ticking of buffs on the player.
+ * More confirmation from classic sniffs https://i.imgur.com/YIA8veT.png
  */
-const uint32_t SANDBLAST_TIMER_INITIAL_MIN = 30000;
-const uint32_t SANDBLAST_TIMER_INITIAL_MAX = 45000;
 const uint32_t SUBMERGE_ANIMATION_INVIS    = 2000;
-const uint32_t SWEEP_TIMER                 = 15000;
+const uint32_t SWEEP_TIMER                 = 20500;
 
-struct boss_ouroAI : public Scripted_NoMovementAI
+struct boss_ouroAI : public ScriptedAI
 {
-    boss_ouroAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+    boss_ouroAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
@@ -88,6 +86,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     uint32 m_uiSweepTimer;
     uint32 m_uiSandBlastTimer;
+    uint32 m_uiRestoreTargetTimer;
     uint32 m_uiSubmergeTimer;
     bool m_SummonBase;
     uint32 m_uiNoMeleeTimer;
@@ -104,27 +103,33 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     // Take nerfs into account http://blue.cardplace.com/cache/wow-dungeons/481724.htm for content patch progression
     // Note: Investigate if these timers are 100% accurate.
-    inline uint32_t SandBlastTimerMin() { return sWorld.GetWowPatch() >= WOW_PATCH_110 ? 17000 : 12000; }
-    inline uint32_t SandBlastTimerMax() { return sWorld.GetWowPatch() >= WOW_PATCH_110 ? 22000 : 17000; }
+    inline uint32_t SandBlastTimerMin() { return sWorld.GetWowPatch() >= WOW_PATCH_110 ? 20000 : 12000; }
+    inline uint32_t SandBlastTimerMax() { return sWorld.GetWowPatch() >= WOW_PATCH_110 ? 25000 : 17000; }
     inline uint32_t SubmergeTimer() { return sWorld.GetWowPatch() >= WOW_PATCH_110 ? 90000 : 60000; }
 
     void Reset() override
     {
-
-        m_uiSweepTimer        = urand(30000, 40000);
-        m_uiSandBlastTimer    = urand(SANDBLAST_TIMER_INITIAL_MIN, SANDBLAST_TIMER_INITIAL_MAX);
-        m_uiSubmergeTimer     = SubmergeTimer();
-        m_SummonBase = true;
-        m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
+        // This makes the mob behave like rooted mobs etc, that is,
+        // retargetting another top-threat target if current leaves melee range
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
+        m_creature->StopMoving();
+        m_creature->SetRooted(true);
         
+        m_uiSweepTimer          = SWEEP_TIMER;
+        m_uiSandBlastTimer      = urand(SandBlastTimerMin(), SandBlastTimerMax());
+        m_uiRestoreTargetTimer  = 0;
+        m_uiSubmergeTimer       = SubmergeTimer();
+        m_SummonBase            = true;
+        m_uiSubmergeInvisTimer  = SUBMERGE_ANIMATION_INVIS;
+
         m_uiNoMeleeTimer        = 3000;
         // Source : http://wowwiki.wikia.com/wiki/Ouro
         // "Ouro seems to give you about 10 seconds to get a MT in there when he pops up"
         m_justEmergedGraceTimer = 10000;
 
-        m_uiSummonMoundTimer  = 10000;
-        m_bEnraged            = false;
-        m_bSubmerged          = false;
+        m_uiSummonMoundTimer    = 10000;
+        m_bEnraged              = false;
+        m_bSubmerged            = false;
 
 
         m_ouroTriggerGuid.Clear();
@@ -212,67 +217,28 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             m_uiSubmergeTimer = 30000;
             
             m_justEmergedGraceTimer = 10000;
-            m_uiNoMeleeTimer        = 3000;
+            m_uiNoMeleeTimer        = 10000; // This has to be 10 sec and not 3 sec. Otherwise sometimes, if CanReachWithMeleeAutoAttack returns false for a whole 3 seconds, NoMeleeTimer will never be set to equal grace timer, and grace timer won't work.
             m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
             DoResetThreat();
         }
-        else
-        {
-            m_uiSubmergeTimer = 2000; // try again in a moment
-        }
     }
-
-    void SetNewTarget(Unit &pNewTarget)
-    {
-        uint32 const uiMaxThreat = m_creature->GetThreatManager().getThreat(m_creature->GetVictim());
-
-        // erase current target's threat as soon as we switch the target now
-        m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
-
-        // give the new target aggro
-        m_creature->GetThreatManager().addThreat(&pNewTarget, uiMaxThreat);
-    }
-
-
-    bool CheckForMelee()
-    {
-        // at first we check for the current player-type target
-        Unit* pMainTarget = m_creature->GetVictim();
-        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->IsGameMaster() &&
-            m_creature->CanReachWithMeleeAutoAttack(pMainTarget) && m_creature->IsWithinLOSInMap(pMainTarget))
-        {
-            return true;
-        }
-
-        // at second we look for any melee player-type target (if current target is not reachable)
-        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
-            SELECT_FLAG_PLAYER_NOT_GM | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
-        {
-            SetNewTarget(*pTarget);
-            return true;
-        }
-
-        // reaching this point means there are no more reachable player-type targets in melee range
-
-        // at third we take any melee pet target just to punch in the face
-        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
-            SELECT_FLAG_PET | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
-        {
-            SetNewTarget(*pTarget);
-            return false;
-        }
-
-        // at fourth we take anything to wipe it out and log (whatever, just in case)
-        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
-            SELECT_FLAG_NOT_PLAYER | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
-        {
-            SetNewTarget(*pTarget);
-        }
-        return false;
-    }
-
+    
+    // Threat is preserved when Ouro swaps target. The only mechanics that affect threat are being hit by sandblast, and the threat wipe on submerge.
     void UpdateAI(uint32 const uiDiff) override
     {
+        // This is to let Ouro reset when he enters evade mode. Because rooted mobs don't reset when they evade until their root is removed.
+        if (m_creature->IsInEvadeMode())
+        {
+            m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            m_creature->SetRooted(false);
+        }
+        else
+        {
+            m_creature->AddUnitState(UNIT_STAT_ROOT);
+            m_creature->StopMoving();
+            m_creature->SetRooted(true);
+        }
+        
         // Return since we have no pTarget
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -302,12 +268,36 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             if (m_uiSandBlastTimer < uiDiff)
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, SPELL_SANDBLAST, SELECT_FLAG_PLAYER))
+                {
+                    // Ouro visually targets the victim of Sand Blast for its whole 2 second cast time.
+                    m_creature->SetInFront(pTarget);
+                    m_creature->SetTargetGuid(pTarget->GetObjectGuid());
                     if (DoCastSpellIfCan(pTarget, SPELL_SANDBLAST) == CAST_OK)
+                    {
                         m_uiSandBlastTimer = urand(SandBlastTimerMin(), SandBlastTimerMax());
+                        m_uiRestoreTargetTimer = 2100; // 2 second timer to swap visual target back to the tank. With 100ms grace window to make sure the visual animation of the boss spitting sand is facing the right direction.
+                    }
+                }
             }
             else
                 m_uiSandBlastTimer -= uiDiff;
 
+            // Get new visual target after casting Sand Blast at the highest threat. (If highest threat was not the melee tank -such as the case of ranged tanks soaking sand blasts-, this is to swap the visual target back to the melee tank)
+            if (m_uiRestoreTargetTimer)
+            {
+                if (m_uiRestoreTargetTimer <= uiDiff)
+                {
+                    if (Unit* pTarget = m_creature->GetVictim())
+                    {
+                        m_creature->SetInFront(pTarget);
+                        m_creature->SetTargetGuid(pTarget->GetObjectGuid());
+                        m_uiRestoreTargetTimer = 0;
+                    }
+                }
+                else
+                m_uiRestoreTargetTimer -= uiDiff;
+            }
+            
             if (!m_bEnraged)
             {
                 // Enrage at 20% HP
@@ -340,18 +330,15 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_uiSummonMoundTimer -= uiDiff;
             }
 
-            // every tick we check for melee targets to attack
-            if (CheckForMelee())
-            {
-                m_uiNoMeleeTimer = std::max((uint32)3000, m_justEmergedGraceTimer);
-            }
-
-            // If we are within range melee the target
+            // Because the mob is rooted, target selection is handled automatically by rooted mob AI. All we have to do is we check if the target is in melee range. If it is, autoattack it and refresh the submerge timer.
             if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             {
                 DoMeleeAttackIfReady();
+                m_uiNoMeleeTimer = std::max((uint32)3000, m_justEmergedGraceTimer);
             }
+            
             // Spam Boulder spell when enraged and not tanked
+            // Todo: Find out if he he starts bouldering the moment he's not tanked, or after the 3 sec nomeleetimer has passed.
             else if (m_bEnraged)
             {
                 if (!m_creature->IsNonMeleeSpellCasted(false))
@@ -360,12 +347,13 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                         DoCastSpellIfCan(pTarget, SPELL_BOULDER);
                 }
             }
+            
             // Submerge if no melee and not enraged
             else if (m_uiNoMeleeTimer < uiDiff)
             {
                 Submerge();
             }
-            else
+            else if (m_uiRestoreTargetTimer <= 0) // Submerge timer only ticks down if Ouro is not casting Sandblast
                 m_uiNoMeleeTimer -= uiDiff;
             
             m_justEmergedGraceTimer -= std::min(uiDiff, m_justEmergedGraceTimer);
@@ -406,7 +394,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
                     m_uiSweepTimer = SWEEP_TIMER;
                     m_uiSandBlastTimer = urand(SandBlastTimerMin(), SandBlastTimerMax());
-
+                    
                     DespawnCreatures(false);
 
                     // Ouro should despawn instant on reset, not after going to his spawn point

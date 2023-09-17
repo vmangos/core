@@ -321,6 +321,9 @@ enum PlayerFlags
     PLAYER_FLAGS_PVP_DESIRED            = 0x00000200,       // Stores player's permanent PvP flag preference
     PLAYER_FLAGS_HIDE_HELM              = 0x00000400,
     PLAYER_FLAGS_HIDE_CLOAK             = 0x00000800,
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
+    PLAYER_FLAGS_CAN_SELF_RESURRECT     = 0x00001000,
+#endif
     PLAYER_FLAGS_PARTIAL_PLAY_TIME      = 0x00001000,       // played long time
     PLAYER_FLAGS_NO_PLAY_TIME           = 0x00002000,       // played too long time
     PLAYER_FLAGS_UNK15                  = 0x00004000,
@@ -1501,7 +1504,9 @@ class Player final: public Unit
         SpellModList m_spellMods[MAX_SPELLMOD];
         uint32 m_lastFromClientCastedSpellID;
         std::map<uint32, ItemSetEffect> m_itemSetEffects;
-        
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
+        uint32 m_resurrectionSpellId;
+#endif
         bool IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const;
         void SendInitialSpells() const;
         bool AddSpell(uint32 spellId, bool active, bool learning, bool dependent, bool disabled);
@@ -2178,7 +2183,7 @@ class Player final: public Unit
         void SendMessageToSetInRange(WorldPacket* data, float fist, bool self) const override;
         void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool own_team_only) const;
         void SendInitWorldStates(uint32 zone) const;
-        void SendUpdateWorldState(uint32 field, uint32 value) const;
+        void SendUpdateWorldState(uint32 state, uint32 value) const;
         void SendDirectMessage(WorldPacket* data) const;
 
         uint32 GetTotalPlayedTime() const { return m_playedTime[PLAYED_TIME_TOTAL]; }
@@ -2263,7 +2268,11 @@ class Player final: public Unit
         void SpawnCorpseBones();
         Corpse* CreateCorpse();
         void KillPlayer();
-        uint32 GetResurrectionSpellId() const;
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
+        uint32 GetResurrectionSpellId() const { return m_resurrectionSpellId; }
+        void SetResurrectionSpellId(uint32 resurrectionSpellId) { m_resurrectionSpellId = resurrectionSpellId; }
+#endif
+        uint32 SelectResurrectionSpellId() const;
         void ResurrectPlayer(float restore_percent, bool applySickness = false);
         void BuildPlayerRepop();
         void RepopAtGraveyard();

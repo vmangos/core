@@ -315,6 +315,9 @@ void World::AddSession_(WorldSession* s)
 
     UpdateMaxSessionCounters();
 
+    // Only init warden after session has been added
+    s->InitWarden();
+
     // Updates the population
     if (playerLimit > 0)
     {
@@ -400,6 +403,7 @@ bool World::RemoveQueuedSession(WorldSession* sess)
         pop_sess->SetInQueue(false);
         pop_sess->m_idleTime = WorldTimer::getMSTime();
         pop_sess->SendAuthWaitQue(0);
+        pop_sess->InitWarden();
         m_QueuedSessions.pop_front();
 
         // update iter to point first queued socket or end() if queue is empty now
@@ -2688,6 +2692,7 @@ void World::UpdateSessions(uint32 diff)
                 pop_sess->SetInQueue(false);
                 pop_sess->m_idleTime = WorldTimer::getMSTime();
                 pop_sess->SendAuthWaitQue(0);
+                pop_sess->InitWarden();
                 m_QueuedSessions.pop_front();
             }
 

@@ -323,7 +323,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
     if (m_clientOS == CLIENT_OS_WIN && !m_maiev)
     {
         // indicates to the client that there are no further requests in this packet
-        buff << m_xor;
+        buff << uint8(m_module->scanTerminator ^ m_xor);
     }
 
     BeginTimeoutClock();

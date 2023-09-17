@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "WorldStates.h"
+
 enum ScourgeInvasionSpells
 {
     SPELL_SPIRIT_PARTICLES_PURPLE                   = 28126, // Purple Minions Aura.
@@ -316,7 +318,7 @@ enum ScourgeInvasionNPCEvents
     EVENT_MOUTH_OF_KELTHUZAD_UPDATE         = 4,
 };
 
-enum ScourgeInvasionWorldStatesVariables
+enum ScourgeInvasionVariables
 {
     // Worldstates
     WORLDSTATE_WINTERSPRING                     = 0x08D3, // 2259 - Icon on map.

@@ -27,6 +27,7 @@
 class Unit;
 class Creature;
 class CreatureGroup;
+struct CreatureData;
 
 enum OptionFlags
 {
@@ -50,8 +51,11 @@ struct CreatureGroupMember
     uint32 memberFlags = 0;
 };
 
+class CreatureGroupsManager;
+
 class CreatureGroup
 {
+    friend class CreatureGroupsManager;
     public:
         CreatureGroup(ObjectGuid leader) : m_leaderGuid(leader), m_originalLeaderGuid(leader), m_options(0), m_assistGuard(false), m_respawnGuard(false), m_deleted(false), m_lastReachedWaypoint(0)
         {
@@ -70,6 +74,7 @@ class CreatureGroup
         bool IsFormation() const { return m_options & OPTION_FORMATION_MOVE; }
         bool HasGroupFlag(uint32 flag) const { return m_options & flag; }
         void SetLastReachedWaypoint(uint32 point) { m_lastReachedWaypoint = point; }
+        uint32 ChooseCreatureId(ObjectGuid guid, CreatureData const* pData, Map* pMap) const;
 
         void OnMemberAttackStart(Creature* member, Unit* target);
         void OnMemberDied(Creature* member);
@@ -87,6 +92,7 @@ class CreatureGroup
         bool m_deleted;
         uint32 m_lastReachedWaypoint;
         std::map<ObjectGuid, CreatureGroupMember> m_members;
+        std::map<uint32 /*entry*/, std::pair<int32 /*min*/, int32 /*max*/>> m_entryLimits;
 };
 
 class CreatureGroupsManager
@@ -97,7 +103,7 @@ class CreatureGroupsManager
             static CreatureGroupsManager* i = new CreatureGroupsManager();
             return i;
         }
-        void LoadCreatureGroup(Creature* creature, CreatureGroup*& group);
+        void LoadCreatureGroup(ObjectGuid guid, CreatureGroup*& group);
         void RegisterNewGroup(CreatureGroup* group) { m_groups[group->GetOriginalLeaderGuid()] = group; }
         void Load();
         void EraseCreatureGroup(ObjectGuid leaderGuid) { m_groups.erase(leaderGuid); }
