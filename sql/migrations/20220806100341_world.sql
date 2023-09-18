@@ -697,7 +697,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (1614301, 0, 0, 41, 0, 0, 0, 0, 181142, 2, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Object(Summoner Shield)'),
     (1614301, 0, 0, 44, 1, 1, 0, 0, 16172, 15, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Set Phase for Damaged Necrotic Shard'),
-    (1614301, 2, 0, 0, 0, 0, 0, 0, 2, 0, 4, 16, 12420, 12421, 12422, 12243, 0, 0, 0, 0, 0, 'Shadow of Doom - Talk'),
     (1614301, 5, 0, 4, 46, 768, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadow of Doom - Remove Unit Flags');
 
     -- Events list for Flameshocker
