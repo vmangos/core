@@ -526,6 +526,32 @@ bool AuthSocket::_HandleLogonChallenge()
                     for(int i = 0; i < 4; ++i)
                         m_localizationName[i] = ch->country[4-i-1];
 
+                    // Retrieve the BannedLocale setting from the configuration
+                    std::string bannedLocaleSetting = sConfig.GetStringDefault("BannedLocale", "");
+
+                    // Create a vector to store individual banned locales
+                    std::vector<std::string> bannedLocales;
+
+                    // Split the bannedLocaleSetting by comma and store individual locales in the vector
+                    std::stringstream ss(bannedLocaleSetting);
+                    std::string locale;
+                    while (std::getline(ss, locale, ',')) {
+                        // Trim leading and trailing whitespaces from the locale string
+                        locale.erase(0, locale.find_first_not_of(" \t"));
+                        locale.erase(locale.find_last_not_of(" \t") + 1);
+
+                        bannedLocales.push_back(locale);
+                    }
+
+                    // Check if m_localizationName exists in the bannedLocales vector
+                    if (std::find(bannedLocales.begin(), bannedLocales.end(), m_localizationName) != bannedLocales.end())
+                    {
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account %s using IP %s tried to login with the banned locale %s!", m_login.c_str(), get_remote_address().c_str(), m_localizationName.c_str());
+                        char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_VERSION_INVALID };
+                        send(data, sizeof(data));
+                        return true;
+                    }
+
                     LoadAccountSecurityLevels(account_id);
                     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' is using '%c%c%c%c' locale (%u)", m_login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(m_localizationName));
 
