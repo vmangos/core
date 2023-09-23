@@ -175,7 +175,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_AURA:
         {
-            return target->ToUnit()->HasAura(m_value1, SpellEffectIndex(m_value2));
+            if (m_value2 < EFFECT_INDEX_0)
+                return target->ToUnit()->HasAura(m_value1);
+            else
+                return target->ToUnit()->HasAura(m_value1, SpellEffectIndex(m_value2));
         }
         case CONDITION_ITEM:
         {
