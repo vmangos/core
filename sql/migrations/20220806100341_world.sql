@@ -94,6 +94,12 @@ INSERT INTO `migrations` VALUES ('20220806100341');
         (28364, 1, 16432, 0, 0, 5464, 5875),
         (28364, 1, 16396, 0, 0, 5464, 5875);
 
+    -- spell_mod:
+    INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES
+        (28032, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 32, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL),
+        (28056, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 32, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL),
+        (28041, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 32, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL);
+
     -- gameobject:
     UPDATE `gameobject` SET `spawn_flags`=1, `visibility_mod`=533 WHERE `id` IN (181154, 181373, 181374, 181215, 181223, 181172);
 
@@ -943,8 +949,8 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1617202, 0, 1, 15, 28201, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Choose Camp Type'),
     (1617202, 0, 2, 15, 27887, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, small'),
     (1617202, 0, 3, 15, 27886, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Disturb Minion Trap, Buttress'),
-    (1617202, 0, 4, 18, 4000, 0, 0, 0, 16136, 5, 8, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Despawn Necrotic Shard'),
-    (1617202, 0, 5, 15, 27888, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, Buttress');
+    (1617202, 0, 4, 18, 4000, 0, 0, 0, 16136, 5, 8, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Despawn Necrotic Shard');
+    --(1617202, 0, 5, 15, 27888, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, Buttress');
 
     -- Events list for Cultist Engineer
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16230;
