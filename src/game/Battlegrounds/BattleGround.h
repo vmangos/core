@@ -136,12 +136,10 @@ enum BattleGroundTimeIntervals
     INVITE_ACCEPT_WAIT_TIME         = 80000,                // ms
     TIME_TO_AUTOREMOVE              = 120000,               // ms
     MAX_OFFLINE_TIME                = 30,                   // secs
-    RESPAWN_ONE_DAY                 = 86400,                // secs
     RESPAWN_IMMEDIATELY             = 0,                    // secs
+    RESPAWN_2MINUTES                = 120,                  // secs
     BUFF_RESPAWN_TIME               = 180,                  // secs
-    RESPAWN_FOUR_DAYS               = 345600,               // secs
-    DESPAWN_IMMEDIATELY             = 345601,               // secs
-    RESPAWN_2MINUTES                = 120
+    RESPAWN_NEVER                   = 31536000,             // secs (1 year)
 };
 
 enum BattleGroundStartTimeIntervals
@@ -531,7 +529,7 @@ class BattleGround
         // TODO drop m_BGObjects
         BGObjects m_bgObjects;
         void SpawnBGObject(ObjectGuid guid, uint32 respawnTime);
-        bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0);
+        bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3);
         void SpawnBGCreature(ObjectGuid guid, BattleGroundCreatureSpawnMode mode);
         bool DelObject(uint32 type);
 

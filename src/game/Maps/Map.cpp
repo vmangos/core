@@ -3627,6 +3627,12 @@ Creature* Map::LoadCreatureSpawn(uint32 dbGuid, bool delaySpawn)
     if (!pSpawnData)
         return nullptr;
 
+    if (GetId() != pSpawnData->position.mapId)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to load creature spawn guid %u on wrong map %u.", dbGuid, GetId());
+        return nullptr;
+    }
+
     Creature* pCreature;
     ObjectGuid guid = pSpawnData->GetObjectGuid(dbGuid);
     if (pCreature = GetCreature(guid))
