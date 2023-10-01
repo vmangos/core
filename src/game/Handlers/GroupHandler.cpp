@@ -586,7 +586,12 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     uint8 flag;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     recv_data >> guid;
+#else
+    std::string name;
+    recv_data >> name;
+#endif
     recv_data >> flag;
 
     Group* group = GetPlayer()->GetGroup();
@@ -597,6 +602,13 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
     if (!group->IsLeader(GetPlayer()->GetObjectGuid()))
         return;
     /********************/
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
+    if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
+        guid = player->GetObjectGuid();
+    else
+        return;
+#endif
 
     // everything is fine, do it
     group->SetAssistant(guid, (flag != 0));
