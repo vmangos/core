@@ -905,27 +905,24 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 
     if (!guid.IsEmpty())
     {
-        ObjectGuid serverMoverGuid = _player->GetMover()->GetObjectGuid();
-        if (serverMoverGuid != guid)
+        Unit* pMover = _player->GetMover();
+        if (pMover->GetObjectGuid() != guid)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
-                _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());
-            m_clientMoverGuid = _player->GetMover()->GetObjectGuid();
+                pMover->GetGuidStr().c_str(), guid.GetString().c_str());
+            m_clientMoverGuid = pMover->GetObjectGuid();
             return;
         }
 
-        if (guid.IsAnyTypeCreature())
+        if (pMover->IsCreature())
         {
-            if (Unit* pMover = _player->GetMap()->GetUnit(guid))
-            {
-                if (pMover->IsRooted())
-                    MovementPacketSender::AddMovementFlagChangeToController(pMover, MOVEFLAG_ROOT, true);
+            if (pMover->IsRooted())
+                MovementPacketSender::AddMovementFlagChangeToController(pMover, MOVEFLAG_ROOT, true);
 
-                // Older clients do not send spline done opcode for splines that started before they took control.
+            // Older clients do not send spline done opcode for splines that started before they took control.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
-                pMover->SetSplineDonePending(false);
+            pMover->SetSplineDonePending(false);
 #endif
-            }
         }
 
         // mover swap after Eyes of the Beast, PetAI::UpdateAI handle the pet's return
