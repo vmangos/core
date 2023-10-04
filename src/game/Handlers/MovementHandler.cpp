@@ -280,9 +280,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (recvData.GetPacketTime() <= m_moveRejectTime)
         return;
 
-    Unit* pMover = _player->GetMover();
-
-    if (pMover->GetObjectGuid() != m_clientMoverGuid)
+    Unit* pMover = _player->GetConfirmedMover();
+    if (!pMover)
         return;
 
     if (pMover->HasPendingSplineDone())
@@ -904,41 +903,43 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
-    ObjectGuid serverMoverGuid = _player->GetMover()->GetObjectGuid();
-
-    // Before 1.10, client sends 0 as guid if it has no control.
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
-    if ((serverMoverGuid == _player->GetObjectGuid()) && !_player->HasSelfMovementControl())
-        serverMoverGuid = ObjectGuid();
-#endif
-
-    if (serverMoverGuid != guid)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
-                      _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());
-        m_clientMoverGuid = _player->GetMover()->GetObjectGuid();
-        return;
-    }
-
     if (!guid.IsEmpty())
     {
-        Unit* pMover = _player->GetMap()->GetUnit(guid);
-
-        if (pMover && pMover->IsCreature() && pMover->IsRooted())
-            MovementPacketSender::AddMovementFlagChangeToController(pMover, MOVEFLAG_ROOT, true);
-    }
-
-    // mover swap after Eyes of the Beast, PetAI::UpdateAI handle the pet's return
-    // Check if we actually have a pet before looking up
-    if (_player->GetPetGuid() && _player->GetPetGuid() == m_clientMoverGuid)
-    {
-        if (Pet* pet = _player->GetPet())
+        ObjectGuid serverMoverGuid = _player->GetMover()->GetObjectGuid();
+        if (serverMoverGuid != guid)
         {
-            pet->ClearUnitState(UNIT_STAT_POSSESSED);
-            pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
-            // out of range pet dismissed
-            if (!pet->IsWithinDistInMap(_player, pet->GetMap()->GetGridActivationDistance()))
-                _player->RemovePet(PET_SAVE_REAGENTS);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
+                _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());
+            m_clientMoverGuid = _player->GetMover()->GetObjectGuid();
+            return;
+        }
+
+        if (guid.IsAnyTypeCreature())
+        {
+            if (Unit* pMover = _player->GetMap()->GetUnit(guid))
+            {
+                if (pMover->IsRooted())
+                    MovementPacketSender::AddMovementFlagChangeToController(pMover, MOVEFLAG_ROOT, true);
+
+                // Older clients do not send spline done opcode for splines that started before they took control.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+                pMover->SetSplineDonePending(false);
+#endif
+            }
+        }
+
+        // mover swap after Eyes of the Beast, PetAI::UpdateAI handle the pet's return
+        // Check if we actually have a pet before looking up
+        if (_player->GetPetGuid() && _player->GetPetGuid() == m_clientMoverGuid)
+        {
+            if (Pet* pet = _player->GetPet())
+            {
+                pet->ClearUnitState(UNIT_STAT_POSSESSED);
+                pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
+                // out of range pet dismissed
+                if (!pet->IsWithinDistInMap(_player, pet->GetMap()->GetGridActivationDistance()))
+                    _player->RemovePet(PET_SAVE_REAGENTS);
+            }
         }
     }
 
