@@ -5719,7 +5719,7 @@ bool ChatHandler::HandleListExploredAreasCommand(char* args)
         sObjectMgr.GetAreaLocaleString(itr->Id, GetSessionDbLocaleIndex(), &name);
 
         if (!itr->ExploreFlag || itr->ExploreFlag == 0xffff)
-            continue;;
+            continue;
 
         int offset = itr->ExploreFlag / 32;
         if (offset >= PLAYER_EXPLORED_ZONES_SIZE)

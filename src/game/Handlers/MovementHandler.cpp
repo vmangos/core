@@ -1063,7 +1063,7 @@ Unit* WorldSession::GetMoverFromGuid(ObjectGuid const& guid) const
     if (guid == _player->GetObjectGuid())
         return _player;
     if (guid == m_clientMoverGuid)
-        return _player->GetMap()->GetUnit(guid);;
+        return _player->GetMap()->GetUnit(guid);
 
     return nullptr;
 }
