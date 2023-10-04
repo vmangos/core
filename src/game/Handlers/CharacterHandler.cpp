@@ -739,8 +739,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
 
     m_playerLoading = false;
-    m_clientMoverGuid = pCurrChar->GetObjectGuid();
     delete holder;
+
     if (alreadyOnline)
     {
         pCurrChar->UpdateControl();
