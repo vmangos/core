@@ -619,6 +619,26 @@ struct SpellShapeshiftFormEntry
     //uint32 unk1;                                          // 13       m_attackIconID
 };
 
+struct SpellVisualEntry
+{
+    uint32 id;
+    uint32 precastKit;
+    uint32 castKit;
+    uint32 impactKit;
+    uint32 stateKit;
+    uint32 channelKit;
+    uint32 hasMissile;
+    uint32 missileModel;
+    uint32 missilePathType;
+    uint32 missileDestinationAttachment;
+    uint32 missileSound;
+    uint32 hasAreaEffect;
+    uint32 areaModel;
+    uint32 areaKit;
+    uint32 animEventSoundID;
+    uint32 flags;
+};
+
 struct SpellDurationEntry
 {
     uint32    ID;                                           //          m_ID

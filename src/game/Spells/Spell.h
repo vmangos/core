@@ -529,6 +529,9 @@ class Spell
         typedef std::list<SpellAuraHolder*> SpellAuraHolderList;
         SpellAuraHolderList m_channeledHolders;             // aura holders of spell on targets for channeled spells. process in sync with spell
         SpellAuraHolderList::iterator m_channeledUpdateIterator; // maintain an iterator to the current update element so we can handle removal of multiple auras
+        uint32 m_channeledVisualKit = 0;                    // id from SpellVisualKit.dbc that needs to be sent in SMSG_PLAY_SPELL_VISUAL periodically
+        uint32 m_channeledVisualTimer = 0;                  // timer for sending the visual kit
+        void InitializeChanneledVisualTimer();
 
         // These vars are used in both delayed spell system and modified immediate spell system
         bool m_referencedFromCurrentSpell = false;          // mark as references to prevent deleted and access by dead pointers

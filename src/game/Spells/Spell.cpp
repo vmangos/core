@@ -47,7 +47,7 @@
 
 using namespace Spells;
 
-#define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
+#define SPELL_CHANNEL_VISUAL_TIMER 800
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
@@ -4021,6 +4021,7 @@ void Spell::handle_immediate()
         SendChannelStart(m_duration);
         if (m_caster->IsPlayer())
             m_caster->ToPlayer()->RemoveSpellMods(this);
+        InitializeChanneledVisualTimer();
     }
 
     m_targetNum = 0;
@@ -4435,6 +4436,18 @@ void Spell::update(uint32 difftime)
                 }
 
                 finish();
+            }
+            // Periodically send the spell visual kit for some channeled spells
+            // This fixes Tranquility and Starshards visuals
+            else if (m_channeledVisualKit && m_casterUnit)
+            {
+                if (difftime >= m_channeledVisualTimer)
+                {
+                    m_casterUnit->SendPlaySpellVisual(m_channeledVisualKit);
+                    m_channeledVisualTimer = SPELL_CHANNEL_VISUAL_TIMER;
+                }
+                else
+                    m_channeledVisualTimer -= difftime;
             }
         }
         break;
@@ -5158,6 +5171,22 @@ void Spell::SendChannelStart(uint32 duration)
             m_casterUnit->SetChannelObjectGuid(target->GetObjectGuid());
         m_casterUnit->SetUInt32Value(UNIT_CHANNEL_SPELL, m_spellInfo->Id);
     }
+}
+
+void Spell::InitializeChanneledVisualTimer()
+{
+    if (!(m_spellInfo->Custom & SPELL_CUSTOM_SEND_CHANNEL_VISUAL))
+        return;
+
+    if (!m_spellInfo->SpellVisual)
+        return;
+
+    SpellVisualEntry const* pSpellVisual = sSpellVisualStore.LookupEntry(m_spellInfo->SpellVisual);
+    if (!pSpellVisual || !pSpellVisual->channelKit)
+        return;
+
+    m_channeledVisualKit = pSpellVisual->channelKit;
+    m_channeledVisualTimer = SPELL_CHANNEL_VISUAL_TIMER;
 }
 
 void Spell::SendResurrectRequest(Player* target, bool sickness)
