@@ -216,6 +216,7 @@ set (game_SRCS
     vmap/VMapFactory.cpp
     vmap/VMapManager2.cpp
     vmap/WorldModel.cpp
+    AccountData.h
     AccountMgr.h
     AuraRemovalMgr.h
     AutoBroadCastMgr.h

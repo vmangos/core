@@ -881,7 +881,7 @@ void WorldSession::LoadGlobalAccountData()
     QueryResult* result = CharacterDatabase.PQuery("SELECT `type`, `time`, `data` FROM `account_data` WHERE `account`=%u", GetAccountId());
     LoadAccountData(
         result,
-        GLOBAL_CACHE_MASK
+        NewAccountData::GLOBAL_CACHE_MASK
     );
     if (result)
         delete result;
@@ -889,7 +889,7 @@ void WorldSession::LoadGlobalAccountData()
 
 void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
 {
-    for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
+    for (uint32 i = 0; i < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++i)
         if (mask & (1 << i))
             m_accountData[i] = AccountData();
 
@@ -901,17 +901,17 @@ void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
         Field* fields = result->Fetch();
 
         uint32 type = fields[0].GetUInt32();
-        if (type >= NUM_ACCOUNT_DATA_TYPES)
+        if (type >= NewAccountData::NUM_ACCOUNT_DATA_TYPES)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have invalid account data type (%u), ignore.",
-                mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+                mask == NewAccountData::GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
             continue;
         }
 
         if ((mask & (1 << type)) == 0)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have non appropriate for table  account data type (%u), ignore.",
-                mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+                mask == NewAccountData::GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
             continue;
         }
 
@@ -920,10 +920,10 @@ void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
     } while (result->NextRow());
 }
 
-void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
+void WorldSession::SetAccountData(NewAccountData::AccountDataType type, const std::string& data)
 {
     time_t const currentTime = time(nullptr);
-    if ((1 << type) & GLOBAL_CACHE_MASK)
+    if ((1 << type) & NewAccountData::GLOBAL_CACHE_MASK)
     {
         uint32 acc = GetAccountId();
 
@@ -972,9 +972,20 @@ void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
 
 void WorldSession::SendAccountDataTimes()
 {
-    WorldPacket data(SMSG_ACCOUNT_DATA_MD5, NUM_ACCOUNT_DATA_TYPES * MD5_DIGEST_LENGTH);
-    for (AccountData const& itr : m_accountData)
+    bool const isOldClient = GetGameBuild() <= CLIENT_BUILD_1_8_4;
+    uint32 const dataCount = isOldClient ? OldAccountData::NUM_ACCOUNT_DATA_TYPES : NewAccountData::NUM_ACCOUNT_DATA_TYPES;
+    WorldPacket data(SMSG_ACCOUNT_DATA_MD5, dataCount * MD5_DIGEST_LENGTH);
+    for (uint32 index = 0; index < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++index)
     {
+        // Skip indexes that dont exist in old clients
+        if (isOldClient)
+        {
+            OldAccountData::AccountDataType oldIndex = ConvertNewAccountDataToOld(index);
+            if (oldIndex == OldAccountData::NUM_ACCOUNT_DATA_TYPES)
+                continue;
+        }
+
+        AccountData const& itr = m_accountData[index];
         if (itr.data.empty())
         {
             for (int i = 0; i < MD5_DIGEST_LENGTH; i++)

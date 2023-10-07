@@ -32,6 +32,7 @@
 #include "SniffFile.h"
 #include "ClientDefines.h"
 #include "Auth/BigNumber.h"
+#include "AccountData.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -57,30 +58,6 @@ class MasterPlayer;
 
 struct OpcodeHandler;
 struct PlayerBotEntry;
-
-enum AccountDataType
-{
-    GLOBAL_CONFIG_CACHE             = 0,                    // 0x01 g
-    PER_CHARACTER_CONFIG_CACHE      = 1,                    // 0x02 p
-    GLOBAL_BINDINGS_CACHE           = 2,                    // 0x04 g
-    PER_CHARACTER_BINDINGS_CACHE    = 3,                    // 0x08 p
-    GLOBAL_MACROS_CACHE             = 4,                    // 0x10 g
-    PER_CHARACTER_MACROS_CACHE      = 5,                    // 0x20 p
-    PER_CHARACTER_LAYOUT_CACHE      = 6,                    // 0x40 p
-    PER_CHARACTER_CHAT_CACHE        = 7,                    // 0x80 p
-    NUM_ACCOUNT_DATA_TYPES          = 8
-};
-
-#define GLOBAL_CACHE_MASK           0x15
-#define PER_CHARACTER_CACHE_MASK    0xEA
-
-struct AccountData
-{
-    AccountData() : timestamp(0), data("") {}
-
-    time_t timestamp;
-    std::string data;
-};
 
 enum PartyOperation
 {
@@ -468,8 +445,8 @@ class WorldSession
         bool CheckStableMaster(ObjectGuid guid);
 
         // Account Data
-        AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
-        void SetAccountData(AccountDataType type, const std::string& data);
+        AccountData* GetAccountData(NewAccountData::AccountDataType type) { return &m_accountData[type]; }
+        void SetAccountData(NewAccountData::AccountDataType type, const std::string& data);
         void SendAccountDataTimes();
         void LoadGlobalAccountData();
         void LoadAccountData(QueryResult* result, uint32 mask);
@@ -916,7 +893,7 @@ class WorldSession
         uint32 m_charactersCount;
         uint32 m_characterMaxLevel;
         BigNumber m_sessionKey;
-        AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
+        AccountData m_accountData[NewAccountData::NUM_ACCOUNT_DATA_TYPES];
         uint32 m_tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;
         

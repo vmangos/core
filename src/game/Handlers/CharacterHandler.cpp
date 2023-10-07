@@ -556,7 +556,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     SendPacket(&data);
 
     // load player specific part before send times
-    LoadAccountData(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA), PER_CHARACTER_CACHE_MASK);
+    LoadAccountData(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA), NewAccountData::PER_CHARACTER_CACHE_MASK);
     SendAccountDataTimes();
 
     pCurrChar->GetSocial()->SendFriendList();

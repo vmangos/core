@@ -876,12 +876,24 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
 {
     uint32 type, decompressedSize;
     recv_data >> type >> decompressedSize;
-    if (type > NUM_ACCOUNT_DATA_TYPES)
+
+    NewAccountData::AccountDataType dataType;
+    if (GetGameBuild() <= CLIENT_BUILD_1_8_4)
+        dataType = ConvertOldAccountDataToNew(type);
+    else
+        dataType = (NewAccountData::AccountDataType)type;
+
+    if (dataType >= NewAccountData::NUM_ACCOUNT_DATA_TYPES)
+    {
+        std::stringstream oss;
+        oss << "Client sent invalid account data type " << type << " in CMSG_UPDATE_ACCOUNT_DATA.";
+        ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
         return;
+    }
 
     if (decompressedSize == 0)                              // erase
     {
-        SetAccountData(AccountDataType(type), "");
+        SetAccountData(dataType, "");
         return;
     }
 
@@ -902,23 +914,35 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
     recv_data.rpos(recv_data.wpos());                       // uncompress read (recv_data.size() - recv_data.rpos())
 
     std::string adata((char*)dest.data(), dest.size());
-    SetAccountData(AccountDataType(type), adata);
+    SetAccountData(dataType, adata);
 }
 
 void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 {
     uint32 type;
     recv_data >> type;
-    if (type > NUM_ACCOUNT_DATA_TYPES)
-        return;
 
-    AccountData* adata = GetAccountData(AccountDataType(type));
+    NewAccountData::AccountDataType dataType;
+    if (GetGameBuild() <= CLIENT_BUILD_1_8_4)
+        dataType = ConvertOldAccountDataToNew(type);
+    else
+        dataType = (NewAccountData::AccountDataType)type;
+
+    if (dataType >= NewAccountData::NUM_ACCOUNT_DATA_TYPES)
+    {
+        std::stringstream oss;
+        oss << "Client requested invalid account data type " << type << " in CMSG_REQUEST_ACCOUNT_DATA.";
+        ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
+        return;
+    }
+
+    AccountData* adata = GetAccountData(dataType);
 
     uint32 size = adata->data.size();
     if (!size)
     {
         WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 4 + 4);
-        data << uint32(type);                                // type (0-7)
+        data << uint32(type);                                // use the original type sent by client
         data << uint32(0);                                   // decompressed length
         SendPacket(&data);
     }
@@ -931,7 +955,7 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
         compress(const_cast<uint8*>(dest.contents()), &destSize, (uint8*)adata->data.c_str(), size);
 
         WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 4 + 4 + destSize + 1);
-        data << uint32(type);                                   // type (0-7)
+        data << uint32(type);                                   // use the original type sent by client
         data << uint32(size);                                   // decompressed length
         data.append(dest);                                      // compressed data
         SendPacket(&data);
