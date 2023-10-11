@@ -5010,11 +5010,11 @@ void Spell::SendLogExecute()
 
 void Spell::SendInterrupted(uint8 result)
 {
-    // Nostalrius : fix animation de cast a l'interruption d'un sort
-    // Ce premier paquet ne sert apparement a rien ...
-    // Ce second paquet informe les joueurs aux alentours que le sort a ete interrompu.
+    // Nostalrius: fix cast animation when a spell is interrupted
+    // This first packet is apparently useless...
+    // This second packet informs surrounding players that the spell has been interrupted.
     WorldPacket data(SMSG_SPELL_FAILED_OTHER, (8 + 4));
-    data << m_caster->GetObjectGuid(); // Pareil que pour SMSG_SPELL_FAILURE
+    data << m_caster->GetObjectGuid(); // Same as for SMSG_SPELL_FAILURE
     data << m_spellInfo->Id;
     m_caster->SendObjectMessageToSet(&data, true);
 }
