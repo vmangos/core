@@ -2307,6 +2307,7 @@ class Player final: public Unit
         JoinedChannelsList m_channels;
         void UpdateLocalChannels(uint32 newZone);
         std::string m_name;
+        uint64 m_knownLanguagesMask;
     public:
         void JoinedChannel(Channel* c);
         void LeftChannel(Channel* c);
@@ -2334,6 +2335,10 @@ class Player final: public Unit
         void Say(char const* text, uint32 const language) const;
         void Yell(char const* text, uint32 const language) const;
         void TextEmote(char const* text) const;
+
+        void LearnLanguage(uint64 languageId) { m_knownLanguagesMask |= (1llu << languageId); }
+        void RemoveLanguage(uint64 languageId) { m_knownLanguagesMask &= ~(1llu << languageId);}
+        bool KnowsLanguage(uint64 languageId) const { return (m_knownLanguagesMask & (1llu << languageId)) != 0; }
 
         /*********************************************************/
         /***                   FACTION SYSTEM                  ***/

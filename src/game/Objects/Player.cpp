@@ -548,8 +548,8 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 //== Player ====================================================
 
 Player::Player(WorldSession* session) : Unit(),
-    m_mover(this), m_camera(this), m_reputationMgr(this), m_saveDisabled(false),
-    m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_repopAtGraveyardPending(false),
+    m_mover(this), m_camera(this), m_reputationMgr(this), m_saveDisabled(false), m_enableInstanceSwitch(true),
+    m_currentTicketCounter(0), m_repopAtGraveyardPending(false), m_knownLanguagesMask(0),
     m_honorMgr(this), m_personalXpRate(-1.0f), m_isStandUpScheduled(false), m_foodEmoteTimer(0)
 {
     m_objectType |= TYPEMASK_PLAYER;

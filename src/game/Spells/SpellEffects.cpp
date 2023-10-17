@@ -94,7 +94,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectLearnSpell,                               // 36 SPELL_EFFECT_LEARN_SPELL
     &Spell::EffectEmpty,                                    // 37 SPELL_EFFECT_SPELL_DEFENSE            one spell: SPELLDEFENSE (DND)
     &Spell::EffectDispel,                                   // 38 SPELL_EFFECT_DISPEL
-    &Spell::EffectEmpty,                                    // 39 SPELL_EFFECT_LANGUAGE                 misc store lang id
+    &Spell::EffectLanguage,                                 // 39 SPELL_EFFECT_LANGUAGE                 misc store lang id
     &Spell::EffectDualWield,                                // 40 SPELL_EFFECT_DUAL_WIELD
     &Spell::EffectSummonWild,                               // 41 SPELL_EFFECT_SUMMON_WILD
     &Spell::EffectSummonGuardian,                           // 42 SPELL_EFFECT_SUMMON_GUARDIAN
@@ -3303,6 +3303,15 @@ void Spell::EffectDispel(SpellEffectIndex effIdx)
     }
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
+}
+
+void Spell::EffectLanguage(SpellEffectIndex effIdx)
+{
+    Player* pPlayer = ToPlayer(unitTarget);
+    if (!pPlayer)
+        return;
+
+    pPlayer->LearnLanguage(m_spellInfo->EffectMiscValue[effIdx]);
 }
 
 void Spell::EffectDualWield(SpellEffectIndex /*effIdx*/)

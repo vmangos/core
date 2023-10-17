@@ -253,6 +253,7 @@ class Spell
         void EffectSummon(SpellEffectIndex effIdx);
         void EffectLearnSpell(SpellEffectIndex effIdx);
         void EffectDispel(SpellEffectIndex effIdx);
+        void EffectLanguage(SpellEffectIndex effIdx);
         void EffectDualWield(SpellEffectIndex effIdx);
         void EffectPickPocket(SpellEffectIndex effIdx);
         void EffectAddFarsight(SpellEffectIndex effIdx);
