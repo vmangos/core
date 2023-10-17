@@ -1008,6 +1008,11 @@ class World
         LFGQueue m_lfgQueue;
         std::unique_ptr<std::thread> m_lfgQueueThread;
 
+        // This thread handles packets while the world sessions update is not running
+        std::unique_ptr<std::thread> m_asyncPacketsThread;
+        bool m_canProcessAsyncPackets;
+        void ProcessAsyncPackets();
+
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;
         static float m_MaxVisibleDistanceInInstances;

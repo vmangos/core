@@ -1884,7 +1884,24 @@ bool ChatHandler::ParseCommands(char const* text)
     if (text[0] == '!' || text[0] == '.')
         ++text;
 
-    ExecuteCommand(text);
+    // we need to make sure commands are executed on the world thread,
+    // because the chat packet handler can run asynchronously
+    if (m_session)
+    {
+        sWorld.GetMessager().AddMessage([text, accountId = m_session->GetAccountId(), sessionGuid = m_session->GetGUID()](World* world)
+        {
+            if (WorldSession* session = world->FindSession(accountId))
+            {
+                if (session->GetGUID() == sessionGuid)
+                {
+                    ChatHandler handler(session);
+                    handler.ExecuteCommand(text);
+                }
+            }
+        });
+    }
+    else
+        ExecuteCommand(text);
 
     return true;
 }

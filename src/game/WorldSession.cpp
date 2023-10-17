@@ -215,6 +215,37 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         m_socket->CloseSocket();
 }
 
+uint32 GetChatPacketProcessingType(uint32 chatType)
+{
+    switch (chatType)
+    {
+        // These can be handled at any time session update in world thread is not running.
+        case CHAT_MSG_CHANNEL:
+        case CHAT_MSG_WHISPER:
+        case CHAT_MSG_PARTY:
+        case CHAT_MSG_GUILD:
+        case CHAT_MSG_OFFICER:
+        case CHAT_MSG_RAID:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        case CHAT_MSG_RAID_LEADER:
+        case CHAT_MSG_RAID_WARNING:
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+        case CHAT_MSG_BATTLEGROUND:
+        case CHAT_MSG_BATTLEGROUND_LEADER:
+#endif
+        case CHAT_MSG_DND:
+            return PACKET_PROCESS_ASYNC;
+        // These can be handled on the map thread.
+        case CHAT_MSG_SAY:
+        case CHAT_MSG_EMOTE:
+        case CHAT_MSG_YELL:
+            return PACKET_PROCESS_MAP;
+    }
+
+    return PACKET_PROCESS_WORLD;
+}
+
 // Add an incoming packet to the queue
 void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
 {
@@ -224,27 +255,27 @@ void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
     if (_player && MovementAnticheat::IsLoggedOpcode(newPacket->GetOpcode()))
         GetCheatData()->LogMovementPacket(true, *newPacket);
 
-    OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
-    uint32 const processing = opHandle.packetProcessing;
+    uint32 processing;
 
-    if (processing >= PACKET_PROCESS_MAX_TYPE)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped",
-                      LookupOpcodeName(newPacket->GetOpcode()),
-                      newPacket->GetOpcode());
-        return;
-    }
-
-    // handle query packets in place to reduce load on world
-    // they dont access player or write anything so its safe
-    if (processing == PACKET_PROCESS_DB_QUERY)
-    {
-        // all these packets require STATUS_LOGGEDIN 
-        if (_player)
-            (this->*opHandle.handler)(*newPacket);
-    }
+    // Handle chat packets on async thread when possible
+    if (newPacket->GetOpcode() == CMSG_MESSAGECHAT &&
+        newPacket->size() >= sizeof(uint32))
+        processing = GetChatPacketProcessingType(*((uint32*)newPacket->contents()));
     else
-        m_recvQueue[processing].add(std::move(newPacket));
+    {
+        OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
+        processing = opHandle.packetProcessing;
+
+        if (processing >= PACKET_PROCESS_MAX_TYPE)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped",
+                LookupOpcodeName(newPacket->GetOpcode()),
+                newPacket->GetOpcode());
+            return;
+        }
+    }
+
+    m_recvQueue[processing].add(std::move(newPacket));
 }
 
 // Logging helper for unexpected opcodes
