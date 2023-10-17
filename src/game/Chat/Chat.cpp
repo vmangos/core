@@ -1711,8 +1711,6 @@ ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const*
  */
 void ChatHandler::ExecuteCommand(char const* text)
 {
-    std::string fullcmd = text;                             // original `text` can't be used. It content destroyed in command code processing.
-
     ChatCommand* command = nullptr;
     ChatCommand* parentCommand = nullptr;
 
@@ -1888,14 +1886,14 @@ bool ChatHandler::ParseCommands(char const* text)
     // because the chat packet handler can run asynchronously
     if (m_session)
     {
-        sWorld.GetMessager().AddMessage([text, accountId = m_session->GetAccountId(), sessionGuid = m_session->GetGUID()](World* world)
+        sWorld.GetMessager().AddMessage([txt = std::string(text), accountId = m_session->GetAccountId(), sessionGuid = m_session->GetGUID()](World* world)
         {
             if (WorldSession* session = world->FindSession(accountId))
             {
                 if (session->GetGUID() == sessionGuid)
                 {
                     ChatHandler handler(session);
-                    handler.ExecuteCommand(text);
+                    handler.ExecuteCommand(txt.c_str());
                 }
             }
         });
