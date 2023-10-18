@@ -483,6 +483,7 @@ UPDATE `creature` SET `wander_distance`=1.5,`movement_type`=1 WHERE `guid`=7895;
 
 -- Vincent Hyal should not have any equipment in vanilla
 DELETE FROM `creature_equip_template` WHERE  `entry`=5082 AND `item1`=2705 AND `item2`=0 AND `item3`=0;
+UPDATE `creature_template` SET `equipment_id`=0 WHERE `entry`=5082;
 
 -- Pathing for Guard Clarke Entry: 934
 SET @NPC := 10088;
@@ -773,6 +774,10 @@ UPDATE `creature` SET `wander_distance`=2, `movement_type`=1 WHERE  `guid`=11527
 
 -- Add missing campfire to Bear's Head, Azshara
 INSERT INTO `gameobject` VALUES (21105, 88496, 1, 3962.28, -5029.25, 137.339, 3.14159, 0, 0, 1, 0, 180, 180, 100, 1, 0, 0, 0, 10);
+
+-- Table `creature` have creature (GUID: 40486 Entry: 10083) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.
+-- Table `creature` have creature (GUID: 40483 Entry: 10083) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.
+UPDATE `creature` SET `movement_type`=1 WHERE `guid` IN (40486, 40483);
 
 
 -- End of migration.
