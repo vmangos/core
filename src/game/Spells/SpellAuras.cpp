@@ -2598,6 +2598,8 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             {
                 case FORM_CAT:
 #if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_11_2
+                    // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+                    // - Furor: This talent now works correctly with Cat Form again.
                     break;
 #endif
                 case FORM_BEAR:
