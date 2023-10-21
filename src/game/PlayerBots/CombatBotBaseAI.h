@@ -127,6 +127,8 @@ public:
     void EquipOrUseNewItem();
     void AddItemToInventory(uint32 itemId, uint32 count = 1);
     void AddHunterAmmo();
+    uint8 GetHighestHonorRankFromEquippedItems() const;
+    void UpdateVisualHonorRankBasedOnItems();
 
     bool SummonShamanTotems();
     SpellCastResult CastWeaponBuff(SpellEntry const* pSpellEntry, EquipmentSlots slot);
@@ -549,6 +551,7 @@ public:
     bool m_initialized = false;
     bool m_isBuffing = false;
     bool m_receivedBgInvite = false;
+    uint8 m_visualHonorRank = 0;
     CombatBotRoles m_role = ROLE_INVALID;
 };
 

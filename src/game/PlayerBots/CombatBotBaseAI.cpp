@@ -2701,6 +2701,9 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 {
     LearnArmorProficiencies();
 
+    bool const onlyPvE = urand(0, 1) != 0;
+    uint8 const honorRank = onlyPvE ? 0 : urand(5, 18);
+
     std::map<uint32 /*slot*/, std::vector<ItemPrototype const*>> itemsPerSlot;
     for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
     {
@@ -2745,7 +2748,10 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
             continue;
 
-        if (me->CanUseItem(pProto) != EQUIP_ERR_OK)
+        if (me->CanUseItem(pProto, onlyPvE) != EQUIP_ERR_OK)
+            continue;
+
+        if (pProto->RequiredHonorRank > honorRank)
             continue;
 
         if (pProto->RequiredReputationFaction && uint32(me->GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
@@ -2799,7 +2805,8 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         }
     }
 
-    // Remove items that don't have our primary stat from the list
+    // 1. Remove items that don't have our primary stat from the list
+    // 2. Remove non-pvp items if we have a pvp item available
     uint32 const primaryStat = GetPrimaryItemStatForClassAndRole(me->GetClass(), m_role);
     for (auto& itr : itemsPerSlot)
     {
@@ -2815,6 +2822,9 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                     break;
                 }
             }
+
+            if (hasPrimaryStatItem)
+                break;
         }
 
         if (hasPrimaryStatItem)
@@ -2833,6 +2843,27 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                 }
 
                 return !itemHasPrimaryStat;
+            }),
+                itr.second.end());
+        }
+
+        bool hasPvpItem = false;
+
+        for (auto const& pItem : itr.second)
+        {
+            if (pItem->RequiredHonorRank)
+            {
+                hasPvpItem = true;
+                break;
+            }
+        }
+
+        if (hasPvpItem)
+        {
+            itr.second.erase(std::remove_if(itr.second.begin(), itr.second.end(),
+                [](ItemPrototype const* & pItem)
+            {
+                return pItem->RequiredHonorRank == 0;
             }),
                 itr.second.end());
         }
@@ -2874,6 +2905,8 @@ void CombatBotBaseAI::AutoEquipGear(uint32 option)
             EquipPremadeGearTemplate();
             break;
     }
+
+    UpdateVisualHonorRankBasedOnItems();
 }
 
 bool CombatBotBaseAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const
@@ -3059,6 +3092,31 @@ void CombatBotBaseAI::EquipOrUseNewItem()
             }
         }
     }
+}
+
+uint8 CombatBotBaseAI::GetHighestHonorRankFromEquippedItems() const
+{
+    uint8 maxRank = 0;
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pItem->GetProto()->RequiredHonorRank > maxRank)
+                maxRank = pItem->GetProto()->RequiredHonorRank;
+        }
+    }
+    return maxRank;
+}
+
+void CombatBotBaseAI::UpdateVisualHonorRankBasedOnItems()
+{
+    uint8 rank = GetHighestHonorRankFromEquippedItems();
+    if (rank > m_visualHonorRank)
+        m_visualHonorRank = rank;
+
+    // This is purely visual.
+    me->SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_HONOR_RANK, m_visualHonorRank);
+    me->SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_HIGHEST_HONOR_RANK, m_visualHonorRank);
 }
 
 bool CombatBotBaseAI::SummonShamanTotems()
@@ -3252,6 +3310,14 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             me->GetSession()->QueuePacket(std::move(data));
             break;
         }
+        case SMSG_LOGIN_SETTIMESPEED:
+        {
+            if (!me)
+                return;
+
+            UpdateVisualHonorRankBasedOnItems();
+            break;
+        }
         case SMSG_TRADE_STATUS:
         {
             if (!me)
@@ -3272,6 +3338,7 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             else if (status == TRADE_STATUS_TRADE_COMPLETE)
             {
                 EquipOrUseNewItem();
+                UpdateVisualHonorRankBasedOnItems();
             }
             break;
         }
