@@ -908,6 +908,10 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 1800000 (miliseconds, i.e 30 minutes)
 #                 0 (instance maps are kept in memory until they are reset)
 #
+#    Instance.PerHourLimit
+#        How many instances players can enter per hour per account.
+#        Default: 5
+#
 #    Item.InstantSaveQuality
 #        Save character inventory instantly on receiving item of this quality or higher.
 #        Default: 6 - Artifact

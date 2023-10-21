@@ -17483,7 +17483,7 @@ void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId) const
 /** Implementation of hourly maximum instances per account */
 bool Player::CheckInstanceCount(uint32 instanceId) const
 {
-    return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR);
+    return IsGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, sWorld.getConfig(CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT));
 }
 
 void Player::AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const
