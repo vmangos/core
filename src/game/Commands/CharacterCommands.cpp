@@ -2864,7 +2864,12 @@ bool ChatHandler::HandleLearnAllLangCommand(char* /*args*/)
 
     // skipping UNIVERSAL language (0)
     for (int i = 1; i < LANGUAGES_COUNT; ++i)
-        pPlayer->LearnSpell(lang_description[i].spell_id, false);
+    {
+        if (lang_description[i].spell_id)
+            pPlayer->LearnSpell(lang_description[i].spell_id, false);
+        if (lang_description[i].skill_id)
+            pPlayer->SetSkill(lang_description[i].skill_id, 300, 300);
+    }
 
     SendSysMessage(LANG_COMMAND_LEARN_ALL_LANG);
     return true;

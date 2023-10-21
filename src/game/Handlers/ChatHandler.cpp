@@ -98,9 +98,18 @@ bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
 #endif
                 case CHAT_MSG_CHANNEL:
                     return true;
-                default:
-                    return false;
             }
+            return false;
+        }
+        case LANG_UNIVERSAL:
+        {
+            switch (msgType)
+            {
+                case CHAT_MSG_AFK:
+                case CHAT_MSG_DND:
+                    return true;
+            }
+            return false;
         }
         default:
             return true;
@@ -163,8 +172,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
     // LANG_ADDON should not be changed nor be affected by flood control
     else
     {
-        // prevent talking at unknown language (cheating)
-        if (_player && !_player->KnowsLanguage(lang))
+        // prevent talking in unknown language (cheating)
+        if (lang != LANG_UNIVERSAL && _player && !_player->KnowsLanguage(lang))
         {
             SendNotification(LANG_NOT_LEARNED_LANGUAGE);
             return;
