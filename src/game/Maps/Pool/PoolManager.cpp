@@ -347,7 +347,7 @@ void PoolGroup<Pool>::RemoveOneRelation(uint16 child_pool_id)
 }
 
 template <class T>
-void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint32 triggerFrom, bool instantly)
+void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint32 triggerFrom, bool instantly, uint16 motherPool)
 {
     SpawnedPoolData& spawns = mapState.GetSpawnedPoolData();
     // GameObjects are processed differently than Creatures
@@ -355,6 +355,7 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
     bool isTriggerSpawned = spawns.IsSpawnedObject<T>(triggerFrom);
 
     uint32 lastDespawned = 0;
+    uint32 sub_pool = triggerFrom; // save sub pool for later use
     int count = limit - spawns.GetSpawnedObjects(poolId);
 
     // If triggered from some object respawn this object is still marked as spawned
@@ -398,6 +399,9 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
     // This will try to spawn the rest of pool, not guaranteed
     for (int i = 0; i < count; ++i)
     {
+        if (motherPool)
+            triggerFrom = motherPool;
+
         PoolObject* obj = RollOne(spawns, triggerFrom);
         if (!obj)
             continue;
@@ -418,6 +422,9 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
 
         if (triggerFrom && isTriggerSpawned)
         {
+            if (motherPool) // redirect trigger to the sub pool for disposal
+                triggerFrom = sub_pool;
+
             // One spawn one despawn no count increase
             DespawnObject(mapState, triggerFrom);
             lastDespawned = triggerFrom;
@@ -1011,7 +1018,7 @@ template<>
 void PoolManager::SpawnPoolGroup<Creature>(MapPersistentState& mapState, uint16 pool_id, uint32 db_guid, bool instantly)
 {
     if (!mPoolCreatureGroups[pool_id].isEmpty())
-        mPoolCreatureGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), db_guid, instantly);
+        mPoolCreatureGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), db_guid, instantly, false);
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
@@ -1020,7 +1027,7 @@ template<>
 void PoolManager::SpawnPoolGroup<GameObject>(MapPersistentState& mapState, uint16 pool_id, uint32 db_guid, bool instantly)
 {
     if (!mPoolGameobjectGroups[pool_id].isEmpty())
-        mPoolGameobjectGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), db_guid, instantly);
+        mPoolGameobjectGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), db_guid, instantly, false);
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
@@ -1029,7 +1036,7 @@ template<>
 void PoolManager::SpawnPoolGroup<Pool>(MapPersistentState& mapState, uint16 pool_id, uint32 sub_pool_id, bool instantly)
 {
     if (!mPoolPoolGroups[pool_id].isEmpty())
-        mPoolPoolGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), sub_pool_id, instantly);
+        mPoolPoolGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), sub_pool_id, instantly, pool_id);
 }
 
 /*!
