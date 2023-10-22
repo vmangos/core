@@ -942,6 +942,7 @@ class ChatHandler
         bool HandleDamageCommand(char* args);
         bool HandleAoEDamageCommand(char* args);
         bool HandleReviveCommand(char* args);
+        bool HandleDeplenishCommand(char* args);
         bool HandleReplenishCommand(char* args);
         bool HandleModifyMorphCommand(char* args);
         bool HandleNameAuraCommand(char* args);

@@ -2258,6 +2258,22 @@ bool ChatHandler::HandleModifyManaCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleDeplenishCommand(char* args)
+{
+    Unit* pUnit = GetSelectedUnit();
+    if (!pUnit || !pUnit->IsAlive())
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pUnit->SetHealth(1);
+    pUnit->SetPower(pUnit->GetPowerType(), 0);
+
+    return true;
+}
+
 bool ChatHandler::HandleReplenishCommand(char* args)
 {
     Unit* pUnit = GetSelectedUnit();

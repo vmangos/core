@@ -1162,6 +1162,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "charge",         SEC_GAMEMASTER,     false, &ChatHandler::HandleChargeCommand,              "", nullptr },
         { "cheat",          SEC_GAMEMASTER,     false, nullptr,                                        "", cheatCommandTable    },
         { "debug",          SEC_TICKETMASTER,   true, nullptr,                                         "", debugCommandTable    },
+        { "deplenish",      SEC_GAMEMASTER,     false, &ChatHandler::HandleDeplenishCommand,           "", nullptr              },
         { "replenish",      SEC_GAMEMASTER,     false, &ChatHandler::HandleReplenishCommand,           "", nullptr              },
         { "event",          SEC_GAMEMASTER,     false, nullptr,                                        "", eventCommandTable    },
         { "gm",             SEC_PLAYER,         true, nullptr,                                         "", gmCommandTable       },
