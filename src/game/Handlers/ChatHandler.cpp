@@ -43,9 +43,6 @@
 
 bool WorldSession::CheckChatMessageValidity(char* msg, uint32 lang, uint32 msgType)
 {
-    if (!IsLanguageAllowedForChatType(lang, msgType))
-        return false;
-
     if (lang != LANG_ADDON)
     {
         // strip invisible characters for non-addon messages
@@ -160,6 +157,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
     if (type >= MAX_CHAT_MSG_TYPE)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHAT: Wrong message type received: %u", type);
+        return;
+    }
+
+    if (!IsLanguageAllowedForChatType(lang, type))
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHAT: Wrong language %u received for chat type %u.", lang, type);
         return;
     }
 
