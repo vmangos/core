@@ -609,6 +609,8 @@ class Spell
         };
         bool m_destroyed = false;
 
+        SpellCastResult CheckScriptTargeting(SpellEffectIndex effIndex, uint32 chainTargets, float radius, uint32 targetMode, UnitList& tempUnitList);
+
 #ifndef USE_STANDARD_MALLOC
         typedef tbb::concurrent_vector<TargetInfo>     TargetList;
         typedef tbb::concurrent_vector<GOTargetInfo>   GOTargetList;
