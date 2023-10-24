@@ -1601,7 +1601,7 @@ class Player final: public Unit
         void SetFreeTalentPoints(uint32 points) { SetUInt32Value(PLAYER_CHARACTER_POINTS1, points); }
         bool ResetTalents(bool no_cost = false);
         void InitTalentForLevel();
-        void LearnTalent(uint32 talentId, uint32 talentRank);
+        bool LearnTalent(uint32 talentId, uint32 talentRank);
 
         /*********************************************************/
         /***                    STAT SYSTEM                    ***/

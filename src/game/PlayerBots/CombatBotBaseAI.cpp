@@ -1,4 +1,4 @@
-#include <World.h>
+#include "World.h"
 #include "CombatBotBaseAI.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -10,6 +10,7 @@
 #include "SpellAuras.h"
 #include "Chat.h"
 #include "CharacterDatabaseCache.h"
+#include <random>
 
 enum CombatBotSpells
 {
@@ -2626,8 +2627,70 @@ void CombatBotBaseAI::LearnPremadeSpecForClass()
     else
     {
         // Use gm command to learn spells on trainers and items.
+        LearnRandomTalents();
         ChatHandler(me).HandleLearnAllTrainerCommand("");
         ChatHandler(me).HandleLearnAllItemsCommand("");
+    }
+}
+
+void CombatBotBaseAI::LearnRandomTalents()
+{
+    if (!me->GetFreeTalentPoints())
+        return;
+
+    std::vector<uint32> talentTabsForClass;
+    for (uint32 talentTab = 0; talentTab < sTalentTabStore.GetNumRows(); ++talentTab)
+    {
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTab);
+        if (!talentTabInfo)
+            continue;
+
+        if ((me->GetClassMask() & talentTabInfo->ClassMask) == 0)
+            continue;
+
+        talentTabsForClass.push_back(talentTab);
+    }
+
+    if (talentTabsForClass.empty())
+        return;
+
+    uint32 chosenTab = SelectRandomContainerElement(talentTabsForClass);
+
+    std::map<uint32 /*row*/, std::vector<std::pair<uint32 /*talent id*/, uint32 /*ranks*/>>> possibleTalents;
+    for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+    {
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+        if (!talentInfo)
+            continue;
+
+        if (talentInfo->TalentTab != chosenTab)
+            continue;
+
+        uint32 ranks;
+        for (ranks = 0; ranks < MAX_TALENT_RANK && talentInfo->RankID[ranks]; ++ranks);
+        possibleTalents[talentInfo->Row].push_back({ talentId, ranks });
+    }
+
+    if (possibleTalents.empty())
+        return;
+
+    auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+    for (auto& itrRow : possibleTalents)
+    {
+        std::shuffle(itrRow.second.begin(), itrRow.second.end(), std::default_random_engine(seed));
+        for (auto const& itrTalent: itrRow.second)
+        {
+            for (uint32 rank = 0; rank < itrTalent.second; ++rank)
+            {
+                if (me->LearnTalent(itrTalent.first, rank))
+                {
+                    if (!me->GetFreeTalentPoints())
+                        return;
+                }
+                else
+                    break;
+            }
+        }
     }
 }
 
