@@ -8,6 +8,7 @@
 #include "WorldPacket.h"
 #include "Spell.h"
 #include "SpellAuras.h"
+#include "Chat.h"
 #include "CharacterDatabaseCache.h"
 
 enum CombatBotSpells
@@ -2609,7 +2610,7 @@ void CombatBotBaseAI::LearnPremadeSpecForClass()
             for (const auto itr : vSpecs)
             {
                 if (itr->role == m_role &&
-                   (!pSpec || pSpec->level < itr->level))
+                    (!pSpec || pSpec->level < itr->level))
                 {
                     pSpec = itr;
                 }
@@ -2621,6 +2622,12 @@ void CombatBotBaseAI::LearnPremadeSpecForClass()
         sObjectMgr.ApplyPremadeSpecTemplateToPlayer(pSpec->entry, me);
         if (m_role == ROLE_INVALID)
             m_role = pSpec->role;
+    }
+    else
+    {
+        // Use gm command to learn spells on trainers and items.
+        ChatHandler(me).HandleLearnAllTrainerCommand("");
+        ChatHandler(me).HandleLearnAllItemsCommand("");
     }
 }
 
