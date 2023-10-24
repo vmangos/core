@@ -2610,7 +2610,7 @@ void CombatBotBaseAI::LearnPremadeSpecForClass()
             for (const auto itr : vSpecs)
             {
                 if (itr->role == m_role &&
-                    (!pSpec || pSpec->level < itr->level))
+                   (!pSpec || pSpec->level < itr->level))
                 {
                     pSpec = itr;
                 }
