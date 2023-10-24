@@ -7207,7 +7207,7 @@ void Player::CheckDuelDistance(time_t currTime)
 bool Player::IsOutdoorPvPActive() const
 {
     return (IsAlive() && !IsGameMaster() && !HasInvisibilityAura() && !HasStealthAura() &&
-            (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED) || sWorld.IsPvPRealm()) && !IsTaxiFlying());
+            (IsPvPDesired() || sWorld.IsPvPRealm()) && !IsTaxiFlying());
 }
 
 void Player::DuelComplete(DuelCompleteType type)
@@ -14989,10 +14989,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     SetUInt32Value(PLAYER_FLAGS, fields[15].GetUInt32() & ~(PLAYER_FLAGS_PARTIAL_PLAY_TIME | PLAYER_FLAGS_NO_PLAY_TIME));
 
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED))
+    if (IsPvPDesired())
     {
         UpdatePvP(true);
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED);
+        SetPvPDesired(false);
     }
 
     time_t const now = time(nullptr);
@@ -17498,7 +17498,7 @@ void Player::AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const
 void Player::UpdatePvPFlagTimer(uint32 diff)
 {
     // Freeze flag timer while participating in PvP combat, in pvp enforced zone, in capture points, when carrying flag or on player preference
-    if (!pvpInfo.inPvPCombat && !pvpInfo.inPvPEnforcedArea && !pvpInfo.inPvPCapturePoint && !pvpInfo.isPvPFlagCarrier && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED))
+    if (!pvpInfo.inPvPCombat && !pvpInfo.inPvPEnforcedArea && !pvpInfo.inPvPCapturePoint && !pvpInfo.isPvPFlagCarrier && !IsPvPDesired())
         pvpInfo.timerPvPRemaining -= std::min(pvpInfo.timerPvPRemaining, diff);
 
     // Timer tries to drop flag if all conditions are met and time has passed
@@ -17513,6 +17513,14 @@ void Player::UpdatePvPContestedFlagTimer(uint32 diff)
 
     // Timer tries to drop flag if all conditions are met and time has passed
     UpdatePvPContested(false);
+}
+
+void Player::SetPvPDesired(bool state)
+{
+    if (state)
+        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED);
+    else
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED);
 }
 
 void Player::SetFFAPvP(bool state)
@@ -18281,8 +18289,16 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
     }
 
-    // Remove pvp flag when starting a flight
-    UpdatePvP(false);
+    // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+    // - If you have PvP combat toggled on, it will no longer be cleared when 
+    //   taking a flight.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+    if (!IsPvPDesired())
+        UpdatePvP(false, true);
+#else
+    SetPvPDesired(false);
+    UpdatePvP(false, true);
+#endif
 
     //Checks and preparations done, DO FLIGHT
     ModifyMoney(-(int32)sourceCost);

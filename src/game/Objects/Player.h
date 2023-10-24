@@ -2384,6 +2384,8 @@ class Player final: public Unit
         void UpdatePvP(bool state, bool overriding = false);
         void UpdatePvPContested(bool state, bool overriding = false);
 
+        bool IsPvPDesired() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED); }
+        void SetPvPDesired(bool state);
         bool IsFFAPvP() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_FFA_PVP); }
         void SetFFAPvP(bool state);
         bool IsInInterFactionMode() const;
