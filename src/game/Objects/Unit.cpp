@@ -9731,9 +9731,12 @@ void Unit::TeleportPositionRelocation(float x, float y, float z, float orientati
 {
     Player* player = ToPlayer();
     Creature* crea = ToCreature();
-    uint32 old_zone = 0;
+    uint32 oldZone = 0;
+    uint32 oldArea = 0;
     if (player)
     {
+        oldZone = player->GetCachedZoneId();
+        oldArea = player->GetCachedAreaId();
         player->SetPosition(x, y, z, orientation, true);
         player->m_movementInfo.ChangePosition(x, y, z, orientation);
     }
@@ -9748,10 +9751,12 @@ void Unit::TeleportPositionRelocation(float x, float y, float z, float orientati
     // new zone
     if (player)
     {
-        uint32 newzone, newarea;
-        GetZoneAndAreaId(newzone, newarea);
-        if (old_zone != newzone)
-            player->UpdateZone(newzone, newarea);
+        uint32 newZone, newArea;
+        GetZoneAndAreaId(newZone, newArea);
+        if (oldZone != newZone)
+            player->UpdateZone(newZone, newArea);
+        else if (oldArea != newArea)
+            player->UpdateArea(newArea);
         // honorless target
         if (!player->pvpInfo.inPvPEnforcedArea)
             player->RemoveDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
