@@ -5228,12 +5228,16 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     }
                     return;
                 }
-                case 29710:
+                case 28732: // Naxxramas Worshipper - Widow's Embrace
+                {
+                    if (m_casterUnit && m_casterUnit->IsAlive())
+                        m_casterUnit->Kill(m_casterUnit, nullptr);
+                    return;
+                }
+                case 29710: // Test Ribbon Pole Channel Trigger
                 {
                     if (Player* pPlayerTarget = ToPlayer(unitTarget))
-                    {
                         pPlayerTarget->CastSpell(pPlayerTarget, PickRandomValue(29705, 29726, 29727), false);
-                    }
                     return;
                 }
                 case 30882: // EPL PvP A Game of Towers: Tower Capture Test (DND)
@@ -5256,13 +5260,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 {
                     if (Player* pTarget = ToPlayer(unitTarget))
                         pTarget->CastSpell(pTarget, 32061, true);
-
-                    return;
-                }
-                case 28732: // Naxxramas Worshipper - Widow's Embrace
-                {
-                    if (m_casterUnit)
-                        m_casterUnit->Kill(m_casterUnit, nullptr);
                     return;
                 }
             }
