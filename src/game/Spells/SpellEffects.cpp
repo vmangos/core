@@ -5259,6 +5259,12 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
 
                     return;
                 }
+                case 28732: // Naxxramas Worshipper - Widow's Embrace
+                {
+                    if (m_casterUnit)
+                        m_casterUnit->Kill(m_casterUnit, nullptr);
+                    return;
+                }
             }
             break;
         }
