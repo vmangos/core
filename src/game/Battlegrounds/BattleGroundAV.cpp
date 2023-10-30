@@ -960,16 +960,25 @@ void BattleGroundAV::EndBattleGround(Team winner)
             RewardHonorToTeam(uint32(GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER) * GetHonorModifier()), team[i]);
         }
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: EndbattleGround: bgteam: %u towers:%u honor:%u rep:%u", i, towersSurvived[i], GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER), towersSurvived[i] * BG_AV_REP_SURVIVING_TOWER);
-        if (gravesOwned[i])
+        
+        // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+        // - Alterac Valley now correctly rewards honor for owning graveyards at
+        //   the end of the game.
+        if (sWorld.GetWowPatch() >= WOW_PATCH_107)
         {
-            RewardReputationToTeam(faction[i], gravesOwned[i] * m_repOwnedGrave, team[i]);
-            RewardHonorToTeam(uint32(GetBonusHonorFromKill(gravesOwned[i] * BG_AV_KILL_SURVIVING_GRAVE) * GetHonorModifier()), team[i]);
+            if (gravesOwned[i])
+            {
+                RewardReputationToTeam(faction[i], gravesOwned[i] * m_repOwnedGrave, team[i]);
+                RewardHonorToTeam(uint32(GetBonusHonorFromKill(gravesOwned[i] * BG_AV_KILL_SURVIVING_GRAVE) * GetHonorModifier()), team[i]);
+            }
         }
+
         if (minesOwned[i])
         {
             RewardReputationToTeam(faction[i], minesOwned[i] * m_repOwnedMine, team[i]);
             RewardHonorToTeam(uint32(GetBonusHonorFromKill(minesOwned[i] * BG_AV_KILL_SURVIVING_MINE)  * GetHonorModifier()), team[i]);
         }
+
         // captain survived?:
         if (!IsActiveEvent(BG_AV_NodeEventCaptainDead_A + GetTeamIndexByTeamId(team[i]), 0))
         {
