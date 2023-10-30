@@ -181,22 +181,24 @@ void BattleGroundAB::RemovePlayer(Player* /*player*/, ObjectGuid /*guid*/)
 
 }
 
-void BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
+bool BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
 {
     switch (trigger)
     {
         case 3948:                                          // Arathi Basin Alliance Exit.
-            if (source->GetTeam() != ALLIANCE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_ALLIANCE_USE);
-            else
+            if (source->GetTeam() == ALLIANCE)
+            {
                 source->LeaveBattleground();
-            break;
+                return true;
+            }
+            return false;
         case 3949:                                          // Arathi Basin Horde Exit.
-            if (source->GetTeam() != HORDE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_HORDE_USE);
-            else
+            if (source->GetTeam() == HORDE)
+            {
                 source->LeaveBattleground();
-            break;
+                return true;
+            }
+            return false;
         case 3866:                                          // Stables
         case 3869:                                          // Gold Mine
         case 3867:                                          // Farm
@@ -210,6 +212,7 @@ void BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
             //source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
+    return false;
 }
 
 /*  type: 0-neutral, 1-contested, 3-occupied

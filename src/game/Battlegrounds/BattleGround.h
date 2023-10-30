@@ -474,7 +474,7 @@ class BattleGround
 
         /* Triggers handle */
         // must be implemented in BG subclass
-        virtual void HandleAreaTrigger(Player* /*source*/, uint32 /*trigger*/) {}
+        virtual bool HandleAreaTrigger(Player* /*source*/, uint32 /*trigger*/) { return false; }
         // must be implemented in BG subclass if need AND call base class generic code
         virtual void HandleKillPlayer(Player* pVictim, Player* pKiller);
         virtual void HandleKillUnit(Creature* /*unit*/, Player* /*killer*/) { };

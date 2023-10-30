@@ -1003,24 +1003,32 @@ void BattleGroundAV::RemovePlayer(Player* /*player*/, ObjectGuid /*guid*/)
 {
 }
 
-void BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
+bool BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
 {
-    // this is wrong way to implement these things. On official it done by gameobject spell cast.
     switch (trigger)
     {
-        case 95:
-        case 2608:
-            if (source->GetTeam() != ALLIANCE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_ALLIANCE_USE);
-            else
+        case 2608: // Alterac Valley - Alliance Exit
+            // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+            // - Characters that use the Battlemaster to enter a Battleground will
+            //   now port back to that Battlemaster when they leave the Battleground
+            //   for any reason.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            if (source->GetTeam() == ALLIANCE)
+            {
                 source->LeaveBattleground();
-            break;
-        case 2606:
-            if (source->GetTeam() != HORDE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_HORDE_USE);
-            else
+                return true;
+            }
+#endif
+            return false;
+        case 2606: // Alterac Valley - Horde Exit
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            if (source->GetTeam() == HORDE)
+            {
                 source->LeaveBattleground();
-            break;
+                return true;
+            }
+#endif
+            return false;
         case 3326:
         case 3327:
         case 3328:
@@ -1028,12 +1036,13 @@ void BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
         case 3330:
         case 3331:
             //source->Unmount();
-            break;
+            return true;
         default:
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
 //            source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
+    return false;
 }
 
 void BattleGroundAV::UpdatePlayerScore(Player* source, uint32 type, uint32 value)
