@@ -21852,7 +21852,7 @@ void Player::RefreshBitsForVisibleUnits(UpdateMask* mask, uint32 objectTypeMask)
     {
         if (Object* obj = GetObjectByTypeMask(guid, TypeMask(objectTypeMask)))
         {
-            ByteBuffer buff(50);
+            ByteBuffer& buff = data.AddUpdateBlockAndGetBuffer();
 
             buff << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -21861,7 +21861,6 @@ void Player::RefreshBitsForVisibleUnits(UpdateMask* mask, uint32 objectTypeMask)
             buff << obj->GetGUID();
 #endif
             obj->BuildValuesUpdate(UPDATETYPE_VALUES, &buff, mask, this);
-            data.AddUpdateBlock(buff);
         }
     }
     data.Send(GetSession());

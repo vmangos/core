@@ -50,7 +50,7 @@ void UpdateData::AddOutOfRangeGUID(ObjectGuid const& guid)
     m_outOfRangeGUIDs.insert(guid);
 }
 
-void UpdateData::AddUpdateBlock(ByteBuffer const& block)
+ByteBuffer& UpdateData::AddUpdateBlockAndGetBuffer()
 {
     if (m_datas.empty())
         m_datas.push_back(UpdatePacket());
@@ -62,8 +62,8 @@ void UpdateData::AddUpdateBlock(ByteBuffer const& block)
         it = m_datas.end();
         --it;
     }
-    it->data.append(block);
     ++it->blockCount;
+    return it->data;
 }
 
 void PacketCompressor::Compress(void* dst, uint32* dst_size, void* src, int src_size)

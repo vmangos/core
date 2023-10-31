@@ -261,14 +261,12 @@ void Object::SendForcedObjectUpdate()
 
 void Object::BuildMovementUpdateBlock(UpdateData& data, uint8 flags) const
 {
-    ByteBuffer buf(500);
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
 
     buf << uint8(UPDATETYPE_MOVEMENT);
     buf << GetObjectGuid();
 
     BuildMovementUpdate(&buf, flags);
-
-    data.AddUpdateBlock(buf);
 }
 
 void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) const
@@ -295,7 +293,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
 
     //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BuildCreateUpdate: update-type: %u, object-type: %u got updateFlags: %X", updatetype, m_objectTypeId, updateFlags);
 
-    ByteBuffer buf(500);
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
     buf << (uint8)updatetype;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
@@ -331,7 +329,6 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     updateMask.SetCount(m_valuesCount);
     _SetCreateBits(updateMask, target);
     BuildValuesUpdate(updatetype, &buf, &updateMask, target);
-    data.AddUpdateBlock(buf);
 }
 
 void Object::SendCreateUpdateToPlayer(Player* player)
@@ -360,7 +357,7 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index, uint32 count)
         return;
 
     UpdateData data;
-    ByteBuffer buf(50);
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
     buf << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
@@ -378,7 +375,6 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index, uint32 count)
     for (int i = 0; i < count; i++)
         buf << uint32(m_uint32Values[index + i]);
 
-    data.AddUpdateBlock(buf);
     WorldPacket packet;
     data.BuildPacket(&packet);
     SendObjectMessageToSet(&packet, true);
@@ -405,7 +401,7 @@ void Object::BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* 
 
 void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const
 {
-    ByteBuffer buf(500);
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
 
     buf << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -415,7 +411,6 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updat
 #endif
 
     BuildValuesUpdate(UPDATETYPE_VALUES, &buf, &updateMask, target);
-    data.AddUpdateBlock(buf);
 }
 
 void Object::BuildOutOfRangeUpdateBlock(UpdateData& data) const
