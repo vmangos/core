@@ -2916,6 +2916,11 @@ AHBot.itemcount = 50
 #                 0 (normal starting items)
 #                 2 (premade gear template)
 #
+#    BattleBot.AutoJoin
+#        Adds enough battlebots for battleground to start when a player queues.
+#        Default: 0 - off
+#                 1 - on
+#
 ###################################################################################################################
 RandomBot.Enable = 0
 RandomBot.MinBots = 0

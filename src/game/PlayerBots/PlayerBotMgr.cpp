@@ -13,6 +13,7 @@
 #include "PartyBotAI.h"
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
+#include "BattleGroundMgr.h"
 #include "Language.h"
 #include "Spell.h"
 
@@ -31,6 +32,7 @@ PlayerBotMgr::PlayerBotMgr()
     m_confUpdateDiff            = 10000;
     m_confEnableRandomBots      = false;
     m_confDebug                 = false;
+    m_confBattleBotAutoJoin     = false;
 
     // Time
     m_elapsedTime = 0;
@@ -52,6 +54,7 @@ void PlayerBotMgr::LoadConfig()
     m_confAllowSaving = sConfig.GetBoolDefault("PlayerBot.AllowSaving", false);
     m_confDebug = sConfig.GetBoolDefault("PlayerBot.Debug", false);
     m_confUpdateDiff = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
+    m_confBattleBotAutoJoin = sConfig.GetBoolDefault("BattleBot.AutoJoin", false);
 
     if (!sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
         m_tempBots.clear();
@@ -290,14 +293,69 @@ void PlayerBotMgr::Update(uint32 diff)
         ++iter;
     }
 
-    if (!m_confEnableRandomBots)
-        return;
-
-    uint32 updatesCount = (m_elapsedTime - m_lastBotsRefresh) / m_confRandomBotsRefresh;
-    for (uint32 i = 0; i < updatesCount; ++i)
+    if (m_confBattleBotAutoJoin && (m_lastBattleBotQueueUpdate <= (sWorld.GetGameTime() - 10)))
     {
-        AddOrRemoveBot();
-        m_lastBotsRefresh += m_confRandomBotsRefresh;
+        m_lastBattleBotQueueUpdate = sWorld.GetGameTime();
+        for (uint32 queueType = BATTLEGROUND_QUEUE_AV; queueType < MAX_BATTLEGROUND_QUEUE_TYPES; ++queueType)
+        {
+            uint32 queuedAllianceCount[MAX_BATTLEGROUND_BRACKETS] = {};
+            uint32 queuedHordeCount[MAX_BATTLEGROUND_BRACKETS] = {};
+            BattleGroundQueue const& bgQueue = sBattleGroundMgr.m_battleGroundQueues[queueType];
+            for (auto const& itr : bgQueue.m_queuedPlayers)
+            {
+                if (itr.second.groupInfo->isInvitedToBgInstanceGuid)
+                    continue;
+
+                if (Player* pPlayer = sObjectAccessor.FindPlayer(itr.first))
+                {
+                    if (pPlayer->IsBot())
+                        continue;
+
+                    BattleGroundTypeId bgTypeId = itr.second.groupInfo->bgTypeId;
+                    BattleGroundBracketId bgBracketId = pPlayer->GetBattleGroundBracketIdFromLevel(bgTypeId);
+                    if (bgBracketId == BG_BRACKET_ID_NONE)
+                        continue;
+
+                    if (itr.second.groupInfo->groupTeam == ALLIANCE)
+                        ++queuedAllianceCount[bgBracketId];
+                    else
+                        ++queuedHordeCount[bgBracketId];
+                }
+            }
+
+            for (uint32 bracketId = BG_BRACKET_ID_FIRST; bracketId < MAX_BATTLEGROUND_BRACKETS; ++bracketId)
+            {
+                if (!queuedAllianceCount[bracketId] && !queuedHordeCount[bracketId])
+                    continue;
+
+                BattleGroundTypeId bgTypeId = BattleGroundMgr::BgTemplateId(BattleGroundQueueTypeId(queueType));
+                BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
+                ASSERT(bg);
+
+                uint32 botLevel = bg->GetMinLevel() + 10 * bracketId;
+                
+                for (uint32 i = queuedAllianceCount[bracketId]; i < bg->GetMinPlayersPerTeam(); ++i)
+                {
+                    sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+                    AddBattleBot(BattleGroundQueueTypeId(queueType), ALLIANCE, botLevel);
+                }
+                for (uint32 i = queuedHordeCount[bracketId]; i < bg->GetMinPlayersPerTeam(); ++i)
+                {
+                    sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
+                    AddBattleBot(BattleGroundQueueTypeId(queueType), HORDE, botLevel);
+                }
+            }
+        }
+    }
+
+    if (m_confEnableRandomBots)
+    {
+        uint32 updatesCount = (m_elapsedTime - m_lastBotsRefresh) / m_confRandomBotsRefresh;
+        for (uint32 i = 0; i < updatesCount; ++i)
+        {
+            AddOrRemoveBot();
+            m_lastBotsRefresh += m_confRandomBotsRefresh;
+        }
     }
 }
 
@@ -478,6 +536,61 @@ bool PlayerBotMgr::DeleteRandomBot()
     return false;
 }
 
+uint8 SelectRandomRaceForClass(uint8 playerClass, Team playerTeam)
+{
+    std::vector<uint32> validRaces;
+    for (uint32 raceId = 1; raceId < MAX_RACES; ++raceId)
+    {
+        if (playerTeam == ALLIANCE)
+        {
+            if (!((1 << (raceId - 1)) & RACEMASK_ALLIANCE))
+                continue;
+        }
+        else if (playerTeam == HORDE)
+        {
+            if (!((1 << (raceId - 1)) & RACEMASK_HORDE))
+                continue;
+        }
+
+        if (sObjectMgr.GetPlayerInfo(raceId, playerClass))
+            validRaces.push_back(raceId);
+    }
+
+    if (validRaces.empty())
+        return 0;
+
+    return SelectRandomContainerElement(validRaces);
+}
+
+void PlayerBotMgr::AddBattleBot(BattleGroundQueueTypeId queueType, Team botTeam, uint32 botLevel)
+{
+    std::vector<uint32> availableClasses = { CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK, CLASS_PRIEST, CLASS_DRUID };
+    if (botTeam == HORDE)
+        availableClasses.push_back(CLASS_SHAMAN);
+    else
+        availableClasses.push_back(CLASS_PALADIN);
+
+    uint8 botClass = SelectRandomContainerElement(availableClasses);
+    uint8 botRace = SelectRandomRaceForClass(botClass, botTeam);
+    if (!botRace)
+        return;
+
+    // Spawn bot on GM Island
+    uint32 const instanceId = sMapMgr.GetContinentInstanceId(1, 16224.356f, 16284.763f);
+    BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, instanceId, 16224.356f, 16284.763f, 13.175f, 4.56f, queueType);
+    AddBot(ai);
+}
+
+void PlayerBotMgr::DeleteBattleBots()
+{
+    for (auto const& itr : m_bots)
+    {
+        if (dynamic_cast<BattleBotAI*>(itr.second->ai.get()))
+            itr.second->requestRemoval = true;
+    }
+    m_confBattleBotAutoJoin = false;
+}
+
 bool PlayerBotMgr::ForceAccountConnection(WorldSession* sess)
 {
     if (sess->GetBot())
@@ -615,75 +728,6 @@ bool ChatHandler::HandleBotStartCommand(char * args)
 {
     sPlayerBotMgr.Start();
     return true;
-}
-
-uint8 SelectRandomRaceForClass(uint8 playerClass, Team playerTeam)
-{
-    switch (playerClass)
-    {
-        case CLASS_WARRIOR:
-        {
-            if (playerTeam == ALLIANCE)
-                return PickRandomValue(RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME);
-            else
-                return PickRandomValue(RACE_ORC, RACE_UNDEAD, RACE_TAUREN, RACE_TROLL);
-            break;
-        }
-        case CLASS_PALADIN:
-        {
-            return urand(0, 1) ? RACE_HUMAN : RACE_DWARF;
-        }
-        case CLASS_HUNTER:
-        {
-            if (playerTeam == ALLIANCE)
-                return urand(0, 1) ? RACE_DWARF : RACE_NIGHTELF;
-            else
-                return PickRandomValue(RACE_ORC, RACE_TAUREN, RACE_TROLL);
-            break;
-        }
-        case CLASS_ROGUE:
-        {
-            if (playerTeam == ALLIANCE)
-                return PickRandomValue(RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME);
-            else
-                return PickRandomValue(RACE_ORC, RACE_UNDEAD, RACE_TROLL);
-            break;
-        }
-        case CLASS_PRIEST:
-        {
-            if (playerTeam == ALLIANCE)
-                return PickRandomValue(RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF);
-            else
-                return urand(0, 1) ? RACE_UNDEAD : RACE_TROLL;
-            break;
-        }
-        case CLASS_SHAMAN:
-        {
-            return PickRandomValue(RACE_ORC, RACE_TAUREN, RACE_TROLL);
-        }
-        case CLASS_MAGE:
-        {
-            if (playerTeam == ALLIANCE)
-                return urand(0, 1) ? RACE_HUMAN : RACE_GNOME;
-            else
-                return urand(0, 1) ? RACE_UNDEAD : RACE_TROLL;
-            break;
-        }
-        case CLASS_WARLOCK:
-        {
-            if (playerTeam == ALLIANCE)
-                return urand(0, 1) ? RACE_HUMAN : RACE_GNOME;
-            else
-                return urand(0, 1) ? RACE_ORC : RACE_UNDEAD;
-            break;
-        }
-        case CLASS_DRUID:
-        {
-            return playerTeam == ALLIANCE ? RACE_NIGHTELF : RACE_TAUREN;
-        }
-    }
-
-    return 0;
 }
 
 bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player const* pTarget)
@@ -849,6 +893,12 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     }
 
     uint8 botRace = SelectRandomRaceForClass(botClass, pPlayer->GetTeam());
+    if (!botRace)
+    {
+        SendSysMessage("Unable to select race for bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     float x, y, z;
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
@@ -1667,18 +1717,7 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
         ExtractUInt32(&args, botLevel);
     }
 
-    std::vector<uint32> dpsClasses = { CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK, CLASS_PRIEST, CLASS_DRUID };
-    if (botTeam == HORDE)
-        dpsClasses.push_back(CLASS_SHAMAN);
-    else
-        dpsClasses.push_back(CLASS_PALADIN);
-    uint8 botClass = SelectRandomContainerElement(dpsClasses);
-    uint8 botRace = SelectRandomRaceForClass(botClass, botTeam);
-
-    // Spawn bot on GM Island
-    uint32 const instanceId = sMapMgr.GetContinentInstanceId(1, 16224.356f, 16284.763f);
-    BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, instanceId, 16224.356f, 16284.763f, 13.175f, 4.56f, bg);
-    sPlayerBotMgr.AddBot(ai);
+    sPlayerBotMgr.AddBattleBot(BattleGroundQueueTypeId(bg), botTeam, botLevel);
 
     if (bg == BATTLEGROUND_QUEUE_WS)
         PSendSysMessage("Added %s battle bot and queuing for WS", option.c_str());
@@ -1714,6 +1753,13 @@ bool ChatHandler::HandleBattleBotRemoveCommand(char* args)
     SendSysMessage("Target is not a battle bot.");
     SetSentErrorMessage(true);
     return false;
+}
+
+bool ChatHandler::HandleBattleBotRemoveAllCommand(char* args)
+{
+    sPlayerBotMgr.DeleteBattleBots();
+    SendSysMessage("Removed all battlebots.");
+    return true;
 }
 
 #define SPELL_RED_GLOW 20370
