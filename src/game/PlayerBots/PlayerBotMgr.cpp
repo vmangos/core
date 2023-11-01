@@ -38,6 +38,7 @@ PlayerBotMgr::PlayerBotMgr()
     m_elapsedTime = 0;
     m_lastBotsRefresh = 0;
     m_lastUpdate = 0;
+    m_lastBattleBotQueueUpdate = 0;
 }
 
 PlayerBotMgr::~PlayerBotMgr()
