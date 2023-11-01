@@ -2938,6 +2938,7 @@ PartyBot.AutoEquip = 1
 PartyBot.RandomGearLevelDifference = 10
 
 BattleBot.AutoEquip = 1
+BattleBot.AutoJoin = 0
 
 ###################################################################################################################
 #    Database-based chat
