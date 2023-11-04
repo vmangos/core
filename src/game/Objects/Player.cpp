@@ -4949,6 +4949,14 @@ void Player::SetFly(bool enable)
 {
     if (enable)
     {
+        if (GenericTransport* pTransport = GetTransport())
+        {
+            // Remove client from transport by sending regular monster move packet.
+            // Otherwise camera will bug out and get stuck in a weird position.
+            pTransport->RemovePassenger(this);
+            StopMoving(true);
+        }
+            
         m_movementInfo.moveFlags = (MOVEFLAG_LEVITATING | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING);
         AddUnitState(UNIT_STAT_FLYING_ALLOWED);
     }
