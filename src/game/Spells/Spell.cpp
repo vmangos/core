@@ -1741,9 +1741,15 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             this));
     }
 
-    if (triggerWeaponProcs && m_caster->IsPlayer())
-        ((Player*)m_caster)->CastItemCombatSpell(unitTarget, m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON ? m_attackType : BASE_ATTACK);
+    if (triggerWeaponProcs && m_casterUnit)
+    {
+        if (m_casterUnit->IsPlayer() && unitTarget->IsAlive())
+            ((Player*)m_casterUnit)->CastItemCombatSpell(unitTarget, m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON ? m_attackType : BASE_ATTACK);
 
+        if (m_damage)
+            m_casterUnit->TriggerDamageShields(unitTarget);
+    }
+        
     if (missInfo != SPELL_MISS_NONE)
         return;
 
