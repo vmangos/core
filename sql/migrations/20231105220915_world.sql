@@ -146,13 +146,13 @@ INSERT INTO `creature_movement_template` (`entry`,`point`,`position_x`,`position
 
 -- Correct positions for Forsaken Bodyguard Entry: 2714
 -- Bottom
-UPDATE `creature` SET `spawntimesecsmin`=300, `spawntimesecsmax`=300, `position_x`=-1555.1652,`position_y`=-3046.3308,`position_z`=13.084437, `orientation`=1.329019546508789062 WHERE `guid`=14775; -- CreateObject2
+UPDATE `creature` SET `spawntimesecsmin`=300, `position_x`=-1555.1652,`position_y`=-3046.3308,`position_z`=13.084437, `orientation`=1.329019546508789062 WHERE `guid`=14775; -- CreateObject2
 -- Left
-UPDATE `creature` SET `spawntimesecsmin`=300, `spawntimesecsmax`=300, `position_x`=-1545.0703,`position_y`=-3043.7456,`position_z`=13.569029, `orientation`=2.233138084411621093 WHERE `guid`=14773; -- CreateObject2
+UPDATE `creature` SET `spawntimesecsmin`=300, `position_x`=-1545.0703,`position_y`=-3043.7456,`position_z`=13.569029, `orientation`=2.233138084411621093 WHERE `guid`=14773; -- CreateObject2
 -- Right
-UPDATE `creature` SET `spawntimesecsmin`=300, `spawntimesecsmax`=300, `position_x`=-1547.1117,`position_y`=-3036.405,`position_z`=13.128309, `orientation`=4.555309295654296875 WHERE `guid`=14776; -- CreateObject2
+UPDATE `creature` SET `spawntimesecsmin`=300, `position_x`=-1547.1117,`position_y`=-3036.405,`position_z`=13.128309, `orientation`=4.555309295654296875 WHERE `guid`=14776; -- CreateObject2
 -- Top
-UPDATE `creature` SET `spawntimesecsmin`=300, `spawntimesecsmax`=300, `position_x`=-1553.7556,`position_y`=-3040.217,`position_z`=13.138359, `orientation`=6.091198921203613281 WHERE `guid`=14774; -- CreateObject2
+UPDATE `creature` SET `spawntimesecsmin`=300, `position_x`=-1553.7556,`position_y`=-3040.217,`position_z`=13.138359, `orientation`=6.091198921203613281 WHERE `guid`=14774; -- CreateObject2
 
 -- Correct formations
 UPDATE `creature_groups` SET `dist`=3 WHERE `member_guid`=14774;
