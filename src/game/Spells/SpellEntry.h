@@ -1113,6 +1113,7 @@ class SpellEntry
         uint32 GetCastTime(SpellCaster const* caster, Spell* spell = nullptr) const;
         uint32 GetCastTimeForBonus(DamageEffectType damagetype) const;
         uint16 GetAuraMaxTicks() const;
+        uint32 GetRank() const;
         WeaponAttackType GetWeaponAttackType() const;
         int32 CalculateSimpleValue(SpellEffectIndex eff) const { return EffectBasePoints[eff] + int32(EffectBaseDice[eff]); }
         float CalculateDefaultCoefficient(DamageEffectType const damagetype) const;
