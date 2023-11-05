@@ -6119,7 +6119,6 @@ void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint
     }
 }
 
-
 void Unit::ClearInCombat()
 {
     m_combatTimer = 0;
@@ -6133,37 +6132,45 @@ void Unit::ClearInCombat()
     }
 }
 
-bool Unit::IsTargetableBy(WorldObject const* pAttacker, bool forAoE, bool checkAlive) const
+bool Unit::IsTargetableBy(WorldObject const* pCaster, bool forAoE, bool checkAlive, bool helpful) const
 {
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+    // applies to both harmful and helpful
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE_2))
         return false;
 
     if (checkAlive && !IsAlive())
         return false;
 
-    if (Player const* pPlayer = ToPlayer())
+    if (!helpful)
     {
-        if (pPlayer->IsGameMaster() || pPlayer->GetCurrentCinematicEntry() != 0)
-            return false;
-    }
-
-    if (pAttacker)
-    {
-        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
+        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NOT_SELECTABLE))
             return false;
 
-        if (IsTaxiFlying())
-            return false;
+        if (Player const* pPlayer = ToPlayer())
+        {
+            if (pPlayer->IsGameMaster())
+                return false;
+
+            if (pPlayer->GetCurrentCinematicEntry() != 0)
+                return false;
+
+            if (IsTaxiFlying())
+                return false;
+        }
 
         if (!forAoE && !CanBeDetected())
             return false;
+    }
 
-        if (pAttacker->IsCharmerOrOwnerPlayerOrPlayerItself())
+    if (pCaster)
+    {
+        if (pCaster->IsCharmerOrOwnerPlayerOrPlayerItself())
         {
+            // applies to both harmful and helpful
             if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
                 return false;
         }
-        else // non player attacker
+        else if (!helpful) // non player attacker
         {
             if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
                 return false;
@@ -6173,16 +6180,16 @@ bool Unit::IsTargetableBy(WorldObject const* pAttacker, bool forAoE, bool checkA
         }
 
         // attacker flags prevent attacking victim too
-        if (pAttacker->IsUnit())
+        if (!helpful && pCaster->IsUnit())
         {
             if (IsCharmerOrOwnerPlayerOrPlayerItself())
             {
-                if (pAttacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+                if (pCaster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
                     return false;
             }
             else // non player victim
             {
-                if (pAttacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                if (pCaster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
                     return false;
             }
         }

@@ -3653,3 +3653,45 @@ bool WorldObject::IsValidAttackTarget(Unit const* target, bool checkAlive) const
     }
     return true;
 }
+
+bool WorldObject::IsValidHelpfulTarget(Unit const* target, bool checkAlive) const
+{
+    ASSERT(target);
+
+    // this unit flag prevents casting on friendly or self too
+    if (target == this)
+        return !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE_2);
+
+    if (FindMap() != target->FindMap())
+        return false;
+
+    if (!target->IsTargetableBy(this, false, checkAlive, true))
+        return false;
+
+    if (GetReactionTo(target) < REP_UNFRIENDLY ||
+        target->GetReactionTo(this) < REP_UNFRIENDLY)
+        return false;
+
+    Player const* playerAffectingAttacker = GetAffectingPlayer();
+    Player const* playerAffectingTarget = target->GetAffectingPlayer();
+
+    // PvP checks
+    if (playerAffectingAttacker && playerAffectingTarget)
+    {
+        // pet and owner
+        if (playerAffectingAttacker == playerAffectingTarget)
+            return true;
+
+        // cannot help others in duels
+        if (playerAffectingAttacker->duel && playerAffectingAttacker->duel->startTime != 0 ||
+            playerAffectingTarget->duel && playerAffectingTarget->duel->startTime != 0)
+            return false;
+
+        // group forces friendly relations in ffa pvp
+        if (playerAffectingAttacker->IsFFAPvP() && playerAffectingTarget->IsFFAPvP() && 
+           !playerAffectingAttacker->IsInSameRaidWith(playerAffectingTarget))
+            return false;
+    }
+
+    return true;
+}

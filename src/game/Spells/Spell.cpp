@@ -2751,7 +2751,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 // remove not targetable units if spell has no script targets
                 for (UnitList::iterator itr = targetUnitMap.begin(); itr != targetUnitMap.end();)
                 {
-                    if (!(*itr)->IsTargetableBy(m_caster, true, false) || !m_spellInfo->CanTargetAliveState((*itr)->IsAlive()))
+                    if (!(*itr)->IsTargetableBy(m_caster, true, false, m_spellInfo->IsPositiveSpell(m_caster, *itr)) || !m_spellInfo->CanTargetAliveState((*itr)->IsAlive()))
                         targetUnitMap.erase(itr++);
                     else
                         ++itr;
@@ -5956,20 +5956,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (strict && m_spellInfo->HasAttribute(SPELL_ATTR_EX3_ONLY_ON_PLAYER) && target->GetTypeId() != TYPEID_PLAYER && !m_spellInfo->IsAreaOfEffectSpell())
                     return SPELL_FAILED_BAD_TARGETS;
             }
-            // Can't help a friend in duel   |  sorry, not enough time to figure out why this is necessary
-            if (m_spellInfo->IsPositiveSpell() && m_spellInfo->Id != 28697)
-            {
-                Player* casterOwner = m_casterUnit ? m_casterUnit->GetCharmerOrOwnerPlayerOrPlayerItself() : nullptr;
-                Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
-
-                if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && casterOwner && !casterOwner->IsInDuelWith(targetOwner))
-                {
-                    return SPELL_FAILED_TARGET_DUELING;
-                }
-
-                if (targetOwner && casterOwner != targetOwner && targetOwner->duel && targetOwner->duel->startTime && casterOwner && !casterOwner->IsInDuelWith(targetOwner))
-                    return SPELL_FAILED_TARGET_DUELING;
-            }
         }
         else if (m_caster == target)
         {
@@ -6048,7 +6034,6 @@ SpellCastResult Spell::CheckCast(bool strict)
 
             // simple cases
             bool explicit_target_mode = false;
-            bool target_hostile = false;
             bool target_hostile_checked = false;
             bool target_friendly_checked = false;
             for (uint32 k : m_spellInfo->EffectImplicitTargetA)
@@ -6058,12 +6043,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!target_hostile_checked)
                     {
                         target_hostile_checked = true;
-                        target_hostile = m_caster->IsHostileTo(target);
+                        if (!m_caster->IsValidHelpfulTarget(target, false))
+                            return SPELL_FAILED_BAD_TARGETS;
                     }
-
-                    if (target_hostile)
-                        return SPELL_FAILED_BAD_TARGETS;
-
                     explicit_target_mode = true;
                 }
                 else if (IsExplicitNegativeTarget(k))
@@ -6085,10 +6067,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 // check correctness positive/negative cast target (pet cast real check and cheating check)
                 if (m_spellInfo->IsPositiveSpell())
                 {
-                    if (!target_hostile_checked)
-                        target_hostile = m_caster->IsHostileTo(target);
-
-                    if (target_hostile)
+                    if (!target_hostile_checked && m_caster->IsHostileTo(target))
                         return SPELL_FAILED_BAD_TARGETS;
                 }
                 else
@@ -6759,9 +6738,19 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_EFFECT_DUEL:
             {
-                Unit* target = m_targets.getUnitTarget();
-                if (target && target->GetTransport() != m_caster->GetTransport())
+                if (!m_caster->IsPlayer())
+                    return SPELL_FAILED_BAD_TARGETS;
+
+                Player* target = ToPlayer(m_targets.getUnitTarget());
+                if (!target)
+                    return SPELL_FAILED_BAD_TARGETS;
+
+                if (target->GetTransport() != m_caster->GetTransport())
                     return SPELL_FAILED_NOT_ON_TRANSPORT;
+
+                if (target->duel)
+                    return SPELL_FAILED_TARGET_DUELING;
+
                 break;
             }
             case SPELL_EFFECT_SCRIPT_EFFECT:
@@ -7165,11 +7154,12 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
         // for target dead/target not valid
         if (_target && IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]))
         {
-            if (!_target->IsTargetableBy(m_spellInfo->IsPositiveSpell() ? nullptr : m_casterUnit))
+            bool const positive = m_spellInfo->IsPositiveSpell(m_caster, _target);
+            if (!_target->IsTargetableBy(m_casterUnit, false, true, positive))
                 return SPELL_FAILED_BAD_TARGETS;            // guessed error
 
             // SPELL_EFFECT_DISPEL -> Positive or negative depending on the target
-            if (m_spellInfo->IsPositiveSpell() && !m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL))
+            if (positive)
             {
                 if (m_casterUnit->IsHostileTo(_target))
                     return SPELL_FAILED_BAD_TARGETS;
@@ -8172,9 +8162,12 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
 
         Player* casterOwner = m_casterUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
         Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
-        if (targetOwner && casterOwner != targetOwner && targetOwner->duel && casterOwner && !casterOwner->IsInDuelWith(targetOwner))
+        if (targetOwner && casterOwner && casterOwner != targetOwner &&
+            targetOwner->duel && targetOwner->duel->startTime != 0 &&
+            targetOwner->duel->opponent != casterOwner)
             return false;
     }
+
     // Check targets for creature type mask and remove not appropriate (skip explicit self target case, maybe need other explicit targets)
     if (m_spellInfo->EffectImplicitTargetA[eff] != TARGET_UNIT_CASTER)
     {
@@ -8572,7 +8565,7 @@ public:
             if (i_TargetType != SPELL_TARGETS_ALL)
             {
                 bool const forAttack = i_TargetType == SPELL_TARGETS_HOSTILE || i_TargetType == SPELL_TARGETS_NOT_FRIENDLY || i_TargetType == SPELL_TARGETS_AOE_DAMAGE;
-                if (!unit->IsTargetableBy(forAttack ? i_originalCaster : nullptr, true, false) || !i_spell.m_spellInfo->CanTargetAliveState(unit->IsAlive()))
+                if (!unit->IsTargetableBy(i_originalCaster, true, false, !forAttack) || !i_spell.m_spellInfo->CanTargetAliveState(unit->IsAlive()))
                     continue;
             }
 
