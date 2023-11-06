@@ -396,6 +396,9 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
             if (lvl > 60)
                 lvl = 60;
 
+#pragma warning( push )
+#pragma warning( disable : 4065)
+
             switch (GetShapeshiftForm())
             {
                 // World of Warcraft Client Patch 1.7.0 (2005-09-13)
@@ -412,6 +415,8 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
                     weapon_maxdamage = lvl * 1.25f * att_speed;
                     break;
             }
+
+#pragma warning( pop ) 
             
             total_value = 0.0f;                             // remove benefit from weapon enchants
         }
