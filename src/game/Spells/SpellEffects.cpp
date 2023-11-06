@@ -1870,7 +1870,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     break;
                 }
 #endif
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
                 // Ferocious Bite
                 case 22568: // Rank 1
                 case 22827: // Rank 2
