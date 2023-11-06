@@ -570,76 +570,37 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except)
     }
 }
 
-// Nostalrius
-void Unit::RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype)
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+void Unit::RemoveAurasByDamageTaken(uint32 damage, uint32 exceptSpellId)
 {
-    if (!HasAuraType(SPELL_AURA_MOD_FEAR))
-        return;
-
-    // Formula derived from Youfie's post here:
-    // https://forum.nostalrius.org/viewtopic.php?f=5&t=17424#p119432
-
-    // The chance to dispel an aura depends on the damage taken with respect to the caster's level.
-    uint32 max_dmg = GetLevel() > 8 ? 25 * GetLevel() - 150 : 50;
-
-    // Players are 3x more likely to break fears
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    if (IsPlayer())
-#else
-    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-    // - Fear: The calculations to determine if Fear effects should break due
-    //   to receiving damage have been changed. In addition, Intimidating
-    //   Shout now follows that player versus non - player distinction, while
-    //   previously it did not.
-    if (IsPlayer() && !HasAura(5246))
-#endif
-        max_dmg *= 0.333f;
-
-    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-    // - Fear: The calculations to determine if Fear effects should break due
-    //   to receiving damage have been changed. In addition, the chance for a
-    //   damage over time spell to break Fear is now significantly lower.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    // DOT spells are 3x less likely to break fears after 1.11
-    if (damagetype == DOT)
-        max_dmg *= 3;
-#endif
-
-    // for players, this means max_dmg = 450 at level 60, or 1350 if the damage source is a dot
-    // for mobs, this means max_dmg = 1350 at level 60, or 4050 if the damage source is a dot
-
-    float chance = float(damage) / float(max_dmg) * 100.0f;
-
-    if (!roll_chance_f(chance))
-        return;
-
-    for (AuraList::const_iterator iter = m_modAuras[SPELL_AURA_MOD_FEAR].begin(); iter != m_modAuras[SPELL_AURA_MOD_FEAR].end();)
+    for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end();)
     {
-        // skip `except` aura
-        if ((*iter)->GetId() == exceptSpellId)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        if (iter->second->GetSpellProto()->HasAttribute(SPELL_ATTR_HEARTBEAT_RESIST) &&
+            iter->second->GetSpellProto()->procChance < 101)
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+        if (iter->second->GetSpellProto()->HasAttribute(SPELL_ATTR_HEARTBEAT_RESIST))
+#else
+        if (iter->second->GetSpellProto()->HasAttribute(SPELL_ATTR_CAN_BREAK_ON_DAMAGE))
+#endif
         {
-            ++iter;
-            continue;
+            if (iter->first != exceptSpellId)
+            {
+                uint32 max_dmg = GetLevel() > 8 ? 25 * GetLevel() - 150 : 50;
+                float chance = float(damage) / max_dmg * 100.0f;
+                if (roll_chance_f(chance))
+                {
+                    RemoveSpellAuraHolder(iter->second);
+                    iter = m_spellAuraHolders.begin();
+                    continue;
+                }
+            }
         }
-        bool canRemoveAura = false;
-        switch ((*iter)->GetSpellProto()->Mechanic)
-        {
-            case MECHANIC_FEAR:
-            case MECHANIC_TURN: // [Turn Undead] #2878
-                // only fears with proc flags mention that damage may interrupt the effect on tooltip
-                // example: Flash Bomb does not break on damage
-                canRemoveAura = (*iter)->GetSpellProto()->procFlags;
-                break;
-        }
-        if (!canRemoveAura)
-        {
-            ++iter;
-            continue;
-        }
-        RemoveAurasDueToSpell((*iter)->GetId());
-        iter = m_modAuras[SPELL_AURA_MOD_FEAR].begin();
+
+        ++iter;
     }
 }
+#endif
 
 void Unit::DoKillUnit(Unit* pVictim)
 {
@@ -687,17 +648,11 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             // Damage received under shield for example.
             if (cleanDamage->absorb)
             {
-                // Before 1.11 the calculation whether to break fear used base spell damage.
-                // Calling it from spell class for direct spell damage in this case.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-                if (!spellProto || !spellProto->HasAura(SPELL_AURA_MOD_FEAR))
-#else
-                if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->HasAura(SPELL_AURA_MOD_FEAR)))
+                // In patch 1.10 proc flags were added to CC auras to make them break on damage.
+                // Before that chance to break on damage was handled by attributes.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+                pVictim->RemoveAurasByDamageTaken(cleanDamage->absorb, spellProto ? spellProto->Id : 0);
 #endif
-                {
-                    if (!(IsCreature() && ((Creature*)this)->IsWorldBoss()))
-                        pVictim->RemoveFearEffectsByDamageTaken(cleanDamage->absorb, spellProto ? spellProto->Id : 0, damagetype);
-                }
 
                 pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DAMAGE_CANCELS, spellProto ? spellProto->Id : 0, true, SKIP_STEALTH);
 
@@ -714,17 +669,11 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         return 0;
     }
 
-    // Before 1.11 the calculation whether to break fear used base spell damage.
-    // Calling it from spell class for direct spell damage in this case.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    if (!spellProto || !spellProto->HasAura(SPELL_AURA_MOD_FEAR))
-#else
-    if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->HasAura(SPELL_AURA_MOD_FEAR)))
+    // In patch 1.10 proc flags were added to CC auras to make them break on damage.
+    // Before that chance to break on damage was handled by attributes.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    pVictim->RemoveAurasByDamageTaken(damage, spellProto ? spellProto->Id : 0);
 #endif
-    {
-        if (!(IsCreature() && ((Creature*)this)->IsWorldBoss()))
-            pVictim->RemoveFearEffectsByDamageTaken(damage, spellProto ? spellProto->Id : 0, damagetype);
-    }
 
     uint32 health = pVictim->GetHealth();
     // duel ends when player has 1 or less hp
@@ -5891,10 +5840,24 @@ bool Unit::IsShapeShifted() const
 
 bool Unit::IsNoWeaponShapeShift() const
 {
+
     // Mirroring clientside gameplay logic
     if (ShapeshiftForm form = GetShapeshiftForm())
         if (SpellShapeshiftFormEntry const* entry = sSpellShapeshiftFormStore.LookupEntry(form))
             return entry->flags1 & SHAPESHIFT_FLAG_DONT_USE_WEAPON;
+
+    return false;
+}
+
+bool Unit::IsAttackSpeedOverridenShapeShift() const
+{
+    switch (GetShapeshiftForm())
+    {
+        case FORM_CAT:
+        case FORM_BEAR:
+        case FORM_DIREBEAR:
+            return true;
+    }
 
     return false;
 }

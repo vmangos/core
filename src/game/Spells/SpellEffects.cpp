@@ -1870,6 +1870,41 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     break;
                 }
 #endif
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+                // Ferocious Bite
+                case 22568: // Rank 1
+                case 22827: // Rank 2
+                case 22828: // Rank 3
+                case 22829: // Rank 4
+                {
+                    if (!m_casterUnit || !unitTarget)
+                        return;
+
+                    uint32 damageSpellId;
+                    switch (m_spellInfo->Id)
+                    {
+                        case 22568: // Rank 1
+                            damageSpellId = 22851;
+                            break;
+                        case 22827: // Rank 2
+                            damageSpellId = 22853;
+                            break;
+                        case 22828: // Rank 3
+                            damageSpellId = 22861;
+                            break;
+                        case 22829: // Rank 4
+                            damageSpellId = 22862;
+                            break;
+                        default:
+                            return;
+                    }
+
+                    int32 dmg = m_casterUnit->GetPower(POWER_ENERGY) * m_spellInfo->DmgMultiplier[effIdx];
+                    m_casterUnit->CastCustomSpell(unitTarget, damageSpellId, dmg, {}, {}, true);
+                    m_casterUnit->SetPower(POWER_ENERGY, 0);
+                    break;
+                }
+#endif
                 case 29201: // Loatheb Corrupted Mind triggered sub spells
                 {
                     uint32 spellid;
@@ -6460,12 +6495,7 @@ void Spell::EffectDispelMechanic(SpellEffectIndex effIdx)
         next = iter;
         ++next;
         SpellEntry const* spell = iter->second->GetSpellProto();
-
-        // World of Warcraft Client Patch 1.7.0 (2005-09-13)
-        // - Escape Artist works with Frost Nova and Frost Trap again.
-        if (iter->second->HasMechanic(mechanic) &&
-            // attribute removed from Frost Nova in 1.7, which likely means this effect ignores it
-           !spell->HasAttribute(SPELL_ATTR_NO_AURA_CANCEL))
+        if (iter->second->HasMechanic(mechanic))
         {
             unitTarget->RemoveAurasDueToSpell(spell->Id);
             if (Auras.empty())

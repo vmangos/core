@@ -7651,7 +7651,11 @@ void SpellAuraHolder::SetAuraFlag(uint32 slot, bool add)
     {
         uint32 flags = AFLAG_NONE;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         if (IsPositive() && !m_spellProto->HasAttribute(SPELL_ATTR_NO_AURA_CANCEL))
+#else
+        if (IsPositive())
+#endif
             flags |= AFLAG_CANCELABLE;
 
         if (GetAuraByEffectIndex(EFFECT_INDEX_0))

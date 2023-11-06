@@ -741,7 +741,11 @@ enum SpellAttributes
     SPELL_ATTR_NOT_IN_COMBAT_ONLY_PEACEFUL      = 0x10000000,            // 28 Cannot be used in combat
     SPELL_ATTR_NO_IMMUNITIES                    = 0x20000000,            // 29 Unaffected by invulnerability
     SPELL_ATTR_HEARTBEAT_RESIST                 = 0x40000000,            // 30 Chance for spell effects to break early (heartbeat resist)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     SPELL_ATTR_NO_AURA_CANCEL                   = 0x80000000             // 31 Positive aura can't be canceled
+#else
+    SPELL_ATTR_CAN_BREAK_ON_DAMAGE              = 0x80000000             // 32 Taking damage has chance to remove the aura
+#endif
 };
 
 enum SpellAttributesEx

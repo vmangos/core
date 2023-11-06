@@ -247,6 +247,7 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
             case CLASS_DRUID:
             {
                 ShapeshiftForm form = GetShapeshiftForm();
+
                 //Check if Predatory Strikes is skilled
                 float mLevelMult = 0.0;
                 switch (form)
@@ -254,7 +255,6 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                     case FORM_CAT:
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
-                    case FORM_MOONKIN:
                     {
                         Unit::AuraList const& mDummy = GetAurasByType(SPELL_AURA_DUMMY);
                         for (const auto itr : mDummy)
@@ -275,13 +275,14 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 switch (form)
                 {
                     case FORM_CAT:
+                       // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                       // - Cat Form - Each point of agility now adds 1 attack power.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                         val2 = GetLevel() * mLevelMult + strength * 2.0f + agility - 20.0f;
                         break;
+#endif
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f - 20.0f;
-                        break;
-                    case FORM_MOONKIN:
                         val2 = GetLevel() * mLevelMult + strength * 2.0f - 20.0f;
                         break;
                     default:
@@ -377,7 +378,7 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE, index);
     float weapon_maxdamage = GetWeaponDamageRange(attType, MAXDAMAGE, index);
 
-    if (IsNoWeaponShapeShift())                             // check if player is in shapeshift which doesnt use weapon
+    if (IsAttackSpeedOverridenShapeShift()) // check if player is in shapeshift which doesnt use weapon
     {
         /* Druids don't use weapons so a weapon damage index > 0 
            should not affect their damage. Fixes crazy druid scaling
@@ -395,8 +396,23 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
             if (lvl > 60)
                 lvl = 60;
 
-            weapon_mindamage = lvl * 0.85f * att_speed;
-            weapon_maxdamage = lvl * 1.25f * att_speed;
+            switch (GetShapeshiftForm())
+            {
+                // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                // - Cat Form - The base weapon damage of the form has been increased.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+                case FORM_CAT:
+                    // guessed
+                    weapon_mindamage = lvl * 0.60f * att_speed;
+                    weapon_maxdamage = lvl * 1.00f * att_speed;
+                    break;
+#endif
+                default:
+                    weapon_mindamage = lvl * 0.85f * att_speed;
+                    weapon_maxdamage = lvl * 1.25f * att_speed;
+                    break;
+            }
+            
             total_value = 0.0f;                             // remove benefit from weapon enchants
         }
     }
