@@ -141,8 +141,16 @@ INSERT INTO `creature_movement_template` (`entry`,`point`,`position_x`,`position
 (@NPC,125,-53.75716,-854.9446,56.123142,100,0,0,0),
 (@NPC,126,-48.583767,-869.2076,55.545685,100,0,0,0),
 (@NPC,127,-35.751953,-881.8281,56.09774,100,0,0,0),
-(@NPC,128,-26.509169,-897.1533,56.041534,100,0,0,309);
+(@NPC,128,-26.509169,-897.1533,56.041534,100,11000,0,309);
 -- 0x204CB0000002A680000021000035D135 .go xyz -1550.5396 -3063.7197 13.153982
+
+DELETE FROM `creature_movement_scripts` WHERE `id`=309;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(309, 10, 0, 18, 0, 0, 0, 0, 2721, 10, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Courier - Despawn Nearby Bodyguard'),
+(309, 10, 0, 18, 0, 0, 0, 0, 2721, 10, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Courier - Despawn Nearby Bodyguard'),
+(309, 10, 0, 18, 0, 0, 0, 0, 2721, 10, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Courier - Despawn Nearby Bodyguard'),
+(309, 10, 0, 18, 0, 0, 0, 0, 2721, 10, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Courier - Despawn Nearby Bodyguard'),
+(309, 10, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Courier - Despawn self');
 
 -- Correct positions for Forsaken Bodyguard Entry: 2714
 -- Bottom
