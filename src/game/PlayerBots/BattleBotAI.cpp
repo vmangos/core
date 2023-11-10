@@ -463,11 +463,17 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
             uint8 ended = *((uint8*)(*packet).contents());
             if (ended)
             {
-                std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_LEAVE_BATTLEFIELD);
+                // Temporary battlebots are removed after bg ends.
+                if (m_temporary)
+                    botEntry->requestRemoval = true;
+                else
+                {
+                    std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_LEAVE_BATTLEFIELD);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                *data << uint32(me->GetMapId());
+                    *data << uint32(me->GetMapId());
 #endif
-                me->GetSession()->QueuePacket(std::move(data));
+                    me->GetSession()->QueuePacket(std::move(data));
+                }
             }
             return;
         }

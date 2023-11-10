@@ -86,7 +86,7 @@ class PlayerBotMgr
         bool AddRandomBot();
         bool DeleteRandomBot();
 
-        void AddBattleBot(BattleGroundQueueTypeId queueType, Team botTeam, uint32 botLevel);
+        void AddBattleBot(BattleGroundQueueTypeId queueType, Team botTeam, uint32 botLevel, bool temporary);
         void DeleteBattleBots();
 
         void DeleteAll();
