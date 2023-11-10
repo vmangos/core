@@ -1081,6 +1081,9 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
             // Seal of Righteousness - melee proc dummy
             if ((dummySpell->IsFitToFamilyMask<CF_PALADIN_SEALS>()) && triggeredByAura->GetEffIndex() == EFFECT_INDEX_0)
             {
+                if (!pVictim || !pVictim->IsAlive())
+                    return SPELL_AURA_PROC_FAILED;
+
                 if (GetTypeId() != TYPEID_PLAYER)
                     return SPELL_AURA_PROC_FAILED;
 
@@ -1435,8 +1438,15 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
         case SPELLFAMILY_PALADIN:
         {
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+            // Seal of Righteousness - melee proc dummy
             if (auraSpellInfo->IsFitToFamilyMask<CF_PALADIN_SEALS>())
             {
+                if (!pVictim || !pVictim->IsAlive())
+                    return SPELL_AURA_PROC_FAILED;
+
+                if (GetTypeId() != TYPEID_PLAYER)
+                    return SPELL_AURA_PROC_FAILED;
+
                 uint32 spellId = 0;
                 switch (auraSpellInfo->Id)
                 {
@@ -1698,6 +1708,9 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit* pVictim, uint32 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "ProcDamageAndSpell: doing %u damage from spell id %u (triggered by auratype %u of spell %u)",
                      triggeredByAura->GetModifier()->m_amount, spellInfo->Id, triggeredByAura->GetModifier()->m_auraname, triggeredByAura->GetId());
     
+    if (!pVictim || !pVictim->IsAlive())
+        return SPELL_AURA_PROC_FAILED;
+
     // Trigger damage can be resisted...
     if (SpellMissInfo missInfo = SpellHitResult(pVictim, spellInfo, triggeredByAura->GetEffIndex(), false))
     {
