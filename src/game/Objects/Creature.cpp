@@ -2759,7 +2759,12 @@ void Creature::SetInCombatWithZone(bool initialPulse)
                 continue;
 
             if (IsValidAttackTarget(pPlayer))
+            {
                 EnterCombatWithTarget(pPlayer);
+                Pet* pet = pPlayer->GetPet();
+                if (pet && IsValidAttackTarget(pet))
+                    EnterCombatWithTarget(pet);
+            }
         }
     }
 }
