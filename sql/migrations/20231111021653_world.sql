@@ -286,7 +286,6 @@ UPDATE `creature` SET `id2`=4109 WHERE `guid`=21139; -- Highperch Consort
 UPDATE `creature` SET `position_x`=-6775.07, `position_y`=815.446, `position_z`=55.8303, `orientation`=3.31613 WHERE `guid`=113001; -- High Overlord Saurfang
 UPDATE `creature` SET `position_x`=-13269.1, `position_y`=-497.587, `position_z`=13.8957, `orientation`=0 WHERE `guid`=756; -- Ironjaw Basilisk
 UPDATE `creature` SET `position_x`=-2.57726, `position_y`=-915.778, `position_z`=56.5364, `orientation`=3.23139 WHERE `guid`=15537; -- Tarren Mill Deathguard
-UPDATE `creature` SET `position_x`=6729.07, `position_y`=-4662.94, `position_z`=720.875, `orientation`=5.9877 WHERE `guid`=42290; -- Everlook Bruiser
 UPDATE `creature` SET `position_x`=-6683.93, `position_y`=1583.53, `position_z`=5.56161, `orientation`=3.22356 WHERE `guid`=42955; -- Twilight Avenger
 UPDATE `creature` SET `id`=11880 WHERE `guid`=42955; -- Twilight Avenger
 UPDATE `creature` SET `id2`=11881 WHERE `guid`=42955; -- Twilight Geolord
@@ -1459,7 +1458,6 @@ UPDATE `creature` SET `id2`=624 WHERE `guid`=89567; -- Undead Excavator
 UPDATE `creature` SET `id3`=625 WHERE `guid`=89567; -- Undead Dynamiter
 UPDATE `creature` SET `position_x`=-4791.95, `position_y`=-3028.05, `position_z`=302.162, `orientation`=0.575959 WHERE `guid`=9307; -- Tunnel Rat Forager
 UPDATE `creature` SET `position_x`=-6094.81, `position_y`=-3044.25, `position_z`=400.607, `orientation`=0.628319 WHERE `guid`=9078; -- Stonesplinter Bonesnapper
-UPDATE `creature` SET `position_x`=-14449.5, `position_y`=463.654, `position_z`=3.97493, `orientation`=1.0305 WHERE `guid`=718; -- Booty Bay Bruiser
 
 -- Fix startup errors.
 UPDATE `creature` SET `mana_percent`=100 WHERE `guid` IN (6108, 6060, 5886, 5190, 5093, 4329, 2627, 2622, 9327, 9323, 9150, 9149, 27017, 23555, 23514, 21500, 20388, 20387, 20354, 7351, 16350, 44481, 92092, 92093, 92094, 42945, 42946, 42987, 43161, 43168);
