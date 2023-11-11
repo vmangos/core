@@ -6866,6 +6866,15 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
     m_makesTargetSecondaryFocus = !GetSpellProto()->IsPositiveSpell() && (GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS)
                                                                     ||  m_spellProto->HasAura(SPELL_AURA_MOD_CONFUSE)
                                                                     ||  m_spellProto->HasAura(SPELL_AURA_MOD_FEAR));
+    //  Exception spells for targetsecondaryfocus:
+    switch (m_spellProto->Id)
+    {
+        case 23310:                                         // Chromaggus Time Lapse
+        case 23312:                                         // Chromaggus Time Lapse
+            m_makesTargetSecondaryFocus = true;
+            break;
+        
+    }
 }
 
 void SpellAuraHolder::AddAura(Aura* aura, SpellEffectIndex index)
