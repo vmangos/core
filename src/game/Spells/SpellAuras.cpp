@@ -1193,8 +1193,8 @@ void Aura::TriggerSpell()
                     // Brood Affliction: Bronze
                     case 23170:
                     {
-                        int rand = urand(0, 9);
-                        if (rand < 4)   // Ustaag <Nostalrius> : 40% chance
+                        int rand = urand(0, 3);
+                        if (rand < 1)   // https://docs.google.com/spreadsheets/d/1xwndyUVb3iYZ_arZskD-NKK50jaovrgcYR5wwPP2juc/edit?usp=sharing : 25% chance
                             target->CastSpell(target, 23171, true, nullptr, this);
                         return;
                     }
