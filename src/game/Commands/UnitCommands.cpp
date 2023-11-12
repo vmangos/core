@@ -876,13 +876,13 @@ bool ChatHandler::HandleUnfreezeCommand(char* args)
 
 bool ChatHandler::HandlePossessCommand(char *args)
 {
-    Unit* tar = GetSelectedUnit();
-    if (!tar)
+    Unit* target = GetSelectedUnit();
+    if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         return false;
     }
-    m_session->GetPlayer()->CastSpell(tar, 530, true);
+    m_session->GetPlayer()->CastCustomSpell(target, 530, 255, {}, {}, true);
     return true;
 }
 

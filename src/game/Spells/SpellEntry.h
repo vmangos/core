@@ -342,6 +342,23 @@ namespace Spells
         return false;
     }
 
+    inline bool IsScriptTarget(uint32 target)
+    {
+        switch (target)
+        {
+            case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_DEST_LOC:
+            case TARGET_UNIT_SCRIPT_NEAR_CASTER:
+            case TARGET_GAMEOBJECT_SCRIPT_NEAR_CASTER:
+            case TARGET_LOCATION_SCRIPT_NEAR_CASTER:
+            case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_SCRIPT_IN_CONE_60:
+                return true;
+        }
+        return false;
+    }
+
     inline bool IsAreaEffectPossitiveTarget(SpellTarget target)
     {
         switch (target)
