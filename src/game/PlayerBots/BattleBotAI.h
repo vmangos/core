@@ -52,6 +52,7 @@ public:
     void OnPacketReceived(WorldPacket const* packet) final;
     void MovementInform(uint32 MovementType, uint32 Data = 0) final;
 
+    bool ShouldIgnoreCombat() const;
     bool DrinkAndEat();
     bool UseMount();
     uint32 GetMountSpellId() const;
