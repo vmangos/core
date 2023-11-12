@@ -8197,18 +8197,32 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
             checkLosType = CORPSE_LOS;
             break;
         }
-        case SPELL_AURA_MOD_POSSESS:
-        case SPELL_AURA_MOD_CHARM:
+        case SPELL_EFFECT_APPLY_AURA:
+        case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+        case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+        case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
         {
-            if (target == m_casterUnit)
-                return false;
+            switch (m_spellInfo->EffectApplyAuraName[eff])
+            {
+                case SPELL_AURA_MOD_POSSESS:
+                case SPELL_AURA_MOD_CHARM:
+                {
+                    if (target == m_casterUnit)
+                        return false;
 
-            if (target->GetCharmerGuid())
-                return false;
+                    if (target->GetCharmerGuid())
+                        return false;
 
-            if (int32(target->GetLevel()) > CalculateDamage(eff, target))
-                return false;
+                    if (int32(target->GetLevel()) > CalculateDamage(eff, target))
+                        return false;
 
+                    break;
+                }
+            }
             break;
         }
     }
