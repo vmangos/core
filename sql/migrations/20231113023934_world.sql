@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20231113023934');
 -- Add your query below.
 
 
--- Correct bounding radius of creaturs based on 1.13 sniffs.
+-- Correct bounding radius of creatures based on 1.13 sniffs.
 UPDATE `creature_display_info_addon` SET `bounding_radius`=1.45 WHERE `display_id`=589;
 UPDATE `creature_display_info_addon` SET `bounding_radius`=1.10298 WHERE `display_id`=711;
 UPDATE `creature_display_info_addon` SET `bounding_radius`=0.45 WHERE `display_id`=836;
@@ -468,7 +468,7 @@ UPDATE `creature_display_info_addon` SET `bounding_radius`=0.383 WHERE `display_
 UPDATE `creature_display_info_addon` SET `bounding_radius`=0.383 WHERE `display_id`=17405;
 UPDATE `creature_display_info_addon` SET `bounding_radius`=0.5 WHERE `display_id`=17548;
 
--- Correct bounding radius of creaturs based on 1.14 sniffs.
+-- Correct bounding radius of creatures based on 1.14 sniffs.
 UPDATE `creature_display_info_addon` SET `bounding_radius`=1.7 WHERE `display_id`=479;
 UPDATE `creature_display_info_addon` SET `bounding_radius`=0.6945 WHERE `display_id`=549;
 UPDATE `creature_display_info_addon` SET `bounding_radius`=0.9 WHERE `display_id`=892;
