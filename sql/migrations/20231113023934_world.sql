@@ -2036,6 +2036,21 @@ UPDATE `creature_display_info_addon` SET `gender`=0 WHERE `display_id`=15562;
 UPDATE `creature_display_info_addon` SET `gender`=0 WHERE `display_id`=16357;
 UPDATE `creature_display_info_addon` SET `gender`=0 WHERE `display_id`=16358;
 
+-- More updates based on 1.13 sniffs.
+UPDATE `creature_display_info_addon` SET `bounding_radius`=0.347, `combat_reach`=1.5, `gender`=0 WHERE `display_id`=5648;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=3.75, `combat_reach`=3.75, `gender`=2 WHERE `display_id`=7690;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=0.306, `combat_reach`=1.5, `gender`=0 WHERE `display_id`=10545;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=0.306, `combat_reach`=1.5, `gender`=0 WHERE `display_id`=15415;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=3, `combat_reach`=4.5, `gender`=2 WHERE `display_id`=15654;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=0.459, `combat_reach`=2.25, `gender`=0 WHERE `display_id`=15732;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=0.3672, `combat_reach`=1.8, `gender`=0 WHERE `display_id`=15737;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=0.6, `combat_reach`=0, `gender`=1 WHERE `display_id`=16361;
+
+-- More updates based on 1.14 sniffs.
+UPDATE `creature_display_info_addon` SET `bounding_radius`=2, `combat_reach`=20, `gender`=2 WHERE `display_id`=15474;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=0.4164, `combat_reach`=1.8, `gender`=0 WHERE `display_id`=15735;
+UPDATE `creature_display_info_addon` SET `bounding_radius`=0.306, `combat_reach`=1.5, `gender`=0 WHERE `display_id`=16023;
+
 
 -- End of migration.
 END IF;
