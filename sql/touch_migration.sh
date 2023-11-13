@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 DATE=`date +%Y%m%d%H%M%S`
 FPATH=migrations/"$DATE"_world.sql
 
