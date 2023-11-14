@@ -703,9 +703,9 @@ enum
     NPC_COLOSSUS_REGAL              = 15741,
     NPC_COLOSSUS_ASHI               = 15742,
 
-    TEXT_COLOSSUS_ASHI = -1000009,
-    TEXT_COLOSSUS_REGAL = -1000016,
-    TEXT_COLOSSUS_ZORA = -1000017,
+    TEXT_COLOSSUS_REGAL = 11424,
+    TEXT_COLOSSUS_ZORA = 11425,
+    TEXT_COLOSSUS_ASHI = 11426,
 };
 
 struct npc_colossusAI : public ScriptedAI
@@ -727,7 +727,7 @@ struct npc_colossusAI : public ScriptedAI
         }
 
         if (text)
-            m_creature->MonsterScriptToZone(text, CHAT_MSG_MONSTER_EMOTE);
+            DoScriptText(text, m_creature);
 
         Reset();
     }
