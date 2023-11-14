@@ -570,76 +570,37 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except)
     }
 }
 
-// Nostalrius
-void Unit::RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype)
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+void Unit::RemoveAurasByDamageTaken(uint32 damage, uint32 exceptSpellId)
 {
-    if (!HasAuraType(SPELL_AURA_MOD_FEAR))
-        return;
-
-    // Formula derived from Youfie's post here:
-    // https://forum.nostalrius.org/viewtopic.php?f=5&t=17424#p119432
-
-    // The chance to dispel an aura depends on the damage taken with respect to the caster's level.
-    uint32 max_dmg = GetLevel() > 8 ? 25 * GetLevel() - 150 : 50;
-
-    // Players are 3x more likely to break fears
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    if (IsPlayer())
-#else
-    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-    // - Fear: The calculations to determine if Fear effects should break due
-    //   to receiving damage have been changed. In addition, Intimidating
-    //   Shout now follows that player versus non - player distinction, while
-    //   previously it did not.
-    if (IsPlayer() && !HasAura(5246))
-#endif
-        max_dmg *= 0.333f;
-
-    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-    // - Fear: The calculations to determine if Fear effects should break due
-    //   to receiving damage have been changed. In addition, the chance for a
-    //   damage over time spell to break Fear is now significantly lower.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    // DOT spells are 3x less likely to break fears after 1.11
-    if (damagetype == DOT)
-        max_dmg *= 3;
-#endif
-
-    // for players, this means max_dmg = 450 at level 60, or 1350 if the damage source is a dot
-    // for mobs, this means max_dmg = 1350 at level 60, or 4050 if the damage source is a dot
-
-    float chance = float(damage) / float(max_dmg) * 100.0f;
-
-    if (!roll_chance_f(chance))
-        return;
-
-    for (AuraList::const_iterator iter = m_modAuras[SPELL_AURA_MOD_FEAR].begin(); iter != m_modAuras[SPELL_AURA_MOD_FEAR].end();)
+    for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end();)
     {
-        // skip `except` aura
-        if ((*iter)->GetId() == exceptSpellId)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        if (iter->second->GetSpellProto()->HasAttribute(SPELL_ATTR_HEARTBEAT_RESIST) &&
+            iter->second->GetSpellProto()->procChance < 101)
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+        if (iter->second->GetSpellProto()->HasAttribute(SPELL_ATTR_HEARTBEAT_RESIST))
+#else
+        if (iter->second->GetSpellProto()->HasAttribute(SPELL_ATTR_CAN_BREAK_ON_DAMAGE))
+#endif
         {
-            ++iter;
-            continue;
+            if (iter->first != exceptSpellId)
+            {
+                uint32 max_dmg = GetLevel() > 8 ? 25 * GetLevel() - 150 : 50;
+                float chance = float(damage) / max_dmg * 100.0f;
+                if (roll_chance_f(chance))
+                {
+                    RemoveSpellAuraHolder(iter->second);
+                    iter = m_spellAuraHolders.begin();
+                    continue;
+                }
+            }
         }
-        bool canRemoveAura = false;
-        switch ((*iter)->GetSpellProto()->Mechanic)
-        {
-            case MECHANIC_FEAR:
-            case MECHANIC_TURN: // [Turn Undead] #2878
-                // only fears with proc flags mention that damage may interrupt the effect on tooltip
-                // example: Flash Bomb does not break on damage
-                canRemoveAura = (*iter)->GetSpellProto()->procFlags;
-                break;
-        }
-        if (!canRemoveAura)
-        {
-            ++iter;
-            continue;
-        }
-        RemoveAurasDueToSpell((*iter)->GetId());
-        iter = m_modAuras[SPELL_AURA_MOD_FEAR].begin();
+
+        ++iter;
     }
 }
+#endif
 
 void Unit::DoKillUnit(Unit* pVictim)
 {
@@ -687,17 +648,11 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             // Damage received under shield for example.
             if (cleanDamage->absorb)
             {
-                // Before 1.11 the calculation whether to break fear used base spell damage.
-                // Calling it from spell class for direct spell damage in this case.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-                if (!spellProto || !spellProto->HasAura(SPELL_AURA_MOD_FEAR))
-#else
-                if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->HasAura(SPELL_AURA_MOD_FEAR)))
+                // In patch 1.10 proc flags were added to CC auras to make them break on damage.
+                // Before that chance to break on damage was handled by attributes.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+                pVictim->RemoveAurasByDamageTaken(cleanDamage->absorb, spellProto ? spellProto->Id : 0);
 #endif
-                {
-                    if (!(IsCreature() && ((Creature*)this)->IsWorldBoss()))
-                        pVictim->RemoveFearEffectsByDamageTaken(cleanDamage->absorb, spellProto ? spellProto->Id : 0, damagetype);
-                }
 
                 pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DAMAGE_CANCELS, spellProto ? spellProto->Id : 0, true, SKIP_STEALTH);
 
@@ -714,17 +669,11 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         return 0;
     }
 
-    // Before 1.11 the calculation whether to break fear used base spell damage.
-    // Calling it from spell class for direct spell damage in this case.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    if (!spellProto || !spellProto->HasAura(SPELL_AURA_MOD_FEAR))
-#else
-    if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->HasAura(SPELL_AURA_MOD_FEAR)))
+    // In patch 1.10 proc flags were added to CC auras to make them break on damage.
+    // Before that chance to break on damage was handled by attributes.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    pVictim->RemoveAurasByDamageTaken(damage, spellProto ? spellProto->Id : 0);
 #endif
-    {
-        if (!(IsCreature() && ((Creature*)this)->IsWorldBoss()))
-            pVictim->RemoveFearEffectsByDamageTaken(damage, spellProto ? spellProto->Id : 0, damagetype);
-    }
 
     uint32 health = pVictim->GetHealth();
     // duel ends when player has 1 or less hp
@@ -1714,67 +1663,72 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             ((Player*)this)->CastItemCombatSpell(pVictim, damageInfo->attackType);
 
         // victim's damage shield
-        std::set<Aura*> alreadyDone;
-        AuraList const& vDamageShields = pVictim->GetAurasByType(SPELL_AURA_DAMAGE_SHIELD);
-        for (AuraList::const_iterator i = vDamageShields.begin(); i != vDamageShields.end();)
+        TriggerDamageShields(pVictim);
+    }
+}
+
+void Unit::TriggerDamageShields(Unit* pVictim)
+{
+    std::set<Aura*> alreadyDone;
+    AuraList const& vDamageShields = pVictim->GetAurasByType(SPELL_AURA_DAMAGE_SHIELD);
+    for (AuraList::const_iterator i = vDamageShields.begin(); i != vDamageShields.end();)
+    {
+        if (alreadyDone.find(*i) == alreadyDone.end())
         {
-            if (alreadyDone.find(*i) == alreadyDone.end())
+            alreadyDone.insert(*i);
+            SpellEntry const* pSpellProto = (*i)->GetSpellProto();
+
+            // Damage shield can be resisted...
+            if (SpellMissInfo missInfo = pVictim->SpellHitResult(this, pSpellProto, (*i)->GetEffIndex()))
             {
-                alreadyDone.insert(*i);
-                SpellEntry const* pSpellProto = (*i)->GetSpellProto();
-
-                // Damage shield can be resisted...
-                if (SpellMissInfo missInfo = pVictim->SpellHitResult(this, pSpellProto, (*i)->GetEffIndex()))
-                {
-                    pVictim->SendSpellMiss(this, pSpellProto->Id, missInfo);
-                    continue;
-                }
-
-                // ...or immuned
-                if (IsImmuneToDamage(pSpellProto->GetSpellSchoolMask()))
-                {
-                    pVictim->SendSpellOrDamageImmune(this, pSpellProto->Id);
-                    continue;
-                }
-
-                float fdamage = (*i)->GetModifier()->m_amount;
-
-                // Damage shield effects do benefit from damage done bonuses, including spell power if bonus coefficient is set.
-                // For example Flame Wrath has a coefficient of 1, making it scale with 100% of spell power.
-                fdamage = pVictim->SpellDamageBonusDone(this, pSpellProto, (*i)->GetEffIndex(), fdamage, SPELL_DIRECT_DAMAGE, (*i)->GetStackAmount());
-
-                // apply SpellBaseDamageBonusTaken for mobs only
-                // for example, Death Talon Seethers with Aura of Flames reflect 1200 damage to tanks with Mark of Flame
-                if (pVictim->IsCreature())
-                {
-                    int32 spellDmgTakenBonus = this->SpellBaseDamageBonusTaken(pSpellProto->GetSpellSchoolMask());
-                    // don't allow damage shields to be reduced by Blessing of Sanctuary, etc.
-                    if (spellDmgTakenBonus > 0) fdamage += spellDmgTakenBonus;
-                }
-
-                //Calculate absorb resist ??? no data in opcode for this possibly unable to absorb or resist?
-                //uint32 absorb;
-                //uint32 resist;
-                //CalcAbsorbResist(pVictim, SpellSchools(spellProto->School), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
-                //damage-=absorb + resist;
-
-                uint32 damage = ditheru(fdamage);
-                pVictim->DealDamageMods(this, damage, nullptr);
-
-                WorldPacket data(SMSG_SPELLDAMAGESHIELD, (8 + 8 + 4 + 4));
-                data << pVictim->GetObjectGuid();
-                data << GetObjectGuid();
-                data << uint32(damage);
-                data << uint32(pSpellProto->School);
-                pVictim->SendObjectMessageToSet(&data, true);
-
-                pVictim->DealDamage(this, damage, nullptr, SPELL_DIRECT_DAMAGE, pSpellProto->GetSpellSchoolMask(), pSpellProto, true);
-
-                i = vDamageShields.begin();
+                pVictim->SendSpellMiss(this, pSpellProto->Id, missInfo);
+                continue;
             }
-            else
-                ++i;
+
+            // ...or immuned
+            if (IsImmuneToDamage(pSpellProto->GetSpellSchoolMask()))
+            {
+                pVictim->SendSpellOrDamageImmune(this, pSpellProto->Id);
+                continue;
+            }
+
+            float fdamage = (*i)->GetModifier()->m_amount;
+
+            // Damage shield effects do benefit from damage done bonuses, including spell power if bonus coefficient is set.
+            // For example Flame Wrath has a coefficient of 1, making it scale with 100% of spell power.
+            fdamage = pVictim->SpellDamageBonusDone(this, pSpellProto, (*i)->GetEffIndex(), fdamage, SPELL_DIRECT_DAMAGE, (*i)->GetStackAmount());
+
+            // apply SpellBaseDamageBonusTaken for mobs only
+            // for example, Death Talon Seethers with Aura of Flames reflect 1200 damage to tanks with Mark of Flame
+            if (pVictim->IsCreature())
+            {
+                int32 spellDmgTakenBonus = this->SpellBaseDamageBonusTaken(pSpellProto->GetSpellSchoolMask());
+                // don't allow damage shields to be reduced by Blessing of Sanctuary, etc.
+                if (spellDmgTakenBonus > 0) fdamage += spellDmgTakenBonus;
+            }
+
+            //Calculate absorb resist ??? no data in opcode for this possibly unable to absorb or resist?
+            //uint32 absorb;
+            //uint32 resist;
+            //CalcAbsorbResist(pVictim, SpellSchools(spellProto->School), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
+            //damage-=absorb + resist;
+
+            uint32 damage = ditheru(fdamage);
+            pVictim->DealDamageMods(this, damage, nullptr);
+
+            WorldPacket data(SMSG_SPELLDAMAGESHIELD, (8 + 8 + 4 + 4));
+            data << pVictim->GetObjectGuid();
+            data << GetObjectGuid();
+            data << uint32(damage);
+            data << uint32(pSpellProto->School);
+            pVictim->SendObjectMessageToSet(&data, true);
+
+            pVictim->DealDamage(this, damage, nullptr, SPELL_DIRECT_DAMAGE, pSpellProto->GetSpellSchoolMask(), pSpellProto, true);
+
+            i = vDamageShields.begin();
         }
+        else
+            ++i;
     }
 }
 
@@ -2684,15 +2638,8 @@ float Unit::GetUnitParryChance() const
 
     if (Player const* pPlayer = ToPlayer())
     {
-        if (pPlayer->CanParry())
-        {
-            Item* tmpitem = pPlayer->GetWeaponForAttack(BASE_ATTACK, true, true);
-            if (!tmpitem)
-                tmpitem = pPlayer->GetWeaponForAttack(OFF_ATTACK, true, true);
-
-            if (tmpitem)
-                chance = GetFloatValue(PLAYER_PARRY_PERCENTAGE);
-        }
+        if (pPlayer->CanParry() && pPlayer->HasWeaponForParry())
+            chance = GetFloatValue(PLAYER_PARRY_PERCENTAGE);
     }
     else
     {
@@ -5893,10 +5840,24 @@ bool Unit::IsShapeShifted() const
 
 bool Unit::IsNoWeaponShapeShift() const
 {
+
     // Mirroring clientside gameplay logic
     if (ShapeshiftForm form = GetShapeshiftForm())
         if (SpellShapeshiftFormEntry const* entry = sSpellShapeshiftFormStore.LookupEntry(form))
             return entry->flags1 & SHAPESHIFT_FLAG_DONT_USE_WEAPON;
+
+    return false;
+}
+
+bool Unit::IsAttackSpeedOverridenShapeShift() const
+{
+    switch (GetShapeshiftForm())
+    {
+        case FORM_CAT:
+        case FORM_BEAR:
+        case FORM_DIREBEAR:
+            return true;
+    }
 
     return false;
 }
@@ -6126,7 +6087,6 @@ void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint
     }
 }
 
-
 void Unit::ClearInCombat()
 {
     m_combatTimer = 0;
@@ -6140,37 +6100,45 @@ void Unit::ClearInCombat()
     }
 }
 
-bool Unit::IsTargetableBy(WorldObject const* pAttacker, bool forAoE, bool checkAlive) const
+bool Unit::IsTargetableBy(WorldObject const* pCaster, bool forAoE, bool checkAlive, bool helpful) const
 {
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+    // applies to both harmful and helpful
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE_2))
         return false;
 
     if (checkAlive && !IsAlive())
         return false;
 
-    if (Player const* pPlayer = ToPlayer())
+    if (!helpful)
     {
-        if (pPlayer->IsGameMaster() || pPlayer->GetCurrentCinematicEntry() != 0)
-            return false;
-    }
-
-    if (pAttacker)
-    {
-        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
+        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NOT_SELECTABLE))
             return false;
 
-        if (IsTaxiFlying())
-            return false;
+        if (Player const* pPlayer = ToPlayer())
+        {
+            if (pPlayer->IsGameMaster())
+                return false;
+
+            if (pPlayer->GetCurrentCinematicEntry() != 0)
+                return false;
+
+            if (IsTaxiFlying())
+                return false;
+        }
 
         if (!forAoE && !CanBeDetected())
             return false;
+    }
 
-        if (pAttacker->IsCharmerOrOwnerPlayerOrPlayerItself())
+    if (pCaster)
+    {
+        if (pCaster->IsCharmerOrOwnerPlayerOrPlayerItself())
         {
+            // applies to both harmful and helpful
             if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
                 return false;
         }
-        else // non player attacker
+        else if (!helpful) // non player attacker
         {
             if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
                 return false;
@@ -6180,16 +6148,16 @@ bool Unit::IsTargetableBy(WorldObject const* pAttacker, bool forAoE, bool checkA
         }
 
         // attacker flags prevent attacking victim too
-        if (pAttacker->IsUnit())
+        if (!helpful && pCaster->IsUnit())
         {
             if (IsCharmerOrOwnerPlayerOrPlayerItself())
             {
-                if (pAttacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+                if (pCaster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
                     return false;
             }
             else // non player victim
             {
-                if (pAttacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                if (pCaster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
                     return false;
             }
         }
@@ -9738,9 +9706,12 @@ void Unit::TeleportPositionRelocation(float x, float y, float z, float orientati
 {
     Player* player = ToPlayer();
     Creature* crea = ToCreature();
-    uint32 old_zone = 0;
+    uint32 oldZone = 0;
+    uint32 oldArea = 0;
     if (player)
     {
+        oldZone = player->GetCachedZoneId();
+        oldArea = player->GetCachedAreaId();
         player->SetPosition(x, y, z, orientation, true);
         player->m_movementInfo.ChangePosition(x, y, z, orientation);
     }
@@ -9755,10 +9726,12 @@ void Unit::TeleportPositionRelocation(float x, float y, float z, float orientati
     // new zone
     if (player)
     {
-        uint32 newzone, newarea;
-        GetZoneAndAreaId(newzone, newarea);
-        if (old_zone != newzone)
-            player->UpdateZone(newzone, newarea);
+        uint32 newZone, newArea;
+        GetZoneAndAreaId(newZone, newArea);
+        if (oldZone != newZone)
+            player->UpdateZone(newZone, newArea);
+        else if (oldArea != newArea)
+            player->UpdateArea(newArea);
         // honorless target
         if (!player->pvpInfo.inPvPEnforcedArea)
             player->RemoveDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
@@ -10529,7 +10502,12 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     bool arrived = movespline->Finalized();
 
     if (arrived)
+    {
         DisableSpline();
+
+        if (HasPendingSplineDone() && !IsPlayer() && !GetPossessorGuid().IsPlayer())
+            SetSplineDonePending(false);
+    }
     else if (!movespline->isCyclic() && movespline->getLastPointSent() >= 0 && movespline->getLastPointSent() < (movespline->currentPathIdx() + 3))
     {
         WorldPacket data(SMSG_MONSTER_MOVE, 64);

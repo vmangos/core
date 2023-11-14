@@ -906,6 +906,7 @@ class WorldObject : public Object
         virtual ReputationRank GetReactionTo(WorldObject const* target) const;
         ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
         bool IsValidAttackTarget(Unit const* target, bool checkAlive = true) const;
+        bool IsValidHelpfulTarget(Unit const* target, bool checkAlive = true) const;
 
         virtual void SaveRespawnTime() {}
         void AddObjectToRemoveList();

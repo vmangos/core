@@ -1196,7 +1196,7 @@ void BattleGround::UpdatePlayerScore(Player* source, uint32 type, uint32 value)
     }
 }
 
-bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 /*respawnTime*/)
+bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
     // must be created this way, adding to godatamap would add it to the base map of the instance
     // and when loading it (in go::LoadFromDB()), a new guid would be assigned to the object, and a new object would be created
@@ -1210,28 +1210,7 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
         delete go;
         return false;
     }
-    /*
-        uint32 guid = go->GetGUIDLow();
-
-        // without this, UseButtonOrDoor caused the crash, since it tried to get go info from godata
-        // iirc that was changed, so adding to go data map is no longer required if that was the only function using godata from GameObject without checking if it existed
-        GameObjectData& data = sObjectMgr.NewGOData(guid);
-
-        data.id             = entry;
-        data.position.mapId = GetMapId();
-        data.position.x     = x;
-        data.position.y     = y;
-        data.position.z     = z;
-        data.orientation    = o;
-        data.rotation0      = rotation0;
-        data.rotation1      = rotation1;
-        data.rotation2      = rotation2;
-        data.rotation3      = rotation3;
-        data.spawntimesecs  = respawnTime;
-        data.spawnMask      = 1;
-        data.animprogress   = 100;
-        data.go_state       = 1;
-    */
+    
     // add to world, so it can be later looked up from HashMapHolder
     go->AddToWorld();
     m_bgObjects[type] = go->GetObjectGuid();
@@ -1250,7 +1229,7 @@ void BattleGround::DoorClose(ObjectGuid guid)
         {
             //change state to allow door to be closed
             obj->SetLootState(GO_READY);
-            obj->UseDoorOrButton(RESPAWN_ONE_DAY);
+            obj->UseDoorOrButton(RESPAWN_NEVER);
         }
     }
     else
@@ -1264,7 +1243,7 @@ void BattleGround::DoorOpen(ObjectGuid guid)
     {
         //change state to be sure they will be opened
         obj->SetLootState(GO_READY);
-        obj->UseDoorOrButton(RESPAWN_ONE_DAY);
+        obj->UseDoorOrButton(RESPAWN_NEVER);
     }
     else
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround: Door %s not found! - doors will be closed.", guid.GetString().c_str());
@@ -1324,7 +1303,7 @@ void BattleGround::OnObjectDBLoad(GameObject* obj)
     {
         m_eventObjects[MAKE_PAIR32(i.event1, i.event2)].gameobjects.push_back(obj->GetObjectGuid());
         if (!IsActiveEvent(i.event1, i.event2))
-            SpawnBGObject(obj->GetObjectGuid(), RESPAWN_ONE_DAY);
+            SpawnBGObject(obj->GetObjectGuid(), RESPAWN_NEVER);
         else
         {
             // it's possible, that doors aren't spawned anymore (wsg)
@@ -1438,7 +1417,7 @@ void BattleGround::SpawnEvent(uint8 event1, uint8 event2, bool spawn, bool force
 
     BGObjects::const_iterator itr2 = m_eventObjects[MAKE_PAIR32(event1, event2)].gameobjects.begin();
     for (; itr2 != m_eventObjects[MAKE_PAIR32(event1, event2)].gameobjects.end(); ++itr2)
-        SpawnBGObject(*itr2, (spawn) ? delay : RESPAWN_ONE_DAY);
+        SpawnBGObject(*itr2, (spawn) ? delay : RESPAWN_NEVER);
 
     OnEventStateChanged(event1, event2, spawn);
 }
@@ -1471,12 +1450,23 @@ void BattleGround::SetSpawnEventMode(uint8 event1, uint8 event2, BattleGroundCre
 void BattleGround::SpawnBGObject(ObjectGuid guid, uint32 respawnTime)
 {
     Map* map = GetBgMap();
-
     GameObject* obj = map->GetGameObject(guid);
-    if (!obj)
-        return;
-    if (respawnTime != RESPAWN_ONE_DAY)
+
+    if (respawnTime != RESPAWN_NEVER)
     {
+        bool justLoaded = false;
+        if (!obj)
+        {
+            // try loading it if spawn is not found
+            obj = GameObject::CreateGameObject(guid.GetEntry());
+            if (!obj->LoadFromDB(guid.GetCounter(), map, true))
+            {
+                delete obj;
+                return;
+            }
+            justLoaded = true;
+        }
+
         //we need to change state from GO_JUST_DEACTIVATED to GO_READY in case battleground is starting again
         if (obj->getLootState() == GO_JUST_DEACTIVATED)
             obj->SetLootState(GO_READY);
@@ -1488,16 +1478,23 @@ void BattleGround::SpawnBGObject(ObjectGuid guid, uint32 respawnTime)
         if (obj->GetEntry() == 178786 || obj->GetEntry() == 178787 || obj->GetEntry() == 178788 || obj->GetEntry() == 178789)
             obj->SetRespawnDelay(60);
 
-        if (!obj->GetRespawnTime())
+        if (justLoaded || !obj->GetRespawnTime())
             map->Add(obj);
     }
     else
     {
-        if (obj->GetGOInfo()->type != GAMEOBJECT_TYPE_FLAGSTAND)
-            obj->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+        if (obj)
+        {
+            if (obj->GetGOInfo()->type != GAMEOBJECT_TYPE_FLAGSTAND)
+                obj->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
 
-        obj->SetRespawnTime(respawnTime);
-        obj->SetLootState(GO_JUST_DEACTIVATED);
+            obj->SetRespawnTime(respawnTime);
+            obj->SetLootState(GO_JUST_DEACTIVATED);
+
+            // remove from map and delete the object
+            if (obj->HasStaticDBSpawnData())
+                obj->AddObjectToRemoveList();
+        }
     }
 }
 
@@ -1517,7 +1514,7 @@ void BattleGround::SpawnBGCreature(ObjectGuid guid, BattleGroundCreatureSpawnMod
     }
     else if (mode == DESPAWN_FORCED)
     {
-        obj->SetRespawnDelay(RESPAWN_FOUR_DAYS);
+        obj->SetRespawnDelay(RESPAWN_NEVER);
         obj->SetDeathState(JUST_DIED);
         obj->RemoveCorpse();
     }
@@ -1529,7 +1526,7 @@ void BattleGround::SpawnBGCreature(ObjectGuid guid, BattleGroundCreatureSpawnMod
     }
     else if (mode == RESPAWN_STOP)
     {
-        obj->SetRespawnDelay(RESPAWN_FOUR_DAYS);
+        obj->SetRespawnDelay(RESPAWN_NEVER);
         if (obj->IsDespawned())
         {
             obj->SetDeathState(JUST_DIED);
@@ -1654,7 +1651,7 @@ void BattleGround::HandleTriggerBuff(ObjectGuid goGuid)
     if (m_buffChange && entry != g_buffEntries[buff])
     {
         //despawn current buff
-        SpawnBGObject(m_bgObjects[index], RESPAWN_ONE_DAY);
+        SpawnBGObject(m_bgObjects[index], RESPAWN_NEVER);
         //set index for new one
         for (uint8 currBuffTypeIndex = 0; currBuffTypeIndex < 3; ++currBuffTypeIndex)
         {

@@ -196,6 +196,7 @@ enum eConfigUInt32Values
     CONFIG_UINT32_MIN_HONOR_KILLS,
     CONFIG_UINT32_INSTANCE_RESET_TIME_HOUR,
     CONFIG_UINT32_INSTANCE_UNLOAD_DELAY,
+    CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT,
     CONFIG_UINT32_MAX_SPELL_CASTS_IN_CHAIN,
     CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL,
     CONFIG_UINT32_MIN_PETITION_SIGNS,
@@ -1010,6 +1011,11 @@ class World
         // Housing this here but logically it is completely asynchronous - TODO: Separate this and unify with BG queue
         LFGQueue m_lfgQueue;
         std::unique_ptr<std::thread> m_lfgQueueThread;
+
+        // This thread handles packets while the world sessions update is not running
+        std::unique_ptr<std::thread> m_asyncPacketsThread;
+        bool m_canProcessAsyncPackets;
+        void ProcessAsyncPackets();
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;

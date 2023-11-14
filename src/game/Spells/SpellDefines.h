@@ -741,7 +741,11 @@ enum SpellAttributes
     SPELL_ATTR_NOT_IN_COMBAT_ONLY_PEACEFUL      = 0x10000000,            // 28 Cannot be used in combat
     SPELL_ATTR_NO_IMMUNITIES                    = 0x20000000,            // 29 Unaffected by invulnerability
     SPELL_ATTR_HEARTBEAT_RESIST                 = 0x40000000,            // 30 Chance for spell effects to break early (heartbeat resist)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     SPELL_ATTR_NO_AURA_CANCEL                   = 0x80000000             // 31 Positive aura can't be canceled
+#else
+    SPELL_ATTR_CAN_BREAK_ON_DAMAGE              = 0x80000000             // 31 Taking damage has chance to remove the aura
+#endif
 };
 
 enum SpellAttributesEx
@@ -881,6 +885,7 @@ enum SpellAttributesCustom
     SPELL_CUSTOM_SINGLE_TARGET_AURA         = 0x100,     // Aura applied by spell can only be on 1 target at a time
     SPELL_CUSTOM_AURA_APPLY_BREAKS_STEALTH  = 0x200,     // Stealth is removed when this aura is applied
     SPELL_CUSTOM_NOT_REMOVED_ON_EVADE       = 0x400,     // Aura persists after creature evades
+    SPELL_CUSTOM_SEND_CHANNEL_VISUAL        = 0x800,     // Will periodically send the channeling spell visual kit
 };
 
 // Custom flags assigned by the core based on spell template data

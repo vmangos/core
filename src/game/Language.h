@@ -775,8 +775,8 @@ enum MangosStrings
     //                                  = 749, not used
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING      = 750,  // "Not enough players. This game will close in %u mins."
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
-    LANG_BATTLEGROUND_ONLY_ALLIANCE_USE = 752,              // "Only The Alliance can use that portal"
-    LANG_BATTLEGROUND_ONLY_HORDE_USE    = 753,              // "Only The Horde can use that portal"
+//                                      = 752, not used
+//                                      = 753, not used
 //                                      = 754, not used
 //                                      = 755, not used
 //                                      = 756, not used

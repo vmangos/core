@@ -148,7 +148,7 @@ class BattleGroundWS : public BattleGround
         virtual void EventPlayerCapturedFlag(Player* source);
 
         void RemovePlayer(Player* player, ObjectGuid guid);
-        void HandleAreaTrigger(Player* source, uint32 trigger);
+        bool HandleAreaTrigger(Player* source, uint32 trigger);
         void HandleKillPlayer(Player* pVictim, Player* pKiller);
         bool SetupBattleGround();
         virtual void Reset();

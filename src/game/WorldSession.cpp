@@ -215,6 +215,37 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         m_socket->CloseSocket();
 }
 
+uint32 GetChatPacketProcessingType(uint32 chatType)
+{
+    switch (chatType)
+    {
+        // These can be handled at any time session update in world thread is not running.
+        case CHAT_MSG_CHANNEL:
+        case CHAT_MSG_WHISPER:
+        case CHAT_MSG_PARTY:
+        case CHAT_MSG_GUILD:
+        case CHAT_MSG_OFFICER:
+        case CHAT_MSG_RAID:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        case CHAT_MSG_RAID_LEADER:
+        case CHAT_MSG_RAID_WARNING:
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+        case CHAT_MSG_BATTLEGROUND:
+        case CHAT_MSG_BATTLEGROUND_LEADER:
+#endif
+        case CHAT_MSG_DND:
+            return PACKET_PROCESS_ASYNC;
+        // These can be handled on the map thread.
+        case CHAT_MSG_SAY:
+        case CHAT_MSG_EMOTE:
+        case CHAT_MSG_YELL:
+            return PACKET_PROCESS_MAP;
+    }
+
+    return PACKET_PROCESS_WORLD;
+}
+
 // Add an incoming packet to the queue
 void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
 {
@@ -224,27 +255,27 @@ void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
     if (_player && MovementAnticheat::IsLoggedOpcode(newPacket->GetOpcode()))
         GetCheatData()->LogMovementPacket(true, *newPacket);
 
-    OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
-    uint32 const processing = opHandle.packetProcessing;
+    uint32 processing;
 
-    if (processing >= PACKET_PROCESS_MAX_TYPE)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped",
-                      LookupOpcodeName(newPacket->GetOpcode()),
-                      newPacket->GetOpcode());
-        return;
-    }
-
-    // handle query packets in place to reduce load on world
-    // they dont access player or write anything so its safe
-    if (processing == PACKET_PROCESS_DB_QUERY)
-    {
-        // all these packets require STATUS_LOGGEDIN 
-        if (_player)
-            (this->*opHandle.handler)(*newPacket);
-    }
+    // Handle chat packets on async thread when possible
+    if (newPacket->GetOpcode() == CMSG_MESSAGECHAT &&
+        newPacket->size() >= sizeof(uint32))
+        processing = GetChatPacketProcessingType(*((uint32*)newPacket->contents()));
     else
-        m_recvQueue[processing].add(std::move(newPacket));
+    {
+        OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
+        processing = opHandle.packetProcessing;
+
+        if (processing >= PACKET_PROCESS_MAX_TYPE)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped",
+                LookupOpcodeName(newPacket->GetOpcode()),
+                newPacket->GetOpcode());
+            return;
+        }
+    }
+
+    m_recvQueue[processing].add(std::move(newPacket));
 }
 
 // Logging helper for unexpected opcodes
@@ -756,6 +787,7 @@ void WorldSession::LogoutPlayer(bool Save)
         m_masterPlayer = nullptr;
     }
 
+    m_clientMoverGuid.Clear();
     m_playerLogout = false;
     m_playerSave = false;
     m_playerRecentlyLogout = true;
@@ -880,7 +912,7 @@ void WorldSession::LoadGlobalAccountData()
     QueryResult* result = CharacterDatabase.PQuery("SELECT `type`, `time`, `data` FROM `account_data` WHERE `account`=%u", GetAccountId());
     LoadAccountData(
         result,
-        GLOBAL_CACHE_MASK
+        NewAccountData::GLOBAL_CACHE_MASK
     );
     if (result)
         delete result;
@@ -888,7 +920,7 @@ void WorldSession::LoadGlobalAccountData()
 
 void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
 {
-    for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
+    for (uint32 i = 0; i < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++i)
         if (mask & (1 << i))
             m_accountData[i] = AccountData();
 
@@ -900,17 +932,17 @@ void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
         Field* fields = result->Fetch();
 
         uint32 type = fields[0].GetUInt32();
-        if (type >= NUM_ACCOUNT_DATA_TYPES)
+        if (type >= NewAccountData::NUM_ACCOUNT_DATA_TYPES)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have invalid account data type (%u), ignore.",
-                mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+                mask == NewAccountData::GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
             continue;
         }
 
         if ((mask & (1 << type)) == 0)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have non appropriate for table  account data type (%u), ignore.",
-                mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+                mask == NewAccountData::GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
             continue;
         }
 
@@ -919,28 +951,21 @@ void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
     } while (result->NextRow());
 }
 
-void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
+void WorldSession::SetAccountData(NewAccountData::AccountDataType type, const std::string& data)
 {
     time_t const currentTime = time(nullptr);
-    if ((1 << type) & GLOBAL_CACHE_MASK)
+    if ((1 << type) & NewAccountData::GLOBAL_CACHE_MASK)
     {
-        uint32 acc = GetAccountId();
-
-        static SqlStatementID delId;
-        static SqlStatementID insId;
-
-        CharacterDatabase.BeginTransaction();
-
-        SqlStatement stmt = CharacterDatabase.CreateStatement(delId, "DELETE FROM `account_data` WHERE `account`=? AND `type`=?");
-        stmt.PExecute(acc, uint32(type));
-
-        if (!data.empty())
+        if (data.empty())
         {
-            stmt = CharacterDatabase.CreateStatement(insId, "INSERT INTO `account_data` VALUES (?,?,?,?)");
-            stmt.PExecute(acc, uint32(type), uint64(currentTime), data.c_str());
+            CharacterDatabase.PExecute("DELETE FROM `account_data` WHERE `account`=%u AND `type`=%u", GetAccountId(), uint32(type));
         }
-
-        CharacterDatabase.CommitTransaction();
+        else
+        {
+            std::string escapedData = data;
+            CharacterDatabase.escape_string(escapedData);
+            CharacterDatabase.PExecute("REPLACE INTO `account_data` VALUES (%u, %u, %u, '%s')", GetAccountId(), uint32(type), uint64(currentTime), escapedData.c_str());
+        }
     }
     else
     {
@@ -948,21 +973,16 @@ void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
         if (!m_currentPlayerGuid)
             return;
 
-        static SqlStatementID delId;
-        static SqlStatementID insId;
-
-        CharacterDatabase.BeginTransaction();
-
-        SqlStatement stmt = CharacterDatabase.CreateStatement(delId, "DELETE FROM `character_account_data` WHERE `guid`=? AND `type`=?");
-        stmt.PExecute(m_currentPlayerGuid.GetCounter(), uint32(type));
-
-        if (!data.empty())
+        if (data.empty())
         {
-            stmt = CharacterDatabase.CreateStatement(insId, "INSERT INTO `character_account_data` VALUES (?,?,?,?)");
-            stmt.PExecute(m_currentPlayerGuid.GetCounter(), uint32(type), uint64(currentTime), data.c_str());
+            CharacterDatabase.PExecute("DELETE FROM `character_account_data` WHERE `guid`=%u AND `type`=%u", m_currentPlayerGuid.GetCounter(), uint32(type));
         }
-
-        CharacterDatabase.CommitTransaction();
+        else
+        {
+            std::string escapedData = data;
+            CharacterDatabase.escape_string(escapedData);
+            CharacterDatabase.PExecute("REPLACE INTO `character_account_data` VALUES (%u, %u, %u, '%s')", m_currentPlayerGuid.GetCounter(), uint32(type), uint64(currentTime), escapedData.c_str());
+        }
     }
 
     m_accountData[type].timestamp = currentTime;
@@ -971,9 +991,20 @@ void WorldSession::SetAccountData(AccountDataType type, const std::string& data)
 
 void WorldSession::SendAccountDataTimes()
 {
-    WorldPacket data(SMSG_ACCOUNT_DATA_MD5, NUM_ACCOUNT_DATA_TYPES * MD5_DIGEST_LENGTH);
-    for (AccountData const& itr : m_accountData)
+    bool const isOldClient = GetGameBuild() <= CLIENT_BUILD_1_8_4;
+    uint32 const dataCount = isOldClient ? OldAccountData::NUM_ACCOUNT_DATA_TYPES : NewAccountData::NUM_ACCOUNT_DATA_TYPES;
+    WorldPacket data(SMSG_ACCOUNT_DATA_MD5, dataCount * MD5_DIGEST_LENGTH);
+    for (uint32 index = 0; index < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++index)
     {
+        // Skip indexes that dont exist in old clients
+        if (isOldClient)
+        {
+            OldAccountData::AccountDataType oldIndex = ConvertNewAccountDataToOld(index);
+            if (oldIndex == OldAccountData::NUM_ACCOUNT_DATA_TYPES)
+                continue;
+        }
+
+        AccountData const& itr = m_accountData[index];
         if (itr.data.empty())
         {
             for (int i = 0; i < MD5_DIGEST_LENGTH; i++)

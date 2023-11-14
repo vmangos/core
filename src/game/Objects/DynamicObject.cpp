@@ -158,6 +158,11 @@ Unit* DynamicObject::GetUnitCaster() const
     return nullptr;
 }
 
+Player* DynamicObject::GetAffectingPlayer() const
+{
+    return ::ToPlayer(GetUnitCaster());
+}
+
 uint32 DynamicObject::GetFactionTemplateId() const
 {
     return GetCaster()->GetFactionTemplateId();

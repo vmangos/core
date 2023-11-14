@@ -1837,7 +1837,7 @@ bool ChatHandler::HandleReloadCreatureDisplayInfoAddon(char*)
 
 bool ChatHandler::HandleReloadIPBanList(char*)
 {
-    sAccountMgr.LoadIPBanList();
+    sAccountMgr.LoadIPBanList(LoginDatabase.Query(LOAD_IP_BANS_QUERY));
     SendSysMessage(">> Table `ip_banned` reloaded.");
     return true;
 }

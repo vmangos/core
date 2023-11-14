@@ -285,7 +285,7 @@ void SocialMgr::BroadcastToFriendListers(MasterPlayer* player, WorldPacket* pack
     AccountTypes gmLevelInWhoList = AccountTypes(sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST));
     bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
 
-    std::unique_lock<std::mutex> guard(_socialMapLock);
+    std::shared_lock<std::shared_timed_mutex> guard(_socialMapLock);
     for (const auto& itr : m_socialMap)
     {
         PlayerSocialMap::const_iterator itr2 = itr.second.m_playerSocialMap.find(guid);
@@ -306,7 +306,7 @@ void SocialMgr::BroadcastToFriendListers(MasterPlayer* player, WorldPacket* pack
 
 PlayerSocial* SocialMgr::LoadFromDB(QueryResult* result, ObjectGuid guid)
 {
-    std::unique_lock<std::mutex> guard(_socialMapLock);
+    std::unique_lock<std::shared_timed_mutex> guard(_socialMapLock);
     PlayerSocial *social = &m_socialMap[guid.GetCounter()];
     social->SetPlayerGuid(guid);
 
@@ -348,6 +348,6 @@ PlayerSocial* SocialMgr::LoadFromDB(QueryResult* result, ObjectGuid guid)
 
 void SocialMgr::RemovePlayerSocial(uint32 guid)
 {
-    std::unique_lock<std::mutex> guard(_socialMapLock);
+    std::unique_lock<std::shared_timed_mutex> guard(_socialMapLock);
     m_socialMap.erase(guid);
 }

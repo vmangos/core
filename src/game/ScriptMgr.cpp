@@ -159,7 +159,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
         {
             case SCRIPT_COMMAND_TALK:
             {
-                if (tmp.talk.chatType > CHAT_TYPE_ZONE_YELL)
+                if (tmp.talk.chatType >= CHAT_TYPE_MAX)
                 {
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has invalid CHAT_TYPE_ (datalong = %u) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.talk.chatType, tmp.id);
                     continue;
@@ -2156,7 +2156,7 @@ void ScriptMgr::LoadScriptTexts()
             if (!GetLanguageDescByID(pTemp.Language))
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %i in table `script_texts` using Language %u but Language does not exist.", iId, pTemp.Language);
 
-            if (pTemp.Type > CHAT_TYPE_ZONE_YELL)
+            if (pTemp.Type >= CHAT_TYPE_MAX)
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %i in table `script_texts` has Type %u but this Chat Type does not exist.", iId, pTemp.Type);
 
             m_mTextDataMap[iId] = pTemp;
@@ -2218,7 +2218,7 @@ void ScriptMgr::LoadScriptTextsCustom()
             if (!GetLanguageDescByID(pTemp.Language))
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %i in table `custom_texts` using Language %u but Language does not exist.", iId, pTemp.Language);
 
-            if (pTemp.Type > CHAT_TYPE_ZONE_YELL)
+            if (pTemp.Type >= CHAT_TYPE_MAX)
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %i in table `custom_texts` has Type %u but this Chat Type does not exist.", iId, pTemp.Type);
 
             m_mTextDataMap[iId] = pTemp;
@@ -2619,7 +2619,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
     {
         if (sObjectMgr.GetSoundEntry(soundId))
         {
-            if (chatType == CHAT_TYPE_ZONE_YELL)
+            if (chatType == CHAT_TYPE_ZONE_YELL || chatType == CHAT_TYPE_ZONE_EMOTE)
             {
                 if (Map* pZone = pSource->GetMap())
                     pZone->PlayDirectSoundToMap(soundId, pZone->IsContinent() ? pSource->GetZoneId() : 0);
@@ -2671,6 +2671,9 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
         }
         case CHAT_TYPE_ZONE_YELL:
             pSource->MonsterYellToZone(textId, languageId, pTarget);
+            break;
+        case CHAT_TYPE_ZONE_EMOTE:
+            pSource->MonsterScriptToZone(textId, CHAT_MSG_MONSTER_EMOTE, languageId, pTarget);
             break;
     }
 }
@@ -2739,6 +2742,7 @@ void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Cr
             chatMsg = CHAT_MSG_MONSTER_YELL;
             break;
         case CHAT_TYPE_TEXT_EMOTE:
+        case CHAT_TYPE_ZONE_EMOTE:
             chatMsg = CHAT_MSG_MONSTER_EMOTE;
             break;
         case CHAT_TYPE_BOSS_EMOTE:

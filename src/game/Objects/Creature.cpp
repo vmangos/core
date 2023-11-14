@@ -2759,7 +2759,12 @@ void Creature::SetInCombatWithZone(bool initialPulse)
                 continue;
 
             if (IsValidAttackTarget(pPlayer))
+            {
                 EnterCombatWithTarget(pPlayer);
+                Pet* pet = pPlayer->GetPet();
+                if (pet && IsValidAttackTarget(pet))
+                    EnterCombatWithTarget(pet);
+            }
         }
     }
 }
@@ -2806,7 +2811,11 @@ bool Creature::MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* 
             return false;
     }
 
-    if (!IsValidAttackTarget(pTarget))
+    // It makes more sense to check IsValidAttackTarget, but will break Kel'Thuzad script.
+    // He is immune to players in first phase, but picks random targets from threat list for summons to attack.
+    if (pTarget->IsDead() ||
+        pTarget->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2 | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_SELECTABLE) ||
+        IsFriendlyTo(pTarget))
         return false;
 
     if (pSpellInfo)

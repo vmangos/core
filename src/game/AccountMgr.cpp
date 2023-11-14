@@ -21,6 +21,7 @@
 
 #include "AccountMgr.h"
 #include "Database/DatabaseEnv.h"
+#include "Database/DatabaseImpl.h"
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
 #include "Player.h"
@@ -253,7 +254,7 @@ void AccountMgr::Load()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> %u GM ranks loaded for realm %u", m_accountSecurity.size(), realmID);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     LoadAccountBanList();
-    LoadIPBanList();
+    LoadIPBanList(LoginDatabase.Query(LOAD_IP_BANS_QUERY));
     LoadAccountWarnings();
 }
 
@@ -368,21 +369,19 @@ void AccountMgr::Update(uint32 diff)
     if (m_banlistUpdateTimer < diff)
     {
         m_banlistUpdateTimer = sWorld.getConfig(CONFIG_UINT32_BANLIST_RELOAD_TIMER) * 1000;
-        LoadIPBanList(true);
+        LoginDatabase.AsyncQuery(this, &AccountMgr::LoadIPBanList, true, LOAD_IP_BANS_QUERY);
         //LoadAccountBanList(true);
     }
     else
         m_banlistUpdateTimer -= diff;
 }
 
-void AccountMgr::LoadIPBanList(bool silent)
+void AccountMgr::LoadIPBanList(QueryResult* result, bool silent)
 {
     if (!silent)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading ip_banned ...");
 
-    std::unique_ptr<QueryResult> banresult(LoginDatabase.PQuery("SELECT `ip`, `unbandate`, `bandate` FROM `ip_banned` WHERE (`unbandate` > UNIX_TIMESTAMP() OR `bandate` = `unbandate`)"));
-    
-    if (!banresult)
+    if (!result)
     {
         if (!silent)
         {
@@ -395,19 +394,23 @@ void AccountMgr::LoadIPBanList(bool silent)
         return;
     }
 
-    m_ipBanned.clear();
-    std::unique_ptr<BarGoLink> bar = silent ? nullptr : std::make_unique<BarGoLink>(banresult->GetRowCount());
+    std::map<std::string, uint32> ipBanned;
+    std::unique_ptr<BarGoLink> bar = silent ? nullptr : std::make_unique<BarGoLink>(result->GetRowCount());
     do
     {
         if (bar)
             bar->step();
-        Field* fields = banresult->Fetch();
+        Field* fields = result->Fetch();
         uint32 unbandate = fields[1].GetUInt32();
         uint32 bandate = fields[2].GetUInt32();
         if (unbandate == bandate)
             unbandate = 0xFFFFFFFF;
-        m_ipBanned[fields[0].GetString()] = unbandate;
-    } while (banresult->NextRow());
+        ipBanned.emplace(std::make_pair(fields[0].GetString(), unbandate));
+    } while (result->NextRow());
+    delete result;
+
+    std::lock_guard<std::shared_timed_mutex> lock(m_ipBannedMutex);
+    std::swap(ipBanned, m_ipBanned);
 
     if (!silent)
     {
@@ -459,6 +462,7 @@ void AccountMgr::LoadAccountBanList(bool silent)
 
 bool AccountMgr::IsIPBanned(std::string const& ip) const
 {
+    std::shared_lock<std::shared_timed_mutex> lock(m_ipBannedMutex);
     std::map<std::string, uint32>::const_iterator it = m_ipBanned.find(ip);
     return !(it == m_ipBanned.end() || it->second < time(nullptr));
 }

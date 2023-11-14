@@ -90,6 +90,7 @@ class BattleBotAI;
 
 class ChatHandler
 {
+    friend class CombatBotBaseAI;
     friend class PartyBotAI;
     friend class BattleBotAI;
     public:
@@ -277,6 +278,7 @@ class ChatHandler
         bool HandleBattleBotAddArathiCommand(char* args);
         bool HandleBattleBotAddWarsongCommand(char* args);
         bool HandleBattleBotRemoveCommand(char* args);
+        bool HandleBattleBotRemoveAllCommand(char* args);
         bool HandleBattleBotShowPathCommand(char* args);
         bool HandleBattleBotShowAllPathsCommand(char* args);
 
@@ -582,6 +584,7 @@ class ChatHandler
         bool HandleLearnAllMyTalentsCommand(char* args);
         bool HandleLearnAllMyTaxisCommand(char* args);
         bool HandleLearnAllTrainerCommand(char* args);
+        bool HandleLearnAllItemsCommand(char* args);
 
         bool HandleListAurasCommand(char* args);
         bool HandleListCreatureCommand(char* args);
@@ -942,6 +945,7 @@ class ChatHandler
         bool HandleDamageCommand(char* args);
         bool HandleAoEDamageCommand(char* args);
         bool HandleReviveCommand(char* args);
+        bool HandleDeplenishCommand(char* args);
         bool HandleReplenishCommand(char* args);
         bool HandleModifyMorphCommand(char* args);
         bool HandleNameAuraCommand(char* args);

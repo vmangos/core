@@ -32,6 +32,7 @@
 #include "SniffFile.h"
 #include "ClientDefines.h"
 #include "Auth/BigNumber.h"
+#include "AccountData.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -57,30 +58,6 @@ class MasterPlayer;
 
 struct OpcodeHandler;
 struct PlayerBotEntry;
-
-enum AccountDataType
-{
-    GLOBAL_CONFIG_CACHE             = 0,                    // 0x01 g
-    PER_CHARACTER_CONFIG_CACHE      = 1,                    // 0x02 p
-    GLOBAL_BINDINGS_CACHE           = 2,                    // 0x04 g
-    PER_CHARACTER_BINDINGS_CACHE    = 3,                    // 0x08 p
-    GLOBAL_MACROS_CACHE             = 4,                    // 0x10 g
-    PER_CHARACTER_MACROS_CACHE      = 5,                    // 0x20 p
-    PER_CHARACTER_LAYOUT_CACHE      = 6,                    // 0x40 p
-    PER_CHARACTER_CHAT_CACHE        = 7,                    // 0x80 p
-    NUM_ACCOUNT_DATA_TYPES          = 8
-};
-
-#define GLOBAL_CACHE_MASK           0x15
-#define PER_CHARACTER_CACHE_MASK    0xEA
-
-struct AccountData
-{
-    AccountData() : timestamp(0), data("") {}
-
-    time_t timestamp;
-    std::string data;
-};
 
 enum PartyOperation
 {
@@ -176,12 +153,15 @@ enum PacketProcessing
      */
     PACKET_PROCESS_MOVEMENT,
     /*
-     * PACKET_PROCESS_DB_QUERY
-     * Does not write anything. Can be processed in any environment.
-     * Reads static data (usually data from World DB)
-     * Currently executed directly in the network thread.
+     * PACKET_PROCESS_ASYNC
+     * Handled whenever session update is not running.
+     * Never at the same time as PACKET_PROCESS_WORLD.
+     * Never while cli and gm commands are being executed.
+     * Can be at the same time as maps are being updated.
+     * Be careful touching the player.
+     * Never touch the map.
      */
-    PACKET_PROCESS_DB_QUERY,
+    PACKET_PROCESS_ASYNC,
     PACKET_PROCESS_MAX_TYPE,                                // no handler for this packet (server side, or not implemented)
     /*
      * PACKET_PROCESS_SELF_ITEMS
@@ -196,6 +176,12 @@ enum PacketProcessing
      * - No other modification / no read allowed
      */
     PACKET_PROCESS_SELF_ITEMS = PACKET_PROCESS_MAP,
+    /*
+    * PACKET_PROCESS_DB_QUERY
+    * Does not write anything. Can be processed as long as containers are not being reloaded.
+    * Reads static data (usually data from World DB)
+    */
+    PACKET_PROCESS_DB_QUERY = PACKET_PROCESS_ASYNC,
     /*
      * PACKET_PROCESS_CHANNEL
      * Allowed:
@@ -383,8 +369,12 @@ class WorldSession
         void ProcessAnticheatAction(char const* detector, char const* reason, uint32 action, uint32 banTime = 0 /* Perm ban */);
         uint32 GetFingerprint() const { return 0; } // TODO
         void CleanupFingerprintHistory() {} // TODO
-        bool HasClientMovementControl() const { return !m_clientMoverGuid.IsEmpty(); }
         bool HasUsedClickToMove() const;
+
+        // Movement
+        Unit* GetMoverFromGuid(ObjectGuid const& guid) const;
+        ObjectGuid const& GetClientMoverGuid() const { return m_clientMoverGuid; }
+        bool HasClientMovementControl() const { return !m_clientMoverGuid.IsEmpty(); }
         
         void SetReceivedWhoRequest(bool v) { m_who_recvd = v; }
         bool ReceivedWhoRequest() const { return m_who_recvd; }
@@ -464,8 +454,8 @@ class WorldSession
         bool CheckStableMaster(ObjectGuid guid);
 
         // Account Data
-        AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
-        void SetAccountData(AccountDataType type, const std::string& data);
+        AccountData* GetAccountData(NewAccountData::AccountDataType type) { return &m_accountData[type]; }
+        void SetAccountData(NewAccountData::AccountDataType type, const std::string& data);
         void SendAccountDataTimes();
         void LoadGlobalAccountData();
         void LoadAccountData(QueryResult* result, uint32 mask);
@@ -912,7 +902,7 @@ class WorldSession
         uint32 m_charactersCount;
         uint32 m_characterMaxLevel;
         BigNumber m_sessionKey;
-        AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
+        AccountData m_accountData[NewAccountData::NUM_ACCOUNT_DATA_TYPES];
         uint32 m_tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;
         

@@ -522,14 +522,11 @@ void BattleGroundWS::UpdateTeamScore(Team team)
         UpdateWorldState(BG_WS_FLAG_CAPTURES_HORDE, GetTeamScore(team));
 }
 
-void BattleGroundWS::HandleAreaTrigger(Player* source, uint32 trigger)
+bool BattleGroundWS::HandleAreaTrigger(Player* source, uint32 trigger)
 {
-    // this is wrong way to implement these things. On official it done by gameobject spell cast.
     if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
+        return false;
 
-    //uint32 SpellId = 0;
-    //uint64 buff_guid = 0;
     switch (trigger)
     {
         case 3686:                                          // Alliance elixir of speed spawn. Trigger not working, because located inside other areatrigger, can be replaced by IsWithinDist(object, dist) in BattleGround::Update().
@@ -538,29 +535,39 @@ void BattleGroundWS::HandleAreaTrigger(Player* source, uint32 trigger)
         case 3708:                                          // Horde elixir of regeneration spawn
         case 3707:                                          // Alliance elixir of berserk spawn
         case 3709:                                          // Horde elixir of berserk spawn
-            break;
+            return true;
         case AREATRIGGER_ALLIANCE_FLAG_SPAWN:               // Alliance Flag spawn
             if (m_flagState[BG_TEAM_HORDE] && !m_flagState[BG_TEAM_ALLIANCE])
                 if (GetHordeFlagPickerGuid() == source->GetObjectGuid())
                     EventPlayerCapturedFlag(source);
-            break;
+            return true;
         case AREATRIGGER_HORDE_FLAG_SPAWN:                  // Horde Flag spawn
             if (m_flagState[BG_TEAM_ALLIANCE] && !m_flagState[BG_TEAM_HORDE])
                 if (GetAllianceFlagPickerGuid() == source->GetObjectGuid())
                     EventPlayerCapturedFlag(source);
-            break;
-        case 3669: // horde portal
-            if (source->GetTeam() != HORDE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_HORDE_USE);
-            else
+            return true;
+        case 3669: // Warsong Gulch - Horde Exit
+            // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+            // - Characters that use the Battlemaster to enter a Battleground will
+            //   now port back to that Battlemaster when they leave the Battleground
+            //   for any reason.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            if (source->GetTeam() == HORDE)
+            {
                 source->LeaveBattleground();
-            break;
-        case 3671: // alliance portal
-            if (source->GetTeam() != ALLIANCE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_ALLIANCE_USE);
-            else
+                return true;
+            }
+#endif
+            return false;
+        case 3671: // Warsong Gulch - Alliance Exit
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            if (source->GetTeam() == ALLIANCE)
+            {
                 source->LeaveBattleground();
-            break;
+                return true;
+            }
+#endif
+            return false;
         /*case 3649:                                          // unk1
           case 3688:                                          // unk2
           case 4628:                                          // unk3
@@ -571,6 +578,7 @@ void BattleGroundWS::HandleAreaTrigger(Player* source, uint32 trigger)
             source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
+    return false;
 }
 
 bool BattleGroundWS::SetupBattleGround()

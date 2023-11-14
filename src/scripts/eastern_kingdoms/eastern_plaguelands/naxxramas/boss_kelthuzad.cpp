@@ -864,6 +864,8 @@ struct mob_abomAI : public kt_p1AddAI
     void Reset() override
     {
         mortalWoundTimer = 7500;
+        m_creature->SetMaxHealth(90000);
+        m_creature->SetHealth(90000);
     }
 
     void UpdateAI(uint32 const diff) override
@@ -891,7 +893,11 @@ struct mob_soldierAI : public kt_p1AddAI
         Reset();
     }
 
-    void Reset() override { }
+    void Reset() override
+    { 
+        m_creature->SetMaxHealth(2000);
+        m_creature->SetHealth(2000);
+    }
 
     void UpdateAI(uint32 const diff) override
     {
@@ -914,13 +920,18 @@ struct mob_soldierAI : public kt_p1AddAI
 
 struct mob_soulweaverAI : public kt_p1AddAI
 {
-    mob_soulweaverAI(Creature* pCreature) : kt_p1AddAI(pCreature) { }
+    mob_soulweaverAI(Creature* pCreature) : kt_p1AddAI(pCreature)
+    { 
+        Reset();
+    }
 
     bool hasHitSomeone;
 
     void Reset() override
     {
         hasHitSomeone = false;
+        m_creature->SetMaxHealth(70000);
+        m_creature->SetHealth(70000);
     }
 
     void UpdateAI(uint32 const diff) override

@@ -78,7 +78,7 @@ class UpdateData
 
         void AddOutOfRangeGUID(ObjectGuidSet& guids);
         void AddOutOfRangeGUID(ObjectGuid const& guid);
-        void AddUpdateBlock(ByteBuffer const& block);
+        ByteBuffer& AddUpdateBlockAndGetBuffer();
         void Send(WorldSession* session, bool hasTransport = false);
         bool BuildPacket(WorldPacket* packet, bool hasTransport = false);
         bool BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket, bool hasTransport = false);

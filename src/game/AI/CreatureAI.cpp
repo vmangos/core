@@ -286,7 +286,7 @@ struct EnterEvadeModeHelper
     {
         if (unit->IsCreature() && unit->ToCreature()->IsTotem())
             ((Totem*)unit)->UnSummon();
-        else
+        else if (unit->IsAlive())
         {
             unit->GetMotionMaster()->Clear(false);
             // for a controlled unit this will result in a follow move

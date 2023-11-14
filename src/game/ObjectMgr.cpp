@@ -9364,7 +9364,7 @@ void ObjectMgr::LoadBroadcastTexts()
             bct.languageId = LANG_UNIVERSAL;
         }
 
-        if (bct.chatType > CHAT_TYPE_ZONE_YELL)
+        if (bct.chatType >= CHAT_TYPE_MAX)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "BroadcastText (Id: %u) in table `broadcast_text` has ChatType %u but this chat type does not exist.", bct.entry, bct.chatType);
             bct.chatType = CHAT_TYPE_SAY;
@@ -9642,7 +9642,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
                 data.LanguageId = LANG_UNIVERSAL;
             }
 
-            if (data.Type > CHAT_TYPE_ZONE_YELL)
+            if (data.Type >= CHAT_TYPE_MAX)
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %i in table `%s` has Type %u but this Chat Type does not exist.", entry, table, data.Type);
                 data.Type = CHAT_TYPE_SAY;

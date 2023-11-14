@@ -186,18 +186,18 @@ typedef std::vector<CreatureSpellsEntry> CreatureSpellsList;
 struct CreatureInfo
 {
     uint32  entry;
+    char*   name;
+    char*   subname;
+    uint32  level_min;
+    uint32  level_max;
+    uint32  faction;
+    uint32  npc_flags;
+    uint32  gossip_menu_id;
     uint32  display_id[MAX_DISPLAY_IDS_PER_CREATURE];
     float   display_scale[MAX_DISPLAY_IDS_PER_CREATURE];
     uint32  display_probability[MAX_DISPLAY_IDS_PER_CREATURE];
     uint32  display_total_probability;
     uint32  mount_display_id;
-    char*   name;
-    char*   subname;
-    uint32  gossip_menu_id;
-    uint32  level_min;
-    uint32  level_max;
-    uint32  faction;
-    uint32  npc_flags;
     float   speed_walk;
     float   speed_run;
     float   detection_range;                                // Detection Range for Line of Sight aggro
@@ -437,7 +437,10 @@ enum ChatType
     CHAT_TYPE_BOSS_EMOTE        = 3,
     CHAT_TYPE_WHISPER           = 4,
     CHAT_TYPE_BOSS_WHISPER      = 5,
-    CHAT_TYPE_ZONE_YELL         = 6
+    CHAT_TYPE_ZONE_YELL         = 6,
+    CHAT_TYPE_ZONE_EMOTE        = 7,
+
+    CHAT_TYPE_MAX
 };
 
 // Selection method used by SelectAttackingTarget

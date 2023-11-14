@@ -2833,6 +2833,58 @@ void ChatHandler::HandleLearnTrainerHelper(Player* player, TrainerSpellData cons
     } while (learnedAnything);
 }
 
+bool ChatHandler::HandleLearnAllItemsCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+
+    for (auto const& itr : sObjectMgr.GetItemPrototypeMap())
+    {
+        ItemPrototype const* pProto = &itr.second;
+
+        if (pProto->ExtraFlags & ITEM_EXTRA_NOT_OBTAINABLE)
+            continue;
+
+        SpellEntry const* pLearnSpell = nullptr;
+        for (uint32 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        {
+            if (!pProto->Spells[i].SpellId)
+                continue;
+
+            if (pProto->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
+                continue;
+
+            SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(pProto->Spells[i].SpellId);
+            if (pSpellEntry->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+                pLearnSpell = pSpellEntry;
+
+            // items have only one on use effect
+            break;
+        }
+
+        if (!pLearnSpell)
+            continue;
+
+        if (pPlayer->CanUseItem(pProto) != EQUIP_ERR_OK)
+            continue;
+
+        for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            uint32 spellId = pLearnSpell->EffectTriggerSpell[i];
+            if (spellId && pLearnSpell->Effect[i] == SPELL_EFFECT_LEARN_SPELL)
+            {
+                SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellId);
+                if (bounds.first == bounds.second)
+                    continue;
+
+                pPlayer->LearnSpell(spellId, false);
+            }
+        }
+    }
+
+    SendSysMessage("Learned all available spells from items.");
+    return true;
+}
+
 bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
 {
     Player* player = m_session->GetPlayer();
@@ -2864,7 +2916,12 @@ bool ChatHandler::HandleLearnAllLangCommand(char* /*args*/)
 
     // skipping UNIVERSAL language (0)
     for (int i = 1; i < LANGUAGES_COUNT; ++i)
-        pPlayer->LearnSpell(lang_description[i].spell_id, false);
+    {
+        if (lang_description[i].spell_id)
+            pPlayer->LearnSpell(lang_description[i].spell_id, false);
+        if (lang_description[i].skill_id)
+            pPlayer->SetSkill(lang_description[i].skill_id, 300, 300);
+    }
 
     SendSysMessage(LANG_COMMAND_LEARN_ALL_LANG);
     return true;
@@ -5719,7 +5776,7 @@ bool ChatHandler::HandleListExploredAreasCommand(char* args)
         sObjectMgr.GetAreaLocaleString(itr->Id, GetSessionDbLocaleIndex(), &name);
 
         if (!itr->ExploreFlag || itr->ExploreFlag == 0xffff)
-            continue;;
+            continue;
 
         int offset = itr->ExploreFlag / 32;
         if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
