@@ -137,8 +137,7 @@ enum NaxxNPCs : uint32
     NPC_LightningTotem          = 16385,
     NPC_PlaguedDeathhound       = 16448,
 
-    NPC_EyeStalk                = 16236,
-    NPC_ArchmageTarsis          = 16381
+    NPC_EyeStalk                = 16236
 };
 
 enum NaxxAreaTriggers : uint32
