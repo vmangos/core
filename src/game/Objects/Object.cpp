@@ -3660,7 +3660,7 @@ bool WorldObject::IsValidHelpfulTarget(Unit const* target, bool checkAlive) cons
 
     // this unit flag prevents casting on friendly or self too
     if (target == this)
-        return !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE_2);
+        return !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE_2) && (!checkAlive || target->IsAlive());
 
     if (FindMap() != target->FindMap())
         return false;
@@ -3672,24 +3672,23 @@ bool WorldObject::IsValidHelpfulTarget(Unit const* target, bool checkAlive) cons
         target->GetReactionTo(this) < REP_UNFRIENDLY)
         return false;
 
-    Player const* playerAffectingAttacker = GetAffectingPlayer();
+    Player const* playerAffectingCaster = GetAffectingPlayer();
     Player const* playerAffectingTarget = target->GetAffectingPlayer();
 
     // PvP checks
-    if (playerAffectingAttacker && playerAffectingTarget)
+    if (playerAffectingCaster && playerAffectingTarget)
     {
         // pet and owner
-        if (playerAffectingAttacker == playerAffectingTarget)
+        if (playerAffectingCaster == playerAffectingTarget)
             return true;
 
         // cannot help others in duels
-        if (playerAffectingAttacker->duel && playerAffectingAttacker->duel->startTime != 0 ||
-            playerAffectingTarget->duel && playerAffectingTarget->duel->startTime != 0)
+        if (playerAffectingTarget->duel && playerAffectingTarget->duel->startTime != 0)
             return false;
 
         // group forces friendly relations in ffa pvp
-        if (playerAffectingAttacker->IsFFAPvP() && playerAffectingTarget->IsFFAPvP() && 
-           !playerAffectingAttacker->IsInSameRaidWith(playerAffectingTarget))
+        if (playerAffectingCaster->IsFFAPvP() && playerAffectingTarget->IsFFAPvP() &&
+           !playerAffectingCaster->IsInSameRaidWith(playerAffectingTarget))
             return false;
     }
 
