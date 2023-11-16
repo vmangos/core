@@ -4706,6 +4706,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 case 24590:                                 // Brittle Armor - need remove one 24575 Brittle Armor aura
                     unitTarget->RemoveAuraHolderFromStack(24575);
                     return;
+                case 24660:                                 // Zandalarian Hero Charm - Unstable Power
+                    unitTarget->RemoveAuraHolderFromStack(24659);
+                    return;
                 case 24693:                                 // Hakkar Power Down - cast by priests on death
                 {
                     if (!m_casterUnit)

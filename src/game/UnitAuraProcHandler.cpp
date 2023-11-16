@@ -301,26 +301,6 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
         if ((procSpell->Id == 20424) && (spellProto->SpellIconID == 84))
             return SPELL_PROC_TRIGGER_FAILED;
 #endif
-        // Zandalarian Hero Charm - Unstable Power
-        if (spellProto->Id == 24658)
-        {
-            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
-            // - The charges from the Zandalarian Hero Charm will now be consumed by
-            //   melee and ranged abilities and spells which do non - physical damage.
-            //   This includes : Hammer of Wrath, Judgement of Righteousness, Seal of
-            //   Command, Judgement of Command, Volley, and Arcane Shot.The trinket
-            //   will also now burn charges from each casting of a damage over time
-            //   spell, heal over time spell, and area aura spells such as Blizzard
-            //   and Consecration. Only one charge will be burned per area spell cast,
-            //   rather than multiple charges per target hit as was previously the case.  
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            if ((procFlag & (PROC_FLAG_DEAL_MELEE_ABILITY | PROC_FLAG_DEAL_RANGED_ABILITY)) && (procSpell->School != SPELL_SCHOOL_NORMAL))
-                return SPELL_PROC_TRIGGER_OK;
-#else
-            if ((procFlag & (PROC_FLAG_DEAL_HARMFUL_PERIODIC)) && (procSpell->School != SPELL_SCHOOL_NORMAL))
-                return SPELL_PROC_TRIGGER_OK;
-#endif
-        }
         // DRUID
         // Omen of Clarity
         if (spellProto->Id == 16864)
@@ -674,9 +654,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                 case 24658:
                 {
                     // Need to remove one 24659 aura
-                    // Holy Nova both heals and damages, so check needed to avoid consuming 2 charges
-                    if (!procSpell->IsFitToFamilyMask<CF_PRIEST_HOLY_NOVA1>())
-                        RemoveAuraHolderFromStack(24659);
+                    // It does consume 2 charges on using Holy Nova, confirmed on classic era ptr.
+                    RemoveAuraHolderFromStack(24659);
                     return SPELL_AURA_PROC_OK;
                 }
                 // Restless Strength
@@ -1946,8 +1925,67 @@ SpellAuraProcResult Unit::HandleModResistanceAuraProc(Unit* /*pVictim*/, uint32 
 SpellAuraProcResult Unit::HandleModDamageAuraProc(Unit* /*pVictim*/, uint32 /*damage*/, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 /*cooldown*/)
 {
     // the aura school mask must match the spell school
-    return (procSpell == nullptr || (GetSchoolMask(procSpell->School) & triggeredByAura->GetModifier()->m_miscvalue))
-        ? SPELL_AURA_PROC_OK : SPELL_AURA_PROC_FAILED;
+    uint32 const schoolMask = procSpell ? GetSchoolMask(procSpell->School) : SPELL_SCHOOL_MASK_NORMAL;
+    if (!(schoolMask & triggeredByAura->GetModifier()->m_miscvalue))
+        return SPELL_AURA_PROC_FAILED;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    switch (triggeredByAura->GetId())
+    {
+        case 24659: // Zandalarian Hero Charm - Unstable Power
+        {
+            if (!procSpell)
+                return SPELL_AURA_PROC_FAILED;
+
+            /*
+            World of Warcraft Client Patch 1.11.0 (2006-06-20)
+            - Judgement of Command: Now consumes a charge of the Zandalarian Hero 
+              Charm. In addition, when this spell is resisted it will no longer 
+              erroneously still do damage.
+            - Judgement of Righteousness: Now consumes a charge of the Zandalarian 
+              Hero Charm.
+            - Shadowguard: This Troll Priest racial spell now works with Vampiric 
+              Embrace, Blackout, and Shadow Weaving. In addition, the damage from 
+              Shadowguard will now consume charges of the Zandalarian Hero Charm's 
+              Unstable Power aura.
+            - Zandalarian Hero Charm: The damage and healing on this item have been
+              reduced by 30%. Instead of granting 35 damage and 70 healing per 
+              charge, it now grants 25 damage and 50 healing per charge. Several 
+              Paladin spells, Starshards, and Lightning Shield were not consuming 
+              charges of this trinket. All those spells have been fixed. In 
+              addition, totems which now benefit from increased damage and healing 
+              will also consume charges (Healing Stream Totem, Searing Totem, Magma 
+              Totem, and Fire Nova Totem)
+            World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            - The charges from the Zandalarian Hero Charm will now be consumed by
+              melee and ranged abilities and spells which do non-physical damage.
+              This includes: Hammer of Wrath, Judgement of Righteousness, Seal of
+              Command, Judgement of Command, Volley, and Arcane Shot. The trinket
+              will also now burn charges from each casting of a damage over time
+              spell, heal over time spell, and area aura spells such as Blizzard
+              and Consecration. Only one charge will be burned per area spell cast,
+              rather than multiple charges per target hit as was previously the
+              case.
+            */
+            if (!procSpell->IsDirectDamageSpell() &&
+                !procSpell->IsHealSpell() &&
+                !procSpell->HasAura(SPELL_AURA_PERIODIC_DAMAGE) &&
+                !procSpell->HasAura(SPELL_AURA_PERIODIC_LEECH) &&
+                !procSpell->HasAura(SPELL_AURA_PERIODIC_HEALTH_FUNNEL) &&
+                !(procSpell->SpellVisual == 319 && procSpell->SpellIconID == 1647) && // Healing Stream Totem
+                !(procSpell->SpellVisual == 221 && procSpell->SpellIconID == 680) &&  // Searing Totem
+                !(procSpell->SpellVisual == 369 && procSpell->SpellIconID == 37) &&   // Magma Totem
+                !(procSpell->SpellVisual == 221 && procSpell->SpellIconID == 33)      // Fire Nova Totem
+                )
+                return SPELL_AURA_PROC_FAILED;
+
+            RemoveAuraHolderFromStack(24659);
+            return SPELL_AURA_PROC_OK;
+        }
+    }
+#endif
+
+    return SPELL_AURA_PROC_OK;
 }
 
 SpellAuraProcResult Unit::HandleRemoveByDamageChanceProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown)

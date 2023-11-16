@@ -2120,6 +2120,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                     return;
                 }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
                 case 24658:                                 // Unstable Power
                 {
                     if (apply)
@@ -2134,6 +2135,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->RemoveAurasDueToSpell(24659);
                     return;
                 }
+#endif
                 case 26681:                             // Love is in the Air - Cologne
                 case 26682:                             // Love is in the Air - Perfume
                 {
@@ -4401,6 +4403,22 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
 
     switch (GetId())
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1 && SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        case 24658:                                 // Zandalarian Hero Charm - Unstable Power
+        {
+            if (apply)
+            {
+                Unit* caster = GetCaster();
+                if (!caster)
+                    return;
+
+                caster->CastSpell(GetTarget(), 24659, true, nullptr, nullptr, GetCasterGuid());
+            }
+            else
+                GetTarget()->RemoveAurasDueToSpell(24659);
+            break;
+        }
+#endif
         // some spell have charges by functionality not have its in spell data
         case 28200:                                         // Ascendance (Talisman of Ascendance trinket)
         {
