@@ -1617,7 +1617,7 @@ bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos) con
         return true;
     float ox, oy, oz;
     obj->GetPosition(ox, oy, oz);
-    float targetHeight = obj->IsUnit() ? obj->ToUnit()->GetCollisionHeight() : 2.f;
+    float targetHeight = obj->GetCollisionHeight();
     return (IsWithinLOS(ox, oy, oz, checkDynLos, targetHeight));
 }
 
@@ -1625,7 +1625,7 @@ bool WorldObject::IsWithinLOSAtPosition(float ownX, float ownY, float ownZ, floa
 {
     if (IsInWorld())
     {
-        float height = IsUnit() ? ToUnit()->GetCollisionHeight() : 2.f;
+        float height = GetCollisionHeight();
         return GetMap()->isInLineOfSight(ownX, ownY, ownZ + height, targetX, targetY, targetZ + targetHeight, checkDynLos);
     }
 
@@ -2005,7 +2005,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     GenericTransport* transport = GetTransport();
 
-    float halfHeight = IsUnit() ? static_cast<Unit*>(this)->GetCollisionHeight() : 0.0f;
+    float halfHeight = GetCollisionHeight();
     if (IsUnit())
     {
         PathFinder path(static_cast<Unit*>(this));

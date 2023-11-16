@@ -250,6 +250,7 @@ class GameObject : public SpellCaster
         uint32 GetFactionTemplateId() const final { return GetGOInfo()->faction; }
         uint32 GetLevel() const final ;
 
+        float GetCollisionHeight() const final;
         bool IsAtInteractDistance(Position const& pos, float radius) const;
         bool IsAtInteractDistance(Player const* player, uint32 maxRange = 0) const;
 

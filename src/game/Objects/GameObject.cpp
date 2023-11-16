@@ -2541,6 +2541,14 @@ void GameObject::GetClosestChairSlotPosition(float userX, float userY, float& ou
     outY = GetPositionY();
 }
 
+float GameObject::GetCollisionHeight() const
+{
+    // use the center of the model
+    if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
+        return (displayInfo->max_z + displayInfo->min_z) * 0.5f * GetObjectScale();
+    return 1.0f;
+}
+
 bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
 {
     if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
