@@ -426,7 +426,6 @@ enum UnitState
     UNIT_STAT_RUNNING            = 0x01000000,
 
     UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x02000000, // allow movement with incomplete or partial paths
-    UNIT_STAT_ALLOW_LOS_ATTACK      = 0x04000000, // allow melee attacks without LoS
 
     UNIT_STAT_NO_SEARCH_FOR_OTHERS   = 0x08000000, // MoveInLineOfSight will not be called
     UNIT_STAT_NO_BROADCAST_TO_OTHERS = 0x10000000, // ScheduleAINotify will not be called
@@ -519,8 +518,6 @@ static char const* UnitStateToString(uint32 state)
             return "Running";
         case UNIT_STAT_ALLOW_INCOMPLETE_PATH:
             return "Allow Incomplete Path";
-        case UNIT_STAT_ALLOW_LOS_ATTACK:
-            return "Allow LoS Attack";
         case UNIT_STAT_NO_SEARCH_FOR_OTHERS:
             return "No Search for Others";
         case UNIT_STAT_NO_BROADCAST_TO_OTHERS:
