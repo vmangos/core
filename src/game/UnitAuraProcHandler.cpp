@@ -256,16 +256,23 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
     {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         // Eye for an Eye
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        if (spellProto->SpellIconID == 1820)
-#else
-        if (spellProto->SpellIconID == 1799)
-#endif
+        if (spellProto->Id == 9799 || spellProto->Id == 25988)
         {
-            if (procFlag & PROC_FLAG_TAKE_HARMFUL_SPELL && procExtra & PROC_EX_CRITICAL_HIT)
-                return SPELL_PROC_TRIGGER_OK;
-            else
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            // - Eye for an Eye - This talent can now trigger while you are mounted.
+            if (IsMounted())
                 return SPELL_PROC_TRIGGER_FAILED;
+
+            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            // - If a paladin avoids damage with Divine Shield, Eye for an Eye will
+            //   not react.
+            if (!((procFlag & PROC_FLAG_TAKE_HARMFUL_SPELL) && (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_IMMUNE))))
+                return SPELL_PROC_TRIGGER_FAILED;
+#else
+            if (!((procFlag & PROC_FLAG_TAKE_HARMFUL_SPELL) && (procExtra & PROC_EX_CRITICAL_HIT)))
+                return SPELL_PROC_TRIGGER_FAILED;
+#endif
         }
 #endif
         // Improved Lay on Hands
