@@ -307,31 +307,7 @@ void Item::SaveToDB()
         break;
         case ITEM_REMOVED:
         {
-            static SqlStatementID delItemText;
-            static SqlStatementID delInst ;
-            static SqlStatementID delGifts ;
-            static SqlStatementID delLoot ;
-
-            if (uint32 item_text_id = GetUInt32Value(ITEM_FIELD_ITEM_TEXT_ID))
-            {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(delItemText, "DELETE FROM `item_text` WHERE `id` = ?");
-                stmt.PExecute(item_text_id);
-            }
-
-            SqlStatement stmt = CharacterDatabase.CreateStatement(delInst, "DELETE FROM `item_instance` WHERE `guid` = ?");
-            stmt.PExecute(guid);
-
-            if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
-            {
-                stmt = CharacterDatabase.CreateStatement(delGifts, "DELETE FROM `character_gifts` WHERE `item_guid` = ?");
-                stmt.PExecute(GetGUIDLow());
-            }
-
-            if (HasSavedLoot())
-            {
-                stmt = CharacterDatabase.CreateStatement(delLoot, "DELETE FROM `item_loot` WHERE `guid` = ?");
-                stmt.PExecute(GetGUIDLow());
-            }
+            DeleteAllFromDB();
             if (IsInWorld())
                 RemoveFromWorld();
 
@@ -491,6 +467,35 @@ bool Item::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint3
     }
 
     return true;
+}
+
+void Item::DeleteAllFromDB()
+{
+    static SqlStatementID delItemText;
+    static SqlStatementID delInst;
+    static SqlStatementID delGifts;
+    static SqlStatementID delLoot;
+
+    if (uint32 item_text_id = GetUInt32Value(ITEM_FIELD_ITEM_TEXT_ID))
+    {
+        SqlStatement stmt = CharacterDatabase.CreateStatement(delItemText, "DELETE FROM `item_text` WHERE `id` = ?");
+        stmt.PExecute(item_text_id);
+    }
+
+    SqlStatement stmt = CharacterDatabase.CreateStatement(delInst, "DELETE FROM `item_instance` WHERE `guid` = ?");
+    stmt.PExecute(GetGUIDLow());
+
+    if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
+    {
+        stmt = CharacterDatabase.CreateStatement(delGifts, "DELETE FROM `character_gifts` WHERE `item_guid` = ?");
+        stmt.PExecute(GetGUIDLow());
+    }
+
+    if (HasSavedLoot())
+    {
+        stmt = CharacterDatabase.CreateStatement(delLoot, "DELETE FROM `item_loot` WHERE `guid` = ?");
+        stmt.PExecute(GetGUIDLow());
+    }
 }
 
 void Item::DeleteAllFromDB(uint32 guidLow)

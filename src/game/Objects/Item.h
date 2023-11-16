@@ -271,6 +271,7 @@ class Item : public Object
         void DeleteFromInventoryDB();
         void LoadLootFromDB(Field* fields);
 
+        void DeleteAllFromDB();
         static void DeleteAllFromDB(uint32 guidLow);
 
         bool isWeapon() const{ return GetProto()->Class == ITEM_CLASS_WEAPON; }

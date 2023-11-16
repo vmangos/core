@@ -156,6 +156,14 @@ void WorldSession::MoveItems(Item* myItems[], Item* hisItems[])
 
                 // store
                 trader->MoveItemToInventory(traderDst, myItems[i], true, true);
+
+                // If saving is disabled for player who receives the item, it must be deleted from db, or it enables duping.
+                if (trader->IsSavingDisabled())
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Item guid %u traded to character %u with disabled saving. Deleting from DB.", myItems[i]->GetGUIDLow(), trader->GetGUIDLow());
+                    myItems[i]->DeleteFromInventoryDB();
+                    myItems[i]->DeleteAllFromDB();
+                }
             }
 
             if (hisItems[i])
@@ -173,6 +181,14 @@ void WorldSession::MoveItems(Item* myItems[], Item* hisItems[])
 
                 // store
                 _player->MoveItemToInventory(playerDst, hisItems[i], true, true);
+
+                // If saving is disabled for player who receives the item, it must be deleted from db, or it enables duping.
+                if (_player->IsSavingDisabled())
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Item guid %u traded to character %u with disabled saving. Deleting from DB.", hisItems[i]->GetGUIDLow(), _player->GetGUIDLow());
+                    hisItems[i]->DeleteFromInventoryDB();
+                    hisItems[i]->DeleteAllFromDB();
+                }
             }
         }
         else
