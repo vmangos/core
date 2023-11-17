@@ -296,7 +296,7 @@ struct mob_core_houndAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        m_creature->MonsterTextEmote("Core Hound collapses and begins to smolder.");
+        m_creature->MonsterTextEmote(7866, m_creature);
         m_creature->SetHealth(0);
         m_creature->RemoveAllAuras();
         m_creature->GetMotionMaster()->Clear();
@@ -367,7 +367,7 @@ struct mob_core_houndAI : public ScriptedAI
                 {
                     ResurrectSelf();
                     DoCastSpellIfCan(m_creature, SPELL_FIRE_NOVA_VISUAL, CF_TRIGGERED);
-                    m_creature->MonsterTextEmote("Core Hound reignites from the heat of another Core Hound!");
+                    m_creature->MonsterTextEmote(7867, m_creature);
                 }
                 else
                     Kill_Self();
