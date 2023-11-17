@@ -201,7 +201,7 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         if (reflectchance > 0 && roll_chance_i(reflectchance))
         {
             // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
-            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKE_HARMFUL_SPELL, PROC_EX_REFLECT, 1, BASE_ATTACK, spell));
+            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKE_HARMFUL_SPELL, PROC_EX_REFLECT, 1, 1, BASE_ATTACK, spell));
             return SPELL_MISS_REFLECT;
         }
     }
@@ -219,9 +219,9 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     return SPELL_MISS_NONE;
 }
 
-ProcSystemArguments::ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_,
+ProcSystemArguments::ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, uint32 originalAmount_, WeaponAttackType attType_,
     SpellEntry const* procSpell_, Spell const* spell)
-    : pVictim(pVictim_), procFlagsAttacker(procFlagsAttacker_), procFlagsVictim(procFlagsVictim_), procExtra(procExtra_), amount(amount_),
+    : pVictim(pVictim_), procFlagsAttacker(procFlagsAttacker_), procFlagsVictim(procFlagsVictim_), procExtra(procExtra_), amount(amount_), originalAmount(originalAmount_),
     attType(attType_), procSpell(procSpell_), isSpellTriggeredByAuraOrItem(spell && (spell->IsTriggeredByAura() || spell->IsTriggered() && spell->IsCastByItem())), procTime(sWorld.GetGameTime())
 {
     if (spell)
@@ -312,7 +312,7 @@ void SpellCaster::ProcDamageAndSpell_real(ProcSystemArguments& data, ProcessProc
     }
 
     if (Unit* pUnit = ToUnit())
-        pUnit->HandleTriggers(data.pVictim, data.procExtra, data.amount, data.procSpell, procTriggered);
+        pUnit->HandleTriggers(data.pVictim, data.procExtra, data.amount, data.originalAmount, data.procSpell, procTriggered);
 }
 
 // Melee based spells can be miss, parry or dodge on this step

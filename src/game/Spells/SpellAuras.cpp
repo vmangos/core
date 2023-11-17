@@ -1529,7 +1529,7 @@ void Aura::TriggerSpell()
                     return;
 
                 // Talent 'Entrapment' for example (chance to root)
-                caster->ProcDamageAndSpell(ProcSystemArguments(target, PROC_FLAG_ON_TRAP_ACTIVATION, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, BASE_ATTACK, GetSpellProto()));
+                caster->ProcDamageAndSpell(ProcSystemArguments(target, PROC_FLAG_ON_TRAP_ACTIVATION, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, 1, BASE_ATTACK, GetSpellProto()));
                 break;
             }
             // Thaddius negative charge
@@ -6058,6 +6058,12 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // Consecration: recalculate the damage on each tick
             if (spellProto->IsFitToFamily<SPELLFAMILY_PALADIN, CF_PALADIN_CONSECRATION>())
                 fdamage = pCaster->SpellDamageBonusDone(target, GetSpellProto(), GetEffIndex(), m_currentBasePoints, DOT, GetStackAmount());
+            // Curse of Agony damage-per-tick calculation
+            else if (spellProto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CURSE_OF_AGONY>())
+                fdamage += (-1 + ((int)GetAuraTicks() - 1) / 4) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0) / 2.0);
+            // Starshards damage-per-tick calculation
+            else if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_STARSHARDS>())
+                fdamage += (-1 + ((int)GetAuraTicks() - 1) / 2) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0) / 3.0);
 
             // SpellDamageBonus for magic spells
             if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
@@ -6069,15 +6075,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 fdamage = target->MeleeDamageBonusTaken(pCaster, fdamage, attackType, spellProto, GetEffIndex(), DOT, GetStackAmount());
             }
 
-            // Curse of Agony damage-per-tick calculation
-            if (spellProto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CURSE_OF_AGONY>())
-                fdamage += ( -1 + ((int)GetAuraTicks() -1)/4) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/2.0);
-
-            // Starshards damage-per-tick calculation
-            if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_STARSHARDS>())
-                fdamage += ( -1 + ((int)GetAuraTicks() -1)/2) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/3.0);
-
             uint32 pdamage = ditheru(std::max(fdamage, 0.f)); // prevent negative damage due to sickness
+            uint32 const originalDamage = pdamage;
 
             target->CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), DOT, pdamage, &absorb, &resist, spellProto);
 
@@ -6101,7 +6100,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (pdamage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
 
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, BASE_ATTACK, spellProto));
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, originalDamage, BASE_ATTACK, spellProto));
 
             cleanDamage.absorb = absorb;
             cleanDamage.resist = resist;
@@ -6150,8 +6149,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             CleanDamage cleanDamage =  CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL, 0, 0);
 
             uint32 pdamage = ditheru(m_modifier.m_amount > 0 ? m_modifier.m_amount : 0);
-
             pdamage = target->SpellDamageBonusTaken(pCaster, spellProto, GetEffIndex(), pdamage, DOT, GetStackAmount());
+            uint32 const originalDamage = pdamage;
 
             target->CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), DOT, pdamage, &absorb, &resist, spellProto);
 
@@ -6181,7 +6180,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             cleanDamage.absorb = absorb;
             cleanDamage.resist = resist;
 
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, BASE_ATTACK, spellProto));
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, originalDamage, BASE_ATTACK, spellProto));
             int32 new_damage = pCaster->DealDamage(target, pdamage, &cleanDamage, DOT, spellProto->GetSpellSchoolMask(), spellProto, false, nullptr, GetHolder()->IsReflected());
 
             if (!target->IsAlive() && pCaster->IsNonMeleeSpellCasted(false))
@@ -6210,18 +6209,6 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (!pCaster)
                 return;
 
-            // Don't heal target if it is already at max health. We still need
-            // to do procs on the tick, however
-            if (target->GetHealth() == target->GetMaxHealth())
-            {
-                uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
-                uint32 procVictim = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
-                uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
-                pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, 1, BASE_ATTACK, spellProto));
-
-                return;
-            }
-
             // heal for caster damage (must be alive)
             if (target != pCaster && spellProto->SpellVisual == 163 && !pCaster->IsAlive())
                 return;
@@ -6248,13 +6235,23 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 #endif
 
             float fdamage;
-
             if (m_modifier.m_auraname == SPELL_AURA_OBS_MOD_HEALTH)
                 fdamage = target->GetMaxHealth() * amount / 100;
             else
                 fdamage = amount;
 
             uint32 pdamage = ditheru(target->SpellHealingBonusTaken(pCaster, spellProto, GetEffIndex(), fdamage, DOT, GetStackAmount()));
+
+            // Don't heal target if it is already at max health. We still need
+            // to do procs on the tick, however
+            if (target->GetHealth() == target->GetMaxHealth())
+            {
+                uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
+                uint32 procVictim = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
+                uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
+                pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, 1, pdamage, BASE_ATTACK, spellProto));
+                return;
+            }
 
             DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %s heal of %s for %u health inflicted by %u",
                               GetCasterGuid().GetString().c_str(), target->GetGuidStr().c_str(), pdamage, GetId());
@@ -6267,7 +6264,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
             uint32 procVictim   = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
             uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, gain, BASE_ATTACK, spellProto));
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, gain, pdamage, BASE_ATTACK, spellProto));
 
             target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
 
@@ -6512,6 +6509,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             bool isCrit = pCaster->IsSpellCrit(damageInfo.target, spellProto, GetSchoolMask(damageInfo.school), BASE_ATTACK);
             pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto, GetEffIndex(), BASE_ATTACK, nullptr, isCrit);
 
+            uint32 const originalDamage = damageInfo.damage;
+
             damageInfo.target->CalculateAbsorbResistBlock(pCaster, &damageInfo, spellProto);
 
             pCaster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
@@ -6525,7 +6524,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (damageInfo.damage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
 
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, procAttacker, procVictim, procEx, damageInfo.damage, BASE_ATTACK, spellProto));
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, procAttacker, procVictim, procEx, damageInfo.damage, originalDamage, BASE_ATTACK, spellProto));
 
             pCaster->DealSpellDamage(&damageInfo, true);
             break;

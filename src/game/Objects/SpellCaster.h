@@ -299,6 +299,7 @@ struct ProcSystemArguments
     uint32 procExtra;
 
     uint32 amount; // contains full heal or full damage
+    uint32 originalAmount; // before resist and absorb
     SpellEntry const* procSpell;
     WeaponAttackType attType;
 
@@ -306,7 +307,7 @@ struct ProcSystemArguments
     bool isSpellTriggeredByAuraOrItem;
     time_t procTime;
 
-    explicit ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_ = BASE_ATTACK,
+    explicit ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, uint32 originalAmount_, WeaponAttackType attType_ = BASE_ATTACK,
         SpellEntry const* procSpell_ = nullptr, Spell const* spell = nullptr);
 };
 

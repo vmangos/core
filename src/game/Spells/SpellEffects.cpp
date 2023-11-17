@@ -4208,7 +4208,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
         }
 
         m_casterUnit->SendAttackStateUpdate(&damageInfo);
-        m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.attackType));
+        m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
         m_casterUnit->DealMeleeDamage(&damageInfo, true);
 
         // if damage unitTarget call AI reaction
