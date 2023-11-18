@@ -55,9 +55,9 @@ float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, float threat, bool crit, Sp
 //================= HostileReference ==========================
 //============================================================
 
-HostileReference::HostileReference(Unit* pUnit, ThreatManager *pThreatManager, float pThreat)
+HostileReference::HostileReference(Unit* pUnit, ThreatManager *pThreatManager, float threat)
 {
-    iThreat = pThreat;
+    iThreat = threat;
     iTempThreatModifyer = 0.0f;
     link(pUnit, pThreatManager);
     iUnitGuid = pUnit->GetObjectGuid();
@@ -231,14 +231,14 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* pVictim)
 //============================================================
 // Add the threat, if we find the reference
 
-HostileReference* ThreatContainer::addThreat(Unit* pVictim, float pThreat)
+HostileReference* ThreatContainer::addThreat(Unit* pVictim, float threat)
 {
     if (!pVictim)
         return nullptr;
 
     HostileReference* ref = getReferenceByTarget(pVictim);
     if (ref)
-        ref->addThreat(pThreat);
+        ref->addThreat(threat);
     return ref;
 }
 
@@ -401,11 +401,6 @@ void ThreatManager::addThreat(Unit* pVictim, float threat, bool crit, SpellSchoo
 
     MANGOS_ASSERT(getOwner()->GetTypeId() == TYPEID_UNIT);
 
-    // Grace of Earth trinket reduces threat but has no threat attribute.
-    if (pThreatSpell && pThreatSpell->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
-       (threat >= 0.0f || !iThreatContainer.getReferenceByTarget(pVictim)))
-        return;
-
     // don't add assist threat to targets under hard CC
     // check for fear, blind, freezing trap, reckless charge, banish, etc.
     if (isAssistThreat)
@@ -418,10 +413,10 @@ void ThreatManager::addThreat(Unit* pVictim, float threat, bool crit, SpellSchoo
     }
 
     float totalThreat = ThreatCalcHelper::CalcThreat(pVictim, threat, crit, schoolMask, pThreatSpell);
-    addThreatDirectly(pVictim, totalThreat);
+    addThreatDirectly(pVictim, totalThreat, pThreatSpell && pThreatSpell->HasAttribute(SPELL_ATTR_EX_NO_THREAT));
 }
 
-void ThreatManager::addThreatDirectly(Unit* pVictim, float threat)
+void ThreatManager::addThreatDirectly(Unit* pVictim, float threat, bool noNew)
 {
     if (!pVictim || pVictim == getOwner() || !pVictim->IsAlive() || !pVictim->IsInMap(getOwner()))
         return;
@@ -431,7 +426,8 @@ void ThreatManager::addThreatDirectly(Unit* pVictim, float threat)
     if (!ref)
         ref = iThreatOfflineContainer.addThreat(pVictim, threat);
 
-    if (!ref)                                               // there was no ref => create a new one
+    // there was no ref => create a new one
+    if (!ref && !noNew)
     {
         // threat has to be 0 here
         HostileReference* hostileReference = new HostileReference(pVictim, this, 0);
