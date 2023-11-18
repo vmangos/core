@@ -135,6 +135,7 @@ class Creature : public Unit
         void ClearCreatureState(CreatureStateFlag f) { m_creatureStateFlags &= ~f; }
         bool HasTypeFlag(CreatureTypeFlags flag) const { return GetCreatureInfo()->type_flags & flag; }
         bool HasExtraFlag(CreatureFlagsExtra flag) const { return GetCreatureInfo()->flags_extra & flag; }
+        bool HasImmunityFlag(CreatureImmunityFlags flag) const { return GetCreatureInfo()->immunity_flags & flag; }
 
         CreatureSubtype GetSubtype() const { return m_subtype; }
         bool IsPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }
@@ -154,9 +155,9 @@ class Creature : public Unit
         // - Area effect spells and abilities will no longer consider totems as
         //   valid targets.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        bool IsImmuneToAoe() const { return IsTotem() || HasExtraFlag(CREATURE_FLAG_EXTRA_IMMUNE_AOE); }
+        bool IsImmuneToAoe() const { return IsTotem() || HasImmunityFlag(CREATURE_IMMUNITY_AOE); }
 #else
-        bool IsImmuneToAoe() const { return HasExtraFlag(CREATURE_FLAG_EXTRA_IMMUNE_AOE); }
+        bool IsImmuneToAoe() const { return HasImmunityFlag(CREATURE_IMMUNITY_AOE); }
 #endif
 
         bool CanWalk() const override { return GetCreatureInfo()->inhabit_type & INHABIT_GROUND; }
@@ -331,8 +332,6 @@ class Creature : public Unit
 
         uint32 GetDefaultMount() { return m_mountId; }
         void SetDefaultMount(uint32 id) { m_mountId = id; }
-        
-        void SetTauntImmunity(bool immune);
 
         MovementGeneratorType GetDefaultMovementType() const { return m_defaultMovementType; }
         void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
