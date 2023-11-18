@@ -116,13 +116,13 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_CRUSH                     = 0x00000020, // 32       Creature can't do crush attacks
     CREATURE_FLAG_EXTRA_FIXED_Z                      = 0x00000040, // 64       Creature does not fall
     CREATURE_FLAG_EXTRA_INVISIBLE                    = 0x00000080, // 128      Creature is always invisible for player (mostly trigger creatures)
-    CREATURE_FLAG_EXTRA_NOT_TAUNTABLE                = 0x00000100, // 256      Creature is immune to taunt auras and effect attack me
+                                                                   // 256      unused
     CREATURE_FLAG_EXTRA_AGGRO_ZONE                   = 0x00000200, // 512      Creature sets itself in combat with zone on aggro
     CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400, // 1024     Creature is a guard
     CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800, // 2048     Creature does not select targets based on threat
     CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000, // 4096     Creature keeps positive auras at reset
     CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000, // 8192     Creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
-    CREATURE_FLAG_EXTRA_IMMUNE_AOE                   = 0x00004000, // 16384    Creature is immune to AoE
+                                                                   // 16384    unused
     CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING         = 0x00008000, // 32768    Creature does not move back when target is within bounding radius
     CREATURE_FLAG_EXTRA_NO_ASSIST                    = 0x00010000, // 65536    Creature does not aggro when nearby creatures aggro
     CREATURE_FLAG_EXTRA_NO_TARGET                    = 0x00020000, // 131072   Creature is passive and does not acquire targets
@@ -138,6 +138,16 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_APPEAR_DEAD                  = 0x08000000, // 134217728 Creature will have UNIT_DYNFLAG_DEAD applied
     CREATURE_FLAG_EXTRA_NO_LEASH_EVADE               = 0x10000000, // 268435456 Creature will not evade due to target running away
     CREATURE_FLAG_EXTRA_DESPAWN_INSTANTLY            = 0x20000000, // 536870912 CREATURE_STATIC_FLAG_DESPAWN_INSTANTLY (despawn on death)
+};
+
+enum CreatureImmunityFlags
+{
+    CREATURE_IMMUNITY_AOE            = 0x01,
+    CREATURE_IMMUNITY_TAUNT          = 0x02, // SPELL_AURA_MOD_TAUNT, SPELL_EFFECT_ATTACK_ME
+    CREATURE_IMMUNITY_MOD_STAT       = 0x04, // SPELL_AURA_MOD_STAT, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE
+    CREATURE_IMMUNITY_MOD_CAST_SPEED = 0x08, // SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK
+    CREATURE_IMMUNITY_DISEASE        = 0x10, // DISPEL_DISEASE
+    CREATURE_IMMUNITY_POISON         = 0x20, // DISPEL_POISON
 };
 
 // Number of spells in one template
@@ -249,6 +259,7 @@ struct CreatureInfo
     uint32  vendor_id;
     uint32  mechanic_immune_mask;
     uint32  school_immune_mask;
+    uint32  immunity_flags;
     uint32  flags_extra;
     uint32  script_id;
 

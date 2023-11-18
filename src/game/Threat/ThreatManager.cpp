@@ -32,8 +32,7 @@
 //================= ThreatCalcHelper ===========================
 //==============================================================
 
-// The pHatingUnit is not used yet
-float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell)
+float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell)
 {
     // all flat mods applied early
     if (!threat)
@@ -41,9 +40,6 @@ float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, floa
 
     if (pThreatSpell)
     {
-        if (pThreatSpell->AttributesEx & SPELL_ATTR_EX_NO_THREAT)
-            return 0.0f;
-
         if (Player* modOwner = pHatedUnit->GetSpellModOwner())
             modOwner->ApplySpellMod(pThreatSpell->Id, SPELLMOD_THREAT, threat);
 
@@ -384,7 +380,7 @@ void ThreatManager::clearReferences()
 
 //============================================================
 
-void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell, bool isAssistThreat)
+void ThreatManager::addThreat(Unit* pVictim, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell, bool isAssistThreat)
 {
     //function deals with adding threat and adding players and pets into ThreatList
     //mobs, NPCs, guards have ThreatList and HateOfflineList
@@ -405,20 +401,24 @@ void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellScho
 
     MANGOS_ASSERT(getOwner()->GetTypeId() == TYPEID_UNIT);
 
+    // Grace of Earth trinket reduces threat but has no threat attribute.
+    if (pThreatSpell && pThreatSpell->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
+       (threat >= 0.0f || !iThreatContainer.getReferenceByTarget(pVictim)))
+        return;
+
     // don't add assist threat to targets under hard CC
     // check for fear, blind, freezing trap, reckless charge, banish, etc.
     if (isAssistThreat)
     {
-        if (getOwner()->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED)
-            || (getOwner()->HasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
+        if (getOwner()->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED) ||
+           (getOwner()->HasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
         {
-            pThreat = 0.0f;
+            threat = 0.0f;
         }
     }
 
-    float threat = ThreatCalcHelper::CalcThreat(pVictim, iOwner, pThreat, crit, schoolMask, pThreatSpell);
-
-    addThreatDirectly(pVictim, threat);
+    float totalThreat = ThreatCalcHelper::CalcThreat(pVictim, threat, crit, schoolMask, pThreatSpell);
+    addThreatDirectly(pVictim, totalThreat);
 }
 
 void ThreatManager::addThreatDirectly(Unit* pVictim, float threat)
