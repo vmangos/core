@@ -2249,41 +2249,6 @@ bool Creature::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectInd
     if (!castOnSelf && spellInfo->EffectMechanic[index] && GetCreatureInfo()->mechanic_immune_mask & (1 << (spellInfo->EffectMechanic[index] - 1)))
         return true;
 
-    // Taunt immunity special flag check
-    if (HasImmunityFlag(CREATURE_IMMUNITY_TAUNT))
-    {
-        // Taunt aura apply check
-        if (spellInfo->EffectApplyAuraName[index] == SPELL_AURA_MOD_TAUNT)
-            return true;
-        // Spell effect taunt check
-        if (spellInfo->Effect[index] == SPELL_EFFECT_ATTACK_ME)
-            return true;
-    }
-
-    if (HasImmunityFlag(CREATURE_IMMUNITY_MOD_STAT))
-    {
-        if (spellInfo->EffectApplyAuraName[index] == SPELL_AURA_MOD_STAT ||
-            spellInfo->EffectApplyAuraName[index] == SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE)
-            return true;
-    }
-
-    if (HasImmunityFlag(CREATURE_IMMUNITY_MOD_CAST_SPEED))
-    {
-        if (spellInfo->EffectApplyAuraName[index] == SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK)
-            return true;
-    }
-
-    // Ustaag <Nostalrius> : Mechanical Creature Type check
-    if (GetCreatureInfo()->type && GetCreatureInfo()->type == CREATURE_TYPE_MECHANICAL)
-    {
-        // Periodic leech aura apply check
-        if (spellInfo->Effect[index] == SPELL_EFFECT_APPLY_AURA)
-        {
-            if (spellInfo->EffectApplyAuraName[index] == SPELL_AURA_PERIODIC_LEECH)
-                return true;
-        }
-    }
-
     return Unit::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);
 }
 
