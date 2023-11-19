@@ -19,12 +19,12 @@
 namespace tome_of_divinity
 {
     // Script name: tome_of_divinity
-    // Used by two npc's
+    // Used by two npcs
     // https://www.wowhead.com/classic/npc=6172/henze-faulk
     // https://www.wowhead.com/classic/npc=6177/narm-faulk
 
-    constexpr uint32 SAY_HEAL{ 2283 };
-    constexpr uint32 SPELL_SYMBOL_OF_LIFE{ 8593 };
+    static constexpr uint32 SAY_HEAL = 2283;
+    static constexpr uint32 SPELL_SYMBOL_OF_LIFE = 8593;
 
     enum State
     {
@@ -68,63 +68,63 @@ struct tome_of_divinityAI : public ScriptedAI
         m_creature->SetDeathState(JUST_DIED);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_creature->IsStandingUp())
         {
             switch (m_uiState)
             {
-            case tome_of_divinity::STATE_JUST_REVIVED:
-            {
-                if (m_uiTalkTimer < uiDiff)
+                case tome_of_divinity::STATE_JUST_REVIVED:
                 {
-                    if (Player * pPlayer{ sObjectAccessor.FindPlayer(m_playerGuid) })
+                    if (m_uiTalkTimer < uiDiff)
                     {
-                        m_creature->SetFacingToObject(pPlayer);
-                        DoScriptText(tome_of_divinity::SAY_HEAL, m_creature, pPlayer);
+                        if (Player * pPlayer{ sObjectAccessor.FindPlayer(m_playerGuid) })
+                        {
+                            m_creature->SetFacingToObject(pPlayer);
+                            DoScriptText(tome_of_divinity::SAY_HEAL, m_creature, pPlayer);
+                        }
+
+                        m_playerGuid.Clear();
+
+                        m_uiState = tome_of_divinity::STATE_DO_EMOTE;
+                    }
+                    else
+                    {
+                        m_uiTalkTimer -= uiDiff;
                     }
 
-                    m_playerGuid.Clear();
-
-                    m_uiState = tome_of_divinity::STATE_DO_EMOTE;
+                    break;
                 }
-                else
+                case tome_of_divinity::STATE_DO_EMOTE:
                 {
-                    m_uiTalkTimer -= uiDiff;
-                }
+                    if (m_uiEmoteTimer < uiDiff)
+                    {
+                        m_creature->HandleEmote(EMOTE_ONESHOT_BOW);
+                        m_uiState = tome_of_divinity::STATE_RESET;
+                    }
+                    else
+                    {
+                        m_uiEmoteTimer -= uiDiff;
+                    }
 
-                break;
-            }
-            case tome_of_divinity::STATE_DO_EMOTE:
-            {
-                if (m_uiEmoteTimer < uiDiff)
-                {
-                    m_creature->HandleEmote(EMOTE_ONESHOT_BOW);
-                    m_uiState = tome_of_divinity::STATE_RESET;
+                    break;
                 }
-                else
+                case tome_of_divinity::STATE_RESET:
+                    // no break
+                default:
                 {
-                    m_uiEmoteTimer -= uiDiff;
-                }
+                    if (m_uiResetTimer < uiDiff)
 
-                break;
-            }
-            case tome_of_divinity::STATE_RESET:
-                [[fallthrough]];
-            default:
-            {
-                if (m_uiResetTimer < uiDiff)
+                    {
+                        tome_of_divinityAI::Reset();
+                    }
+                    else
+                    {
+                        m_uiResetTimer -= uiDiff;
+                    }
 
-                {
-                    tome_of_divinityAI::Reset();
+                    break;
                 }
-                else
-                {
-                    m_uiResetTimer -= uiDiff;
-                }
-
-                break;
-            }
             }
         }
     }
@@ -138,9 +138,9 @@ struct tome_of_divinityAI : public ScriptedAI
 
             m_uiState = tome_of_divinity::STATE_JUST_REVIVED;
 
-            if (Player * pPlayer{ pCaster->ToPlayer() })
+            if (Player* pPlayer = pCaster->ToPlayer())
             {
-                m_playerGuid = static_cast<ObjectGuid>(pPlayer->GetGUID());
+                m_playerGuid = pPlayer->GetObjectGuid();
                 m_bSpellHit = true;
             }
         }
@@ -155,8 +155,8 @@ CreatureAI* GetAI_tome_of_divinity(Creature* pCreature)
 
 void AddSC_elwynn_forest()
 {
-    Script* newscript{ new Script };
-    newscript->Name = "tome_of_divinity";
+    Script* newscript = new Script;
+    newscript->Name = "npc_tome_of_divinity";
     newscript->GetAI = &GetAI_tome_of_divinity;
     newscript->RegisterSelf();
 }
