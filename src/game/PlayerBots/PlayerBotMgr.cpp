@@ -1766,8 +1766,7 @@ bool ChatHandler::HandleBattleBotAutoJoinCommand(char* args)
 {
     if (!*args)
     {
-        bool autoJoin = m_confBattleBotAutoJoin;
-        SendSysMessage(autoJoin ? "Battlebots AutoJoin - on" : "Battlebots AutoJoin - off");
+        SendSysMessage(m_confBattleBotAutoJoin ? "Battlebots AutoJoin - on" : "Battlebots AutoJoin - off");
         return true;
 
     }
@@ -1780,7 +1779,7 @@ bool ChatHandler::HandleBattleBotAutoJoinCommand(char* args)
         return false;
     }
 
-    m_confBattleBotAutoJoin = value;
+    m_confBattleBotAutoJoin = value ? true : false;
 
     return true;    
 }
