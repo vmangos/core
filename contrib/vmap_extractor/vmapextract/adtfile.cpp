@@ -129,7 +129,8 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
         ADT.read(&size, 4);
         flipcc(fourcc);
         fourcc[4] = 0;
-
+		
+		printf("Map=%s, Chunk '%s' pos=%zd, size=%d\n", AdtMapNumber.c_str(), fourcc, ADT.getPos(), size);
         size_t nextpos = ADT.getPos() + size;
 
         if (!strcmp(fourcc, "MCIN"))
