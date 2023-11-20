@@ -848,7 +848,11 @@ SpellCastResult Spell::CheckScriptTargeting(SpellEffectIndex effIndex, uint32 ch
         /* For TARGET_GAMEOBJECT_SCRIPT_NEAR_CASTER makes DB targets optional not required for now
         * TODO: Makes more research for this target type
         */
-        if (targetMode != TARGET_GAMEOBJECT_SCRIPT_NEAR_CASTER)
+        if (targetMode != TARGET_GAMEOBJECT_SCRIPT_NEAR_CASTER ||
+            m_spellInfo->Id == 15958 || // Collect Rookery Egg
+            m_spellInfo->Id == 16447 || // Spawn Challenge to Urok
+            m_spellInfo->Id == 24973 // Clean Up Stink Bomb
+            )
         {
             // not report target not existence for triggered spells
             if (m_triggeredByAuraSpell || m_IsTriggeredSpell)
@@ -6586,36 +6590,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // chance for failure in orange gather / lockpick (gathering skill can't fail at maxskill)
                     if ((canFailAtMax || skillValue < sWorld.GetConfigMaxSkillValue()) && reqSkillValue > irand(skillValue - 25, skillValue + 37))
                         return SPELL_FAILED_TRY_AGAIN;
-                }
-                break;
-            }
-            case SPELL_EFFECT_ACTIVATE_OBJECT:
-            {
-                if (m_spellInfo->Id == 15958) // Collect Rookery Egg
-                { 
-                    if (!m_UniqueGOTargetInfo.empty())
-                    {
-                        ObjectGuid eggGuid = m_UniqueGOTargetInfo.back().targetGUID;
-                        if (GameObject* pRookeryEgg = m_caster->GetMap()->GetGameObject(eggGuid))
-                        {
-                            if (pRookeryEgg->GetGoState() != GO_STATE_ACTIVE_ALTERNATIVE)
-                                return SPELL_FAILED_BAD_TARGETS;
-                        }
-                        else
-                            return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
-                    }
-                    else
-                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
-                }
-                else if (m_spellInfo->Id == 16447) // Spawn Challenge to Urok
-                {
-                    if (m_UniqueGOTargetInfo.empty())
-                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
-                }
-                else if (m_spellInfo->Id == 24973) // Clean Up Stink Bomb
-                {
-                    if (m_UniqueGOTargetInfo.empty())
-                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
                 }
                 break;
             }
