@@ -333,15 +333,19 @@ void PlayerBotMgr::Update(uint32 diff)
                 BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
                 ASSERT(bg);
 
-                uint32 botLevel = bg->GetMinLevel() + 10 * bracketId;
+                uint32 const minLevel = bg->GetMinLevel() + 10 * bracketId;
+                ASSERT(minLevel <= PLAYER_MAX_LEVEL);
+                uint32 const maxLevel = std::min<uint32>(minLevel + 9, PLAYER_MAX_LEVEL);
                 
                 for (uint32 i = queuedAllianceCount[bracketId]; i < bg->GetMinPlayersPerTeam(); ++i)
                 {
+                    uint32 const botLevel = urand(minLevel, maxLevel);
                     sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
                     AddBattleBot(BattleGroundQueueTypeId(queueType), ALLIANCE, botLevel, true);
                 }
                 for (uint32 i = queuedHordeCount[bracketId]; i < bg->GetMinPlayersPerTeam(); ++i)
                 {
+                    uint32 const botLevel = urand(minLevel, maxLevel);
                     sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
                     AddBattleBot(BattleGroundQueueTypeId(queueType), HORDE, botLevel, true);
                 }

@@ -553,7 +553,7 @@ class Unit : public SpellCaster
         void ResetTransformScale();
         float GetNativeScale() const;
         void SetNativeScale(float scale);
-        float GetCollisionHeight() const final { return m_modelCollisionHeight * m_nativeScaleOverride; }
+        float GetCollisionHeight() const { return m_modelCollisionHeight * m_nativeScaleOverride; }
         float GetMinSwimDepth() const { return GetCollisionHeight() * 0.75f; } // client switches to swim animation at this depth
         static float GetScaleForDisplayId(uint32 displayId);
         void UpdateModelData(); // at any changes to scale and/or displayId
