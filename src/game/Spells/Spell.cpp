@@ -7543,6 +7543,16 @@ SpellCastResult Spell::CheckPower() const
     if (m_casterUnit->GetPower(powerType) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
 
+    if (m_spellInfo->NeedsComboPoints())
+    {
+        if (Player* pPlayer = m_caster->ToPlayer())
+        {
+            if (!pPlayer->GetComboPoints())
+                return SPELL_FAILED_NO_COMBO_POINTS;
+        }
+    }
+
+
     return SPELL_CAST_OK;
 }
 
