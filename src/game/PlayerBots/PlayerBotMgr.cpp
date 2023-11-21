@@ -591,6 +591,11 @@ void PlayerBotMgr::DeleteBattleBots()
     }
 }
 
+void PlayerBotMgr::SwitchAutoJoinBattleBots(bool payload)
+{
+    m_confBattleBotAutoJoin = payload ? true : false;
+}
+
 bool PlayerBotMgr::ForceAccountConnection(WorldSession* sess)
 {
     if (sess->GetBot())
@@ -1764,13 +1769,6 @@ bool ChatHandler::HandleBattleBotRemoveAllCommand(char* args)
 
 bool ChatHandler::HandleBattleBotAutoJoinCommand(char* args)
 {
-    if (!*args)
-    {
-        SendSysMessage(m_confBattleBotAutoJoin ? "Battlebots AutoJoin - on" : "Battlebots AutoJoin - off");
-        return true;
-
-    }
-
     bool value;
     if (!ExtractOnOff(&args, value))
     {
@@ -1778,9 +1776,7 @@ bool ChatHandler::HandleBattleBotAutoJoinCommand(char* args)
         SetSentErrorMessage(true);
         return false;
     }
-
-    m_confBattleBotAutoJoin = value ? true : false;
-
+    sPlayerBotMgr.SwitchAutoJoinBattleBots(value)
     return true;    
 }
 
