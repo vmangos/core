@@ -1776,7 +1776,7 @@ bool ChatHandler::HandleBattleBotAutoJoinCommand(char* args)
         SetSentErrorMessage(true);
         return false;
     }
-    sPlayerBotMgr.SwitchAutoJoinBattleBots(value)
+    sPlayerBotMgr.SwitchAutoJoinBattleBots(value);
     return true;    
 }
 
