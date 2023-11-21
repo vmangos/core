@@ -593,7 +593,11 @@ void PlayerBotMgr::DeleteBattleBots()
         if (dynamic_cast<BattleBotAI*>(itr.second->ai.get()))
             itr.second->requestRemoval = true;
     }
-    m_confBattleBotAutoJoin = false;
+}
+
+void PlayerBotMgr::SwitchAutoJoinBattleBots(bool payload)
+{
+    m_confBattleBotAutoJoin = payload ? true : false;
 }
 
 bool PlayerBotMgr::ForceAccountConnection(WorldSession* sess)
@@ -1765,6 +1769,19 @@ bool ChatHandler::HandleBattleBotRemoveAllCommand(char* args)
     sPlayerBotMgr.DeleteBattleBots();
     SendSysMessage("Removed all battlebots.");
     return true;
+}
+
+bool ChatHandler::HandleBattleBotAutoJoinCommand(char* args)
+{
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    sPlayerBotMgr.SwitchAutoJoinBattleBots(value);
+    return true;    
 }
 
 #define SPELL_RED_GLOW 20370
