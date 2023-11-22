@@ -1310,10 +1310,6 @@ UPDATE `creature_template` SET `immunity_flags` = (`immunity_flags` | 4) WHERE `
 -- Son of Flame
 -- Mechanic Disoriented: Blind
 UPDATE `creature_template` SET `mechanic_immune_mask` = (`mechanic_immune_mask` | 2) WHERE `entry`=12143;
--- Mechanic Root: Frost Nova, Frost Nova, Frost Nova
-UPDATE `creature_template` SET `mechanic_immune_mask` = (`mechanic_immune_mask` | 64) WHERE `entry`=12143;
--- Mechanic Snare: Earthbind, Frostbolt, Piercing Howl
-UPDATE `creature_template` SET `mechanic_immune_mask` = (`mechanic_immune_mask` | 1024) WHERE `entry`=12143;
 -- Poison: Blind, Instant Poison V, Instant Poison VI, Serpent Sting
 UPDATE `creature_template` SET `immunity_flags` = (`immunity_flags` | 32) WHERE `entry`=12143;
 
