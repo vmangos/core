@@ -5752,6 +5752,14 @@ void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply)
 {
     if (apply)
     {
+        // Don't add same permanent immunity to list twice.
+        if (!spellId)
+        {
+            for (auto const& itr : m_spellImmune[op])
+                if (itr.spellId == spellId && itr.type == type)
+                    return;
+        }
+
         SpellImmune Immune;
         Immune.spellId = spellId;
         Immune.type = type;
