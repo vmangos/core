@@ -7547,7 +7547,7 @@ SpellCastResult Spell::CheckPower() const
     {
         if (Player* pPlayer = m_caster->ToPlayer())
         {
-            if (!pPlayer->GetComboPoints())
+            if (pPlayer->GetComboTargetGuid() != pPlayer->GetTargetGuid())
                 return SPELL_FAILED_NO_COMBO_POINTS;
         }
     }
