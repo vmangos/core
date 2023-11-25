@@ -1876,6 +1876,27 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
             // Need remove it later
             if (mod->m_amount <= 0)
                 existExpired = true;
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+            // Patch 1.11.0 changed Mage talent Improved Frost Ward to Frost Warding.
+            // Improved Frost Ward - 50% of the damage absorbed by your Frost Ward is added to your mana.
+            SpellEntry const* absorbProto = (*i)->GetSpellProto();
+            if (absorbProto->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_FROST_WARD>() && HasAura(11189))
+                CastCustomSpell(this, 27679, currentAbsorb / 2, {}, {}, true);
+            else if (absorbProto->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_FIRE_WARD>())
+            {
+                Unit::AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                for (const auto i : mOverrideClassScript)
+                    // Patch 1.11.0 changed Mage talent Improved Fire Ward.
+                    // Old effect - Causes your Fire Ward to reflect 20%/35% of the Fire damage absorbed back to the caster.
+                    // The % values don't show up anywhere in dbcs other than the tooltip
+                    if (i->GetModifier()->m_miscvalue == 948)
+                        if (i->GetId() == 11094) // Improved Fire Ward 1
+                            CastCustomSpell(pCaster->ToUnit(), 12559, 0.2f * currentAbsorb, {}, {}, true);
+                        else if (i->GetId() == 13043) // Improved Fire Ward 2
+                            CastCustomSpell(pCaster->ToUnit(), 12559, 0.35f * currentAbsorb, {}, {}, true);
+            }
+#endif
         }
 
         // Remove all expired absorb auras
@@ -5286,6 +5307,12 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
                 {
                     if (!(i->GetSpellProto()->SpellFamilyName == spellProto->SpellFamilyName))
                         continue;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+                    // 1.11.0 - Mage talent Shatter was changed to affect all spells, previously limited to Frost spells.
+                    SpellEntry const* modSpellProto = i->GetSpellProto();
+                    if (modSpellProto->EffectItemType[0] && !spellProto->IsFitToFamily(SpellFamily(modSpellProto->SpellFamilyName), modSpellProto->EffectItemType[0]))
+                        continue;
+#endif
                     switch (i->GetModifier()->m_miscvalue)
                     {
                         // Shatter
