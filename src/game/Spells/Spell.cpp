@@ -3767,9 +3767,6 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
             // add gcd server side (client side is handled by client itself)
             if (!m_caster->IsPlayer() || !static_cast<Player*>(m_caster)->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
                 m_caster->AddGCD(*m_spellInfo);
-            // Cast on self -> execute NOW
-            //if (!m_timer && m_caster->IsPlayer() && !m_targets.m_targetMask && !IsAreaOfEffectSpell(m_spellInfo))
-            //    cast(true);
         }
         // execute triggered without cast time explicitly in call point
         else if ((m_timer == 0) &&
@@ -5810,11 +5807,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_MOVING;
         }
 
-        if (!m_IsTriggeredSpell && m_spellInfo->NeedsComboPoints() && Spells::IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]) &&
-           (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetObjectGuid() != ((Player*)m_caster)->GetComboTargetGuid()))
-            // warrior not have real combo-points at client side but use this way for mark allow Overpower use
-            return m_casterUnit->GetClass() == CLASS_WARRIOR ? SPELL_FAILED_BAD_TARGETS : SPELL_FAILED_NO_COMBO_POINTS;
-
         switch (m_spellInfo->Id)
         {
             // Mongoose Bite
@@ -7450,6 +7442,11 @@ SpellCastResult Spell::CheckPower() const
     // item cast not used power
     if (m_CastItem || m_IsTriggeredSpell || !m_casterUnit)
         return SPELL_CAST_OK;
+
+    if (m_casterUnit->IsPlayer() && m_spellInfo->NeedsComboPoints() && Spells::IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]) &&
+       (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetObjectGuid() != ((Player*)m_casterUnit)->GetComboTargetGuid()))
+        // warrior not have real combo-points at client side but use this way for mark allow Overpower use
+        return m_casterUnit->GetClass() == CLASS_WARRIOR ? SPELL_FAILED_BAD_TARGETS : SPELL_FAILED_NO_COMBO_POINTS;
 
     // health as power used - need check health amount
     if (m_spellInfo->powerType == POWER_HEALTH)

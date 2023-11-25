@@ -3698,18 +3698,6 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
     else
         target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, apply);
 
-    // Warrior 'Disarm' skill generates 104 base threat
-    // http://wowwiki.wikia.com/wiki/Disarm?direction=prev&oldid=200198 (2006) implies it
-    // generates a large amount
-    // http://wowwiki.wikia.com/wiki/Threat has threat listed at 104, which is in line
-    // with the values of other warrior abilities
-    // We can suppose that the same is true for all spells which apply disarm
-    if (apply)
-    {
-        float threat = 104.0f * sSpellMgr.GetSpellThreatMultiplier(GetHolder()->GetSpellProto());
-        target->AddThreat(GetCaster(), threat, false, SPELL_SCHOOL_MASK_NONE, GetHolder()->GetSpellProto());
-    }
-
     // Don't update damage if in feral
     if (!target->IsNoWeaponShapeShift())
         target->UpdateDamagePhysical(BASE_ATTACK);

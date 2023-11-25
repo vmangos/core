@@ -449,6 +449,7 @@ enum eConfigFloatValues
     CONFIG_FLOAT_RATE_XP_PERSONAL_MAX,
     CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE,
     CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE,
+    CONFIG_FLOAT_RP_DECAY,
     CONFIG_FLOAT_VALUE_COUNT
 };
 
@@ -1047,7 +1048,7 @@ class World
         std::unique_ptr<MovementBroadcaster> m_broadcaster;
 
         std::unique_ptr<ThreadPool> m_updateThreads;
-        
+
         static uint32 m_currentMSTime;
         static TimePoint m_currentTime;
         static uint32 m_currentDiff;

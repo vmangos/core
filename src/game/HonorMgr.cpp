@@ -549,7 +549,9 @@ float HonorMaintenancer::CalculateRpEarning(float cp, HonorScores sc)
 
 float HonorMaintenancer::CalculateRpDecay(float rpEarning, float rp)
 {
-    float decay = floor((0.2f * rp) + 0.5f);
+    float decayMultiplier = sWorld.getConfig(CONFIG_FLOAT_RP_DECAY);
+
+    float decay = floor((decayMultiplier * rp) + 0.5f);
     float delta = rpEarning - decay;
 
     if (delta < 0)

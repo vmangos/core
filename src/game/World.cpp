@@ -633,6 +633,7 @@ void World::LoadConfigSettings(bool reload)
             setConfig(CONFIG_UINT32_MIN_HONOR_KILLS, MIN_HONOR_KILLS_PRE_1_10);
     }
 
+    setConfigMinMax(CONFIG_FLOAT_RP_DECAY, "RpDecay", 0.2f, 0.0f, 1.0f);
     setConfigMinMax(CONFIG_UINT32_MAINTENANCE_DAY, "MaintenanceDay", 4, 0, 6);
     setConfig(CONFIG_BOOL_AUTO_HONOR_RESTART, "AutoHonorRestart", true);
     setConfig(CONFIG_BOOL_ALL_TAXI_PATHS, "AllFlightPaths", false);
