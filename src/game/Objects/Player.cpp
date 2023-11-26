@@ -5742,6 +5742,9 @@ inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLeve
 
 inline int CraftingSkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 YellowLevel)
 {
+    if (YellowLevel >= GrayLevel)
+        return 0;
+
     // Linear decrease in chance as you go from the YellowLevel -> GrayLevel.
     // To avoid casting to floats and back to uint32 we multiply the numerator by 1000, to get into a range of 0-1000.
     return G3D::iClamp(((GrayLevel - SkillValue) * 1000) / (GrayLevel - YellowLevel), 0, 1000);
