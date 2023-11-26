@@ -41,7 +41,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 -- .go xyz -4929.023 -2066.4766 85.52668
 
 
-
 -- End of migration.
 END IF;
 END??
