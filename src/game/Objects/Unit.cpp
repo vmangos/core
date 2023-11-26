@@ -2543,39 +2543,6 @@ bool Unit::IsEffectResist(SpellEntry const* spell, int eff) const
     return false;
 }
 
-float Unit::GetBonusHitChanceFromAuras(WeaponAttackType attType) const
-{
-    float chance = 0.0f;
-    AuraList const& mTotalAuraList = GetAurasByType(SPELL_AURA_MOD_HIT_CHANCE);
-    for (auto const& i : mTotalAuraList)
-    {
-        SpellEntry const* pSpellEntry = i->GetSpellProto();
-        if (pSpellEntry->EquippedItemClass >= 0)
-        {
-            if (Player const* pPlayer = ToPlayer())
-            {
-                Item* pWeapon = pPlayer->GetWeaponForAttack(attType);
-                if (!pWeapon)
-                    continue;
-
-                if (!pWeapon->IsFitToSpellRequirements(pSpellEntry))
-                    continue;
-            }
-            else if (Creature const* pCreature = ToCreature())
-            {
-                if (!pCreature->GetVirtualItemDisplayId(attType))
-                    continue;
-
-                if (!Item::IsFitToSpellRequirements(pSpellEntry, pCreature->GetVirtualItemClass(attType), pCreature->GetVirtualItemSubclass(attType), pCreature->GetVirtualItemInventoryType(attType)))
-                    continue;
-            }
-        }
-
-        chance += i->GetModifier()->m_amount;
-    }
-    return chance;
-}
-
 float Unit::MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) const
 {
     if (!pVictim || !pVictim->IsStandingUp())

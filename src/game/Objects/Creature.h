@@ -548,6 +548,7 @@ class Creature : public Unit
         }
 
         bool HasWeapon() const;
+        float GetBonusHitChanceFromAuras(WeaponAttackType attType) const final;
 
         void SetCallForHelpDist(float dist)
         {
