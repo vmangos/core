@@ -316,8 +316,11 @@ class ChatHandler
         bool HandleVariableCommand(char* args);
         bool HandleReloadVariablesCommand(char* args);
         //  AQ variables
-        bool HandleGetWarEffortResource(char* args);
-        bool HandleSetWarEffortResource(char* args);
+        bool HandleWarEffortGetResource(char* args);
+        bool HandleWarEffortSetResource(char* args);
+        bool HandleWarEffortInfoCommand(char* args);
+        bool HandleWarEffortSetGongTimeCommand(char* args);
+        bool HandleWarEffortSetStageCommand(char* args);
         // Deplacement
         bool HandleGoForwardCommand(char* args);
         bool HandleGoUpCommand(char* args);

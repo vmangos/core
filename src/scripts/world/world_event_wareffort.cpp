@@ -650,7 +650,7 @@ bool GetWarEffortStockInfo(uint32 resourceId, WarEffortStockInfo &info, TeamId t
     return found;
 }
 
-bool ChatHandler::HandleGetWarEffortResource(char* args)
+bool ChatHandler::HandleWarEffortGetResource(char* args)
 {
     uint32 resourceId = 0;
     uint32 team;
@@ -682,7 +682,7 @@ bool ChatHandler::HandleGetWarEffortResource(char* args)
     return true;
 }
 
-bool ChatHandler::HandleSetWarEffortResource(char* args)
+bool ChatHandler::HandleWarEffortSetResource(char* args)
 {
     uint32 resourceId = 0;
     uint32 resourceAmount = 0;
