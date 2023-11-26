@@ -146,8 +146,6 @@ Unit::Unit()
         m_createResistance = 0;
 
     m_attacking = nullptr;
-    m_modMeleeHitChance = 0.0f;
-    m_modRangedHitChance = 0.0f;
     m_modSpellHitChance = 0.0f;
     m_baseSpellCritChance = 5;
 
@@ -2545,6 +2543,39 @@ bool Unit::IsEffectResist(SpellEntry const* spell, int eff) const
     return false;
 }
 
+float Unit::GetBonusHitChanceFromAuras(WeaponAttackType attType) const
+{
+    float chance = 0.0f;
+    AuraList const& mTotalAuraList = GetAurasByType(SPELL_AURA_MOD_HIT_CHANCE);
+    for (auto const& i : mTotalAuraList)
+    {
+        SpellEntry const* pSpellEntry = i->GetSpellProto();
+        if (pSpellEntry->EquippedItemClass >= 0)
+        {
+            if (Player const* pPlayer = ToPlayer())
+            {
+                Item* pWeapon = pPlayer->GetWeaponForAttack(attType);
+                if (!pWeapon)
+                    continue;
+
+                if (!pWeapon->IsFitToSpellRequirements(pSpellEntry))
+                    continue;
+            }
+            else if (Creature const* pCreature = ToCreature())
+            {
+                if (!pCreature->GetVirtualItemDisplayId(attType))
+                    continue;
+
+                if (!Item::IsFitToSpellRequirements(pSpellEntry, pCreature->GetVirtualItemClass(attType), pCreature->GetVirtualItemSubclass(attType), pCreature->GetVirtualItemInventoryType(attType)))
+                    continue;
+            }
+        }
+
+        chance += i->GetModifier()->m_amount;
+    }
+    return chance;
+}
+
 float Unit::MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) const
 {
     if (!pVictim || !pVictim->IsStandingUp())
@@ -2585,11 +2616,7 @@ float Unit::MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) c
     missChance *= levelDiffMultiplier;
 
     // Hit chance bonus from attacker based on ratings and auras
-    float hitChance = 0.0f;
-    if (attType == RANGED_ATTACK)
-        hitChance = m_modRangedHitChance;
-    else
-        hitChance = m_modMeleeHitChance;
+    float hitChance = GetBonusHitChanceFromAuras(attType);
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
     // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking player’s Weapon Skill.

@@ -1880,7 +1880,7 @@ void Creature::LoadEquipment(uint32 equipmentId, bool force)
         if (force)
         {
             for (uint8 i = 0; i < MAX_VIRTUAL_ITEM_SLOT; ++i)
-                SetVirtualItem(VirtualItemSlot(i), 0);
+                SetVirtualItem(WeaponAttackType(i), 0);
             m_equipmentId = 0;
         }
         return;
@@ -1892,7 +1892,7 @@ void Creature::LoadEquipment(uint32 equipmentId, bool force)
         if (EquipmentEntry const* pEquipEntry = pEquipTemplate->ChooseEquipmentEntry())
         {
             for (uint8 i = 0; i < MAX_VIRTUAL_ITEM_SLOT; ++i)
-                SetVirtualItem(VirtualItemSlot(i), pEquipEntry->item[i]);
+                SetVirtualItem(WeaponAttackType(i), pEquipEntry->item[i]);
         }
     }
 }
@@ -4059,7 +4059,7 @@ uint32 Creature::GetDBTableGUIDLow() const
     return 0;
 }
 
-void Creature::SetVirtualItem(VirtualItemSlot slot, uint32 item_id)
+void Creature::SetVirtualItem(WeaponAttackType slot, uint32 item_id)
 {
     if (item_id == 0)
     {
@@ -4083,6 +4083,26 @@ void Creature::SetVirtualItem(VirtualItemSlot slot, uint32 item_id)
     SetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_INVENTORYTYPE, proto->InventoryType);
 
     SetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 1, VIRTUAL_ITEM_INFO_1_OFFSET_SHEATH,        proto->Sheath);
+}
+
+uint32 Creature::GetVirtualItemDisplayId(WeaponAttackType slot) const
+{
+    return GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + slot);
+}
+
+uint32 Creature::GetVirtualItemClass(WeaponAttackType slot) const
+{
+    return GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
+}
+
+uint32 Creature::GetVirtualItemSubclass(WeaponAttackType slot) const
+{
+    return GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_SUBCLASS);
+}
+
+uint32 Creature::GetVirtualItemInventoryType(WeaponAttackType slot) const
+{
+    return GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_INVENTORYTYPE);
 }
 
 void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint32 options)

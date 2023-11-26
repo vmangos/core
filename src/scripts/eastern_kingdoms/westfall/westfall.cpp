@@ -87,7 +87,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         switch (uiPoint)
         {
             case 4:
-                m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 6946);
+                m_creature->SetVirtualItem(BASE_ATTACK, 6946);
                 m_creature->SetSheath(SHEATH_STATE_RANGED);
                 m_creature->HandleEmoteCommand(EMOTE_STATE_USESTANDING_NOSHEATHE);
                 break;

@@ -514,7 +514,11 @@ class Creature : public Unit
         void RegenerateHealth();
         void RegenerateMana();
 
-        void SetVirtualItem(VirtualItemSlot slot, uint32 item_id);
+        void SetVirtualItem(WeaponAttackType slot, uint32 item_id);
+        uint32 GetVirtualItemDisplayId(WeaponAttackType slot) const;
+        uint32 GetVirtualItemClass(WeaponAttackType slot) const;
+        uint32 GetVirtualItemSubclass(WeaponAttackType slot) const;
+        uint32 GetVirtualItemInventoryType(WeaponAttackType slot) const;
 
         void ResetDamageTakenOrigin()
         {

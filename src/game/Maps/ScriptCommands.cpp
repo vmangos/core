@@ -711,15 +711,15 @@ bool Map::ScriptCommand_SetEquipment(ScriptInfo const& script, WorldObject* sour
 
     // main hand
     if (script.setEquipment.slot[0] >= 0)
-        pSource->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, script.setEquipment.slot[0]);
+        pSource->SetVirtualItem(BASE_ATTACK, script.setEquipment.slot[0]);
 
     // off hand
     if (script.setEquipment.slot[1] >= 0)
-        pSource->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, script.setEquipment.slot[1]);
+        pSource->SetVirtualItem(OFF_ATTACK, script.setEquipment.slot[1]);
 
     // ranged
     if (script.setEquipment.slot[2] >= 0)
-        pSource->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, script.setEquipment.slot[2]);
+        pSource->SetVirtualItem(RANGED_ATTACK, script.setEquipment.slot[2]);
 
     return false;
 }
