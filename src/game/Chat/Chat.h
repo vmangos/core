@@ -202,6 +202,7 @@ class ChatHandler
         bool HandleCheatUntargetableCommand(char *);
         bool HandleCheatWaterwalkCommand(char* args);
         bool HandleCheatWallclimbCommand(char* args);
+        bool HandleCheatDebugTargetInfoCommand(char* args);
 
         //Custom
         bool HandleSendSpellVisualCommand(char *);
