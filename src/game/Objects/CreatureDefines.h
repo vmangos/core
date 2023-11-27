@@ -598,13 +598,6 @@ struct TrainerSpellData
 
 #define MAX_VENDOR_ITEMS 128                                // Limitation in item count field size in SMSG_LIST_INVENTORY
 
-enum VirtualItemSlot
-{
-    VIRTUAL_ITEM_SLOT_0 = 0,
-    VIRTUAL_ITEM_SLOT_1 = 1,
-    VIRTUAL_ITEM_SLOT_2 = 2,
-};
-
 #define MAX_VIRTUAL_ITEM_SLOT 3
 
 enum VirtualItemInfoByteOffset

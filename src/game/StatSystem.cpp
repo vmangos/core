@@ -469,6 +469,31 @@ void Player::UpdateDamagePhysical(WeaponAttackType attType)
     }
 }
 
+float Player::GetBonusHitChanceFromAuras(WeaponAttackType attType) const
+{
+    float chance = 0.0f;
+    AuraList const& hitAurasList = GetAurasByType(SPELL_AURA_MOD_HIT_CHANCE);
+    if (hitAurasList.empty())
+        return chance;
+
+    Item* pWeapon = GetWeaponForAttack(attType);
+    for (auto const& i : hitAurasList)
+    {
+        SpellEntry const* pSpellEntry = i->GetSpellProto();
+        if (pSpellEntry->EquippedItemClass >= 0)
+        {
+            if (!pWeapon)
+                continue;
+
+            if (!pWeapon->IsFitToSpellRequirements(pSpellEntry))
+                continue;
+        }
+
+        chance += i->GetModifier()->m_amount;
+    }
+    return chance;
+}
+
 void Player::UpdateDefenseBonusesMod()
 {
     UpdateBlockPercentage();
@@ -934,6 +959,27 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 
     SetStatFloatValue(fieldmin, mindamage);
     SetStatFloatValue(fieldmax, maxdamage);
+}
+
+float Creature::GetBonusHitChanceFromAuras(WeaponAttackType attType) const
+{
+    float chance = 0.0f;
+    AuraList const& mTotalAuraList = GetAurasByType(SPELL_AURA_MOD_HIT_CHANCE);
+    for (auto const& i : mTotalAuraList)
+    {
+        SpellEntry const* pSpellEntry = i->GetSpellProto();
+        if (pSpellEntry->EquippedItemClass >= 0)
+        {
+            if (!GetVirtualItemDisplayId(attType))
+                continue;
+
+            if (!Item::IsFitToSpellRequirements(pSpellEntry, GetVirtualItemClass(attType), GetVirtualItemSubclass(attType), GetVirtualItemInventoryType(attType)))
+                continue;
+        }
+
+        chance += i->GetModifier()->m_amount;
+    }
+    return chance;
 }
 
 /*#######################################

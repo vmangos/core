@@ -587,11 +587,16 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
         }
+        else if (isType(TYPEMASK_UNIT) && target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+        {
+            // Force include dynamic flags to make special info visible.
+            updateMask->SetBit(UNIT_DYNAMIC_FLAGS);
+        }
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
         else if (isType(TYPEMASK_ITEM))
         {
             // Force include flags field in create object packet,
-            // because the static flags need to sent in that field.
+            // because the static flags need to be sent in that field.
             updateMask->SetBit(ITEM_FIELD_FLAGS);
         }
 #endif
@@ -725,6 +730,9 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                         if (!target->IsAllowedToLoot(creature))
                             dynamicFlags &= ~UNIT_DYNFLAG_LOOTABLE;
                     }
+                    if (target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+                        dynamicFlags |= UNIT_DYNFLAG_SPECIALINFO;
+
                     *data << dynamicFlags;
                 }
                 // RAID ally-horde - Faction
@@ -975,19 +983,30 @@ uint16 Object::GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*&
         case TYPEID_UNIT:
         case TYPEID_PLAYER:
         {
-            if (static_cast<Unit const*>(this)->GetOwnerGuid() == target->GetObjectGuid() ||
-                static_cast<Unit const*>(this)->GetCharmerGuid() == target->GetObjectGuid())
-                visibleFlag |= UF_FLAG_OWNER_ONLY;
+            if (target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+            {
+                visibleFlag |= UF_FLAG_OWNER_ONLY | UF_FLAG_SPECIAL_INFO | UF_FLAG_GROUP_ONLY;
+            }
+            else
+            {
+                if (static_cast<Unit const*>(this)->GetOwnerGuid() == target->GetObjectGuid() ||
+                    static_cast<Unit const*>(this)->GetCharmerGuid() == target->GetObjectGuid())
+                    visibleFlag |= UF_FLAG_OWNER_ONLY;
 
-            if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO))
-                if (target->CanSeeSpecialInfoOf(static_cast<Unit const*>(this)))
-                    visibleFlag |= UF_FLAG_SPECIAL_INFO;
+                if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO))
+                    if (target->CanSeeSpecialInfoOf(static_cast<Unit const*>(this)))
+                        visibleFlag |= UF_FLAG_SPECIAL_INFO;
 
-            if (Player* plr = static_cast<Unit const*>(this)->GetCharmerOrOwnerPlayerOrPlayerItself())
-                if (plr->IsInSameRaidWith(target))
-                    visibleFlag |= UF_FLAG_GROUP_ONLY;
+                if (Player* plr = static_cast<Unit const*>(this)->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    if (plr->IsInSameRaidWith(target))
+                        visibleFlag |= UF_FLAG_GROUP_ONLY;
+            }
+            
             break;
         }
+        /*
+        Optimization: these objects dont actually have any fields marked as owner only, so comment this out
+
         case TYPEID_GAMEOBJECT:
             if (static_cast<GameObject const*>(this)->GetOwnerGuid() == target->GetObjectGuid())
                 visibleFlag |= UF_FLAG_OWNER_ONLY;
@@ -1002,6 +1021,7 @@ uint16 Object::GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*&
             break;
         case TYPEID_OBJECT:
             break;
+        */
     }
 
     return visibleFlag;

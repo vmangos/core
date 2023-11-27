@@ -237,6 +237,7 @@ class Creature : public Unit
         void UpdateManaRegen() override;
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
         void UpdateDamagePhysical(WeaponAttackType attType) override;
+        float GetBonusHitChanceFromAuras(WeaponAttackType attType) const final;
         uint32 GetCurrentEquipmentId() const { return m_equipmentId; }
 
         static float _GetHealthMod(int32 rank);             // Get custom factor to scale health (default 1, CONFIG_FLOAT_RATE_CREATURE_*_HP)
@@ -514,7 +515,11 @@ class Creature : public Unit
         void RegenerateHealth();
         void RegenerateMana();
 
-        void SetVirtualItem(VirtualItemSlot slot, uint32 item_id);
+        void SetVirtualItem(WeaponAttackType slot, uint32 item_id);
+        uint32 GetVirtualItemDisplayId(WeaponAttackType slot) const;
+        uint32 GetVirtualItemClass(WeaponAttackType slot) const;
+        uint32 GetVirtualItemSubclass(WeaponAttackType slot) const;
+        uint32 GetVirtualItemInventoryType(WeaponAttackType slot) const;
 
         void ResetDamageTakenOrigin()
         {

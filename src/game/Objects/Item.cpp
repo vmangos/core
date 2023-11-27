@@ -965,22 +965,20 @@ bool Item::IsBoundByEnchant() const
     return false;
 }
 
-bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo) const
+bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo, uint32 itemClass, uint32 itemSubClass, uint32 itemInventoryType)
 {
-    ItemPrototype const* proto = GetProto();
-
     if (spellInfo->EquippedItemClass != -1)                 // -1 == any item class
     {
         // Ustaag <Nostalrius> : ajout exception pour le spell Enchant Cloak - Minor Agility
         // prob de DB : spellInfo->EquippedItemClass == 2 alors qu'il devrait etre == 4
-        if (spellInfo->Id == 13419 && proto->InventoryType == INVTYPE_CLOAK)
+        if (spellInfo->Id == 13419 && itemInventoryType == INVTYPE_CLOAK)
             return true;
-        if ((spellInfo->EquippedItemClass != int32(proto->Class)) && spellInfo->Id != 13419)
+        if ((spellInfo->EquippedItemClass != int32(itemClass)) && spellInfo->Id != 13419)
             return false;                                   //  wrong item class
 
         if (spellInfo->EquippedItemSubClassMask != 0)        // 0 == any subclass
         {
-            if ((spellInfo->EquippedItemSubClassMask & (1 << proto->SubClass)) == 0)
+            if ((spellInfo->EquippedItemSubClassMask & (1 << itemSubClass)) == 0)
                 return false;                               // subclass not present in mask
         }
     }
@@ -990,11 +988,17 @@ bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo) const
     // and special code (Titan's Grip, Windfury Attack). Check clearly not applicable for Lava Lash.
     if (spellInfo->EquippedItemInventoryTypeMask != 0 && (spellInfo->Targets & TARGET_FLAG_ITEM))    // 0 == any inventory type
     {
-        if ((spellInfo->EquippedItemInventoryTypeMask  & (1 << proto->InventoryType)) == 0)
+        if ((spellInfo->EquippedItemInventoryTypeMask  & (1 << itemInventoryType)) == 0)
             return false;                                   // inventory type not present in mask
     }
 
     return true;
+}
+
+bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo) const
+{
+    ItemPrototype const* proto = GetProto();
+    return IsFitToSpellRequirements(spellInfo, proto->Class, proto->SubClass, proto->InventoryType);
 }
 
 bool Item::IsTargetValidForItemUse(Unit* pUnitTarget)
