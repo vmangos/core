@@ -5774,16 +5774,6 @@ inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLeve
     return sWorld.getConfig(CONFIG_UINT32_SKILL_CHANCE_ORANGE) * 10;
 }
 
-inline int CraftingSkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 YellowLevel)
-{
-    if (YellowLevel >= GrayLevel)
-        return 0;
-
-    // Linear decrease in chance as you go from the YellowLevel -> GrayLevel.
-    // To avoid casting to floats and back to uint32 we multiply the numerator by 1000, to get into a range of 0-1000.
-    return G3D::iClamp(((GrayLevel - SkillValue) * 1000) / (GrayLevel - YellowLevel), 0, 1000);
-}
-
 bool Player::UpdateCraftSkill(uint32 spellid)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "UpdateCraftSkill spellid %d", spellid);
@@ -5798,8 +5788,9 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 
             uint32 craft_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_CRAFTING);
 
-            return UpdateSkillPro(_spell_idx->second->skillId, CraftingSkillGainChance(SkillValue,
+            return UpdateSkillPro(_spell_idx->second->skillId, SkillGainChance(SkillValue,
                                   _spell_idx->second->max_value,
+                                  (_spell_idx->second->max_value + _spell_idx->second->min_value) / 2,
                                   _spell_idx->second->min_value),
                                   craft_skill_gain);
         }
