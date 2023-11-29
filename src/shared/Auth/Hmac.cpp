@@ -53,7 +53,11 @@ void HmacHash::UpdateBigNumber(BigNumber* bn)
 
 void HmacHash::UpdateData(std::vector<uint8> const& data)
 {
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
+    EVP_MAC_update(m_ctx, data.data(), data.size());
+#else
     HMAC_Update(m_ctx, data.data(), data.size());
+#endif
 }
 
 void HmacHash::UpdateData(uint8 const* data, int length)
@@ -80,7 +84,7 @@ void HmacHash::Finalize()
 uint8* HmacHash::ComputeHash(BigNumber* bn)
 {
     auto byteArray = bn->AsByteArray();
-    HMAC_Update(m_ctx, byteArray.data(), byteArray.size());
+    UpdateData(m_ctx, byteArray.data(), byteArray.size());
     Finalize();
     return (uint8*)m_digest;
 }
