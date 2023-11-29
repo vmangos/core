@@ -12,6 +12,7 @@
 #include "MovementPacketSender.h"
 #include "Geometry.h"
 #include "AccountMgr.h"
+#include "BattleGround.h"
 
 using namespace Geometry;
 
