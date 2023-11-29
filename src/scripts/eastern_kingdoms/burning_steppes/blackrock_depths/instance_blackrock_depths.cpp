@@ -467,6 +467,9 @@ struct instance_blackrock_depths : ScriptedInstance
     {
         switch (pCreature->GetEntry())
         {
+            case NPC_BURNING_SPIRIT:
+                m_burningSpirits.remove(pCreature->GetObjectGuid());
+                break;
             case NPC_SHADOWFORGE_SENATOR:
                 // Emperor Dagran Thaurissan performs a random yell upon the death
                 // of Shadowforge Senators in the Throne Room
@@ -949,7 +952,7 @@ struct instance_blackrock_depths : ScriptedInstance
                     for (const auto& guid : m_burningSpirits)
                     {
                         if (Creature* pSummon = GetMap()->GetCreature(guid))
-                            if (pSummon->IsAlive() && (!pSummon->IsInCombat() || uiData != DONE))
+                            if (!pSummon->IsInCombat() || uiData != DONE)
                                 pSummon->DespawnOrUnsummon();
                     }
 
