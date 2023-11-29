@@ -59,7 +59,6 @@ enum
     DATA_ARENA_CHALLENGER      = 42,
 
     TYPE_FLAMELASH             = 43,
-    DATA_FLAMELASH             = 44,
     MAX_ENCOUNTER              = 21,
 
     EVENT_BAR_PATRONS          = 100,
