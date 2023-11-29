@@ -20,6 +20,7 @@
 #include "CreatureGroups.h"
 #include "ObjectMgr.h"
 #include "CreatureAI.h"
+#include "BattleGround.h"
 
 void CreatureGroup::AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags)
 {

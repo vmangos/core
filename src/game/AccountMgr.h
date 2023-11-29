@@ -40,6 +40,7 @@ enum AccountOpResult
 class WorldSession;
 class ChatHandler;
 class MasterPlayer;
+class QueryResult;
 
 #define MAX_ACCOUNT_STR 16
 

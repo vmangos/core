@@ -28,6 +28,7 @@
 #include "Language.h"
 #include "WorldPacket.h"
 #include "Chat.h"
+#include "World.h"
 
 
 BattleGroundAV::BattleGroundAV()

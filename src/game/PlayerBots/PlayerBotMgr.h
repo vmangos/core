@@ -5,6 +5,7 @@
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "PlayerBotAI.h"
+#include "BattleGroundDefines.h"
 
 #include <vector>
 #include <memory>

@@ -16,6 +16,7 @@
 
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
+#include "BattleGround.h"
 #include "Player.h"
 #include "Group.h"
 #include "CreatureAI.h"

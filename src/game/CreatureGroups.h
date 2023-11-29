@@ -24,6 +24,7 @@
 
 #include <map>
 
+class Map;
 class Unit;
 class Creature;
 class CreatureGroup;
