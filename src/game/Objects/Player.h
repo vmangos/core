@@ -26,11 +26,12 @@
 #include "Unit.h"
 #include "Database/DatabaseEnv.h"
 #include "GroupReference.h"
+#include "MapReference.h"
 #include "WorldSession.h"
 #include "Pet.h"
 #include "Util.h"                                           // for Tokens typedef
 #include "ReputationMgr.h"
-#include "BattleGround.h"
+#include "BattleGroundDefines.h"
 #include "SharedDefines.h"
 #include "GameObjectDefines.h"
 #include "SpellMgr.h"
@@ -39,6 +40,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <shared_mutex>
 
 struct Mail;
 struct ItemPrototype;
@@ -56,7 +58,7 @@ class Item;
 class ZoneScript;
 class PlayerAI;
 class PlayerBroadcaster;
-class MapReference;
+class BattleGround;
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_EXPLORED_ZONES_SIZE  64
@@ -2244,9 +2246,9 @@ class Player final: public Unit
         void SetSelectedGobj(ObjectGuid guid) { m_selectedGobj = guid; }
         ObjectGuid const& GetSelectionGuid() const { return m_curSelectionGuid; }
         void SetSelectionGuid(ObjectGuid guid) { m_curSelectionGuid = guid; SetTargetGuid(guid); }
-        Unit* GetSelectedUnit() { return GetMap()->GetUnit(m_curSelectionGuid); }
-        Creature* GetSelectedCreature() { return GetMap()->GetCreature(m_curSelectionGuid); }
-        Player* GetSelectedPlayer() { return GetMap()->GetPlayer(m_curSelectionGuid); }
+        Unit* GetSelectedUnit();
+        Creature* GetSelectedCreature();
+        Player* GetSelectedPlayer();
         Object* GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask);
 
         void SetResurrectRequestData(ObjectGuid guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)

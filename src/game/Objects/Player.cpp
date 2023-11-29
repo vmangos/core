@@ -21245,6 +21245,21 @@ bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown)
     return TeleportTo(m_homebind, (options | TELE_TO_FORCE_MAP_CHANGE));
 }
 
+Unit* Player::GetSelectedUnit()
+{
+    return GetMap()->GetUnit(m_curSelectionGuid);
+}
+
+Creature* Player::GetSelectedCreature()
+{
+    return GetMap()->GetCreature(m_curSelectionGuid);
+}
+
+Player* Player::GetSelectedPlayer()
+{
+    return GetMap()->GetPlayer(m_curSelectionGuid);
+}
+
 Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
 {
     switch (guid.GetHigh())

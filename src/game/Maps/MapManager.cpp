@@ -31,6 +31,7 @@
 #include "Group.h"
 #include "ZoneScriptMgr.h"
 #include "Map.h"
+#include "BattleGround.h"
 #include "ThreadPool.h"
 
 typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex> MapManagerLock;

@@ -30,6 +30,7 @@
 #include "Spell.h"
 #include "SocialMgr.h"
 #include "Language.h"
+#include "Map.h"
 
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
