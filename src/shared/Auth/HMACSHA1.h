@@ -41,7 +41,7 @@ class HMACSHA1
         uint8* GetDigest() { return (uint8*)m_digest; }
         int GetLength() { return SHA_DIGEST_LENGTH; }
     private:
-#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
         EVP_MAC* m_mac;
         EVP_MAC_CTX* m_ctx;
 #else

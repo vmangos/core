@@ -21,7 +21,7 @@
 
 HMACSHA1::HMACSHA1(const uint8* seed, size_t len)
 {
-#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
     m_mac = EVP_MAC_fetch(nullptr, "HMAC", nullptr);
     m_ctx = EVP_MAC_CTX_new(m_mac);
 
@@ -38,7 +38,7 @@ HMACSHA1::HMACSHA1(const uint8* seed, size_t len)
 
 HMACSHA1::~HMACSHA1()
 {
-#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
     EVP_MAC_CTX_free(m_ctx);
     EVP_MAC_free(m_mac);
 #else
@@ -58,7 +58,7 @@ void HMACSHA1::UpdateData(std::vector<uint8> const& data)
 
 void HMACSHA1::UpdateData(uint8 const* data, int length)
 {
-#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
     EVP_MAC_update(m_ctx, data, length);
 #else
     HMAC_Update(m_ctx, data, length);
@@ -72,7 +72,7 @@ void HMACSHA1::UpdateData(std::string const& str)
 
 void HMACSHA1::Finalize()
 {
-#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
     size_t length = 0;
     EVP_MAC_final(m_ctx, m_digest, &length, sizeof(m_digest));
 #else
