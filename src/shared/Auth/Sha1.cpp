@@ -22,22 +22,46 @@
 
 Sha1Hash::Sha1Hash()
 {
-    SHA1_Init(&mC);
+    m_ctx = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(m_ctx, EVP_sha1(), nullptr);
+}
+
+Sha1Hash::Sha1Hash(const Sha1Hash& other) : Sha1Hash()  // copy
+{
+    EVP_MD_CTX_copy_ex(m_ctx, other.m_ctx);
+    std::memcpy(m_digest, other.m_digest, SHA_DIGEST_LENGTH);
+}
+
+Sha1Hash::Sha1Hash(Sha1Hash&& other) : Sha1Hash()       // move
+{
+    swap(other);
+}
+
+Sha1Hash& Sha1Hash::operator=(Sha1Hash other)           // assign
+{
+    swap(other);
+    return *this;
 }
 
 Sha1Hash::~Sha1Hash()
 {
-    SHA1_Init(&mC);
+    EVP_MD_CTX_free(m_ctx);
+}
+
+void Sha1Hash::swap(Sha1Hash& other) throw()
+{
+    std::swap(m_ctx, other.m_ctx);
+    std::swap(m_digest, other.m_digest);
 }
 
 void Sha1Hash::UpdateData(uint8 const* dta, int len)
 {
-    SHA1_Update(&mC, dta, len);
+    EVP_DigestUpdate(m_ctx, dta, len);
 }
 
 void Sha1Hash::UpdateData(std::vector<uint8> const& data)
 {
-    SHA1_Update(&mC, data.data(), data.size());
+    UpdateData(data.data(), data.size());
 }
 
 void Sha1Hash::UpdateData(std::string const& str)
@@ -62,10 +86,11 @@ void Sha1Hash::UpdateBigNumbers(BigNumber* bn0, ...)
 
 void Sha1Hash::Initialize()
 {
-    SHA1_Init(&mC);
+    EVP_DigestInit(m_ctx, EVP_sha1());
 }
 
 void Sha1Hash::Finalize(void)
 {
-    SHA1_Final(mDigest, &mC);
+    uint32 length = SHA_DIGEST_LENGTH;
+    EVP_DigestFinal_ex(m_ctx, m_digest, &length);
 }

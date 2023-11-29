@@ -36,6 +36,9 @@
 #include "migrations_list.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
+#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+#include <openssl/provider.h>
+#endif
 
 #include <ace/Get_Opt.h>
 #include <ace/Dev_Poll_Reactor.h>
@@ -214,6 +217,23 @@ extern int main(int argc, char **argv)
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
+
+#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+    // Load OpenSSL 3.0+ providers
+    OSSL_PROVIDER* openssl_legacy = OSSL_PROVIDER_load(nullptr, "legacy");
+    if (!openssl_legacy)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "OpenSSL3: Failed to load Legacy provider");
+        return 1;
+    }
+    OSSL_PROVIDER* openssl_default = OSSL_PROVIDER_load(nullptr, "default");
+    if (!openssl_default)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "OpenSSL3: Failed to load Default provider");
+        OSSL_PROVIDER_unload(openssl_legacy);
+        return 1;
+    }
+#endif
 
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using ACE: %s", ACE_VERSION);
 
