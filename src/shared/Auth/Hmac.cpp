@@ -84,7 +84,7 @@ void HmacHash::Finalize()
 uint8* HmacHash::ComputeHash(BigNumber* bn)
 {
     auto byteArray = bn->AsByteArray();
-    UpdateData(m_ctx, byteArray.data(), byteArray.size());
+    UpdateData(byteArray.data(), byteArray.size());
     Finalize();
     return (uint8*)m_digest;
 }

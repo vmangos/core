@@ -90,7 +90,7 @@ void HMACSHA1::Finalize()
 uint8* HMACSHA1::ComputeHash(BigNumber* bn)
 {
     auto byteArray = bn->AsByteArray();
-    UpdateData(m_ctx, byteArray.data(), byteArray.size());
+    UpdateData(byteArray.data(), byteArray.size());
     Finalize();
     return (uint8*)m_digest;
 }
