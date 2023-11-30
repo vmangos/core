@@ -50,7 +50,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/burning_steppes.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/arena_challenge_ai.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/blackrock_depths.cpp
-    eastern_kingdoms/burning_steppes/blackrock_depths/boss_ambassador_flamelash.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_anubshiah.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_emperor_dagran_thaurissan.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_general_angerforge.cpp

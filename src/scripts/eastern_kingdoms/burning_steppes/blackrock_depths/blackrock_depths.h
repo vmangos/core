@@ -58,7 +58,8 @@ enum
 
     DATA_ARENA_CHALLENGER      = 42,
 
-    MAX_ENCOUNTER              = 20,
+    TYPE_FLAMELASH             = 43,
+    MAX_ENCOUNTER              = 21,
 
     EVENT_BAR_PATRONS          = 100,
 
@@ -101,6 +102,8 @@ enum
     GO_JAIL_DOOR_SHILL         = 170569,
 
     // Ambassador Flamelash
+    NPC_FLAMELASH              = 9156,
+    NPC_BURNING_SPIRIT         = 9178,
     GO_DWARF_RUNE_A01          = 170578,
     GO_DWARF_RUNE_B01          = 170579,
     GO_DWARF_RUNE_C01          = 170580,
@@ -108,6 +111,8 @@ enum
     GO_DWARF_RUNE_E01          = 170582,
     GO_DWARF_RUNE_F01          = 170583,
     GO_DWARF_RUNE_G01          = 170584,
+    DWARF_RUNES_MAX            = 7,
+    BURNING_SPIRIT_MAX         = 30, // What is a good maximum and should there be any?
 
     // Grim Guzzler
     NPC_PLUGGER_SPAZZRING      = 9499,
