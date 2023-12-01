@@ -3053,8 +3053,7 @@ bool Creature::IsInEvadeMode() const
 
 bool Creature::HasSpell(uint32 spellId) const
 {
-    uint8 i;
-    for (i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
         if (spellId == m_spells[i])
             return true;
     return false;
