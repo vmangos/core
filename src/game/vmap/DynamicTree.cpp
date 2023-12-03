@@ -186,7 +186,7 @@ struct DynamicTreeIntersectionCallback_WithLogger
 struct DynamicTreeIntersectionCallback_findCollisionObject
 {
     bool did_hit;
-    const GameObjectModel* hitObj;
+    GameObjectModel const* hitObj;
     DynamicTreeIntersectionCallback_findCollisionObject() : did_hit(false), hitObj(nullptr) {}
     bool operator()(const G3D::Ray& r, const GameObjectModel &obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
@@ -301,11 +301,11 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist) 
     return -G3D::inf();
 }
 
-const GameObjectModel* DynamicMapTree::getObjectHit(Vector3 const& pPos1, Vector3 const& pPos2) const
+GameObjectModel const* DynamicMapTree::getObjectHit(Vector3 const& pPos1, Vector3 const& pPos2) const
 {
     float distance = (pPos2 - pPos1).magnitude();
-    const Vector3 dir = (pPos2 - pPos1) / distance;
-    const G3D::Ray ray(pPos1, dir);
+    Vector3 const dir = (pPos2 - pPos1) / distance;
+    G3D::Ray const ray(pPos1, dir);
 
     DynamicTreeIntersectionCallback_findCollisionObject callback;
     impl.intersectRay(ray, callback, distance, pPos2, false);
