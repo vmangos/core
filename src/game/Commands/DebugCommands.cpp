@@ -1662,7 +1662,7 @@ bool ChatHandler::HandleDebugLoSCommand(char*)
     else
         PSendSysMessage("* Collision with static object at '%s' [%f %f %f]", spawn->name.c_str(), spawn->iPos.x, spawn->iPos.y, spawn->iPos.z);
 
-    const GameObjectModel* dynObj = m_session->GetPlayer()->GetMap()->FindDynamicObjectCollisionModel(x0, y0, z0, x1, y1, z1);
+    GameObjectModel const* dynObj = m_session->GetPlayer()->GetMap()->FindDynamicObjectCollisionModel(x0, y0, z0, x1, y1, z1);
 
     if (!dynObj)
         SendSysMessage("* No collision with dynamic objects found.");

@@ -188,7 +188,7 @@ struct DynamicTreeIntersectionCallback_findCollisionObject
     bool did_hit;
     GameObjectModel const* hitObj;
     DynamicTreeIntersectionCallback_findCollisionObject() : did_hit(false), hitObj(nullptr) {}
-    bool operator()(const G3D::Ray& r, const GameObjectModel &obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
+    bool operator()(G3D::Ray const &r, GameObjectModel const &obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
         bool hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
         if (hit)
