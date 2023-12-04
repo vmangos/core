@@ -7305,6 +7305,7 @@ void Unit::SetDeathState(DeathState s)
     }
 
     m_deathState = s;
+
     if (s == JUST_DIED)
     {
         if (!m_ComboPointHolders.empty())
@@ -7342,11 +7343,6 @@ void Unit::SetDeathState(DeathState s)
     else if (s == JUST_ALIVED || s == ALIVE)
     {
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);  // clear skinnable for creature and player (at battleground)
-    }
-
-    if (m_deathState != ALIVE && s == ALIVE)
-    {
-        //_ApplyAllAuraMods();
     }
 }
 
