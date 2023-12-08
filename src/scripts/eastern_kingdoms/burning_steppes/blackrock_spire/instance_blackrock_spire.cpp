@@ -947,56 +947,6 @@ GameObjectAI* GetAIgo_father_flame(GameObject *pGo)
     return new go_father_flameAI(pGo);
 }
 
-struct npc_solakar_triggerAI : public ScriptedAI
-{
-    npc_solakar_triggerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        instance = (instance_blackrock_spire*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* instance;
-
-    void Reset() override
-    {
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!instance)
-            return;
-
-        if (who->GetTypeId() == TYPEID_UNIT && m_creature->IsWithinDistInMap(who, 5.0f) && instance->GetData(TYPE_SOLAKAR) == IN_PROGRESS)
-        {
-            Creature* CreaGuardian = m_creature->FindNearestCreature(10258, 5.0f); // NPC_ROOKERY_GUARDIAN = 10258
-            Creature* CreaHatcher = m_creature->FindNearestCreature(10683, 5.0f); // NPC_ROOKERY_HATCHER = 10683
-            if (CreaGuardian || CreaHatcher)
-            {
-                instance->SetData(TYPE_SOLAKAR, SPECIAL);
-
-                std::list<Creature*> listHatcher;
-                GetCreatureListWithEntryInGrid(listHatcher, m_creature, 10683, 10.0f);
-                for (std::list<Creature*>::const_iterator itr = listHatcher.begin(); itr != listHatcher.end(); ++itr)
-                {
-                    if (listHatcher.empty())
-                        break;
-                    if (!(*itr)->IsAlive())
-                        continue;
-
-                    (*itr)->AI()->EnterEvadeMode();
-                }
-                listHatcher.clear();
-            }
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_solakar_trigger(Creature* pCreature)
-{
-    return new npc_solakar_triggerAI(pCreature);
-}
-
 /****************************************
 ** Rookery Hatcher npc_rookery_hatcher **
 ****************************************/
@@ -1062,13 +1012,14 @@ struct npc_rookery_hatcherAI : public ScriptedAI
             if (uiHatchedEgg < uiMaxHatchedEgg)
             {
                 (*itr)->SetLootState(GO_JUST_DEACTIVATED);
+
+                Creature* pWhelp = m_creature->SummonCreature(10161, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
                 if (m_pInstance->GetData(TYPE_SOLAKAR) == SPECIAL)
                 {
-                    m_creature->SummonCreature(160015, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
+                    if (pWhelp)
+                        pWhelp->SetInCombatWithZone(true);
                     uiMaxHatchedEgg = 24;
                 }
-                else
-                    m_creature->SummonCreature(10161, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
 
                 uiHatchedEgg++;
             }
@@ -1131,57 +1082,6 @@ CreatureAI* GetAI_npc_rookery_hatcher(Creature* pCreature)
     return new npc_rookery_hatcherAI(pCreature);
 }
 
-/*struct go_rookey_eggAI : public GameObjectAI
-{
-    go_rookey_eggAI(GameObject* pGo) : GameObjectAI(pGo) {}
-
-    bool OnUse(Unit* pUser)
-    {
-        if (me->isSpawned())
-        {
-            me->SetLootState(GO_JUST_DEACTIVATED);
-            float x,y,z;
-            me->GetPosition(x,y,z);
-            ((Creature *)pUser)->SummonCreature(160015, x, y, z, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
-        }
-    }
-
-    void SummonWelp()
-    {
-        Map::PlayerList const &liste = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-        {
-            if (me->GetDistance(i->getSource()) <= 4.0f)
-            {
-                me->SetLootState(GO_JUST_DEACTIVATED);
-                float x,y,z;
-                me->GetPosition(x,y,z);
-                i->getSource()->SummonCreature(10161, x, y, z, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
-                Actif = true;
-            }
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff)
-    {
-        if (!Actif && me->isSpawned())
-        {
-            if (CheckTimer <= uiDiff)
-            {
-                SummonWelp();
-                CheckTimer = 500;
-            }
-            else
-                CheckTimer -= uiDiff;
-        }
-    }
-};
-
-GameObjectAI* GetAIgo_rookey_egg(GameObject *pGo)
-{
-    return new go_rookey_eggAI(pGo);
-}*/
-
 bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pPlayer->IsDead())
@@ -1211,11 +1111,6 @@ void AddSC_instance_blackrock_spire()
     pNewScript = new Script;
     pNewScript->Name = "go_father_flame";
     pNewScript->GOGetAI = &GetAIgo_father_flame;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_solakar_trigger";
-    pNewScript->GetAI = &GetAI_npc_solakar_trigger;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;

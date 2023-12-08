@@ -38,6 +38,7 @@ class DynamicMapTree
         bool getIntersectionTime(G3D::Ray const& ray, G3D::Vector3 const& endPos, float& maxDist) const;
         bool getObjectHitPos(G3D::Vector3 const& pPos1, G3D::Vector3 const& pPos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
         bool getObjectHitPos(float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float pModifyDist) const;
+        GameObjectModel const* getObjectHit(G3D::Vector3 const& pPos1, G3D::Vector3 const& pPos2) const;
         float getHeight(float x, float y, float z, float maxSearchDist) const;
 
         void insert(GameObjectModel const&);
