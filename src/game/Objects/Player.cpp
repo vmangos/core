@@ -5549,10 +5549,13 @@ float Player::GetMeleeCritFromAgility() const
     switch (GetClass())
     {
         case CLASS_PALADIN:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
+        case CLASS_SHAMAN: // Vanilla Reforged - Shaman and Druid scaling changes
+            valLevel1 = 2.2f;
+            valLevel60 = 29.0f;
+            break;
+        case CLASS_DRUID: // Vanilla Reforged - Shaman and Druid scaling changes
+            valLevel1 = 2.2f;
+            valLevel60 = 29.0f;
             break;
         case CLASS_MAGE:
             valLevel1 = 12.9f;
@@ -5593,10 +5596,13 @@ float Player::GetDodgeFromAgility() const
     switch (GetClass())
     {
         case CLASS_PALADIN:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
+        case CLASS_SHAMAN: // Vanilla Reforged - Shaman and Druid scaling changes
+            valLevel1 = 1.1f;
+            valLevel60 = 14.5f;
+            break;
+        case CLASS_DRUID:// Vanilla Reforged - Shaman and Druid scaling changes
+            valLevel1 = 1.1f;
+            valLevel60 = 14.5f;
             break;
         case CLASS_MAGE:
             valLevel1 = 12.9f;

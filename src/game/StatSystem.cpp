@@ -242,7 +242,7 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 val2 = level * 2.0f + strength + agility - 20.0f;
                 break;
             case CLASS_SHAMAN:
-                val2 = level * 2.0f + strength * 2.0f    - 20.0f;
+                val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
                 break;
             case CLASS_DRUID:
             {
@@ -275,17 +275,17 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 switch (form)
                 {
                     case FORM_CAT:
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f + agility - 20.0f;
+                        val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
                         break;
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f - 20.0f;
+                        val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
                         break;
                     case FORM_MOONKIN:
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f - 20.0f;
+                        val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
                         break;
                     default:
-                        val2 = strength * 2.0f - 20.0f;
+                        val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
                         break;
                 }
                 break;
@@ -494,10 +494,10 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
 
     float value = GetTotalPercentageModValue(modGroup);
     switch (GetClass())
-    {
+    {   /* Vanilla Reforged - Shaman and Druid scaling changes
         case CLASS_DRUID:
             value += 0.9f;
-            break;
+            break; */
         case CLASS_MAGE:
             value += 3.2f;
             break;
@@ -507,9 +507,10 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
         case CLASS_PRIEST:
             value += 3.0f;
             break;
+        /* Vanilla Reforged - Shaman and Druid scaling changes
         case CLASS_SHAMAN:
             value += 1.7f;
-            break;
+            break; */
         case CLASS_WARLOCK:
             value += 2.0f;
             break;
@@ -555,10 +556,10 @@ void Player::UpdateDodgePercentage()
     // Nostalrius : base dodge per class
     float value = 0.0f;
     switch (GetClass())
-    {
+    {   /* Vanilla Reforged - Shaman and Druid scaling changes
         case CLASS_DRUID:
             value += 0.9f;
-            break;
+            break; */
         case CLASS_MAGE:
             value += 3.2f;
             break;
@@ -568,9 +569,10 @@ void Player::UpdateDodgePercentage()
         case CLASS_PRIEST:
             value += 3.0f;
             break;
+        /* Vanilla Reforged - Shaman and Druid scaling changes
         case CLASS_SHAMAN:
             value += 1.7f;
-            break;
+            break; */
         case CLASS_WARLOCK:
             value += 2.0f;
             break;
