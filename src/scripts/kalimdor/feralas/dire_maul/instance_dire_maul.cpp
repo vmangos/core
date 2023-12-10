@@ -926,6 +926,7 @@ enum
     GOSSIP_MENU_1               = 6795,
     GOSSIP_MENU_2               = 6883,
 
+    GO_KNOTS_CACHE              = 179501,
     GO_KNOTS_BALL_AND_CHAIN     = 179511,
 };
 
@@ -1042,6 +1043,11 @@ bool QuestRewarded_npc_knot_thimblejack(Player* pPlayer, Creature* pCreature, Qu
             {
                 if (GameObject* pGo = pCreature->FindNearestGameObject(GO_KNOTS_BALL_AND_CHAIN, 20.0f))
                     pGo->Delete();
+                if (GameObject* pGo_2 = pCreature->FindNearestGameObject(GO_KNOTS_CACHE, 20.0f))
+                {
+                    pPlayer->SummonGameObject(GO_KNOTS_CACHE, pGo_2->GetPositionX(), pGo_2->GetPositionY(), pGo_2->GetPositionZ(), 0.0f, 0, 0, 0, 0, 43200);
+                    pGo_2->Delete();
+                }
                 pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 //pCreature->SetActiveObjectState(true);
                 pCreature->GetMotionMaster()->MovePoint(1, 518.325f, 542.00f, -23.901f);
