@@ -495,9 +495,6 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Percent shadow damage mod: %g", pPlayer->GetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Percent arcane damage mod: %g", pPlayer->GetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + SPELL_SCHOOL_ARCANE));
 
-    PSendSysMessage("Melee hit mod: %g", pPlayer->m_modMeleeHitChance);
-    PSendSysMessage("Ranged hit mod: %g", pPlayer->m_modRangedHitChance);
-    PSendSysMessage("Spell hit mod: %g", pPlayer->m_modSpellHitChance);
     return true;
 }
 
