@@ -27,7 +27,7 @@
 #include "ObjectGuid.h"
 #include "GroupReference.h"
 #include "GroupRefManager.h"
-#include "BattleGround.h"
+#include "BattleGroundDefines.h"
 #include "LootMgr.h"
 #include "LFGMgr.h"
 #include "DBCEnums.h"

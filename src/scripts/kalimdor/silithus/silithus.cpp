@@ -703,9 +703,9 @@ enum
     NPC_COLOSSUS_REGAL              = 15741,
     NPC_COLOSSUS_ASHI               = 15742,
 
-    TEXT_COLOSSUS_ASHI = -1000009,
-    TEXT_COLOSSUS_REGAL = -1000016,
-    TEXT_COLOSSUS_ZORA = -1000017,
+    TEXT_COLOSSUS_REGAL = 11424,
+    TEXT_COLOSSUS_ZORA = 11425,
+    TEXT_COLOSSUS_ASHI = 11426,
 };
 
 struct npc_colossusAI : public ScriptedAI
@@ -727,7 +727,7 @@ struct npc_colossusAI : public ScriptedAI
         }
 
         if (text)
-            m_creature->MonsterScriptToZone(text, CHAT_MSG_MONSTER_EMOTE);
+            DoScriptText(text, m_creature);
 
         Reset();
     }
@@ -2132,20 +2132,20 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         m_uiEventTimer = 15000;
                         break;
                     case 40:
-                        m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, ITEM_SCEPTER_OF_THE_SHIFTING_SANDS);
+                        m_creature->SetVirtualItem(BASE_ATTACK, ITEM_SCEPTER_OF_THE_SHIFTING_SANDS);
                         if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
                             DoScriptText(EMOTE_ANACHRONOS_SCEPTER, m_creature, pFandral);
                         m_uiEventTimer = 1500;
                         break;
                     case 41:
-                        m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
+                        m_creature->SetVirtualItem(BASE_ATTACK, 0);
                         m_creature->HandleEmote(EMOTE_ONESHOT_BEG);
                         m_uiEventTimer = 1500;
                         break;
                     case 42:
                         if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
                         {
-                            pFandral->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, ITEM_SCEPTER_OF_THE_SHIFTING_SANDS);
+                            pFandral->SetVirtualItem(BASE_ATTACK, ITEM_SCEPTER_OF_THE_SHIFTING_SANDS);
                             pFandral->SetStandState(UNIT_STAND_STATE_STAND);
                             DoScriptText(SAY_FANDRAL_EPILOGUE_4, pFandral);
                         }
@@ -2161,7 +2161,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         {
                             pFandral->CastSpell(pFandral, SPELL_SHATTER_HAMMER, false);
                             DoScriptText(EMOTE_FANDRAL_SHATTER, pFandral);
-                            pFandral->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
+                            pFandral->SetVirtualItem(BASE_ATTACK, 0);
                         }
                         m_uiEventTimer = 3000;
                         break;

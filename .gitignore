@@ -31,8 +31,7 @@ CMakeSettings.json
 /out/
 
 # CLion files
-cmake-build-debug
-cmake-build-release
+cmake-build-*
 
 #
 # Top-level generic files

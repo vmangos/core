@@ -309,13 +309,24 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recv_data)
 void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     recv_data >> guid;
+#else
+    std::string name;
+    recv_data >> name;
+#endif
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     Player* player = sObjectMgr.GetPlayer(guid);
+#else
+    Player* player = sObjectMgr.GetPlayer(name.c_str());
+    if (player)
+        guid = player->GetObjectGuid();
+#endif
 
     /** error handling **/
     if (!player || !group->IsLeader(GetPlayer()->GetObjectGuid()) || player->GetGroup() != group)
@@ -575,7 +586,12 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     uint8 flag;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     recv_data >> guid;
+#else
+    std::string name;
+    recv_data >> name;
+#endif
     recv_data >> flag;
 
     Group* group = GetPlayer()->GetGroup();
@@ -586,6 +602,13 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
     if (!group->IsLeader(GetPlayer()->GetObjectGuid()))
         return;
     /********************/
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
+    if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
+        guid = player->GetObjectGuid();
+    else
+        return;
+#endif
 
     // everything is fine, do it
     group->SetAssistant(guid, (flag != 0));

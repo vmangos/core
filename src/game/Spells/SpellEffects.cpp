@@ -94,7 +94,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectLearnSpell,                               // 36 SPELL_EFFECT_LEARN_SPELL
     &Spell::EffectEmpty,                                    // 37 SPELL_EFFECT_SPELL_DEFENSE            one spell: SPELLDEFENSE (DND)
     &Spell::EffectDispel,                                   // 38 SPELL_EFFECT_DISPEL
-    &Spell::EffectEmpty,                                    // 39 SPELL_EFFECT_LANGUAGE                 misc store lang id
+    &Spell::EffectLanguage,                                 // 39 SPELL_EFFECT_LANGUAGE                 misc store lang id
     &Spell::EffectDualWield,                                // 40 SPELL_EFFECT_DUAL_WIELD
     &Spell::EffectSummonWild,                               // 41 SPELL_EFFECT_SUMMON_WILD
     &Spell::EffectSummonGuardian,                           // 42 SPELL_EFFECT_SUMMON_GUARDIAN
@@ -257,7 +257,7 @@ void Spell::EffectResurrectNew(SpellEffectIndex effIdx)
 
     uint32 health = damage;
     uint32 mana = m_spellInfo->EffectMiscValue[effIdx];
-    pTarget->SetResurrectRequestData(m_caster->GetObjectGuid(), m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), health, mana);
+    pTarget->SetResurrectRequestData(m_caster->GetObjectGuid(), m_caster->GetMapId(), m_caster->GetInstanceId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), m_caster->GetOrientation(), health, mana);
     SendResurrectRequest(pTarget, m_casterUnit && m_casterUnit->IsSpiritHealer());
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
@@ -1415,7 +1415,10 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     return;
                 case 23725:                                 // Gift of Life (warrior bwl trinket)
                     if (m_casterUnit)
-                        m_casterUnit->CastSpell(m_casterUnit, 23782, true);
+                    {
+                        int32 LifegivingGemHealthMod = int32(m_casterUnit->GetMaxHealth() * 0.15);
+                        m_casterUnit->CastCustomSpell(m_casterUnit, 23782, LifegivingGemHealthMod, {}, {}, true, nullptr);
+                    }
                     return;
                 case 24781:                                 // Dream Fog
                 {
@@ -1870,6 +1873,41 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
                     int32 reductionMod = unitTarget->HasAura(9634) ? -16 : -27;
                     unitTarget->CastCustomSpell(unitTarget, 25503, reductionMod, {}, {}, true);
+                    break;
+                }
+#endif
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+                // Ferocious Bite
+                case 22568: // Rank 1
+                case 22827: // Rank 2
+                case 22828: // Rank 3
+                case 22829: // Rank 4
+                {
+                    if (!m_casterUnit || !unitTarget)
+                        return;
+
+                    uint32 damageSpellId;
+                    switch (m_spellInfo->Id)
+                    {
+                        case 22568: // Rank 1
+                            damageSpellId = 22851;
+                            break;
+                        case 22827: // Rank 2
+                            damageSpellId = 22853;
+                            break;
+                        case 22828: // Rank 3
+                            damageSpellId = 22861;
+                            break;
+                        case 22829: // Rank 4
+                            damageSpellId = 22862;
+                            break;
+                        default:
+                            return;
+                    }
+
+                    int32 dmg = m_casterUnit->GetPower(POWER_ENERGY) * m_spellInfo->DmgMultiplier[effIdx];
+                    m_casterUnit->CastCustomSpell(unitTarget, damageSpellId, dmg, {}, {}, true);
+                    m_casterUnit->SetPower(POWER_ENERGY, 0);
                     break;
                 }
 #endif
@@ -2858,7 +2896,10 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
 
     // mark item as unlocked
     if (itemTarget)
+    {
         itemTarget->SetFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNLOCKED);
+        itemTarget->SetState(ITEM_CHANGED);
+    }
 
     SendLoot(guid, LOOT_SKINNING, LockType(m_spellInfo->EffectMiscValue[effIdx]));
 
@@ -3307,6 +3348,15 @@ void Spell::EffectDispel(SpellEffectIndex effIdx)
     }
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
+}
+
+void Spell::EffectLanguage(SpellEffectIndex effIdx)
+{
+    Player* pPlayer = ToPlayer(unitTarget);
+    if (!pPlayer)
+        return;
+
+    pPlayer->LearnLanguage(m_spellInfo->EffectMiscValue[effIdx]);
 }
 
 void Spell::EffectDualWield(SpellEffectIndex /*effIdx*/)
@@ -4163,7 +4213,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
         }
 
         m_casterUnit->SendAttackStateUpdate(&damageInfo);
-        m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.attackType));
+        m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
         m_casterUnit->DealMeleeDamage(&damageInfo, true);
 
         // if damage unitTarget call AI reaction
@@ -4661,6 +4711,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 }
                 case 24590:                                 // Brittle Armor - need remove one 24575 Brittle Armor aura
                     unitTarget->RemoveAuraHolderFromStack(24575);
+                    return;
+                case 24660:                                 // Zandalarian Hero Charm - Unstable Power
+                    unitTarget->RemoveAuraHolderFromStack(24659);
                     return;
                 case 24693:                                 // Hakkar Power Down - cast by priests on death
                 {
@@ -5225,12 +5278,16 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     }
                     return;
                 }
-                case 29710:
+                case 28732: // Naxxramas Worshipper - Widow's Embrace
+                {
+                    if (m_casterUnit && m_casterUnit->IsAlive())
+                        m_casterUnit->Kill(m_casterUnit, nullptr);
+                    return;
+                }
+                case 29710: // Test Ribbon Pole Channel Trigger
                 {
                     if (Player* pPlayerTarget = ToPlayer(unitTarget))
-                    {
                         pPlayerTarget->CastSpell(pPlayerTarget, PickRandomValue(29705, 29726, 29727), false);
-                    }
                     return;
                 }
                 case 30882: // EPL PvP A Game of Towers: Tower Capture Test (DND)
@@ -5253,7 +5310,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 {
                     if (Player* pTarget = ToPlayer(unitTarget))
                         pTarget->CastSpell(pTarget, 32061, true);
-
                     return;
                 }
             }
@@ -6150,7 +6206,7 @@ void Spell::EffectResurrect(SpellEffectIndex effIdx)
     uint32 health = ditheru(pTarget->GetMaxHealth() * damage / 100);
     uint32 mana   = ditheru(pTarget->GetMaxPower(POWER_MANA) * damage / 100);
 
-    pTarget->SetResurrectRequestData(m_caster->GetObjectGuid(), m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), health, mana);
+    pTarget->SetResurrectRequestData(m_caster->GetObjectGuid(), m_caster->GetMapId(), m_caster->GetInstanceId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), m_caster->GetOrientation(), health, mana);
     SendResurrectRequest(pTarget, m_casterUnit && m_casterUnit->IsSpiritHealer());
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
@@ -6454,12 +6510,7 @@ void Spell::EffectDispelMechanic(SpellEffectIndex effIdx)
         next = iter;
         ++next;
         SpellEntry const* spell = iter->second->GetSpellProto();
-
-        // World of Warcraft Client Patch 1.7.0 (2005-09-13)
-        // - Escape Artist works with Frost Nova and Frost Trap again.
-        if (iter->second->HasMechanic(mechanic) &&
-            // attribute removed from Frost Nova in 1.7, which likely means this effect ignores it
-           !spell->HasAttribute(SPELL_ATTR_NO_AURA_CANCEL))
+        if (iter->second->HasMechanic(mechanic))
         {
             unitTarget->RemoveAurasDueToSpell(spell->Id);
             if (Auras.empty())

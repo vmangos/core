@@ -205,7 +205,7 @@ class BattleGroundAB : public BattleGround
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
         void RemovePlayer(Player* player, ObjectGuid guid);
-        void HandleAreaTrigger(Player* source, uint32 trigger);
+        bool HandleAreaTrigger(Player* source, uint32 trigger);
         virtual bool SetupBattleGround();
         virtual void Reset();
         void EndBattleGround(Team winner);

@@ -25,6 +25,7 @@
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include <shared_mutex>
 
 class SocialMgr;
 class PlayerSocial;
@@ -157,7 +158,7 @@ class SocialMgr
     private:
         SocialMap m_socialMap;
 
-        std::mutex _socialMapLock;
+        std::shared_timed_mutex _socialMapLock;
 };
 
 #define sSocialMgr MaNGOS::Singleton<SocialMgr>::Instance()

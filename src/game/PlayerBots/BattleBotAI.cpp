@@ -16,6 +16,7 @@
 
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
+#include "BattleGround.h"
 #include "Player.h"
 #include "Group.h"
 #include "CreatureAI.h"
@@ -70,6 +71,8 @@ enum BattleBotSpells
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
+#define GO_WSG_SILVERWING_FLAG 179830
+#define GO_WSG_WARSONG_FLAG 179831
 
 uint32 BattleBotAI::GetMountSpellId() const
 {
@@ -259,8 +262,20 @@ bool BattleBotAI::AttackStart(Unit* pVictim)
     return false;
 }
 
+bool BattleBotAI::ShouldIgnoreCombat() const
+{
+    if (m_battlegroundId == BATTLEGROUND_QUEUE_WS && !me->IsRooted() &&
+       (me->HasAura(AURA_SILVERWING_FLAG) || me->HasAura(AURA_WARSONG_FLAG)))
+        return true;
+    return false;
+}
+
 Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
 {
+    // Ignore attackers while carrying flag, just keep running.
+    if (ShouldIgnoreCombat())
+        return nullptr;
+
     // 1. Check units we are currently in combat with.
 
     std::list<Unit*> targets;
@@ -463,11 +478,17 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
             uint8 ended = *((uint8*)(*packet).contents());
             if (ended)
             {
-                std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_LEAVE_BATTLEFIELD);
+                // Temporary battlebots are removed after bg ends.
+                if (m_temporary)
+                    botEntry->requestRemoval = true;
+                else
+                {
+                    std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_LEAVE_BATTLEFIELD);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                *data << uint32(me->GetMapId());
+                    *data << uint32(me->GetMapId());
 #endif
-                me->GetSession()->QueuePacket(std::move(data));
+                    me->GetSession()->QueuePacket(std::move(data));
+                }
             }
             return;
         }
@@ -492,9 +513,6 @@ void BattleBotAI::UpdateWaypointMovement()
         return;
 
     if (!me->IsStopped())
-        return;
-
-    if (me->IsInCombat())
         return;
 
     if (me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
@@ -864,6 +882,12 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
+    if (ShouldIgnoreCombat())
+    {
+        UpdateWaypointMovement();
+        return;
+    }
+
     if (!pVictim || !IsValidHostileTarget(pVictim) || 
         !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
     {
@@ -877,7 +901,8 @@ void BattleBotAI::UpdateAI(uint32 const diff)
            (me != me->GetVictim()->GetVictim()))
         {
             me->AttackStop(false);
-            StopMoving();
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+                StopMoving();
             return;
         }
     }
@@ -910,10 +935,23 @@ void BattleBotAI::UpdateBattleGroundAI()
     {
         case BATTLEGROUND_WS:
         {
+            // Pick up dropped flags.
             if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_DROPPED_SILVERWING_FLAG, INTERACTION_DISTANCE))
                 pGo->Use(me);
             if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_DROPPED_WARSONG_FLAG, INTERACTION_DISTANCE))
                 pGo->Use(me);
+
+            // Pick up stationary flags from bases.
+            if (me->GetTeam() == HORDE)
+            {
+                if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_SILVERWING_FLAG, INTERACTION_DISTANCE))
+                    pGo->Use(me);
+            }
+            else
+            {
+                if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_WARSONG_FLAG, INTERACTION_DISTANCE))
+                    pGo->Use(me);
+            }
             break;
         }
     }

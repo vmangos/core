@@ -767,6 +767,19 @@ uint16 SpellEntry::GetAuraMaxTicks() const
     return 6;
 }
 
+uint32 SpellEntry::GetRank() const
+{
+    if (Rank[0].length() > 5 &&
+        Rank[0][0] == 'R' &&
+        Rank[0][1] == 'a' &&
+        Rank[0][2] == 'n' &&
+        Rank[0][3] == 'k' &&
+        Rank[0][4] == ' ')
+        return strtoul(Rank[0].c_str() + 5, NULL, 10);
+
+    return 0;
+}
+
 bool SpellEntry::IsPositiveSpell(WorldObject const* caster, WorldObject const* victim) const
 {
     if (Attributes & SPELL_ATTR_AURA_IS_DEBUFF)

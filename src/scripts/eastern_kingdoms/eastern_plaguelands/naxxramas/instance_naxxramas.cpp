@@ -392,9 +392,6 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             if (m_auiEncounter[TYPE_GOTHIK] != IN_PROGRESS)
                 m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
-        case NPC_ArchmageTarsis:
-            pCreature->SetStandState(UNIT_STAND_STATE_DEAD);
-            break;
         case NPC_SewageSlime:
             pCreature->SetWanderDistance(30.0f);
             break;
@@ -1772,13 +1769,6 @@ CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
     return new mob_dark_touched_warriorAI(pCreature);
 }
 
-bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->GetStandState() != UNIT_STAND_STATE_SIT)
-        pCreature->SetStandState(UNIT_STAND_STATE_SIT);
-    return false;
-}
-
 enum OmarionMisc
 {
     QUEST_OMARIONS_HANDBOOK = 9233,
@@ -2083,11 +2073,6 @@ void AddSC_instance_naxxramas()
     pNewScript = new Script;
     pNewScript->Name = "dark_touched_warriorAI";
     pNewScript->GetAI = &GetAI_dark_touched_warrior;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_archmage_tarsis";
-    pNewScript->pGossipHello = &GossipHello_npc_ArchmageTarsis;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;

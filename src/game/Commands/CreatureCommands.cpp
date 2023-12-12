@@ -1157,13 +1157,13 @@ bool ChatHandler::HandleNpcAddWeaponCommand(char* args)
         return true;
     }
 
-    if (uiSlotId > VIRTUAL_ITEM_SLOT_2)
+    if (uiSlotId > RANGED_ATTACK)
     {
         PSendSysMessage(LANG_ITEM_SLOT_NOT_EXIST, uiSlotId);
         return true;
     }
 
-    pCreature->SetVirtualItem(VirtualItemSlot(uiSlotId), uiItemId);
+    pCreature->SetVirtualItem(WeaponAttackType(uiSlotId), uiItemId);
     PSendSysMessage(LANG_ITEM_ADDED_TO_SLOT, uiItemId, pItemProto->Name1, uiSlotId);
 
     return true;

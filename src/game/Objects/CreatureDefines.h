@@ -116,13 +116,13 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_CRUSH                     = 0x00000020, // 32       Creature can't do crush attacks
     CREATURE_FLAG_EXTRA_FIXED_Z                      = 0x00000040, // 64       Creature does not fall
     CREATURE_FLAG_EXTRA_INVISIBLE                    = 0x00000080, // 128      Creature is always invisible for player (mostly trigger creatures)
-    CREATURE_FLAG_EXTRA_NOT_TAUNTABLE                = 0x00000100, // 256      Creature is immune to taunt auras and effect attack me
+                                                                   // 256      unused
     CREATURE_FLAG_EXTRA_AGGRO_ZONE                   = 0x00000200, // 512      Creature sets itself in combat with zone on aggro
     CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400, // 1024     Creature is a guard
     CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800, // 2048     Creature does not select targets based on threat
     CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000, // 4096     Creature keeps positive auras at reset
     CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000, // 8192     Creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
-    CREATURE_FLAG_EXTRA_IMMUNE_AOE                   = 0x00004000, // 16384    Creature is immune to AoE
+                                                                   // 16384    unused
     CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING         = 0x00008000, // 32768    Creature does not move back when target is within bounding radius
     CREATURE_FLAG_EXTRA_NO_ASSIST                    = 0x00010000, // 65536    Creature does not aggro when nearby creatures aggro
     CREATURE_FLAG_EXTRA_NO_TARGET                    = 0x00020000, // 131072   Creature is passive and does not acquire targets
@@ -138,6 +138,17 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_APPEAR_DEAD                  = 0x08000000, // 134217728 Creature will have UNIT_DYNFLAG_DEAD applied
     CREATURE_FLAG_EXTRA_NO_LEASH_EVADE               = 0x10000000, // 268435456 Creature will not evade due to target running away
     CREATURE_FLAG_EXTRA_DESPAWN_INSTANTLY            = 0x20000000, // 536870912 CREATURE_STATIC_FLAG_DESPAWN_INSTANTLY (despawn on death)
+};
+
+enum CreatureImmunityFlags
+{
+    CREATURE_IMMUNITY_AOE            = 0x01,
+    CREATURE_IMMUNITY_TAUNT          = 0x02, // SPELL_AURA_MOD_TAUNT, SPELL_EFFECT_ATTACK_ME
+    CREATURE_IMMUNITY_MOD_STAT       = 0x04, // SPELL_AURA_MOD_STAT, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE
+    CREATURE_IMMUNITY_MOD_CAST_SPEED = 0x08, // SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK
+    CREATURE_IMMUNITY_DISEASE        = 0x10, // DISPEL_DISEASE
+    CREATURE_IMMUNITY_POISON         = 0x20, // DISPEL_POISON
+    CREATURE_IMMUNITY_CURSE          = 0x40, // DISPEL_CURSE
 };
 
 // Number of spells in one template
@@ -186,18 +197,18 @@ typedef std::vector<CreatureSpellsEntry> CreatureSpellsList;
 struct CreatureInfo
 {
     uint32  entry;
+    char*   name;
+    char*   subname;
+    uint32  level_min;
+    uint32  level_max;
+    uint32  faction;
+    uint32  npc_flags;
+    uint32  gossip_menu_id;
     uint32  display_id[MAX_DISPLAY_IDS_PER_CREATURE];
     float   display_scale[MAX_DISPLAY_IDS_PER_CREATURE];
     uint32  display_probability[MAX_DISPLAY_IDS_PER_CREATURE];
     uint32  display_total_probability;
     uint32  mount_display_id;
-    char*   name;
-    char*   subname;
-    uint32  gossip_menu_id;
-    uint32  level_min;
-    uint32  level_max;
-    uint32  faction;
-    uint32  npc_flags;
     float   speed_walk;
     float   speed_run;
     float   detection_range;                                // Detection Range for Line of Sight aggro
@@ -249,6 +260,7 @@ struct CreatureInfo
     uint32  vendor_id;
     uint32  mechanic_immune_mask;
     uint32  school_immune_mask;
+    uint32  immunity_flags;
     uint32  flags_extra;
     uint32  script_id;
 
@@ -334,6 +346,10 @@ struct CreatureData
             creatureId = 1;
 
         return creatureId;
+    }
+    bool HasCreatureId(uint32 id) const
+    {
+        return std::find(creature_id.begin(), creature_id.end(), id) != creature_id.end();
     }
     uint32 GetCreatureIdCount() const
     {
@@ -433,7 +449,10 @@ enum ChatType
     CHAT_TYPE_BOSS_EMOTE        = 3,
     CHAT_TYPE_WHISPER           = 4,
     CHAT_TYPE_BOSS_WHISPER      = 5,
-    CHAT_TYPE_ZONE_YELL         = 6
+    CHAT_TYPE_ZONE_YELL         = 6,
+    CHAT_TYPE_ZONE_EMOTE        = 7,
+
+    CHAT_TYPE_MAX
 };
 
 // Selection method used by SelectAttackingTarget
@@ -578,13 +597,6 @@ struct TrainerSpellData
 #define CREATURE_Z_ATTACK_RANGE 3
 
 #define MAX_VENDOR_ITEMS 128                                // Limitation in item count field size in SMSG_LIST_INVENTORY
-
-enum VirtualItemSlot
-{
-    VIRTUAL_ITEM_SLOT_0 = 0,
-    VIRTUAL_ITEM_SLOT_1 = 1,
-    VIRTUAL_ITEM_SLOT_2 = 2,
-};
 
 #define MAX_VIRTUAL_ITEM_SLOT 3
 

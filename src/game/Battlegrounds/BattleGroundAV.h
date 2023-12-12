@@ -482,7 +482,7 @@ class BattleGroundAV : public BattleGround
         void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
 
         void RemovePlayer(Player* plr, ObjectGuid guid) override;
-        void HandleAreaTrigger(Player* source, uint32 trigger) override;
+        bool HandleAreaTrigger(Player* source, uint32 trigger) override;
         void Reset() override;
 
         void ResetTamedEvent(uint32 teamIdx);

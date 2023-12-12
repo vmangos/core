@@ -163,8 +163,12 @@ void PlayerMenu::SendGossipMenu(uint32 textId, ObjectGuid objectGuid)
 
     constexpr size_t gossipPartSize =
         sizeof(uint32) + // index
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         sizeof(uint8) + // icon
         sizeof(uint8) + // coded
+#else
+        sizeof(uint32) + // icon
+#endif
         128; // message (average)
 
     constexpr size_t questPartSize =
@@ -182,8 +186,12 @@ void PlayerMenu::SendGossipMenu(uint32 textId, ObjectGuid objectGuid)
     {
         GossipMenuItem const& gItem = mGossipMenu.GetItem(iI);
         data << uint32(iI);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         data << uint8(gItem.m_gIcon);
         data << uint8(gItem.m_gCoded);                      // makes pop up box password
+#else
+        data << uint32(gItem.m_gIcon);
+#endif
         data << gItem.m_gMessage;                           // text for gossip item, max 0x800
     }
 

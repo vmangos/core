@@ -845,6 +845,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Min kills that players must obtain to enter in weekly honor calculation
 #        Default: 0 (auto select based on patch)
 #
+#    RpDecay
+#        Determines the percentage of rank points (RP) decay per week
+#        If set to 0 there will be no decay
+#        Default: 0.2 (20%)
+#
 #    MaintenanceDay
 #        The day of the week on which server maintenance is performed ( currently used for Honor distribution )
 #        range (0..6): 0 is the first day of the week (normally sunday), 6 is the latest
@@ -907,6 +912,10 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Unload the instance map from memory after some time if no players are inside.
 #        Default: 1800000 (miliseconds, i.e 30 minutes)
 #                 0 (instance maps are kept in memory until they are reset)
+#
+#    Instance.PerHourLimit
+#        How many instances players can enter per hour per account.
+#        Default: 5
 #
 #    Item.InstantSaveQuality
 #        Save character inventory instantly on receiving item of this quality or higher.
@@ -1072,6 +1081,7 @@ MaxPlayerLevel = 60
 StartPlayerLevel = 1
 StartPlayerMoney = 0
 MinHonorKills = 0
+RpDecay = 0.2
 MaintenanceDay = 3
 InstantLogout = 1
 ForceLogoutDelay = 0
@@ -1085,6 +1095,7 @@ Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0
 Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
+Instance.PerHourLimit = 5
 Item.InstantSaveQuality = 6
 Item.PreventDataMining = 1
 Quests.LowLevelHideDiff = 4
@@ -2911,6 +2922,11 @@ AHBot.itemcount = 50
 #                 0 (normal starting items)
 #                 2 (premade gear template)
 #
+#    BattleBot.AutoJoin
+#        Adds enough battlebots for battleground to start when a player queues.
+#        Default: 0 - off
+#                 1 - on
+#
 ###################################################################################################################
 RandomBot.Enable = 0
 RandomBot.MinBots = 0
@@ -2928,6 +2944,7 @@ PartyBot.AutoEquip = 1
 PartyBot.RandomGearLevelDifference = 10
 
 BattleBot.AutoEquip = 1
+BattleBot.AutoJoin = 0
 
 ###################################################################################################################
 #    Database-based chat

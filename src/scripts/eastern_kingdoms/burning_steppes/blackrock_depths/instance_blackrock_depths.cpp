@@ -75,6 +75,9 @@ struct instance_blackrock_depths : ScriptedInstance
     uint64 m_uiDwarfRuneE01GUID;
     uint64 m_uiDwarfRuneF01GUID;
     uint64 m_uiDwarfRuneG01GUID;
+    uint64 m_uiFlamelashGUID;
+    uint32 m_uiSpiritTimer[DWARF_RUNES_MAX];
+    GuidList m_burningSpirits;
 
     uint64 m_uiMagmusGUID;
 
@@ -142,6 +145,18 @@ struct instance_blackrock_depths : ScriptedInstance
         m_uiSeethrelGUID = 0;
         m_uiDoomrelGUID = 0;
         m_uiDoperelGUID = 0;
+
+        m_uiDwarfRuneA01GUID = 0;
+        m_uiDwarfRuneB01GUID = 0;
+        m_uiDwarfRuneC01GUID = 0;
+        m_uiDwarfRuneD01GUID = 0;
+        m_uiDwarfRuneE01GUID = 0;
+        m_uiDwarfRuneF01GUID = 0;
+        m_uiDwarfRuneG01GUID = 0;
+        m_uiFlamelashGUID = 0;
+
+        for (uint32 & i : m_uiSpiritTimer)
+            i = 5 * IN_MILLISECONDS;
 
         m_uiMagmusGUID = 0;
 
@@ -328,6 +343,10 @@ struct instance_blackrock_depths : ScriptedInstance
                 break;
             case NPC_GRIMSTONE:
                 m_uiGrimstoneGUID = pCreature->GetGUID();
+                break;
+            case NPC_FLAMELASH:
+                m_uiFlamelashGUID = pCreature->GetGUID();
+                break;
         }
     }
 
@@ -448,6 +467,9 @@ struct instance_blackrock_depths : ScriptedInstance
     {
         switch (pCreature->GetEntry())
         {
+            case NPC_BURNING_SPIRIT:
+                m_burningSpirits.remove(pCreature->GetObjectGuid());
+                break;
             case NPC_SHADOWFORGE_SENATOR:
                 // Emperor Dagran Thaurissan performs a random yell upon the death
                 // of Shadowforge Senators in the Throne Room
@@ -915,6 +937,37 @@ struct instance_blackrock_depths : ScriptedInstance
             case EVENT_BAR_PATRONS:
                 HandleBarPatrons(uiData);
                 break;
+            case TYPE_FLAMELASH:
+                if (uiData == NOT_STARTED || uiData == FAIL || uiData == DONE)
+                {
+                    for (uint8 i = 0; i < DWARF_RUNES_MAX; i++)
+                    {
+                        if (GameObject* pRune = GetGameObject(GetData64(GO_DWARF_RUNE_A01 + i)))
+                            pRune->ResetDoorOrButton();
+                    }
+
+                    for (uint32 & i : m_uiSpiritTimer)
+                        i = 5 * IN_MILLISECONDS;
+
+                    for (const auto& guid : m_burningSpirits)
+                    {
+                        if (Creature* pSummon = GetMap()->GetCreature(guid))
+                            if (!pSummon->IsInCombat() || uiData != DONE)
+                                pSummon->DespawnOrUnsummon();
+                    }
+
+                    m_burningSpirits.clear();
+                }
+                else if (uiData == IN_PROGRESS)
+                {
+                    for (uint8 i = 0; i < DWARF_RUNES_MAX; i++)
+                    {
+                        if (GameObject* pRune = GetGameObject(GetData64(GO_DWARF_RUNE_A01 + i)))
+                            pRune->UseDoorOrButton();
+                    }
+                }
+                m_auiEncounter[20] = uiData;
+                break;
        }
 
         if (uiData == DONE)
@@ -1004,6 +1057,8 @@ struct instance_blackrock_depths : ScriptedInstance
             case GO_JAIL_DOOR_JAZ:    return m_bDoorJazOpened;
             case GO_JAIL_DOOR_SHILL:  return m_bDoorShillOpened;
             case GO_JAIL_DOOR_SUPPLY: return m_bDoorSupplyOpened; 
+            case TYPE_FLAMELASH:
+                return m_auiEncounter[20];
         }
         return 0;
     }
@@ -1136,6 +1191,36 @@ struct instance_blackrock_depths : ScriptedInstance
             }
             else
                 m_uiPatrolTimer -= uiDiff;
+        }
+
+        if (GetData(TYPE_FLAMELASH) == IN_PROGRESS)
+        {
+            for (uint8 i = 0; i < DWARF_RUNES_MAX; i++)
+            {
+                if (m_uiSpiritTimer[i] < uiDiff)
+                {
+                    if (Creature* pFlamelash = GetCreature(m_uiFlamelashGUID))
+                    {
+                        if (GameObject* pRune = GetMap()->GetGameObject(GetData64(GO_DWARF_RUNE_A01 + i)))
+                        {
+                            if (m_burningSpirits.size() < BURNING_SPIRIT_MAX)
+                            {
+                                if (Creature* pSpirit = GetMap()->SummonCreature(NPC_BURNING_SPIRIT, pRune->GetPositionX(), pRune->GetPositionY(), pRune->GetPositionZ(), pRune->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000))
+                                {
+                                    pSpirit->SetWalk(false);
+                                    pSpirit->GetMotionMaster()->MoveFollow(pFlamelash, 0.0f, 0.0f);
+                                    m_burningSpirits.push_back(pSpirit->GetObjectGuid());
+                                }
+                                m_uiSpiritTimer[i] = urand(15 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
+                            }
+                            else
+                                m_uiSpiritTimer[i] = 1 * IN_MILLISECONDS;
+                        }
+                    }
+                }
+                else
+                    m_uiSpiritTimer[i] -= uiDiff;
+            }
         }
     }
 

@@ -261,14 +261,12 @@ void Object::SendForcedObjectUpdate()
 
 void Object::BuildMovementUpdateBlock(UpdateData& data, uint8 flags) const
 {
-    ByteBuffer buf(500);
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
 
     buf << uint8(UPDATETYPE_MOVEMENT);
     buf << GetObjectGuid();
 
     BuildMovementUpdate(&buf, flags);
-
-    data.AddUpdateBlock(buf);
 }
 
 void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) const
@@ -295,7 +293,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
 
     //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BuildCreateUpdate: update-type: %u, object-type: %u got updateFlags: %X", updatetype, m_objectTypeId, updateFlags);
 
-    ByteBuffer buf(500);
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
     buf << (uint8)updatetype;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
@@ -331,7 +329,6 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     updateMask.SetCount(m_valuesCount);
     _SetCreateBits(updateMask, target);
     BuildValuesUpdate(updatetype, &buf, &updateMask, target);
-    data.AddUpdateBlock(buf);
 }
 
 void Object::SendCreateUpdateToPlayer(Player* player)
@@ -360,7 +357,7 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index, uint32 count)
         return;
 
     UpdateData data;
-    ByteBuffer buf(50);
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
     buf << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
@@ -378,7 +375,6 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index, uint32 count)
     for (int i = 0; i < count; i++)
         buf << uint32(m_uint32Values[index + i]);
 
-    data.AddUpdateBlock(buf);
     WorldPacket packet;
     data.BuildPacket(&packet);
     SendObjectMessageToSet(&packet, true);
@@ -405,7 +401,7 @@ void Object::BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* 
 
 void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const
 {
-    ByteBuffer buf(500);
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
 
     buf << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -415,7 +411,6 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updat
 #endif
 
     BuildValuesUpdate(UPDATETYPE_VALUES, &buf, &updateMask, target);
-    data.AddUpdateBlock(buf);
 }
 
 void Object::BuildOutOfRangeUpdateBlock(UpdateData& data) const
@@ -592,11 +587,16 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
         }
+        else if (isType(TYPEMASK_UNIT) && target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+        {
+            // Force include dynamic flags to make special info visible.
+            updateMask->SetBit(UNIT_DYNAMIC_FLAGS);
+        }
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
         else if (isType(TYPEMASK_ITEM))
         {
             // Force include flags field in create object packet,
-            // because the static flags need to sent in that field.
+            // because the static flags need to be sent in that field.
             updateMask->SetBit(ITEM_FIELD_FLAGS);
         }
 #endif
@@ -730,6 +730,9 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                         if (!target->IsAllowedToLoot(creature))
                             dynamicFlags &= ~UNIT_DYNFLAG_LOOTABLE;
                     }
+                    if (target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+                        dynamicFlags |= UNIT_DYNFLAG_SPECIALINFO;
+
                     *data << dynamicFlags;
                 }
                 // RAID ally-horde - Faction
@@ -980,19 +983,30 @@ uint16 Object::GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*&
         case TYPEID_UNIT:
         case TYPEID_PLAYER:
         {
-            if (static_cast<Unit const*>(this)->GetOwnerGuid() == target->GetObjectGuid() ||
-                static_cast<Unit const*>(this)->GetCharmerGuid() == target->GetObjectGuid())
-                visibleFlag |= UF_FLAG_OWNER_ONLY;
+            if (target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+            {
+                visibleFlag |= UF_FLAG_OWNER_ONLY | UF_FLAG_SPECIAL_INFO | UF_FLAG_GROUP_ONLY;
+            }
+            else
+            {
+                if (static_cast<Unit const*>(this)->GetOwnerGuid() == target->GetObjectGuid() ||
+                    static_cast<Unit const*>(this)->GetCharmerGuid() == target->GetObjectGuid())
+                    visibleFlag |= UF_FLAG_OWNER_ONLY;
 
-            if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO))
-                if (target->CanSeeSpecialInfoOf(static_cast<Unit const*>(this)))
-                    visibleFlag |= UF_FLAG_SPECIAL_INFO;
+                if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO))
+                    if (target->CanSeeSpecialInfoOf(static_cast<Unit const*>(this)))
+                        visibleFlag |= UF_FLAG_SPECIAL_INFO;
 
-            if (Player* plr = static_cast<Unit const*>(this)->GetCharmerOrOwnerPlayerOrPlayerItself())
-                if (plr->IsInSameRaidWith(target))
-                    visibleFlag |= UF_FLAG_GROUP_ONLY;
+                if (Player* plr = static_cast<Unit const*>(this)->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    if (plr->IsInSameRaidWith(target))
+                        visibleFlag |= UF_FLAG_GROUP_ONLY;
+            }
+            
             break;
         }
+        /*
+        Optimization: these objects dont actually have any fields marked as owner only, so comment this out
+
         case TYPEID_GAMEOBJECT:
             if (static_cast<GameObject const*>(this)->GetOwnerGuid() == target->GetObjectGuid())
                 visibleFlag |= UF_FLAG_OWNER_ONLY;
@@ -1007,6 +1021,7 @@ uint16 Object::GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*&
             break;
         case TYPEID_OBJECT:
             break;
+        */
     }
 
     return visibleFlag;
@@ -1621,20 +1636,25 @@ bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos) con
     if (IsWithinDist(obj, 0.0f))
         return true;
     float ox, oy, oz;
-    obj->GetPosition(ox, oy, oz);
-    float targetHeight = obj->IsUnit() ? obj->ToUnit()->GetCollisionHeight() : 2.f;
-    return (IsWithinLOS(ox, oy, oz, checkDynLos, targetHeight));
+    obj->GetLosCheckPosition(ox, oy, oz);
+    return (IsWithinLOS(ox, oy, oz, checkDynLos, 0.0f));
 }
 
 bool WorldObject::IsWithinLOSAtPosition(float ownX, float ownY, float ownZ, float targetX, float targetY, float targetZ, bool checkDynLos, float targetHeight) const
 {
     if (IsInWorld())
     {
-        float height = IsUnit() ? ToUnit()->GetCollisionHeight() : 2.f;
+        float height = IsUnit() ? static_cast<Unit const*>(this)->GetCollisionHeight() : 1.0f;
         return GetMap()->isInLineOfSight(ownX, ownY, ownZ + height, targetX, targetY, targetZ + targetHeight, checkDynLos);
     }
 
     return true;
+}
+
+void WorldObject::GetLosCheckPosition(float& x, float& y, float& z) const
+{
+    GetPosition(x, y, z);
+    z += 1.0f;
 }
 
 bool WorldObject::GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D /* = true */) const
@@ -2010,7 +2030,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     GenericTransport* transport = GetTransport();
 
-    float halfHeight = IsUnit() ? static_cast<Unit*>(this)->GetCollisionHeight() : 0.0f;
+    float halfHeight = IsUnit() ? static_cast<Unit*>(this)->GetCollisionHeight() : 1.0f;
     if (IsUnit())
     {
         PathFinder path(static_cast<Unit*>(this));
@@ -3656,5 +3676,46 @@ bool WorldObject::IsValidAttackTarget(Unit const* target, bool checkAlive) const
         return (playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_UNK1)
                || (playerAffectingTarget->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_UNK1);
     }
+    return true;
+}
+
+bool WorldObject::IsValidHelpfulTarget(Unit const* target, bool checkAlive) const
+{
+    ASSERT(target);
+
+    // this unit flag prevents casting on friendly or self too
+    if (target == this)
+        return !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE_2) && (!checkAlive || target->IsAlive());
+
+    if (FindMap() != target->FindMap())
+        return false;
+
+    if (!target->IsTargetableBy(this, false, checkAlive, true))
+        return false;
+
+    if (GetReactionTo(target) < REP_UNFRIENDLY ||
+        target->GetReactionTo(this) < REP_UNFRIENDLY)
+        return false;
+
+    Player const* playerAffectingCaster = GetAffectingPlayer();
+    Player const* playerAffectingTarget = target->GetAffectingPlayer();
+
+    // PvP checks
+    if (playerAffectingCaster && playerAffectingTarget)
+    {
+        // pet and owner
+        if (playerAffectingCaster == playerAffectingTarget)
+            return true;
+
+        // cannot help others in duels
+        if (playerAffectingTarget->duel && playerAffectingTarget->duel->startTime != 0)
+            return false;
+
+        // group forces friendly relations in ffa pvp
+        if (playerAffectingCaster->IsFFAPvP() && playerAffectingTarget->IsFFAPvP() &&
+           !playerAffectingCaster->IsInSameRaidWith(playerAffectingTarget))
+            return false;
+    }
+
     return true;
 }

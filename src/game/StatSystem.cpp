@@ -247,6 +247,7 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
             case CLASS_DRUID:
             {
                 ShapeshiftForm form = GetShapeshiftForm();
+
                 //Check if Predatory Strikes is skilled
                 float mLevelMult = 0.0;
                 switch (form)
@@ -254,7 +255,6 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                     case FORM_CAT:
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
-                    case FORM_MOONKIN:
                     {
                         Unit::AuraList const& mDummy = GetAurasByType(SPELL_AURA_DUMMY);
                         for (const auto itr : mDummy)
@@ -275,8 +275,12 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 switch (form)
                 {
                     case FORM_CAT:
-                        val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
+                       // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                       // - Cat Form - Each point of agility now adds 1 attack power.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+                        val2 = GetLevel() * mLevelMult + strength * 2.0f + agility - 20.0f;
                         break;
+#endif
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
                         val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
@@ -377,7 +381,7 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE, index);
     float weapon_maxdamage = GetWeaponDamageRange(attType, MAXDAMAGE, index);
 
-    if (IsNoWeaponShapeShift())                             // check if player is in shapeshift which doesnt use weapon
+    if (IsAttackSpeedOverridenShapeShift()) // check if player is in shapeshift which doesnt use weapon
     {
         /* Druids don't use weapons so a weapon damage index > 0 
            should not affect their damage. Fixes crazy druid scaling
@@ -395,8 +399,28 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
             if (lvl > 60)
                 lvl = 60;
 
-            weapon_mindamage = lvl * 0.85f * att_speed;
-            weapon_maxdamage = lvl * 1.25f * att_speed;
+#pragma warning( push )
+#pragma warning( disable : 4065)
+
+            switch (GetShapeshiftForm())
+            {
+                // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                // - Cat Form - The base weapon damage of the form has been increased.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+                case FORM_CAT:
+                    // guessed
+                    weapon_mindamage = lvl * 0.60f * att_speed;
+                    weapon_maxdamage = lvl * 1.00f * att_speed;
+                    break;
+#endif
+                default:
+                    weapon_mindamage = lvl * 0.85f * att_speed;
+                    weapon_maxdamage = lvl * 1.25f * att_speed;
+                    break;
+            }
+
+#pragma warning( pop ) 
+            
             total_value = 0.0f;                             // remove benefit from weapon enchants
         }
     }
@@ -446,6 +470,31 @@ void Player::UpdateDamagePhysical(WeaponAttackType attType)
             SetStatFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, maxdamage);
             break;
     }
+}
+
+float Player::GetBonusHitChanceFromAuras(WeaponAttackType attType) const
+{
+    float chance = 0.0f;
+    AuraList const& hitAurasList = GetAurasByType(SPELL_AURA_MOD_HIT_CHANCE);
+    if (hitAurasList.empty())
+        return chance;
+
+    Item* pWeapon = GetWeaponForAttack(attType);
+    for (auto const& i : hitAurasList)
+    {
+        SpellEntry const* pSpellEntry = i->GetSpellProto();
+        if (pSpellEntry->EquippedItemClass >= 0)
+        {
+            if (!pWeapon)
+                continue;
+
+            if (!pWeapon->IsFitToSpellRequirements(pSpellEntry))
+                continue;
+        }
+
+        chance += i->GetModifier()->m_amount;
+    }
+    return chance;
 }
 
 void Player::UpdateDefenseBonusesMod()
@@ -526,11 +575,9 @@ void Player::UpdateAllCritPercentages()
     float value = GetMeleeCritFromAgility();
 
     SetBaseModValue(CRIT_PERCENTAGE, PCT_MOD, value);
-    SetBaseModValue(OFFHAND_CRIT_PERCENTAGE, PCT_MOD, value);
     SetBaseModValue(RANGED_CRIT_PERCENTAGE, PCT_MOD, value);
 
     UpdateCritPercentage(BASE_ATTACK);
-    UpdateCritPercentage(OFF_ATTACK);
     UpdateCritPercentage(RANGED_ATTACK);
 }
 
@@ -917,6 +964,27 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 
     SetStatFloatValue(fieldmin, mindamage);
     SetStatFloatValue(fieldmax, maxdamage);
+}
+
+float Creature::GetBonusHitChanceFromAuras(WeaponAttackType attType) const
+{
+    float chance = 0.0f;
+    AuraList const& mTotalAuraList = GetAurasByType(SPELL_AURA_MOD_HIT_CHANCE);
+    for (auto const& i : mTotalAuraList)
+    {
+        SpellEntry const* pSpellEntry = i->GetSpellProto();
+        if (pSpellEntry->EquippedItemClass >= 0)
+        {
+            if (!GetVirtualItemDisplayId(attType))
+                continue;
+
+            if (!Item::IsFitToSpellRequirements(pSpellEntry, GetVirtualItemClass(attType), GetVirtualItemSubclass(attType), GetVirtualItemInventoryType(attType)))
+                continue;
+        }
+
+        chance += i->GetModifier()->m_amount;
+    }
+    return chance;
 }
 
 /*#######################################

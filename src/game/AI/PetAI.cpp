@@ -30,6 +30,7 @@
 #include "Util.h"
 #include "Group.h"
 #include "SpellAuraDefines.h"
+#include "Map.h"
 
 int PetAI::Permissible(Creature const* creature)
 {

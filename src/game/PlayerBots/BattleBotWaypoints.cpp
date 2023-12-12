@@ -24,6 +24,7 @@
 #include "Spell.h"
 #include "Battlegrounds/BattleGround.h"
 #include "BattleGroundAV.h"
+#include "BattleGroundWS.h"
 #include "Geometry.h"
 
 using namespace Geometry;
@@ -91,14 +92,7 @@ void WSG_AtAllianceFlag(BattleBotAI* pAI)
                 else
                 {
                     pAI->ClearPath();
-                    ObjectGuid guid = pFlag->GetObjectGuid();
                     pAI->me->GetMotionMaster()->MovePoint(0, pFlag->GetPositionX(), pFlag->GetPositionY(), 353.0f);
-                    pAI->me->m_Events.AddLambdaEventAtOffset([pAI, guid]
-                    {
-                        WorldPacket data(CMSG_GAMEOBJ_USE);
-                        data << guid;
-                        pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
-                    }, 2000);
                     return;
                 }
             }
@@ -133,14 +127,7 @@ void WSG_AtHordeFlag(BattleBotAI* pAI)
                 else
                 {
                     pAI->ClearPath();
-                    ObjectGuid guid = pFlag->GetObjectGuid();
                     pAI->me->GetMotionMaster()->MovePoint(0, pFlag->GetPositionX(), pFlag->GetPositionY(), pFlag->GetPositionZ());
-                    pAI->me->m_Events.AddLambdaEventAtOffset([pAI, guid]
-                    {
-                        WorldPacket data(CMSG_GAMEOBJ_USE);
-                        data << guid;
-                        pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
-                    }, 2000);
                     return;
                 }
             }
@@ -254,7 +241,7 @@ void MoveToNextPointSpecial(BattleBotAI* pAI)
     uint32 const lastPointInPath = pAI->m_movingInReverse ? 0 : ((*pAI->m_currentPath).size() - 1);
 
     if ((pAI->m_currentPoint == lastPointInPath) ||
-        pAI->me->IsInCombat() || !pAI->me->IsAlive())
+        (pAI->me->IsInCombat() && !pAI->ShouldIgnoreCombat()) || !pAI->me->IsAlive())
     {
         // Path is over.
         pAI->ClearPath();
@@ -1781,7 +1768,7 @@ void BattleBotAI::MoveToNextPoint()
     uint32 const lastPointInPath = m_movingInReverse ? 0 : ((*m_currentPath).size() - 1);
 
     if ((m_currentPoint == lastPointInPath) ||
-        me->IsInCombat() || !me->IsAlive())
+        (me->IsInCombat() && !ShouldIgnoreCombat()) || !me->IsAlive())
     {
         // Path is over.
         ClearPath();
@@ -2165,10 +2152,28 @@ bool BattleBotAI::StartNewPathToObjective()
         }
         case BATTLEGROUND_WS:
         {
-            if (me->HasAura(AURA_WARSONG_FLAG))
-                return StartNewPathToPosition(WS_FLAG_POS_ALLIANCE, vPaths_WS);
-            if (me->HasAura(AURA_SILVERWING_FLAG))
-                return StartNewPathToPosition(WS_FLAG_POS_HORDE, vPaths_WS);
+            if (me->GetTeam() == HORDE)
+            {
+                if (me->HasAura(AURA_SILVERWING_FLAG))
+                    return StartNewPathToPosition(WS_FLAG_POS_HORDE, vPaths_WS);
+                if (!static_cast<BattleGroundWS*>(bg)->IsAllianceFlagPickedup())
+                {
+                    float const distance = me->GetDistance(WS_FLAG_POS_ALLIANCE);
+                    if (distance > 20.0f && distance < 300.0f)
+                        return StartNewPathToPosition(WS_FLAG_POS_ALLIANCE, vPaths_WS);
+                }
+            }
+            else
+            {
+                if (me->HasAura(AURA_WARSONG_FLAG))
+                    return StartNewPathToPosition(WS_FLAG_POS_ALLIANCE, vPaths_WS);
+                if (!static_cast<BattleGroundWS*>(bg)->IsHordeFlagPickedup())
+                {
+                    float const distance = me->GetDistance(WS_FLAG_POS_HORDE);
+                    if (distance > 20.0f && distance < 300.0f)
+                        return StartNewPathToPosition(WS_FLAG_POS_HORDE, vPaths_WS);
+                }
+            }
             break;
         }
     }

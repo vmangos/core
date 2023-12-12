@@ -9,7 +9,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/blackrock_spire/blackrock_spire.h
     eastern_kingdoms/burning_steppes/blackwing_lair/blackwing_lair.h
     eastern_kingdoms/burning_steppes/molten_core/molten_core.h
-    eastern_kingdoms/dun_morogh/dun_morogh.h
     eastern_kingdoms/dun_morogh/gnomeregan/gnomeregan.h
     eastern_kingdoms/eastern_plaguelands/naxxramas/naxxramas.h
     eastern_kingdoms/eastern_plaguelands/stratholme/stratholme.h
@@ -51,7 +50,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/burning_steppes.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/arena_challenge_ai.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/blackrock_depths.cpp
-    eastern_kingdoms/burning_steppes/blackrock_depths/boss_ambassador_flamelash.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_anubshiah.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_emperor_dagran_thaurissan.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_general_angerforge.cpp

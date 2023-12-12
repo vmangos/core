@@ -25,6 +25,7 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 #include <string>
+#include <shared_mutex>
 
 enum AccountOpResult
 {
@@ -36,12 +37,14 @@ enum AccountOpResult
     AOR_DB_INTERNAL_ERROR
 };
 
-
 class WorldSession;
 class ChatHandler;
 class MasterPlayer;
+class QueryResult;
 
 #define MAX_ACCOUNT_STR 16
+
+#define LOAD_IP_BANS_QUERY "SELECT `ip`, `unbandate`, `bandate` FROM `ip_banned` WHERE (`unbandate` > UNIX_TIMESTAMP() OR `bandate` = `unbandate`)"
 
 class AccountPersistentData
 {
@@ -97,7 +100,7 @@ class AccountMgr
         static bool normalizeString(std::string& utf8str);
         // Nostalrius
         void Update(uint32 diff);
-        void LoadIPBanList(bool silent=false);
+        void LoadIPBanList(QueryResult* result, bool silent=false);
         void LoadAccountBanList(bool silent=false);
         void BanIP(std::string const& ip, uint32 unbandate) { m_ipBanned[ip] = unbandate; }
         void UnbanIP(std::string const& ip) { m_ipBanned.erase(ip); }
@@ -126,6 +129,7 @@ class AccountMgr
         std::map<uint32, AccountTypes> m_accountSecurity;
         uint32 m_banlistUpdateTimer;
         std::map<std::string, uint32> m_ipBanned;
+        mutable std::shared_timed_mutex m_ipBannedMutex;
         std::map<uint32, uint32> m_accountBanned;
         typedef std::map<uint32 /* instanceId */, time_t /* enter time */> InstanceEnterTimesMap;
         typedef std::map<uint32 /* accountId */, InstanceEnterTimesMap> AccountInstanceEnterTimesMap;
