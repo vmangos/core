@@ -1038,7 +1038,7 @@ bool ChatHandler::HandleReloadAreaTriggerTeleportCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadCommandCommand(char* /*args*/)
 {
-    load_command_table = true;
+    m_loadCommandTable = true;
     SendSysMessage("DB table `command` will be reloaded at next chat command use.");
     return true;
 }
@@ -1991,7 +1991,7 @@ bool ChatHandler::HandleWarEffortSetGongTimeCommand(char* args)
         return false;
 
     sObjectMgr.SetSavedVariable(VAR_WE_GONG_TIME, gongTime, true);
-    PSendSysMessage("War effort gong ring time set to '%s' (%u).", TimeToTimestampStr(gongTime), gongTime);
+    PSendSysMessage("War effort gong ring time set to '%s' (%u).", TimeToTimestampStr(gongTime).c_str(), gongTime);
     sGameEventMgr.Update();
 
     return true;

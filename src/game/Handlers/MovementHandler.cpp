@@ -170,6 +170,12 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             GetPlayer()->SendInstanceResetWarning(mEntry->id, timeleft);
         }
     }
+    else if (!mEntry->IsDungeon())
+    {
+        MapEntry const* oldMapEntry = sMapStorage.LookupEntry<MapEntry>(oldLoc.mapId);
+        if (oldMapEntry->IsDungeon())
+            GetPlayer()->ResetPersonalInstanceOnLeaveDungeon(oldLoc.mapId);
+    }
 
     // mount allow check
     if (!mEntry->IsMountAllowed())

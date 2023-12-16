@@ -126,9 +126,9 @@ void CombatBotBaseAI::ResetSpellData()
         ptr = nullptr;
 
     m_resurrectionSpell = nullptr;
-    spellListDirectHeal.clear();
-    spellListPeriodicHeal.clear();
-    spellListTaunt.clear();
+    m_spellListDirectHeal.clear();
+    m_spellListPeriodicHeal.clear();
+    m_spellListTaunt.clear();
 }
 
 void CombatBotBaseAI::PopulateSpellData()
@@ -1602,10 +1602,10 @@ void CombatBotBaseAI::PopulateSpellData()
             switch (pSpellEntry->Effect[i])
             {
                 case SPELL_EFFECT_HEAL:
-                    spellListDirectHeal.insert(pSpellEntry);
+                    m_spellListDirectHeal.insert(pSpellEntry);
                     break;
                 case SPELL_EFFECT_ATTACK_ME:
-                    spellListTaunt.push_back(pSpellEntry);
+                    m_spellListTaunt.push_back(pSpellEntry);
                     break;
                 case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_RESURRECT_NEW:
@@ -1616,10 +1616,10 @@ void CombatBotBaseAI::PopulateSpellData()
                     switch (pSpellEntry->EffectApplyAuraName[i])
                     {
                         case SPELL_AURA_PERIODIC_HEAL:
-                            spellListPeriodicHeal.insert(pSpellEntry);
+                            m_spellListPeriodicHeal.insert(pSpellEntry);
                             break;
                         case SPELL_AURA_MOD_TAUNT:
-                            spellListTaunt.push_back(pSpellEntry);
+                            m_spellListTaunt.push_back(pSpellEntry);
                             break;
                     }
                     break;
@@ -1951,7 +1951,7 @@ bool CombatBotBaseAI::HealInjuredTarget(Unit* pTarget)
 
 bool CombatBotBaseAI::HealInjuredTargetPeriodic(Unit* pTarget)
 {
-    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, spellListPeriodicHeal))
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, m_spellListPeriodicHeal))
     {
         if (CanTryToCastSpell(pTarget, pHealSpell))
         {
@@ -1965,7 +1965,7 @@ bool CombatBotBaseAI::HealInjuredTargetPeriodic(Unit* pTarget)
 
 bool CombatBotBaseAI::HealInjuredTargetDirect(Unit* pTarget)
 {
-    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, spellListDirectHeal))
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, m_spellListDirectHeal))
         if (DoCastSpell(pTarget, pHealSpell) == SPELL_CAST_OK)
             return true;
 
@@ -2100,7 +2100,7 @@ bool CombatBotBaseAI::FindAndPreHealTarget()
     if (maxIncomingDamage < int32(pTarget->GetMaxHealth() / 2))
         return false;
 
-    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, maxIncomingDamage, spellListDirectHeal))
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, maxIncomingDamage, m_spellListDirectHeal))
     {
         if (pHealSpell->GetCastTime(me) > 1000 && CanTryToCastSpell(pTarget, pHealSpell))
         {

@@ -159,7 +159,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_high_inquisitor_fairbanks.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_houndmaster_loksey.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_interrogator_vishas.cpp
-    eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_mograine_and_whitemane.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/instance_scarlet_monastery.cpp
     eastern_kingdoms/uldaman/boss_archaedas.cpp
     eastern_kingdoms/uldaman/boss_ironaya.cpp

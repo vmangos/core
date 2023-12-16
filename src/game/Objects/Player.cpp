@@ -2297,6 +2297,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             DuelComplete(DUEL_FLED);
 
     // reset movement flags at teleport, because player will continue move with these flags after teleport
+    m_movementInfo.ctime = 0;
     m_movementInfo.RemoveMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
     if (!(options & TELE_TO_NOT_LEAVE_TRANSPORT) || !m_transport)
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
@@ -2366,7 +2367,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 m_teleportRecover = wps;
             wps();
         }
-        m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN; // For extrapolation
     }
     else
     {
@@ -2648,7 +2648,7 @@ void Player::RemoveFromWorld()
         UnsummonAllTotems();
         RemoveMiniPet();
         sZoneScriptMgr.HandlePlayerLeaveZone(this, m_zoneUpdateId);
-        TradeCancel(false);
+        TradeCancel(!GetSession()->PlayerLogout());
 
         if (ObjectGuid lootGuid = GetLootGuid())
             GetSession()->DoLootRelease(lootGuid);
@@ -4994,7 +4994,7 @@ void Player::SetFly(bool enable)
             pTransport->RemovePassenger(this);
             StopMoving(true);
         }
-            
+        
         m_movementInfo.moveFlags = (MOVEFLAG_LEVITATING | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING);
         AddUnitState(UNIT_STAT_FLYING_ALLOWED);
     }
@@ -6516,8 +6516,9 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
             if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
                 SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
-            if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-                GetSession()->SendCancelTrade();   // will close both side trade windows
+            if (Player* pTrader = GetTrader())
+                if (!IsWithinDistInMap(pTrader, INTERACTION_DISTANCE))
+                    TradeCancel(true, TRADE_STATUS_TRADE_CANCELED);   // will close both side trade windows
 
             if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
             {
@@ -8380,7 +8381,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                                 group->NeedBeforeGreed(creature, loot);
                                 break;
                             case MASTER_LOOT:
-                                group->MasterLoot(creature, loot);
+                                group->MasterLoot(creature, loot, this);
                                 break;
                             default:
                                 break;
@@ -11999,7 +12000,7 @@ void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemG
     GetSession()->SendPacket(&data);
 }
 
-void Player::TradeCancel(bool sendback)
+void Player::TradeCancel(bool sendback, TradeStatus status /*= TRADE_STATUS_TRADE_CANCELED*/)
 {
     if (m_trade)
     {
@@ -12007,9 +12008,9 @@ void Player::TradeCancel(bool sendback)
 
         // send yellow "Trade canceled" message to both traders
         if (sendback)
-            GetSession()->SendCancelTrade();
+            GetSession()->SendCancelTrade(status);
 
-        trader->GetSession()->SendCancelTrade();
+        trader->GetSession()->SendCancelTrade(status);
 
         // cleanup
         delete m_trade;
@@ -16250,15 +16251,6 @@ void Player::_LoadBoundInstances(QueryResult* result)
                 continue;
             }
 
-            if (!perm && group)
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_LoadBoundInstances: %s is in group (Id: %d) but has a non-permanent character bind to map %d,%d",
-                              GetGuidStr().c_str(), group->GetId(), mapId, instanceId);
-                CharacterDatabase.PExecute("DELETE FROM `character_instance` WHERE `guid` = '%u' AND `instance` = '%u'",
-                                           GetGUIDLow(), instanceId);
-                continue;
-            }
-
             // since non permanent binds are always solo bind, they can always be reset
             DungeonPersistentState* state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, instanceId, resetTime, !perm, true);
             if (state) BindToInstance(state, perm, true);
@@ -16346,9 +16338,8 @@ DungeonPersistentState* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapid)
     InstancePlayerBind* pBind = GetBoundInstance(mapid);
     DungeonPersistentState* state = pBind ? pBind->state : nullptr;
 
-    // the player's permanent player bind is taken into consideration first
-    // then the player's group bind and finally the solo bind.
-    if (!pBind || !pBind->perm)
+    // the player's personal or permanent bind is taken into consideration first
+    if (!pBind)
     {
         if (Group* group = GetGroup())
             if (InstanceGroupBind* groupBind = group->GetBoundInstance(mapid))
@@ -17494,6 +17485,13 @@ void Player::ResetInstances(InstanceResetMethod method)
             continue;
         }
 
+        // cannot reset instance while inside
+        if (IsInWorld() && itr->first == GetMapId())
+        {
+            ++itr;
+            continue;
+        }
+
         if (method == INSTANCE_RESET_ALL)
         {
             // the "reset all instances" method can only reset normal maps
@@ -17502,29 +17500,54 @@ void Player::ResetInstances(InstanceResetMethod method)
                 ++itr;
                 continue;
             }
-
-            // solo player cannot reset instance while inside
-            if (IsInWorld() && itr->first == GetMapId())
-            {
-                ++itr;
-                continue;
-            }
         }
 
-        // if the map is loaded, reset it
-        if (Map* map = sMapMgr.FindMap(state->GetMapId(), state->GetInstanceId()))
-            if (map->IsDungeon())
-                ((DungeonMap*)map)->Reset(method);
+        ResetInstance(method, itr);
+    }
+}
 
-        // since this is a solo instance there should not be any players inside
-        if (method == INSTANCE_RESET_ALL)
-            SendResetInstanceSuccess(state->GetMapId());
+void Player::ResetInstance(InstanceResetMethod method, BoundInstancesMap::iterator& itr)
+{
+    DungeonPersistentState* state = itr->second.state;
 
-        state->DeleteFromDB();
-        m_boundInstances.erase(itr++);
+    // if the map is loaded, reset it
+    if (Map* map = sMapMgr.FindMap(state->GetMapId(), state->GetInstanceId()))
+        if (map->IsDungeon())
+            ((DungeonMap*)map)->Reset(method);
 
-        // the following should remove the instance save from the manager and delete it as well
-        state->RemovePlayer(this);
+    // since this is a solo instance there should not be any players inside
+    if (method == INSTANCE_RESET_ALL)
+        SendResetInstanceSuccess(state->GetMapId());
+
+    state->DeleteFromDB();
+    m_boundInstances.erase(itr++);
+
+    // the following should remove the instance save from the manager and delete it as well
+    state->RemovePlayer(this);
+}
+
+// should only be called on teleport from inside dungeon to outside
+// if player was inside a different instance of a dungeon when he got invited to group
+// it should only be reset once he leaves the dungeon, not immediately on accepting group
+void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
+{
+    MANGOS_ASSERT(GetMapId() != mapId);
+
+    Group* pGroup = GetGroup();
+    if (!pGroup)
+        return;
+
+    BoundInstancesMap::iterator itr = m_boundInstances.find(mapId);
+    if (itr == m_boundInstances.end() || itr->second.perm)
+        return;
+
+    // the group save replaces the personal save
+    if (InstanceGroupBind* pGroupBind = pGroup->GetBoundInstance(mapId))
+    {
+        if (itr->second.state != pGroupBind->state)
+            ResetInstance(INSTANCE_RESET_GROUP_JOIN, itr);
+        else
+            UnbindInstance(itr, false);
     }
 }
 

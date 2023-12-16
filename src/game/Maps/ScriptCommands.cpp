@@ -588,7 +588,11 @@ bool Map::ScriptCommand_RemoveAura(ScriptInfo const& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    pSource->RemoveAurasDueToSpell(script.removeAura.spellId);
+    if (script.removeAura.spellId)
+        pSource->RemoveAurasDueToSpell(script.removeAura.spellId);
+    else
+        pSource->RemoveAllAuras();
+
     return false;
 }
 

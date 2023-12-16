@@ -442,6 +442,7 @@ class Map : public GridRefManager<NGridType>
         void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
 
         bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
+        bool HaveRealPlayers() const; // no bots
         uint32 GetPlayersCountExceptGMs() const;
         bool ActiveObjectsNearGrid(uint32 x,uint32 y) const;
 

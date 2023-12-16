@@ -650,7 +650,8 @@ struct npc_mission_possible_but_not_probableAI : ScriptedAI
                 return;
         }
 
-        DoCastSpellIfCan(m_creature, spellId);
+        if (spellId)
+            DoCastSpellIfCan(m_creature, spellId);
     }
 };
 

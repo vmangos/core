@@ -817,7 +817,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
     recv_data >> iguid;
 
     Player* player = sObjectMgr.GetPlayer(iguid);
-    if (!player || !player->GetSession())
+    if (!player)
         return;
 
     WorldPacket data;

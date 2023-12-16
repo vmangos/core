@@ -165,8 +165,10 @@ class Pet : public Creature
         void DelayedUnsummon(uint32 timeMSToDespawn, PetSaveMode mode);
         static void DeleteFromDB(uint32 guidlow, bool separate_transaction = true);
 
+        void InitializeDefaultName();
         char const* GetName() const final { return m_name.c_str(); }
         void SetName(std::string const& newname) { m_name = newname; }
+        char const* GetNameForLocaleIdx(int32 locale_idx) const final;
 
         void SetDeathState(DeathState s) override;                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
         void Update(uint32 update_diff, uint32 diff) override;  // overwrite virtual Creature::Update and Unit::Update
@@ -260,9 +262,6 @@ class Pet : public Creature
         void SetAuraUpdateSlot(uint8 slot) { m_auraUpdateMask |= (uint64(1) << slot); }
         void SetAuraUpdateMask(uint64 mask) { m_auraUpdateMask = mask; }
         void ResetAuraUpdateMask() { m_auraUpdateMask = 0; }
-
-        // overwrite Creature function for name localization back to WorldObject version without localization
-        char const* GetNameForLocaleIdx(int32 locale_idx) const final { return Pet::GetName(); }
 
         bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
     protected:

@@ -67,6 +67,7 @@ public:
     void OnEnterBattleGround();
     void OnLeaveBattleGround();
 
+    void UpdateFlagCarrierAI();
     void UpdateBattleGroundAI();
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;

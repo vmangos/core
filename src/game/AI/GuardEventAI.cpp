@@ -80,9 +80,3 @@ void GuardEventAI::MoveInLineOfSight(Unit* pWho)
         AttackStart(pWho);
     }
 }
-
-void GuardEventAI::EnterCombat(Unit* pWho)
-{
-    CreatureEventAI::EnterCombat(pWho);
-    m_creature->CallForHelp(30.0f);
-}
