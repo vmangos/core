@@ -972,7 +972,7 @@ bool MovementAnticheat::CheckMultiJump(uint16 opcode)
     return false;
 }
 
-#define NO_WALL_CLIMB_CHECK_MOVE_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)
+#define NO_WALL_CLIMB_CHECK_MOVE_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT | MOVEFLAG_SPLINE_ELEVATION)
 #define NO_WALL_CLIMB_CHECK_UNIT_FLAGS (UNIT_FLAG_UNK_0 | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED)
 
 bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const
@@ -996,7 +996,17 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
     float const angleRad = atan(deltaZ / deltaXY);
     //float const angleDeg = angleRad * (360 / (M_PI_F * 2));
 
-    return angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE);
+    if (angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE))
+    {
+        // check height with and without vmaps and compare
+        // if player is stepping over model like stairs, that can increase wall climb angle
+        float const height1 = me->GetMap()->GetHeight(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, false);
+        float const height2 = me->GetMap()->GetHeight(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, true);
+        if ((std::abs(height1 - height2) < 0.5f) || (deltaZ > 5.0f))
+            return true;
+    }
+
+    return false;
 }
 
 bool MovementAnticheat::CheckForbiddenArea(MovementInfo const& movementInfo) const
@@ -1297,9 +1307,10 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
         return true;
 
     // check moving in given axis without appropriate move flags
+    // during fall collision with cliffs can change xy so skip that case
     if (GetLastMovementInfo().ctime &&
-        !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_MASK_XZ) &&
-        !movementInfo.HasMovementFlag(MOVEFLAG_MASK_XZ) &&
+       !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_MASK_XZ | MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR) &&
+       !movementInfo.HasMovementFlag(MOVEFLAG_MASK_XZ | MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR) &&
         GetLastMovementInfo().HasMovementFlag(MOVEFLAG_ONTRANSPORT) == movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
     {
         float const distance2d = movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ?
@@ -1311,8 +1322,8 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
 
         // swimming flag only included in check because of 1.14
         // vanilla clients do not have a descend/ascend flag
-        if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING) &&
-            !movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING))
+        if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_SWIMMING) &&
+            !movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
         {
             float const distanceZ = movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ?
                 std::abs(GetLastMovementInfo().t_pos.z - movementInfo.t_pos.z) :
