@@ -1275,8 +1275,6 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
         return false;
     }
 
-    InitializeDefaultName();
-
     if (cinfo->type == CREATURE_TYPE_CRITTER)
     {
         setPetType(MINI_PET);
@@ -2262,10 +2260,13 @@ void Pet::InitializeDefaultName()
         case SUMMON_PET:
         case HUNTER_PET:
         {
-            if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(GetCreatureInfo()->pet_family))
+            if (GetOwnerGuid().IsPlayer())
             {
-                SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
-                break;
+                if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(GetCreatureInfo()->pet_family))
+                {
+                    SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
+                    break;
+                }
             }
             // no break
         }

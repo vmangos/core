@@ -3106,7 +3106,6 @@ void Spell::EffectSummon(SpellEffectIndex effIdx)
     if (m_duration > 0)
         spawnCreature->SetDuration(m_duration);
 
-    spawnCreature->InitializeDefaultName();
     spawnCreature->SetOwnerGuid(m_casterUnit->GetObjectGuid());
     spawnCreature->SetCreatorGuid(m_casterUnit->GetObjectGuid());
     spawnCreature->SetFactionTemplateId(m_casterUnit->GetFactionTemplateId());
@@ -3123,6 +3122,7 @@ void Spell::EffectSummon(SpellEffectIndex effIdx)
     else
         spawnCreature->SetReactState(REACT_AGGRESSIVE);
 
+    spawnCreature->InitializeDefaultName();
     spawnCreature->AIM_Initialize();
     spawnCreature->InitPetCreateSpells();
     spawnCreature->SetHealth(spawnCreature->GetMaxHealth());
@@ -3647,7 +3647,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
         if (m_duration > 0)
             spawnCreature->SetDuration(m_duration);
 
-        spawnCreature->InitializeDefaultName();
         spawnCreature->SetOwnerGuid(m_casterUnit->GetObjectGuid());
         spawnCreature->SetCreatorGuid(m_casterUnit->GetObjectGuid());
         spawnCreature->SetFactionTemplateId(m_casterUnit->GetFactionTemplateId());
@@ -3665,6 +3664,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
             spawnCreature->SetFollowAngle(followAngle);
         }
 
+        spawnCreature->InitializeDefaultName();
         spawnCreature->AIM_Initialize();
         spawnCreature->LoadCreatureAddon();
 
@@ -3951,6 +3951,7 @@ void Spell::EffectTameCreature(SpellEffectIndex /*effIdx*/)
 
     pet->GetCharmInfo()->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
     pet->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
+    pet->InitializeDefaultName();
     pet->AIM_Initialize();
     pet->InitPetCreateSpells();
     pet->SetHealth(pet->GetMaxHealth());
@@ -4066,11 +4067,6 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
     else
         newSummon->SetReactState(REACT_DEFENSIVE);
 
-    newSummon->AIM_Initialize();
-    newSummon->InitPetCreateSpells();
-    newSummon->SetHealth(newSummon->GetMaxHealth());
-    newSummon->SetPower(POWER_MANA, newSummon->GetMaxPower(POWER_MANA));
-
     if (newSummon->getPetType() == SUMMON_PET)
     {
         // Remove Demonic Sacrifice auras (new pet)
@@ -4098,6 +4094,11 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
         newSummon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME);
         newSummon->InitializeDefaultName();
     }
+
+    newSummon->AIM_Initialize();
+    newSummon->InitPetCreateSpells();
+    newSummon->SetHealth(newSummon->GetMaxHealth());
+    newSummon->SetPower(POWER_MANA, newSummon->GetMaxPower(POWER_MANA));
 
     if (IsPvP())
         newSummon->SetPvP(true);
@@ -6407,13 +6408,12 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
     if (m_duration > 0)
         critter->SetDuration(m_duration);
 
-    critter->InitializeDefaultName();
     critter->SetOwnerGuid(m_caster->GetObjectGuid());
     critter->SetCreatorGuid(m_caster->GetObjectGuid());
     critter->SetFactionTemplateId(m_caster->GetFactionTemplateId());
     critter->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
     critter->SetUInt32Value(UNIT_NPC_FLAGS, critter->GetCreatureInfo()->npc_flags); // some mini-pets have quests
-
+    critter->InitializeDefaultName();
     critter->AIM_Initialize();
     critter->InitPetCreateSpells();                         // e.g. disgusting oozeling has a create spell as critter...
     critter->SelectLevel();                                 // some summoned creatures have different from 1 DB data for level/hp
