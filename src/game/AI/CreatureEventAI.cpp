@@ -359,7 +359,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
             pHolder.UpdateRepeatTimer(m_creature, event.move_inform.repeatMin, event.move_inform.repeatMax);
             break;
         }
-        case EVENT_T_MAP_SCRIPT_EVENT:
+        case EVENT_T_SCRIPT:
         case EVENT_T_GROUP_MEMBER_DIED:
         {
             break;
@@ -840,8 +840,8 @@ void CreatureEventAI::OnScriptEventHappened(uint32 uiEvent, uint32 uiData, World
 
     for (auto& i : m_CreatureEventAIList)
     {
-        if (i.Event.event_type == EVENT_T_MAP_SCRIPT_EVENT)
-            if ((i.Event.map_event.eventId == uiEvent) && (i.Event.map_event.data == uiData))
+        if (i.Event.event_type == EVENT_T_SCRIPT)
+            if ((i.Event.script_event.eventId == uiEvent) && (i.Event.script_event.data == uiData))
                 ProcessEvent(i, ToUnit(pInvoker));
     }
 }
