@@ -215,10 +215,6 @@ UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `type` = 7 AND `inhabit_
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `entry` = 938 AND `item` = 737;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Remove Incorrect Creatures
-DELETE FROM `creature` WHERE `guid` IN (21707, 21708);
-
--- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Set Correct Target For Script
 DELETE FROM `creature_ai_scripts` WHERE `id`=852401;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
