@@ -68,7 +68,7 @@ enum EventAI_Type
     EVENT_T_TARGET_MISSING_AURA     = 28,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
     EVENT_T_MOVEMENT_INFORM         = 29,                   // Param1 = motion type, Param2 = point ID, RepeatMin, RepeatMax
     EVENT_T_LEAVE_COMBAT            = 30,                   // NONE
-    EVENT_T_MAP_SCRIPT_EVENT        = 31,                   // Param1 = EventID, Param2 = Data
+    EVENT_T_SCRIPT                  = 31,                   // Param1 = EventID, Param2 = Data
     EVENT_T_GROUP_MEMBER_DIED       = 32,                   // Param1 = CreatureId, Param2 = IsLeader
     EVENT_T_VICTIM_ROOTED           = 33,                   // RepeatMin, RepeatMax
     EVENT_T_HIT_BY_AURA             = 34,                   // AuraType, Unused, RepeatMin, RepeatMax
@@ -83,13 +83,6 @@ enum EventFlags
     EFLAG_RANDOM_ACTION         = 0x02,                     //Event only execute one from existed actions instead each action.
     EFLAG_DEBUG_ONLY            = 0x04,                     //Event only occurs in debug build
     // uint8 field
-};
-
-enum SpawnedEventMode
-{
-    SPAWNED_EVENT_ALWAY = 0,
-    SPAWNED_EVENT_MAP   = 1,
-    SPAWNED_EVENT_ZONE  = 2
 };
 
 enum UnitInLosReaction
@@ -235,12 +228,12 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } move_inform;
-        // EVENT_T_MAP_SCRIPT_EVENT                         = 31
+        // EVENT_T_SCRIPT                                   = 31
         struct
         {
             uint32 eventId;
             uint32 data;
-        } map_event;
+        } script_event;
         // EVENT_T_GROUP_MEMBER_DIED                        = 32
         struct
         {

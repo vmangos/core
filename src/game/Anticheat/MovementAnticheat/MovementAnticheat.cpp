@@ -990,19 +990,23 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
         return false;
 
     float const deltaZ = movementInfo.pos.z - GetLastMovementInfo().pos.z;
-    if (deltaZ < 0.5f)
+    if (deltaZ < 1.0f)
         return false;
 
     float const angleRad = atan(deltaZ / deltaXY);
     //float const angleDeg = angleRad * (360 / (M_PI_F * 2));
 
-    if (angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE))
+    float const maxClimbAngle = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE);
+    if (angleRad > maxClimbAngle)
     {
+        if (angleRad > (maxClimbAngle + 0.2f))
+            return true;
+
         // check height with and without vmaps and compare
         // if player is stepping over model like stairs, that can increase wall climb angle
         float const height1 = me->GetMap()->GetHeight(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, false);
         float const height2 = me->GetMap()->GetHeight(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, true);
-        if ((std::abs(height1 - height2) < 0.5f) || (deltaZ > 5.0f))
+        if (std::abs(height1 - height2) < 0.5f)
             return true;
     }
 
