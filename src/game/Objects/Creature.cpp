@@ -1042,7 +1042,21 @@ void Creature::RegenerateHealth()
 
 void Creature::DoFlee()
 {
-    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+    /*
+    Some observations from tests on classic regarding what happens if creature
+    cant flee at the moment its health reaches the amount it should flee at.
+
+    In these cases both emote and move is delayed:
+    - Casting a spell.
+    - Mind controlled.
+
+    In these cases emote is shown instantly:
+    - Stunned
+    - Feared.
+    */
+
+    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) ||
+        HasUnitState(UNIT_STAT_FEIGN_DEATH | UNIT_STAT_POSSESSED | UNIT_STAT_DISTRACTED | UNIT_STAT_CONFUSED))
         return;
 
     float hpPercent = GetHealthPercent();
@@ -1060,7 +1074,8 @@ void Creature::DoFlee()
 
 void Creature::DoFleeToGetAssistance()
 {
-    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) ||
+        HasUnitState(UNIT_STAT_FEIGN_DEATH | UNIT_STAT_POSSESSED | UNIT_STAT_DISTRACTED | UNIT_STAT_CONFUSED))
         return;
 
     float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);

@@ -81,7 +81,8 @@ enum EventFlags
 {
     EFLAG_REPEATABLE            = 0x01,                     //Event repeats
     EFLAG_RANDOM_ACTION         = 0x02,                     //Event only execute one from existed actions instead each action.
-    EFLAG_DEBUG_ONLY            = 0x04,                     //Event only occurs in debug build
+    EFLAG_NOT_CASTING           = 0x04,                     //Event will not occur while creature is casting a spell
+    EFLAG_DEBUG_ONLY            = 0x08,                     //Event only occurs in debug build
     // uint8 field
 };
 
