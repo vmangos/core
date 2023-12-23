@@ -383,6 +383,10 @@ void WorldSession::HandleLootMethodOpcode(WorldPacket& recv_data)
     group->SetLooterGuid(lootMaster);
     group->SetLootThreshold((ItemQualities)lootThreshold);
     group->SendUpdate();
+
+    // SendUpdate clears the target icons, send an icon update
+    if (!group->isRaidGroup())
+        group->SendTargetIconList();
 }
 
 void WorldSession::HandleLootRoll(WorldPacket& recv_data)

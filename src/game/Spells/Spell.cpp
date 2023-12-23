@@ -387,6 +387,7 @@ void Spell::FillTargetMap()
         if (m_casterUnit)
         {
             if (IsAreaAuraEffect(m_spellInfo->Effect[i]) ||
+                m_spellInfo->Effect[i] == SPELL_EFFECT_SPAWN ||
                 m_spellInfo->Effect[i] == SPELL_EFFECT_LANGUAGE ||
                 m_spellInfo->Effect[i] == SPELL_EFFECT_QUEST_COMPLETE)
                 AddUnitTarget(m_casterUnit, SpellEffectIndex(i));
