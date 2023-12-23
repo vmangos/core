@@ -1419,11 +1419,23 @@ void ScriptMgr::LoadQuestEndScripts()
 {
     LoadScripts(sQuestEndScripts, "quest_end_scripts");
 
+    std::set<uint32> usedQuestCompleteScripts;
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT DISTINCT `CompleteScript` FROM `quest_template`"));
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 scriptId = fields[0].GetUInt32();
+            usedQuestCompleteScripts.insert(scriptId);
+        } while (result->NextRow());
+    }
+
     // check ids
     for (const auto& itr : sQuestEndScripts)
     {
-        if (!sObjectMgr.GetQuestTemplate(itr.first) && !sObjectMgr.IsExistingQuestId(itr.first))
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `quest_end_scripts` has not existing quest (Id: %u) as script id", itr.first);
+        if (usedQuestCompleteScripts.find(itr.first) == usedQuestCompleteScripts.end())
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `quest_end_scripts` has script (Id: %u) not referenced from anywhere", itr.first);
     }
 }
 
@@ -1431,11 +1443,23 @@ void ScriptMgr::LoadQuestStartScripts()
 {
     LoadScripts(sQuestStartScripts, "quest_start_scripts");
 
+    std::set<uint32> usedQuestStartScripts;
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT DISTINCT `StartScript` FROM `quest_template`"));
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 scriptId = fields[0].GetUInt32();
+            usedQuestStartScripts.insert(scriptId);
+        } while (result->NextRow());
+    }
+
     // check ids
     for (const auto& itr : sQuestStartScripts)
     {
-        if (!sObjectMgr.GetQuestTemplate(itr.first) && !sObjectMgr.IsExistingQuestId(itr.first))
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `quest_start_scripts` has not existing quest (Id: %u) as script id", itr.first);
+        if (usedQuestStartScripts.find(itr.first) == usedQuestStartScripts.end())
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `quest_start_scripts` has script (Id: %u) not referenced from anywhere", itr.first);
     }
 }
 
