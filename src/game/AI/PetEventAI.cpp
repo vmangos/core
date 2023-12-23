@@ -123,7 +123,7 @@ void PetEventAI::AttackedBy(Unit* pAttacker)
 
     if (Creature* pOwner = ToCreature(m_creature->GetCharmerOrOwner()))
     {
-        if (pAttacker->IsTargetableBy(pOwner))
+        if (pOwner->IsAlive() && pAttacker->IsTargetableBy(pOwner))
         {
             pOwner->AddThreat(pAttacker);
             pOwner->SetInCombatWith(pAttacker);
