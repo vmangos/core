@@ -2538,7 +2538,7 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, Scr
             if (!(target = GetTargetByType(source, target, this, script.target_type, script.target_param1, script.target_param2, pSpellInfo)))
             {
                 if (!(script.raw.data[4] & SF_GENERAL_SKIP_MISSING_TARGETS))
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FindScriptTargets: Failed to find target for Cast Spell script with id %u (spellId: %u), (target_param1: %u), (target_param2: %u), (target_type: %u).", script.castSpell.spellId, script.id, script.target_param1, script.target_param2, script.target_type);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FindScriptTargets: Failed to find target for Cast Spell script with id %u (spellId: %u), (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.castSpell.spellId, script.target_param1, script.target_param2, script.target_type);
                 return false;
             }
         }
