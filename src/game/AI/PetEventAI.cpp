@@ -120,15 +120,6 @@ void PetEventAI::AttackedBy(Unit* pAttacker)
 {
     if (!m_creature->GetVictim())
         AttackStart(pAttacker);
-
-    if (Creature* pOwner = ToCreature(m_creature->GetCharmerOrOwner()))
-    {
-        if (pOwner->IsAlive() && pAttacker->IsTargetableBy(pOwner))
-        {
-            pOwner->AddThreat(pAttacker);
-            pOwner->SetInCombatWith(pAttacker);
-        }
-    }
 }
 
 Unit* PetEventAI::FindTargetForAttack() const
