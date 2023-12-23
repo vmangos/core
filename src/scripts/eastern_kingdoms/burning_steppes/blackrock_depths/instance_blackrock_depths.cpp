@@ -893,6 +893,14 @@ struct instance_blackrock_depths : ScriptedInstance
             case DATA_THELDREN:
                 if (uiData == DONE)
                 {
+                    // Give kill credit for quest The Challenge (9015)
+                    Map::PlayerList const& players = instance->GetPlayers();
+                    for (const auto& itr : players)
+                    {
+                        if (Player* pPlayer = itr.getSource())
+                            pPlayer->KilledMonsterCredit(NPC_THELDREN_KILL_CREDIT);
+                    }
+
                     // Spawn "Arena Spoils" chest with sick loot
                     DoRespawnGameObject(m_uiArenaSpoilsGUID);
                 }
