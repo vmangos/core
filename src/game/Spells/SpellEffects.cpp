@@ -3949,7 +3949,7 @@ void Spell::EffectTameCreature(SpellEffectIndex /*effIdx*/)
         return;
     }
 
-    pet->GetCharmInfo()->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
+    pet->GetCharmInfo()->SetPetNumber(pet->GetObjectGuid().GetEntry(), true);
     pet->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
     pet->InitializeDefaultName();
     pet->AIM_Initialize();
