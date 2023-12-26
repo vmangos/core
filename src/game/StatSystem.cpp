@@ -34,8 +34,8 @@
 
 bool Player::UpdateStats(Stats stat)
 {
-    if (stat > STAT_SPIRIT)
-        return false;
+    /* if (stat > STAT_SPIRIT) //Vanilla Reforged - Scaling changes
+        return false; */
 
     // value = ((base_value * base_pct) + total_value) * total_pct
     float value  = GetTotalStatValue(stat);
@@ -190,7 +190,7 @@ void Player::UpdateMaxPower(Powers power)
     SetMaxPower(power, uint32(value));
 }
 
-float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, float agility) const
+float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, float agility, float spirit) const //Vanilla Reforged - Scaling changes
 {
     float val2 = 0.0f;
     float level = float(GetLevel());
@@ -199,14 +199,13 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
         switch (GetClass())
         {
             case CLASS_HUNTER:
-                val2 = level * 2.0f + agility * 2.0f - 10.0f;
+                val2 = (level * 2.0f + agility * 2.0f)*0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_ROGUE:
-                val2 = level        + agility - 10.0f;
+                val2 = (level        + agility)       *0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_WARRIOR:
-                val2 = level        + agility - 10.0f;
-                break;
+                val2 = (level        + agility)       *0.66f; //Vanilla Reforged - Scaling changes
             case CLASS_DRUID:
                 switch (GetShapeshiftForm())
                 {
@@ -216,12 +215,12 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                         val2 = 0.0f;
                         break;
                     default:
-                        val2 = agility - 10.0f;
+                        val2 = agility                *0.66f; //Vanilla Reforged - Scaling changes
                         break;
                 }
                 break;
             default:
-                val2 = agility - 10.0f;
+                val2 = agility                        *0.66f; //Vanilla Reforged - Scaling changes
                 break;
         }
     }
@@ -230,19 +229,19 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
         switch (GetClass())
         {
             case CLASS_WARRIOR:
-                val2 = level * 3.0f + strength * 2.0f    - 20.0f;
+                val2 = (level * 3.0f + strength * 2.0f +    spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_PALADIN:
-                val2 = level * 3.0f + strength * 2.0f    - 20.0f;
+                val2 = (level * 3.0f + strength * 2.0f +    spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_ROGUE:
-                val2 = level * 2.0f + strength + agility - 20.0f;
+                val2 = (level * 2.0f + strength + agility + spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_HUNTER:
-                val2 = level * 2.0f + strength + agility - 20.0f;
+                val2 = (level * 2.0f + strength + agility + spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_SHAMAN:
-                val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
+                val2 = (level * 3.0f + strength * 2.0f +    spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_DRUID:
             {
@@ -275,33 +274,29 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 switch (form)
                 {
                     case FORM_CAT:
-                       // World of Warcraft Client Patch 1.7.0 (2005-09-13)
-                       // - Cat Form - Each point of agility now adds 1 attack power.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f + agility - 20.0f;
+                        val2 = (level * 2.0f + strength + agility + spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                         break;
-#endif
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
-                        val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
+                        val2 = (level * 2.0f + strength + agility + spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                         break;
                     case FORM_MOONKIN:
-                        val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
+                        val2 = (level * 2.0f + strength + agility + spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                         break;
                     default:
-                        val2 = level * 2.0f + strength + agility - 20.0f; // Vanilla Reforged - Shaman and Druid scaling changes
+                        val2 = (level * 2.0f + strength + agility + spirit * 0.5f)*0.66f; //Vanilla Reforged - Scaling changes
                         break;
                 }
                 break;
             }
             case CLASS_MAGE:
-                val2 = strength - 10.0f;
+                val2 = strength*0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_PRIEST:
-                val2 = strength - 10.0f;
+                val2 = strength*0.66f; //Vanilla Reforged - Scaling changes
                 break;
             case CLASS_WARLOCK:
-                val2 = strength - 10.0f;
+                val2 = strength*0.66f; //Vanilla Reforged - Scaling changes
                 break;
         }
     }
@@ -327,7 +322,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 #endif  
     }
 
-    float val2 = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY));
+    float val2 = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY), GetStat(STAT_SPIRIT)); //Vanilla Reforged - Scaling changes
     SetModifierValue(unitMod, BASE_VALUE, val2);
 
     float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);
@@ -543,7 +538,7 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
 
     float value = GetTotalPercentageModValue(modGroup);
     switch (GetClass())
-    {   /* Vanilla Reforged - Shaman and Druid scaling changes
+    {   /* Vanilla Reforged - Scaling changes
         case CLASS_DRUID:
             value += 0.9f;
             break; */
@@ -556,10 +551,9 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
         case CLASS_PRIEST:
             value += 3.0f;
             break;
-        /* Vanilla Reforged - Shaman and Druid scaling changes
         case CLASS_SHAMAN:
             value += 1.7f;
-            break; */
+            break;
         case CLASS_WARLOCK:
             value += 2.0f;
             break;
@@ -603,7 +597,7 @@ void Player::UpdateDodgePercentage()
     // Nostalrius : base dodge per class
     float value = 0.0f;
     switch (GetClass())
-    {   /* Vanilla Reforged - Shaman and Druid scaling changes
+    {   /* Vanilla Reforged - Scaling changes
         case CLASS_DRUID:
             value += 0.9f;
             break; */
@@ -616,10 +610,9 @@ void Player::UpdateDodgePercentage()
         case CLASS_PRIEST:
             value += 3.0f;
             break;
-        /* Vanilla Reforged - Shaman and Druid scaling changes
         case CLASS_SHAMAN:
             value += 1.7f;
-            break; */
+            break;
         case CLASS_WARLOCK:
             value += 2.0f;
             break;
@@ -864,10 +857,11 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
     // Only apply AP bonus from stats when different than default value,
     // as the stats are already taken into account in the base AP values.
     if (GetCreateStat(STAT_STRENGTH) != GetStat(STAT_STRENGTH) ||
-        GetCreateStat(STAT_AGILITY) != GetStat(STAT_AGILITY))
+       GetCreateStat(STAT_AGILITY) != GetStat(STAT_AGILITY) ||
+       GetCreateStat(STAT_STRENGTH) != GetStat(STAT_SPIRIT)) // Vanilla Reforged - Scaling changes
     {
-        float defaultAPBonus = GetAttackPowerFromStrengthAndAgility(ranged, GetCreateStat(STAT_STRENGTH), GetCreateStat(STAT_AGILITY));
-        float currentAPBonus = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY));
+        float defaultAPBonus = GetAttackPowerFromStrengthAndAgility(ranged, GetCreateStat(STAT_STRENGTH), GetCreateStat(STAT_AGILITY), GetStat(STAT_SPIRIT)); // Vanilla Reforged - Scaling changes
+        float currentAPBonus = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY), GetStat(STAT_SPIRIT)); // Vanilla Reforged - Scaling changes
         attackPowerMod += (currentAPBonus - defaultAPBonus);
     }
 
