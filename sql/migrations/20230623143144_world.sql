@@ -103,6 +103,20 @@ UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2242;
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` = 2977;
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 2967;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct Respawn Times for Some Objects
+-- Abercrombies Crate
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` = 14137;
+
+-- Cozzle's Footlocker
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` = 11013;
+
+-- Clara's Fresh Apples
+UPDATE `gameobject` SET `spawntimesecsmin` = 20, `spawntimesecsmax` = 20 WHERE `guid` = 26772;
+
+-- Waterlogged Letter
+UPDATE `gameobject` SET `spawntimesecsmin` = 20, `spawntimesecsmax` = 20 WHERE `guid` = 14656;
+
 
 -- End of migration.
 END IF;
