@@ -83,8 +83,11 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (GetPlayer()->GetMapId() > 1 && GetPlayer()->GetInstanceId() && player->GetInstanceId() && GetPlayer()->GetInstanceId() != player->GetInstanceId() && GetPlayer()->GetMapId() == player->GetMapId())
+    // Prevent inviting player to group who is in a different instance of the same map.
+    if (GetPlayer()->GetMapId() > 1 && GetPlayer()->GetInstanceId() && player->GetInstanceId() &&
+        GetPlayer()->GetInstanceId() != player->GetInstanceId() && GetPlayer()->GetMapId() == player->GetMapId())
         return;
+
     // Just ignore us
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {

@@ -2283,7 +2283,7 @@ bool DungeonMap::Reset(InstanceResetMethod method)
         }
         else
         {
-            if (method == INSTANCE_RESET_GLOBAL)
+            if (method == INSTANCE_RESET_GLOBAL || method == INSTANCE_RESET_GROUP_JOIN)
             {
                 // set the homebind timer for players inside (1 minute)
                 for (const auto& itr : m_mapRefManager)
@@ -2313,11 +2313,19 @@ void DungeonMap::PermBindAllPlayers(Player* player)
     for (const auto& itr : m_mapRefManager)
     {
         Player* plr = itr.getSource();
+
         // players inside an instance cannot be bound to other instances
         // some players may already be permanently bound, in this case nothing happens
         InstancePlayerBind *bind = plr->GetBoundInstance(GetId());
         if (!bind || !bind->perm)
         {
+            if (m_resetAfterUnload)
+            {
+                sLog.Player(plr->GetSession(), LOG_BASIC, LOG_LVL_ERROR, "Attempt to permanently save player to raid (map %u, instance %u) scheduled for reset on unload and already deleted from DB!", GetId(), GetInstanceId());
+                plr->TeleportToHomebind();
+                continue;
+            }
+
             plr->BindToInstance(GetPersistanceState(), true);
             WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);
