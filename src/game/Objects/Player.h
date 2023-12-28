@@ -2580,22 +2580,26 @@ class Player final: public Unit
         /***                 INSTANCE SYSTEM                   ***/
         /*********************************************************/
 
+    public:
+        typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
+
     private:
         bool   m_enableInstanceSwitch;
         bool   m_smartInstanceRebind;
         uint32 m_HomebindTimer;
+
+        void ResetInstance(InstanceResetMethod method, BoundInstancesMap::iterator& itr);
     public:
         void SendTransferAborted(uint8 reason) const;
         void SendInstanceResetWarning(uint32 mapid, uint32 time) const;
-
+        
         void ResetInstances(InstanceResetMethod method);
+        void ResetPersonalInstanceOnLeaveDungeon(uint32 mapId);
         void SendResetInstanceSuccess(uint32 MapId) const;
         void SendResetInstanceFailed(uint32 reason, uint32 MapId) const;
         void SendResetFailedNotify();
         bool CheckInstanceCount(uint32 instanceId) const;
         void AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const;
-
-        typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
 
         void UpdateHomebindTime(uint32 time);
         bool m_InstanceValid;

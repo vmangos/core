@@ -164,16 +164,17 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     if (mEntry->IsRaid())
     {
-        // Cancel any group invites on teleport to dungeon to prevent raid reset exploits.
-        // We already prevent inviting player who is in different instance of same map.
-        // This makes sure you cant bypass that by inviting player first but not accepting until inside.
-        GetPlayer()->UninviteFromGroup();
-
         if (time_t timeReset = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(mEntry->id))
         {
             uint32 timeleft = uint32(timeReset - time(nullptr));
             GetPlayer()->SendInstanceResetWarning(mEntry->id, timeleft);
         }
+    }
+    else if (!mEntry->IsDungeon())
+    {
+        MapEntry const* oldMapEntry = sMapStorage.LookupEntry<MapEntry>(oldLoc.mapId);
+        if (oldMapEntry->IsDungeon())
+            GetPlayer()->ResetPersonalInstanceOnLeaveDungeon(oldLoc.mapId);
     }
 
     // mount allow check

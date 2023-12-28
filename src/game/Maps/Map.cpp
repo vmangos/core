@@ -2181,28 +2181,21 @@ void DungeonMap::BindPlayerOrGroupOnEnter(Player* player)
         {
             // solo saves should be reset when entering a group
             InstanceGroupBind *groupBind = pGroup->GetBoundInstance(GetId());
-            if (playerBind)
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "InstanceMap::Add: %s is being put in instance %d,%d,%d,%d,%d but he is in group (Id: %d) and is bound to instance %d,%d,%d,%d,%d!",
-                    player->GetObjectGuid().GetString().c_str(), playerBind->state->GetMapId(), playerBind->state->GetInstanceId(),
-                    playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(),
-                    playerBind->state->CanReset(), pGroup->GetId(),
-                    playerBind->state->GetMapId(), playerBind->state->GetInstanceId(),
-                    playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(), playerBind->state->CanReset());
-
-                if (groupBind)
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "InstanceMap::Add: the group (Id: %d) is bound to instance %d,%d,%d,%d,%d",
-                        pGroup->GetId(),
-                        groupBind->state->GetMapId(), groupBind->state->GetInstanceId(),
-                        groupBind->state->GetPlayerCount(), groupBind->state->GetGroupCount(), groupBind->state->CanReset());
-
-                // no reason crash if we can fix state
-                player->UnbindInstance(GetId());
-            }
 
             // bind to the group or keep using the group save
             if (!groupBind)
+            {
                 pGroup->BindToInstance(GetPersistanceState(), false);
+
+                // the personal save has become a group save
+                if (playerBind)
+                    player->UnbindInstance(GetId());
+            }
+            else if (playerBind)
+            {
+                // cannot jump to a different instance without resetting it
+                MANGOS_ASSERT(playerBind->state == GetPersistentState());
+            }
             else
             {
                 // cannot jump to a different instance without resetting it
@@ -2283,7 +2276,7 @@ bool DungeonMap::Reset(InstanceResetMethod method)
         }
         else
         {
-            if (method == INSTANCE_RESET_GLOBAL || method == INSTANCE_RESET_GROUP_JOIN)
+            if (method == INSTANCE_RESET_GLOBAL)
             {
                 // set the homebind timer for players inside (1 minute)
                 for (const auto& itr : m_mapRefManager)
@@ -2314,18 +2307,18 @@ void DungeonMap::PermBindAllPlayers(Player* player)
     {
         Player* plr = itr.getSource();
 
+        if (m_resetAfterUnload)
+        {
+            sLog.Player(plr->GetSession(), LOG_BASIC, LOG_LVL_ERROR, "Attempt to permanently save player to raid (map %u, instance %u) scheduled for reset on unload and already deleted from DB!", GetId(), GetInstanceId());
+            plr->TeleportToHomebind();
+            continue;
+        }
+
         // players inside an instance cannot be bound to other instances
         // some players may already be permanently bound, in this case nothing happens
         InstancePlayerBind *bind = plr->GetBoundInstance(GetId());
         if (!bind || !bind->perm)
         {
-            if (m_resetAfterUnload)
-            {
-                sLog.Player(plr->GetSession(), LOG_BASIC, LOG_LVL_ERROR, "Attempt to permanently save player to raid (map %u, instance %u) scheduled for reset on unload and already deleted from DB!", GetId(), GetInstanceId());
-                plr->TeleportToHomebind();
-                continue;
-            }
-
             plr->BindToInstance(GetPersistanceState(), true);
             WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);

@@ -16251,15 +16251,6 @@ void Player::_LoadBoundInstances(QueryResult* result)
                 continue;
             }
 
-            if (!perm && group)
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_LoadBoundInstances: %s is in group (Id: %d) but has a non-permanent character bind to map %d,%d",
-                              GetGuidStr().c_str(), group->GetId(), mapId, instanceId);
-                CharacterDatabase.PExecute("DELETE FROM `character_instance` WHERE `guid` = '%u' AND `instance` = '%u'",
-                                           GetGUIDLow(), instanceId);
-                continue;
-            }
-
             // since non permanent binds are always solo bind, they can always be reset
             DungeonPersistentState* state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, instanceId, resetTime, !perm, true);
             if (state) BindToInstance(state, perm, true);
@@ -16347,9 +16338,8 @@ DungeonPersistentState* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapid)
     InstancePlayerBind* pBind = GetBoundInstance(mapid);
     DungeonPersistentState* state = pBind ? pBind->state : nullptr;
 
-    // the player's permanent player bind is taken into consideration first
-    // then the player's group bind and finally the solo bind.
-    if (!pBind || !pBind->perm)
+    // the player's personal or permanent bind is taken into consideration first
+    if (!pBind)
     {
         if (Group* group = GetGroup())
             if (InstanceGroupBind* groupBind = group->GetBoundInstance(mapid))
@@ -17495,6 +17485,13 @@ void Player::ResetInstances(InstanceResetMethod method)
             continue;
         }
 
+        // cannot reset instance while inside
+        if (IsInWorld() && itr->first == GetMapId())
+        {
+            ++itr;
+            continue;
+        }
+
         if (method == INSTANCE_RESET_ALL)
         {
             // the "reset all instances" method can only reset normal maps
@@ -17503,29 +17500,52 @@ void Player::ResetInstances(InstanceResetMethod method)
                 ++itr;
                 continue;
             }
-
-            // solo player cannot reset instance while inside
-            if (IsInWorld() && itr->first == GetMapId())
-            {
-                ++itr;
-                continue;
-            }
         }
 
-        // if the map is loaded, reset it
-        if (Map* map = sMapMgr.FindMap(state->GetMapId(), state->GetInstanceId()))
-            if (map->IsDungeon())
-                ((DungeonMap*)map)->Reset(method);
+        ResetInstance(method, itr);
+    }
+}
 
-        // since this is a solo instance there should not be any players inside
-        if (method == INSTANCE_RESET_ALL)
-            SendResetInstanceSuccess(state->GetMapId());
+void Player::ResetInstance(InstanceResetMethod method, BoundInstancesMap::iterator& itr)
+{
+    DungeonPersistentState* state = itr->second.state;
 
-        state->DeleteFromDB();
-        m_boundInstances.erase(itr++);
+    // if the map is loaded, reset it
+    if (Map* map = sMapMgr.FindMap(state->GetMapId(), state->GetInstanceId()))
+        if (map->IsDungeon())
+            ((DungeonMap*)map)->Reset(method);
 
-        // the following should remove the instance save from the manager and delete it as well
-        state->RemovePlayer(this);
+    // since this is a solo instance there should not be any players inside
+    if (method == INSTANCE_RESET_ALL)
+        SendResetInstanceSuccess(state->GetMapId());
+
+    state->DeleteFromDB();
+    m_boundInstances.erase(itr++);
+
+    // the following should remove the instance save from the manager and delete it as well
+    state->RemovePlayer(this);
+}
+
+// should only be called on teleport from inside dungeon to outside
+// if player was inside a different instance of a dungeon when he got invited to group
+// it should only be reset once he leaves the dungeon, not immediately on accepting group
+void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
+{
+    MANGOS_ASSERT(GetMapId() != mapId);
+
+    Group* pGroup = GetGroup();
+    if (!pGroup)
+        return;
+
+    BoundInstancesMap::iterator itr = m_boundInstances.find(mapId);
+    if (itr == m_boundInstances.end() || itr->second.perm)
+        return;
+
+    // the group save replaces the personal save
+    if (InstanceGroupBind* pGroupBind = pGroup->GetBoundInstance(mapId))
+    {
+        MANGOS_ASSERT(itr->second.state != pGroupBind->state);
+        ResetInstance(INSTANCE_RESET_GROUP_JOIN, itr);
     }
 }
 

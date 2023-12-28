@@ -709,7 +709,7 @@ void WorldSession::LogoutPlayer(bool Save)
         bool removedFromMap = false;
         if (Map* map = _player->FindMap())
         {
-            if (map->IsNonRaidDungeon() && _player->GetGroup())
+            if (map->IsNonRaidDungeon() && !_player->GetBoundInstanceSaveForSelfOrGroup(map->GetId()))
             {
                 AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(map->GetId());
                 if (at)
@@ -731,11 +731,6 @@ void WorldSession::LogoutPlayer(bool Save)
 
         // If the player is in a group (or invited), remove him. If the group if then only 1 person, disband the group.
         _player->UninviteFromGroup();
-
-        // remove player from the group if he is:
-        // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected)
-        if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && m_socket)
-            _player->RemoveFromGroup();
 
         // Send update to group
         if (Group* group = _player->GetGroup())
