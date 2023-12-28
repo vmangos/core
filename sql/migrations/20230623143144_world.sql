@@ -117,6 +117,12 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 20, `spawntimesecsmax` = 20 WHERE `
 -- Waterlogged Letter
 UPDATE `gameobject` SET `spawntimesecsmin` = 20, `spawntimesecsmax` = 20 WHERE `guid` = 14656;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Quests are Alliance / Horde Only
+UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (8951, 8952, 8953, 8954, 8955, 8956, 8958, 8959);
+
+UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` IN (8957, 9016, 9017, 9018, 9019, 9020, 9021, 9022);
+
 
 -- End of migration.
 END IF;
