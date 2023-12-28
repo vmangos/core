@@ -193,8 +193,6 @@ struct boss_onyxiaAI : public ScriptedAI
         
         SetCombatMovement(true);
         m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED);
-        m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 15.0f);
-        m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 16.0f);
 
         // Daemon: remise en mode "dort"
         m_creature->SetStandState(UNIT_STAND_STATE_SLEEP);
@@ -605,10 +603,6 @@ struct boss_onyxiaAI : public ScriptedAI
                 m_creature->CastSpell(m_creature, 17131, true); /** Start flying */
                 m_bTransition = false;
                 m_uiTransTimer = 0;
-
-                // increase Onyxia's hitbox while in the air to make it slightly easier for melee to use specials on her
-                m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 21.0f);
-                m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 22.0f);
                 
                 m_pPointData = GetMoveData();
                 m_creature->GetMotionMaster()->MovePoint(m_pPointData->uiLocId, m_pPointData->fX, m_pPointData->fY, m_pPointData->fZ, MOVE_PATHFINDING | MOVE_FLY_MODE);
@@ -631,8 +625,6 @@ struct boss_onyxiaAI : public ScriptedAI
                     m_creature->GetMotionMaster()->MovePoint(LANDING_FLIGHT, -8.86f, -212.752f, -88.542f, MOVE_FLY_MODE);   // North
 
                 m_creature->RemoveAurasDueToSpell(17131); /** Stop flying */
-                m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 15.0f);
-                m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 16.0f);
                 m_uiTransTimer = 60000; // handled by MovementInform
             }
             /** Landing in progress */
