@@ -143,6 +143,10 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` = 235;
 DELETE FROM `creature_loot_template`  WHERE `entry` = 235;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Incorrect Creature
+DELETE FROM `creature` WHERE `guid` = 21706;
+
 
 -- End of migration.
 END IF;
