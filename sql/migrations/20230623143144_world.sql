@@ -132,6 +132,11 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (766409, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4549, 0, 0, 0, 0, 0, 0, 0, 0, 'Razelikh the Defiler - Yell on Spawn');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Incorrect Loot Template
+UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` = 235;
+DELETE FROM `creature_loot_template`  WHERE `entry` = 235;
+
 
 -- End of migration.
 END IF;
