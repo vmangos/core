@@ -299,6 +299,7 @@ void PlayerBotMgr::Update(uint32 diff)
         m_lastBattleBotQueueUpdate = sWorld.GetGameTime();
         for (uint32 queueType = BATTLEGROUND_QUEUE_AV; queueType < MAX_BATTLEGROUND_QUEUE_TYPES; ++queueType)
         {
+            bool hasPlayerInQueue[MAX_BATTLEGROUND_BRACKETS] = {};
             uint32 queuedAllianceCount[MAX_BATTLEGROUND_BRACKETS] = {};
             uint32 queuedHordeCount[MAX_BATTLEGROUND_BRACKETS] = {};
             BattleGroundQueue const& bgQueue = sBattleGroundMgr.m_battleGroundQueues[queueType];
@@ -309,9 +310,6 @@ void PlayerBotMgr::Update(uint32 diff)
 
                 if (Player* pPlayer = sObjectAccessor.FindPlayer(itr.first))
                 {
-                    if (pPlayer->IsBot())
-                        continue;
-
                     BattleGroundTypeId bgTypeId = itr.second.groupInfo->bgTypeId;
                     BattleGroundBracketId bgBracketId = pPlayer->GetBattleGroundBracketIdFromLevel(bgTypeId);
                     if (bgBracketId == BG_BRACKET_ID_NONE)
@@ -321,11 +319,17 @@ void PlayerBotMgr::Update(uint32 diff)
                         ++queuedAllianceCount[bgBracketId];
                     else
                         ++queuedHordeCount[bgBracketId];
+
+                    if (!pPlayer->IsBot())
+                        hasPlayerInQueue[bgBracketId] = true;
                 }
             }
 
             for (uint32 bracketId = BG_BRACKET_ID_FIRST; bracketId < MAX_BATTLEGROUND_BRACKETS; ++bracketId)
             {
+                if (!hasPlayerInQueue[bracketId])
+                    continue;
+
                 if (!queuedAllianceCount[bracketId] && !queuedHordeCount[bracketId])
                     continue;
 
