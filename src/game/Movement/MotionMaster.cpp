@@ -868,12 +868,13 @@ void MotionMaster::MoveJump(float x, float y, float z, float horizontalSpeed, fl
     Mutate(new EffectMovementGenerator(id));*/
 }
 
-void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack)
+void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack, bool useCombatReach)
 {
+    float meleeReach = useCombatReach ? (m_owner->GetCombatReachToTarget(target, false, 0.0f, true) - 0.5f) : 0.0f;
     if (m_owner->IsPlayer())
-        Mutate(new ChargeMovementGenerator<Player>(*(m_owner->ToPlayer()), *target, delay, triggerAutoAttack));
+        Mutate(new ChargeMovementGenerator<Player>(*(m_owner->ToPlayer()), *target, delay, triggerAutoAttack, 0.0f, meleeReach));
     else
-        Mutate(new ChargeMovementGenerator<Creature>(*(m_owner->ToCreature()), *target, delay, triggerAutoAttack));
+        Mutate(new ChargeMovementGenerator<Creature>(*(m_owner->ToCreature()), *target, delay, triggerAutoAttack, 0.0f, meleeReach));
 }
 
 bool MotionMaster::MoveDistance(Unit* pTarget, float distance)

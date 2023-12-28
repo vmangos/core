@@ -179,13 +179,10 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
             return;
         }
 
-    // Try to prevent redundant micro-moves
-    float pathLength = path.Length();
-    if (pathLength < 0.4f ||
-            (pathLength < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
-            (pathType & PATHFIND_NOPATH && !petFollowing) ||
-            (pathType & PATHFIND_INCOMPLETE && !owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH) && !petFollowing) ||
-            (!petFollowing && !m_bReachable && !(owner.IsPlayer() && owner.HasUnitState(UNIT_STAT_FOLLOW))))
+    // Prevent redundant moves
+    if ((path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
+        (!petFollowing && pathType & PATHFIND_NOPATH) ||
+        (!petFollowing && pathType & PATHFIND_INCOMPLETE && !owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH)) ||
     {
         if (!losChecked)
             losResult = owner.IsWithinLOSInMap(i_target.getTarget());
@@ -346,7 +343,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             }
             else
             {
-                float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
+                float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget());
                 bool targetMoved = false;
                 G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
                 if (GenericTransport* ownerTransport = owner.GetTransport())
@@ -360,12 +357,12 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
                     targetMoved = true;
 
                 if (!targetMoved)
-                    targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.5f);
+                    targetMoved = (dest.x != i_target->GetPositionX() || dest.y != i_target->GetPositionY() || dest.z != i_target->GetPositionZ());
 
                 // Chase movement may be interrupted
                 if (!targetMoved)
                     if (owner.movespline->Finalized())
-                        targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, allowed_dist - owner.GetObjectBoundingRadius());
+                        targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, allowed_dist, SizeFactor::None);
 
                 if (targetMoved)
                 {
