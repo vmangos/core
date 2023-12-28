@@ -322,7 +322,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
                 float attackDistance = pAttacker->GetMaxChaseDistance(target);
                 // second choice targets are: immune to attacker's autoattack damage school / is secondary threat target (fear, gouge etc) /
                 // is outside of attacker's caster chase distance if rooted caster / is unreachable by attacker's melee attacks if rooted melee.
-                if ( target->IsImmuneToDamage(pAttacker->GetMeleeDamageSchoolMask()) || (target->IsSecondaryThreatTarget()) ||
+                if ( target->IsImmuneToDamage(pAttacker->GetMeleeDamageSchoolMask()) || target->IsSecondaryThreatTarget() ||
                    ( attackerImmobilized && pAttacker->HasDistanceCasterMovement() &&!target->IsWithinDist(pAttacker, attackDistance, true, SizeFactor::None)) ||
                    ( attackerImmobilized && !pAttacker->CanReachWithMeleeAutoAttack(target)))
                 {
