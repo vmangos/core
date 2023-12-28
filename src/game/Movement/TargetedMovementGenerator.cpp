@@ -183,6 +183,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     if ((path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
         (!petFollowing && pathType & PATHFIND_NOPATH) ||
         (!petFollowing && pathType & PATHFIND_INCOMPLETE && !owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH)) ||
+        (!petFollowing && !m_bReachable && !(owner.IsPlayer() && owner.HasUnitState(UNIT_STAT_FOLLOW))))
     {
         if (!losChecked)
             losResult = owner.IsWithinLOSInMap(i_target.getTarget());

@@ -1518,9 +1518,11 @@ float WorldObject::GetSizeFactorForDistance(WorldObject const* obj, SizeFactor d
         }
         case SizeFactor::CombatReachWithMelee:
         {
-            sizefactor = std::max(1.5f, GetCombatReach());
+            sizefactor = BASE_MELEERANGE_OFFSET + GetCombatReach();
             if (obj)
-                sizefactor += std::max(1.5f, obj->GetCombatReach());
+                sizefactor += obj->GetCombatReach();
+            if (sizefactor < ATTACK_DISTANCE)
+                sizefactor = ATTACK_DISTANCE;
             break;
         }
         default:
@@ -1754,7 +1756,7 @@ bool WorldObject::CanReachWithMeleeSpellAttack(WorldObject const* pVictim, float
         return false;
 
     float reach = IsUnit() && pVictim->IsUnit() ? 
-        static_cast<Unit const*>(this)->GetCombatReach(static_cast<Unit const*>(pVictim), true, flat_mod) : ATTACK_DISTANCE;
+        static_cast<Unit const*>(this)->GetCombatReachToTarget(static_cast<Unit const*>(pVictim), true, flat_mod) : ATTACK_DISTANCE;
 
     // This check is not related to bounding radius
     float dx = GetPositionX() - pVictim->GetPositionX();
