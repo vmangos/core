@@ -107,6 +107,8 @@ class ChargeMovementGenerator
         {
             ComputePath(attacker, victim);
         }
+        void ComputePath(T& attacker, Unit& victim);
+
         void Initialize(T&);
         void Finalize(T&);
         void Interrupt(T&);
