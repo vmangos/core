@@ -117,6 +117,12 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 20, `spawntimesecsmax` = 20 WHERE `
 -- Waterlogged Letter
 UPDATE `gameobject` SET `spawntimesecsmin` = 20, `spawntimesecsmax` = 20 WHERE `guid` = 14656;
 
+-- Shadowforge Cache
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` = 40694;
+
+-- Conspicuous Urn
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` = 40695;
+
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Quests are Alliance / Horde Only
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (8951, 8952, 8953, 8954, 8955, 8956, 8958, 8959);
