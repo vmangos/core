@@ -120,8 +120,17 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 20, `spawntimesecsmax` = 20 WHERE `
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Quests are Alliance / Horde Only
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (8951, 8952, 8953, 8954, 8955, 8956, 8958, 8959);
-
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` IN (8957, 9016, 9017, 9018, 9019, 9020, 9021, 9022);
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct Position of Altar of the Defiler
+UPDATE `gameobject` SET `position_x` = -11247.5, `position_y` = -2831.07, `position_z` = 159.971, `orientation` = 5.79449, `rotation2` = -0.241921, `rotation3` = 0.970296 WHERE  `guid`=16739;
+
+-- Add Missing Spawn Yell For Razelikh the Defiler
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(766409, 7664, 0, 11, 0, 100, 0, 0, 0, 0, 0, 766409, 0, 0, 'Razelikh the Defiler - Yell on Spawn');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(766409, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4549, 0, 0, 0, 0, 0, 0, 0, 0, 'Razelikh the Defiler - Yell on Spawn');
 
 
 -- End of migration.
