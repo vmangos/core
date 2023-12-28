@@ -2189,7 +2189,28 @@ void DungeonMap::BindPlayerOrGroupOnEnter(Player* player)
 
                 // the personal save has become a group save
                 if (playerBind)
+                {
+                    // cannot jump to a different instance without resetting it
+                    MANGOS_ASSERT(playerBind->state == GetPersistentState());
                     player->UnbindInstance(GetId());
+                }
+
+                // reset personal saves of other members now that group save is created
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    if (Player* pMember = itr->getSource())
+                    {
+                        if (pMember == player)
+                            continue;
+
+                        if (pMember->GetMapId() != GetId())
+                        {
+                            InstancePlayerBind* memberBind = pMember->GetBoundInstance(GetId());
+                            if (memberBind && !memberBind->perm)
+                                pMember->UnbindInstance(GetId());
+                        }
+                    }
+                }
             }
             else if (playerBind)
             {
