@@ -262,8 +262,8 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
 
         // before GM
         float x, y, z;
-        pPlayer->GetClosePoint(x, y, z, pl->GetObjectBoundingRadius());
-        pl->TeleportTo(pPlayer->GetMapId(), x, y, z, pl->GetOrientation());
+        pPlayer->GetPosition(x, y, z);
+        pl->TeleportTo(pPlayer->GetMapId(), x, y, z, pPlayer->GetOrientation());
     }
 
     return true;
@@ -1179,8 +1179,8 @@ bool ChatHandler::HandleNamegoCommand(char* args)
 
         // before GM
         float x, y, z;
-        pPlayer->GetClosePoint(x, y, z, pTarget->GetObjectBoundingRadius());
-        pTarget->TeleportTo(pPlayer->GetMapId(), x, y, z, pTarget->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT);
+        pPlayer->GetPosition(x, y, z);
+        pTarget->TeleportTo(pPlayer->GetMapId(), x, y, z, pPlayer->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT);
     }
     else
     {

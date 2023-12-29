@@ -4667,8 +4667,11 @@ void Unit::AttackedBy(Unit* attacker)
             pCreature->AI()->AttackedBy(attacker);
 
         // trigger owner AI reaction
+        // must check that attacker is targetable by owner,
+        // because there are cases with unattackable creatures spawning pets
+        // example: Scarshield Portal (9707) spawns guardian pet Burning Imp (9708) with spell 15126
         if (Creature* pOwner = ::ToCreature(GetCharmerOrOwner()))
-            if (pOwner->AI())
+            if (pOwner->AI() && pOwner->IsAlive() && attacker->IsTargetableBy(pOwner))
                 pOwner->AI()->AttackedBy(attacker);
     }
 }

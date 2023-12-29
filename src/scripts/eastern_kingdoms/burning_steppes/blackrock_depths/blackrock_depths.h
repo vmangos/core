@@ -143,6 +143,7 @@ enum
     NPC_SHADOWFORGE_CITIZEN    = 8902,
     NPC_GRIMSTONE              = 10096,
     NPC_THELDREN               = 16059,
+    NPC_THELDREN_KILL_CREDIT   = 16166,
 
     GO_ARENA1                  = 161525,
     GO_ARENA2                  = 161522,

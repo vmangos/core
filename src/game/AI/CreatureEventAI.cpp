@@ -109,6 +109,9 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
     if (pHolder.Event.event_inverse_phase_mask & (1 << m_Phase))
         return false;
 
+    if ((pHolder.Event.event_flags & EFLAG_NOT_CASTING) && m_creature->IsNonMeleeSpellCasted(false, false, true))
+        return false;
+
     if (pHolder.Event.condition_id && !IsConditionSatisfied(pHolder.Event.condition_id, pActionInvoker ? pActionInvoker : m_creature->GetVictim(), m_creature->GetMap(), m_creature, CONDITION_FROM_EVENTAI))
         return false;
 

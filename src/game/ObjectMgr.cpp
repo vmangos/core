@@ -10770,7 +10770,7 @@ void ObjectMgr::RemoveGroup(Group* group)
 bool FindCreatureData::operator()(CreatureDataPair const& dataPair)
 {
     // skip wrong entry ids
-    if (i_id && dataPair.second.creature_id[0] != i_id)
+    if (i_id && !dataPair.second.HasCreatureId(i_id))
         return false;
 
     if (!i_anyData)
