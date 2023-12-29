@@ -147,6 +147,10 @@ DELETE FROM `creature_loot_template`  WHERE `entry` = 235;
 -- Remove Incorrect Creature
 DELETE FROM `creature` WHERE `guid` = 21706;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Ran Bloodtooth's Skull Should Always Drop
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `item` = 5388;
+
 
 -- End of migration.
 END IF;
