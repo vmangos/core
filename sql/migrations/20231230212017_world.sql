@@ -26,12 +26,12 @@ DELETE FROM `spell_mod` WHERE `Id`=28380;
 DELETE FROM `spell_mod` WHERE `Id`=28381;
 DELETE FROM `spell_mod` WHERE `Id`=28382;
 -- Correct fix
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28377, 0, 0, 5464, 5875);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28378, 0, 0, 5464, 5875);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28379, 0, 0, 5464, 5875);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28380, 0, 0, 5464, 5875);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28381, 0, 0, 5464, 5875);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28382, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28377, 0, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28378, 0, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28379, 0, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28380, 0, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28381, 0, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28382, 0, 0, 0, 5464, 5875);
 
 -- Holy Nova heal should cause no threat
 -- Delete bad fix
