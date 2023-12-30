@@ -26,12 +26,12 @@ DELETE FROM `spell_mod` WHERE `Id`=28380;
 DELETE FROM `spell_mod` WHERE `Id`=28381;
 DELETE FROM `spell_mod` WHERE `Id`=28382;
 -- Correct fix
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28377, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28378, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28379, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28380, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28381, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (28382, 0, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28377, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28378, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28379, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28380, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28381, 0, 0, 5464, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (28382, 0, 0, 5464, 5875);
 
 -- Holy Nova heal should cause no threat
 -- Delete bad fix
@@ -42,12 +42,12 @@ DELETE FROM `spell_mod` WHERE `Id`=27803;
 DELETE FROM `spell_mod` WHERE `Id`=27804;
 DELETE FROM `spell_mod` WHERE `Id`=27805;
 -- Correct fix
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (23455, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (23458, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (23459, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (27803, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (27804, 0, 0, 0);
-INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`) VALUES (27805, 0, 0, 0);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (23455, 0, 0, 0, 4499, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (23458, 0, 0, 0, 4499, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (23459, 0, 0, 0, 4499, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (27803, 0, 0, 0, 5302, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (27804, 0, 0, 0, 5302, 5875);
+INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (27805, 0, 0, 0, 5302, 5875);
 
 -- Feral Charge Effect should cause threat
 -- Delete bad fix, wrong value and wrong spell
