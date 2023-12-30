@@ -5506,37 +5506,31 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
         spellInfo->HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS))
         return false;
 
-    //TODO add spellEffect immunity checks!, player with flag in bg is immune to immunity buffs from other friendly players!
-    //SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_EFFECT];
-
-    SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
-    for (const auto& itr : dispelList)
+    // Venomhide Ravasaur (6508) is immune to being poisoned by others, but has passive poison aura 14108.
+    // Should either check self cast or passive spell here, not sure which is better.
+    if (!spellInfo->HasAttribute(SPELL_ATTR_PASSIVE))
     {
-        if (itr.type == spellInfo->Dispel)
+        SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
+        for (const auto& itr : dispelList)
         {
-            SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
-
-            if (!pImmunitySpell)
+            if (itr.type == spellInfo->Dispel)
             {
-                // Venomhide Ravasaur (6508) is immune to being poisoned by others, but has passive poison aura 14108.
-                // Should either check self cast or passive spell here, not sure which is better.
-                if (spellInfo->IsPassiveSpell())
-                    continue;
+                SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+                if (!pImmunitySpell)
+                    return true;
 
-                return true;
+                if ((pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
+                    return true;
+
+                if (pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+                    return true;
             }
-
-            if ((pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
-                return true;
-
-            if (pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
-                return true;
         }
     }
 
-    if (!(spellInfo->Attributes & SPELL_ATTR_NO_IMMUNITIES)               // ignore invulnerability
-     && !(spellInfo->AttributesEx & SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT) // can remove immune (by dispell or immune it)
-     && !(spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NO_SCHOOL_IMMUNITIES))
+    if (!spellInfo->HasAttribute(SPELL_ATTR_NO_IMMUNITIES)             // ignore invulnerability
+     && !spellInfo->HasAttribute(SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT) // can remove immune (by dispell or immune it)
+     && !spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_SCHOOL_IMMUNITIES))
     {
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
         for (const auto& itr : schoolList)
@@ -5587,6 +5581,41 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
                     return true;
 
                 if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+                    return true;
+            }
+        }
+    }
+
+    // Spells with this attribute cant be cast if there is aura that will be removed by it.
+    // Example: Trying to stealth or bubble with WSG flag.
+    // Most immunity spells only received the attribute in patch 1.9.
+    if (spellInfo->HasAttribute(SPELL_ATTR_EX2_FAIL_ON_ALL_TARGETS_IMMUNE))
+    {
+        bool hasStealth = false;
+        bool hasImmunity = false;
+        for (auto const& auraType : spellInfo->EffectApplyAuraName)
+        {
+            switch (auraType)
+            {
+                case SPELL_AURA_MOD_STEALTH:
+                case SPELL_AURA_MOD_INVISIBILITY:
+                    hasStealth = true;
+                    break;
+                case SPELL_AURA_EFFECT_IMMUNITY:
+                case SPELL_AURA_SCHOOL_IMMUNITY:
+                    hasImmunity = true;
+                    break;
+            }
+        }
+
+        if (hasStealth || hasImmunity)
+        {
+            for (auto const& itr : m_spellAuraHolders)
+            {
+                SpellEntry const* pAuraSpell = itr.second->GetSpellProto();
+                if (hasStealth && pAuraSpell->HasAuraInterruptFlag(AURA_INTERRUPT_STEALTH_INVIS_CANCELS))
+                    return true;
+                if (hasImmunity && pAuraSpell->HasAuraInterruptFlag(AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS))
                     return true;
             }
         }
