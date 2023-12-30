@@ -5515,8 +5515,16 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
         if (itr.type == spellInfo->Dispel)
         {
             SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+
             if (!pImmunitySpell)
+            {
+                // Venomhide Ravasaur (6508) is immune to being poisoned by others, but has passive poison aura 14108.
+                // Should either check self cast or passive spell here, not sure which is better.
+                if (spellInfo->IsPassiveSpell())
+                    continue;
+
                 return true;
+            }
 
             if ((pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
                 return true;

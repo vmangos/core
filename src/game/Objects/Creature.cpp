@@ -2660,19 +2660,19 @@ void Creature::UpdateLeashExtensionTime()
 
 void Creature::LoadDefaultAuras(uint32 const* auras)
 {
-    for (uint32 const* cAura = auras; *cAura; ++cAura)
+    for (uint32 const* pSpellId = auras; *pSpellId; ++pSpellId)
     {
-        SpellEntry const* AdditionalSpellInfo = sSpellMgr.GetSpellEntry(*cAura);
-        if (!AdditionalSpellInfo)
+        SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(*pSpellId);
+        if (!pSpellEntry)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *cAura);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *pSpellId);
             continue;
         }
 
-        if (HasAura(*cAura))
+        if (HasAura(*pSpellId))
             continue;
 
-        CastSpell(this, AdditionalSpellInfo, true);
+        CastSpell(this, pSpellEntry, true);
     }
 }
 
