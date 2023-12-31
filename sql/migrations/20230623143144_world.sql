@@ -151,6 +151,10 @@ DELETE FROM `creature` WHERE `guid` = 21706;
 -- Ran Bloodtooth's Skull Should Always Drop
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `item` = 5388;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct Scale For Mechanical Greench
+UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 15721;
+
 
 -- End of migration.
 END IF;
