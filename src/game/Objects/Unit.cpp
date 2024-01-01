@@ -5586,38 +5586,15 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
         }
     }
 
-    // Spells with this attribute cant be cast if there is aura that will be removed by it.
-    // Example: Trying to stealth or bubble with WSG flag.
-    // Most immunity spells only received the attribute in patch 1.9.
-    if (spellInfo->HasAttribute(SPELL_ATTR_EX2_FAIL_ON_ALL_TARGETS_IMMUNE))
+    // You should not be able to cast Blessing of Protection or Divine Intervention on WSG flag carrier.
+    if (Spells::IsExplicitPositiveTarget(spellInfo->EffectImplicitTargetA[0]) &&
+        spellInfo->HasAuraOrTriggersAnotherSpellWithAura(SPELL_AURA_SCHOOL_IMMUNITY))
     {
-        bool hasStealth = false;
-        bool hasImmunity = false;
-        for (auto const& auraType : spellInfo->EffectApplyAuraName)
+        for (auto const& itr : m_spellAuraHolders)
         {
-            switch (auraType)
-            {
-                case SPELL_AURA_MOD_STEALTH:
-                case SPELL_AURA_MOD_INVISIBILITY:
-                    hasStealth = true;
-                    break;
-                case SPELL_AURA_EFFECT_IMMUNITY:
-                case SPELL_AURA_SCHOOL_IMMUNITY:
-                    hasImmunity = true;
-                    break;
-            }
-        }
-
-        if (hasStealth || hasImmunity)
-        {
-            for (auto const& itr : m_spellAuraHolders)
-            {
-                SpellEntry const* pAuraSpell = itr.second->GetSpellProto();
-                if (hasStealth && pAuraSpell->HasAuraInterruptFlag(AURA_INTERRUPT_STEALTH_INVIS_CANCELS))
-                    return true;
-                if (hasImmunity && pAuraSpell->HasAuraInterruptFlag(AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS))
-                    return true;
-            }
+            SpellEntry const* pAuraSpell = itr.second->GetSpellProto();
+            if (pAuraSpell->HasAuraInterruptFlag(AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS))
+                return true;
         }
     }
 
