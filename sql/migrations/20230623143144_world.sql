@@ -155,6 +155,17 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `item` = 5
 -- Correct Scale For Mechanical Greench
 UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 15721;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Item Root Sample To Correct Objects
+DELETE FROM `gameobject_loot_template` WHERE `item` = 5056;
+INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
+(2511, 5056, -40, 0, 1, 1, 0, 0, 10),
+(2512, 5056, -40, 0, 1, 1, 0, 0, 10),
+(2513, 5056, -40, 0, 1, 1, 0, 0, 10),
+(2515, 5056, -40, 0, 1, 1, 0, 0, 10),
+(2514, 5056, -40, 0, 1, 1, 0, 0, 10),
+(2516, 5056, -40, 0, 1, 1, 0, 0, 10);
+
 
 -- End of migration.
 END IF;
