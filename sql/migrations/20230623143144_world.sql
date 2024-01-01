@@ -166,6 +166,10 @@ INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, 
 (2514, 5056, -40, 0, 1, 1, 0, 0, 10),
 (2516, 5056, -40, 0, 1, 1, 0, 0, 10);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct Position of Argent Sentry
+UPDATE `creature` SET `position_x` = 2281.64, `position_y` = -5323.76, `position_z` = 89.2311, `orientation` = 2.21657 WHERE `guid` = 69677;
+
 
 -- End of migration.
 END IF;
