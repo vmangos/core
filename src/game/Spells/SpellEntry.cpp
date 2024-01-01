@@ -1103,7 +1103,8 @@ bool SpellEntry::HasAuraOrTriggersAnotherSpellWithAura(AuraType aura) const
 
         if (Effect[i] == SPELL_EFFECT_TRIGGER_SPELL)
             if (SpellEntry const* pTriggeredSpell = sSpellMgr.GetSpellEntry(EffectTriggerSpell[i]))
-                return pTriggeredSpell->HasAura(aura);
+                if (pTriggeredSpell->HasAura(aura))
+                    return true;
     }
     return false;
 }
