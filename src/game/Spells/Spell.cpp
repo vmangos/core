@@ -7779,7 +7779,7 @@ SpellCastResult Spell::CheckItems()
             {
                 if (!m_IsTriggeredSpell && i == EFFECT_INDEX_0)
                 {
-                    if (Unit* target = m_targets.getUnitTarget())
+                    if (Unit* target = (m_spellInfo->EffectImplicitTargetB[i] == TARGET_UNIT_CASTER ? m_casterUnit : m_targets.getUnitTarget()))
                     {
                         if (!target->IsPlayer())
                             return SPELL_FAILED_BAD_TARGETS;
