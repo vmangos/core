@@ -180,7 +180,8 @@ bool BattleBotAI::DrinkAndEat()
     if (me->GetVictim())
         return false;
 
-    bool const needToEat = me->GetHealthPercent() < 100.0f && !(me->GetBattleGround() && me->GetBattleGround()->GetStatus() == STATUS_WAIT_JOIN);
+    BattleGround* bg;
+    bool const needToEat = me->GetHealthPercent() < 100.0f && !((bg = me->GetBattleGround()) && bg->GetStatus() == STATUS_WAIT_JOIN);
     bool const needToDrink = (me->GetPowerType() == POWER_MANA) && (me->GetPowerPercent(POWER_MANA) < 100.0f);
 
     if (!needToEat && !needToDrink)
@@ -229,8 +230,8 @@ bool BattleBotAI::DrinkAndEat()
 
 float BattleBotAI::GetMaxAggroDistanceForMap() const
 {
-    if (!me->GetBattleGround() ||
-        me->GetBattleGround()->GetTypeID() != BATTLEGROUND_AV)
+    BattleGround* bg = me->GetBattleGround();
+    if (!bg || bg->GetTypeID() != BATTLEGROUND_AV)
         return 50.0f;
     
     return 30.0f;
@@ -429,8 +430,8 @@ Unit* BattleBotAI::SelectFollowTarget() const
 
 void BattleBotAI::DoGraveyardJump()
 {
-    if (!me->GetBattleGround() ||
-        me->GetBattleGround()->GetTypeID() != BATTLEGROUND_WS)
+    BattleGround* bg = me->GetBattleGround();
+    if (!bg || bg->GetTypeID() != BATTLEGROUND_WS)
         return;
 
     m_doingGraveyardJump = true;
@@ -566,7 +567,7 @@ void BattleBotAI::OnEnterBattleGround()
 
     SummonPetIfNeeded();
 
-    if (me->GetBattleGround()->GetTypeID() == BATTLEGROUND_WS)
+    if (bg->GetTypeID() == BATTLEGROUND_WS)
     {
         m_waitingSpot = urand(BB_WSG_WAIT_SPOT_SPAWN, BB_WSG_WAIT_SPOT_RIGHT);
         if (m_waitingSpot == BB_WSG_WAIT_SPOT_RIGHT)
@@ -584,14 +585,14 @@ void BattleBotAI::OnEnterBattleGround()
                 me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_ALLIANCE_2.x, WS_WAITING_POS_ALLIANCE_2.y, WS_WAITING_POS_ALLIANCE_2.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_ALLIANCE_2.o);
         }
     }
-    else if (me->GetBattleGround()->GetTypeID() == BATTLEGROUND_AB)
+    else if (bg->GetTypeID() == BATTLEGROUND_AB)
     {
         if (me->GetTeam() == HORDE)
             me->GetMotionMaster()->MovePoint(0, AB_WAITING_POS_HORDE.x + frand(-2.0f, 2.0f), AB_WAITING_POS_HORDE.y + frand(-2.0f, 2.0f), AB_WAITING_POS_HORDE.z, MOVE_PATHFINDING, 0, AB_WAITING_POS_HORDE.o);
         else
             me->GetMotionMaster()->MovePoint(0, AB_WAITING_POS_ALLIANCE.x + frand(-2.0f, 2.0f), AB_WAITING_POS_ALLIANCE.y + frand(-2.0f, 2.0f), AB_WAITING_POS_ALLIANCE.z, MOVE_PATHFINDING, 0, AB_WAITING_POS_ALLIANCE.o);
     }
-    else if (me->GetBattleGround()->GetTypeID() == BATTLEGROUND_AV)
+    else if (bg->GetTypeID() == BATTLEGROUND_AV)
     {
         if (me->GetTeam() == HORDE)
             me->GetMotionMaster()->MovePoint(0, AV_WAITING_POS_HORDE.x + frand(-2.0f, 2.0f), AV_WAITING_POS_HORDE.y + frand(-2.0f, 2.0f), AV_WAITING_POS_HORDE.z, MOVE_PATHFINDING, 0, AV_WAITING_POS_HORDE.o);
@@ -605,6 +606,10 @@ void BattleBotAI::OnLeaveBattleGround()
     ClearPath();
     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         StopMoving();
+
+    // Temporary battlebots are removed after bg ends.
+    if (m_temporary)
+        botEntry->requestRemoval = true;
 }
 
 bool BattleBotAI::CheckForUnreachableTarget()
@@ -750,6 +755,21 @@ void BattleBotAI::UpdateAI(uint32 const diff)
             m_wasInBG = true;
             OnEnterBattleGround();
             return;
+        }
+        else if (m_temporary)
+        {
+            // Remove temporary battlebots if no real players in map.
+            if (BattleGround* bg = me->GetBattleGround())
+            {
+                if (bg->GetStatus() == STATUS_IN_PROGRESS)
+                {
+                    if (!me->GetMap()->HaveRealPlayers())
+                    {
+                        botEntry->requestRemoval = true;
+                        return;
+                    }
+                }
+            }
         }
     }
     
