@@ -188,7 +188,9 @@ enum MangosStrings
     LANG_XP_RATE_MIN                    = 177,
     LANG_XP_RATE_MAX                    = 178,
     LANG_XP_RATE_SET                    = 179,
-    // Room for more level 1              180-199 not used
+    LANG_ALLIANCE_BATTLEBOT_ADDED       = 180,
+    LANG_HORDE_BATTLEBOT_ADDED          = 181,
+    // Room for more level 1              182-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
