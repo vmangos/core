@@ -291,14 +291,17 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
         ExtraAttacksLocked(false);
     }
 
-    if (uint32 base_att = GetAttackTimer(BASE_ATTACK))
-        SetAttackTimer(BASE_ATTACK, (update_diff >= base_att ? 0 : base_att - update_diff));
+    if (int32 base_att = GetAttackTimer(BASE_ATTACK))
+        if (base_att > 0)
+            SetAttackTimer(BASE_ATTACK, base_att - update_diff);
 
-    if (uint32 base_att = GetAttackTimer(OFF_ATTACK))
-        SetAttackTimer(OFF_ATTACK, (update_diff >= base_att ? 0 : base_att - update_diff));
+    if (int32 off_att = GetAttackTimer(OFF_ATTACK))
+        if (off_att > 0)
+        SetAttackTimer(OFF_ATTACK, off_att - update_diff);
 
-    if (uint32 ranged_att = GetAttackTimer(RANGED_ATTACK))
-        SetAttackTimer(RANGED_ATTACK, (update_diff >= ranged_att ? 0 : ranged_att - update_diff));
+    if (int32 ranged_att = GetAttackTimer(RANGED_ATTACK))
+        if (ranged_att > 0)
+        SetAttackTimer(RANGED_ATTACK, ranged_att - update_diff);
 
     if (IsAlive())
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, GetHealth() < GetMaxHealth() * 0.20f);
@@ -379,24 +382,18 @@ bool Unit::UpdateMeleeAttackingState()
 
             if (IsAttackReady(BASE_ATTACK))
             {
-                // prevent base and off attack in same time, delay attack at 0.2 sec
-                if (HaveOffhandWeapon())
-                {
-                    if (GetAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                        SetAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-                }
                 AttackerStateUpdate(pVictim, BASE_ATTACK);
-                ResetAttackTimer(BASE_ATTACK);
+                ResetAttackTimer(BASE_ATTACK, !openerAttack);
+                if (openerAttack && HaveOffhandWeapon() && GetAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
+                    SetAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
+                openerAttack = false;
             }
             if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
             {
-                // prevent base and off attack in same time, delay attack at 0.2 sec
-                uint32 base_att = GetAttackTimer(BASE_ATTACK);
-                if (base_att < ATTACK_DISPLAY_DELAY)
-                    SetAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
                 // do attack
                 AttackerStateUpdate(pVictim, OFF_ATTACK);
-                ResetAttackTimer(OFF_ATTACK);
+                ResetAttackTimer(OFF_ATTACK, !openerAttack);
+                openerAttack = false;
             }
             break;
         }
@@ -473,9 +470,9 @@ void Unit::SendMovementPacket(uint16 opcode, bool includingSelf)
     SendMovementMessageToSet(std::move(data), includingSelf);
 }
 
-void Unit::ResetAttackTimer(WeaponAttackType type)
+void Unit::ResetAttackTimer(WeaponAttackType type, bool compensateDiff/*= false*/)
 {
-    m_attackTimer[type] = uint32(GetAttackTime(type) * m_modAttackSpeedPct[type]);
+    m_attackTimer[type] = uint32(GetAttackTime(type) * m_modAttackSpeedPct[type]) + ((compensateDiff) ? std::min(m_attackTimer[type], 0) : 0);
 }
 
 void Unit::RemoveSpellsCausingAura(AuraType auraType, AuraRemoveMode mode)
@@ -1599,11 +1596,11 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             float percent20 = pVictim->GetAttackTime(OFF_ATTACK) * 0.20f;
             float percent60 = 3.0f * percent20;
             if (offtime > percent20 && offtime <= percent60)
-                pVictim->SetAttackTimer(OFF_ATTACK, uint32(percent20));
+                pVictim->SetAttackTimer(OFF_ATTACK, int32(percent20));
             else if (offtime > percent60)
             {
                 offtime -= 2.0f * percent20;
-                pVictim->SetAttackTimer(OFF_ATTACK, uint32(offtime));
+                pVictim->SetAttackTimer(OFF_ATTACK, int32(offtime));
             }
         }
         else
@@ -1611,11 +1608,11 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             float percent20 = pVictim->GetAttackTime(BASE_ATTACK) * 0.20f;
             float percent60 = 3.0f * percent20;
             if (basetime > percent20 && basetime <= percent60)
-                pVictim->SetAttackTimer(BASE_ATTACK, uint32(percent20));
+                pVictim->SetAttackTimer(BASE_ATTACK, int32(percent20));
             else if (basetime > percent60)
             {
                 basetime -= 2.0f * percent20;
-                pVictim->SetAttackTimer(BASE_ATTACK, uint32(basetime));
+                pVictim->SetAttackTimer(BASE_ATTACK, int32(basetime));
             }
         }
     }
@@ -2866,7 +2863,7 @@ void Unit::_UpdateAutoRepeatSpell()
         spell->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
 
         // all went good, reset attack
-        ResetAttackTimer(RANGED_ATTACK);
+        ResetAttackTimer(RANGED_ATTACK, true); //Compensate Diff always because opener Attack delay is handled by m_AutoRepeatFirstCast
         SetStandState(UNIT_STAND_STATE_STAND);
     }
 }
@@ -4639,13 +4636,11 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
                     pGuardian->AI()->OwnerAttacked(victim);
     }
 
-    // delay offhand weapon attack to next attack time
-    if (HaveOffhandWeapon())
-        ResetAttackTimer(OFF_ATTACK);
-
     if (meleeAttack)
+    {
+        openerAttack = true;
         SendMeleeAttackStart(victim);
-
+    }
     return true;
 }
 
@@ -9274,7 +9269,7 @@ bool Unit::IsPolymorphed() const
 
 bool Unit::IsAttackReady(WeaponAttackType type) const
 {
-    return m_attackTimer[type] == 0;
+    return m_attackTimer[type] <= 0;
 }
 
 void Unit::SetDisplayId(uint32 displayId)
