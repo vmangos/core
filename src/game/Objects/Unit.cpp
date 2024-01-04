@@ -388,7 +388,7 @@ bool Unit::UpdateMeleeAttackingState()
                     SetAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
                 openerAttack = false;
             }
-            if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
+            else if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
             {
                 // do attack
                 AttackerStateUpdate(pVictim, OFF_ATTACK);
