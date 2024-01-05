@@ -389,7 +389,7 @@ bool Unit::UpdateMeleeAttackingState()
                     SetAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
                 m_openerAttack = false;
             }
-            else if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
+            if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
             {
                 AttackerStateUpdate(pVictim, OFF_ATTACK);
                 ResetAttackTimer(OFF_ATTACK, !m_openerAttack);
@@ -472,7 +472,10 @@ void Unit::SendMovementPacket(uint16 opcode, bool includingSelf)
 
 void Unit::ResetAttackTimer(WeaponAttackType type, bool compensateDiff/*= false*/)
 {
-    m_attackTimer[type] = uint32(GetAttackTime(type) * m_modAttackSpeedPct[type]) + ((compensateDiff) ? std::min(m_attackTimer[type], 0) : 0);
+    if (compensateDiff && m_attackTimer[type] < 0)
+        m_attackTimer[type] += int32(GetAttackTime(type) * m_modAttackSpeedPct[type]);
+    else
+        m_attackTimer[type] = int32(GetAttackTime(type) * m_modAttackSpeedPct[type]);
 }
 
 void Unit::RemoveSpellsCausingAura(AuraType auraType, AuraRemoveMode mode)
