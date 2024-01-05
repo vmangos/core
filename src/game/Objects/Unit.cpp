@@ -146,6 +146,7 @@ Unit::Unit()
         m_createResistance = 0;
 
     m_attacking = nullptr;
+    m_openerAttack = true;
     m_modSpellHitChance = 0.0f;
     m_baseSpellCritChance = 5;
 
@@ -297,11 +298,11 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 
     if (int32 off_att = GetAttackTimer(OFF_ATTACK))
         if (off_att > 0)
-        SetAttackTimer(OFF_ATTACK, off_att - update_diff);
+            SetAttackTimer(OFF_ATTACK, off_att - update_diff);
 
     if (int32 ranged_att = GetAttackTimer(RANGED_ATTACK))
         if (ranged_att > 0)
-        SetAttackTimer(RANGED_ATTACK, ranged_att - update_diff);
+            SetAttackTimer(RANGED_ATTACK, ranged_att - update_diff);
 
     if (IsAlive())
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, GetHealth() < GetMaxHealth() * 0.20f);
@@ -383,17 +384,16 @@ bool Unit::UpdateMeleeAttackingState()
             if (IsAttackReady(BASE_ATTACK))
             {
                 AttackerStateUpdate(pVictim, BASE_ATTACK);
-                ResetAttackTimer(BASE_ATTACK, !openerAttack);
-                if (openerAttack && HaveOffhandWeapon() && GetAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
+                ResetAttackTimer(BASE_ATTACK, !m_openerAttack);
+                if (m_openerAttack && HaveOffhandWeapon() && GetAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
                     SetAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-                openerAttack = false;
+                m_openerAttack = false;
             }
             else if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
             {
-                // do attack
                 AttackerStateUpdate(pVictim, OFF_ATTACK);
-                ResetAttackTimer(OFF_ATTACK, !openerAttack);
-                openerAttack = false;
+                ResetAttackTimer(OFF_ATTACK, !m_openerAttack);
+                m_openerAttack = false;
             }
             break;
         }
@@ -4638,7 +4638,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
     if (meleeAttack)
     {
-        openerAttack = true;
+        m_openerAttack = true;
         SendMeleeAttackStart(victim);
     }
     return true;
