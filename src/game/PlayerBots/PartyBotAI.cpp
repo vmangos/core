@@ -946,7 +946,7 @@ void PartyBotAI::UpdateInCombatAI()
             // Taunt target if its attacking someone else.
             if (pVictim && pVictim->GetVictim() != me)
             {
-                for (const auto& pSpellEntry : spellListTaunt)
+                for (const auto& pSpellEntry : m_spellListTaunt)
                 {
                     if (CanTryToCastSpell(pVictim, pSpellEntry))
                     {

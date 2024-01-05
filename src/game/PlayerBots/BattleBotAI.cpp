@@ -904,17 +904,21 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (ShouldIgnoreCombat())
     {
+        UpdateFlagCarrierAI();
         UpdateWaypointMovement();
         return;
     }
 
     if (!pVictim || !IsValidHostileTarget(pVictim) || 
-        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
+        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_SMALL))
     {
-        if (pVictim = SelectAttackTarget(pVictim))
+        if (Unit* pNewVictim = SelectAttackTarget(pVictim))
         {
-            AttackStart(pVictim);
-            return;
+            if (pVictim != pNewVictim)
+            {
+                AttackStart(pNewVictim);
+                return;
+            }
         }
 
         if (me->GetVictim() &&
@@ -973,6 +977,219 @@ void BattleBotAI::UpdateBattleGroundAI()
                     pGo->Use(me);
             }
             break;
+        }
+    }
+}
+
+void BattleBotAI::UpdateFlagCarrierAI()
+{
+    // First those that can be cast both in and out of combat.
+    switch (me->GetClass())
+    {
+        case CLASS_PALADIN:
+        {
+            if (m_spells.paladin.pHolyShock && me->GetHealthPercent() < 90.0f &&
+                CanTryToCastSpell(me, m_spells.paladin.pHolyShock))
+            {
+                me->CastSpell(me, m_spells.paladin.pHolyShock, false);
+                return;
+            }
+            break;
+        }
+        case CLASS_SHAMAN:
+        {
+            if (m_spells.shaman.pGhostWolf && !me->IsMoving() &&
+                CanTryToCastSpell(me, m_spells.shaman.pGhostWolf))
+            {
+                me->CastSpell(me, m_spells.shaman.pGhostWolf, false);
+                return;
+            }
+            break;
+        }
+        case CLASS_MAGE:
+        {
+            if (m_spells.mage.pManaShield &&
+                CanTryToCastSpell(me, m_spells.mage.pManaShield))
+            {
+                me->CastSpell(me, m_spells.mage.pManaShield, false);
+                return;
+            }
+            if (m_spells.mage.pIceBarrier &&
+                CanTryToCastSpell(me, m_spells.mage.pIceBarrier))
+            {
+                me->CastSpell(me, m_spells.mage.pIceBarrier, false);
+                return;
+            }
+            break;
+        }
+        case CLASS_PRIEST:
+        {
+            if (m_spells.priest.pPowerWordShield &&
+                CanTryToCastSpell(me, m_spells.priest.pPowerWordShield))
+            {
+                me->CastSpell(me, m_spells.priest.pPowerWordShield, false);
+                return;
+            }
+            if (m_spells.priest.pHolyNova && me->GetHealthPercent() < 90.0f &&
+                CanTryToCastSpell(me, m_spells.priest.pHolyNova))
+            {
+                me->CastSpell(me, m_spells.priest.pHolyNova, false);
+                return;
+            }
+            break;
+        }
+        case CLASS_WARRIOR:
+        {
+            if (m_spells.warrior.pDefensiveStance &&
+                CanTryToCastSpell(me, m_spells.warrior.pDefensiveStance))
+            {
+                me->CastSpell(me, m_spells.warrior.pDefensiveStance, false);
+                return;
+            }
+            break;
+        }
+        case CLASS_ROGUE:
+        {
+            if (m_spells.rogue.pSprint &&
+                CanTryToCastSpell(me, m_spells.rogue.pSprint))
+            {
+                me->CastSpell(me, m_spells.rogue.pSprint, false);
+                return;
+            }
+            break;
+        }
+        case CLASS_DRUID:
+        {
+            if (me->GetShapeshiftForm() == FORM_NONE)
+            {
+                if (m_spells.druid.pTravelForm &&
+                    CanTryToCastSpell(me, m_spells.druid.pTravelForm))
+                {
+                    me->CastSpell(me, m_spells.druid.pTravelForm, false);
+                    return;
+                }
+            }
+            else if (me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+            {
+                me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+            }
+            break;
+        }
+    }
+
+    Unit* pAttacker = me->GetAttackerForHelper();
+    if (pAttacker)
+    {
+        switch (me->GetClass())
+        {
+            case CLASS_PALADIN:
+            {
+                if (m_spells.paladin.pHammerOfJustice &&
+                    CanTryToCastSpell(pAttacker, m_spells.paladin.pHammerOfJustice))
+                {
+                    me->CastSpell(pAttacker, m_spells.paladin.pHammerOfJustice, false);
+                    return;
+                }
+                break;
+            }
+            case CLASS_SHAMAN:
+            {
+                if (m_spells.shaman.pFrostShock &&
+                    CanTryToCastSpell(pAttacker, m_spells.shaman.pFrostShock))
+                {
+                    me->CastSpell(pAttacker, m_spells.shaman.pFrostShock, false);
+                    return;
+                }
+                break;
+            }
+            case CLASS_HUNTER:
+            {
+                if (m_spells.hunter.pAspectOfTheCheetah &&
+                    me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id))
+                {
+                    me->RemoveAurasDueToSpellByCancel(m_spells.hunter.pAspectOfTheCheetah->Id);
+                    return;
+                }
+                break;
+            }
+            case CLASS_MAGE:
+            {
+                if (m_spells.mage.pFrostNova &&
+                    CanTryToCastSpell(me, m_spells.mage.pFrostNova) &&
+                    m_spells.mage.pFrostNova->IsTargetInRange(me, pAttacker))
+                {
+                    me->CastSpell(me, m_spells.mage.pFrostNova, false);
+                    return;
+                }
+                break;
+            }
+            case CLASS_PRIEST:
+            {
+                if (m_spells.priest.pPsychicScream &&
+                    CanTryToCastSpell(me, m_spells.priest.pPsychicScream) &&
+                    m_spells.priest.pPsychicScream->IsTargetInRange(me, pAttacker))
+                {
+                    me->CastSpell(me, m_spells.priest.pPsychicScream, false);
+                    return;
+                }
+                break;
+            }
+            case CLASS_WARLOCK:
+            {
+                if (m_spells.warlock.pDeathCoil &&
+                    CanTryToCastSpell(pAttacker, m_spells.warlock.pDeathCoil))
+                {
+                    me->CastSpell(pAttacker, m_spells.warlock.pDeathCoil, false);
+                    return;
+                }
+                break;
+            }
+            case CLASS_WARRIOR:
+            {
+                if (m_spells.warrior.pShieldWall && me->GetHealthPercent() < 50.0f &&
+                    CanTryToCastSpell(me, m_spells.warrior.pShieldWall))
+                {
+                    me->CastSpell(me, m_spells.warrior.pShieldWall, false);
+                    return;
+                }
+                break;
+            }
+            case CLASS_ROGUE:
+            {
+                if (m_spells.rogue.pEvasion && me->GetHealthPercent() < 50.0f &&
+                    CanTryToCastSpell(me, m_spells.rogue.pEvasion))
+                {
+                    me->CastSpell(me, m_spells.rogue.pEvasion, false);
+                    return;
+                }
+                break;
+            }
+            case CLASS_DRUID:
+            {
+                if (m_spells.druid.pBarkskin && me->GetHealthPercent() < 50.0f &&
+                    CanTryToCastSpell(me, m_spells.druid.pBarkskin))
+                {
+                    me->CastSpell(me, m_spells.druid.pBarkskin, false);
+                    return;
+                }
+                break;
+            }
+        }
+    }
+    else // no attackers
+    {
+        switch (me->GetClass())
+        {
+            case CLASS_HUNTER:
+            {
+                if (m_spells.hunter.pAspectOfTheCheetah &&
+                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheCheetah))
+                {
+                    me->CastSpell(me, m_spells.hunter.pAspectOfTheCheetah, false);
+                    return;
+                }
+                break;
+            }
         }
     }
 }
