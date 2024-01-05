@@ -911,7 +911,7 @@ class Unit : public SpellCaster
         int32 m_attackTimer[MAX_ATTACK];
         AttackerSet m_attackers;
         Unit* m_attacking;
-        bool openerAttack; // The unit's first attack against an enemy.
+        bool m_openerAttack; // The unit's first attack against an enemy.
         uint32 m_reactiveTimer[MAX_REACTIVE];
         ObjectGuid m_reactiveTarget[MAX_REACTIVE];
         typedef std::map<ObjectGuid /*attackerGuid*/, uint32 /*damage*/ > DamageTakenHistoryMap;
