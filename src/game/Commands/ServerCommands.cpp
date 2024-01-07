@@ -1038,7 +1038,7 @@ bool ChatHandler::HandleReloadAreaTriggerTeleportCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadCommandCommand(char* /*args*/)
 {
-    load_command_table = true;
+    m_loadCommandTable = true;
     SendSysMessage("DB table `command` will be reloaded at next chat command use.");
     return true;
 }

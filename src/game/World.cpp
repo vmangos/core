@@ -1845,6 +1845,9 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading spell group stack rules ...");
     sSpellMgr.LoadSpellGroupStackRules();
 
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading RBAC for chat commands...");
+    ChatHandler::LoadRbacPermissions();
+
     sObjectMgr.LoadPlayerPremadeTemplates();
 
     if (getConfig(CONFIG_BOOL_RESTORE_DELETED_ITEMS))
