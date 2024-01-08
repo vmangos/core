@@ -2648,7 +2648,7 @@ void Player::RemoveFromWorld()
         UnsummonAllTotems();
         RemoveMiniPet();
         sZoneScriptMgr.HandlePlayerLeaveZone(this, m_zoneUpdateId);
-        TradeCancel(false);
+        TradeCancel(!GetSession()->PlayerLogout());
 
         if (ObjectGuid lootGuid = GetLootGuid())
             GetSession()->DoLootRelease(lootGuid);
@@ -6517,8 +6517,9 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
             if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
                 SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
-            if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-                GetSession()->SendCancelTrade();   // will close both side trade windows
+            if (Player* pTrader = GetTrader())
+                if (!IsWithinDistInMap(pTrader, INTERACTION_DISTANCE))
+                    TradeCancel(true, TRADE_STATUS_TRADE_CANCELED);   // will close both side trade windows
 
             if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
             {
@@ -12000,7 +12001,7 @@ void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemG
     GetSession()->SendPacket(&data);
 }
 
-void Player::TradeCancel(bool sendback)
+void Player::TradeCancel(bool sendback, TradeStatus status /*= TRADE_STATUS_TRADE_CANCELED*/)
 {
     if (m_trade)
     {
@@ -12008,9 +12009,9 @@ void Player::TradeCancel(bool sendback)
 
         // send yellow "Trade canceled" message to both traders
         if (sendback)
-            GetSession()->SendCancelTrade();
+            GetSession()->SendCancelTrade(status);
 
-        trader->GetSession()->SendCancelTrade();
+        trader->GetSession()->SendCancelTrade(status);
 
         // cleanup
         delete m_trade;
