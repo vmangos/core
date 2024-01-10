@@ -690,6 +690,16 @@ struct GameObjectInfo
         }
     }
 
+    bool CanAlwaysBreakLoS() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_DOOR:              return true;
+            case GAMEOBJECT_TYPE_GENERIC:           return true;
+            default: return false;
+        }
+    }
+
     float GetInteractionDistance() const
     {
         switch (type)
