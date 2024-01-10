@@ -911,7 +911,6 @@ class Unit : public SpellCaster
         int32 m_attackTimer[MAX_ATTACK];
         AttackerSet m_attackers;
         Unit* m_attacking;
-        bool m_openerAttack; // The unit's first attack against an enemy.
         uint32 m_reactiveTimer[MAX_REACTIVE];
         ObjectGuid m_reactiveTarget[MAX_REACTIVE];
         typedef std::map<ObjectGuid /*attackerGuid*/, uint32 /*damage*/ > DamageTakenHistoryMap;
@@ -962,6 +961,11 @@ class Unit : public SpellCaster
          * Called from UpdateMeleeAttackingState if attack can't happen now.
          */
         void DelayAutoAttacks();
+        /**
+         * When a starts autoattacking. Erases the saved update diff on its swing timer
+         * and delays the offhand attack to half its attack speed
+         */
+        void FirstAttackDelay();
         /**
          * Checks that need to be done before an auto attack swing happens.
          * Target's faction is only checked for players since its done elsewhere
