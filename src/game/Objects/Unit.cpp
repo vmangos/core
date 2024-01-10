@@ -146,7 +146,6 @@ Unit::Unit()
         m_createResistance = 0;
 
     m_attacking = nullptr;
-    m_openerAttack = true;
     m_modSpellHitChance = 0.0f;
     m_baseSpellCritChance = 5;
 
@@ -361,6 +360,18 @@ void Unit::DelayAutoAttacks()
         SetAttackTimer(OFF_ATTACK, 100);
 }
 
+void Unit::FirstAttackDelay()
+{
+    if (isAttackReady(BASE_ATTACK))
+        SetAttackTimer(BASE_ATTACK, 0); // Erase saved update timer diff from the swing timer
+    if (HaveOffhandWeapon() // Doing an attack command sets offhand timer equal to half its swing speed.
+    {
+        uint32 halfattack = GetAttackTime(OFF_ATTACK) * m_modAttackSpeedPct[OFF_ATTACK] * 0.5
+        if GetAttackTimer(OFF_ATTACK) < halfattack
+            SetAttackTimer(OFF_ATTACK, halfattack)
+    }
+}
+
 bool Unit::UpdateMeleeAttackingState()
 {
     Unit* pVictim = GetVictim();
@@ -384,16 +395,12 @@ bool Unit::UpdateMeleeAttackingState()
             if (IsAttackReady(BASE_ATTACK))
             {
                 AttackerStateUpdate(pVictim, BASE_ATTACK);
-                ResetAttackTimer(BASE_ATTACK, !m_openerAttack);
-                if (m_openerAttack && HaveOffhandWeapon() && GetAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                    SetAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-                m_openerAttack = false;
+                ResetAttackTimer(BASE_ATTACK, true);
             }
             if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
             {
                 AttackerStateUpdate(pVictim, OFF_ATTACK);
-                ResetAttackTimer(OFF_ATTACK, !m_openerAttack);
-                m_openerAttack = false;
+                ResetAttackTimer(OFF_ATTACK, true);
             }
             break;
         }
@@ -4614,6 +4621,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         // remove old target data
         AttackStop(true);
     }
+    else // not fighting already, do swing timer delays.
+        FirstAttackDelay();
 
     // Set our target
     SetTargetGuid(victim->GetObjectGuid());
@@ -4640,10 +4649,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     }
 
     if (meleeAttack)
-    {
-        m_openerAttack = true;
         SendMeleeAttackStart(victim);
-    }
+
     return true;
 }
 
