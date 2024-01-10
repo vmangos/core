@@ -591,16 +591,16 @@ void PlayerBotMgr::AddBattleBot(BattleGroundQueueTypeId queueType, Team botTeam,
 
     if (m_confBattleBotAddAnnounce)
     {
-            if (botTeam == ALLIANCE)
-        {
-            sWorld.SendWorldText(LANG_ALLIANCE_BATTLEBOT_ADDED, botLevel, queueType);
-            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
-        }
+        if (botTeam == ALLIANCE)
+            {
+                sWorld.SendWorldText(LANG_ALLIANCE_BATTLEBOT_ADDED, botLevel, queueType);
+                sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+            }
         else
-        {
-            sWorld.SendWorldText(LANG_HORDE_BATTLEBOT_ADDED, botLevel, queueType);
-            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
-        }
+            {
+                sWorld.SendWorldText(LANG_HORDE_BATTLEBOT_ADDED, botLevel, queueType);
+                sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
+            }
     }
 }
 
@@ -611,7 +611,6 @@ void PlayerBotMgr::DeleteBattleBots()
         if (dynamic_cast<BattleBotAI*>(itr.second->ai.get()))
             itr.second->requestRemoval = true;
     }
-    m_confBattleBotAutoJoin = false;
 }
 
 bool PlayerBotMgr::ForceAccountConnection(WorldSession* sess)
