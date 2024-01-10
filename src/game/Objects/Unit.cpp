@@ -362,13 +362,13 @@ void Unit::DelayAutoAttacks()
 
 void Unit::FirstAttackDelay()
 {
-    if (isAttackReady(BASE_ATTACK))
+    if (IsAttackReady(BASE_ATTACK))
         SetAttackTimer(BASE_ATTACK, 0); // Erase saved update timer diff from the swing timer
-    if (HaveOffhandWeapon() // Doing an attack command sets offhand timer equal to half its swing speed.
+    if (HaveOffhandWeapon()) // Doing an attack command sets offhand timer equal to half its swing speed.
     {
-        uint32 halfattack = GetAttackTime(OFF_ATTACK) * m_modAttackSpeedPct[OFF_ATTACK] * 0.5
-        if GetAttackTimer(OFF_ATTACK) < halfattack
-            SetAttackTimer(OFF_ATTACK, halfattack)
+        int32 halfattack = int32(GetAttackTime(OFF_ATTACK) * m_modAttackSpeedPct[OFF_ATTACK] * 0.5);
+        if (GetAttackTimer(OFF_ATTACK) < halfattack)
+            SetAttackTimer(OFF_ATTACK, halfattack);
     }
 }
 
