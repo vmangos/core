@@ -766,6 +766,8 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand petCommandTable[] =
     {
+        { "learnspell",     SEC_DEVELOPER,      false, &ChatHandler::HandlePetLearnSpellCommand,        "", nullptr },
+        { "unlearnspell",   SEC_DEVELOPER,      false, &ChatHandler::HandlePetUnlearnSpellCommand,      "", nullptr },
         { "list",           SEC_GAMEMASTER,     true,  &ChatHandler::HandlePetListCommand,              "", nullptr },
         { "rename",         SEC_GAMEMASTER,     true,  &ChatHandler::HandlePetRenameCommand,            "", nullptr },
         { "delete",         SEC_GAMEMASTER,     true,  &ChatHandler::HandlePetDeleteCommand,            "", nullptr },
