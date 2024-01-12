@@ -17545,8 +17545,10 @@ void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
     // the group save replaces the personal save
     if (InstanceGroupBind* pGroupBind = pGroup->GetBoundInstance(mapId))
     {
-        MANGOS_ASSERT(itr->second.state != pGroupBind->state);
-        ResetInstance(INSTANCE_RESET_GROUP_JOIN, itr);
+        if (itr->second.state != pGroupBind->state)
+            ResetInstance(INSTANCE_RESET_GROUP_JOIN, itr);
+        else
+            UnbindInstance(itr, false);
     }
 }
 
