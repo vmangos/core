@@ -2927,6 +2927,11 @@ AHBot.itemcount = 50
 #        Default: 0 - off
 #                 1 - on
 #
+#    BattleBot.AddAnnounce
+#        Add message in chat when battlebots are added.
+#        Default: 1 - on
+#                 0 - off
+#
 ###################################################################################################################
 RandomBot.Enable = 0
 RandomBot.MinBots = 0
@@ -2945,6 +2950,7 @@ PartyBot.RandomGearLevelDifference = 10
 
 BattleBot.AutoEquip = 1
 BattleBot.AutoJoin = 0
+BattleBot.AddAnnounce = 1
 
 ###################################################################################################################
 #    Database-based chat
