@@ -960,6 +960,27 @@ void PartyBotAI::UpdateInCombatAI()
             return;
     }
 
+    Unit* pVictim = me->GetVictim();
+
+    // Swap to marked target or party leader's target
+    if (GetRole() != ROLE_HEALER)
+    {
+        if (Player* pLeader = GetPartyLeader())
+        {
+            Unit* newVictim = SelectAttackTarget(pLeader);
+
+            if (newVictim && (newVictim != pVictim))
+            {
+                if (pVictim)
+                    me->AttackStop();
+                else
+                    AttackStart(newVictim);
+
+                return;
+            }
+        }
+    }
+
     switch (me->GetClass())
     {
         case CLASS_PALADIN:
