@@ -109,6 +109,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "unpause",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnpauseCommand,     "", nullptr },
         { "unequip",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnequipCommand,     "", nullptr },
         { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
+        { "repairitems",     SEC_PLAYER,      false, &ChatHandler::HandlePartyBotRepairItemsCommand,      "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
     static ChatCommand battleBotAddCommandTable[] =
