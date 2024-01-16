@@ -496,8 +496,6 @@ bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
     if (!loot_owner)
         return false;
 
-    printf("FillLoot %u, loot_owner %s, personal %u, looter %u\n", loot_id, loot_owner->GetName(), personal, (bool)looted);
-
     LootTemplate const* tab = store.GetLootFor(loot_id);
 
     if (!tab)
