@@ -8382,7 +8382,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                                 group->NeedBeforeGreed(creature, loot);
                                 break;
                             case MASTER_LOOT:
-                                group->MasterLoot(creature, loot);
+                                group->MasterLoot(creature, loot, this);
                                 break;
                             default:
                                 break;
