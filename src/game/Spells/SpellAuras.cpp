@@ -8336,57 +8336,115 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
     // Exceptions - se stack avec tout.
     switch (spellproto->Id)
     {
-        // Terres foudroyees et Zanza
-        case 10693:
-        case 10691: // +25 esprit
-        case 10668:
-        case 10671: // +25 endu
-        case 10667:
-        case 10670: // +25 force
-        case 10669:
-        case 10672: // +25 agi
-        case 10692:
-        case 10690: // +25 intel
-        case 24382:             // Buff zanza
-        // Alcools
-        case 25804:
-        case 20875:
-        case 25722:
-        case 25037:
-        case 22789:
-        case 22790:
-        case 6114:
-        case 5020:
-        case 5021:
-        case 23179: //le proc de l'�p�e de Razorgore (+300 force) devrait se cumuler avec TOUT : ID 23179
-        case 20007: //le proc Crois� devrait se cumuler avec TOUT : ID 20007
-        case 20572: //Le racial Orc (ID 20572)
-        case 17038: //l'Eau des Tombe-Hiver (ID 17038)
-        case 16329: //le Juju's Might (ID 16329)
-        case 25891: //le buff du Bijou Choc de Terre (ID : 25891)
-        case 18264: // Charge du maitre (baton epique scholo)
-        case 12022: // Chapeau pirate
-        case 22817: // PA HT Nord
-        // Aura de precision (hunt)
-        case 19506:
-        case 20905:
-        case 20906:
-        case 18262: // Pierre � Aiguiser El�mentaire (+2% crit)
-        case 24932: // chef de la Meute
-        case 24907: // aura S�l�nien
-        case 22888: // Buff Onyxia
-        case 15366: // Buff Felwood
-        case 22820: // HT +3% crit sorts
-        case 17628: // Supreme Power
-        case 22730: // Bouffe +10 Intell
-        case 18141: // Bouffe +10 Esprit
-        case 18125: // Bouffe +10 Force
-        case 18192: // Bouffe +10 Agility
-        case 18191: // Bouffe +10 Endu
-        case 25661: // Bouffe +25 Endu
-        case 24427: // Diamond Flask
-        case 17528: // Mighty Rage Potion
+	// Vanilla Reforged - Worldbuff & Consumables Changes Start
+	// WORLD BUFFS
+	// Blasted Lands
+        case 10693: // Gizzard Gum
+        case 10691: // Vulture's Vigor (Quest)
+        case 10668: // Lung Juice Cocktail
+        case 10671: // A Boar's Vitality (Quest)
+        case 10667: // R.O.I.D.S
+        case 10670: // Snickerfang Jowls (Quest)
+        case 10669: // Ground Scorpok Assay
+        case 10672: // The Decisive Striker (Quest)
+        case 10692: // Cerebral Cortex Compound
+        case 10690: // The Basilisk's Bite (Quest)
+	// Dire Maul
+        case 22817: // Fengus' Ferocity
+        case 22820: // Slip'kik's Savvy
+	// Felwood
+        case 15366: // Songflower Serenade
+	// Onyxia
+        case 22888: // Rallying Cry of the Dragonslayer
+        case 16609: // Warchief's Blessing
+	// Sayge's Buffs
+        case 23767: // Sayge's Dark Fortune of Armor
+	// CONSUMABLES
+	// Alcohol
+        case 25804: // Rumsey Rum Black Label
+        case 20875: // Rumsey Rum
+        case 25722: // Rumsey Rum Dark
+        case 25037: // Rumsey Rum Light
+        case 22789: // Gordok Green Grog
+        case 22790: // Kreeg's Stout Beatdown
+        case 5021: // Trogg Ale
+        case 31395: // Eric's Barrel of Nightshade Rum
+        case 31396: // Sasha's Barrel of Stout Special
+        case 31397: // Christopher's Special: "The Bishop"
+        case 31398: // Lucia's Special: "Bishop of Bordeaux"
+	// Elixir and Juju
+	case 16322: // Juju Flurry
+	case 11334: // Elixir of Greater Agility
+	case 11328: // Elixir of Agility
+	case 3160: // Elixir of Lesser Agility
+	case 16329: // Juju Might
+        case 11405: // Elixir of Giants
+	case 17537: // Elixir of Brute Force
+	case 3164: // Elixir of Ogre's Strength
+	case 8212: // Elixir of Giant Growth
+	case 2367: // Elixir of Lion's Strength
+	case 16321: // Juju Escape
+	case 11348: // Elixir of Superior Defense
+	case 11349: // Elixir of Greater Defense
+	case 3220: // Elixir of Defense
+	case 673: // Elixir of Minor Defense
+	case 16327: // Juju Guille
+	case 17535: // Elixir of the Sages
+	case 11396: // Elixir of Greater Intellect
+	case 3166: // Elixir of Wisdom
+	// Flask
+        case 17628: // Flask of Supreme Power
+	case 17629: // Flask of Chromatic Aggression
+	// Food
+        case 24799: // Smoked Desert Dumplings
+        case 22730: // Runn Tum Tuber Surprise
+        case 18141: // Blessed Sunfruit Juice
+        case 18125: // Blessed Sunfruit
+        case 18192: // Grilled Squid
+        case 18191: // Cooked Glossy Mightfish / Mightfish Steak / Windblossom Berries
+        case 25661: // Dirge's Kickin' Chimaerok Chops
         case 23697: // Alterac Spring Water
+        case 31401: // Runn Tum Tuber Surprise with Bread
+        case 31388: // Grilled Squid with Bread
+        case 31390: // Smoked Desert Dumplings with Bread
+	// Scrolls & Un'Goro Crystals
+	case 8115:
+	case 8116:
+	case 8117:
+	case 12174:
+	case 8096:
+	case 8097:
+	case 8098:
+	case 12176:
+	case 8091:
+	case 8094:
+	case 8095:
+	case 12175:
+	case 8112:
+	case 8113:
+	case 8114:
+	case 12177:
+	case 8099:
+	case 8100:
+	case 8101:
+	case 12178:
+	case 8118:
+	case 8119:
+	case 8120:
+	case 12179:
+	// Special
+        case 17528: // Mighty Rage Potion
+        // CLASS ABILITIES
+        case 19506: // Trueshot Aura Rank 1
+        case 20905: // Trueshot Aura Rank 2
+        case 20906: // Trueshot Aura Rank 3
+	// ITEMS
+	case 12022: // Admiral's Hat
+        case 20007: // Crusader Enchant
+        case 24427: // Diamond Flask
+        case 25891: // Earthstrike Trinket
+        case 18264: // Headmaster's Charge
+        case 23179: // Shadowy Potion
         // Love is in the Air buffs
         case 27664:
         case 27665:
@@ -8395,6 +8453,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 27670:
         case 27671:
             return false;
+	    // Vanilla Reforged - Worldbuff & Consumables Changes End
 
         case 17538: // Le +crit du buff de l'Elixir de la Mangouste 17538, devrait se stack avec TOUT.
             return (eff == EFFECT_INDEX_0);
@@ -8424,6 +8483,11 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case SPELLFAMILY_HUNTER:
             // Aspect of the Hawk
             if (spellproto->IsFitToFamilyMask<CF_HUNTER_ASPECT_OF_THE_HAWK>())
+                return false;
+            break;
+	        case SPELLFAMILY_MAGE: // Vanilla Reforged - Consumables Changes
+            // Arcane Intellect
+            if (spellproto->IsFitToFamilyMask<CF_MAGE_ARCANE_INT>())
                 return false;
             break;
         case SPELLFAMILY_DRUID:
