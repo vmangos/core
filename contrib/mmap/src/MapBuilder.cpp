@@ -764,7 +764,7 @@ namespace MMAP
                     }
                 }
                 /// 4. Every triangle is correctly marked now, we can rasterize everything
-                rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, areas, tTriCount, *tile.solid, 0);
+                SortAndRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, areas, tTriCount, *tile.solid, 0);
                 delete [] areas;
 
                 /// 5. Don't walk over too high Obstacles.
