@@ -18,32 +18,35 @@
 
 #include "mpq_libmpq.h"
 #include <deque>
-#include <stdio.h>
+#include <cstdio>
 
 ArchiveSet gOpenArchives;
 
 MPQArchive::MPQArchive(const char* filename)
 {
-    int result = libmpq__archive_open(&mpq_a, filename, 0);
+    int result = libmpq__archive_open(&mpq_a, filename, -1);
     printf("Opening %s\n", filename);
     if (result)
     {
         switch (result)
         {
-            case LIBMPQ_ERROR_MALLOC:                   /* error on file operation */
-                printf("Error opening archive '%s': Run off free RAM memory\n", filename);
+            case LIBMPQ_ERROR_OPEN :
+                printf("Error opening archive '%s': Does file really exist?\n", filename);
                 break;
-            case LIBMPQ_ERROR_OPEN:
-                printf("Error opening archive '%s': Can't open archive\n", filename);
+            case LIBMPQ_ERROR_FORMAT :            /* bad file format */
+                printf("Error opening archive '%s': Bad file format\n", filename);
                 break;
-            case LIBMPQ_ERROR_SEEK:
-                printf("Error opening archive '%s': Can't seek begin of archive. File corrupt?\n", filename);
+            case LIBMPQ_ERROR_SEEK :         /* seeking in file failed */
+                printf("Error opening archive '%s': Seeking in file failed\n", filename);
                 break;
-            case LIBMPQ_ERROR_FORMAT:
-                printf("Error opening archive '%s': Invalid MPQ format. File corrupt?\n", filename);
+            case LIBMPQ_ERROR_READ :              /* Read error in archive */
+                printf("Error opening archive '%s': Read error in archive\n", filename);
                 break;
-            case LIBMPQ_ERROR_READ:
-                printf("Error opening archive '%s': Can't read MPQ file. File corrupt?\n", filename);
+            case LIBMPQ_ERROR_MALLOC :               /* maybe not enough memory? :) */
+                printf("Error opening archive '%s': Maybe not enough memory\n", filename);
+                break;
+            default:
+                printf("Error opening archive '%s': Unknown error\n", filename);
                 break;
         }
         return;
@@ -53,6 +56,7 @@ MPQArchive::MPQArchive(const char* filename)
 
 void MPQArchive::close()
 {
+    //gOpenArchives.erase(erase(&mpq_a);
     libmpq__archive_close(mpq_a);
 }
 
@@ -66,7 +70,7 @@ MPQFile::MPQFile(const char* filename):
     {
         mpq_archive* mpq_a = (*i)->mpq_a;
 
-        uint32 filenum;
+        uint32_t filenum;
         if (libmpq__file_number(mpq_a, filename, &filenum)) continue;
         libmpq__off_t transferred;
         libmpq__file_size_unpacked(mpq_a, filenum, &size);
@@ -109,13 +113,13 @@ size_t MPQFile::read(void* dest, size_t bytes)
     return bytes;
 }
 
-void MPQFile::seek(int offset)
+void MPQFile::seek(libmpq__off_t offset)
 {
     pointer = offset;
     eof = (pointer >= size);
 }
 
-void MPQFile::seekRelative(int offset)
+void MPQFile::seekRelative(libmpq__off_t offset)
 {
     pointer += offset;
     eof = (pointer >= size);
