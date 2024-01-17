@@ -1440,8 +1440,8 @@ void Player::OnMirrorTimerExpirationPulse(MirrorTimer::Type timer)
             if (IsInMagma())
                 EnvironmentalDamage(DAMAGE_LAVA, urand(sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MIN), sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MAX)));
             // FIXME: Need to skip slime damage in Undercity, maybe someone can find better way to handle environmental damage
-            if (IsInSlime() && GetMapId() == 533)
-                EnvironmentalDamage(DAMAGE_SLIME, urand(sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MIN), sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MAX)));
+            //if (IsInSlime() && m_zoneUpdateId != 1497)
+            //    EnvironmentalDamage(DAMAGE_SLIME, urand(sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MIN), sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MAX)));
             break;
         case MirrorTimer::FEIGNDEATH:
             // Vanilla: kill player on feigning death for too long
@@ -20607,7 +20607,7 @@ void Player::UpdateTerainEnvironmentFlags()
     GetPosition(x, y, z);
 
     GridMapLiquidData liquid_status;
-    GridMapLiquidStatus res = m->GetTerrain()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
+    GridMapLiquidStatus res = m->GetTerrain()->getLiquidStatus(x, y, z + 0.01f, MAP_ALL_LIQUIDS, &liquid_status);
     if (!res)
     {
         SetEnvironmentFlags(ENVIRONMENT_MASK_LIQUID_FLAGS, false);
