@@ -1395,7 +1395,7 @@ void ChatHandler::LoadRbacPermissions()
 
             if (m_rbacPermissionNames.find(permissionId) == m_rbacPermissionNames.end())
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Unknown RBAC permission id %u assigned to command '%s'!", permissionId, command);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Unknown RBAC permission id %u assigned to command '%s'!", permissionId, command.c_str());
                 continue;
             }
             
