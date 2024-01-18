@@ -2389,7 +2389,7 @@ bool Map::ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, Wo
         return ShouldAbortScript(script);
     }
 
-    pSource->UpdatePvP(script.setPvP.enabled);
+    pSource->UpdatePvP(script.setPvP.enabled, true);
 
     return false;
 }
