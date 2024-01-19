@@ -3398,8 +3398,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->SetCharmerGuid(GetCasterGuid());
         target->SetFactionTemplateId(caster->GetFactionTemplateId());
-        if (target != caster)
-            target->InterruptNonMeleeSpells(false);
         caster->SetCharm(target);
 
         target->CombatStop(true);
@@ -3532,6 +3530,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
 
         target->UpdateControl();
+        target->InterruptNonMeleeSpells(true);
 
         if (pPlayerTarget)
             pPlayerTarget->SetFactionForRace(target->GetRace());
@@ -3539,9 +3538,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (pPlayerTarget && pPlayerTarget->IsAlive() && caster && caster->IsAlive() && caster->IsInCombat())
         {
             pPlayerTarget->SendAttackSwingCancelAttack();
-
-            if (target->IsNonMeleeSpellCasted(false))
-                target->InterruptNonMeleeSpells(false);
 
             target->AttackStop();
             target->RemoveAllAttackers();
@@ -3560,7 +3556,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
             target->GetHostileRefManager().deleteReferences();
         }
 
-        //target->SetUnitMovementFlags(MOVEFLAG_NONE);
         target->StopMoving();
         target->GetMotionMaster()->Clear(false);
         target->GetMotionMaster()->MoveIdle();
