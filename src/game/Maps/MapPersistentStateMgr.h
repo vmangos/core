@@ -397,5 +397,5 @@ void MapPersistentStateManager::DoForAllStatesWithMapId(uint32 mapId, uint32 ins
     }
 }
 
-#define sMapPersistentStateMgr MaNGOS::Singleton<MapPersistentStateManager>::Instance()
+#define sMapPersistentStateMgr MapPersistentStateManager::Instance()
 #endif
