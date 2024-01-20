@@ -960,11 +960,11 @@ void PartyBotAI::UpdateInCombatAI()
             return;
     }
 
-    // Swap DPS to marked target or party leader's target
-    if (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS)
-    {
-        Unit* pVictim = me->GetVictim();
+    Unit* pVictim = me->GetVictim();
 
+    // Swap to marked target or party leader's target
+    if (GetRole() != ROLE_HEALER)
+    {
         if (Player* pLeader = GetPartyLeader())
         {
             Unit* newVictim = SelectAttackTarget(pLeader);
