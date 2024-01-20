@@ -380,6 +380,7 @@ class ChatHandler
         bool HandleSpellIconFixCommand(char *args);
         bool HandleUnitStatCommand(char *args);
         bool HandleDebugControlCommand(char *args);
+        bool HandlePvPCommand(char *args);
         // Reload
         bool HandleReloadCreatureTemplate(char* args);
         bool HandleReloadItemTemplate(char* args);

@@ -156,8 +156,8 @@ class Roll : public LootValidatorRef
             : lootedTargetGUID(_lootedTragetGuid), itemid(li.itemid), itemRandomPropId(li.randomPropertyId),
             totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0) {}
         ~Roll() override { }
-        void setLoot(Loot *pLoot) { link(pLoot, this); }
-        Loot *getLoot() { return getTarget(); }
+        void setLoot(Loot* pLoot) { link(pLoot, this); }
+        Loot* getLoot() { return getTarget(); }
         void targetObjectBuildLink() override;
 
         ObjectGuid lootedTargetGUID;
@@ -358,9 +358,9 @@ class Group
         static void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, Roll const& r);
         static void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, Roll const& r);
         static void SendLootAllPassed(Roll const& r);
-        void GroupLoot(Creature* creature, Loot *loot);
-        void NeedBeforeGreed(Creature* creature, Loot *loot);
-        void MasterLoot(Creature* creature, Loot *loot);
+        void GroupLoot(Creature* creature, Loot* loot);
+        void NeedBeforeGreed(Creature* creature, Loot* loot);
+        void MasterLoot(Creature* creature, Loot* loot, Player* player);
         bool CountRollVote(Player* player, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote);
         void StartLootRoll(Creature* lootTarget, LootMethod method, Loot* loot, uint8 itemSlot);
         void EndRoll(Loot* loot);
