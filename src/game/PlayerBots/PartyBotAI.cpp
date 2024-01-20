@@ -361,7 +361,7 @@ Unit* PartyBotAI::GetMarkedTarget(RaidTargetIcon mark) const
     return nullptr;
 }
 
-Unit* PartyBotAI::SelectMarketAttackTarget(Player* pLeader) const
+Unit* PartyBotAI::SelectMarketAttackTarget() const
 {
     for (auto markId : m_marksToFocus)
     {
