@@ -361,18 +361,6 @@ Unit* PartyBotAI::GetMarkedTarget(RaidTargetIcon mark) const
     return nullptr;
 }
 
-Unit* PartyBotAI::SelectMarketAttackTarget() const
-{
-    for (auto markId : m_marksToFocus)
-    {
-        ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(markId);
-        if (targetGuid.IsUnit())
-            if (Unit* pVictim = me->GetMap()->GetUnit(targetGuid))
-                if (IsValidHostileTarget(pVictim))
-                    return pVictim;
-    }
-}
-
 Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
 {
     if (IsInDuel())
@@ -385,7 +373,14 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
         // Stick to marked target in combat.
         if (me->IsInCombat() || pLeader->GetVictim())
         {
-            return SelectMarketAttackTarget();
+            for (auto markId : m_marksToFocus)
+            {
+                ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(markId);
+                if (targetGuid.IsUnit())
+                    if (Unit* pVictim = me->GetMap()->GetUnit(targetGuid))
+                        if (IsValidHostileTarget(pVictim))
+                            return pVictim;
+            }
         }
 
         // Who is the leader attacking.
@@ -938,17 +933,6 @@ void PartyBotAI::UpdateInCombatAI()
         {
             Unit* pVictim = me->GetVictim();
 
-            // Attack marked target if exist
-            Unit* newVictim = SelectMarketAttackTarget();
-            if (newVictim && (newVictim != pVictim))
-            {
-                if (pVictim)
-                    me->AttackStop();
-                else
-                    AttackStart(newVictim);
-                return;
-            }
-            
             // Defend party members.
             if (!pVictim || pVictim->GetVictim() == me)
             {
@@ -991,6 +975,7 @@ void PartyBotAI::UpdateInCombatAI()
                     me->AttackStop();
                 else
                     AttackStart(newVictim);
+
                 return;
             }
         }
