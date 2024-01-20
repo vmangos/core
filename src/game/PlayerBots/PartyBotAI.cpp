@@ -361,6 +361,18 @@ Unit* PartyBotAI::GetMarkedTarget(RaidTargetIcon mark) const
     return nullptr;
 }
 
+Unit* PartyBotAI::SelectMarketAttackTarget(Player* pLeader) const
+{
+    for (auto markId : m_marksToFocus)
+    {
+        ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(markId);
+        if (targetGuid.IsUnit())
+            if (Unit* pVictim = me->GetMap()->GetUnit(targetGuid))
+                if (IsValidHostileTarget(pVictim))
+                    return pVictim;
+    }
+}
+
 Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
 {
     if (IsInDuel())
@@ -373,14 +385,7 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
         // Stick to marked target in combat.
         if (me->IsInCombat() || pLeader->GetVictim())
         {
-            for (auto markId : m_marksToFocus)
-            {
-                ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(markId);
-                if (targetGuid.IsUnit())
-                    if (Unit* pVictim = me->GetMap()->GetUnit(targetGuid))
-                        if (IsValidHostileTarget(pVictim))
-                            return pVictim;
-            }
+            return SelectMarketAttackTarget();
         }
 
         // Who is the leader attacking.
@@ -933,6 +938,17 @@ void PartyBotAI::UpdateInCombatAI()
         {
             Unit* pVictim = me->GetVictim();
 
+            // Attack marked target if exist
+            Unit* newVictim = SelectMarketAttackTarget();
+            if (newVictim && (newVictim != pVictim))
+            {
+                if (pVictim)
+                    me->AttackStop();
+                else
+                    AttackStart(newVictim);
+                return;
+            }
+            
             // Defend party members.
             if (!pVictim || pVictim->GetVictim() == me)
             {
@@ -960,11 +976,11 @@ void PartyBotAI::UpdateInCombatAI()
             return;
     }
 
-    Unit* pVictim = me->GetVictim();
-
-    // Swap to marked target or party leader's target
-    if (GetRole() != ROLE_HEALER)
+    // Swap DPS to marked target or party leader's target
+    if (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS)
     {
+        Unit* pVictim = me->GetVictim();
+
         if (Player* pLeader = GetPartyLeader())
         {
             Unit* newVictim = SelectAttackTarget(pLeader);
@@ -975,7 +991,6 @@ void PartyBotAI::UpdateInCombatAI()
                     me->AttackStop();
                 else
                     AttackStart(newVictim);
-
                 return;
             }
         }
