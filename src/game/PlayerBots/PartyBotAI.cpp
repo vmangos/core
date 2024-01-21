@@ -931,6 +931,22 @@ void PartyBotAI::UpdateInCombatAI()
     {
         if (m_role == ROLE_TANK)
         {
+            // Attack marked if exist
+            if (m_marksToFocus.size() != 0)
+            {
+                for (auto markId : m_marksToFocus)
+                {
+                    ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(markId);
+                    if (targetGuid.IsUnit())
+                        if (Unit* pVictim = me->GetMap()->GetUnit(targetGuid))
+                            if (IsValidHostileTarget(pVictim))
+                            {
+                                AttackStart(pVictim);
+                                return;
+                            }                                
+                }                
+            }
+
             Unit* pVictim = me->GetVictim();
 
             // Defend party members.
