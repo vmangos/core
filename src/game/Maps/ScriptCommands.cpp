@@ -1055,7 +1055,7 @@ bool Map::ScriptCommand_SendTaxiPath(ScriptInfo const& script, WorldObject* sour
     if (!pPlayer->IsAlive())
         return ShouldAbortScript(script);
 
-    if (pPlayer->ActivateTaxiPathTo(script.sendTaxiPath.taxiPathId, 0, true))
+    if (!pPlayer->ActivateTaxiPathTo(script.sendTaxiPath.taxiPathId, 0, true))
         return ShouldAbortScript(script);
 
     return false;
