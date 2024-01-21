@@ -285,10 +285,15 @@ bool Map::ScriptCommand_TeleportTo(ScriptInfo const& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
+    bool result;
+
     if (pSource->GetTypeId() == TYPEID_PLAYER)
-        (static_cast<Player*>(pSource))->TeleportTo(script.teleportTo.mapId, script.x, script.y, script.z, script.o, script.teleportTo.teleportOptions);
+        result = (static_cast<Player*>(pSource))->TeleportTo(script.teleportTo.mapId, script.x, script.y, script.z, script.o, script.teleportTo.teleportOptions);
     else
-        pSource->NearTeleportTo(script, script.teleportTo.teleportOptions);
+        result = pSource->NearTeleportTo(script, script.teleportTo.teleportOptions);
+
+    if (!result)
+        return ShouldAbortScript(script);
 
     return false;
 }
@@ -344,7 +349,6 @@ bool Map::ScriptCommand_KillCredit(ScriptInfo const& script, WorldObject* source
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SCRIPT_COMMAND_KILL_CREDIT (script id %u) call for a nullptr object, skipping.", script.id);
         return ShouldAbortScript(script);
     }
-    
 
     return false;
 }
@@ -623,10 +627,15 @@ bool Map::ScriptCommand_CastSpell(ScriptInfo const& script, WorldObject* source,
     Unit* pUnitTarget = pTarget->ToUnit();
     Creature* pCreatureSource = source->ToCreature();
 
+    SpellCastResult result;
+
     if (pCreatureSource && pUnitTarget)
-        pCreatureSource->TryToCast(pUnitTarget, script.castSpell.spellId, script.castSpell.flags, 0u);
+        result = pCreatureSource->TryToCast(pUnitTarget, script.castSpell.spellId, script.castSpell.flags, 0u);
     else
-        pSource->CastSpell(pTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
+        result = pSource->CastSpell(pTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
+
+    if (result != SPELL_CAST_OK)
+        return ShouldAbortScript(script);
 
     return false;
 }
@@ -1046,7 +1055,8 @@ bool Map::ScriptCommand_SendTaxiPath(ScriptInfo const& script, WorldObject* sour
     if (!pPlayer->IsAlive())
         return ShouldAbortScript(script);
 
-    pPlayer->ActivateTaxiPathTo(script.sendTaxiPath.taxiPathId, 0, true);
+    if (pPlayer->ActivateTaxiPathTo(script.sendTaxiPath.taxiPathId, 0, true))
+        return ShouldAbortScript(script);
 
     return false;
 }
@@ -1491,10 +1501,15 @@ bool Map::ScriptCommand_Flee(ScriptInfo const& script, WorldObject* source, Worl
     if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
+    bool result;
+
     if (script.flee.seekAssistance)
-        pSource->DoFleeToGetAssistance();
+        result = pSource->DoFleeToGetAssistance();
     else
-        pSource->DoFlee();
+        result = pSource->DoFlee();
+
+    if (!result)
+        return ShouldAbortScript(script);
 
     return false;
 }

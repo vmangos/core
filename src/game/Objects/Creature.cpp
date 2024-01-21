@@ -1040,7 +1040,7 @@ void Creature::RegenerateHealth()
     ModifyHealth(addvalue);
 }
 
-void Creature::DoFlee()
+bool Creature::DoFlee()
 {
     /*
     Some observations from tests on classic regarding what happens if creature
@@ -1057,7 +1057,7 @@ void Creature::DoFlee()
 
     if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) ||
         HasUnitState(UNIT_STAT_FEIGN_DEATH | UNIT_STAT_POSSESSED | UNIT_STAT_DISTRACTED | UNIT_STAT_CONFUSED))
-        return;
+        return false;
 
     float hpPercent = GetHealthPercent();
     ModifyAuraState(AURA_STATE_HEALTHLESS_15_PERCENT, hpPercent < 16.0f);
@@ -1070,13 +1070,14 @@ void Creature::DoFlee()
     MonsterTextEmote(CREATURE_FLEE_TEXT, GetVictim());
     UpdateSpeed(MOVE_RUN, false);
     InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+    return true;
 }
 
-void Creature::DoFleeToGetAssistance()
+bool Creature::DoFleeToGetAssistance()
 {
     if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) ||
         HasUnitState(UNIT_STAT_FEIGN_DEATH | UNIT_STAT_POSSESSED | UNIT_STAT_DISTRACTED | UNIT_STAT_CONFUSED))
-        return;
+        return false;
 
     float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
 
@@ -1100,7 +1101,10 @@ void Creature::DoFleeToGetAssistance()
         MonsterTextEmote(CREATURE_FLEE_TEXT, GetVictim());
         UpdateSpeed(MOVE_RUN, false);
         InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+        return true;
     }
+
+    return false;
 }
 
 
