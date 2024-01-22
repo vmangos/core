@@ -188,6 +188,9 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
 
+    // stop drowning if not in water anymore
+    GetPlayer()->UpdateTerainEnvironmentFlags();
+
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
 
