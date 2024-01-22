@@ -82,7 +82,8 @@ enum EventFlags
     EFLAG_REPEATABLE            = 0x01,                     //Event repeats
     EFLAG_RANDOM_ACTION         = 0x02,                     //Event only execute one from existed actions instead each action.
     EFLAG_NOT_CASTING           = 0x04,                     //Event will not occur while creature is casting a spell
-    EFLAG_DEBUG_ONLY            = 0x08,                     //Event only occurs in debug build
+    EFLAG_CHECK_RESULT          = 0x08,                     //Event will not go on cooldown if script actions fail
+    EFLAG_DEBUG_ONLY            = 0x10,                     //Event only occurs in debug build
     // uint8 field
 };
 
@@ -325,7 +326,7 @@ class CreatureEventAI : public BasicAI
         static int Permissible(Creature const*);
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* pActionInvoker = nullptr);
-        void ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
+        bool ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
         void SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent);
 
         uint8  m_Phase;                                     // Current phase, max 32 phases

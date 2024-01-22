@@ -2522,12 +2522,14 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid 
     sScriptMgr.IncreaseScheduledScriptsCount();
 }
 
-void Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+bool Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
     if ((script.command != SCRIPT_COMMAND_DISABLED) && 
         FindScriptFinalTargets(source, target, script) && 
         (!script.condition || IsConditionSatisfied(script.condition, target, this, source, CONDITION_FROM_DBSCRIPTS)))
-        (this->*(m_ScriptCommands[script.command]))(script, source, target);
+        return (this->*(m_ScriptCommands[script.command]))(script, source, target);
+
+    return (script.raw.data[4] & SF_GENERAL_ABORT_ON_FAILURE) != 0;
 }
 
 bool Map::FindScriptInitialTargets(WorldObject*& source, WorldObject*& target, ScriptAction const& step)

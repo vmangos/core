@@ -33,7 +33,7 @@
 
 inline bool ShouldAbortScript(ScriptInfo const& script)
 {
-    return (script.raw.data[4] & SF_GENERAL_ABORT_ON_FAILURE);
+    return (script.raw.data[4] & SF_GENERAL_ABORT_ON_FAILURE) != 0;
 }
 
 // SCRIPT_COMMAND_TALK (0)
