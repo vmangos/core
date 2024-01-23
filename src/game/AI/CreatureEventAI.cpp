@@ -186,6 +186,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
             break;
         }
         case EVENT_T_HIT_BY_SPELL:
+        case EVENT_T_SPELL_HIT_TARGET:
         {
             //Spell hit is special case, param1 and param2 handled within CreatureEventAI::SpellHit
 
@@ -686,7 +687,7 @@ void CreatureEventAI::UpdateEventsOn_MoveInLineOfSight(Unit* pWho)
     }
 }
 
-void CreatureEventAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell)
+void CreatureEventAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellEntry)
 {
     if (m_bEmptyList)
         return;
@@ -698,17 +699,34 @@ void CreatureEventAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell)
             case EVENT_T_HIT_BY_SPELL:
             {
                 //If spell id matches (or no spell id) & if spell school matches (or no spell school)
-                if (!i.Event.hit_by_spell.spellId || pSpell->Id == i.Event.hit_by_spell.spellId)
-                    if (GetSchoolMask(pSpell->School) & i.Event.hit_by_spell.schoolMask)
+                if (!i.Event.hit_by_spell.spellId || pSpellEntry->Id == i.Event.hit_by_spell.spellId)
+                    if (GetSchoolMask(pSpellEntry->School) & i.Event.hit_by_spell.schoolMask)
                         ProcessEvent(i, pCaster);
                 break;
             }
             case EVENT_T_HIT_BY_AURA:
             {
-                if (!i.Event.hit_by_aura.auraType || pSpell->HasAura(AuraType(i.Event.hit_by_aura.auraType)))
+                if (!i.Event.hit_by_aura.auraType || pSpellEntry->HasAura(AuraType(i.Event.hit_by_aura.auraType)))
                     ProcessEvent(i, pCaster);
                 break;
             }
+        }
+    }
+}
+
+void CreatureEventAI::SpellHitTarget(Unit* pTarget, SpellEntry const* pSpellEntry)
+{
+    if (m_bEmptyList)
+        return;
+
+    for (auto& i : m_CreatureEventAIList)
+    {
+        if (i.Event.event_type == EVENT_T_SPELL_HIT_TARGET)
+        {
+            //If spell id matches (or no spell id) & if spell school matches (or no spell school)
+            if (!i.Event.hit_by_spell.spellId || pSpellEntry->Id == i.Event.hit_by_spell.spellId)
+                if (GetSchoolMask(pSpellEntry->School) & i.Event.hit_by_spell.schoolMask)
+                    ProcessEvent(i, pTarget);
         }
     }
 }
