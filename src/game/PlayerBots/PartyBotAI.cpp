@@ -929,25 +929,18 @@ void PartyBotAI::UpdateInCombatAI()
 {
     if (!IsInDuel())
     {
+        Player* pLeader = GetPartyLeader();
+        Unit* pVictim = me->GetVictim();
+
         if (m_role == ROLE_TANK)
         {
             // Attack marked if exist
             if (m_marksToFocus.size() != 0)
             {
-                for (auto markId : m_marksToFocus)
-                {
-                    ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(markId);
-                    if (targetGuid.IsUnit())
-                        if (Unit* pVictim = me->GetMap()->GetUnit(targetGuid))
-                            if (IsValidHostileTarget(pVictim))
-                            {
-                                AttackStart(pVictim);
-                                return;
-                            }                                
-                }                
-            }
-
-            Unit* pVictim = me->GetVictim();
+                pVictim = SelectAttackTarget(pLeader);
+                AttackStart(pVictim);
+                return;              
+            }            
 
             // Defend party members.
             if (!pVictim || pVictim->GetVictim() == me)
@@ -972,28 +965,21 @@ void PartyBotAI::UpdateInCombatAI()
                 }
             }
         }
-        else if (CrowdControlMarkedTargets())
-            return;
-    }
 
-    // Swap DPS to marked target or party leader's target
-    if (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS)
-    {
-        Unit* pVictim = me->GetVictim();
-
-        if (Player* pLeader = GetPartyLeader())
+        // Swap DPS to marked target or party leader's target
+        if (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS)
         {
             Unit* newVictim = SelectAttackTarget(pLeader);
 
             if (newVictim && (newVictim != pVictim))
             {
-                if (pVictim)
-                    me->AttackStop();
-                else
-                    AttackStart(newVictim);
+                AttackStart(newVictim);
                 return;
             }
         }
+        
+        if (CrowdControlMarkedTargets())
+            return;
     }
 
     switch (me->GetClass())
