@@ -4195,7 +4195,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
     if (!unitTarget->IsAlive())
         return;
 
-    if (m_spellInfo->Id == 17364) // Courroux naturel
+    if (m_spellInfo->Id == 17364) // Stormstrike
     {
         if (!m_casterUnit->IsAlive()) // CalculateMeleeDamage does not work in that case.
             return;
@@ -4239,28 +4239,12 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
                 break;
         }
     }
-
-    // some spell specific modifiers
-    bool customBonusDamagePercentMod = false;
-    float bonusDamagePercentMod  = 1.0f;                    // applied to fixed effect damage bonus if set customBonusDamagePercentMod
-    float weaponDamagePercentMod = 1.0f;                    // applied to weapon damage (and to fixed effect damage bonus if customBonusDamagePercentMod not set
-    bool normalized = false;
-
-    switch (m_spellInfo->SpellFamilyName)
-    {
-        case SPELLFAMILY_ROGUE:
-        {
-            // Ambush
-            if (m_spellInfo->IsFitToFamilyMask<CF_ROGUE_AMBUSH>())
-            {
-                customBonusDamagePercentMod = true;
-                bonusDamagePercentMod = 2.5f;               // 250%
-            }
-            break;
-        }
-    }
-
-    float bonus = 0.f;
+    
+    float weaponDamagePercentMod = 1.0f;                    // SPELL_EFFECT_WEAPON_PERCENT_DAMAGE pct that is applied to both fixed bonus damage bonus of other effects and to base weapon swing damage
+    bool normalized = false;                                // whether the spell has SPELL_EFFECT_NORMALIZED_WEAPON_DMG
+    float bonus = 0.f;                                      // fixed bonus damage from SPELL_EFFECT_WEAPON_DAMAGE, SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL,
+                                                              // and SPELL_EFFECT_NORMALIZED_WEAPON_DMG. (If creature and has no weapon, also from SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
+    
     for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         switch (m_spellInfo->Effect[j])
@@ -4274,13 +4258,14 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
                 normalized = true;
                 break;
             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                weaponDamagePercentMod *= CalculateDamage(SpellEffectIndex(j), unitTarget) / 100.0f;
-
-                // applied only to prev.effects fixed damage
-                if (customBonusDamagePercentMod)
-                    bonus = bonus * bonusDamagePercentMod;
+                if (m_casterUnit->IsCreature() && !((Creature*)m_casterUnit)->HasWeapon())
+                {
+                    // creatures without weapons do static damage with SPELL_EFFECT_WEAPON_PERCENT_DAMAGE
+                    weaponDamagePercentMod = 0.0f;
+                    bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
+                }
                 else
-                    bonus = bonus * weaponDamagePercentMod;
+                    weaponDamagePercentMod *= CalculateDamage(SpellEffectIndex(j), unitTarget) / 100.0f;
                 break;
             default:
                 break;                                      // not weapon damage effect, just skip
@@ -4290,6 +4275,10 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
     // apply to non-weapon bonus weapon total pct effect, weapon total flat effect included in weapon damage
     if (bonus)
     {
+        // apply SPELL_EFFECT_WEAPON_PERCENT_DAMAGE multiplier to bonus dmg effects of the spell (if the creature has a weapon)
+        if (weaponDamagePercentMod > 0.0f)
+            bonus = bonus * weaponDamagePercentMod;
+
         UnitMods unitMod;
         switch (m_attackType)
         {
@@ -4305,11 +4294,12 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
                 break;
         }
 
+        // apply SPELL_AURA_MOD_DAMAGE_PERCENT_DONE multiplier to bonus dmg effects of the spell (flat damage done is included in weapon damage)
         float weapon_total_pct  = m_casterUnit->GetModifierValue(unitMod, TOTAL_PCT);
         bonus = bonus * weapon_total_pct;
     }
 
-    // + weapon damage with applied weapon% dmg to base weapon damage in call
+    // apply SPELL_EFFECT_WEAPON_PERCENT_DAMAGE multiplier to base weapon swing damage
     for (uint8 i = 0; i < m_casterUnit->GetWeaponDamageCount(m_attackType); i++)
     {
         if (unitTarget->IsImmuneToDamage(GetSchoolMask(m_casterUnit->GetWeaponDamageSchool(m_attackType, i))))

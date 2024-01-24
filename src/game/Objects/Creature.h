@@ -301,8 +301,8 @@ class Creature : public Unit
 
         void SendAIReaction(AiReaction reactionType);
 
-        void DoFlee();
-        void DoFleeToGetAssistance();
+        bool DoFlee();
+        bool DoFleeToGetAssistance();
         float GetFleeingSpeed() const;
         float GetBaseWalkSpeedRate() const;
         float GetBaseRunSpeedRate() const;
