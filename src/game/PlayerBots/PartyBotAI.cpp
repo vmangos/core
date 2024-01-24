@@ -931,7 +931,16 @@ void PartyBotAI::UpdateInCombatAI()
     {
         if (m_role == ROLE_TANK)
         {
+            Player* pLeader = GetPartyLeader();
             Unit* pVictim = me->GetVictim();
+
+            // Attack marked if exist
+            if (m_marksToFocus.size() != 0)
+            {
+                pVictim = SelectAttackTarget(pLeader);
+                AttackStart(pVictim);
+                return;              
+            }       
 
             // Defend party members.
             if (!pVictim || pVictim->GetVictim() == me)
