@@ -168,7 +168,6 @@ instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance
     m_uiFatherFlameGUID(0),
     m_uiFatherFlame_timer(0),
     m_uiFatherFlame_WaveCount(0),
-    m_uiSolakarTriggerGUID(0),
 
     m_uiUBRSDoorGUID(0),
     m_uiBrazier01GUID(0),
@@ -366,9 +365,6 @@ void instance_blackrock_spire::OnCreatureCreate(Creature* pCreature)
             break;
         case NPC_BLACKHAND_INCANCERATOR:
             m_lIncanceratorGUIDList.push_back(pCreature->GetGUID());
-            break;
-        case NPC_SOLAKAR_TRIGGER:
-            m_uiSolakarTriggerGUID = pCreature->GetGUID();
             break;
         case NPC_FIREBRAND_GRUNT:
             // 14.26% chance to spawn Bannok Grimaxe instead of one of his 3 placeholders

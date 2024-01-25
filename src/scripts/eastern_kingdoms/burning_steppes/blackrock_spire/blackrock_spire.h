@@ -136,7 +136,6 @@ class instance_blackrock_spire : public ScriptedInstance, private DialogueHelper
         uint64 m_uiFatherFlameGUID;
         uint32 m_uiFatherFlame_timer;
         uint32 m_uiFatherFlame_WaveCount;
-        uint64 m_uiSolakarTriggerGUID;
 
         uint64 m_uiUBRSDoorGUID;
         uint64 m_uiBrazier01GUID;
