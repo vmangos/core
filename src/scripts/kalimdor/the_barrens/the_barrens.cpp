@@ -30,46 +30,6 @@ EndContentData */
 
 #include "scriptPCH.h"
 
-enum
-{
-    // TODO: implement random broadcast on spawn
-    //SAY_SPAWN_1 = 3164, 
-    //SAY_SPAWN_2 = 3170, 
-    SAY_CRACKER = 3167,
-    SAY_SQUAWK  = 3165
-};
-
-struct npc_pollyAI : public ScriptedAI
-{
-    npc_pollyAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    bool b_text;
-
-    void Reset() override
-    {
-        b_text = false;
-    }
-
-    void Aggro(Unit* pWho) override
-    {
-        if (!b_text)
-        {
-            DoScriptText(SAY_CRACKER, m_creature);
-            DoScriptText(SAY_SQUAWK, m_creature);
-            b_text = true;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_polly(Creature* pCreature)
-{
-    return new npc_pollyAI(pCreature);
-}
-
-
 /*######
 # npc_gilthares
 ######*/
@@ -784,11 +744,6 @@ void AddSC_the_barrens()
     newscript->Name = "npc_gilthares";
     newscript->GetAI = &GetAI_npc_gilthares;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_gilthares;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_polly";
-    newscript->GetAI = &GetAI_npc_polly;
     newscript->RegisterSelf();
 
     newscript = new Script;
