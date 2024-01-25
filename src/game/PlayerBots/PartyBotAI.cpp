@@ -940,7 +940,7 @@ void PartyBotAI::UpdateInCombatAI()
                 pVictim = SelectAttackTarget(pLeader);
                 AttackStart(pVictim);
                 return;              
-            }            
+            }       
 
             // Defend party members.
             if (!pVictim || pVictim->GetVictim() == me)
