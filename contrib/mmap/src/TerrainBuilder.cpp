@@ -766,8 +766,8 @@ namespace MMAP
                     float inDist  = -1.0f;
                     if (it->IsUnderObject(v, up, isM2, &outDist, &inDist)) // inDist < outDist
                     {
-                        //if there are less than 1.5y between terrain and model then mark the terrain as unwalkable
-                        if (inDist < 1.5f)
+                        //if there are less than 5.0y between terrain and model then mark the terrain as unwalkable
+                        if (inDist < 5.0f)
                             terrainInsideModelsVerts[t] = inDist;
                     }
                 }
