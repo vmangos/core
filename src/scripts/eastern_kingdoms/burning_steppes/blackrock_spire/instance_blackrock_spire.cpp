@@ -746,16 +746,14 @@ void instance_blackrock_spire::Update(uint32 uiDiff)
 
     if (GetData(TYPE_SOLAKAR) == IN_PROGRESS)
     {
-        if (Creature* Crea = GetCreature(m_uiSolakarTriggerGUID))
-        {
             if (m_uiFatherFlame_timer <= uiDiff)
             {
                 if (m_uiFatherFlame_WaveCount == 0) // First wave should be a Rookery Hatcher and there is a text that it has to say.
                 {
-                    Creature* pFirstHatcher = Crea->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                    if (pFirstHatcher)
+                    if (Creature* pFirstHatcher = GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS))
                         DoScriptText(SAY_ROOKERY_EVENT_START, pFirstHatcher);
-                    Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+
+                    GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                     m_uiFatherFlame_timer = urand(30000, 40000);
                     ++m_uiFatherFlame_WaveCount;
                 }
@@ -765,20 +763,20 @@ void instance_blackrock_spire::Update(uint32 uiDiff)
                     {
                         case 0:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_GUARDIAN, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                         case 1:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                         case 2:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                     }
@@ -787,14 +785,13 @@ void instance_blackrock_spire::Update(uint32 uiDiff)
                 }
                 else
                 {
-                    Crea->SummonCreature(NPC_SOLAKAR, 43.7685f, -259.82f, 91.6483f, 0, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                    GetMap()->SummonCreature(NPC_SOLAKAR, 43.7685f, -259.82f, 91.6483f, 0, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                     SetData(TYPE_SOLAKAR, DONE);
                     m_uiFatherFlame_timer = 0;
                 }
             }
             else
                 m_uiFatherFlame_timer -= uiDiff;
-        }
     }
 }
 
