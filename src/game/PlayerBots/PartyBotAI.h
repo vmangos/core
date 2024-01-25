@@ -104,6 +104,7 @@ public:
     float m_z = 0.0f;
     float m_o = 0.0f;
     bool m_resetSpellData = false;
+    bool m_personalControls = false;
 };
 
 #endif
