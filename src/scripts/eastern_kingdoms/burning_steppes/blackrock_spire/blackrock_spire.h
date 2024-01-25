@@ -32,7 +32,6 @@ enum
     NPC_SOLAKAR                 = 10264,
     NPC_ROOKERY_GUARDIAN        = 10258,
     NPC_ROOKERY_HATCHER         = 10683,
-    NPC_SOLAKAR_TRIGGER         = 160014,
     NPC_DRAKKISATH              = 10363,
     NPC_THE_BEAST               = 10430,
     NPC_CHROMATIC_WHELP         = 10442,                    // related to Gyth arena event
