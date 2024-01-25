@@ -44,7 +44,6 @@
 #include "PathFinder.h"
 #include "CharacterDatabaseCache.h"
 #include "ZoneScript.h"
-#include "UpdateMask.h"
 
 using namespace Spells;
 
