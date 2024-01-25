@@ -935,7 +935,7 @@ void PartyBotAI::UpdateInCombatAI()
         if (m_role == ROLE_TANK)
         {
             // Attack marked if exist
-            if (m_marksToFocus.size() != 0)
+            if (!m_marksToFocus.empty())
             {
                 pVictim = SelectAttackTarget(pLeader);
                 AttackStart(pVictim);
