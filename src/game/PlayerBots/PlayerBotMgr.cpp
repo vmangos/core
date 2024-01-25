@@ -33,6 +33,7 @@ PlayerBotMgr::PlayerBotMgr()
     m_confEnableRandomBots      = false;
     m_confDebug                 = false;
     m_confBattleBotAutoJoin     = false;
+    m_confBattleBotAddAnnounce  = true;
 
     // Time
     m_elapsedTime = 0;
@@ -56,6 +57,7 @@ void PlayerBotMgr::LoadConfig()
     m_confDebug = sConfig.GetBoolDefault("PlayerBot.Debug", false);
     m_confUpdateDiff = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
     m_confBattleBotAutoJoin = sConfig.GetBoolDefault("BattleBot.AutoJoin", false);
+    m_confBattleBotAddAnnounce = sConfig.GetBoolDefault("BattleBot.AddAnnounce", true);
 
     if (!sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
         m_tempBots.clear();
@@ -587,16 +589,20 @@ void PlayerBotMgr::AddBattleBot(BattleGroundQueueTypeId queueType, Team botTeam,
     BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, instanceId, 16224.356f, 16284.763f, 13.175f, 4.56f, queueType, temporary);
     AddBot(ai);
 
-    if (botTeam == ALLIANCE)
+    if (m_confBattleBotAddAnnounce) 
     {
-        sWorld.SendWorldText(LANG_ALLIANCE_BATTLEBOT_ADDED, botLevel, queueType);
-        sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+        if (botTeam == ALLIANCE)
+        {
+            sWorld.SendWorldText(LANG_ALLIANCE_BATTLEBOT_ADDED, botLevel, queueType);
+            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+        }
+        else
+        {
+            sWorld.SendWorldText(LANG_HORDE_BATTLEBOT_ADDED, botLevel, queueType);
+            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
+        }
     }
-    else
-    {
-        sWorld.SendWorldText(LANG_HORDE_BATTLEBOT_ADDED, botLevel, queueType);
-        sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
-    }
+    
 }
 
 void PlayerBotMgr::DeleteBattleBots()
@@ -1682,6 +1688,37 @@ bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
         if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
         {
             pAI->botEntry->requestRemoval = true;
+            return true;
+        }
+    }
+
+    SendSysMessage("Target is not a party bot.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotRepairItemsCommand(char* args)
+{
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            // check online security
+            if (HasLowerSecurity(pTarget))
+                return false;
+
+            // Repair items
+            pTarget->DurabilityRepairAll(false, 0);
+
+            PSendSysMessage(LANG_YOU_REPAIR_ITEMS, GetNameLink(pTarget).c_str());
             return true;
         }
     }
