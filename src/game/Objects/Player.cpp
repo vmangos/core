@@ -21255,6 +21255,13 @@ void Player::SendSpellRemoved(uint32 spellId) const
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendChannelUpdate(uint32 time) const
+{
+    WorldPacket data(MSG_CHANNEL_UPDATE, 4);
+    data << uint32(0);
+    SendDirectMessage(&data);
+}
+
 bool Player::HasMovementFlag(MovementFlags f) const
 {
     return m_movementInfo.HasMovementFlag(f);
