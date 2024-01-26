@@ -1310,7 +1310,8 @@ bool ChatHandler::HandlePartyBotFocusMarkCommand(char* args)
         {
             if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
             {
-                if (std::find(pAI->m_marksToFocus.begin(), pAI->m_marksToFocus.end(), itrMark->second) != pAI->m_marksToFocus.end()) {
+                if (std::find(pAI->m_marksToFocus.begin(), pAI->m_marksToFocus.end(), itrMark->second) != pAI->m_marksToFocus.end()) 
+                {
                     PSendSysMessage("%s already have focus %s.", pTarget->GetName(), args);
                     return false;
                 }
@@ -1344,7 +1345,8 @@ bool ChatHandler::HandlePartyBotFocusMarkCommand(char* args)
             {
                 if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
                 {
-                    if (std::find(pAI->m_marksToFocus.begin(), pAI->m_marksToFocus.end(), itrMark->second) != pAI->m_marksToFocus.end()) {
+                    if (std::find(pAI->m_marksToFocus.begin(), pAI->m_marksToFocus.end(), itrMark->second) != pAI->m_marksToFocus.end()) 
+                    {
                         // Already have focus mark
                         continue;
                     }
