@@ -8392,9 +8392,6 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                             case NEED_BEFORE_GREED:
                                 group->NeedBeforeGreed(creature, loot);
                                 break;
-                            case MASTER_LOOT:
-                                group->MasterLoot(creature, loot, this);
-                                break;
                             default:
                                 break;
                         }
@@ -8434,6 +8431,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                             switch (group->GetLootMethod())
                             {
                                 case MASTER_LOOT:
+                                    group->MasterLoot(creature, loot, this);
                                     permission = MASTER_PERMISSION;
                                     break;
                                 case FREE_FOR_ALL:
