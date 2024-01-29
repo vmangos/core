@@ -104,7 +104,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "focusmark",  SEC_PLAYER,      false, &ChatHandler::HandlePartyBotFocusMarkCommand,   "", nullptr },
         { "clearmarks", SEC_PLAYER,      false, &ChatHandler::HandlePartyBotClearMarksCommand,  "", nullptr },
         { "cometome",   SEC_PLAYER,      false, &ChatHandler::HandlePartyBotComeToMeCommand,    "", nullptr },
-        { "altar",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotUseGObjectCommand,  "", nullptr },
+        { "usealtar",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotUseGObjectCommand,  "", nullptr },
         { "pause",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotPauseCommand,       "", nullptr },
         { "unpause",    SEC_PLAYER,      false, &ChatHandler::HandlePartyBotUnpauseCommand,     "", nullptr },
         { "unequip",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnequipCommand,     "", nullptr },
