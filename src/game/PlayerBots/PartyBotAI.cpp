@@ -2624,6 +2624,14 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
                 }
             }
         }
+
+        if (m_spells.warrior.pBerserkerRage &&
+            me->HasAuraType(SPELL_AURA_MOD_FEAR) &&
+            CanTryToCastSpell(me, m_spells.warrior.pBerserkerRage))
+        {
+            if (DoCastSpell(me, m_spells.warrior.pBerserkerRage) == SPELL_CAST_OK)
+                return;
+        }
     }
     else // no victim
     {
