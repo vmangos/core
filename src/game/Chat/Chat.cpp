@@ -109,7 +109,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { "unpause",    SEC_PLAYER,      false, &ChatHandler::HandlePartyBotUnpauseCommand,     "", nullptr },
         { "unequip",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnequipCommand,     "", nullptr },
         { "remove",     SEC_PLAYER,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
-        { "repairitems",SEC_PLAYER,      false, &ChatHandler::HandlePartyBotRepairItemsCommand,      "", nullptr },
         { "controls",   SEC_PLAYER,      false, &ChatHandler::HandlePartyBotControls,           "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
