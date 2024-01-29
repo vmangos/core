@@ -7395,6 +7395,10 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
             _ApplyAmmoBonuses();
     }
 
+    // Some bonus parry talents are weapon specific in early patches.
+    if (slot == EQUIPMENT_SLOT_MAINHAND)
+        UpdateParryPercentage();
+
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "_ApplyItemMods complete.");
 }
 
@@ -9010,7 +9014,7 @@ Item* Player::GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bo
     return item;
 }
 
-bool Player::HasWeaponForParry() const
+Item* Player::GetWeaponForParry() const
 {
     Item* pWeapon = GetWeaponForAttack(BASE_ATTACK, true, true);
 
@@ -9030,7 +9034,7 @@ bool Player::HasWeaponForParry() const
         pWeapon = nullptr;
 #endif
 
-    return pWeapon != nullptr;
+    return pWeapon;
 }
 
 uint32 Player::GetAttackBySlot(uint8 slot)
