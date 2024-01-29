@@ -1669,6 +1669,8 @@ bool HandlePartyBotUseGObjectHelper(Player* pTarget, GameObject* pGo)
 
 bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
 {
+    HandleGameObjectSelectCommand(args);
+
     Player* pPlayer = GetSession()->GetPlayer();
     Player* pTarget = GetSelectedPlayer();
 
@@ -1676,6 +1678,13 @@ bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
     if (!pGo)
     {
         SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
+        return false;
+    }
+
+
+    if (pGo->GetGOInfo()->type != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
+    {
+        SendSysMessage("Party bots can only use the altar.");
         return false;
     }
 
