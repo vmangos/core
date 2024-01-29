@@ -2625,6 +2625,10 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                 if (slot == EQUIPMENT_SLOT_OFFHAND)
                 {
                     // Only allow shield in offhand for tanks
+                    if (pProto->InventoryType == INVTYPE_SHIELD &&
+                        m_role != ROLE_TANK && IsShieldClass(me->GetClass()))
+                        continue;
+
                     if (pProto->InventoryType != INVTYPE_SHIELD &&
                         m_role == ROLE_TANK && IsShieldClass(me->GetClass()))
                         continue;
