@@ -349,6 +349,7 @@ public:
             SpellEntry const* pFeignDeath;
             SpellEntry const* pScareBeast;
             SpellEntry const* pVolley;
+            SpellEntry const* pTranquilizingShot;
         } hunter;
         struct
         {
@@ -468,6 +469,7 @@ public:
             SpellEntry const* pSunderArmor;
             SpellEntry const* pConcussionBlow;
             SpellEntry const* pPiercingHowl;
+            SpellEntry const* pChallengingShout;
         } warrior;
         struct
         {
