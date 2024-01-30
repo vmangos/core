@@ -8098,6 +8098,8 @@ void Unit::SetMaxHealth(uint32 val)
 void Unit::SetHealthPercent(float percent)
 {
     uint32 newHealth = GetMaxHealth() * percent / 100.0f;
+    if (percent > 0 && newHealth == 0)
+        newHealth = 1;
     SetHealth(newHealth);
 }
 
