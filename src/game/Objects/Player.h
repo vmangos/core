@@ -2606,6 +2606,7 @@ class Player final: public Unit
         bool m_InstanceValid;
         // permanent binds and solo binds
         BoundInstancesMap m_boundInstances;
+        mutable std::mutex m_boundInstancesMutex;
         InstancePlayerBind* GetBoundInstance(uint32 mapid);
         BoundInstancesMap& GetBoundInstances() { return m_boundInstances; }
         void UnbindInstance(uint32 mapid, bool unload = false);
