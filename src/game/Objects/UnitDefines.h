@@ -426,6 +426,7 @@ enum UnitState
     UNIT_STAT_RUNNING            = 0x01000000,
 
     UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x02000000, // allow movement with incomplete or partial paths
+    UNIT_STAT_PENDING_CHANNEL_RESET = 0x04000000, // pending end of spell channeling animation
 
     UNIT_STAT_NO_SEARCH_FOR_OTHERS   = 0x08000000, // MoveInLineOfSight will not be called
     UNIT_STAT_NO_BROADCAST_TO_OTHERS = 0x10000000, // ScheduleAINotify will not be called
@@ -461,7 +462,7 @@ enum UnitState
     UNIT_STAT_MOVING          = UNIT_STAT_ROAMING_MOVE | UNIT_STAT_CHASE_MOVE | UNIT_STAT_FOLLOW_MOVE | UNIT_STAT_FLEEING_MOVE,
 
     UNIT_STAT_ALL_STATE       = 0xFFFFFFFF,
-    UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING | UNIT_STAT_NO_SEARCH_FOR_OTHERS | UNIT_STAT_NO_BROADCAST_TO_OTHERS | UNIT_STAT_AI_USES_MOVE_IN_LOS),
+    UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING | UNIT_STAT_PENDING_CHANNEL_RESET | UNIT_STAT_NO_SEARCH_FOR_OTHERS | UNIT_STAT_NO_BROADCAST_TO_OTHERS | UNIT_STAT_AI_USES_MOVE_IN_LOS),
 };
 
 static char const* UnitStateToString(uint32 state)
@@ -518,6 +519,8 @@ static char const* UnitStateToString(uint32 state)
             return "Running";
         case UNIT_STAT_ALLOW_INCOMPLETE_PATH:
             return "Allow Incomplete Path";
+        case UNIT_STAT_PENDING_CHANNEL_RESET:
+            return "Pending Channel Reset";
         case UNIT_STAT_NO_SEARCH_FOR_OTHERS:
             return "No Search for Others";
         case UNIT_STAT_NO_BROADCAST_TO_OTHERS:

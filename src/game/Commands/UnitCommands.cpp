@@ -446,8 +446,8 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Frost spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_FROST));
     PSendSysMessage("Shadow spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Arcane spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_ARCANE));
-    PSendSysMessage("Melee hit chance: %g", pPlayer->GetBonusHitChanceFromAuras(BASE_ATTACK));
-    PSendSysMessage("Ranged hit chance: %g", pPlayer->GetBonusHitChanceFromAuras(RANGED_ATTACK));
+    PSendSysMessage("Melee hit chance: %g", pPlayer->GetWeaponBasedAuraModifier(BASE_ATTACK, SPELL_AURA_MOD_HIT_CHANCE));
+    PSendSysMessage("Ranged hit chance: %g", pPlayer->GetWeaponBasedAuraModifier(RANGED_ATTACK, SPELL_AURA_MOD_HIT_CHANCE));
     PSendSysMessage("Spell hit chance: %g", pPlayer->m_modSpellHitChance);
     PSendSysMessage("Positive strength: %g", pPlayer->GetPosStat(STAT_STRENGTH));
     PSendSysMessage("Positive agility: %g", pPlayer->GetPosStat(STAT_AGILITY));

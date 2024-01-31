@@ -4969,7 +4969,7 @@ void Player::DeleteOldCharacters()
  */
 void Player::DeleteOldCharacters(uint32 keepDays)
 {
-    QueryResult* resultChars = CharacterDatabase.PQuery("SELECT `guid`, `deleted_account` FROM `characters` WHERE `deleted_time` IS NOT NULL AND `deleted_time` < '" UI64FMTD "' LIMIT 0,2", uint64(time(nullptr) - time_t(keepDays * DAY)));
+    QueryResult* resultChars = CharacterDatabase.PQuery("SELECT `guid`, `deleted_account` FROM `characters` WHERE `deleted_account` IS NOT NULL AND `deleted_time` IS NOT NULL AND `deleted_time` < '" UI64FMTD "' LIMIT 0,2", uint64(time(nullptr) - time_t(keepDays * DAY)));
     if (resultChars)
     {
         do
@@ -7395,6 +7395,10 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
             _ApplyAmmoBonuses();
     }
 
+    // Some bonus parry talents are weapon specific in early patches.
+    if (slot == EQUIPMENT_SLOT_MAINHAND)
+        UpdateParryPercentage();
+
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "_ApplyItemMods complete.");
 }
 
@@ -8388,9 +8392,6 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                             case NEED_BEFORE_GREED:
                                 group->NeedBeforeGreed(creature, loot);
                                 break;
-                            case MASTER_LOOT:
-                                group->MasterLoot(creature, loot, this);
-                                break;
                             default:
                                 break;
                         }
@@ -8430,6 +8431,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                             switch (group->GetLootMethod())
                             {
                                 case MASTER_LOOT:
+                                    group->MasterLoot(creature, loot, this);
                                     permission = MASTER_PERMISSION;
                                     break;
                                 case FREE_FOR_ALL:
@@ -9010,7 +9012,7 @@ Item* Player::GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bo
     return item;
 }
 
-bool Player::HasWeaponForParry() const
+Item* Player::GetWeaponForParry() const
 {
     Item* pWeapon = GetWeaponForAttack(BASE_ATTACK, true, true);
 
@@ -9030,7 +9032,7 @@ bool Player::HasWeaponForParry() const
         pWeapon = nullptr;
 #endif
 
-    return pWeapon != nullptr;
+    return pWeapon;
 }
 
 uint32 Player::GetAttackBySlot(uint8 slot)
@@ -16269,6 +16271,7 @@ void Player::_LoadBoundInstances(QueryResult* result)
 
 InstancePlayerBind* Player::GetBoundInstance(uint32 mapid)
 {
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     BoundInstancesMap::iterator itr = m_boundInstances.find(mapid);
     if (itr != m_boundInstances.end())
         return &itr->second;
@@ -16278,6 +16281,7 @@ InstancePlayerBind* Player::GetBoundInstance(uint32 mapid)
 
 void Player::UnbindInstance(uint32 mapid, bool unload)
 {
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     BoundInstancesMap::iterator itr = m_boundInstances.find(mapid);
     UnbindInstance(itr, unload);
 }
@@ -16299,6 +16303,7 @@ InstancePlayerBind* Player::BindToInstance(DungeonPersistentState* state, bool p
     if (state)
     {
         ASSERT(state->GetMapId() > 1);
+        std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
         InstancePlayerBind& bind = m_boundInstances[state->GetMapId()];
 
         if (bind.state)
@@ -16366,6 +16371,7 @@ void Player::SendRaidInfo() const
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
 
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)
@@ -16396,6 +16402,7 @@ void Player::SendSavedInstances() const
     bool hasBeenSaved = false;
     WorldPacket data;
 
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)                               // only permanent binds are sent
@@ -16445,6 +16452,7 @@ void Player::ConvertInstancesToGroup(Player* player, Group* group, ObjectGuid pl
 
     if (player)
     {
+        std::lock_guard<std::mutex> guard(player->m_boundInstancesMutex);
         for (BoundInstancesMap::iterator itr = player->m_boundInstances.begin(); itr != player->m_boundInstances.end();)
         {
             has_binds = true;
@@ -17483,6 +17491,7 @@ void Player::SendResetFailedNotify()
 void Player::ResetInstances(InstanceResetMethod method)
 {
     // method can be INSTANCE_RESET_ALL, INSTANCE_RESET_GROUP_JOIN
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (BoundInstancesMap::iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
     {
         DungeonPersistentState* state = itr->second.state;
@@ -17545,6 +17554,7 @@ void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
     if (!pGroup)
         return;
 
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     BoundInstancesMap::iterator itr = m_boundInstances.find(mapId);
     if (itr == m_boundInstances.end() || itr->second.perm)
         return;
@@ -21253,6 +21263,13 @@ void Player::SendSpellRemoved(uint32 spellId) const
     WorldPacket data(SMSG_REMOVED_SPELL, 4);
     data << uint16(spellId);
     GetSession()->SendPacket(&data);
+}
+
+void Player::SendChannelUpdate(uint32 time) const
+{
+    WorldPacket data(MSG_CHANNEL_UPDATE, 4);
+    data << uint32(0);
+    SendDirectMessage(&data);
 }
 
 bool Player::HasMovementFlag(MovementFlags f) const

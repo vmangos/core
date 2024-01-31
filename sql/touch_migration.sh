@@ -1,13 +1,31 @@
 #!/usr/bin/env bash
 
-DATE=`date +%Y%m%d%H%M%S`
-FPATH=migrations/"$DATE"_world.sql
+DATE=$(date -u +%Y%m%d%H%M%S) # UTC DATE
+FPATH="migrations/${DATE}_world.sql"
 
-touch "$FPATH"
+cat <<EOF > "$FPATH"
+DROP PROCEDURE IF EXISTS add_migration;
+DELIMITER ??
+CREATE PROCEDURE \`add_migration\`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM \`migrations\` WHERE \`id\`='$DATE');
+IF v = 0 THEN
+INSERT INTO \`migrations\` VALUES ('$DATE');
+-- Add your query below.
 
-if [ -e "$FPATH" ]; then
-	echo -e "DROP PROCEDURE IF EXISTS add_migration;\r\ndelimiter ??\r\nCREATE PROCEDURE \`add_migration\`()\r\nBEGIN\r\nDECLARE v INT DEFAULT 1;\r\nSET v = (SELECT COUNT(*) FROM \`migrations\` WHERE \`id\`='$DATE');\r\nIF v=0 THEN\r\nINSERT INTO \`migrations\` VALUES ('$DATE');\r\n-- Add your query below.\r\n\r\n\r\n\r\n-- End of migration.\r\nEND IF;\r\nEND??\r\ndelimiter ; \r\nCALL add_migration();\r\nDROP PROCEDURE IF EXISTS add_migration;" > $FPATH
 
-else 
-	echo "FAILED to create file"
+
+-- End of migration.
+END IF;
+END??
+DELIMITER ;
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
+EOF
+
+if [ $? -eq 0 ]; then
+    echo "File created: $FPATH"
+else
+    echo "Error creating file: $FPATH"
 fi
