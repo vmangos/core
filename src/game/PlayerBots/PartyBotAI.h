@@ -41,6 +41,14 @@ public:
         m_updateTimer.Reset(2000);
     }
 
+    // POTS start
+    void UsePotionsOrRune(uint16 potion);
+    bool CanUsePotionsOrRune(uint16 itemId);
+    bool CreateAndUseItemFromId(uint16 itemId);
+    uint16 SelectHealingPotionForLevel();
+    uint16 SelectManaPotionForLevel();
+    // POTS end
+
     bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) final;
     void OnPlayerLogin() final;
     void UpdateAI(uint32 const diff) final;

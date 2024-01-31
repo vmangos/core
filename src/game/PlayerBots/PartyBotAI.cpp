@@ -43,6 +43,103 @@ enum PartyBotSpells
 #define PB_MIN_FOLLOW_ANGLE 0.0f
 #define PB_MAX_FOLLOW_ANGLE 6.0f
 
+// Use potions start
+enum ManaPotionsId
+{
+    MINOR_MANA_POTION = 2455,
+    LESSER_MANA_POTION = 3385,
+    MANA_POTION = 3827,
+    GREATER_MANA_POTION = 6149,
+    SUPERIOR_MANA_POTION = 13443,
+    MAJOR_MANA_POTION = 13444,
+};
+
+enum ManaRunesId
+{
+    DARK_RUNE = 20520
+};
+
+enum HealingItemId
+{
+    MINOR_HEALING_POTION = 118,
+    LESSER_HEALING_POTION = 858,
+    HEALING_POTION = 929,
+    GREATER_HEALING_POTION = 1710,
+    SUPERIOR_HEALING_POTION = 3928,
+    MAJOR_HEALING_POTION = 13446,
+};
+
+void PartyBotAI::UsePotionsOrRune(uint16 potion)
+{
+    CreateAndUseItemFromId(potion);
+    return;
+}
+
+bool PartyBotAI::CanUsePotionsOrRune(uint16 itemId)
+{
+    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itemId);
+    for (auto const& itr : pProto->Spells)
+    {
+        if (itr.SpellId && itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+        {
+            if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(itr.SpellId))
+            {
+                if (me->IsSpellReady(*pSpellEntry, pProto))
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool PartyBotAI::CreateAndUseItemFromId(uint16 itemId)
+{
+    if (Item* pItem = me->StoreNewItemInInventorySlot(itemId, 1))
+    {
+        UseItemEffect(pItem);
+        return true;
+    }
+
+    return false;
+}
+
+uint16 PartyBotAI::SelectHealingPotionForLevel()
+{
+    uint8 myLevel = me->GetLevel();
+    if (myLevel >= 1 && myLevel <= 3)
+        return MINOR_HEALING_POTION;
+    if (myLevel >= 4 && myLevel <= 12)
+        return LESSER_HEALING_POTION;
+    if (myLevel >= 13 && myLevel <= 20)
+        return HEALING_POTION;
+    if (myLevel >= 21 && myLevel <= 34)
+        return GREATER_HEALING_POTION;
+    if (myLevel >= 35 && myLevel <= 44)
+        return SUPERIOR_HEALING_POTION;
+    if (myLevel >= 45)
+        return MAJOR_HEALING_POTION;
+}
+
+uint16 PartyBotAI::SelectManaPotionForLevel()
+{
+    uint8 myLevel = me->GetLevel();
+    if (myLevel >= 5 && myLevel <= 13)
+        return MINOR_MANA_POTION;
+    if (myLevel >= 14 && myLevel <= 21)
+        return LESSER_MANA_POTION;
+    if (myLevel >= 22 && myLevel <= 30)
+        return MANA_POTION;
+    if (myLevel >= 31 && myLevel <= 40)
+        return GREATER_MANA_POTION;
+    if (myLevel >= 41 && myLevel <= 48)
+        return SUPERIOR_MANA_POTION;
+    if (myLevel >= 49)
+        return MAJOR_MANA_POTION;
+}
+// Use potions end
+
 bool PartyBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
 {
     if (!m_race && !m_class)
@@ -982,7 +1079,45 @@ void PartyBotAI::UpdateInCombatAI()
         
         if (CrowdControlMarkedTargets())
             return;
-    }
+
+        // Use potions start
+        if (me->GetPowerPercent(POWER_MANA) < 70.0f)
+        {
+            uint16 potion = SelectManaPotionForLevel();
+
+            if (CanUsePotionsOrRune(potion))
+            {
+                if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                {
+                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+                }
+                UsePotionsOrRune(potion);
+            } 
+            else if (CanUsePotionsOrRune(DARK_RUNE) && me->GetHealthPercent() > 60.0f)
+            {
+                if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                {
+                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+                }
+                UsePotionsOrRune(DARK_RUNE);
+            }
+        }
+
+        if (me->GetHealthPercent() < 20.0f)
+        {
+            uint16 potion = SelectHealingPotionForLevel();
+
+            if (CanUsePotionsOrRune(potion))
+            {
+                if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                {
+                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+                }
+                UsePotionsOrRune(potion);
+            }
+        }
+        // Use potions stop
+    }    
 
     switch (me->GetClass())
     {
