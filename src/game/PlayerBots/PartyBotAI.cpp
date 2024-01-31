@@ -1021,6 +1021,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Paladin()
                 if (DoCastSpell(pTarget, m_spells.paladin.pBlessingBuff) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }  
@@ -1580,6 +1581,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
                 if (DoCastSpell(pTarget, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -1836,6 +1838,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
                 if (DoCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -1850,6 +1853,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
                 if (DoCastSpell(pTarget, m_spells.priest.pPowerWordFortitude) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -1865,6 +1869,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
                 if (DoCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -1879,6 +1884,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
                 if (DoCastSpell(me, m_spells.priest.pDivineSpirit) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -1894,6 +1900,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
                 if (DoCastSpell(pTarget, m_spells.priest.pShadowProtection) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -2128,6 +2135,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Warlock()
                 if (DoCastSpell(pTarget, m_spells.warlock.pDetectInvisibility) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -2928,6 +2936,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
                 if (DoCastSpell(pTarget, m_spells.druid.pGiftoftheWild) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -2942,6 +2951,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
                 if (DoCastSpell(pTarget, m_spells.druid.pMarkoftheWild) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
@@ -2957,6 +2967,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
                 if (DoCastSpell(pTarget, m_spells.druid.pThorns) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
+                    me->ClearTarget();
                     return;
                 }
             }
