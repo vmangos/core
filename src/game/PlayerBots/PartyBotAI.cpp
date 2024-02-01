@@ -3109,6 +3109,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
     {
         if (Player* pTarget = SelectBuffTarget(m_spells.druid.pGiftoftheWild))
         {
+            if (me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
             if (CanTryToCastSpell(pTarget, m_spells.druid.pGiftoftheWild))
             {
                 if (DoCastSpell(pTarget, m_spells.druid.pGiftoftheWild) == SPELL_CAST_OK)
@@ -3124,6 +3126,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
     {
         if (Player* pTarget = SelectBuffTarget(m_spells.druid.pMarkoftheWild))
         {
+            if (me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
             if (CanTryToCastSpell(pTarget, m_spells.druid.pMarkoftheWild))
             {
                 if (DoCastSpell(pTarget, m_spells.druid.pMarkoftheWild) == SPELL_CAST_OK)
@@ -3142,6 +3146,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
         {
             if (CanTryToCastSpell(pTarget, m_spells.druid.pThorns))
             {
+                if (me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
                 if (DoCastSpell(pTarget, m_spells.druid.pThorns) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
