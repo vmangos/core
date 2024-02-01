@@ -2713,7 +2713,8 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
                 DoCastSpell(me, m_spells.warrior.pDefensiveStance);
             }
         }
-        else
+
+        if (m_role == ROLE_MELEE_DPS && me->GetShapeshiftForm() != FORM_BERSERKERSTANCE)
         {
             if (m_spells.warrior.pBerserkerStance &&
                 CanTryToCastSpell(me, m_spells.warrior.pBerserkerStance))
