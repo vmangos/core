@@ -1793,7 +1793,7 @@ enum GuardDidierData
     SAY_MULE_DIED = 12118,
     SPELL_MARK_OF_DIDIER = 28114,
     GOSSIP_NOT_STARTED = 7165,
-    GOSSIP_MULE_DIED = 7167,
+    GOSSIP_MULE_DIED = 7168,
 };
 
 struct npc_guard_didierAI : public ScriptedAI
@@ -1819,7 +1819,6 @@ struct npc_guard_didierAI : public ScriptedAI
     {
         m_muleDied = false;
 
-        m_creature->SetDefaultGossipMenuId(GOSSIP_MULE_DIED);
         if (CreatureGroup* pGroup = m_creature->GetCreatureGroup())
             pGroup->DoForAllMembers(m_creature->GetMap(), [](Creature* pMember) { if (pMember->IsAlive()) pMember->DespawnOrUnsummon(1); });
     }
@@ -1833,6 +1832,7 @@ struct npc_guard_didierAI : public ScriptedAI
             m_creature->GetMotionMaster()->MoveIdle();
             m_creature->MonsterSay(SAY_MULE_DIED);
             m_creature->HandleEmote(EMOTE_ONESHOT_CRY);
+            m_creature->SetDefaultGossipMenuId(GOSSIP_MULE_DIED);
             m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
             if (CreatureGroup* pGroup = m_creature->GetCreatureGroup())
