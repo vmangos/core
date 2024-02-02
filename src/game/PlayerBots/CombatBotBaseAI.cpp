@@ -2474,22 +2474,24 @@ void CombatBotBaseAI::EquipPremadeGearTemplate()
     }
     if (!vGear.empty())
     {
-        PlayerPremadeGearTemplate const* pGear = nullptr;
+        std::vector<PlayerPremadeGearTemplate const*> vGear2;
+
         // Try to find a role appropriate gear template.
         if (m_role != ROLE_INVALID)
         {
             for (const auto itr : vGear)
             {
-                if (itr->role == m_role &&
-                   (!pGear || pGear->level < itr->level))
-                {
-                    pGear = itr;
-                }
+                if (itr->role == m_role)
+                    vGear2.push_back(itr);
             }
         }
-        // There is no gear template for this role, pick randomly.
-        if (!pGear)
+
+        PlayerPremadeGearTemplate const* pGear;
+        if (vGear2.empty())
             pGear = SelectRandomContainerElement(vGear);
+        else
+            pGear = SelectRandomContainerElement(vGear2);
+
         sObjectMgr.ApplyPremadeGearTemplateToPlayer(pGear->entry, me);
     }
 }
