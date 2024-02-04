@@ -48,8 +48,7 @@ struct CellArea
 
 struct Cell
 {
-    Cell() { data.All = 0; }
-    Cell(Cell const& cell) { data.All = cell.data.All; }
+    Cell() : data() { };
     explicit Cell(CellPair const& p);
 
     void Compute(uint32& x, uint32& y) const
@@ -84,12 +83,6 @@ struct Cell
         return CellPair(
             data.Part.grid_x*MAX_NUMBER_OF_CELLS+data.Part.cell_x,
             data.Part.grid_y*MAX_NUMBER_OF_CELLS+data.Part.cell_y);
-    }
-
-    Cell& operator=(Cell const& cell)
-    {
-        data.All = cell.data.All;
-        return *this;
     }
 
     bool operator==(Cell const& cell) const { return (data.All == cell.data.All); }
