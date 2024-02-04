@@ -25,7 +25,6 @@
 #include "GameSystem/TypeContainer.h"
 #include "GameSystem/TypeContainerVisitor.h"
 #include "GridDefines.h"
-#include <cmath>
 
 class Map;
 class WorldObject;
@@ -99,12 +98,11 @@ struct Cell
     {
         struct
         {
-            unsigned grid_x : 8;
-            unsigned grid_y : 8;
-            unsigned cell_x : 8;
-            unsigned cell_y : 8;
-            unsigned nocreate : 8;
-            unsigned reserved : 24;
+            uint8  grid_x : 8;
+            uint8  grid_y : 8;
+            uint8  cell_x : 8;
+            uint8  cell_y : 8;
+            uint8  nocreate : 8;
         } Part;
         uint64 All;
     } data;
