@@ -34,8 +34,8 @@
 
 enum BattleBotSpells
 {
-    BB_SPELL_FOOD = 1131,
-    BB_SPELL_DRINK = 1137,
+    BB_SPELL_FOOD = 29073,
+    BB_SPELL_DRINK = 22734,
     BB_SPELL_AUTO_SHOT = 75,
     BB_SPELL_SHOOT_WAND = 5019,
 
