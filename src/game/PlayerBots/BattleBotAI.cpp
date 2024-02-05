@@ -178,8 +178,8 @@ bool BattleBotAI::DrinkAndEat()
         return false;
 
     BattleGround* bg;
-    bool const needToEat = me->GetHealthPercent() < 100.0f && !((bg = me->GetBattleGround()) && bg->GetStatus() == STATUS_WAIT_JOIN);
-    bool const needToDrink = (me->GetPowerType() == POWER_MANA) && (me->GetPowerPercent(POWER_MANA) < 100.0f);
+    bool const needToEat = me->GetHealthPercent() < 70.0f && !((bg = me->GetBattleGround()) && bg->GetStatus() == STATUS_WAIT_JOIN);
+    bool const needToDrink = (me->GetPowerType() == POWER_MANA) && (me->GetPowerPercent(POWER_MANA) < 70.0f);
 
     if (!needToEat && !needToDrink)
         return false;
