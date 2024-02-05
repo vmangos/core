@@ -177,6 +177,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             GetPlayer()->ResetPersonalInstanceOnLeaveDungeon(oldLoc.mapId);
     }
 
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
+
     // mount allow check
     if (!mEntry->IsMountAllowed())
         _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
