@@ -2459,19 +2459,19 @@ void CombatBotBaseAI::EquipPremadeGearTemplate()
     for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
     {
         if (itr.second.requiredClass == me->GetClass() &&
-            itr.second.level == me->GetLevel())
-            vGear.push_back(&itr.second);
-    }
-    // Use lower level gear template if there are no templates for the current level.
-    if (vGear.empty())
-    {
-        for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+            itr.second.level <= me->GetLevel())
         {
-            if (itr.second.requiredClass == me->GetClass() &&
-                itr.second.level < me->GetLevel())
-                vGear.push_back(&itr.second);
+            if (!vGear.empty())
+            {
+                if (vGear.front()->level < itr.second.level)
+                    vGear.clear();
+                else if (vGear.front()->level > itr.second.level)
+                    continue;
+            }
+            vGear.push_back(&itr.second);
         }
     }
+
     if (!vGear.empty())
     {
         std::vector<PlayerPremadeGearTemplate const*> vGear2;
