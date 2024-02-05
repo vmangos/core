@@ -1229,7 +1229,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     return;
                 }
 #endif
-                case 20572:                                 // Blood Fury
+                /* case 20572:                                 // Blood Fury // Vanilla Reforged - Blood Fury redesign
                 {
                     Player* pPlayer = m_caster->ToPlayer();
                     if (!pPlayer)
@@ -1243,7 +1243,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     if (damage > 0)
                         pPlayer->CastCustomSpell(pPlayer, 23234, damage, {}, {}, true, nullptr);
                     return;
-                }
+                } */
                 case 20577:                                 // Cannibalize
                 {
                     if (m_casterUnit && (unitTarget || corpseTarget))
