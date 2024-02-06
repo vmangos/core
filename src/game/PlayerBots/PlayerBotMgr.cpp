@@ -1920,7 +1920,7 @@ bool ChatHandler::HandlePartyBotSummonCommand(char* args)
                 {
                     if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
                     {
-                        status = pAI->TryRitualofSummoning(pTarget);
+                        status = pAI->TryRitualofSummoning();
                     }
                 }
             }

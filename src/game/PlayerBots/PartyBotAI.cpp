@@ -118,7 +118,8 @@ uint16 PartyBotAI::SelectHealingPotionForLevel()
         return GREATER_HEALING_POTION;
     if (myLevel >= 35 && myLevel <= 44)
         return SUPERIOR_HEALING_POTION;
-    return MAJOR_HEALING_POTION;
+    if (myLevel >= 45)
+        return MAJOR_HEALING_POTION;
 }
 
 uint16 PartyBotAI::SelectManaPotionForLevel()
@@ -134,7 +135,8 @@ uint16 PartyBotAI::SelectManaPotionForLevel()
         return GREATER_MANA_POTION;
     if (myLevel >= 41 && myLevel <= 48)
         return SUPERIOR_MANA_POTION;
-    return MAJOR_MANA_POTION;
+    if (myLevel >= 49)
+        return MAJOR_MANA_POTION;
 }
 // Use potions end
 
@@ -325,17 +327,6 @@ bool PartyBotAI::DrinkAndEat()
     }
 
     return needToEat || needToDrink;
-}
-
-bool PartyBotAI::TryRitualofSummoning(Unit* pTarget)
-{
-    if (m_spells.warlock.pRitualofSummoning &&
-        CanTryToCastSpell(pTarget, m_spells.warlock.pRitualofSummoning))
-    {
-        if (DoCastSpell(pTarget, m_spells.warlock.pRitualofSummoning) == SPELL_CAST_OK)
-            return true;
-    }
-    return false;
 }
 
 bool PartyBotAI::ShouldAutoRevive() const
@@ -2850,6 +2841,17 @@ bool PartyBotAI::EnterStealthIfNeeded(SpellEntry const* pStealthSpell)
         }
     }
 
+    return false;
+}
+
+bool PartyBotAI::TryRitualofSummoning()
+{
+    if (m_spells.warrior.pRitualofSummoning &&
+        CanTryToCastSpell(me, m_spells.warrior.pRitualofSummoning))
+    {
+        if (DoCastSpell(me, m_spells.warrior.pRitualofSummoning) == SPELL_CAST_OK)
+            return true;
+    }
     return false;
 }
 
