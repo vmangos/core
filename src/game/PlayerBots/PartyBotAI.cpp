@@ -118,8 +118,7 @@ uint16 PartyBotAI::SelectHealingPotionForLevel()
         return GREATER_HEALING_POTION;
     if (myLevel >= 35 && myLevel <= 44)
         return SUPERIOR_HEALING_POTION;
-    if (myLevel >= 45)
-        return MAJOR_HEALING_POTION;
+    return MAJOR_HEALING_POTION;
 }
 
 uint16 PartyBotAI::SelectManaPotionForLevel()
@@ -135,8 +134,7 @@ uint16 PartyBotAI::SelectManaPotionForLevel()
         return GREATER_MANA_POTION;
     if (myLevel >= 41 && myLevel <= 48)
         return SUPERIOR_MANA_POTION;
-    if (myLevel >= 49)
-        return MAJOR_MANA_POTION;
+    return MAJOR_MANA_POTION;
 }
 // Use potions end
 
