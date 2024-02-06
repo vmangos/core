@@ -54,7 +54,7 @@ REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `
 UPDATE `creature_template` SET `spell_list_id`=49660, `ai_name`='EventAI', `script_name`='' WHERE `entry`=4966;
 
 -- Private Hendel does not need to be an active object and should respawn in 5 minutes.
-UPDATE `creature` SET `spawntimesecsmin`=300, `spawntimesecsmax`=300, `spawn_flags`=0 WHERE `entry`=4966;
+UPDATE `creature` SET `spawntimesecsmin`=300, `spawntimesecsmax`=300, `spawn_flags`=0 WHERE `id`=4966;
 
 -- Events list for Theramore Sentry
 DELETE FROM `creature_ai_events` WHERE `creature_id`=5184;
