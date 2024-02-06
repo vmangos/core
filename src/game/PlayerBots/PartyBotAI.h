@@ -67,6 +67,7 @@ public:
     Unit* GetMarkedTarget(RaidTargetIcon mark) const;
     bool CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget) const;
     bool DrinkAndEat();
+    bool TryRitualofSummoning(Unit* pTarget);
     bool ShouldAutoRevive() const;
     bool IsValidDistancingTarget(Unit* pTarget, Unit* pEnemy);
     Unit* GetDistancingTarget(Unit* pEnemy);
@@ -75,7 +76,6 @@ public:
     bool EnterCombatDruidForm();
     bool ShouldEnterStealth() const;
     bool EnterStealthIfNeeded(SpellEntry const* pStealthSpell);
-    bool TryRitualofSummoning();
 
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;

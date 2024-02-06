@@ -432,6 +432,7 @@ public:
             SpellEntry const* pCurseofTongues;
             SpellEntry const* pCurseofExhaustion;
             SpellEntry const* pLifeTap;
+            SpellEntry const* pRitualofSummoning;
         } warlock;
         struct
         {
@@ -470,7 +471,6 @@ public:
             SpellEntry const* pConcussionBlow;
             SpellEntry const* pPiercingHowl;
             SpellEntry const* pChallengingShout;
-            SpellEntry const* pRitualofSummoning;
         } warrior;
         struct
         {
