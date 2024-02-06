@@ -2844,17 +2844,6 @@ bool PartyBotAI::EnterStealthIfNeeded(SpellEntry const* pStealthSpell)
     return false;
 }
 
-bool PartyBotAI::TryRitualofSummoning()
-{
-    if (m_spells.warrior.pRitualofSummoning &&
-        CanTryToCastSpell(me, m_spells.warrior.pRitualofSummoning))
-    {
-        if (DoCastSpell(me, m_spells.warrior.pRitualofSummoning) == SPELL_CAST_OK)
-            return true;
-    }
-    return false;
-}
-
 void PartyBotAI::UpdateOutOfCombatAI_Rogue()
 {
     if (m_spells.rogue.pMainHandPoison &&

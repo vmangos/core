@@ -1895,50 +1895,6 @@ bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
     return false;
 }
 
-bool ChatHandler::HandlePartyBotSummonCommand(char* args)
-{
-    Player* pTarget = GetSelectedPlayer();
-    Player* pPlayer = GetSession()->GetPlayer();
-    bool status = false;
-
-    if (pTarget->AI()) {
-        SendSysMessage("I can't summon a partybot.");
-        return false;
-    }
-
-    if (Group* pGroup = pPlayer->GetGroup())
-    {
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            if (Player* pMember = itr->getSource())
-            {
-                if (!pMember->AI()) {
-                    continue;
-                }
-
-                if (pMember->GetClass() == CLASS_WARLOCK)
-                {
-                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
-                    {
-                        status = pAI->TryRitualofSummoning();
-                    }
-                }
-            }
-        }
-
-        if (status)
-        {
-            SendSysMessage("Try to summon.");
-        }
-        else
-            SendSysMessage("Something went wrong.");
-        return status;
-    }
-
-    SendSysMessage("You are not in a group.");
-    return false;
-}
-
 bool ChatHandler::HandleBattleBotAddAlteracCommand(char* args)
 {
     return HandleBattleBotAddCommand(args, BATTLEGROUND_QUEUE_AV);
