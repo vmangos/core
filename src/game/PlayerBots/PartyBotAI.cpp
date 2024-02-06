@@ -975,7 +975,6 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         UpdateInCombatAI();
 }
 
-
 void PartyBotAI::UpdateOutOfCombatAI()
 {
     if (!IsInDuel())
