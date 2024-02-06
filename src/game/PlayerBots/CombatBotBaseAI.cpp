@@ -1225,6 +1225,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.warrior.pChallengingShout))
                         m_spells.warrior.pChallengingShout = pSpellEntry;
                 }
+                if (pSpellEntry->SpellName[0].find("Ritual of Summoning") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warrior.pRitualofSummoning))
+                        m_spells.warrior.pRitualofSummoning = pSpellEntry;
+                }
                 break;
             }
             case CLASS_ROGUE:

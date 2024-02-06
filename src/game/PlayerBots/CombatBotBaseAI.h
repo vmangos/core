@@ -470,6 +470,7 @@ public:
             SpellEntry const* pConcussionBlow;
             SpellEntry const* pPiercingHowl;
             SpellEntry const* pChallengingShout;
+            SpellEntry const* pRitualofSummoning;
         } warrior;
         struct
         {
