@@ -2050,7 +2050,7 @@ Warden.ModuleDir             = "warden_modules"
 
 Anticheat.Enable = 1
 Anticheat.PlayersOnly = 1
-Anticheat.NotifyCheaters = 0
+Anticheat.NotifyCheaters = 1
 Anticheat.BanDuration = 86400
 Anticheat.LogData = 0
 Anticheat.PacketLogSize = 100
