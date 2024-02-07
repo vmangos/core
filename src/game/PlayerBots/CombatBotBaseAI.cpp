@@ -2474,37 +2474,39 @@ void CombatBotBaseAI::EquipPremadeGearTemplate()
     for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
     {
         if (itr.second.requiredClass == me->GetClass() &&
-            itr.second.level == me->GetLevel())
-            vGear.push_back(&itr.second);
-    }
-    // Use lower level gear template if there are no templates for the current level.
-    if (vGear.empty())
-    {
-        for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+            itr.second.level <= me->GetLevel())
         {
-            if (itr.second.requiredClass == me->GetClass() &&
-                itr.second.level < me->GetLevel())
-                vGear.push_back(&itr.second);
+            if (!vGear.empty())
+            {
+                if (vGear.front()->level < itr.second.level)
+                    vGear.clear();
+                else if (vGear.front()->level > itr.second.level)
+                    continue;
+            }
+            vGear.push_back(&itr.second);
         }
     }
+
     if (!vGear.empty())
     {
-        PlayerPremadeGearTemplate const* pGear = nullptr;
+        std::vector<PlayerPremadeGearTemplate const*> vGear2;
+
         // Try to find a role appropriate gear template.
         if (m_role != ROLE_INVALID)
         {
             for (const auto itr : vGear)
             {
-                if (itr->role == m_role &&
-                   (!pGear || pGear->level < itr->level))
-                {
-                    pGear = itr;
-                }
+                if (itr->role == m_role)
+                    vGear2.push_back(itr);
             }
         }
-        // There is no gear template for this role, pick randomly.
-        if (!pGear)
+
+        PlayerPremadeGearTemplate const* pGear;
+        if (vGear2.empty())
             pGear = SelectRandomContainerElement(vGear);
+        else
+            pGear = SelectRandomContainerElement(vGear2);
+
         sObjectMgr.ApplyPremadeGearTemplateToPlayer(pGear->entry, me);
     }
 }

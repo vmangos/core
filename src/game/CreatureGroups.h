@@ -67,6 +67,7 @@ class CreatureGroup
         void DisbandGroup(Creature* pLeader);
         void DeleteFromDb();
         void SaveToDb();
+        void DoForAllMembers(Map* pMap, std::function<void(Creature*)>&& pFunc);
 
         ObjectGuid const& GetLeaderGuid() const { return m_leaderGuid; }
         ObjectGuid const& GetOriginalLeaderGuid() const { return m_originalLeaderGuid; }
