@@ -1601,6 +1601,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         // Send log damage message to client
         pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
+        pCaster->DealSpellDamage(&damageInfo, true);
 
         procEx = CreateProcExtendMask(&damageInfo, missInfo);
         procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
@@ -1653,8 +1654,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                     triggerWeaponProcs = true;
             }
         }
-
-        pCaster->DealSpellDamage(&damageInfo, true);
 
         // Courroux Naturel a 20% de chance de faire proc WF.
         if (m_spellInfo->Id == 17364 && pCaster->IsPlayer())
