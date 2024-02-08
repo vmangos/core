@@ -15,7 +15,8 @@ DELETE FROM `creature_ai_scripts` WHERE `id` IN (1527701, 1527702, 1527703, 1527
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527701;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1527701, 0, 0, 46, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Random Phase between 1 and 4'),
-(1527701, 0, 0, 49, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Combat Pulse');
+(1527701, 0, 1, 15, 26553, 7, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Powers Trigger'),
+(1527701, 0, 2, 49, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Combat Pulse');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527702;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -23,61 +24,80 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527703;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527703, 0, 0, 15, 26554, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Thunderclap (Phase 1+2)');
+(1527703, 0, 0, 15, 26554, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Thunderclap (Phase 1+2)');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527704;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527704, 0, 0, 15, 26555, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Shadow Storm (Phase 3+4)');
+(1527704, 0, 0, 15, 26555, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Shadow Storm (Phase 3+4)');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527705;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527705, 0, 0, 15, 26556, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Plague (Phase 1+3)');
+(1527705, 0, 0, 15, 26556, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Plague (Phase 1+3)');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527706;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527706, 0, 0, 15, 26558, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Meteor (Phase 2+4)');
+(1527706, 0, 0, 15, 26558, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Meteor (Phase 2+4)');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527717;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527717, 0, 0, 15, 13022, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Fire and Arcane Reflect');
+(1527717, 0, 0, 15, 13022, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Fire and Arcane Reflect');
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527727;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527727, 0, 0, 15, 19595, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Shadow and Frost Reflect');
+(1527727, 0, 0, 15, 19595, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Shadow and Frost Reflect');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527718;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527718, 0, 0, 15, 25698, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Explode');
+(1527718, 0, 0, 15, 25698, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Explode');
+
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527728;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527728, 0, 0, 15, 8269, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Enrage');
+(1527728, 0, 0, 15, 8269, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Enrage');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527719;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527719, 0, 0, 10, 15537, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 'Anubisath Defender - Summon Anubisath Warrior'),
-(1527719, 0, 0, 15, 18476, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Summon Animation');
+(1527719, 0, 0, 10, 15537, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 'Anubisath Defender - Summon Anubisath Warrior');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527729;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1527729, 0, 0, 10, 15538, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 'Anubisath Defender - Summon Anubisath Swarmguard'),
-(1527729, 0, 0, 15, 18476, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Summon Animation');
+(1527729, 0, 0, 10, 15538, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 'Anubisath Defender - Summon Anubisath Swarmguard');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1527710;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1527710, 0, 0, 15, 20477, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Teleport Target');
 
+DELETE FROM `creature_ai_scripts` WHERE `id`=1527711;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1527711, 0, 0, 15, 84, 7, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Low Hp Trigger');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1527712;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1527712, 0, 0, 15, 18476, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Summon Minion Trigger');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1527713;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1527713, 0, 0, 15, 9173, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Aoe Trigger');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1527714;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1527714, 0, 0, 15, 14291, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anubisath Defender - Cast Aoe Trigger');
 
 -- Events list for Anubisath Defender
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15277;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527701, 15277, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1527701, 0, 0, 'Anubisath Defender - Aggro pulse and Phase');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527702, 15277, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1527702, 0, 0, 'Anubisath Defender - Drop Obsidian');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527703, 15277, 0, 0, 24, 100, 1, 2500, 6500, 3000, 8000, 1527703, 0, 0, 'Anubisath Defender - Cast Thunderclap (Phase 1+2)');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527704, 15277, 0, 0, 6, 100, 1, 2500, 6500, 3000, 8000, 1527704, 0, 0, 'Anubisath Defender - Cast Shadow Storm (Phase 3+4)');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527705, 15277, 0, 0, 20, 100, 1, 4000, 12000, 4000, 12000, 1527705, 0, 0, 'Anubisath Defender - Cast Plague (Phase 1+3)');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527706, 15277, 0, 0, 10, 100, 1, 4000, 12000, 4000, 12000, 1527706, 0, 0, 'Anubisath Defender - Cast Meteor (Phase 2+4)');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527707, 15277, 0, 4, 0, 100, 2, 0, 0, 0, 0, 1527717, 1527727, 0, 'Anubisath Defender - Cast Spell Reflect');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527708, 15277, 0, 2, 0, 100, 2, 10, 0, 0, 0, 1527718, 1527728, 0, 'Anubisath Defender - Cast Low Hp Spell');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527709, 15277, 0, 0, 0, 100, 3, 10000, 10000, 10000, 10000, 1527719, 1527729, 0, 'Anubisath Defender - Summon Minion');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1527710, 15277, 0, 9, 0, 100, 1, 60, 100, 5000, 5000, 1527710, 0, 0, 'Anubisath Defender - Teleport Target');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(1527701, 15277, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1527701, 0, 0, 'Anubisath Defender - Aggro pulse and Phase'),
+(1527702, 15277, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1527702, 0, 0, 'Anubisath Defender - Drop Obsidian'),
+(1527703, 15277, 0, 8, 24, 100, 1, 9173, 127, 0, 0, 1527703, 0, 0, 'Anubisath Defender - Cast Thunderclap (Phase 1+2)'),
+(1527704, 15277, 0, 8, 6, 100, 1, 9173, 127, 0, 0, 1527704, 0, 0, 'Anubisath Defender - Cast Shadow Storm (Phase 3+4)'),
+(1527705, 15277, 0, 36, 20, 100, 1, 14291, 127, 0, 0, 1527705, 0, 0, 'Anubisath Defender - Cast Plague (Phase 1+3)'),
+(1527706, 15277, 0, 36, 10, 100, 1, 14291, 127, 0, 0, 1527706, 0, 0, 'Anubisath Defender - Cast Meteor (Phase 2+4)'),
+(1527707, 15277, 0, 8, 0, 100, 2, 26553, 127, 0, 0, 1527717, 1527727, 0, 'Anubisath Defender - Cast Spell Reflect'),
+(1527708, 15277, 0, 8, 0, 100, 2, 84, 127, 0, 0, 1527718, 1527728, 0, 'Anubisath Defender - Cast Low Hp Spell'),
+(1527709, 15277, 0, 36, 0, 100, 3, 18476, 127, 0, 0, 1527719, 1527729, 0, 'Anubisath Defender - Summon Minion'),
+(1527710, 15277, 0, 9, 0, 100, 1, 60, 100, 5000, 5000, 1527710, 0, 0, 'Anubisath Defender - Teleport Target'),
+(1527711, 15277, 0, 2, 0, 100, 0, 10, 0, 0, 0, 1527711, 0, 0, 'Anubisath Defender - Cast Low Hp Trigger'),
+(1527712, 15277, 0, 0, 0, 100, 1, 10000, 10000, 10000, 10000, 1527712, 0, 0, 'Anubisath Defender - Summon Minion Trigger'),
+(1527713, 15277, 0, 0, 0, 100, 1, 2500, 6500, 3000, 8000, 1527713, 0, 0, 'Anubisath Defender - Cast Aoe Trigger'),
+(1527714, 15277, 0, 0, 0, 100, 1, 4000, 12000, 4000, 12000, 1527714, 0, 0, 'Anubisath Defender - Cast Targeted Trigger');
 
 
 -- End of migration.
