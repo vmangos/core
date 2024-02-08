@@ -1096,7 +1096,7 @@ void PartyBotAI::UpdateInCombatAI()
                 }
                 UsePotionsOrRune(potion);
             } 
-            else if (CanUsePotionsOrRune(DARK_RUNE) && me->GetHealthPercent() > 60.0f)
+            else if (me->GetLevel() == 60 && CanUsePotionsOrRune(DARK_RUNE) && me->GetHealthPercent() > 60.0f)
             {
                 if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
                 {
