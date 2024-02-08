@@ -27,6 +27,7 @@
 #include "SpellAuras.h"
 #include "Chat.h"
 #include <random>
+#include "PartyBotRaidStrats.h"
 
 enum PartyBotSpells
 {
@@ -979,6 +980,11 @@ void PartyBotAI::UpdateOutOfCombatAI()
 {
     if (!IsInDuel())
     {
+        if (RaidStratsIsInRaid())
+        {
+            RaidStratsIsZGPotions();
+        }
+
         if (m_resurrectionSpell)
             if (Player* pTarget = SelectResurrectionTarget())
                 if (CanTryToCastSpell(pTarget, m_resurrectionSpell))
