@@ -361,6 +361,20 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
                 return pTarget;
         }
 
+        // Aggro people on the flag in AB / AV
+        auto spell = pTarget->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        if (spell && (spell->m_spellInfo->Id == SPELL_CAPTURE_BANNER))
+            return pTarget;
+
+        // Aggro healers
+        if ((IsHealerClass(pTarget->GetClass())) &&
+            pTarget->GetShapeshiftForm() == FORM_NONE)
+            return pTarget;
+
+        // Aggro casters / Hunters
+        if (IsRangedDamageClass(pTarget->GetClass()))
+            return pTarget;
+
         // Aggro weak enemies from further away.
         uint32 const aggroDistance = me->GetHealth() > pTarget->GetHealth() ? maxAggroDistance : 20.0f;
         if (!me->IsWithinDist(pTarget, aggroDistance))
