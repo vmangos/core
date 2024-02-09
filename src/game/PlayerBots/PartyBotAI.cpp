@@ -1085,28 +1085,6 @@ void PartyBotAI::UpdateInCombatAI()
             return;
 
         // Use potions start
-        if (me->GetPowerPercent(POWER_MANA) < 70.0f)
-        {
-            uint16 potion = SelectManaPotionForLevel();
-
-            if (CanUsePotionsOrRune(potion))
-            {
-                if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
-                {
-                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
-                }
-                UsePotionsOrRune(potion);
-            } 
-            else if (me->GetLevel() == 60 && CanUsePotionsOrRune(DARK_RUNE) && me->GetHealthPercent() > 60.0f)
-            {
-                if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
-                {
-                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
-                }
-                UsePotionsOrRune(DARK_RUNE);
-            }
-        }
-
         if (me->GetHealthPercent() < 20.0f)
         {
             uint16 potion = SelectHealingPotionForLevel();
@@ -1119,17 +1097,44 @@ void PartyBotAI::UpdateInCombatAI()
                     {
                         me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
                         UsePotionsOrRune(potion);
+                        return;
                     }
-                    else 
+                    else
                     {
                         me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
                         UsePotionsOrRune(potion);
+                        return;
                     }
                 }
-                else 
+                else
                 {
                     UsePotionsOrRune(potion);
+                    return;
                 }
+            }
+        }
+
+        if (me->GetPowerPercent(POWER_MANA) < 70.0f)
+        {
+            uint16 potion = SelectManaPotionForLevel();
+
+            if (CanUsePotionsOrRune(potion))
+            {
+                if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                {
+                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+                }
+                UsePotionsOrRune(potion);
+                return;
+            } 
+            else if (me->GetLevel() == 60 && CanUsePotionsOrRune(DARK_RUNE) && me->GetHealthPercent() > 60.0f)
+            {
+                if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                {
+                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+                }
+                UsePotionsOrRune(DARK_RUNE);
+                return;
             }
         }
         // Use potions stop
