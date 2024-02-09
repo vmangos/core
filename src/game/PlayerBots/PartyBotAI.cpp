@@ -980,9 +980,10 @@ void PartyBotAI::UpdateOutOfCombatAI()
 {
     if (!IsInDuel())
     {
-        if (RaidStratsIsInRaid())
+        if (me->GetLevel() == 60 && RaidStratsIsInRaid())
         {
-            RaidStratsIsZGPotions();
+            RaidStratsDefaultAurasOfRaid();
+            RaidStratsIsZGProtectionPotions();
         }
 
         if (m_resurrectionSpell)

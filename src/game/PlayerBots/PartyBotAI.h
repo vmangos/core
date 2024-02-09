@@ -98,7 +98,8 @@ public:
     void UpdateOutOfCombatAI_Druid() final;
 
     bool RaidStratsIsInRaid();
-    void RaidStratsIsZGPotions();
+    void RaidStratsDefaultAurasOfRaid();
+    void RaidStratsIsZGProtectionPotions();
 
     std::vector<RaidTargetIcon> m_marksToCC;
     std::vector<RaidTargetIcon> m_marksToFocus;
