@@ -74,6 +74,8 @@ enum BattleBotSpells
 #define GO_WSG_SILVERWING_FLAG 179830
 #define GO_WSG_WARSONG_FLAG 179831
 
+#define SPELL_CAPTURE_BANNER 21651
+
 uint32 BattleBotAI::GetMountSpellId() const
 {
     if (me->GetLevel() >= 60)
@@ -265,6 +267,12 @@ bool BattleBotAI::ShouldIgnoreCombat() const
     if (m_battlegroundId == BATTLEGROUND_QUEUE_WS && !me->IsRooted() &&
        (me->HasAura(AURA_SILVERWING_FLAG) || me->HasAura(AURA_WARSONG_FLAG)))
         return true;
+
+    auto spell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    if (spell && (spell->m_spellInfo->Id == SPELL_CAPTURE_BANNER))
+        return true;
+
+
     return false;
 }
 
