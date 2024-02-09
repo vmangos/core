@@ -293,7 +293,7 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
         {
             if (pTarget != pExcept &&
                 IsValidHostileTarget(pTarget) &&
-                me->IsWithinDist(pTarget, VISIBILITY_DISTANCE_NORMAL))
+                me->IsWithinDist(pTarget, GetMaxAggroDistanceForMap()))
             {
                 if (me->GetTeam() == HORDE)
                 {
