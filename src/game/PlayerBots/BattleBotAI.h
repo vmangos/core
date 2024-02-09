@@ -69,6 +69,7 @@ public:
 
     void UpdateFlagCarrierAI();
     void UpdateBattleGroundAI();
+    Unit* GetFlagCapper();
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;
     void UpdateInCombatAI_Paladin() final;

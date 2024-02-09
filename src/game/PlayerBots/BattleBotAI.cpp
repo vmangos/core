@@ -1261,8 +1261,46 @@ void BattleBotAI::UpdateOutOfCombatAI()
     }
 }
 
+Unit* BattleBotAI::GetFlagCapper()
+{
+    // Check current victim first.. if they are capping flag no need to look at anything else
+    Unit* pVictim = me->GetVictim();
+    if (pVictim)
+    {
+        auto spell = pVictim->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        if (spell && (spell->m_spellInfo->Id == SPELL_CAPTURE_BANNER))
+            return pVictim;
+    }
+
+    // Check other players next..
+    std::list<Player*> players;
+    me->GetAlivePlayerListInRange(me, players, GetMaxAggroDistanceForMap());
+    for (const auto& pTarget : players)
+    {
+        auto spell = pTarget->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        if (spell && (spell->m_spellInfo->Id == SPELL_CAPTURE_BANNER) &&
+            IsValidHostileTarget(pTarget))
+            return pTarget;
+    }
+
+    return nullptr;
+}
+
 void BattleBotAI::UpdateInCombatAI()
 {
+    Unit* pVictim = me->GetVictim();
+
+    // Hit people capping AB / AV flags
+    if (Unit* pCapper = GetFlagCapper())
+    {
+        if (pCapper != me->GetVictim())
+        {
+            me->AttackStop();
+            AttackStart(pCapper);
+            return;
+        }
+    }
+
     switch (me->GetClass())
     {
         case CLASS_PALADIN:
