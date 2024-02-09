@@ -1738,14 +1738,19 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
 {
     if (m_spells.mage.pArcaneBrilliance)
     {
-        if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
+        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneBrilliance))
         {
-            if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+            if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
             {
-                m_isBuffing = true;
-                return;
+                if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+                {
+                    m_isBuffing = true;
+                    me->ClearTarget();
+                    return;
+                }
             }
         }
+        
     }
     else if (m_spells.mage.pArcaneIntellect)
     {
@@ -1769,6 +1774,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
         if (DoCastSpell(me, m_spells.mage.pIceArmor) == SPELL_CAST_OK)
         {
             m_isBuffing = true;
+            me->ClearTarget();
             return;
         }
     }
@@ -1779,6 +1785,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
         if (DoCastSpell(me, m_spells.mage.pIceBarrier) == SPELL_CAST_OK)
         {
             m_isBuffing = true;
+            me->ClearTarget();
             return;
         }
     }
@@ -2116,6 +2123,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
         if (DoCastSpell(me, m_spells.priest.pInnerFire) == SPELL_CAST_OK)
         {
             m_isBuffing = true;
+            me->ClearTarget();
             return;
         }
     }
@@ -2375,6 +2383,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Warlock()
         if (DoCastSpell(me, m_spells.warlock.pDemonArmor) == SPELL_CAST_OK)
         {
             m_isBuffing = true;
+            me->ClearTarget();
             return;
         }
     }
