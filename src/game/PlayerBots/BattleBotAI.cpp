@@ -306,6 +306,11 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
                         return pTarget;
                 }
 
+                // Aggro people on the flag in AB / AV
+                auto spell = pTarget->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+                if (spell && (spell->m_spellInfo->Id == SPELL_CAPTURE_BANNER))
+                    return pTarget;
+
                 targets.push_back(pTarget);
             }
         }
