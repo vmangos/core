@@ -339,8 +339,8 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
     // 2. Find enemy player in range.
 
     std::list<Player*> players;
-    me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
     float const maxAggroDistance = GetMaxAggroDistanceForMap();
+    me->GetAlivePlayerListInRange(me, players, maxAggroDistance);
 
     for (const auto& pTarget : players)
     {
