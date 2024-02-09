@@ -311,6 +311,11 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
                 if (spell && (spell->m_spellInfo->Id == SPELL_CAPTURE_BANNER))
                     return pTarget;
 
+                // Aggro healers
+                if ((IsHealerClass(pTarget->GetClass())) &&
+                    pTarget->GetShapeshiftForm() == FORM_NONE)
+                    return pTarget;
+
                 targets.push_back(pTarget);
             }
         }
