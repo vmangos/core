@@ -316,6 +316,10 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
                     pTarget->GetShapeshiftForm() == FORM_NONE)
                     return pTarget;
 
+                // Aggro casters / Hunters
+                if (IsRangedDamageClass(pTarget->GetClass()))
+                    return pTarget;
+
                 targets.push_back(pTarget);
             }
         }
