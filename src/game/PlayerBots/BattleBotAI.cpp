@@ -68,6 +68,9 @@ enum BattleBotSpells
 };
 
 #define BB_UPDATE_INTERVAL 1000
+#define BB_MAX_MELEE_CHASE_RANGE 20.0f
+#define BB_MAX_HEALER_CHASE_RANGE 36.0f
+#define BB_MAX_CHASE_RANGE 41.0f
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
@@ -1300,6 +1303,62 @@ void BattleBotAI::UpdateInCombatAI()
             return;
         }
     }
+
+    // Stop chasing targets if they are very far away
+    if (pVictim)
+    {
+        if (IsMeleeDamageClass(me->GetClass()))
+        {
+            if (me->GetDistance(pVictim) > BB_MAX_MELEE_CHASE_RANGE)
+            {
+                if (Pet* pPet = me->GetPet())
+                {
+                    if (pPet->IsAlive())
+                        pPet->AttackStop();
+                }
+                me->AttackStop();
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                    ClearPath();
+                    StartNewPathFromBeginning();
+                }
+                return;
+            }
+
+        }
+        else if (m_role == ROLE_HEALER)
+        {
+            if (me->GetDistance(pVictim) > BB_MAX_HEALER_CHASE_RANGE)
+            {
+                me->AttackStop();
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                    ClearPath();
+                    StartNewPathFromBeginning();
+                }
+                return;
+            }
+        }
+        else
+        {
+            if (me->GetDistance(pVictim) > BB_MAX_CHASE_RANGE)
+            {
+                if (Pet* pPet = me->GetPet())
+                {
+                    if (pPet->IsAlive())
+                        pPet->AttackStop();
+                }
+                me->AttackStop();
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                    ClearPath();
+                    StartNewPathFromBeginning();
+                }
+                return;
+            }
+        }
+    }
+
 
     switch (me->GetClass())
     {
