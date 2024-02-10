@@ -234,6 +234,8 @@ bool PartyBotAI::DrinkAndEat()
 
 bool PartyBotAI::ShouldAutoRevive() const
 {
+    me->DurabilityRepairAll(false, 0);
+
     if (me->GetDeathState() == DEAD)
         return true;
 
