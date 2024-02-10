@@ -68,6 +68,7 @@ enum BattleBotSpells
 };
 
 #define BB_UPDATE_INTERVAL 1000
+#define BB_NEW_TARGET_INTERVAL 5000
 #define BB_MAX_MELEE_CHASE_RANGE 20.0f
 #define BB_MAX_HEALER_CHASE_RANGE 36.0f
 #define BB_MAX_CHASE_RANGE 41.0f
@@ -923,7 +924,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
             else if (FollowMovementGenerator<Player> const* pMoveGen = dynamic_cast<FollowMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent()))
             {
                 Unit* pTarget = pMoveGen->GetTarget();
-                if (!pTarget || !pTarget->IsAlive() || !pTarget->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
+                if (!pTarget || !pTarget->IsAlive() || !pTarget->IsWithinDist(me, GetMaxAggroDistanceForMap()))
                 {
                     StopMoving();
                     return;
@@ -946,7 +947,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     }
 
     if (!pVictim || !IsValidHostileTarget(pVictim) || 
-        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_SMALL))
+        !pVictim->IsWithinDist(me, GetMaxAggroDistanceForMap()))
     {
         if (Unit* pNewVictim = SelectAttackTarget(pVictim))
         {
@@ -979,6 +980,31 @@ void BattleBotAI::UpdateAI(uint32 const diff)
             IsValidHostileTarget(pVictim) &&
             AttackStart(pVictim))
             return;
+    }
+
+    // Select a new target if ther is a better target to select
+    m_targetSelectTimer.Update(diff);
+    if (m_targetSelectTimer.Passed())
+    {
+        m_targetSelectTimer.Reset(BB_NEW_TARGET_INTERVAL);
+        if (pVictim &&
+            me->IsInCombat() &&
+            (me->GetEnemyCountInRadiusAround(me, 36.0f) > 1) &&
+            !me->IsMounted() &&
+            m_role != ROLE_HEALER)
+        {
+            Unit* newVictim = SelectAttackTarget(pVictim);
+
+            if (newVictim && (newVictim != pVictim))
+            {
+                if (pVictim)
+                    me->AttackStop();
+                else
+                    AttackStart(newVictim);
+
+                return;
+            }
+        }
     }
 
     if (me->IsInCombat())
@@ -1358,7 +1384,6 @@ void BattleBotAI::UpdateInCombatAI()
             }
         }
     }
-
 
     switch (me->GetClass())
     {

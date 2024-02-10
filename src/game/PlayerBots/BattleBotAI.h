@@ -93,6 +93,7 @@ public:
 
     uint8 m_battlegroundId = 0;
     ShortTimeTracker m_updateTimer;
+    ShortTimeTracker m_targetSelectTimer;
     uint8 m_race = 0;
     uint8 m_class = 0;
     uint8 m_level = 0;
