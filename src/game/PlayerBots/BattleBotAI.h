@@ -41,6 +41,7 @@ public:
         : CombatBotBaseAI(),  m_race(race), m_class(class_), m_level(level), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId), m_temporary(temporary)
     {
         m_updateTimer.Reset(2000);
+        m_targetSelectTimer.Reset(5000);
     }
     bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) override
     {
