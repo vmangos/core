@@ -1005,6 +1005,26 @@ bool AuthSocket::_HandleRealmList()
     return true;
 }
 
+std::string AuthSocket::GetRealmAddress(Realm const& realm) const
+{
+    ACE_INET_Addr addr;
+    if (peer().get_remote_addr(addr) == 0)
+    {
+        ACE_INET_Addr localAddress;
+        if (localAddress.set(realm.localAddress.c_str()) == 0)
+        {
+            ACE_INET_Addr localSubnetMask;
+            if (localSubnetMask.set("0", realm.localSubnetMask.c_str()) == 0)
+            {
+                if ((addr.get_ip_address() & localSubnetMask.get_ip_address()) == (localAddress.get_ip_address() & localSubnetMask.get_ip_address()))
+                    return realm.localAddress; 
+            }
+        }  
+    }
+
+    return realm.address;
+}
+
 void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
     if (m_build < 6299)        // before version 2.0.3 (exclusive)
@@ -1051,7 +1071,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             pkt << uint32(i->second.icon);              // realm type
             pkt << uint8(realmflags);                   // realmflags
             pkt << name;                                // name
-            pkt << i->second.address;                   // address
+            pkt << GetRealmAddress(i->second);          // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(i->second.timezone);           // realm category
@@ -1101,7 +1121,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             pkt << uint8(lock);                         // flags, if 0x01, then realm locked
             pkt << uint8(realmFlags);                   // see enum RealmFlags
             pkt << i->first;                            // name
-            pkt << i->second.address;                   // address
+            pkt << GetRealmAddress(i->second);          // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(i->second.timezone);           // realm category (Cfg_Categories.dbc)

@@ -52,6 +52,8 @@ typedef std::set<uint32> RealmBuilds;
 struct Realm
 {
     std::string address;
+    std::string localAddress;
+    std::string localSubnetMask;
     uint8 icon;
     RealmFlags realmflags;                                  // realmflags
     uint8 timezone;
@@ -82,7 +84,7 @@ class RealmList
         uint32 size() const { return m_realms.size(); }
     private:
         void UpdateRealms(bool init);
-        void UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const std::string& builds);
+        void UpdateRealm( uint32 ID, std::string const& name, std::string const& address, std::string const& localAddress, std::string const& localSubnetMask, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float population, std::string const& builds);
         void LoadAllowedClients();
     private:
         RealmMap m_realms;                                  // Internal map of realms
