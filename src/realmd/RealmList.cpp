@@ -30,6 +30,7 @@
 #include "Log.h"
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
+#include <ace/INET_Addr.h>
 
 INSTANTIATE_SINGLETON_1( RealmList );
 
@@ -85,15 +86,15 @@ void RealmList::Initialize(uint32 updateInterval)
     UpdateRealms(true);
 }
 
-void RealmList::UpdateRealm(uint32 ID, std::string const& name, std::string const& address, std::string const& localAddress, std::string const& localSubnetMask, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float population, std::string const& builds)
+void RealmList::UpdateRealm(uint32 realmId, std::string const& name, std::string const& address, std::string const& localAddress, std::string const& localSubnetMask, uint32 port, uint8 icon, RealmFlags realmFlags, uint8 timeZone, AccountTypes allowedSecurityLevel, float population, std::string const& builds)
 {
     // Create new if not exist or update existed
     Realm& realm = m_realms[name];
 
-    realm.m_ID       = ID;
+    realm.id         = realmId;
     realm.icon       = icon;
-    realm.realmflags = realmflags;
-    realm.timezone   = timezone;
+    realm.realmFlags = realmFlags;
+    realm.timeZone   = timeZone;
     realm.allowedSecurityLevel = allowedSecurityLevel;
     realm.populationLevel      = population;
 
@@ -103,10 +104,10 @@ void RealmList::UpdateRealm(uint32 ID, std::string const& name, std::string cons
     for (iter = tokens.begin(); iter != tokens.end(); ++iter)
     {
         uint32 build = atol((*iter).c_str());
-        realm.realmbuilds.insert(build);
+        realm.realmBuilds.insert(build);
     }
 
-    uint16 first_build = !realm.realmbuilds.empty() ? *realm.realmbuilds.begin() : 0;
+    uint16 first_build = !realm.realmBuilds.empty() ? *realm.realmBuilds.begin() : 0;
 
     realm.realmBuildInfo.build = first_build;
     realm.realmBuildInfo.majorVersion = 0;
@@ -131,7 +132,11 @@ void RealmList::UpdateRealm(uint32 ID, std::string const& name, std::string cons
     realm.localAddress = ss.str();
 
     // Subnet mask does not need port.
-    realm.localSubnetMask = localSubnetMask;
+    ACE_INET_Addr subnetAddress;
+    if (subnetAddress.set("0", localSubnetMask.c_str()) == -1)
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to parse local subnet mask for realm id %u!", realmId);
+    else
+        realm.localSubnetMask = subnetAddress.get_ip_address();
 }
 
 void RealmList::UpdateIfNeed()

@@ -51,17 +51,17 @@ typedef std::set<uint32> RealmBuilds;
 // Storage object for a realm
 struct Realm
 {
+    uint32 id = 0;
     std::string address;
     std::string localAddress;
-    std::string localSubnetMask;
-    uint8 icon;
-    RealmFlags realmflags;                                  // realmflags
-    uint8 timezone;
-    uint32 m_ID;
-    AccountTypes allowedSecurityLevel;                      // current allowed join security level (show as locked for not fit accounts)
-    float populationLevel;
-    RealmBuilds realmbuilds;                                // list of supported builds (updated in DB by mangosd)
-    RealmBuildInfo realmBuildInfo;                          // build info for show version in list
+    uint32 localSubnetMask = 0;
+    uint8 icon = 0;
+    RealmFlags realmFlags = REALM_FLAG_NONE;
+    uint8 timeZone = 0;
+    AccountTypes allowedSecurityLevel = SEC_PLAYER;         // required security level to join (shows as locked for other accounts)
+    float populationLevel = 0.0f;
+    RealmBuilds realmBuilds;                                // list of supported builds (updated in DB by mangosd)
+    RealmBuildInfo realmBuildInfo;                          // build info for showing version in list
 };
 
 // Storage object for the list of realms on the server
@@ -84,7 +84,7 @@ class RealmList
         uint32 size() const { return m_realms.size(); }
     private:
         void UpdateRealms(bool init);
-        void UpdateRealm( uint32 ID, std::string const& name, std::string const& address, std::string const& localAddress, std::string const& localSubnetMask, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float population, std::string const& builds);
+        void UpdateRealm(uint32 realmId, std::string const& name, std::string const& address, std::string const& localAddress, std::string const& localSubnetMask, uint32 port, uint8 icon, RealmFlags realmFlags, uint8 timeZone, AccountTypes allowedSecurityLevel, float population, std::string const& builds);
         void LoadAllowedClients();
     private:
         RealmMap m_realms;                                  // Internal map of realms
