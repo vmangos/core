@@ -23,6 +23,10 @@ enum class RaidStratsPotionItemId {
     ELIXIR_OF_FROST_POWER = 17708,
 
     GREATER_FIRE_PROTECTION_POTION = 13457,
+    GREATER_NATURE_PROTECTION_POTION = 13458,
+    GREATER_SHADOW_PROTECTION_POTION = 13459,
+    GREATER_ARCANE_PROTECTION_POTION = 13461,
+    FLASK_OF_CHROMATIC_RESISTANCE = 13513,
 };
 
 enum class RaidStratsPotionAuraId {
@@ -41,6 +45,10 @@ enum class RaidStratsPotionAuraId {
     ELIXIR_OF_FROST_POWER = 21920,
 
     GREATER_FIRE_PROTECTION_POTION = 17543,
+    GREATER_NATURE_PROTECTION_POTION = 17546,
+    GREATER_SHADOW_PROTECTION_POTION = 17548,
+    GREATER_ARCANE_PROTECTION_POTION = 17549,
+    FLASK_OF_CHROMATIC_RESISTANCE = 17629,
 };
 
 bool PartyBotAI::RaidStratsIsInRaid()
@@ -210,15 +218,40 @@ void PartyBotAI::PartyBotAI::RaidStratsIsZGProtectionPotions()
         return;
     }
 
+    //High Priest Venoxis
+    if (me->GetAreaId() == 3377)
+    {
+        if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_NATURE_PROTECTION_POTION))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_NATURE_PROTECTION_POTION))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_NATURE_PROTECTION_POTION);
+                return;
+            }
+        }
+    }
+
     //High Priestess Jeklik
     if (me->GetAreaId() == 3378)
     {
-        // GFPP for all
         if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_FIRE_PROTECTION_POTION))
         {
             if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_FIRE_PROTECTION_POTION))
             {
                 UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_FIRE_PROTECTION_POTION);
+                return;
+            }
+        }
+    }
+
+    //High Priestess Mar'li
+    if (me->GetAreaId() == 3379)
+    {
+        if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_NATURE_PROTECTION_POTION))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_NATURE_PROTECTION_POTION))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_NATURE_PROTECTION_POTION);
                 return;
             }
         }
