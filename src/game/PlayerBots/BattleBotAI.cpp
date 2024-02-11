@@ -72,6 +72,8 @@ enum BattleBotSpells
 #define BB_MAX_MELEE_CHASE_RANGE 20.0f
 #define BB_MAX_HEALER_CHASE_RANGE 36.0f
 #define BB_MAX_CHASE_RANGE 41.0f
+#define BB_NS_DRUID 17116
+#define BB_NS_SHAMAN 16188
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
@@ -946,6 +948,37 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
+    // Run away if oom
+    if (me->GetPowerPercent(POWER_MANA) < 10.0f &&
+        (m_role != ROLE_MELEE_DPS) &&
+        (!me->HasUnitState(UNIT_STAT_ROOT)) &&
+        (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
+    {
+        if (!me->IsStopped())
+            me->StopMoving();
+        me->GetMotionMaster()->Clear();
+        if (me->GetMotionMaster()->MoveDistance(pVictim, 70.0f))
+            return;
+    }
+
+    // Healers and ranged DPS should away if more than 1 enemy is near
+    if (m_role == ROLE_HEALER || m_role == ROLE_RANGE_DPS)
+    {
+        if ((me->GetEnemyCountInRadiusAround(me, 10.0f) > 1) &&
+            !me->HasUnitState(UNIT_STAT_ROOT) &&
+            !me->HasAura(BB_NS_DRUID) &&
+            !me->HasAura(BB_NS_SHAMAN) &&
+            (pVictim->GetHealthPercent() > 50.0f) &&
+            (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
+        {
+            if (!me->IsStopped())
+                me->StopMoving();
+            me->GetMotionMaster()->Clear();
+            if (me->GetMotionMaster()->MoveDistance(pVictim, 30.0f))
+                return;
+        }
+    }
+
     if (!pVictim || !IsValidHostileTarget(pVictim) || 
         !pVictim->IsWithinDist(me, GetMaxAggroDistanceForMap()))
     {
@@ -1324,19 +1357,6 @@ void BattleBotAI::UpdateInCombatAI()
             AttackStart(pCapper);
             return;
         }
-    }
-
-    // Run away if oom
-    if (me->GetPowerPercent(POWER_MANA) < 10.0f &&
-        (m_role != ROLE_MELEE_DPS) &&
-        (!me->HasUnitState(UNIT_STAT_ROOT)) &&
-        (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
-    {
-        if (!me->IsStopped())
-            me->StopMoving();
-        me->GetMotionMaster()->Clear();
-        if (me->GetMotionMaster()->MoveDistance(pVictim, 70.0f))
-            return;
     }
 
     // Stop chasing targets if they are very far away
