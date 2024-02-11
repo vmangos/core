@@ -997,11 +997,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
             if (newVictim && (newVictim != pVictim))
             {
-                if (pVictim)
-                    me->AttackStop();
-                else
-                    AttackStart(newVictim);
-
+                AttackStart(newVictim);
                 return;
             }
         }
