@@ -19,6 +19,8 @@ enum class RaidStratsPotionItemId {
     ELIXIR_OF_THE_SAGES = 13447,
     ELIXIR_OF_SHADOW_POWER = 9264,
     GREATER_ARCANE_ELIXIR = 13454,
+    WINTERFALL_FIREWATER = 12820,
+    ELIXIR_OF_FROST_POWER = 17708,
 
     GREATER_FIRE_PROTECTION_POTION = 13457,
 };
@@ -35,6 +37,8 @@ enum class RaidStratsPotionAuraId {
     ELIXIR_OF_THE_SAGES = 17535,
     ELIXIR_OF_SHADOW_POWER = 11474,
     GREATER_ARCANE_ELIXIR = 17539,
+    WINTERFALL_FIREWATER = 17038,
+    ELIXIR_OF_FROST_POWER = 21920,
 
     GREATER_FIRE_PROTECTION_POTION = 17543,
 };
@@ -102,6 +106,16 @@ void PartyBotAI::RaidStratsDefaultAurasOfRaid()
             }
         }
 
+        //Winterfall Firewater
+        if (!me->HasAura((int)RaidStratsPotionAuraId::WINTERFALL_FIREWATER))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::WINTERFALL_FIREWATER))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::WINTERFALL_FIREWATER);
+                return;
+            }
+        }
+
         if (m_role == ROLE_TANK)
         {
             //Gift of Arthas
@@ -159,6 +173,19 @@ void PartyBotAI::RaidStratsDefaultAurasOfRaid()
                     return;
                 }
             }            
+        }
+
+        if (me->GetClass() == CLASS_MAGE)
+        {
+            //Elixir of Frost Power
+            if (!me->HasAura((int)RaidStratsPotionAuraId::ELIXIR_OF_FROST_POWER))
+            {
+                if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::ELIXIR_OF_FROST_POWER))
+                {
+                    UsePotionsOrRune((int)RaidStratsPotionItemId::ELIXIR_OF_FROST_POWER);
+                    return;
+                }
+            }
         }
 
         if (m_role != ROLE_HEALER)
