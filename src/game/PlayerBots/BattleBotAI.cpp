@@ -1825,7 +1825,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Paladin()
         m_isBuffing = false;
     }
 
-    FindAndHealInjuredAlly();
+    if (FindAndHealInjuredAlly(60.0f, 60.0f));
+        return;
 }
 
 void BattleBotAI::UpdateInCombatAI_Paladin()
