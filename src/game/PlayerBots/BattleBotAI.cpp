@@ -1021,34 +1021,62 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
-    // Run away if oom
-    if (me->GetPowerPercent(POWER_MANA) < 10.0f &&
-        (m_role != ROLE_MELEE_DPS) &&
-        (!me->HasUnitState(UNIT_STAT_ROOT)) &&
-        (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
+    if (pVictim)
     {
-        if (!me->IsStopped())
-            me->StopMoving();
-        me->GetMotionMaster()->Clear();
-        if (me->GetMotionMaster()->MoveDistance(pVictim, 70.0f))
-            return;
-    }
-
-    // Healers and ranged DPS should away if more than 1 enemy is near
-    if (m_role == ROLE_HEALER || m_role == ROLE_RANGE_DPS)
-    {
-        if ((me->GetEnemyCountInRadiusAround(me, 10.0f) > 1) &&
-            !me->HasUnitState(UNIT_STAT_ROOT) &&
-            !me->HasAura(BB_NS_DRUID) &&
-            !me->HasAura(BB_NS_SHAMAN) &&
-            (pVictim->GetHealthPercent() > 50.0f) &&
+        // Run away if oom
+        if (me->GetPowerPercent(POWER_MANA) < 10.0f &&
+            (m_role != ROLE_MELEE_DPS) &&
+            (!me->HasUnitState(UNIT_STAT_ROOT)) &&
             (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
         {
             if (!me->IsStopped())
                 me->StopMoving();
             me->GetMotionMaster()->Clear();
-            if (me->GetMotionMaster()->MoveDistance(pVictim, 30.0f))
+            if (me->GetMotionMaster()->MoveDistance(pVictim, 70.0f))
                 return;
+        }
+
+        // Healers and ranged DPS should away if more than 1 enemy is near
+        if (m_role == ROLE_HEALER || m_role == ROLE_RANGE_DPS)
+        {
+            if (me->GetEnemyCountInRadiusAround(me, 10.0f) > 1 &&
+                !me->HasUnitState(UNIT_STAT_ROOT) &&
+                !me->HasAura(BB_NS_DRUID) &&
+                !me->HasAura(BB_NS_SHAMAN) &&
+                (pVictim->GetHealthPercent() > 50.0f) &&
+                (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
+            {
+                if (!me->IsStopped())
+                    me->StopMoving();
+                me->GetMotionMaster()->Clear();
+                if (me->GetMotionMaster()->MoveDistance(pVictim, 30.0f))
+                    return;
+            }
+        }
+    }
+
+    // Select a new target if ther is a better target to select
+    m_targetSelectTimer.Update(diff);
+    if (m_targetSelectTimer.Passed())
+    {
+        m_targetSelectTimer.Reset(BB_NEW_TARGET_INTERVAL);
+        if (pVictim &&
+            me->IsInCombat() &&
+            me->GetEnemyCountInRadiusAround(me, 10.0f) > 1 &&
+            !me->IsMounted() &&
+            m_role != ROLE_HEALER)
+        {
+            Unit* newVictim = SelectAttackTarget(pVictim);
+
+            if (newVictim && (newVictim != pVictim))
+            {
+                if (pVictim)
+                    me->AttackStop();
+                else
+                    AttackStart(newVictim);
+
+                return;
+            }
         }
     }
 
@@ -1086,27 +1114,6 @@ void BattleBotAI::UpdateAI(uint32 const diff)
             IsValidHostileTarget(pVictim) &&
             AttackStart(pVictim))
             return;
-    }
-
-    // Select a new target if ther is a better target to select
-    m_targetSelectTimer.Update(diff);
-    if (m_targetSelectTimer.Passed())
-    {
-        m_targetSelectTimer.Reset(BB_NEW_TARGET_INTERVAL);
-        if (pVictim &&
-            me->IsInCombat() &&
-            (me->GetEnemyCountInRadiusAround(me, 36.0f) > 1) &&
-            !me->IsMounted() &&
-            m_role != ROLE_HEALER)
-        {
-            Unit* newVictim = SelectAttackTarget(pVictim);
-
-            if (newVictim && (newVictim != pVictim))
-            {
-                AttackStart(newVictim);
-                return;
-            }
-        }
     }
 
     if (me->IsInCombat())
