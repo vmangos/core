@@ -1176,6 +1176,61 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.warlock.pAmplifyCurse))
                         m_spells.warlock.pAmplifyCurse = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Seduction") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pSeduction))
+                        m_spells.warlock.pSeduction = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Spell Lock") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pSpellLock))
+                        m_spells.warlock.pSpellLock = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Devour Magic") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pDevourMagic))
+                        m_spells.warlock.pDevourMagic = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Paranoia") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pParanoia))
+                        m_spells.warlock.pParanoia = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Lash of Pain") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pLashofPain))
+                        m_spells.warlock.pLashofPain = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Lesser Invisibility") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pLesserInvisibility))
+                        m_spells.warlock.pLesserInvisibility = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Torment") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pTorment))
+                        m_spells.warlock.pTorment = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Sacrifice") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pSacrifice))
+                        m_spells.warlock.pSacrifice = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Soul Link") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pSoulLink))
+                        m_spells.warlock.pSoulLink = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Inferno") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pInferno))
+                        m_spells.warlock.pInferno = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Soul Fire") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pSoulfire))
+                        m_spells.warlock.pSoulfire = pSpellEntry;
+                }
                 break;
             }
             case CLASS_WARRIOR:

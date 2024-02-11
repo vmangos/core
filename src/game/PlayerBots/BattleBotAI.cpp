@@ -76,6 +76,8 @@ enum BattleBotSpells
 #define BB_NS_SHAMAN 16188
 #define BB_FEIGN_DEATH_AURA 5384
 #define BB_DETERRENCE 19263
+#define BB_NIGHTFALL_PROC 17941
+#define BB_SOUL_LINK 25228
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
@@ -3435,32 +3437,235 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
 {
     if (Unit* pVictim = me->GetVictim())
     {
+        // Running away logic
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE &&
+            m_spells.warlock.pSeduction &&
+            !pVictim->HasAura(m_spells.warlock.pSeduction->Id))
+        {
+
+            if (m_spells.warlock.pLifeTap &&
+                (me->GetPowerPercent(POWER_MANA) < 30.0f) &&
+                (me->GetHealthPercent() > 70.0f) &&
+                CanTryToCastSpell(me, m_spells.warlock.pLifeTap))
+            {
+                if (DoCastSpell(me, m_spells.warlock.pLifeTap) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pDeathCoil &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pDeathCoil))
+            {
+                me->SetInFront(pVictim);
+                if (DoCastSpell(pVictim, m_spells.warlock.pDeathCoil) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pAmplifyCurse &&
+                m_spells.warlock.pCurseofExhaustion &&
+                CanTryToCastSpell(me, m_spells.warlock.pAmplifyCurse))
+            {
+                if (DoCastSpell(me, m_spells.warlock.pAmplifyCurse) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pCurseofExhaustion &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofExhaustion))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pCurseofExhaustion) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pCorruption &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pCorruption) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pSiphonLife &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pSiphonLife))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pSiphonLife) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pShadowburn &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pShadowburn))
+            {
+                me->SetInFront(pVictim);
+                if (DoCastSpell(pVictim, m_spells.warlock.pShadowburn) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pShadowWard &&
+                (pVictim->GetClass() == CLASS_WARLOCK) &&
+                CanTryToCastSpell(me, m_spells.warlock.pShadowWard))
+            {
+                if (DoCastSpell(me, m_spells.warlock.pShadowWard) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+
+        if (Pet* pPet = me->GetPet())
+        {
+            if (pPet->IsAlive())
+            {
+                if (pPet->GetCreatureInfo()->pet_family == CREATURE_FAMILY_FELHUNTER)
+                {
+                    if (m_spells.warlock.pSpellLock &&
+                        pVictim->IsNonMeleeSpellCasted(false, false, true) &&
+                        (pVictim->GetClass() != CLASS_WARRIOR) &&
+                        (pVictim->GetClass() != CLASS_ROGUE) &&
+                        (pVictim->GetClass() != CLASS_HUNTER) &&
+                        CanTryToCastPetSpell(pVictim, m_spells.warlock.pSpellLock))
+                    {
+                        if (DoCastPetSpell(pVictim, m_spells.warlock.pSpellLock) == SPELL_CAST_OK)
+                            return;
+                    }
+
+                    if (m_spells.warlock.pDevourMagic &&
+                        IsValidDispelTarget(pVictim, m_spells.warlock.pDevourMagic) &&
+                        CanTryToCastPetSpell(pVictim, m_spells.warlock.pDevourMagic))
+                    {
+                        if (DoCastPetSpell(pVictim, m_spells.warlock.pDevourMagic) == SPELL_CAST_OK)
+                            return;
+                    }
+
+                    if (m_spells.warlock.pParanoia &&
+                        CanTryToCastPetSpell(pPet, m_spells.warlock.pParanoia))
+                    {
+                        if (DoCastPetSpell(pPet, m_spells.warlock.pParanoia) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+                else if (pPet->GetCreatureInfo()->pet_family == CREATURE_FAMILY_SUCCUBUS)
+                {
+                    if (m_spells.warlock.pSeduction)
+                    {
+                        if (pVictim->GetDiminishing(DIMINISHING_CHARM) != DIMINISHING_LEVEL_IMMUNE)
+                        {
+                            if (CanTryToCastPetSpell(pVictim, m_spells.warlock.pSeduction) &&
+                                (pVictim->GetDiminishing(DIMINISHING_CHARM) != DIMINISHING_LEVEL_IMMUNE))
+                            {
+                                if (DoCastPetSpell(pVictim, m_spells.warlock.pSeduction) == SPELL_CAST_OK)
+                                    return;
+                            }
+                        }
+                        else
+                        {
+                            if (Unit* pTarget = SelectAttackerDifferentFrom(pVictim))
+                            {
+                                if (CanTryToCastPetSpell(pTarget, m_spells.warlock.pSeduction) &&
+                                    (pVictim->GetDiminishing(DIMINISHING_CHARM) != DIMINISHING_LEVEL_IMMUNE))
+                                {
+                                    if (DoCastPetSpell(pTarget, m_spells.warlock.pSeduction) == SPELL_CAST_OK)
+                                        return;
+                                }
+                            }
+                        }
+                    }
+
+                    if (m_spells.warlock.pLashofPain &&
+                        CanTryToCastPetSpell(pVictim, m_spells.warlock.pLashofPain))
+                    {
+                        if (DoCastPetSpell(pVictim, m_spells.warlock.pLashofPain) == SPELL_CAST_OK)
+                            return;
+                    }
+
+                    if (m_spells.warlock.pLesserInvisibility &&
+                        !pPet->IsInCombat() &&
+                        CanTryToCastPetSpell(pPet, m_spells.warlock.pLesserInvisibility))
+                    {
+                        if (DoCastPetSpell(pPet, m_spells.warlock.pLesserInvisibility) == SPELL_CAST_OK)
+                        {
+                            return;
+                        }
+                    }
+                }
+                else if (pPet->GetCreatureInfo()->pet_family == CREATURE_FAMILY_VOIDWALKER)
+                {
+                    if (m_spells.warlock.pTorment &&
+                        pVictim->IsCreature() &&
+                        CanTryToCastPetSpell(pVictim, m_spells.warlock.pTorment))
+                    {
+                        if (DoCastPetSpell(pVictim, m_spells.warlock.pTorment) == SPELL_CAST_OK)
+                            return;
+                    }
+
+                    if (m_spells.warlock.pSacrifice &&
+                        (me->GetHealthPercent() < 50.0f) &&
+                        CanTryToCastPetSpell(pPet, m_spells.warlock.pSacrifice))
+                    {
+                        if (DoCastPetSpell(pPet, m_spells.warlock.pSacrifice) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+            }
+        }
+
+        if (m_spells.warlock.pLifeTap &&
+            (me->GetPowerPercent(POWER_MANA) < 30.0f) &&
+            (me->GetHealthPercent() > 70.0f) &&
+            CanTryToCastSpell(me, m_spells.warlock.pLifeTap))
+        {
+            if (DoCastSpell(me, m_spells.warlock.pLifeTap) == SPELL_CAST_OK)
+                return;
+        }
+
         if (m_spells.warlock.pDeathCoil &&
-           (pVictim->CanReachWithMeleeAutoAttack(me) || pVictim->IsNonMeleeSpellCasted()) &&
+            (pVictim->CanReachWithMeleeAutoAttack(me) || pVictim->IsNonMeleeSpellCasted()) &&
+            (m_spells.warlock.pSeduction &&
+                (!pVictim->HasAura(m_spells.warlock.pSeduction->Id))) &&
             CanTryToCastSpell(pVictim, m_spells.warlock.pDeathCoil))
         {
             if (DoCastSpell(pVictim, m_spells.warlock.pDeathCoil) == SPELL_CAST_OK)
                 return;
         }
 
-        if (m_spells.warlock.pShadowburn &&
-           (pVictim->GetHealthPercent() < 10.0f) &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pShadowburn))
+        // Fear death coiled targets
+        if (m_spells.warlock.pFear &&
+            m_spells.warlock.pDeathCoil &&
+            (pVictim->GetDiminishing(DIMINISHING_FEAR) != DIMINISHING_LEVEL_IMMUNE) &&
+            (pVictim->HasAura(m_spells.warlock.pDeathCoil->Id)) &&
+            (m_spells.warlock.pSeduction &&
+                (!pVictim->HasAura(m_spells.warlock.pSeduction->Id))) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pFear))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pShadowburn) == SPELL_CAST_OK)
+            if (DoCastSpell(pVictim, m_spells.warlock.pFear) == SPELL_CAST_OK)
                 return;
         }
 
-        if (m_spells.warlock.pSearingPain &&
-           (pVictim->GetHealthPercent() < 20.0f) &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pSearingPain))
+        // Always use up NF procs
+        if (m_spells.warlock.pShadowBolt &&
+            (me->HasAura(BB_NIGHTFALL_PROC)) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pShadowBolt))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pSearingPain) == SPELL_CAST_OK)
+            if (DoCastSpell(pVictim, m_spells.warlock.pShadowBolt) == SPELL_CAST_OK)
                 return;
+        }
+
+        if (m_spells.warlock.pSeduction &&
+            (!pVictim->HasAura(m_spells.warlock.pSeduction->Id)))
+        {
+            if (m_spells.warlock.pShadowburn &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pShadowburn))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pShadowburn) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pSearingPain &&
+                (pVictim->GetHealthPercent() < 20.0f) &&
+                !pVictim->IsMoving() &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pSearingPain))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pSearingPain) == SPELL_CAST_OK)
+                    return;
+            }
         }
 
         if (m_spells.warlock.pShadowWard &&
-           (pVictim->GetClass() == CLASS_WARLOCK) &&
+            (pVictim->GetClass() == CLASS_WARLOCK || pVictim->GetClass() == CLASS_PRIEST) &&
             CanTryToCastSpell(me, m_spells.warlock.pShadowWard))
         {
             if (DoCastSpell(me, m_spells.warlock.pShadowWard) == SPELL_CAST_OK)
@@ -3480,65 +3685,148 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
             }
         }
 
-        if (m_spells.warlock.pImmolate &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pImmolate))
+        if (m_spells.warlock.pSoulLink &&
+            !me->HasAura(BB_SOUL_LINK))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pImmolate) == SPELL_CAST_OK)
-                return;
+            if (Pet* pPet = me->GetPet())
+            {
+                if (pPet->IsAlive() &&
+                    CanTryToCastSpell(pPet, m_spells.warlock.pSoulLink))
+                {
+                    if (DoCastSpell(pPet, m_spells.warlock.pSoulLink) == SPELL_CAST_OK)
+                        return;
+                }
+            }
         }
 
-        if (m_spells.warlock.pConflagrate &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pConflagrate))
+        if (m_spells.warlock.pSeduction &&
+            (!pVictim->HasAura(m_spells.warlock.pSeduction->Id)))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pConflagrate) == SPELL_CAST_OK)
-                return;
+            if (m_spells.warlock.pCorruption &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pCorruption) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pSiphonLife &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pSiphonLife))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pSiphonLife) == SPELL_CAST_OK)
+                    return;
+            }
         }
 
-        if (m_spells.warlock.pCorruption &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption))
+        // CoEX flag carriers or mounted players, otherwise CoT casters or CoA non-casters
+        if (pVictim->IsMounted() || 
+            pVictim->HasAura(AURA_SILVERWING_FLAG) || 
+            pVictim->HasAura(AURA_WARSONG_FLAG))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pCorruption) == SPELL_CAST_OK)
-                return;
-        }
+            if (m_spells.warlock.pAmplifyCurse &&
+                m_spells.warlock.pCurseofExhaustion &&
+                CanTryToCastSpell(me, m_spells.warlock.pAmplifyCurse))
+            {
+                if (DoCastSpell(me, m_spells.warlock.pAmplifyCurse) == SPELL_CAST_OK)
+                    return;
+            }
 
-        if (m_spells.warlock.pSiphonLife &&
-           (me->GetHealthPercent() < 80.0f) &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pSiphonLife))
-        {
-            if (DoCastSpell(pVictim, m_spells.warlock.pSiphonLife) == SPELL_CAST_OK)
-                return;
+            if (m_spells.warlock.pCurseofExhaustion &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofExhaustion))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pCurseofExhaustion) == SPELL_CAST_OK)
+                    return;
+            }
         }
-
-        if (m_spells.warlock.pDrainLife &&
-           (me->GetHealthPercent() < 30.0f) &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pDrainLife))
+        else
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pDrainLife) == SPELL_CAST_OK)
-                return;
+            if (pVictim->IsCaster() &&
+                (pVictim->GetClass() != CLASS_HUNTER))
+            {
+                if (m_spells.warlock.pCurseofTongues &&
+                    CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofTongues))
+                {
+                    if (DoCastSpell(pVictim, m_spells.warlock.pCurseofTongues) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+            else
+            {
+                // If conflag spec, use CoE, otherwise use CoA
+                if (m_spells.warlock.pConflagrate)
+                {
+                    if (m_spells.warlock.pCurseoftheElements &&
+                        CanTryToCastSpell(pVictim, m_spells.warlock.pCurseoftheElements))
+                    {
+                        if (DoCastSpell(pVictim, m_spells.warlock.pCurseoftheElements) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+                else
+                {
+                    if (m_spells.warlock.pAmplifyCurse &&
+                        CanTryToCastSpell(me, m_spells.warlock.pAmplifyCurse))
+                    {
+                        if (DoCastSpell(me, m_spells.warlock.pAmplifyCurse) == SPELL_CAST_OK)
+                            return;
+                    }
+
+                    if (m_spells.warlock.pCurseofAgony &&
+                        (m_spells.warlock.pSeduction &&
+                            (!pVictim->HasAura(m_spells.warlock.pSeduction->Id))) &&
+                        CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofAgony))
+                    {
+                        if (DoCastSpell(pVictim, m_spells.warlock.pCurseofAgony) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+            }
         }
 
         if (m_spells.warlock.pFear &&
+            m_spells.warlock.pSeduction &&
+            (!pVictim->HasAura(m_spells.warlock.pSeduction->Id)) &&
+            (pVictim->GetDiminishing(DIMINISHING_FEAR) != DIMINISHING_LEVEL_IMMUNE) &&
             CanTryToCastSpell(pVictim, m_spells.warlock.pFear))
         {
             if (DoCastSpell(pVictim, m_spells.warlock.pFear) == SPELL_CAST_OK)
                 return;
         }
 
-        if (pVictim->IsCaster())
+        if (m_spells.warlock.pDrainLife &&
+            !m_spells.warlock.pConflagrate &&
+            (m_spells.warlock.pSeduction &&
+                (!pVictim->HasAura(m_spells.warlock.pSeduction->Id))) &&
+            (me->GetHealthPercent() < 30.0f) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pDrainLife))
         {
-            if (m_spells.warlock.pCurseofTongues &&
-                CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofTongues))
+            if (DoCastSpell(pVictim, m_spells.warlock.pDrainLife) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pInferno &&
+            m_spells.warlock.pConflagrate &&
+            (pVictim->GetHealthPercent() > 50.0f) &&
+            (!pVictim->IsMoving()) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pInferno))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pInferno) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pSeduction &&
+            (!pVictim->HasAura(m_spells.warlock.pSeduction->Id)))
+        {
+            if (m_spells.warlock.pImmolate &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pImmolate))
             {
-                if (DoCastSpell(pVictim, m_spells.warlock.pCurseofTongues) == SPELL_CAST_OK)
+                if (DoCastSpell(pVictim, m_spells.warlock.pImmolate) == SPELL_CAST_OK)
                     return;
             }
-        }
-        else
-        {
-            if (m_spells.warlock.pCurseofExhaustion &&
-                CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofExhaustion))
+
+            if (m_spells.warlock.pConflagrate &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pConflagrate))
             {
-                if (DoCastSpell(pVictim, m_spells.warlock.pCurseofExhaustion) == SPELL_CAST_OK)
+                if (DoCastSpell(pVictim, m_spells.warlock.pConflagrate) == SPELL_CAST_OK)
                     return;
             }
         }
@@ -3549,11 +3837,25 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
             me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
         }
 
-        if (m_spells.warlock.pHowlofTerror &&
-            GetAttackersInRangeCount(10.0f) > 1 &&
-            CanTryToCastSpell(me, m_spells.warlock.pHowlofTerror))
+        if (m_spells.warlock.pSearingPain &&
+            (m_spells.warlock.pSeduction &&
+                (!pVictim->HasAura(m_spells.warlock.pSeduction->Id))) &&
+            pVictim->CanReachWithMeleeAutoAttack(me) &&
+            (pVictim->GetVictim() == me) &&
+            IsMeleeDamageClass(pVictim->GetClass()) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pSearingPain))
         {
-            if (DoCastSpell(me, m_spells.warlock.pHowlofTerror) == SPELL_CAST_OK)
+            if (DoCastSpell(pVictim, m_spells.warlock.pSearingPain) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pSoulfire &&
+            m_spells.warlock.pConflagrate &&
+            (pVictim->GetHealthPercent() > 50.0f) &&
+            (!pVictim->IsMoving()) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pSoulfire))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pSoulfire) == SPELL_CAST_OK)
                 return;
         }
 
@@ -3563,21 +3865,6 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
             if (DoCastSpell(pVictim, m_spells.warlock.pShadowBolt) == SPELL_CAST_OK)
                 return;
         }
-
-        if (m_spells.warlock.pLifeTap &&
-           (me->GetPowerPercent(POWER_MANA) < 10.0f) &&
-           (me->GetHealthPercent() > 70.0f) &&
-            CanTryToCastSpell(me, m_spells.warlock.pLifeTap))
-        {
-            if (DoCastSpell(me, m_spells.warlock.pLifeTap) == SPELL_CAST_OK)
-                return;
-        }
-
-        if (me->HasSpell(BB_SPELL_SHOOT_WAND) &&
-           !me->IsMoving() &&
-           (me->GetPowerPercent(POWER_MANA) < 5.0f) &&
-           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
-            me->CastSpell(pVictim, BB_SPELL_SHOOT_WAND, false);
     }
 }
 

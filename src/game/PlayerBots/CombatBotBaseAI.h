@@ -460,6 +460,17 @@ public:
             SpellEntry const* pCurseofExhaustion;
             SpellEntry const* pLifeTap;
             SpellEntry const* pAmplifyCurse;
+            SpellEntry const* pSeduction;
+            SpellEntry const* pSpellLock;
+            SpellEntry const* pDevourMagic;
+            SpellEntry const* pParanoia;
+            SpellEntry const* pLashofPain;
+            SpellEntry const* pLesserInvisibility;
+            SpellEntry const* pTorment;
+            SpellEntry const* pSacrifice;
+            SpellEntry const* pSoulLink;
+            SpellEntry const* pInferno;
+            SpellEntry const* pSoulfire;
         } warlock;
         struct
         {
