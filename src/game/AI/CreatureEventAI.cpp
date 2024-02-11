@@ -109,6 +109,9 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
     if (pHolder.Event.event_inverse_phase_mask & (1 << m_Phase))
         return false;
 
+    if ((pHolder.Event.event_flags & EFLAG_NOT_CASTING) && m_creature->IsNonMeleeSpellCasted(false, false, true))
+        return false;
+
     if (pHolder.Event.condition_id && !IsConditionSatisfied(pHolder.Event.condition_id, pActionInvoker ? pActionInvoker : m_creature->GetVictim(), m_creature->GetMap(), m_creature, CONDITION_FROM_EVENTAI))
         return false;
 
@@ -183,6 +186,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
             break;
         }
         case EVENT_T_HIT_BY_SPELL:
+        case EVENT_T_SPELL_HIT_TARGET:
         {
             //Spell hit is special case, param1 and param2 handled within CreatureEventAI::SpellHit
 
@@ -359,7 +363,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
             pHolder.UpdateRepeatTimer(m_creature, event.move_inform.repeatMin, event.move_inform.repeatMax);
             break;
         }
-        case EVENT_T_MAP_SCRIPT_EVENT:
+        case EVENT_T_SCRIPT:
         case EVENT_T_GROUP_MEMBER_DIED:
         {
             break;
@@ -402,11 +406,14 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
     if (pHolder.Event.event_chance <= rnd % 100)
         return false;
 
+    bool scriptFailed = false;
+
     //Process actions, normal case
     if (!(pHolder.Event.event_flags & EFLAG_RANDOM_ACTION))
     {
         for (const auto& action : pHolder.Event.action)
-            ProcessAction(action, pHolder.Event.event_id, pActionInvoker);
+            if (ProcessAction(action, pHolder.Event.event_id, pActionInvoker))
+                scriptFailed = true;
     }
     //Process actions, random case
     else
@@ -434,24 +441,35 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
                 }
             }
 
-            ProcessAction(pHolder.Event.action[j], pHolder.Event.event_id, pActionInvoker);
+            scriptFailed = ProcessAction(pHolder.Event.action[j], pHolder.Event.event_id, pActionInvoker);
         }
     }
+
+    if (scriptFailed && (pHolder.Event.event_flags & EFLAG_CHECK_RESULT))
+    {
+        pHolder.Enabled = true;
+        pHolder.UpdateRepeatTimer(m_creature, 0, 0);
+        return false;
+    }
+
     return true;
 }
 
-void CreatureEventAI::ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker)
+bool CreatureEventAI::ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker)
 {
     if (!action)
-        return;
+        return false;
 
     WorldObject* target = pActionInvoker ? pActionInvoker : m_creature->GetVictim();
     Map* map = m_creature->GetMap();
 
-    for (const auto& x : *action)
+    for (auto const& x : *action)
     {
-        map->ScriptCommandStartDirect(x.second, m_creature, target);
+        if (map->ScriptCommandStartDirect(x.second, m_creature, target))
+            return true;
     }
+
+    return false;
 }
 
 void CreatureEventAI::JustRespawned()
@@ -669,7 +687,7 @@ void CreatureEventAI::UpdateEventsOn_MoveInLineOfSight(Unit* pWho)
     }
 }
 
-void CreatureEventAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell)
+void CreatureEventAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellEntry)
 {
     if (m_bEmptyList)
         return;
@@ -681,17 +699,34 @@ void CreatureEventAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell)
             case EVENT_T_HIT_BY_SPELL:
             {
                 //If spell id matches (or no spell id) & if spell school matches (or no spell school)
-                if (!i.Event.hit_by_spell.spellId || pSpell->Id == i.Event.hit_by_spell.spellId)
-                    if (GetSchoolMask(pSpell->School) & i.Event.hit_by_spell.schoolMask)
+                if (!i.Event.hit_by_spell.spellId || pSpellEntry->Id == i.Event.hit_by_spell.spellId)
+                    if (GetSchoolMask(pSpellEntry->School) & i.Event.hit_by_spell.schoolMask)
                         ProcessEvent(i, pCaster);
                 break;
             }
             case EVENT_T_HIT_BY_AURA:
             {
-                if (!i.Event.hit_by_aura.auraType || pSpell->HasAura(AuraType(i.Event.hit_by_aura.auraType)))
+                if (!i.Event.hit_by_aura.auraType || pSpellEntry->HasAura(AuraType(i.Event.hit_by_aura.auraType)))
                     ProcessEvent(i, pCaster);
                 break;
             }
+        }
+    }
+}
+
+void CreatureEventAI::SpellHitTarget(Unit* pTarget, SpellEntry const* pSpellEntry)
+{
+    if (m_bEmptyList)
+        return;
+
+    for (auto& i : m_CreatureEventAIList)
+    {
+        if (i.Event.event_type == EVENT_T_SPELL_HIT_TARGET)
+        {
+            //If spell id matches (or no spell id) & if spell school matches (or no spell school)
+            if (!i.Event.hit_by_spell.spellId || pSpellEntry->Id == i.Event.hit_by_spell.spellId)
+                if (GetSchoolMask(pSpellEntry->School) & i.Event.hit_by_spell.schoolMask)
+                    ProcessEvent(i, pTarget);
         }
     }
 }
@@ -840,8 +875,8 @@ void CreatureEventAI::OnScriptEventHappened(uint32 uiEvent, uint32 uiData, World
 
     for (auto& i : m_CreatureEventAIList)
     {
-        if (i.Event.event_type == EVENT_T_MAP_SCRIPT_EVENT)
-            if ((i.Event.map_event.eventId == uiEvent) && (i.Event.map_event.data == uiData))
+        if (i.Event.event_type == EVENT_T_SCRIPT)
+            if ((i.Event.script_event.eventId == uiEvent) && (i.Event.script_event.data == uiData))
                 ProcessEvent(i, ToUnit(pInvoker));
     }
 }

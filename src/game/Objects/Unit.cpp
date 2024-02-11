@@ -626,6 +626,29 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             static_cast<Player*>(pVictim)->ScheduleStandUp();
     }
 
+    auto ShouldEnterCombat = [&]()
+    {
+        if (pVictim == this)
+            return false;
+
+        if (spell && spell->IsTriggeredByProc())
+            return false;
+
+        if (spellProto && spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD))
+            return false;
+
+        if (damagetype == DOT)
+        {
+            // We need to check channeled dot here, because spells like Blizzard and Starshards have No Initial Threat attribute.
+            if (spellProto && spellProto->IsChanneledSpell())
+                return true;
+
+            return false;
+        }
+
+        return true;
+    };
+
     if (!damage)
     {
         if (cleanDamage)
@@ -654,7 +677,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                 if (pVictim->IsPlayer() && damagetype != DOT)
                     pVictim->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_DAMAGE_CANCELS, spellProto ? spellProto->Id : 0);
             }
-            if (damagetype != DOT)
+            if (ShouldEnterCombat())
             {
                 pVictim->SetInCombatWithAggressor(this);
                 SetInCombatWithVictim(pVictim);
@@ -689,8 +712,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     }
 
     // Enter combat or extend leash timer.
-    if ((pVictim != this) && (damagetype != DOT || (spellProto && spellProto->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))) &&
-       (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)) && (!spell || !spell->IsTriggeredByProc()))
+    if (ShouldEnterCombat())
     {
         pVictim->SetInCombatWithAggressor(this);
         SetInCombatWithVictim(pVictim);
@@ -2116,9 +2138,8 @@ void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool ext
     }
 
     SendAttackStateUpdate(&damageInfo);
-    ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
-
     DealMeleeDamage(&damageInfo, true);
+    ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
 
     if (IsPlayer())
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
@@ -2583,7 +2604,7 @@ float Unit::MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) c
     missChance *= levelDiffMultiplier;
 
     // Hit chance bonus from attacker based on ratings and auras
-    float hitChance = GetBonusHitChanceFromAuras(attType);
+    float hitChance = GetWeaponBasedAuraModifier(attType, SPELL_AURA_MOD_HIT_CHANCE);
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
     // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking player’s Weapon Skill.
@@ -2649,7 +2670,7 @@ float Unit::GetUnitParryChance() const
 
     if (Player const* pPlayer = ToPlayer())
     {
-        if (pPlayer->CanParry() && pPlayer->HasWeaponForParry())
+        if (pPlayer->CanParry() && pPlayer->GetWeaponForParry())
             chance = GetFloatValue(PLAYER_PARRY_PERCENTAGE);
     }
     else
@@ -3235,6 +3256,10 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder* holder)
             // Skip channeled spells (Arcane missile, ...) so two casters can channel at the same time
             if (aurSpellInfo->IsChanneledSpell())
                 continue;
+
+            if (aurSpellInfo->Custom & SPELL_CUSTOM_SEPARATE_AURA_PER_CASTER)
+                continue;
+
             bool stop = false;
 
             for (int32 i = 0; i < MAX_EFFECT_INDEX && !stop; ++i)
@@ -3242,10 +3267,6 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder* holder)
                 // no need to check non stacking auras that weren't/won't be applied on this target
                 if (!foundHolder->m_auras[i] || !holder->m_auras[i])
                     continue;
-
-                // Croise
-                if (aurSpellInfo->Id == 20007)
-                    break;
 
                 // m_auraname can be modified to SPELL_AURA_NONE for area auras, use original
                 AuraType aurNameReal = AuraType(aurSpellInfo->EffectApplyAuraName[i]);
@@ -4645,8 +4666,11 @@ void Unit::AttackedBy(Unit* attacker)
             pCreature->AI()->AttackedBy(attacker);
 
         // trigger owner AI reaction
+        // must check that attacker is targetable by owner,
+        // because there are cases with unattackable creatures spawning pets
+        // example: Scarshield Portal (9707) spawns guardian pet Burning Imp (9708) with spell 15126
         if (Creature* pOwner = ::ToCreature(GetCharmerOrOwner()))
-            if (pOwner->AI())
+            if (pOwner->AI() && pOwner->IsAlive() && attacker->IsTargetableBy(pOwner))
                 pOwner->AI()->AttackedBy(attacker);
     }
 }
@@ -4850,6 +4874,15 @@ Player* Unit::GetPossessor() const
     return nullptr;
 }
 
+Player* Unit::GetOwnerPlayerOrPlayerItself() const
+{
+    ObjectGuid guid = GetOwnerGuid();
+    if (guid.IsPlayer())
+        return ObjectAccessor::FindPlayer(guid);
+
+    return IsPlayer() ? (Player*)this : nullptr;
+}
+
 Player* Unit::GetCharmerOrOwnerPlayerOrPlayerItself() const
 {
     ObjectGuid guid = GetCharmerOrOwnerGuid();
@@ -4874,7 +4907,7 @@ Player* Unit::GetAffectingPlayer() const
         return const_cast<Unit*>(this)->ToPlayer();
 
     if (Unit* owner = GetCharmerOrOwner())
-        return owner->GetCharmerOrOwnerPlayerOrPlayerItself();
+        return owner->GetOwnerPlayerOrPlayerItself(); // no charmer, pet of charmed creature should still be attackable by player
 
     return nullptr;
 }
@@ -5481,29 +5514,31 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
         spellInfo->HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS))
         return false;
 
-    //TODO add spellEffect immunity checks!, player with flag in bg is immune to immunity buffs from other friendly players!
-    //SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_EFFECT];
-
-    SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
-    for (const auto& itr : dispelList)
+    // Venomhide Ravasaur (6508) is immune to being poisoned by others, but has passive poison aura 14108.
+    // Should either check self cast or passive spell here, not sure which is better.
+    if (!spellInfo->HasAttribute(SPELL_ATTR_PASSIVE))
     {
-        if (itr.type == spellInfo->Dispel)
+        SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
+        for (const auto& itr : dispelList)
         {
-            SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
-            if (!pImmunitySpell)
-                return true;
+            if (itr.type == spellInfo->Dispel)
+            {
+                SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+                if (!pImmunitySpell)
+                    return true;
 
-            if ((pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
-                return true;
+                if ((pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
+                    return true;
 
-            if (pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
-                return true;
+                if (pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+                    return true;
+            }
         }
     }
 
-    if (!(spellInfo->Attributes & SPELL_ATTR_NO_IMMUNITIES)               // ignore invulnerability
-     && !(spellInfo->AttributesEx & SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT) // can remove immune (by dispell or immune it)
-     && !(spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NO_SCHOOL_IMMUNITIES))
+    if (!spellInfo->HasAttribute(SPELL_ATTR_NO_IMMUNITIES)             // ignore invulnerability
+     && !spellInfo->HasAttribute(SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT) // can remove immune (by dispell or immune it)
+     && !spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_SCHOOL_IMMUNITIES))
     {
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
         for (const auto& itr : schoolList)
@@ -5556,6 +5591,18 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
                 if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
                     return true;
             }
+        }
+    }
+
+    // You should not be able to cast Blessing of Protection or Divine Intervention on WSG flag carrier.
+    if (Spells::IsExplicitPositiveTarget(spellInfo->EffectImplicitTargetA[0]) &&
+        spellInfo->HasAuraOrTriggersAnotherSpellWithAura(SPELL_AURA_SCHOOL_IMMUNITY))
+    {
+        for (auto const& itr : m_spellAuraHolders)
+        {
+            SpellEntry const* pAuraSpell = itr.second->GetSpellProto();
+            if (pAuraSpell->HasAuraInterruptFlag(AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS))
+                return true;
         }
     }
 
@@ -5888,15 +5935,7 @@ bool Unit::IsNoWeaponShapeShift() const
 
 bool Unit::IsAttackSpeedOverridenShapeShift() const
 {
-    switch (GetShapeshiftForm())
-    {
-        case FORM_CAT:
-        case FORM_BEAR:
-        case FORM_DIREBEAR:
-            return true;
-    }
-
-    return false;
+    return IsAttackSpeedOverridenForm(GetShapeshiftForm());
 }
 
 bool Unit::IsInDisallowedMountForm() const
@@ -5998,9 +6037,9 @@ void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/
     // PvP combat participation pulse: refresh pvp timers on pvp combat (we are the victim)
     if (pAggressor->IsPvP())
     {
-        if (Player* pThisPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (Player* pThisPlayer = GetAffectingPlayer())
         {
-            if (Player const* pAggressorPlayer = pAggressor->GetCharmerOrOwnerPlayerOrPlayerItself())
+            if (Player const* pAggressorPlayer = pAggressor->GetAffectingPlayer())
             {
                 if (pThisPlayer != pAggressorPlayer && !pThisPlayer->IsInDuelWith(pAggressorPlayer) && !(pThisPlayer->IsFFAPvP() && pAggressorPlayer->IsFFAPvP()))
                 {
@@ -6068,9 +6107,9 @@ void Unit::TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly
     // PvP combat participation pulse: refresh pvp timers on pvp combat (we are the aggressor)
     if (pVictim->IsPvP())
     {
-        if (Player* pThisPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (Player* pThisPlayer = GetAffectingPlayer())
         {
-            Player const* pVictimPlayer = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself();
+            Player const* pVictimPlayer = pVictim->GetAffectingPlayer();
 
             if (!pVictimPlayer || ((pThisPlayer != pVictimPlayer) && !pThisPlayer->IsInDuelWith(pVictimPlayer) && !(pThisPlayer->IsFFAPvP() && pVictimPlayer->IsFFAPvP())))
             {
@@ -7299,15 +7338,25 @@ void Unit::SetDeathState(DeathState s)
 
         CombatStop();
         DeleteThreatList();
-        ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
         if (IsNonMeleeSpellCasted(false))
             InterruptNonMeleeSpells(false);
     }
 
     m_deathState = s;
+
     if (s == JUST_DIED)
     {
+        if (!m_ComboPointHolders.empty())
+        {
+            // Delay clearing combo points until next update.
+            // This fixes Relentless Strikes not triggering when the finishing move kills the target.
+            m_Events.AddLambdaEventAtOffset([this]
+            {
+                ClearComboPointHolders();
+            }, 1);
+        }
+
         RemoveAllAurasOnDeath();
         UnsummonAllTotems();
 
@@ -7333,11 +7382,6 @@ void Unit::SetDeathState(DeathState s)
     else if (s == JUST_ALIVED || s == ALIVE)
     {
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);  // clear skinnable for creature and player (at battleground)
-    }
-
-    if (m_deathState != ALIVE && s == ALIVE)
-    {
-        //_ApplyAllAuraMods();
     }
 }
 
@@ -8053,6 +8097,8 @@ void Unit::SetMaxHealth(uint32 val)
 void Unit::SetHealthPercent(float percent)
 {
     uint32 newHealth = GetMaxHealth() * percent / 100.0f;
+    if (percent > 0 && newHealth == 0)
+        newHealth = 1;
     SetHealth(newHealth);
 }
 
@@ -9052,7 +9098,8 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, Mo
     else
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
 
-    m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN;
+    m_movementInfo.ctime = 0;
+    m_movementInfo.RemoveMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
 
     if (apply)
     {
@@ -9134,6 +9181,7 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
 {
     if (apply)
     {
+        m_movementInfo.ctime = 0;
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
         if (!IsPlayer())
             StopMoving();
@@ -9695,30 +9743,30 @@ void Unit::RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, 
     }
 }
 
-void Unit::NearTeleportTo(float x, float y, float z, float orientation, uint32 teleportOptions)
+bool Unit::NearTeleportTo(float x, float y, float z, float orientation, uint32 teleportOptions)
 {
     DisableSpline();
 
     if (IsPlayer())
-        ((Player*)this)->TeleportTo(GetMapId(), x, y, z, orientation, teleportOptions);
-    else
-    {
-        Creature* c = (Creature*)this;
-        // Creature relocation acts like instant movement generator, so current generator expects interrupt/reset calls to react properly
-        if (!c->GetMotionMaster()->empty())
-            if (MovementGenerator* movgen = c->GetMotionMaster()->top())
-                movgen->Interrupt(*c);
+        return ((Player*)this)->TeleportTo(GetMapId(), x, y, z, orientation, teleportOptions);
 
-        MovementPacketSender::SendTeleportToObservers(this, x, y, z, orientation);
-        GetMap()->CreatureRelocation((Creature*)this, x, y, z, orientation);
-        MovementPacketSender::SendTeleportToObservers(this, x, y, z, orientation);
+    Creature* c = (Creature*)this;
+    // Creature relocation acts like instant movement generator, so current generator expects interrupt/reset calls to react properly
+    if (!c->GetMotionMaster()->empty())
+        if (MovementGenerator* movgen = c->GetMotionMaster()->top())
+            movgen->Interrupt(*c);
 
-        // finished relocation, movegen can different from top before creature relocation,
-        // but apply Reset expected to be safe in any case
-        if (!c->GetMotionMaster()->empty())
-            if (MovementGenerator* movgen = c->GetMotionMaster()->top())
-                movgen->Reset(*c);
-    }
+    MovementPacketSender::SendTeleportToObservers(this, x, y, z, orientation);
+    GetMap()->CreatureRelocation((Creature*)this, x, y, z, orientation);
+    MovementPacketSender::SendTeleportToObservers(this, x, y, z, orientation);
+
+    // finished relocation, movegen can different from top before creature relocation,
+    // but apply Reset expected to be safe in any case
+    if (!c->GetMotionMaster()->empty())
+        if (MovementGenerator* movgen = c->GetMotionMaster()->top())
+            movgen->Reset(*c);
+
+    return true;
 }
 
 void Unit::NearLandTo(float x, float y, float z, float orientation)
@@ -10617,6 +10665,7 @@ void Unit::DisableSpline()
     if (Player* me = ToPlayer())
         me->SetFallInformation(0, me->GetPositionZ());
     m_movementInfo.RemoveMovementFlag(MOVEFLAG_SPLINE_ENABLED | MOVEFLAG_FORWARD);
+    m_movementInfo.ctime = 0;
     movespline->_Interrupt();
 }
 
@@ -10654,11 +10703,20 @@ void Unit::SendPlaySpellVisual(uint32 id) const
     SendMessageToSet(&data, true);
 }
 
+void Unit::CancelSpellChannelingAnimationInstantly()
+{
+    if (Player* pPlayer = ToPlayer())
+        pPlayer->SendChannelUpdate(0);
+
+    SetChannelObjectGuid(ObjectGuid());
+    SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+    DirectSendPublicValueUpdate({ UNIT_FIELD_CHANNEL_OBJECT , UNIT_FIELD_CHANNEL_OBJECT + 1 , UNIT_CHANNEL_SPELL });
+}
+
 #define PRELOAD if (this == unit) return true; \
 Unit const* u1 = GetCharmerOrOwnerOrSelf(); \
 Unit const* u2 = unit->GetCharmerOrOwnerOrSelf(); \
 if (u1 == u2) return true;
-
 
 bool Unit::IsInPartyWith(Unit const* unit) const
 {
@@ -10867,7 +10925,7 @@ void Unit::RestoreMovement()
         Unit* victim = GetCharmInfo() && GetCharmInfo()->IsAtStay() ? nullptr : GetVictim();
         if (victim)
             GetMotionMaster()->MoveChase(victim);
-        else
+        else if (GetMotionMaster()->GetCurrentMovementGeneratorType() != static_cast<Creature*>(this)->GetDefaultMovementType())
             GetMotionMaster()->Initialize();
     }
 }

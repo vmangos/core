@@ -187,78 +187,6 @@ CreatureAI* GetAI_npc_daphne_stilwell(Creature* pCreature)
     return new npc_daphne_stilwellAI(pCreature);
 }
 
-/*######
-## npc_defias_traitor
-######*/
-
-enum DefiasTraitorData
-{
-    SAY_START                   = 9,
-    SAY_PROGRESS                = 10,
-    SAY_END                     = 11,
-    SAY_AGGRO_1                 = 489,
-    SAY_AGGRO_2                 = 485,
-
-    QUEST_DEFIAS_BROTHERHOOD    = 155
-};
-
-struct npc_defias_traitorAI : public npc_escortAI
-{
-    npc_defias_traitorAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        Reset();
-    }
-
-    void WaypointReached(uint32 i) override
-    {
-        switch (i)
-        {
-            case 35:
-                SetRun(false);
-                break;
-            case 36:
-                if (Player* pPlayer = GetPlayerForEscort())
-                    DoScriptText(SAY_PROGRESS, m_creature, pPlayer);
-                break;
-            case 44:
-                if (Player* pPlayer = GetPlayerForEscort())
-                {
-                    DoScriptText(SAY_END, m_creature, pPlayer);
-                    pPlayer->GroupEventHappens(QUEST_DEFIAS_BROTHERHOOD, m_creature);
-                }
-                break;
-        }
-    }
-
-    void Aggro(Unit* who) override
-    {
-        DoScriptText(urand(0, 1) ? SAY_AGGRO_1 : SAY_AGGRO_2, m_creature, who);
-    }
-
-    void Reset() override { }
-};
-
-bool QuestAccept_npc_defias_traitor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_DEFIAS_BROTHERHOOD)
-    {
-        DoScriptText(SAY_START, pCreature, pPlayer);
-
-        if (npc_defias_traitorAI* pEscortAI = dynamic_cast<npc_defias_traitorAI*>(pCreature->AI()))
-        {
-            pEscortAI->SetMaxAssistDistance(15.0f);
-            pEscortAI->Start(true, pPlayer->GetGUID(), pQuest);
-        }
-    }
-
-    return true;
-}
-
-CreatureAI* GetAI_npc_defias_traitor(Creature* pCreature)
-{
-    return new npc_defias_traitorAI(pCreature);
-}
-
 void AddSC_westfall()
 {
     Script* newscript;
@@ -267,11 +195,5 @@ void AddSC_westfall()
     newscript->Name = "npc_daphne_stilwell";
     newscript->GetAI = &GetAI_npc_daphne_stilwell;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_daphne_stilwell;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_defias_traitor";
-    newscript->GetAI = &GetAI_npc_defias_traitor;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_defias_traitor;
     newscript->RegisterSelf();
 }

@@ -136,6 +136,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                     }
                     break;
                 case EVENT_T_HIT_BY_SPELL:
+                case EVENT_T_SPELL_HIT_TARGET:
                     if (temp.hit_by_spell.spellId)
                     {
                         SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(temp.hit_by_spell.spellId);
@@ -278,7 +279,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Creature %u is using repeatable event(%u) with param4 < param3 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
                     break;
                 }
-                case EVENT_T_MAP_SCRIPT_EVENT:
+                case EVENT_T_SCRIPT:
                     break;
                 case EVENT_T_GROUP_MEMBER_DIED:
                 {

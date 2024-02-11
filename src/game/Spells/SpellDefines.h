@@ -886,6 +886,7 @@ enum SpellAttributesCustom
     SPELL_CUSTOM_AURA_APPLY_BREAKS_STEALTH  = 0x200,     // Stealth is removed when this aura is applied
     SPELL_CUSTOM_NOT_REMOVED_ON_EVADE       = 0x400,     // Aura persists after creature evades
     SPELL_CUSTOM_SEND_CHANNEL_VISUAL        = 0x800,     // Will periodically send the channeling spell visual kit
+    SPELL_CUSTOM_SEPARATE_AURA_PER_CASTER   = 0x1000,    // Each caster has his own aura slot, instead of replacing others
 };
 
 // Custom flags assigned by the core based on spell template data

@@ -214,9 +214,10 @@ void TimedFleeingMovementGenerator::Finalize(Unit &owner)
 {
     owner.ClearUnitState(UNIT_STAT_FLEEING | UNIT_STAT_FLEEING_MOVE);
     owner.UpdateControl();
-    if (Unit* victim = owner.GetVictim())
+
+    if (owner.IsAlive() && !owner.HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED))
     {
-        if (owner.IsAlive())
+        if (Unit* victim = owner.GetVictim())
         {
             owner.AttackStop(true);
             ((Creature*)&owner)->AI()->AttackStart(victim);

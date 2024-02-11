@@ -38,6 +38,7 @@ enum AshbringerEventMisc
     NPC_SCARLET_CHAPLAIN = 4299,
     NPC_FAIRBANKS = 4542,
     NPC_COMMANDER_MOGRAINE = 3976,
+    NPC_INQUISITOR_WHITEMANE = 3977,
     NPC_HIGHLORD_MOGRAINE = 16062,
 
     GO_CHAPEL_DOOR   = 104591,
@@ -52,10 +53,17 @@ enum AshbringerEventMisc
     SAY_ASHBRINGER2 = 12471,
     SAY_ASHBRINGER3 = 12473,
     YELL_COMMANDER  = 12389,
+    YELL_WHITEMANE  = 2973,
 
     SPELL_AB_EFFECT_000   = 28441,
     SPELL_FORGIVENESS     = 28697,
-    SPELL_MOGRAINE_COMETH = 28688
+    SPELL_MOGRAINE_COMETH = 28688,
+
+    STAGE_MOGRAINE_NOT_STARTED = 0,
+    STAGE_MOGRAINE_IN_PROGRESS = 1,
+    STAGE_MOGRAINE_DIED_ONCE   = 2,
+    STAGE_MOGRAINE_REVIVED     = 3,
+    STAGE_MOGRAINE_DONE        = 4,
 };
 
 enum eEvents
@@ -118,10 +126,10 @@ struct instance_scarlet_monastery : ScriptedInstance
     {
         switch (pCreature->GetEntry())
         {
-            case 3976:
+            case NPC_COMMANDER_MOGRAINE:
                 m_uiMograineGUID = pCreature->GetGUID();
                 break;
-            case 3977:
+            case NPC_INQUISITOR_WHITEMANE:
                 m_uiWhitemaneGUID = pCreature->GetGUID();
                 break;
             case 3981:
@@ -148,6 +156,23 @@ struct instance_scarlet_monastery : ScriptedInstance
         }
     }
 
+    void OnCreatureDeath(Creature* pCreature) override
+    {
+        switch (pCreature->GetEntry())
+        {
+            case NPC_COMMANDER_MOGRAINE:
+                if (Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID))
+                    if (pWhitemane->IsDead())
+                        SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, STAGE_MOGRAINE_DONE);
+                break;
+            case NPC_INQUISITOR_WHITEMANE:
+                if (Creature* pMograine = GetCreature(m_uiMograineGUID))
+                    if (pMograine->IsDead())
+                        SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, STAGE_MOGRAINE_DONE);
+                break;
+        }
+    }
+
     uint64 GetData64(uint32 data) override
     {
         switch (data)
@@ -169,8 +194,64 @@ struct instance_scarlet_monastery : ScriptedInstance
     {
         if (uiType == TYPE_MOGRAINE_AND_WHITE_EVENT)
         {
-            if (uiData == IN_PROGRESS || uiData == FAIL)
-                DoUseDoorOrButton(m_uiDoorHighInquisitorGUID);
+            if (uiData == STAGE_MOGRAINE_NOT_STARTED || uiData == STAGE_MOGRAINE_IN_PROGRESS)
+            {
+                if (GameObject* pDoor = GetGameObject(m_uiDoorHighInquisitorGUID))
+                    pDoor->SetGoState(GO_STATE_READY);
+
+                if (Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID))
+                    if (pWhitemane->IsDead())
+                        pWhitemane->Respawn();
+
+                if (Creature* pMograine = GetCreature(m_uiMograineGUID))
+                {
+                    if (pMograine->IsDead())
+                        pMograine->Respawn();
+
+                    if (uiData == STAGE_MOGRAINE_IN_PROGRESS && pMograine->GetVictim())
+                    {
+                        std::list<Creature*> mograinesAssist;
+                        GetCreatureListWithEntryInGrid(mograinesAssist, pMograine, NPC_SCARLET_CHAPLAIN, 82.0f);
+                        GetCreatureListWithEntryInGrid(mograinesAssist, pMograine, NPC_SCARLET_WIZARD, 82.0f);
+                        GetCreatureListWithEntryInGrid(mograinesAssist, pMograine, NPC_SCARLET_CENTURION, 82.0f);
+                        GetCreatureListWithEntryInGrid(mograinesAssist, pMograine, NPC_SCARLET_CHAMPION, 82.0f);
+                        GetCreatureListWithEntryInGrid(mograinesAssist, pMograine, NPC_SCARLET_ABBOT, 82.0f);
+                        GetCreatureListWithEntryInGrid(mograinesAssist, pMograine, NPC_SCARLET_MONK, 82.0f);
+
+                        if (!mograinesAssist.empty())
+                        {
+                            for (const auto& itr : mograinesAssist)
+                            {
+                                if (itr->IsAlive() && itr->AI())
+                                    itr->AI()->AttackStart(pMograine->GetVictim());
+                            }
+                        }
+                    }
+                }
+            }
+            else if (uiData == STAGE_MOGRAINE_DIED_ONCE)
+            {
+                if (GameObject* pDoor = GetGameObject(m_uiDoorHighInquisitorGUID))
+                    pDoor->SetGoState(GO_STATE_ACTIVE);
+
+                if (Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID))
+                {
+                    DoScriptText(YELL_WHITEMANE, pWhitemane);
+
+                    if (Creature* pMograine = GetCreature(m_uiMograineGUID))
+                        pWhitemane->GetMotionMaster()->MovePoint(100, pMograine->GetPositionX(), pMograine->GetPositionY(), pMograine->GetPositionZ(), MOVE_PATHFINDING | MOVE_RUN_MODE);
+                }
+            }
+            else if (uiData == STAGE_MOGRAINE_REVIVED)
+            {
+                if (Creature* pMograine = GetCreature(m_uiMograineGUID))
+                    if (pMograine->IsAlive() &&!pMograine->IsInCombat())
+                        pMograine->SetInCombatWithZone();
+
+                if (Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID))
+                    if (pWhitemane->IsAlive() && !pWhitemane->IsInCombat())
+                        pWhitemane->SetInCombatWithZone();
+            }
 
             m_auiEncounter[0] = uiData;
         }

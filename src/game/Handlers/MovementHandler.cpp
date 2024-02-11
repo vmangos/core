@@ -170,6 +170,14 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             GetPlayer()->SendInstanceResetWarning(mEntry->id, timeleft);
         }
     }
+    else if (!mEntry->IsDungeon())
+    {
+        MapEntry const* oldMapEntry = sMapStorage.LookupEntry<MapEntry>(oldLoc.mapId);
+        if (oldMapEntry->IsDungeon())
+            GetPlayer()->ResetPersonalInstanceOnLeaveDungeon(oldLoc.mapId);
+    }
+
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
 
     // mount allow check
     if (!mEntry->IsMountAllowed())
@@ -181,6 +189,9 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
+
+    // stop drowning if not in water anymore
+    GetPlayer()->UpdateTerainEnvironmentFlags();
 
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();

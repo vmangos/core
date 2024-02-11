@@ -278,9 +278,9 @@ public:
     }
 
     SpellEntry const* m_resurrectionSpell = nullptr;
-    std::vector<SpellEntry const*> spellListTaunt;
-    std::set<SpellEntry const*, HealAuraCompare> spellListPeriodicHeal;
-    std::set<SpellEntry const*, HealSpellCompare> spellListDirectHeal;
+    std::vector<SpellEntry const*> m_spellListTaunt;
+    std::set<SpellEntry const*, HealAuraCompare> m_spellListPeriodicHeal;
+    std::set<SpellEntry const*, HealSpellCompare> m_spellListDirectHeal;
     union
     {
         struct

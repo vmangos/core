@@ -1040,10 +1040,24 @@ void Creature::RegenerateHealth()
     ModifyHealth(addvalue);
 }
 
-void Creature::DoFlee()
+bool Creature::DoFlee()
 {
-    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
-        return;
+    /*
+    Some observations from tests on classic regarding what happens if creature
+    cant flee at the moment its health reaches the amount it should flee at.
+
+    In these cases both emote and move is delayed:
+    - Casting a spell.
+    - Mind controlled.
+
+    In these cases emote is shown instantly:
+    - Stunned
+    - Feared.
+    */
+
+    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) ||
+        HasUnitState(UNIT_STAT_FEIGN_DEATH | UNIT_STAT_POSSESSED | UNIT_STAT_DISTRACTED | UNIT_STAT_CONFUSED))
+        return false;
 
     float hpPercent = GetHealthPercent();
     ModifyAuraState(AURA_STATE_HEALTHLESS_15_PERCENT, hpPercent < 16.0f);
@@ -1056,12 +1070,14 @@ void Creature::DoFlee()
     MonsterTextEmote(CREATURE_FLEE_TEXT, GetVictim());
     UpdateSpeed(MOVE_RUN, false);
     InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+    return true;
 }
 
-void Creature::DoFleeToGetAssistance()
+bool Creature::DoFleeToGetAssistance()
 {
-    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
-        return;
+    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) ||
+        HasUnitState(UNIT_STAT_FEIGN_DEATH | UNIT_STAT_POSSESSED | UNIT_STAT_DISTRACTED | UNIT_STAT_CONFUSED))
+        return false;
 
     float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
 
@@ -1085,7 +1101,10 @@ void Creature::DoFleeToGetAssistance()
         MonsterTextEmote(CREATURE_FLEE_TEXT, GetVictim());
         UpdateSpeed(MOVE_RUN, false);
         InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+        return true;
     }
+
+    return false;
 }
 
 
@@ -2230,7 +2249,7 @@ bool Creature::IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf) con
         if (spellInfo->Mechanic && GetCreatureInfo()->mechanic_immune_mask & (1 << (spellInfo->Mechanic - 1)))
             return true;
 
-        if (GetCreatureInfo()->school_immune_mask & (1 << spellInfo->School))
+        if ((GetCreatureInfo()->school_immune_mask & (1 << spellInfo->School)) && !spellInfo->IsPositiveSpell())
             return true;
     }
 
@@ -2645,19 +2664,19 @@ void Creature::UpdateLeashExtensionTime()
 
 void Creature::LoadDefaultAuras(uint32 const* auras)
 {
-    for (uint32 const* cAura = auras; *cAura; ++cAura)
+    for (uint32 const* pSpellId = auras; *pSpellId; ++pSpellId)
     {
-        SpellEntry const* AdditionalSpellInfo = sSpellMgr.GetSpellEntry(*cAura);
-        if (!AdditionalSpellInfo)
+        SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(*pSpellId);
+        if (!pSpellEntry)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *cAura);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *pSpellId);
             continue;
         }
 
-        if (HasAura(*cAura))
+        if (HasAura(*pSpellId))
             continue;
 
-        CastSpell(this, AdditionalSpellInfo, true);
+        CastSpell(this, pSpellEntry, true);
     }
 }
 
@@ -2679,9 +2698,7 @@ void Creature::LoadCreatureAddon(bool reload)
 
         SetStandState(cainfo->stand_state);
         SetSheath(SheathState(cainfo->sheath_state));
-
-        if (cainfo->emote_state != 0)
-            SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote_state);
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote_state);
 
         if (cainfo->auras)
             LoadDefaultAuras(cainfo->auras);
@@ -2698,6 +2715,7 @@ void Creature::LoadCreatureAddon(bool reload)
 
         SetStandState(UNIT_STAND_STATE_STAND);
         SetSheath(SHEATH_STATE_MELEE);
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
         if (m_creatureInfo->auras)
             LoadDefaultAuras(m_creatureInfo->auras);
@@ -3062,11 +3080,10 @@ bool Creature::IsInEvadeMode() const
 
 bool Creature::HasSpell(uint32 spellId) const
 {
-    uint8 i;
-    for (i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
         if (spellId == m_spells[i])
-            break;
-    return i < CREATURE_MAX_SPELLS;                         // break before end of iteration of known spells
+            return true;
+    return false;
 }
 
 void Creature::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)

@@ -291,6 +291,15 @@ void CreatureGroup::DisbandGroup(Creature* pLeader)
     m_members.clear();
 }
 
+void CreatureGroup::DoForAllMembers(Map* pMap, std::function<void(Creature*)>&& pFunc)
+{
+    for (auto const& it : m_members)
+    {
+        if (Creature* pMember = pMap->GetCreature(it.first))
+            pFunc(pMember);
+    }
+}
+
 void CreatureGroup::DeleteFromDb()
 {
     WorldDatabase.PExecute("DELETE FROM `creature_groups` WHERE `leader_guid`=%u", m_originalLeaderGuid.GetCounter());

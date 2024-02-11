@@ -83,8 +83,6 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (GetPlayer()->GetMapId() > 1 && GetPlayer()->GetInstanceId() && player->GetInstanceId() && GetPlayer()->GetInstanceId() != player->GetInstanceId() && GetPlayer()->GetMapId() == player->GetMapId())
-        return;
     // Just ignore us
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {
@@ -482,7 +480,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recv_data)
     else                                                    // target icon update
     {
         if (!group->IsLeader(GetPlayer()->GetObjectGuid()) &&
-                !group->IsAssistant(GetPlayer()->GetObjectGuid()))
+            !group->IsAssistant(GetPlayer()->GetObjectGuid()))
             return;
 
         ObjectGuid guid;

@@ -44,7 +44,7 @@
 GroupMemberStatus GetGroupMemberStatus(Player const* member = nullptr)
 {
     uint8 flags = MEMBER_STATUS_OFFLINE;
-    if (member && member->GetSession() && !member->GetSession()->PlayerLogout())
+    if (member && !member->GetSession()->PlayerLogout())
     {
         flags |= MEMBER_STATUS_ONLINE;
         if (member->IsPvP())
@@ -579,9 +579,6 @@ void Group::Disband(bool hideDestroy, ObjectGuid initiator)
             }, 1);
         }
 
-        if (!player->GetSession())
-            continue;
-
         WorldPacket data;
         if (!hideDestroy)
         {
@@ -772,7 +769,7 @@ void Group::SendLootStartRoll(uint32 CountDown, Roll const& r)
     for (const auto& itr : r.playerVote)
     {
         Player* p = sObjectMgr.GetPlayer(itr.first);
-        if (!p || !p->GetSession())
+        if (!p)
             continue;
 
         if (itr.second == ROLL_NOT_VALID)
@@ -797,7 +794,7 @@ void Group::SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 r
     for (const auto& itr : r.playerVote)
     {
         Player* p = sObjectMgr.GetPlayer(itr.first);
-        if (!p || !p->GetSession())
+        if (!p)
             continue;
 
         if (itr.second != ROLL_NOT_VALID)
@@ -820,7 +817,7 @@ void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, Roll
     for (const auto& itr : r.playerVote)
     {
         Player* p = sObjectMgr.GetPlayer(itr.first);
-        if (!p || !p->GetSession())
+        if (!p)
             continue;
 
         if (itr.second != ROLL_NOT_VALID)
@@ -840,7 +837,7 @@ void Group::SendLootAllPassed(Roll const& r)
     for (const auto& itr : r.playerVote)
     {
         Player* p = sObjectMgr.GetPlayer(itr.first);
-        if (!p || !p->GetSession())
+        if (!p)
             continue;
 
         if (itr.second != ROLL_NOT_VALID)
@@ -848,7 +845,7 @@ void Group::SendLootAllPassed(Roll const& r)
     }
 }
 
-void Group::GroupLoot(Creature* creature, Loot *loot)
+void Group::GroupLoot(Creature* creature, Loot* loot)
 {
     for (uint8 itemSlot = 0; itemSlot < loot->items.size(); ++itemSlot)
     {
@@ -871,7 +868,7 @@ void Group::GroupLoot(Creature* creature, Loot *loot)
     }
 }
 
-void Group::NeedBeforeGreed(Creature* creature, Loot *loot)
+void Group::NeedBeforeGreed(Creature* creature, Loot* loot)
 {
     for (uint8 itemSlot = 0; itemSlot < loot->items.size(); ++itemSlot)
     {
@@ -894,7 +891,7 @@ void Group::NeedBeforeGreed(Creature* creature, Loot *loot)
     }
 }
 
-void Group::MasterLoot(Creature* creature, Loot* loot)
+void Group::MasterLoot(Creature* creature, Loot* loot, Player* player)
 {
     for (auto& i : loot->items)
     {
@@ -916,8 +913,7 @@ void Group::MasterLoot(Creature* creature, Loot* loot)
         if (!looter->IsInWorld())
             continue;
 
-        //if (looter->IsWithinDistInMap(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
-        if (looter->IsWithinLootXPDist(creature))
+        if (looter->IsWithinLootXPDist(creature) && loot->IsAllowedLooter(looter->GetObjectGuid(), false))
         {
             data << looter->GetObjectGuid();
             ++playerCount;
@@ -925,16 +921,7 @@ void Group::MasterLoot(Creature* creature, Loot* loot)
     }
 
     data.put<uint8>(0, playerCount);
-
-    for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
-    {
-        Player* looter = itr->getSource();
-        if (!looter->IsInWorld())
-            continue;
-        //if (looter->IsWithinDistInMap(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
-        if (looter->IsWithinLootXPDist(creature))
-            looter->GetSession()->SendPacket(&data);
-    }
+    player->GetSession()->SendPacket(&data);
 }
 
 bool Group::CountRollVote(Player* player, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote)
@@ -1015,17 +1002,16 @@ void Group::StartLootRoll(Creature* lootTarget, LootMethod method, Loot* loot, u
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* playerToRoll = itr->getSource();
-        if (!playerToRoll || !playerToRoll->GetSession() || !playerToRoll->IsInWorld())
+        if (!playerToRoll || !playerToRoll->IsInWorld())
             continue;
 
-        if ((method != NEED_BEFORE_GREED || playerToRoll->CanUseItem(item) == EQUIP_ERR_OK) && lootItem.AllowedForPlayer(playerToRoll, lootTarget))
+        if ((method != NEED_BEFORE_GREED || playerToRoll->CanUseItem(item) == EQUIP_ERR_OK) &&
+            lootItem.AllowedForPlayer(playerToRoll, lootTarget) &&
+            loot->IsAllowedLooter(playerToRoll->GetObjectGuid(), false) &&
+            playerToRoll->IsWithinLootXPDist(lootTarget))
         {
-            //if (playerToRoll->IsWithinDistInMap(lootTarget, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
-            if (playerToRoll->IsWithinLootXPDist(lootTarget))
-            {
-                r->playerVote[playerToRoll->GetObjectGuid()] = ROLL_NOT_EMITED_YET;
-                ++r->totalPlayersRolling;
-            }
+            r->playerVote[playerToRoll->GetObjectGuid()] = ROLL_NOT_EMITED_YET;
+            ++r->totalPlayersRolling;
         }
     }
 
@@ -1053,7 +1039,7 @@ void Group::StartLootRoll(Creature* lootTarget, LootMethod method, Loot* loot, u
 
 void Group::SendLootStartRollsForPlayer(Player* pPlayer)
 {
-    if (!pPlayer || !pPlayer->GetSession())
+    if (!pPlayer)
         return;
 
     for (const auto roll : RollId)
@@ -1108,7 +1094,7 @@ void Group::CountSingleLooterRoll(Roll* roll)
     SendLootRollWon(playerGuid, uint8(100), ROLL_NEED, *roll);
 
     LootItem* item = &(roll->getLoot()->items[roll->itemSlot]);
-    if (player && player->GetSession())
+    if (player)
     {
         ItemPosCountVec dest;
         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
@@ -1169,7 +1155,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
             player = sObjectMgr.GetPlayer(maxguid);
 
             LootItem* item = &(roll->getLoot()->items[roll->itemSlot]);
-            if (player && player->GetSession())
+            if (player)
             {
                 ItemPosCountVec dest;
                 InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
@@ -1219,7 +1205,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
             SendLootRollWon(maxguid, maxresul, ROLL_GREED, *roll);
             player = sObjectMgr.GetPlayer(maxguid);
 
-            if (player && player->GetSession())
+            if (player)
             {
                 ItemPosCountVec dest;
                 LootItem* item = &(roll->getLoot()->items[roll->itemSlot]);
@@ -1326,9 +1312,10 @@ void Group::GetDataForXPAtKill(Unit const* victim, uint32& count, uint32& sum_le
 
 void Group::SendTargetIconList(WorldSession* session)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (!session)
         return;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+
     WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + TARGET_ICON_COUNT * 9));
     data << uint8(1); // 1 - full icon list, 0 - delta update
 
@@ -1347,10 +1334,32 @@ void Group::SendTargetIconList(WorldSession* session)
 
 void Group::SendUpdate()
 {
+    // sending full group list update clears marked targets when not in a raid, so we need to resend them
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    std::unique_ptr<WorldPacket> markedTargets;
+    if (!isRaidGroup())
+    {
+        for (int i = 0; i < TARGET_ICON_COUNT; ++i)
+        {
+            if (!m_targetIcons[i])
+                continue;
+
+            if (!markedTargets)
+            {
+                markedTargets = std::make_unique<WorldPacket>(MSG_RAID_TARGET_UPDATE, (1 + TARGET_ICON_COUNT * 9));
+                *markedTargets << uint8(1); // 1 - full icon list, 0 - delta update
+            }
+                
+            *markedTargets << uint8(i);
+            *markedTargets << m_targetIcons[i];
+        }
+    }
+#endif
+
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         Player* player = sObjectMgr.GetPlayer(citr->guid);
-        if (!player || !player->GetSession() || player->GetGroup() != this)
+        if (!player || player->GetGroup() != this)
             continue;
 
         // guess size
@@ -1383,8 +1392,17 @@ void Group::SendUpdate()
             else
                 data << uint64(0);
             data << uint8(m_lootThreshold);                 // loot threshold
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+            data << uint8(0);                               // dungeon difficulty
+#endif
         }
         player->GetSession()->SendPacket(&data);
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        if (markedTargets)
+            player->GetSession()->SendPacket(markedTargets.get());
+#endif
     }
 }
 
@@ -1457,7 +1475,7 @@ void Group::BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int
         if (!pl || (ignore && pl->GetObjectGuid() == ignore) || (ignorePlayersInBGRaid && pl->GetGroup() != this))
             continue;
 
-        if (pl->GetSession() && (group == -1 || itr->getSubGroup() == group))
+        if (group == -1 || itr->getSubGroup() == group)
             pl->GetSession()->SendPacket(packet);
     }
 }
@@ -1467,7 +1485,7 @@ void Group::BroadcastReadyCheck(WorldPacket* packet)
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* pl = itr->getSource();
-        if (pl && pl->GetSession())
+        if (pl)
             if (IsLeader(pl->GetObjectGuid()) || IsAssistant(pl->GetObjectGuid()))
                 pl->GetSession()->SendPacket(packet);
     }
@@ -1479,7 +1497,7 @@ void Group::OfflineReadyCheck()
         for(member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
         {
             Player* pl = sObjectMgr.GetPlayer(citr->guid);
-            if (!pl || !pl->GetSession())
+            if (!pl)
             {
                 WorldPacket data(MSG_RAID_READY_CHECK_CONFIRM, 9);
                 data << citr->guid;
@@ -1629,7 +1647,7 @@ void Group::_chooseLeader(bool offline /*= false*/)
 
         // Prioritize online players
         Player* player = sObjectMgr.GetPlayer(itr.guid);
-        if (!player || !player->GetSession() || player->GetGroup() != this)
+        if (!player || player->GetGroup() != this)
             continue;
 
         // Prioritize assistants for raids
@@ -2096,7 +2114,7 @@ void Group::ResetInstances(InstanceResetMethod method, Player* SendMsgTo)
                 for (const auto& itr : m_memberSlots)
                 {
                     Player* pl = sObjectMgr.GetPlayer(itr.guid);
-                    if (!pl || !pl->GetSession())
+                    if (!pl)
                     {
                         offline_players = true;
                         break;
@@ -2471,18 +2489,5 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
     {
         SetLooterGuid(0);
         SendUpdate();
-    }
-
-    // SendUpdate clears the target icons, send an icon update
-    if (!isRaidGroup()) 
-    {
-        for (const auto& itr : m_memberSlots)
-        {
-            Player* player = sObjectMgr.GetPlayer(itr.guid);
-            if (!player || !player->GetSession() || player->GetGroup() != this)
-                continue;
-
-            SendTargetIconList(player->GetSession());
-        }
     }
 }

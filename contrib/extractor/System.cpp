@@ -30,7 +30,7 @@
 #endif
 
 #include "dbcfile.h"
-#include "mpq_libmpq.h"
+#include "libmpq/mpq_libmpq.h"
 
 #include "loadlib/adt.h"
 #include "loadlib/wdt.h"
@@ -89,7 +89,7 @@ bool  CONF_allow_height_limit = true;
 float CONF_use_minHeight = -500.0f;
 
 // This option allow use float to int conversion
-bool  CONF_allow_float_to_int   = true;
+bool  CONF_allow_float_to_int   = false;
 float CONF_float_to_int8_limit  = 2.0f;      // Max accuracy = val/256
 float CONF_float_to_int16_limit = 2048.0f;   // Max accuracy = val/65536
 float CONF_flat_height_delta_limit = 0.005f; // If max - min less this value - surface is flat

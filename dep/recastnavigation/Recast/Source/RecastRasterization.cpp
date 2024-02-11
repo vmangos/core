@@ -22,6 +22,7 @@
 #include "Recast.h"
 #include "RecastAlloc.h"
 #include "RecastAssert.h"
+#include <algorithm>
 
 inline bool overlapBounds(const float* amin, const float* amax, const float* bmin, const float* bmax)
 {
@@ -442,6 +443,69 @@ bool rcRasterizeTriangles(rcContext* ctx, const float* verts, const unsigned cha
 		const float* v0 = &verts[(i*3+0)*3];
 		const float* v1 = &verts[(i*3+1)*3];
 		const float* v2 = &verts[(i*3+2)*3];
+		// Rasterize.
+		if (!rasterizeTri(v0, v1, v2, areas[i], solid, solid.bmin, solid.bmax, solid.cs, ics, ich, flagMergeThr))
+		{
+			ctx->log(RC_LOG_ERROR, "rcRasterizeTriangles: Out of memory.");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+// Following code is not part of the standard recast library - and used by vmangos movemapgen
+// See PR 2197 for more details
+
+struct Face {
+	int indices[3];
+};
+
+struct CompareFaces {
+	CompareFaces(const Face* faces, const float* verts) : faces_(faces), verts_(verts) {}
+	bool operator()(int a, int b) const {
+		return Z(faces_[a]) > Z(faces_[b]);
+	}
+private:
+	float Z(const Face& face) const {
+		return verts_[3 * face.indices[0] + 1];
+	}
+	const Face* faces_;
+	const float* verts_;
+};
+
+/// @par
+///
+/// This is copy of rcRasterizeTriangles - but also sorts triangles before they are processed.  
+/// 
+/// Spans will only be added for triangles that overlap the heightfield grid.
+///
+/// @see rcHeightfield
+bool SortAndRasterizeTriangles(rcContext* ctx, const float* verts, const int /*nv*/,
+	const int* tris, const unsigned char* areas, const int nt,
+	rcHeightfield& solid, const int flagMergeThr)
+{
+	rcAssert(ctx);
+
+	rcTempVector<int> indices;
+	indices.resize(nt);
+	for (int i = 0; i < nt; i++) {
+		indices[i] = i;
+	}
+	std::sort(indices.begin(), indices.end(), CompareFaces((const Face*)tris, verts));
+
+	rcScopedTimer timer(ctx, RC_TIMER_RASTERIZE_TRIANGLES);
+
+	float const ics = 1.0f / solid.cs;
+	float const ich = 1.0f / solid.ch;
+	// Rasterize triangles.
+	for (int j = 0; j < nt; ++j)
+	{
+		int const i = indices[j];
+		const float* v0 = &verts[tris[i * 3 + 0] * 3];
+		const float* v1 = &verts[tris[i * 3 + 1] * 3];
+		const float* v2 = &verts[tris[i * 3 + 2] * 3];
+
 		// Rasterize.
 		if (!rasterizeTri(v0, v1, v2, areas[i], solid, solid.bmin, solid.bmax, solid.cs, ics, ich, flagMergeThr))
 		{

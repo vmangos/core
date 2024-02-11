@@ -137,7 +137,7 @@ namespace VMAP
                 if (success && fwrite(&nIdx->second, sizeof(uint32), 1, mapfile) != 1) success = false;
             }
 
-            printf("Map %u global objects %u", map_iter->first, i);
+            printf("Map %u global objects %u\n", map_iter->first, i);
 
             fclose(mapfile);
 

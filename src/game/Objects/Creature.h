@@ -237,7 +237,7 @@ class Creature : public Unit
         void UpdateManaRegen() override;
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
         void UpdateDamagePhysical(WeaponAttackType attType) override;
-        float GetBonusHitChanceFromAuras(WeaponAttackType attType) const final;
+        float GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const final;
         uint32 GetCurrentEquipmentId() const { return m_equipmentId; }
 
         static float _GetHealthMod(int32 rank);             // Get custom factor to scale health (default 1, CONFIG_FLOAT_RATE_CREATURE_*_HP)
@@ -301,8 +301,8 @@ class Creature : public Unit
 
         void SendAIReaction(AiReaction reactionType);
 
-        void DoFlee();
-        void DoFleeToGetAssistance();
+        bool DoFlee();
+        bool DoFleeToGetAssistance();
         float GetFleeingSpeed() const;
         float GetBaseWalkSpeedRate() const;
         float GetBaseRunSpeedRate() const;

@@ -1915,11 +1915,8 @@ struct AV_NpcEventAI : public npc_escortAI
         m_creature->SetHomePosition(av_x, av_y, av_z, 0.0f);
         m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, av_x, av_y, av_z);
 
-        if (AV_NpcEventTroopsAI* pEscortAI = dynamic_cast<AV_NpcEventTroopsAI*>(m_creature->AI()))
-        {
-            pEscortAI->Stop();
-            pEscortAI->JustRespawned();
-        }
+        npc_escortAI::Stop();
+        npc_escortAI::JustRespawned();
 
         /** Respawn Primalist at her original place with the adds */
         if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
