@@ -3408,8 +3408,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Warlock()
     }
 
     if (m_isBuffing &&
-       (!m_spells.warlock.pDetectInvisibility ||
-        !me->HasGCD(m_spells.warlock.pDetectInvisibility)))
+        (!m_spells.warlock.pDetectInvisibility ||
+            !me->HasGCD(m_spells.warlock.pDetectInvisibility)))
     {
         m_isBuffing = false;
     }
