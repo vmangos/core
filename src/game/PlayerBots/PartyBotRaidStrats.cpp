@@ -22,9 +22,11 @@ enum class RaidStratsPotionItemId {
     WINTERFALL_FIREWATER = 12820,
     ELIXIR_OF_FROST_POWER = 17708,
 
+    GREATER_FROST_PROTECTION_POTION = 13456,
     GREATER_FIRE_PROTECTION_POTION = 13457,
     GREATER_NATURE_PROTECTION_POTION = 13458,
     GREATER_SHADOW_PROTECTION_POTION = 13459,
+    GREATER_HOLY_PROTECTION_POTION = 13460,
     GREATER_ARCANE_PROTECTION_POTION = 13461,
     FLASK_OF_CHROMATIC_RESISTANCE = 13513,
 };
@@ -45,6 +47,8 @@ enum class RaidStratsPotionAuraId {
     ELIXIR_OF_FROST_POWER = 21920,
 
     GREATER_FIRE_PROTECTION_POTION = 17543,
+    GREATER_FROST_PROTECTION_POTION = 17544,
+    GREATER_HOLY_PROTECTION_POTION = 17545,
     GREATER_NATURE_PROTECTION_POTION = 17546,
     GREATER_SHADOW_PROTECTION_POTION = 17548,
     GREATER_ARCANE_PROTECTION_POTION = 17549,
@@ -242,6 +246,14 @@ void PartyBotAI::PartyBotAI::RaidStratsIsZGProtectionPotions()
                 return;
             }
         }
+        if (me->GetPowerType() == POWER_MANA && !me->HasAura((int)RaidStratsPotionAuraId::GREATER_ARCANE_PROTECTION_POTION))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_ARCANE_PROTECTION_POTION))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_ARCANE_PROTECTION_POTION);
+                return;
+            }
+        }
     }
 
     //High Priestess Mar'li
@@ -252,6 +264,54 @@ void PartyBotAI::PartyBotAI::RaidStratsIsZGProtectionPotions()
             if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_NATURE_PROTECTION_POTION))
             {
                 UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_NATURE_PROTECTION_POTION);
+                return;
+            }
+        }
+    }
+
+    //Jin'do the Hexxer
+    if (me->GetAreaId() == 3383)
+    {
+        if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_SHADOW_PROTECTION_POTION))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_SHADOW_PROTECTION_POTION))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_SHADOW_PROTECTION_POTION);
+                return;
+            }
+        }
+    }
+
+    //Hakkar
+    if (me->GetAreaId() == 3384)
+    {
+        if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_NATURE_PROTECTION_POTION))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_NATURE_PROTECTION_POTION))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_NATURE_PROTECTION_POTION);
+                return;
+            }
+        }
+
+        if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_SHADOW_PROTECTION_POTION))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_SHADOW_PROTECTION_POTION))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_SHADOW_PROTECTION_POTION);
+                return;
+            }
+        }
+    }
+
+    //Gahz'ranka
+    if (me->GetAreaId() == 3419)
+    {
+        if (me->GetPowerType() == POWER_MANA && !me->HasAura((int)RaidStratsPotionAuraId::GREATER_FROST_PROTECTION_POTION))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_FROST_PROTECTION_POTION))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_FROST_PROTECTION_POTION);
                 return;
             }
         }
