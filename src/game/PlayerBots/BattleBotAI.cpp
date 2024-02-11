@@ -1085,6 +1085,11 @@ void BattleBotAI::UpdateFlagCarrierAI()
                 me->CastSpell(me, m_spells.paladin.pHolyShock, false);
                 return;
             }
+            if (me->GetHealthPercent() < 60.0f)
+            {
+                if (FindAndHealInjuredAlly(60.0f, 60.0f))
+                    return;
+            }
             break;
         }
         case CLASS_SHAMAN:
