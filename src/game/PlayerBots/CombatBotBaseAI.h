@@ -350,6 +350,7 @@ public:
             SpellEntry const* pScareBeast;
             SpellEntry const* pVolley;
             SpellEntry const* pTranquilizingShot;
+            SpellEntry const* pScatterShot;
         } hunter;
         struct
         {
@@ -406,6 +407,7 @@ public:
             SpellEntry const* pFade;
             SpellEntry const* pShackleUndead;
             SpellEntry const* pSmite;
+            SpellEntry const* pDesperatePrayer;
         } priest;
         struct
         {
@@ -434,6 +436,7 @@ public:
             SpellEntry const* pCurseofTongues;
             SpellEntry const* pCurseofExhaustion;
             SpellEntry const* pLifeTap;
+            SpellEntry const* pAmplifyCurse;
         } warlock;
         struct
         {

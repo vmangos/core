@@ -659,6 +659,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.hunter.pTranquilizingShot))
                         m_spells.hunter.pTranquilizingShot = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Scatter Shot") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.hunter.pScatterShot))
+                        m_spells.hunter.pScatterShot = pSpellEntry;
+                }
                 break;
             }
             case CLASS_MAGE:
@@ -937,6 +942,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.priest.pSmite))
                         m_spells.priest.pSmite = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Desperate Prayer") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.priest.pDesperatePrayer))
+                        m_spells.priest.pDesperatePrayer = pSpellEntry;
+                        }
                 break;
             }
             case CLASS_WARLOCK:
@@ -1055,6 +1065,11 @@ void CombatBotBaseAI::PopulateSpellData()
                 {
                     if (IsHigherRankSpell(m_spells.warlock.pLifeTap))
                         m_spells.warlock.pLifeTap = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Amplify Curse") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.warlock.pAmplifyCurse))
+                        m_spells.warlock.pAmplifyCurse = pSpellEntry;
                 }
                 break;
             }
