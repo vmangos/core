@@ -674,6 +674,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.hunter.pScatterShot))
                         m_spells.hunter.pScatterShot = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Freezing Trap") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.hunter.pFreezingTrap))
+                        m_spells.hunter.pFreezingTrap = pSpellEntry;
+                }
                 break;
             }
             case CLASS_MAGE:

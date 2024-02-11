@@ -353,6 +353,7 @@ public:
             SpellEntry const* pVolley;
             SpellEntry const* pTranquilizingShot;
             SpellEntry const* pScatterShot;
+            SpellEntry const* pFreezingTrap;
         } hunter;
         struct
         {

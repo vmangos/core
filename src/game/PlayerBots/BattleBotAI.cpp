@@ -2275,11 +2275,23 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
 
 void BattleBotAI::UpdateOutOfCombatAI_Hunter()
 {
-    if (m_spells.hunter.pAspectOfTheCheetah &&
-       !me->IsMounted() &&
-        CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheCheetah))
+    if (m_spells.hunter.pFreezingTrap &&
+        !me->IsMounted() &&
+        CanTryToCastSpell(me, m_spells.hunter.pFreezingTrap))
     {
-        if (DoCastSpell(me, m_spells.hunter.pAspectOfTheCheetah) == SPELL_CAST_OK)
+        if (DoCastSpell(me, m_spells.hunter.pFreezingTrap) == SPELL_CAST_OK)
+            return;
+    }
+
+    // Remove Feign death if > 25% HP
+    if (me->HasAura(BB_FEIGN_DEATH_AURA) &&
+        me->GetHealthPercent() > 25.0f)
+        me->RemoveAurasDueToSpell(BB_FEIGN_DEATH_AURA);
+
+    if (m_spells.hunter.pAspectOfTheHawk &&
+        CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheHawk))
+    {
+        if (DoCastSpell(me, m_spells.hunter.pAspectOfTheHawk) == SPELL_CAST_OK)
             return;
     }
 
