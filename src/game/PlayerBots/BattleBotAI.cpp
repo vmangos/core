@@ -3877,19 +3877,6 @@ void BattleBotAI::UpdateOutOfCombatAI_Warrior()
             return;
     }
 
-    if (m_spells.warrior.pBattleShout &&
-       !me->HasAura(m_spells.warrior.pBattleShout->Id))
-    {
-        if (CanTryToCastSpell(me, m_spells.warrior.pBattleShout))
-            DoCastSpell(me, m_spells.warrior.pBattleShout);
-        else if (m_spells.warrior.pBloodrage &&
-            (me->GetPower(POWER_RAGE) < 10) &&
-            CanTryToCastSpell(me, m_spells.warrior.pBloodrage))
-        {
-            DoCastSpell(me, m_spells.warrior.pBloodrage);
-        }
-    }
-
     if (Unit* pVictim = me->GetVictim())
     {
         if (m_spells.warrior.pCharge &&
@@ -3898,6 +3885,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Warrior()
             if (DoCastSpell(pVictim, m_spells.warrior.pCharge) == SPELL_CAST_OK)
                 return;
         }
+
+        UpdateInCombatAI_Warrior();
     }
 }
 
