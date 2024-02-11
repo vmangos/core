@@ -575,6 +575,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.shaman.pManaTideTotem))
                         m_spells.shaman.pManaTideTotem = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Natures Swiftness") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.shaman.pNaturesSwiftness))
+                        m_spells.shaman.pNaturesSwiftness = pSpellEntry;
+                }
                 break;
             }
             case CLASS_HUNTER:

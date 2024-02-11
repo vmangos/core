@@ -2132,6 +2132,26 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
         me->GetShapeshiftForm() == FORM_GHOSTWOLF)
         me->RemoveAurasDueToSpellByCancel(m_spells.shaman.pGhostWolf->Id);
 
+    if (m_spells.shaman.pNaturesSwiftness &&
+        (me->GetHealthPercent() <= 40.0f) &&
+        (me->GetPowerPercent(POWER_MANA) > 20.0f) &&
+        CanTryToCastSpell(me, m_spells.shaman.pNaturesSwiftness))
+    {
+        if (DoCastSpell(me, m_spells.shaman.pNaturesSwiftness) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_role == ROLE_HEALER)
+    {
+        if (FindAndHealInjuredAlly(80.0f, 80.0f))
+            return;
+    }
+    else
+    {
+        if (FindAndHealInjuredAlly(40.0f, 40.0f))
+            return;
+    }
+
     if (Unit* pVictim = me->GetVictim())
     {
         if (m_spells.shaman.pManaTideTotem &&
@@ -2140,6 +2160,16 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
         {
             if (DoCastSpell(me, m_spells.shaman.pManaTideTotem) == SPELL_CAST_OK)
                 return;
+        }
+
+        // Running away logic
+        if (m_role == ROLE_HEALER || m_role == ROLE_RANGE_DPS)
+        {
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
+            {
+                if (SummonShamanTotems())
+                    return;
+            }
         }
 
         if (m_spells.shaman.pElementalMastery &&
@@ -2152,6 +2182,9 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
 
         if (m_spells.shaman.pEarthShock &&
             pVictim->IsNonMeleeSpellCasted(false, false, true) &&
+            pVictim->GetClass() != CLASS_WARRIOR &&
+            pVictim->GetClass() != CLASS_ROGUE &&
+            pVictim->GetClass() != CLASS_HUNTER &&
             CanTryToCastSpell(pVictim, m_spells.shaman.pEarthShock))
         {
             if (DoCastSpell(pVictim, m_spells.shaman.pEarthShock) == SPELL_CAST_OK)
@@ -2159,8 +2192,11 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
         }
 
         if (m_spells.shaman.pFrostShock &&
-            pVictim->IsMoving() &&
-            CanTryToCastSpell(pVictim, m_spells.shaman.pFrostShock))
+            pVictim->IsMoving() ||
+            pVictim->IsMounted() || 
+            pVictim->HasAura(AURA_SILVERWING_FLAG) || 
+            pVictim->HasAura(AURA_WARSONG_FLAG)
+            && CanTryToCastSpell(pVictim, m_spells.shaman.pFrostShock))
         {
             if (DoCastSpell(pVictim, m_spells.shaman.pFrostShock) == SPELL_CAST_OK)
                 return;
@@ -2173,11 +2209,14 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
                 return;
         }
 
-        if (m_spells.shaman.pChainLightning &&
-            CanTryToCastSpell(pVictim, m_spells.shaman.pChainLightning))
+        if (m_role != ROLE_MELEE_DPS)
         {
-            if (DoCastSpell(pVictim, m_spells.shaman.pChainLightning) == SPELL_CAST_OK)
-                return;
+            if (m_spells.shaman.pChainLightning &&
+                CanTryToCastSpell(pVictim, m_spells.shaman.pChainLightning))
+            {
+                if (DoCastSpell(pVictim, m_spells.shaman.pChainLightning) == SPELL_CAST_OK)
+                    return;
+            }
         }
 
         if (m_spells.shaman.pPurge &&
@@ -2195,17 +2234,27 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
                 return;
         }
         
-        if (m_spells.shaman.pLightningBolt &&
-           !me->CanReachWithMeleeAutoAttack(pVictim) &&
-            CanTryToCastSpell(pVictim, m_spells.shaman.pLightningBolt))
+        if (m_role != ROLE_MELEE_DPS)
         {
-            if (DoCastSpell(pVictim, m_spells.shaman.pLightningBolt) == SPELL_CAST_OK)
-                return;
-        }
+            if (m_spells.shaman.pLightningBolt &&
+                !me->CanReachWithMeleeAutoAttack(pVictim) &&
+                CanTryToCastSpell(pVictim, m_spells.shaman.pLightningBolt))
+            {
+                if (DoCastSpell(pVictim, m_spells.shaman.pLightningBolt) == SPELL_CAST_OK)
+                    return;
+            }
+        }        
     }
 
     if (SummonShamanTotems())
         return;
+
+    if (m_spells.shaman.pLightningShield &&
+        CanTryToCastSpell(me, m_spells.shaman.pLightningShield))
+    {
+        if (DoCastSpell(me, m_spells.shaman.pLightningShield) == SPELL_CAST_OK)
+            return;
+    }
 
     if (m_spells.shaman.pCureDisease &&
         CanTryToCastSpell(me, m_spells.shaman.pCureDisease) &&
@@ -2222,8 +2271,6 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
         if (DoCastSpell(me, m_spells.shaman.pCurePoison) == SPELL_CAST_OK)
             return;
     }
-
-    FindAndHealInjuredAlly(40.0f);
 }
 
 void BattleBotAI::UpdateOutOfCombatAI_Hunter()
