@@ -3912,8 +3912,15 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
             }
         }
 
+        if (m_spells.warrior.pBloodrage &&
+            (me->GetPower(POWER_RAGE) < 100) &&
+            CanTryToCastSpell(me, m_spells.warrior.pBloodrage))
+        {
+            DoCastSpell(me, m_spells.warrior.pBloodrage);
+        }
+
         if (m_spells.warrior.pExecute &&
-           (pVictim->GetHealthPercent() < 20.0f) &&
+            (pVictim->GetHealthPercent() < 20.0f) &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pExecute))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pExecute) == SPELL_CAST_OK)
@@ -3936,7 +3943,7 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (m_spells.warrior.pConcussionBlow &&
-           (pVictim->IsNonMeleeSpellCasted() || pVictim->IsMoving() || (me->GetHealthPercent() < 50.0f)) &&
+            (pVictim->IsNonMeleeSpellCasted() || pVictim->IsMoving() || (me->GetHealthPercent() < 50.0f)) &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pConcussionBlow))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pConcussionBlow) == SPELL_CAST_OK)
@@ -3974,8 +3981,8 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (pVictim->IsMoving() &&
-           !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
-           !pVictim->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+            !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
+            !pVictim->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
         {
             if (m_spells.warrior.pHamstring &&
                 CanTryToCastSpell(pVictim, m_spells.warrior.pHamstring))
@@ -3984,7 +3991,7 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
                     return;
             }
             if (m_spells.warrior.pPiercingHowl &&
-               (me->GetCombatDistance(pVictim) <= 10.0f) &&
+                (me->GetCombatDistance(pVictim) <= 10.0f) &&
                 CanTryToCastSpell(pVictim, m_spells.warrior.pPiercingHowl))
             {
                 if (DoCastSpell(pVictim, m_spells.warrior.pPiercingHowl) == SPELL_CAST_OK)
@@ -3993,7 +4000,7 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (m_spells.warrior.pRend &&
-           (pVictim->GetClass() == CLASS_ROGUE) &&
+            (pVictim->GetClass() == CLASS_ROGUE) &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pRend))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pRend) == SPELL_CAST_OK)
@@ -4001,8 +4008,8 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (m_spells.warrior.pIntimidatingShout &&
-           (me->GetHealthPercent() < 50.0f) &&
-           (GetAttackersInRangeCount(10.0f) > 2) &&
+            (me->GetHealthPercent() < 50.0f) &&
+            (GetAttackersInRangeCount(10.0f) > 2) &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pIntimidatingShout))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pIntimidatingShout) == SPELL_CAST_OK)
@@ -4011,39 +4018,28 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
 
         if (m_spells.warrior.pRetaliation &&
             IsMeleeDamageClass(pVictim->GetClass()) &&
-           (me->GetHealthPercent() > 70.0f) &&
-           ((GetAttackersInRangeCount(10.0f) > 1) || (pVictim->GetClass() == CLASS_ROGUE)) &&
+            (me->GetHealthPercent() > 70.0f) &&
+            ((GetAttackersInRangeCount(10.0f) > 1) || (pVictim->GetClass() == CLASS_ROGUE)) &&
             CanTryToCastSpell(me, m_spells.warrior.pRetaliation))
         {
             if (DoCastSpell(me, m_spells.warrior.pRetaliation) == SPELL_CAST_OK)
                 return;
         }
 
-        if ((me->GetHealthPercent() > 60.0f) && (pVictim->GetHealthPercent() > 40.0f) &&
-            (pVictim->GetClass() == CLASS_WARLOCK || pVictim->GetClass() == CLASS_PRIEST) &&
-            !me->HasUnitState(UNIT_STAT_ROOT) &&
-            !me->IsImmuneToMechanic(MECHANIC_FEAR))
+        // Berserker rage or Death Wish if feared
+        if (m_spells.warrior.pBerserkerRage &&
+            CanTryToCastSpell(me, m_spells.warrior.pBerserkerRage) &&
+            me->HasUnitState(UNIT_STAT_FLEEING_MOVE))
         {
-            if (m_spells.warrior.pRecklessness &&
-                CanTryToCastSpell(me, m_spells.warrior.pRecklessness))
-            {
-                if (DoCastSpell(me, m_spells.warrior.pRecklessness) == SPELL_CAST_OK)
-                    return;
-            }
-
-            if (m_spells.warrior.pDeathWish &&
-                CanTryToCastSpell(me, m_spells.warrior.pDeathWish))
-            {
-                if (DoCastSpell(me, m_spells.warrior.pDeathWish) == SPELL_CAST_OK)
-                    return;
-            }
-
-            if (m_spells.warrior.pBerserkerRage &&
-                CanTryToCastSpell(me, m_spells.warrior.pBerserkerRage))
-            {
-                if (DoCastSpell(me, m_spells.warrior.pBerserkerRage) == SPELL_CAST_OK)
-                    return;
-            }
+            if (DoCastSpell(me, m_spells.warrior.pBerserkerRage) == SPELL_CAST_OK)
+                return;
+        }
+        if (m_spells.warrior.pDeathWish &&
+            CanTryToCastSpell(me, m_spells.warrior.pDeathWish) &&
+            me->HasUnitState(UNIT_STAT_FLEEING_MOVE))
+        {
+            if (DoCastSpell(me, m_spells.warrior.pDeathWish) == SPELL_CAST_OK)
+                return;
         }
 
         if (m_spells.warrior.pMortalStrike &&
@@ -4071,7 +4067,7 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         else
         {
             if (m_spells.warrior.pBerserkerStance &&
-               (pVictim->GetClass() != CLASS_ROGUE) &&
+                (pVictim->GetClass() != CLASS_ROGUE) &&
                 CanTryToCastSpell(me, m_spells.warrior.pBerserkerStance))
             {
                 DoCastSpell(me, m_spells.warrior.pBerserkerStance);
@@ -4100,6 +4096,14 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
                 return;
         }
 
+        if (m_spells.warrior.pIntimidatingShout &&
+            !me->CanReachWithMeleeAutoAttack(pVictim) &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pIntimidatingShout))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pIntimidatingShout) == SPELL_CAST_OK)
+                return;
+        }
+
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && !me->CanReachWithMeleeAutoAttack(pVictim))
         {
@@ -4107,7 +4111,7 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (m_spells.warrior.pHeroicStrike &&
-           (me->GetPower(POWER_RAGE) > 30) &&
+            (me->GetPower(POWER_RAGE) > 30) &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pHeroicStrike))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pHeroicStrike) == SPELL_CAST_OK)
