@@ -2073,6 +2073,25 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
 
 void BattleBotAI::UpdateOutOfCombatAI_Shaman()
 {
+    // Swap out into caster form at low HP then heal up if carrying the WSG flag
+    if (me->GetHealthPercent() < 60.0f)
+    {
+        if (m_spells.shaman.pGhostWolf &&
+            me->GetShapeshiftForm() == FORM_GHOSTWOLF)
+            me->RemoveAurasDueToSpellByCancel(m_spells.shaman.pGhostWolf->Id);
+        return;
+
+        if (me->GetShapeshiftForm() == FORM_NONE)
+        {
+            if (!me->IsMounted() &&
+                (!GetMountSpellId() || me->HasAura(AURA_WARSONG_FLAG) || me->HasAura(AURA_SILVERWING_FLAG)))
+            {
+                if (FindAndHealInjuredAlly(60.0f, 60.0f))
+                    return;
+            }
+        }
+    }
+
     if (m_spells.shaman.pWeaponBuff &&
         CanTryToCastSpell(me, m_spells.shaman.pWeaponBuff))
     {
