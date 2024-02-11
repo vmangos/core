@@ -122,7 +122,9 @@ public:
     bool AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee = true, bool checkSpells = true) const;
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
+    SpellCastResult DoCastPetSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     virtual bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
+    virtual bool CanTryToCastPetSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool IsWearingShield(Player* pPlayer) const;
     bool IsInDuel() const;
     CombatBotRoles GetRole() const;
@@ -354,6 +356,21 @@ public:
             SpellEntry const* pTranquilizingShot;
             SpellEntry const* pScatterShot;
             SpellEntry const* pFreezingTrap;
+            SpellEntry const* pBestialWrath;
+            SpellEntry const* pGrowl;
+            SpellEntry const* pBite;
+            SpellEntry const* pClaw;
+            SpellEntry const* pDash;
+            SpellEntry const* pDive;
+            SpellEntry const* pThunderstomp;
+            SpellEntry const* pScorpidPoison;
+            SpellEntry const* pLightningBreath;
+            SpellEntry const* pCharge;
+            SpellEntry const* pFuriousHowl;
+            SpellEntry const* pViperSting;
+            SpellEntry const* pScorpidSting;
+            SpellEntry const* pDeterrence;
+            SpellEntry const* pCounterattack;
         } hunter;
         struct
         {

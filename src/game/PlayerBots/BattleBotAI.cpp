@@ -75,6 +75,7 @@ enum BattleBotSpells
 #define BB_NS_DRUID 17116
 #define BB_NS_SHAMAN 16188
 #define BB_FEIGN_DEATH_AURA 5384
+#define BB_DETERRENCE 19263
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
@@ -2319,8 +2320,137 @@ void BattleBotAI::UpdateOutOfCombatAI_Hunter()
 
 void BattleBotAI::UpdateInCombatAI_Hunter()
 {
+    if (me->HasAura(BB_FEIGN_DEATH_AURA) &&
+        me->GetHealthPercent() > 25.0f)
+        me->RemoveAurasDueToSpell(BB_FEIGN_DEATH_AURA);
+
     if (Unit* pVictim = me->GetVictim())
     {
+        // Feign death spells being cast on me
+        if (m_spells.hunter.pFeignDeath &&
+            pVictim->IsNonMeleeSpellCasted(false, false, true) &&
+            (pVictim->GetClass() != CLASS_WARRIOR) &&
+            (pVictim->GetClass() != CLASS_ROGUE) &&
+            (pVictim->GetClass() != CLASS_HUNTER) &&
+            !me->HasAura(AURA_WARSONG_FLAG) &&
+            !me->HasAura(AURA_SILVERWING_FLAG) &&
+            CanTryToCastSpell(me, m_spells.hunter.pFeignDeath))
+        {
+            if (DoCastSpell(me, m_spells.hunter.pFeignDeath) == SPELL_CAST_OK)
+                return;
+        }
+
+        // Remove Feign death at < 25% HP
+        if (me->GetHealthPercent() < (rand_chance() / 5.0f))
+        {
+            if (m_spells.hunter.pFeignDeath &&
+                !me->HasAura(AURA_WARSONG_FLAG) &&
+                !me->HasAura(AURA_SILVERWING_FLAG) &&
+                CanTryToCastSpell(me, m_spells.hunter.pFeignDeath))
+            {
+                if (DoCastSpell(me, m_spells.hunter.pFeignDeath) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+
+        if (Pet* pPet = me->GetPet())
+        {
+            if (pPet->IsAlive())
+            {
+                if (m_spells.hunter.pBestialWrath &&
+                    CanTryToCastSpell(pPet, m_spells.hunter.pBestialWrath))
+                {
+                    if (DoCastSpell(pPet, m_spells.hunter.pBestialWrath) == SPELL_CAST_OK)
+                        return;
+                }
+
+                if (m_spells.hunter.pGrowl &&
+                    pVictim->IsCreature() &&
+                    CanTryToCastPetSpell(pVictim, m_spells.hunter.pGrowl))
+                {
+                    if (DoCastPetSpell(pVictim, m_spells.hunter.pGrowl) == SPELL_CAST_OK)
+                        return;
+                }
+
+                if (m_spells.hunter.pBite &&
+                    CanTryToCastPetSpell(pVictim, m_spells.hunter.pBite))
+                {
+                    if (DoCastPetSpell(pVictim, m_spells.hunter.pBite) == SPELL_CAST_OK)
+                        return;
+                }
+
+                if (m_spells.hunter.pClaw &&
+                    CanTryToCastPetSpell(pVictim, m_spells.hunter.pClaw))
+                {
+                    if (DoCastPetSpell(pVictim, m_spells.hunter.pClaw) == SPELL_CAST_OK)
+                        return;
+                }
+
+                if (pPet->GetDistance(pVictim) > 20.0f)
+                {
+                    if (m_spells.hunter.pDash &&
+                        CanTryToCastPetSpell(pPet, m_spells.hunter.pDash))
+                    {
+                        if (DoCastPetSpell(pPet, m_spells.hunter.pDash) == SPELL_CAST_OK)
+                            return;
+                    }
+
+                    if (m_spells.hunter.pDive &&
+                        CanTryToCastPetSpell(pPet, m_spells.hunter.pDive))
+                    {
+                        if (DoCastPetSpell(pPet, m_spells.hunter.pDive) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+
+                if (pPet->GetCreatureInfo()->pet_family == CREATURE_FAMILY_GORILLA)
+                {
+                    if (m_spells.hunter.pThunderstomp &&
+                        CanTryToCastPetSpell(pVictim, m_spells.hunter.pThunderstomp))
+                    {
+                        if (DoCastPetSpell(pVictim, m_spells.hunter.pThunderstomp) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+                else if (pPet->GetCreatureInfo()->pet_family == CREATURE_FAMILY_SPIDER)
+                {
+                    if (m_spells.hunter.pScorpidPoison &&
+                        CanTryToCastPetSpell(pVictim, m_spells.hunter.pScorpidPoison))
+                    {
+                        if (DoCastPetSpell(pVictim, m_spells.hunter.pScorpidPoison) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+                else if (pPet->GetCreatureInfo()->pet_family == CREATURE_FAMILY_WIND_SERPENT)
+                {
+                    if (m_spells.hunter.pLightningBreath &&
+                        CanTryToCastPetSpell(pVictim, m_spells.hunter.pLightningBreath))
+                    {
+                        if (DoCastPetSpell(pVictim, m_spells.hunter.pLightningBreath) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+                else if (pPet->GetCreatureInfo()->pet_family == CREATURE_FAMILY_BOAR)
+                {
+                    if (m_spells.hunter.pCharge &&
+                        CanTryToCastPetSpell(pVictim, m_spells.hunter.pCharge))
+                    {
+                        if (DoCastPetSpell(pVictim, m_spells.hunter.pCharge) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+                else if (pPet->GetCreatureInfo()->pet_family == CREATURE_FAMILY_WOLF)
+                {
+                    if (m_spells.hunter.pFuriousHowl &&
+                        CanTryToCastPetSpell(pPet, m_spells.hunter.pFuriousHowl))
+                    {
+                        if (DoCastPetSpell(pPet, m_spells.hunter.pFuriousHowl) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+            }
+        }
+
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
@@ -2343,26 +2473,49 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
             }
         }
 
-        if (m_spells.hunter.pConcussiveShot &&
-            pVictim->IsMoving() && (pVictim->GetVictim() == me) &&
-            CanTryToCastSpell(pVictim, m_spells.hunter.pConcussiveShot))
+        // Running away logic
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
         {
-            if (DoCastSpell(pVictim, m_spells.hunter.pConcussiveShot) == SPELL_CAST_OK)
-                return;
+            if (m_spells.hunter.pScatterShot &&
+                CanTryToCastSpell(pVictim, m_spells.hunter.pScatterShot))
+            {
+                me->SetInFront(pVictim);
+                DoCastSpell(pVictim, m_spells.hunter.pScatterShot);
+            }
         }
 
         if (m_spells.hunter.pAimedShot &&
+            !pVictim->IsMoving() &&
             CanTryToCastSpell(pVictim, m_spells.hunter.pAimedShot))
         {
             if (DoCastSpell(pVictim, m_spells.hunter.pAimedShot) == SPELL_CAST_OK)
                 return;
         }
 
-        if (m_spells.hunter.pArcaneShot &&
-            CanTryToCastSpell(pVictim, m_spells.hunter.pArcaneShot))
+        if (m_spells.hunter.pConcussiveShot &&
+            CanTryToCastSpell(pVictim, m_spells.hunter.pConcussiveShot))
         {
-            if (DoCastSpell(pVictim, m_spells.hunter.pArcaneShot) == SPELL_CAST_OK)
+            if (DoCastSpell(pVictim, m_spells.hunter.pConcussiveShot) == SPELL_CAST_OK)
                 return;
+        }  
+
+        if (pVictim->IsCaster())
+        {
+            if (m_spells.hunter.pViperSting &&
+                CanTryToCastSpell(pVictim, m_spells.hunter.pViperSting))
+            {
+                if (DoCastSpell(pVictim, m_spells.hunter.pViperSting) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+        else
+        {
+            if (m_spells.hunter.pScorpidSting &&
+                CanTryToCastSpell(pVictim, m_spells.hunter.pScorpidSting))
+            {
+                if (DoCastSpell(pVictim, m_spells.hunter.pScorpidSting) == SPELL_CAST_OK)
+                    return;
+            }
         }
 
         if (m_spells.hunter.pSerpentSting &&
@@ -2379,31 +2532,36 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
                 return;
         }
 
-        if (m_spells.hunter.pAspectOfTheCheetah &&
-            me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id))
+        if (m_spells.hunter.pArcaneShot &&
+            CanTryToCastSpell(pVictim, m_spells.hunter.pArcaneShot))
         {
-            if (pVictim->CanReachWithMeleeAutoAttack(me))
-            {
-                if (m_spells.hunter.pAspectOfTheMonkey &&
-                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheMonkey))
-                {
-                    if (DoCastSpell(me, m_spells.hunter.pAspectOfTheMonkey) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-            else
-            {
-                if (m_spells.hunter.pAspectOfTheHawk &&
-                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheHawk))
-                {
-                    if (DoCastSpell(me, m_spells.hunter.pAspectOfTheHawk) == SPELL_CAST_OK)
-                        return;
-                }
-            }
+            if (DoCastSpell(pVictim, m_spells.hunter.pArcaneShot) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.hunter.pScatterShot &&
+            CanTryToCastSpell(pVictim, m_spells.hunter.pScatterShot))
+        {
+            DoCastSpell(pVictim, m_spells.hunter.pScatterShot);
+        }
+
+        if (m_spells.hunter.pAspectOfTheHawk &&
+            CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheHawk))
+        {
+            if (DoCastSpell(me, m_spells.hunter.pAspectOfTheHawk) == SPELL_CAST_OK)
+                return;
         }
 
         if (pVictim->CanReachWithMeleeAutoAttack(me))
         {
+            if (m_spells.hunter.pDeterrence &&
+                (me->GetHealthPercent() < 50.0f) &&
+                CanTryToCastSpell(me, m_spells.hunter.pDeterrence))
+            {
+                if (DoCastSpell(me, m_spells.hunter.pDeterrence) == SPELL_CAST_OK)
+                    return;
+            }
+
             if (me->HasUnitState(UNIT_STAT_ROOT))
             {
                 if (m_spells.hunter.pMongooseBite &&
@@ -2427,11 +2585,17 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
                 {
                     DoCastSpell(pVictim, m_spells.hunter.pWingClip);
                 }
+                if (m_spells.hunter.pCounterattack &&
+                    CanTryToCastSpell(pVictim, m_spells.hunter.pCounterattack))
+                {
+                    DoCastSpell(pVictim, m_spells.hunter.pCounterattack);
+                }
             }
         }
 
         if (!me->HasUnitState(UNIT_STAT_ROOT) &&
             (me->GetCombatDistance(pVictim) < 8.0f) &&
+            !me->HasAura(BB_DETERRENCE) &&
              me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE)
         {
             if (!me->IsStopped())
