@@ -876,7 +876,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     Unit* pVictim = me->GetVictim();
 
-    if (!me->IsInCombat())
+    if (!me->IsInCombat() && me->GetEnemyCountInRadiusAround(me, VISIBILITY_DISTANCE_SMALL) == 0)
     {
         if (DrinkAndEat())
             return;
