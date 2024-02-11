@@ -1841,6 +1841,80 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
             return;
     }
 
+    // Running away logic
+    if (m_role == ROLE_HEALER)
+    {
+        if (Unit* pVictim = me->GetVictim())
+        {
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
+            {
+                // BOP self at low HP, otherwise freedom self to run away
+                if (me->GetHealthPercent() < 20.0f &&
+                    m_spells.paladin.pBlessingOfProtection &&
+                    pVictim->CanReachWithMeleeAutoAttack(me) &&
+                    IsMeleeDamageClass(pVictim->GetClass()) &&
+                    !me->HasAura(AURA_WARSONG_FLAG) &&
+                    CanTryToCastSpell(me, m_spells.paladin.pBlessingOfProtection))
+                {
+                    if (DoCastSpell(me, m_spells.paladin.pBlessingOfProtection) == SPELL_CAST_OK)
+                        return;
+                }
+                else
+                {
+                    if (m_spells.paladin.pBlessingOfFreedom &&
+                        CanTryToCastSpell(me, m_spells.paladin.pBlessingOfFreedom))
+                    {
+                        if (DoCastSpell(me, m_spells.paladin.pBlessingOfFreedom) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+
+                if (m_spells.paladin.pHammerOfJustice &&
+                    CanTryToCastSpell(pVictim, m_spells.paladin.pHammerOfJustice))
+                {
+                    if (DoCastSpell(pVictim, m_spells.paladin.pHammerOfJustice) == SPELL_CAST_OK)
+                        return;
+                }
+
+                if (m_spells.paladin.pHolyShock &&
+                    CanTryToCastSpell(me, m_spells.paladin.pHolyShock))
+                {
+                    if (m_spells.paladin.pDivineFavor &&
+                        CanTryToCastSpell(me, m_spells.paladin.pDivineFavor))
+                    {
+                        DoCastSpell(me, m_spells.paladin.pDivineFavor);
+                    }
+
+                    if (DoCastSpell(me, m_spells.paladin.pHolyShock) == SPELL_CAST_OK)
+                        return;
+                }
+
+                if (m_spells.paladin.pCleanse)
+                {
+                    if (Unit* pFriend = SelectDispelTarget(m_spells.paladin.pCleanse))
+                    {
+                        if (CanTryToCastSpell(pFriend, m_spells.paladin.pCleanse))
+                        {
+                            if (DoCastSpell(pFriend, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
+                                return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (m_role == ROLE_HEALER)
+    {
+        if (FindAndHealInjuredAlly(80.0f, 80.0f))
+            return;
+    }
+    else
+    {
+        if (FindAndHealInjuredAlly(me->IsTotalImmune() ? 80.0f : 40.0f, 50.0f))
+            return;
+    }
+
     bool const hasSeal = m_spells.paladin.pSeal && me->HasAura(m_spells.paladin.pSeal->Id);
 
     if (!hasSeal &&
@@ -1852,6 +1926,13 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
     
     if (Unit* pVictim = me->GetVictim())
     {
+        if (m_spells.paladin.pRepentance &&
+            (!me->CanReachWithMeleeAutoAttack(pVictim) || pVictim->IsNonMeleeSpellCasted()) &&
+            CanTryToCastSpell(pVictim, m_spells.paladin.pRepentance))
+        {
+            if (DoCastSpell(pVictim, m_spells.paladin.pRepentance) == SPELL_CAST_OK)
+                return;
+        }
         if (hasSeal && m_spells.paladin.pJudgement &&
             CanTryToCastSpell(pVictim, m_spells.paladin.pJudgement))
         {
@@ -1915,21 +1996,26 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
 
     if (Unit* pFriend = me->FindLowestHpFriendlyUnit(30.0f, 70, true, me))
     {
-        if (m_spells.paladin.pBlessingOfProtection &&
-           !IsPhysicalDamageClass(pFriend->GetClass()) &&
-           !pFriend->HasAura(AURA_WARSONG_FLAG) &&
-            CanTryToCastSpell(pFriend, m_spells.paladin.pBlessingOfProtection))
+        if (Unit* pVictim = pFriend->GetVictim())
         {
-            if (DoCastSpell(pFriend, m_spells.paladin.pBlessingOfProtection) == SPELL_CAST_OK)
-                return;
+            if (m_spells.paladin.pBlessingOfProtection &&
+                !IsPhysicalDamageClass(pFriend->GetClass()) &&
+                pVictim->CanReachWithMeleeAutoAttack(pFriend) &&
+                !pFriend->HasAura(AURA_WARSONG_FLAG) &&
+                CanTryToCastSpell(pFriend, m_spells.paladin.pBlessingOfProtection))
+            {
+                if (DoCastSpell(pFriend, m_spells.paladin.pBlessingOfProtection) == SPELL_CAST_OK)
+                    return;
+            }
+            if (m_spells.paladin.pBlessingOfSacrifice &&
+                pFriend->HasAura(AURA_WARSONG_FLAG) &&
+                CanTryToCastSpell(pFriend, m_spells.paladin.pBlessingOfSacrifice))
+            {
+                if (DoCastSpell(pFriend, m_spells.paladin.pBlessingOfSacrifice) == SPELL_CAST_OK)
+                    return;
+            }
         }
-        if (m_spells.paladin.pBlessingOfSacrifice &&
-            pFriend->HasAura(AURA_WARSONG_FLAG) &&
-            CanTryToCastSpell(pFriend, m_spells.paladin.pBlessingOfSacrifice))
-        {
-            if (DoCastSpell(pFriend, m_spells.paladin.pBlessingOfSacrifice) == SPELL_CAST_OK)
-                return;
-        }
+        
         if (m_spells.paladin.pLayOnHands &&
            (pFriend->GetHealthPercent() < 15.0f) &&
             CanTryToCastSpell(pFriend, m_spells.paladin.pLayOnHands))
@@ -1939,12 +2025,18 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
         }
     }
 
-    if (m_spells.paladin.pBlessingOfFreedom &&
-       (me->HasUnitState(UNIT_STAT_ROOT) || me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
-        CanTryToCastSpell(me, m_spells.paladin.pBlessingOfFreedom))
+    if (Unit* pFriend = me->FindLowestHpFriendlyUnit(30.0f, 100, true, me))
     {
-        if (DoCastSpell(me, m_spells.paladin.pBlessingOfFreedom) == SPELL_CAST_OK)
-            return;
+        if (m_role == ROLE_HEALER)
+        {
+            if (m_spells.paladin.pBlessingOfFreedom &&
+                (pFriend->HasUnitState(UNIT_STAT_ROOT) || pFriend->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
+                CanTryToCastSpell(pFriend, m_spells.paladin.pBlessingOfFreedom))
+            {
+                if (DoCastSpell(pFriend, m_spells.paladin.pBlessingOfFreedom) == SPELL_CAST_OK)
+                    return;
+            }
+        }
     }
 
     if (m_spells.paladin.pCleanse)
