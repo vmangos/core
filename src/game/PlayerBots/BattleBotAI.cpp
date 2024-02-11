@@ -1094,6 +1094,21 @@ void BattleBotAI::UpdateFlagCarrierAI()
         }
         case CLASS_SHAMAN:
         {
+            // Swap out into caster form at low HP then heal up
+            if (me->GetHealthPercent() < 60.0f)
+            {
+                if (m_spells.shaman.pGhostWolf &&
+                    me->GetShapeshiftForm() == FORM_GHOSTWOLF)
+                    me->RemoveAurasDueToSpellByCancel(m_spells.shaman.pGhostWolf->Id);
+                return;
+
+                if (me->GetShapeshiftForm() == FORM_NONE)
+                {
+                    if (FindAndHealInjuredAlly(60.0f, 60.0f))
+                        return;
+                }
+            }
+
             if (m_spells.shaman.pGhostWolf && !me->IsMoving() &&
                 CanTryToCastSpell(me, m_spells.shaman.pGhostWolf))
             {
@@ -1104,17 +1119,23 @@ void BattleBotAI::UpdateFlagCarrierAI()
         }
         case CLASS_MAGE:
         {
+            if (m_spells.mage.pIceBarrier &&
+                CanTryToCastSpell(me, m_spells.mage.pIceBarrier))
+            {
+                me->CastSpell(me, m_spells.mage.pIceBarrier, false);
+                return;
+            }
             if (m_spells.mage.pManaShield &&
                 CanTryToCastSpell(me, m_spells.mage.pManaShield))
             {
                 me->CastSpell(me, m_spells.mage.pManaShield, false);
                 return;
             }
-            if (m_spells.mage.pIceBarrier &&
-                CanTryToCastSpell(me, m_spells.mage.pIceBarrier))
+            if (m_spells.mage.pFireWard &&
+                CanTryToCastSpell(me, m_spells.mage.pFireWard))
             {
-                me->CastSpell(me, m_spells.mage.pIceBarrier, false);
-                return;
+                if (DoCastSpell(me, m_spells.mage.pFireWard) == SPELL_CAST_OK)
+                    return;
             }
             break;
         }
@@ -1126,12 +1147,24 @@ void BattleBotAI::UpdateFlagCarrierAI()
                 me->CastSpell(me, m_spells.priest.pPowerWordShield, false);
                 return;
             }
+            // Heal Self
+            if (me->GetHealthPercent() < 60.0f)
+            {
+                if (m_spells.priest.pShadowform && me->GetShapeshiftForm() == FORM_SHADOW)
+                    me->RemoveAurasDueToSpellByCancel(m_spells.priest.pShadowform->Id);
+
+                if (me->GetShapeshiftForm() == FORM_NONE && FindAndHealInjuredAlly(60.0f, 60.0f))
+                    return;
+            }
             if (m_spells.priest.pHolyNova && me->GetHealthPercent() < 90.0f &&
                 CanTryToCastSpell(me, m_spells.priest.pHolyNova))
             {
                 me->CastSpell(me, m_spells.priest.pHolyNova, false);
                 return;
             }
+            if (Unit* HealTarget = SelectPeriodicHealTarget(80.0f, 90.0f))
+                if (HealInjuredTargetPeriodic(HealTarget))
+                    return;
             break;
         }
         case CLASS_WARRIOR:
@@ -1156,6 +1189,18 @@ void BattleBotAI::UpdateFlagCarrierAI()
         }
         case CLASS_DRUID:
         {
+            // Swap out into caster form at low HP then heal up
+            if (me->GetHealthPercent() < 60.0f)
+            {
+                if (m_spells.druid.pTravelForm && me->GetShapeshiftForm() == FORM_TRAVEL)
+                    me->RemoveAurasDueToSpellByCancel(m_spells.druid.pTravelForm->Id);
+
+                if (me->GetShapeshiftForm() == FORM_NONE)
+                {
+                    if (FindAndHealInjuredAlly(60.0f, 60.0f))
+                        return;
+                }
+            }
             if (me->GetShapeshiftForm() == FORM_NONE)
             {
                 if (m_spells.druid.pTravelForm &&
@@ -1165,7 +1210,7 @@ void BattleBotAI::UpdateFlagCarrierAI()
                     return;
                 }
             }
-            else if (me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+            else if (me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED) && me->GetPowerPercent(POWER_MANA) > 20.0f)
             {
                 me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
             }

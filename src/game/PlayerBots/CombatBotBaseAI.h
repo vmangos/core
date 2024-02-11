@@ -357,6 +357,7 @@ public:
             SpellEntry const* pArcaneIntellect;
             SpellEntry const* pArcaneBrilliance;
             SpellEntry const* pIceBarrier;
+            SpellEntry const* pFireWard;
             SpellEntry const* pManaShield;
             SpellEntry const* pPolymorph;
             SpellEntry const* pFrostbolt;
