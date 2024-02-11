@@ -246,7 +246,7 @@ bool BattleBotAI::AttackStart(Unit* pVictim)
 {
     m_isBuffing = false;
 
-    if (me->IsMounted())
+    if (me->IsMounted() && me->GetCombatDistance(pVictim) <= 40.0f)
         me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     if (me->Attack(pVictim, true))
