@@ -429,6 +429,8 @@ public:
             SpellEntry const* pShackleUndead;
             SpellEntry const* pSmite;
             SpellEntry const* pDesperatePrayer;
+            SpellEntry const* pFearWard;
+            SpellEntry const* pTouchofWeakness;
         } priest;
         struct
         {

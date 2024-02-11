@@ -3018,6 +3018,11 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
     }
     else if (bg && bg->GetStatus() == STATUS_IN_PROGRESS)
     {
+        // Heal
+        if (me->GetShapeshiftForm() == FORM_NONE &&
+            FindAndHealInjuredAlly(60.0f, 60.0f))
+            return;
+
         if (m_spells.priest.pPowerWordFortitude &&
             IsValidBuffTarget(me, m_spells.priest.pPowerWordFortitude) &&
             CanTryToCastSpell(me, m_spells.priest.pPowerWordFortitude))
@@ -3028,16 +3033,16 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
                 return;
             }
         }
+    }
 
-        if (m_spells.priest.pDivineSpirit &&
-            IsValidBuffTarget(me, m_spells.priest.pDivineSpirit) &&
-            CanTryToCastSpell(me, m_spells.priest.pDivineSpirit))
+    if (m_spells.priest.pFearWard &&
+        (me->GetRace() == RACE_DWARF) &&
+        CanTryToCastSpell(me, m_spells.priest.pFearWard))
+    {
+        if (DoCastSpell(me, m_spells.priest.pFearWard) == SPELL_CAST_OK)
         {
-            if (DoCastSpell(me, m_spells.priest.pDivineSpirit) == SPELL_CAST_OK)
-            {
-                m_isBuffing = true;
-                return;
-            }
+            m_isBuffing = true;
+            return;
         }
     }
 
@@ -3051,9 +3056,27 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
         }
     }
 
+    if (m_spells.priest.pTouchofWeakness &&
+        (me->GetRace() == RACE_UNDEAD) &&
+        CanTryToCastSpell(me, m_spells.priest.pTouchofWeakness))
+    {
+        if (DoCastSpell(me, m_spells.priest.pTouchofWeakness) == SPELL_CAST_OK)
+        {
+            m_isBuffing = true;
+            return;
+        }
+    }
+
+    if (m_spells.priest.pShadowform &&
+        CanTryToCastSpell(me, m_spells.priest.pShadowform))
+    {
+        if (DoCastSpell(me, m_spells.priest.pShadowform) == SPELL_CAST_OK)
+            return;
+    }
+
     if (m_isBuffing &&
-       (!m_spells.priest.pPowerWordFortitude ||
-        !me->HasGCD(m_spells.priest.pPowerWordFortitude)))
+        (!m_spells.priest.pPowerWordFortitude ||
+            !me->HasGCD(m_spells.priest.pPowerWordFortitude)))
     {
         m_isBuffing = false;
     }

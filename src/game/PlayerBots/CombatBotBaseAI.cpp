@@ -1041,7 +1041,17 @@ void CombatBotBaseAI::PopulateSpellData()
                 {
                     if (IsHigherRankSpell(m_spells.priest.pDesperatePrayer))
                         m_spells.priest.pDesperatePrayer = pSpellEntry;
-                        }
+                }
+                else if (pSpellEntry->SpellName[0].find("Fear Ward") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.priest.pFearWard))
+                        m_spells.priest.pFearWard = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Touch of Weakness") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.priest.pTouchofWeakness))
+                        m_spells.priest.pTouchofWeakness = pSpellEntry;
+                }
                 break;
             }
             case CLASS_WARLOCK:
