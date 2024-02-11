@@ -920,19 +920,33 @@ void BattleBotAI::UpdateAI(uint32 const diff)
                 return;
             }
         }
-        else if (me->GetDistance(pVictim) > BB_MAX_CHASE_RANGE)
+        else
         {
-            if (Pet* pPet = me->GetPet())
+            if (me->GetDistance(pVictim) > BB_MAX_CHASE_RANGE)
             {
-                if (pPet->IsAlive())
-                    pPet->AttackStop();
+                if (Pet* pPet = me->GetPet())
+                {
+                    if (pPet->IsAlive())
+                        pPet->AttackStop();
+                }
+                me->AttackStop();
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                    ClearPath();
+                    StartNewPathFromBeginning();
+                }
+                return;
             }
+        }
+    }
+
+    // Hit people capping AB / AV flags
+    if (Unit* pCapper = GetFlagCapper())
+    {
+        if (pCapper != me->GetVictim())
+        {
             me->AttackStop();
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
-            {
-                ClearPath();
-                StartNewPathFromBeginning();
-            }
+            AttackStart(pCapper);
             return;
         }
     }
@@ -1752,17 +1766,6 @@ void BattleBotAI::UpdateInCombatAI()
                 if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
                     return;
             }
-        }
-    }
-
-    // Hit people capping AB / AV flags
-    if (Unit* pCapper = GetFlagCapper())
-    {
-        if (pCapper != me->GetVictim())
-        {
-            me->AttackStop();
-            AttackStart(pCapper);
-            return;
         }
     }
 
