@@ -73,6 +73,7 @@ enum EventAI_Type
     EVENT_T_VICTIM_ROOTED           = 33,                   // RepeatMin, RepeatMax
     EVENT_T_HIT_BY_AURA             = 34,                   // AuraType, Unused, RepeatMin, RepeatMax
     EVENT_T_STEALTH_ALERT           = 35,                   // RepeatMin, RepeatMax
+    EVENT_T_SPELL_HIT_TARGET        = 36,                   // SpellID, School, RepeatMin, RepeatMax
 
     EVENT_T_END,
 };
@@ -82,7 +83,8 @@ enum EventFlags
     EFLAG_REPEATABLE            = 0x01,                     //Event repeats
     EFLAG_RANDOM_ACTION         = 0x02,                     //Event only execute one from existed actions instead each action.
     EFLAG_NOT_CASTING           = 0x04,                     //Event will not occur while creature is casting a spell
-    EFLAG_DEBUG_ONLY            = 0x08,                     //Event only occurs in debug build
+    EFLAG_CHECK_RESULT          = 0x08,                     //Event will not go on cooldown if script actions fail
+    EFLAG_DEBUG_ONLY            = 0x10,                     //Event only occurs in debug build
     // uint8 field
 };
 
@@ -137,6 +139,7 @@ struct CreatureEventAI_Event
             uint32 playerOnly;
         } kill;
         // EVENT_T_HIT_BY_SPELL                             = 8
+        // EVENT_T_SPELL_HIT_TARGET                         = 36
         struct
         {
             uint32 spellId;
@@ -311,7 +314,8 @@ class CreatureEventAI : public BasicAI
         void KilledUnit(Unit* victim) override;
         void JustSummoned(Creature* pUnit) override;
         void MoveInLineOfSight(Unit* who) override;
-        void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override;
+        void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellEntry) override;
+        void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpellEntry) override;
         void MovementInform(uint32 type, uint32 id) override;
         void DamageTaken(Unit* done_by, uint32& damage) override;
         void UpdateAI(uint32 const diff) override;
@@ -325,7 +329,7 @@ class CreatureEventAI : public BasicAI
         static int Permissible(Creature const*);
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* pActionInvoker = nullptr);
-        void ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
+        bool ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
         void SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent);
 
         uint8  m_Phase;                                     // Current phase, max 32 phases

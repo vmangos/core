@@ -384,6 +384,12 @@ struct boss_gothikAI : public ScriptedAI
             {
                 if (m_uiSpeechTimer < uiDiff)
                 {
+                    if (IsAllPlayersOneSide())
+                    {
+                        EnterEvadeMode();
+                        return;
+                    }
+
                     m_uiSpeechTimer = 5000;
                     ++m_uiSpeechCount;
 

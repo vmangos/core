@@ -114,7 +114,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleAuraModBlockPercent,                       // 51 SPELL_AURA_MOD_BLOCK_PERCENT
     &Aura::HandleAuraModCritPercent,                        // 52 SPELL_AURA_MOD_CRIT_PERCENT
     &Aura::HandlePeriodicLeech,                             // 53 SPELL_AURA_PERIODIC_LEECH
-    &Aura::HandleNoImmediateEffect,                         // 54 SPELL_AURA_MOD_HIT_CHANCE implemented in Unit::GetBonusHitChanceFromAuras
+    &Aura::HandleNoImmediateEffect,                         // 54 SPELL_AURA_MOD_HIT_CHANCE implemented in SpellCaster::MeleeSpellMissChance and Unit::MeleeMissChanceCalc
     &Aura::HandleModSpellHitChance,                         // 55 SPELL_AURA_MOD_SPELL_HIT_CHANCE
     &Aura::HandleAuraTransform,                             // 56 SPELL_AURA_TRANSFORM
     &Aura::HandleModSpellCritChance,                        // 57 SPELL_AURA_MOD_SPELL_CRIT_CHANCE
@@ -3398,8 +3398,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->SetCharmerGuid(GetCasterGuid());
         target->SetFactionTemplateId(caster->GetFactionTemplateId());
-        if (target != caster)
-            target->InterruptNonMeleeSpells(false);
         caster->SetCharm(target);
 
         target->CombatStop(true);
@@ -3532,6 +3530,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
 
         target->UpdateControl();
+        target->InterruptNonMeleeSpells(true);
 
         if (pPlayerTarget)
             pPlayerTarget->SetFactionForRace(target->GetRace());
@@ -3539,9 +3538,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (pPlayerTarget && pPlayerTarget->IsAlive() && caster && caster->IsAlive() && caster->IsInCombat())
         {
             pPlayerTarget->SendAttackSwingCancelAttack();
-
-            if (target->IsNonMeleeSpellCasted(false))
-                target->InterruptNonMeleeSpells(false);
 
             target->AttackStop();
             target->RemoveAllAttackers();
@@ -3560,7 +3556,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
             target->GetHostileRefManager().deleteReferences();
         }
 
-        //target->SetUnitMovementFlags(MOVEFLAG_NONE);
         target->StopMoving();
         target->GetMotionMaster()->Clear(false);
         target->GetMotionMaster()->MoveIdle();
@@ -5202,18 +5197,6 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    // apply item specific bonuses for already equipped weapon
-    if (Real)
-    {
-        for (int i = 0; i < MAX_ATTACK; ++i)
-            if (Item* pItem = ((Player*)target)->GetWeaponForAttack(WeaponAttackType(i), true, false))
-                ((Player*)target)->_ApplyWeaponDependentAuraCritMod(pItem, WeaponAttackType(i), this, apply);
-    }
-
-    // mods must be applied base at equipped weapon class and subclass comparison
-    // with spell->EquippedItemClass and  EquippedItemSubClassMask and EquippedItemInventoryTypeMask
-    // m_modifier.m_miscvalue comparison with item generated damage types
-
     if (GetSpellProto()->EquippedItemClass == -1)
     {
         ((Player*)target)->HandleBaseModValue(CRIT_PERCENTAGE,         FLAT_MOD, m_modifier.m_amount, apply);
@@ -5221,7 +5204,19 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
     }
     else
     {
-        // done in Player::_ApplyWeaponDependentAuraMods
+        // apply item specific bonuses for already equipped weapon
+        if (Real)
+        {
+            // whether aura was really applied will be set in _ApplyWeaponDependentAuraCritMod
+            m_applied = !m_applied;
+
+            // mods must be applied base at equipped weapon class and subclass comparison
+            // with spell->EquippedItemClass and  EquippedItemSubClassMask and EquippedItemInventoryTypeMask
+            // m_modifier.m_miscvalue comparison with item generated damage types
+            for (int i = 0; i < MAX_ATTACK; ++i)
+                if (Item* pItem = ((Player*)target)->GetWeaponForAttack(WeaponAttackType(i), true, false))
+                    ((Player*)target)->_ApplyWeaponDependentAuraCritMod(pItem, WeaponAttackType(i), this, apply);
+        }
     }
 }
 
@@ -5771,6 +5766,20 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             if (Spell* spell = target->GetCurrentSpell(CurrentSpellTypes(i)))
                 if (spell->m_spellInfo->IsRemovedOnShapeLostSpell())
                     target->InterruptSpell(CurrentSpellTypes(i), false);
+    }
+
+    // Effects like Elemental Sharpening Stone should not apply in cat and bear form.
+    if (target->IsPlayer() && IsAttackSpeedOverridenForm(form))
+    {
+        for (int i = 0; i < MAX_ATTACK; ++i)
+        {
+            if (Item* pItem = ((Player*)target)->GetWeaponForAttack(WeaponAttackType(i), true, false))
+            {
+                auto const& auraCritList = target->GetAurasByType(SPELL_AURA_MOD_CRIT_PERCENT);
+                for (const auto itr : auraCritList)
+                    ((Player*)target)->_ApplyWeaponDependentAuraCritMod(pItem, WeaponAttackType(i), itr, !apply);
+            }
+        }
     }
 }
 

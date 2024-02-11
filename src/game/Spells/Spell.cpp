@@ -1601,6 +1601,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         // Send log damage message to client
         pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
+        pCaster->DealSpellDamage(&damageInfo, true);
 
         procEx = CreateProcExtendMask(&damageInfo, missInfo);
         procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
@@ -1653,8 +1654,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                     triggerWeaponProcs = true;
             }
         }
-
-        pCaster->DealSpellDamage(&damageInfo, true);
 
         // Courroux Naturel a 20% de chance de faire proc WF.
         if (m_spellInfo->Id == 17364 && pCaster->IsPlayer())
@@ -3748,10 +3747,19 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
 
         bool channeled = m_channeled;
 
-        // [Nostalrius] Stop pets casting channeled spells ! (succubus seduce ...)
-        if (m_timer && channeled)
-            if (m_caster->IsPet())
+        if (channeled && m_casterUnit)
+        {
+            // Prevent animation from disappearing if casting another channel too soon after previous ends
+            if (m_casterUnit->HasUnitState(UNIT_STAT_PENDING_CHANNEL_RESET))
+            {
+                m_casterUnit->ClearUnitState(UNIT_STAT_PENDING_CHANNEL_RESET);
+                m_casterUnit->CancelSpellChannelingAnimationInstantly();
+            }
+
+            // [Nostalrius] Stop pets casting channeled spells ! (succubus seduce ...)
+            if (m_timer && m_casterUnit->IsPet())
                 m_casterUnit->StopMoving();
+        }
 
         // This is used so that creatures face the target on which they are casting
         if (m_setCreatureTarget = (m_caster->IsCreature() && (channeled || (!m_IsTriggeredSpell && m_timer)) && m_targets.getUnitTarget() && IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]) && static_cast<Creature*>(m_caster)->CanHaveTarget()))
@@ -5276,17 +5284,21 @@ void Spell::SendChannelUpdate(uint32 time, bool interrupted)
 
     if (!time)
     {
-        // Reset of channel values has to be done after a few delay.
-        // Else, we have some visual bugs (arcane projectile, last tick)
-        ChannelResetEvent* event = new ChannelResetEvent(m_casterUnit);
-        m_casterUnit->m_Events.AddEventAtOffset(event, (interrupted ? 1 : 1000));
+        if (interrupted)
+        {
+            // Send update directly on interrupt to fix animation if recasting channeled spell
+            m_casterUnit->CancelSpellChannelingAnimationInstantly();
+        }
+        else
+        {
+            // Reset of channel values has to be done after a few delay.
+            // Else, we have some visual bugs (arcane projectile, last tick)
+            ChannelResetEvent* event = new ChannelResetEvent(m_casterUnit);
+            m_casterUnit->m_Events.AddEventAtOffset(event, 1000);
+        }
     }
     else if (Player* pPlayer = m_casterUnit->ToPlayer())
-    {
-        WorldPacket data(MSG_CHANNEL_UPDATE, 4);
-        data << uint32(time);
-        pPlayer->SendDirectMessage(&data);
-    }
+        pPlayer->SendChannelUpdate(time);
 }
 
 void Spell::SendChannelStart(uint32 duration)
@@ -5336,6 +5348,36 @@ void Spell::SendChannelStart(uint32 duration)
     }
 
     m_timer = duration;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_CHANNELED))
+    {
+        WorldPacket data(SMSG_SPELL_UPDATE_CHAIN_TARGETS);
+        data << m_caster->GetObjectGuid();
+        data << uint32(m_spellInfo->Id);
+        size_t count_pos = data.wpos();
+        data << uint32(0);
+        uint32 hit = 0;
+        for (TargetList::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
+        {
+            if (((itr->effectMask & (1 << EFFECT_INDEX_0)) && itr->reflectResult == SPELL_MISS_NONE &&
+                m_CastItem) || itr->targetGUID != m_caster->GetObjectGuid())
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*m_caster, itr->targetGUID))
+                {
+                    ++hit;
+                    data << target->GetObjectGuid();
+                }
+            }
+        }
+        if (hit)
+        {
+            data.put<uint32>(count_pos, hit);
+            m_caster->SendMessageToSet(&data, true);
+        }
+    }
+#endif
+
     if (m_casterUnit)
     {
         if (target)
@@ -6274,6 +6316,20 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!found)
                         return SPELL_FAILED_TARGET_AURASTATE;
                 }*/
+                break;
+            }
+            case SPELL_EFFECT_RESURRECT:
+            case SPELL_EFFECT_RESURRECT_NEW:
+            {
+                if (m_targets.getCorpseTargetGuid())
+                {
+                    Corpse* corpse = m_caster->GetMap()->GetCorpse(m_targets.getCorpseTargetGuid());
+                    if (!corpse)
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX2_IGNORE_LINE_OF_SIGHT) && !corpse->IsWithinLOSInMap(m_caster))
+                        return SPELL_FAILED_LINE_OF_SIGHT;
+                }
                 break;
             }
             case SPELL_EFFECT_RESURRECT:
@@ -8833,16 +8889,12 @@ bool ChannelResetEvent::Execute(uint64 e_time, uint32)
 
 void ChannelResetEvent::Abort(uint64 e_time)
 {
-    Spell* currSpell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+    if (!m_caster->HasUnitState(UNIT_STAT_PENDING_CHANNEL_RESET))
+        return;
+
+    m_caster->ClearUnitState(UNIT_STAT_PENDING_CHANNEL_RESET);
+
+    Spell* currSpell = m_caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
     if (!currSpell || currSpell->getState() == SPELL_STATE_FINISHED)
-    {
-        caster->SetChannelObjectGuid(ObjectGuid());
-        caster->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-        if (caster->IsPlayer())
-        {
-            WorldPacket data(MSG_CHANNEL_UPDATE, 4);
-            data << uint32(0);
-            ((Player*)caster)->SendDirectMessage(&data);
-        }
-    }
+        m_caster->CancelSpellChannelingAnimationInstantly();
 }

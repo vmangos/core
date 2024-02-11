@@ -1211,6 +1211,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "escort",         SEC_TICKETMASTER,   false, nullptr,                                        "", escortCommandTable   },
         { "bg",             SEC_GAMEMASTER,     false, nullptr,                                        "", bgCommandTable       },
         { "spell",          SEC_GAMEMASTER,     true, nullptr,                                         "", spellCommandTable    },
+        { "pvp",            SEC_GAMEMASTER,     false, &ChatHandler::HandlePvPCommand,                 "", nullptr },
         { "variable",       SEC_DEVELOPER,      true,  &ChatHandler::HandleVariableCommand,            "", nullptr},
         { "aura",           SEC_BASIC_ADMIN,    false, &ChatHandler::HandleAuraCommand,                "", nullptr },
         { "nameaura",       SEC_BASIC_ADMIN,    false, &ChatHandler::HandleNameAuraCommand,            "", nullptr },
@@ -1394,7 +1395,7 @@ void ChatHandler::LoadRbacPermissions()
 
             if (m_rbacPermissionNames.find(permissionId) == m_rbacPermissionNames.end())
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Unknown RBAC permission id %u assigned to command '%s'!", permissionId, command);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Unknown RBAC permission id %u assigned to command '%s'!", permissionId, command.c_str());
                 continue;
             }
             
@@ -2043,8 +2044,15 @@ bool ChatHandler::ParseCommands(char const* text)
             {
                 if (session->GetGUID() == sessionGuid)
                 {
-                    ChatHandler handler(session);
-                    handler.ExecuteCommand(txt.c_str());
+                    if (session->GetPlayer() && session->GetPlayer()->IsInWorld())
+                    {
+                        ChatHandler handler(session);
+                        handler.ExecuteCommand(txt.c_str());
+                    }
+                    else
+                    {
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Skipping command '%s' from account %u. Player is not in world.", txt.c_str(), accountId);
+                    }
                 }
             }
         });

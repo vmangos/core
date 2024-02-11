@@ -345,7 +345,7 @@ float SpellCaster::MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType,
             modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, hitChance, spellPtr);
 
         // Bonuses from attacker aura and ratings
-        hitChance += pUnit->GetBonusHitChanceFromAuras(attType);
+        hitChance += pUnit->GetWeaponBasedAuraModifier(attType, SPELL_AURA_MOD_HIT_CHANCE);
     } 
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from

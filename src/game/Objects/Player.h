@@ -1106,7 +1106,7 @@ class Player final: public Unit
         Item* GetItemByPos(uint8 bag, uint8 slot) const;
         Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }
         Item* GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bool useable) const;
-        bool HasWeaponForParry() const;
+        Item* GetWeaponForParry() const;
         static uint32 GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
         uint32 GetHighestKnownArmorProficiency() const;
         std::vector<Item*>& GetItemUpdateQueue() { return m_itemUpdateQueue; }
@@ -1539,6 +1539,7 @@ class Player final: public Unit
         void LearnQuestRewardedSpells(Quest const* quest);
         void LearnSpellHighRank(uint32 spellid);
         uint32 GetSpellRank(SpellEntry const* spellInfo) const final;
+        void SendChannelUpdate(uint32 time) const;
 
         void CastItemCombatSpell(Unit* Target, WeaponAttackType attType);
         void CastItemUseSpell(Item* item, SpellCastTargets const& targets);
@@ -1691,7 +1692,7 @@ class Player final: public Unit
         void UpdateAllSpellCritChances();
         void UpdateSpellCritChance(uint32 school);
         void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, float& min_damage, float& max_damage, uint8 index = 0) const;
-        float GetBonusHitChanceFromAuras(WeaponAttackType attType) const final;
+        float GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const final;
 
         uint32 GetShieldBlockValue() const override;                 // overwrite Unit version (virtual)
         bool CanParry() const { return m_canParry; }
@@ -2605,6 +2606,7 @@ class Player final: public Unit
         bool m_InstanceValid;
         // permanent binds and solo binds
         BoundInstancesMap m_boundInstances;
+        mutable std::mutex m_boundInstancesMutex;
         InstancePlayerBind* GetBoundInstance(uint32 mapid);
         BoundInstancesMap& GetBoundInstances() { return m_boundInstances; }
         void UnbindInstance(uint32 mapid, bool unload = false);

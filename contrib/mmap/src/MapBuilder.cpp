@@ -154,8 +154,9 @@ void filterLedgeSpans(const int walkableHeight, const int walkableClimbTransitio
                     // Skip neighbours which are out of bounds.
                     if (dx < 0 || dy < 0 || dx >= w || dy >= h)
                     {
-                        //TODO: Figure out why this is commented out. 
-                        //minNeighborHeight  = rcMin(minNeighborHeight , -walkableClimbTerrain - bot);
+                        // This was commented out previously. It's supposed to prevent adjacent terrain polys from having
+                        // radically different vert height values due to bad model design. Smooths out many paths like Thousand Needles bridges
+                        minNeighborHeight  = rcMin(minNeighborHeight , -walkableClimbTerrain - bot);
                         continue;
                     }
 
@@ -763,7 +764,7 @@ namespace MMAP
                     }
                 }
                 /// 4. Every triangle is correctly marked now, we can rasterize everything
-                rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, areas, tTriCount, *tile.solid, 0);
+                SortAndRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, areas, tTriCount, *tile.solid, 0);
                 delete [] areas;
 
                 /// 5. Don't walk over too high Obstacles.
@@ -1000,8 +1001,7 @@ namespace MMAP
                 //printf("%sNo vertices to build tile!              \n", tileString);
                 continue;
             }
-            if (!params.polyCount || !params.polys ||
-                    TILES_PER_MAP * TILES_PER_MAP == params.polyCount)
+            if (!params.polyCount || !params.polys)
             {
                 // we have flat tiles with no actual geometry - don't build those, its useless
                 // keep in mind that we do output those into debug info

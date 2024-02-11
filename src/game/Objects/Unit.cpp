@@ -2138,9 +2138,8 @@ void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool ext
     }
 
     SendAttackStateUpdate(&damageInfo);
-    ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
-
     DealMeleeDamage(&damageInfo, true);
+    ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
 
     if (IsPlayer())
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
@@ -2605,7 +2604,7 @@ float Unit::MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) c
     missChance *= levelDiffMultiplier;
 
     // Hit chance bonus from attacker based on ratings and auras
-    float hitChance = GetBonusHitChanceFromAuras(attType);
+    float hitChance = GetWeaponBasedAuraModifier(attType, SPELL_AURA_MOD_HIT_CHANCE);
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
     // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking player’s Weapon Skill.
@@ -2671,7 +2670,7 @@ float Unit::GetUnitParryChance() const
 
     if (Player const* pPlayer = ToPlayer())
     {
-        if (pPlayer->CanParry() && pPlayer->HasWeaponForParry())
+        if (pPlayer->CanParry() && pPlayer->GetWeaponForParry())
             chance = GetFloatValue(PLAYER_PARRY_PERCENTAGE);
     }
     else
@@ -5936,15 +5935,7 @@ bool Unit::IsNoWeaponShapeShift() const
 
 bool Unit::IsAttackSpeedOverridenShapeShift() const
 {
-    switch (GetShapeshiftForm())
-    {
-        case FORM_CAT:
-        case FORM_BEAR:
-        case FORM_DIREBEAR:
-            return true;
-    }
-
-    return false;
+    return IsAttackSpeedOverridenForm(GetShapeshiftForm());
 }
 
 bool Unit::IsInDisallowedMountForm() const
@@ -6046,9 +6037,9 @@ void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/
     // PvP combat participation pulse: refresh pvp timers on pvp combat (we are the victim)
     if (pAggressor->IsPvP())
     {
-        if (Player* pThisPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (Player* pThisPlayer = GetAffectingPlayer())
         {
-            if (Player const* pAggressorPlayer = pAggressor->GetCharmerOrOwnerPlayerOrPlayerItself())
+            if (Player const* pAggressorPlayer = pAggressor->GetAffectingPlayer())
             {
                 if (pThisPlayer != pAggressorPlayer && !pThisPlayer->IsInDuelWith(pAggressorPlayer) && !(pThisPlayer->IsFFAPvP() && pAggressorPlayer->IsFFAPvP()))
                 {
@@ -6116,9 +6107,9 @@ void Unit::TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly
     // PvP combat participation pulse: refresh pvp timers on pvp combat (we are the aggressor)
     if (pVictim->IsPvP())
     {
-        if (Player* pThisPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (Player* pThisPlayer = GetAffectingPlayer())
         {
-            Player const* pVictimPlayer = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself();
+            Player const* pVictimPlayer = pVictim->GetAffectingPlayer();
 
             if (!pVictimPlayer || ((pThisPlayer != pVictimPlayer) && !pThisPlayer->IsInDuelWith(pVictimPlayer) && !(pThisPlayer->IsFFAPvP() && pVictimPlayer->IsFFAPvP())))
             {
@@ -8106,6 +8097,8 @@ void Unit::SetMaxHealth(uint32 val)
 void Unit::SetHealthPercent(float percent)
 {
     uint32 newHealth = GetMaxHealth() * percent / 100.0f;
+    if (percent > 0 && newHealth == 0)
+        newHealth = 1;
     SetHealth(newHealth);
 }
 
@@ -9750,30 +9743,30 @@ void Unit::RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, 
     }
 }
 
-void Unit::NearTeleportTo(float x, float y, float z, float orientation, uint32 teleportOptions)
+bool Unit::NearTeleportTo(float x, float y, float z, float orientation, uint32 teleportOptions)
 {
     DisableSpline();
 
     if (IsPlayer())
-        ((Player*)this)->TeleportTo(GetMapId(), x, y, z, orientation, teleportOptions);
-    else
-    {
-        Creature* c = (Creature*)this;
-        // Creature relocation acts like instant movement generator, so current generator expects interrupt/reset calls to react properly
-        if (!c->GetMotionMaster()->empty())
-            if (MovementGenerator* movgen = c->GetMotionMaster()->top())
-                movgen->Interrupt(*c);
+        return ((Player*)this)->TeleportTo(GetMapId(), x, y, z, orientation, teleportOptions);
 
-        MovementPacketSender::SendTeleportToObservers(this, x, y, z, orientation);
-        GetMap()->CreatureRelocation((Creature*)this, x, y, z, orientation);
-        MovementPacketSender::SendTeleportToObservers(this, x, y, z, orientation);
+    Creature* c = (Creature*)this;
+    // Creature relocation acts like instant movement generator, so current generator expects interrupt/reset calls to react properly
+    if (!c->GetMotionMaster()->empty())
+        if (MovementGenerator* movgen = c->GetMotionMaster()->top())
+            movgen->Interrupt(*c);
 
-        // finished relocation, movegen can different from top before creature relocation,
-        // but apply Reset expected to be safe in any case
-        if (!c->GetMotionMaster()->empty())
-            if (MovementGenerator* movgen = c->GetMotionMaster()->top())
-                movgen->Reset(*c);
-    }
+    MovementPacketSender::SendTeleportToObservers(this, x, y, z, orientation);
+    GetMap()->CreatureRelocation((Creature*)this, x, y, z, orientation);
+    MovementPacketSender::SendTeleportToObservers(this, x, y, z, orientation);
+
+    // finished relocation, movegen can different from top before creature relocation,
+    // but apply Reset expected to be safe in any case
+    if (!c->GetMotionMaster()->empty())
+        if (MovementGenerator* movgen = c->GetMotionMaster()->top())
+            movgen->Reset(*c);
+
+    return true;
 }
 
 void Unit::NearLandTo(float x, float y, float z, float orientation)
@@ -10710,11 +10703,20 @@ void Unit::SendPlaySpellVisual(uint32 id) const
     SendMessageToSet(&data, true);
 }
 
+void Unit::CancelSpellChannelingAnimationInstantly()
+{
+    if (Player* pPlayer = ToPlayer())
+        pPlayer->SendChannelUpdate(0);
+
+    SetChannelObjectGuid(ObjectGuid());
+    SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+    DirectSendPublicValueUpdate({ UNIT_FIELD_CHANNEL_OBJECT , UNIT_FIELD_CHANNEL_OBJECT + 1 , UNIT_CHANNEL_SPELL });
+}
+
 #define PRELOAD if (this == unit) return true; \
 Unit const* u1 = GetCharmerOrOwnerOrSelf(); \
 Unit const* u2 = unit->GetCharmerOrOwnerOrSelf(); \
 if (u1 == u2) return true;
-
 
 bool Unit::IsInPartyWith(Unit const* unit) const
 {
@@ -10923,7 +10925,7 @@ void Unit::RestoreMovement()
         Unit* victim = GetCharmInfo() && GetCharmInfo()->IsAtStay() ? nullptr : GetVictim();
         if (victim)
             GetMotionMaster()->MoveChase(victim);
-        else
+        else if (GetMotionMaster()->GetCurrentMovementGeneratorType() != static_cast<Creature*>(this)->GetDefaultMovementType())
             GetMotionMaster()->Initialize();
     }
 }

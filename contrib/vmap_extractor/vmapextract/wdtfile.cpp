@@ -108,7 +108,7 @@ bool WDTFile::init(char* map_id, unsigned int mapID)
                 }
             }
         }
-        WDT.seek((int)nextpos);
+        WDT.seek(nextpos);
     }
 
     WDT.close();
