@@ -79,6 +79,7 @@ enum BattleBotSpells
 #define BB_NIGHTFALL_PROC 17941
 #define BB_SOUL_LINK 25228
 #define BB_CHEAP_SHOT 1833
+#define BB_POUNCE 9827
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
@@ -4470,23 +4471,25 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
         }
     }
 
-    if (m_spells.druid.pNaturesGrasp &&
-        CanTryToCastSpell(me, m_spells.druid.pNaturesGrasp))
-    {
-        if (DoCastSpell(me, m_spells.druid.pNaturesGrasp) == SPELL_CAST_OK)
-            return;
-    }
-
     if (m_isBuffing &&
-       (!m_spells.druid.pMarkoftheWild ||
-        !me->HasGCD(m_spells.druid.pMarkoftheWild)))
+        (!m_spells.druid.pMarkoftheWild ||
+            !me->HasGCD(m_spells.druid.pMarkoftheWild)))
     {
         m_isBuffing = false;
     }
 
-    if (me->GetShapeshiftForm() == FORM_NONE)
+    if (m_role == ROLE_HEALER || m_role == ROLE_RANGE_DPS &&
+        me->GetShapeshiftForm() == FORM_NONE)
     {
-        if (m_role == ROLE_MELEE_DPS || m_role == ROLE_TANK)
+        if ((me->GetPowerPercent(POWER_MANA) > 80.0f) &&
+            FindAndHealInjuredAlly(50.0f, 50.0f))
+            return;
+    }
+
+
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_role == ROLE_MELEE_DPS)
         {
             if (m_spells.druid.pCatForm &&
                 CanTryToCastSpell(me, m_spells.druid.pCatForm))
@@ -4494,7 +4497,9 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
                 if (DoCastSpell(me, m_spells.druid.pCatForm) == SPELL_CAST_OK)
                     return;
             }
-
+        }
+        else if (m_role == ROLE_TANK)
+        {
             if (m_spells.druid.pBearForm &&
                 CanTryToCastSpell(me, m_spells.druid.pBearForm))
             {
@@ -4502,24 +4507,27 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
                     return;
             }
         }
-        else
+
+        if (me->HasAuraType(SPELL_AURA_MOD_STEALTH))
         {
-            if ((me->GetPowerPercent(POWER_MANA) >  80.0f) &&
-                FindAndHealInjuredAlly(80.0f))
-                return;
+            if (me->GetCombatDistance(pVictim) <= 15.0f)
+            {
+                if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_POUNCE))
+                {
+                    me->CastSpell(pVictim, pSpellEntry, false);
+                    me->RemoveSpellCooldown(*pSpellEntry);
+                    return;
+                }
+            }
+            if (m_spells.druid.pTigersFury &&
+                CanTryToCastSpell(me, m_spells.druid.pTigersFury))
+            {
+                if (DoCastSpell(me, m_spells.druid.pTigersFury) == SPELL_CAST_OK)
+                    return;
+            }
         }
     }
-    else if (me->GetShapeshiftForm() == FORM_CAT)
-    {
-        if (m_spells.druid.pProwl &&
-            CanTryToCastSpell(me, m_spells.druid.pProwl) &&
-            !me->HasAura(AURA_WARSONG_FLAG) &&
-            !me->HasAura(AURA_SILVERWING_FLAG))
-        {
-            if (DoCastSpell(me, m_spells.druid.pProwl) == SPELL_CAST_OK)
-                return;
-        }
-    }
+
 
     if (me->GetVictim())
     {
@@ -4539,8 +4547,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
             me->RemoveAurasDueToSpellByCancel(m_spells.druid.pMoonkinForm->Id);
 
         if (m_spells.druid.pTravelForm &&
-           !me->IsMounted() &&
-           (!GetMountSpellId() || me->HasAura(AURA_WARSONG_FLAG) || me->HasAura(AURA_SILVERWING_FLAG)) &&
+            !me->IsMounted() &&
+            (!GetMountSpellId() || me->HasAura(AURA_WARSONG_FLAG) || me->HasAura(AURA_SILVERWING_FLAG)) &&
             CanTryToCastSpell(me, m_spells.druid.pTravelForm))
         {
             if (DoCastSpell(me, m_spells.druid.pTravelForm) == SPELL_CAST_OK)
