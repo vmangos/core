@@ -78,6 +78,7 @@ enum BattleBotSpells
 #define BB_DETERRENCE 19263
 #define BB_NIGHTFALL_PROC 17941
 #define BB_SOUL_LINK 25228
+#define BB_CHEAP_SHOT 1833
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
@@ -954,7 +955,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         }
     }
 
-    if (!me->IsInCombat() && me->GetEnemyCountInRadiusAround(me, VISIBILITY_DISTANCE_SMALL) == 0)
+    if (!me->IsInCombat() && GetAttackersInRangeCount(VISIBILITY_DISTANCE_SMALL) == 0)
     {
         if (DrinkAndEat())
             return;
@@ -1042,7 +1043,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         // Healers and ranged DPS should away if more than 1 enemy is near
         if (m_role == ROLE_HEALER || m_role == ROLE_RANGE_DPS)
         {
-            if (me->GetEnemyCountInRadiusAround(me, 10.0f) > 1 &&
+            if (GetAttackersInRangeCount(10.0f) > 1 &&
                 !me->HasUnitState(UNIT_STAT_ROOT) &&
                 !me->HasAura(BB_NS_DRUID) &&
                 !me->HasAura(BB_NS_SHAMAN) &&
@@ -1065,7 +1066,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         m_targetSelectTimer.Reset(BB_NEW_TARGET_INTERVAL);
         if (pVictim &&
             me->IsInCombat() &&
-            me->GetEnemyCountInRadiusAround(me, 10.0f) > 1 &&
+            GetAttackersInRangeCount(10.0f) > 1 &&
             !me->IsMounted() &&
             m_role != ROLE_HEALER)
         {
@@ -2725,7 +2726,7 @@ void BattleBotAI::UpdateInCombatAI_Mage()
         {
 
             if (m_spells.mage.pBlink &&
-                (me->GetEnemyCountInRadiusAround(me, 10.0f) == 0) &&
+                (GetAttackersInRangeCount(10.0f) == 0) &&
                 CanTryToCastSpell(me, m_spells.mage.pBlink))
             {
                 if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
@@ -2744,7 +2745,7 @@ void BattleBotAI::UpdateInCombatAI_Mage()
             }
 
             if (m_spells.mage.pConeofCold &&
-                (me->GetEnemyCountInRadiusAround(me, 8.0f) > 0) &&
+                (GetAttackersInRangeCount(8.0f) > 0) &&
                 CanTryToCastSpell(me, m_spells.mage.pConeofCold))
             {
                 me->SetInFront(pVictim);
@@ -2837,7 +2838,7 @@ void BattleBotAI::UpdateInCombatAI_Mage()
             }
         }
 
-        if (me->GetEnemyCountInRadiusAround(me, 10.0f) > 3)
+        if (GetAttackersInRangeCount(10.0f) > 3)
         {
             if (m_spells.mage.pArcaneExplosion &&
                 CanTryToCastSpell(me, m_spells.mage.pArcaneExplosion))
@@ -2895,7 +2896,7 @@ void BattleBotAI::UpdateInCombatAI_Mage()
 
         // Blink after targets out of range offensively if it's safe to do so
         if (m_spells.mage.pBlink &&
-            (me->GetEnemyCountInRadiusAround(me, 10.0f) == 0) &&
+            (GetAttackersInRangeCount(10.0f) == 0) &&
             (me->GetDistance(pVictim) >= 30.0f) &&
             CanTryToCastSpell(me, m_spells.mage.pBlink))
         {
@@ -2916,7 +2917,7 @@ void BattleBotAI::UpdateInCombatAI_Mage()
         }
 
         if (m_spells.mage.pBlastWave &&
-            me->GetEnemyCountInRadiusAround(me, 8.0f) &&
+            GetAttackersInRangeCount(8.0f) &&
             CanTryToCastSpell(me, m_spells.mage.pBlastWave))
         {
             if (DoCastSpell(me, m_spells.mage.pBlastWave) == SPELL_CAST_OK)
@@ -2956,7 +2957,7 @@ void BattleBotAI::UpdateInCombatAI_Mage()
 
         if (m_spells.mage.pEvocation &&
             (me->GetPowerPercent(POWER_MANA) < 20.0f) &&
-            (me->GetEnemyCountInRadiusAround(me, 10.0f) == 0) &&
+            (GetAttackersInRangeCount(10.0f) == 0) &&
             CanTryToCastSpell(me, m_spells.mage.pEvocation))
         {
             if (DoCastSpell(me, m_spells.mage.pEvocation) == SPELL_CAST_OK)
@@ -3136,7 +3137,7 @@ void BattleBotAI::UpdateInCombatAI_Priest()
     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
     {
         if (m_spells.priest.pPsychicScream &&
-            me->GetEnemyCountInRadiusAround(me, 8.0f) &&
+            GetAttackersInRangeCount(8.0f) &&
             CanTryToCastSpell(me, m_spells.priest.pPsychicScream))
         {
             if (DoCastSpell(me, m_spells.priest.pPsychicScream) == SPELL_CAST_OK)
@@ -3279,7 +3280,7 @@ void BattleBotAI::UpdateInCombatAI_Priest()
 
 
         if (m_spells.priest.pPsychicScream &&
-            me->GetEnemyCountInRadiusAround(me, 8.0f) &&
+            GetAttackersInRangeCount(8.0f) &&
             CanTryToCastSpell(me, m_spells.priest.pPsychicScream))
         {
             if (DoCastSpell(me, m_spells.priest.pPsychicScream) == SPELL_CAST_OK)
@@ -4147,11 +4148,33 @@ void BattleBotAI::UpdateOutOfCombatAI_Rogue()
 
     if (m_spells.rogue.pStealth &&
         CanTryToCastSpell(me, m_spells.rogue.pStealth) &&
-       !me->HasAura(AURA_WARSONG_FLAG) &&
-       !me->HasAura(AURA_SILVERWING_FLAG))
+        !me->HasAura(AURA_WARSONG_FLAG) &&
+        !me->HasAura(AURA_SILVERWING_FLAG))
     {
         if (DoCastSpell(me, m_spells.rogue.pStealth) == SPELL_CAST_OK)
             return;
+    }
+
+
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (me->HasAuraType(SPELL_AURA_MOD_STEALTH))
+        {
+            if (me->GetCombatDistance(pVictim) <= 15.0f)
+            {
+                if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_CHEAP_SHOT))
+                {
+                    me->CastSpell(pVictim, pSpellEntry, false);
+                    me->RemoveSpellCooldown(*pSpellEntry);
+                    return;
+                }
+            }
+            if (m_spells.rogue.pPremeditation &&
+                CanTryToCastSpell(pVictim, m_spells.rogue.pPremeditation))
+            {
+                DoCastSpell(pVictim, m_spells.rogue.pPremeditation);
+            }
+        }
     }
 
     if (me->GetVictim())
