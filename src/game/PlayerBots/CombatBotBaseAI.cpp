@@ -903,6 +903,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.mage.pCombustion))
                         m_spells.mage.pCombustion = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Dampen Magic") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.mage.pDampenMagic))
+                        m_spells.mage.pDampenMagic = pSpellEntry;
+                }
                 break;
             }
             case CLASS_PRIEST:

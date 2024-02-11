@@ -2609,20 +2609,25 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
 
 void BattleBotAI::UpdateOutOfCombatAI_Mage()
 {
-    if (m_spells.mage.pArcaneBrilliance)
+    BattleGround* bg = me->GetBattleGround();
+
+    if (bg && bg->GetStatus() == STATUS_WAIT_JOIN)
     {
-        if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
+        if (m_spells.mage.pArcaneBrilliance)
         {
-            if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
-                return;
+            if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
+            {
+                if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+                    return;
+            }
         }
-    }
-    else if (m_spells.mage.pArcaneIntellect)
-    {
-        if (CanTryToCastSpell(me, m_spells.mage.pArcaneIntellect))
+        else if (m_spells.mage.pArcaneIntellect)
         {
-            if (DoCastSpell(me, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
-                return;
+            if (CanTryToCastSpell(me, m_spells.mage.pArcaneIntellect))
+            {
+                if (DoCastSpell(me, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
+                    return;
+            }
         }
     }
 
@@ -2630,6 +2635,13 @@ void BattleBotAI::UpdateOutOfCombatAI_Mage()
         CanTryToCastSpell(me, m_spells.mage.pIceArmor))
     {
         if (DoCastSpell(me, m_spells.mage.pIceArmor) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_spells.mage.pDampenMagic &&
+        CanTryToCastSpell(me, m_spells.mage.pDampenMagic))
+    {
+        if (DoCastSpell(me, m_spells.mage.pDampenMagic) == SPELL_CAST_OK)
             return;
     }
 
