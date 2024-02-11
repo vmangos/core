@@ -1114,7 +1114,7 @@ void PartyBotAI::UpdateInCombatAI()
             }
         }
 
-        if (me->GetPowerPercent(POWER_MANA) < 70.0f)
+        if (me->GetPowerType() == POWER_MANA && me->GetPowerPercent(POWER_MANA) < 70.0f)
         {
             uint16 potion = SelectManaPotionForLevel();
 
