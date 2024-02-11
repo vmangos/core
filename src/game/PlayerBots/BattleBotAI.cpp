@@ -4192,30 +4192,13 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
             {
                 DoCastSpell(pVictim, m_spells.rogue.pPremeditation);
             }
-
-            if (pVictim->IsCaster())
+            if (me->GetCombatDistance(pVictim) <= 15.0f)
             {
-                if (m_spells.rogue.pGarrote &&
-                    CanTryToCastSpell(pVictim, m_spells.rogue.pGarrote))
+                if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_CHEAP_SHOT))
                 {
-                    if (DoCastSpell(pVictim, m_spells.rogue.pGarrote) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-            else
-            {
-                if (m_spells.rogue.pAmbush &&
-                    CanTryToCastSpell(pVictim, m_spells.rogue.pAmbush))
-                {
-                    if (DoCastSpell(pVictim, m_spells.rogue.pAmbush) == SPELL_CAST_OK)
-                        return;
-                }
-
-                if (m_spells.rogue.pCheapShot &&
-                    CanTryToCastSpell(pVictim, m_spells.rogue.pCheapShot))
-                {
-                    if (DoCastSpell(pVictim, m_spells.rogue.pCheapShot) == SPELL_CAST_OK)
-                        return;
+                    me->CastSpell(pVictim, pSpellEntry, false);
+                    me->RemoveSpellCooldown(*pSpellEntry);
+                    return;
                 }
             }
         }
@@ -4236,26 +4219,80 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
                 {
                     if (DoCastSpell(me, m_spells.rogue.pVanish) == SPELL_CAST_OK)
                     {
-                        if (me->GetMotionMaster()->MoveDistance(pVictim, 40.0f))
+                        if (me->GetMotionMaster()->MoveDistance(pVictim, 50.0f))
                             return;
                     }
                 }
             }
         }
 
-        if (me->GetComboPoints() > 4)
+        if (m_spells.rogue.pVanish &&
+            me->HasUnitState(UNIT_STAT_ROOT) &&
+            !me->CanReachWithMeleeAutoAttack(pVictim))
         {
+            if (m_spells.rogue.pPreparation &&
+                !me->IsSpellReady(m_spells.rogue.pVanish->Id) &&
+                CanTryToCastSpell(me, m_spells.rogue.pPreparation))
+            {
+                if (DoCastSpell(me, m_spells.rogue.pPreparation) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (CanTryToCastSpell(me, m_spells.rogue.pVanish))
+            {
+                if (DoCastSpell(me, m_spells.rogue.pVanish) == SPELL_CAST_OK)
+                {
+                    if (me->GetMotionMaster()->MoveDistance(pVictim, 50.0f))
+                        return;
+                }
+            }
+        }
+
+        if (m_spells.rogue.pBlind &&
+            pVictim->IsNonMeleeSpellCasted() &&
+            !me->CanReachWithMeleeAutoAttack(pVictim))
+        {
+            if (m_spells.rogue.pPreparation &&
+                !me->IsSpellReady(m_spells.rogue.pBlind->Id) &&
+                CanTryToCastSpell(me, m_spells.rogue.pPreparation))
+            {
+                if (DoCastSpell(me, m_spells.rogue.pPreparation) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (CanTryToCastSpell(pVictim, m_spells.rogue.pBlind))
+            {
+                if (DoCastSpell(pVictim, m_spells.rogue.pBlind) == SPELL_CAST_OK)
+                {
+                    return;
+                }
+            }
+        }
+
+        if (me->GetComboPoints() > 2)
+        {
+            if (m_spells.rogue.pKidneyShot &&
+                (!pVictim->HasUnitState(UNIT_STAT_STUNNED)) &&
+                CanTryToCastSpell(pVictim, m_spells.rogue.pKidneyShot))
+            {
+                if (DoCastSpell(pVictim, m_spells.rogue.pKidneyShot) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+
+        if (me->GetComboPoints() > 3)
+        {
+            if (m_spells.rogue.pColdBlood &&
+                CanTryToCastSpell(me, m_spells.rogue.pColdBlood))
+            {
+                DoCastSpell(me, m_spells.rogue.pColdBlood);
+            }
+
             std::vector<SpellEntry const*> vSpells;
-            if (m_spells.rogue.pSliceAndDice)
-                vSpells.push_back(m_spells.rogue.pSliceAndDice);
             if (m_spells.rogue.pEviscerate)
                 vSpells.push_back(m_spells.rogue.pEviscerate);
             if (m_spells.rogue.pKidneyShot)
                 vSpells.push_back(m_spells.rogue.pKidneyShot);
-            if (m_spells.rogue.pExposeArmor)
-                vSpells.push_back(m_spells.rogue.pExposeArmor);
-            if (m_spells.rogue.pRupture)
-                vSpells.push_back(m_spells.rogue.pRupture);
             if (!vSpells.empty())
             {
                 SpellEntry const* pComboSpell = SelectRandomContainerElement(vSpells);
@@ -4284,26 +4321,29 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
         }
 
         if (m_spells.rogue.pAdrenalineRush &&
-           !me->GetPower(POWER_ENERGY) &&
+            me->CanReachWithMeleeAutoAttack(pVictim) &&
             CanTryToCastSpell(me, m_spells.rogue.pAdrenalineRush))
         {
             if (DoCastSpell(me, m_spells.rogue.pAdrenalineRush) == SPELL_CAST_OK)
                 return;
         }
 
-        if (pVictim->IsNonMeleeSpellCasted())
+        if (pVictim->IsNonMeleeSpellCasted(false, false, true) &&
+            (pVictim->GetClass() != CLASS_WARRIOR) &&
+            (pVictim->GetClass() != CLASS_ROGUE) &&
+            (pVictim->GetClass() != CLASS_HUNTER))
         {
-            if (m_spells.rogue.pGouge &&
-                CanTryToCastSpell(pVictim, m_spells.rogue.pGouge))
-            {
-                if (DoCastSpell(pVictim, m_spells.rogue.pGouge) == SPELL_CAST_OK)
-                    return;
-            }
-
             if (m_spells.rogue.pKick &&
                 CanTryToCastSpell(pVictim, m_spells.rogue.pKick))
             {
                 if (DoCastSpell(pVictim, m_spells.rogue.pKick) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.rogue.pGouge &&
+                CanTryToCastSpell(pVictim, m_spells.rogue.pGouge))
+            {
+                if (DoCastSpell(pVictim, m_spells.rogue.pGouge) == SPELL_CAST_OK)
                     return;
             }
         }
@@ -4311,26 +4351,28 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
         if (!me->HasAuraType(SPELL_AURA_MOD_STEALTH))
         {
             if (m_spells.rogue.pEvasion &&
-               (me->GetHealthPercent() < 80.0f) &&
-               ((GetAttackersInRangeCount(10.0f) > 2) || !IsRangedDamageClass(pVictim->GetClass())) &&
+                (me->GetHealthPercent() < 80.0f) &&
+                ((GetAttackersInRangeCount(10.0f) > 2) || !IsRangedDamageClass(pVictim->GetClass())) &&
                 CanTryToCastSpell(me, m_spells.rogue.pEvasion))
             {
                 if (DoCastSpell(me, m_spells.rogue.pEvasion) == SPELL_CAST_OK)
                     return;
             }
 
-            if (m_spells.rogue.pColdBlood &&
-                CanTryToCastSpell(me, m_spells.rogue.pColdBlood))
-            {
-                DoCastSpell(me, m_spells.rogue.pColdBlood);
-            }
-
             if (m_spells.rogue.pBladeFlurry &&
+                me->CanReachWithMeleeAutoAttack(pVictim) &&
                 CanTryToCastSpell(me, m_spells.rogue.pBladeFlurry))
             {
                 if (DoCastSpell(me, m_spells.rogue.pBladeFlurry) == SPELL_CAST_OK)
                     return;
             }
+        }
+
+        if (m_spells.rogue.pRiposte &&
+            CanTryToCastSpell(pVictim, m_spells.rogue.pRiposte))
+        {
+            if (DoCastSpell(pVictim, m_spells.rogue.pRiposte) == SPELL_CAST_OK)
+                return;
         }
 
         if (m_spells.rogue.pBackstab &&
@@ -4362,8 +4404,8 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
         }
 
         if (m_spells.rogue.pSprint &&
-           !me->HasUnitState(UNIT_STAT_ROOT) &&
-           !me->CanReachWithMeleeAutoAttack(pVictim) &&
+            !me->HasUnitState(UNIT_STAT_ROOT) &&
+            !me->CanReachWithMeleeAutoAttack(pVictim) &&
             CanTryToCastSpell(me, m_spells.rogue.pSprint))
         {
             if (DoCastSpell(me, m_spells.rogue.pSprint) == SPELL_CAST_OK)
