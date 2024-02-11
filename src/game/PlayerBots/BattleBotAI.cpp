@@ -430,7 +430,7 @@ Unit* BattleBotAI::SelectFollowTarget() const
         return nullptr;
 
     std::list<Player*> players;
-    me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
+    me->GetAlivePlayerListInRange(me, players, GetMaxAggroDistanceForMap());
     Player* pHealerFollowTarget = nullptr;
 
     for (const auto& pTarget : players)
