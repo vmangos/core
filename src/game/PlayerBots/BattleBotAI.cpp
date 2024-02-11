@@ -1733,6 +1733,20 @@ Unit* BattleBotAI::GetFlagCapper()
 void BattleBotAI::UpdateInCombatAI()
 {
     Unit* pVictim = me->GetVictim();
+    // Taunt target if its attacking someone else.
+    if (pVictim && pVictim->GetVictim() != me &&
+        (me->GetHealthPercent() > 25.0f) &&
+        pVictim->IsCreature())
+    {
+        for (const auto& pSpellEntry : m_spellListTaunt)
+        {
+            if (CanTryToCastSpell(pVictim, pSpellEntry))
+            {
+                if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
 
     // Hit people capping AB / AV flags
     if (Unit* pCapper = GetFlagCapper())
