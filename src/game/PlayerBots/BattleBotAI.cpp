@@ -1326,6 +1326,19 @@ void BattleBotAI::UpdateInCombatAI()
         }
     }
 
+    // Run away if oom
+    if (me->GetPowerPercent(POWER_MANA) < 10.0f &&
+        (m_role != ROLE_MELEE_DPS) &&
+        (!me->HasUnitState(UNIT_STAT_ROOT)) &&
+        (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
+    {
+        if (!me->IsStopped())
+            me->StopMoving();
+        me->GetMotionMaster()->Clear();
+        if (me->GetMotionMaster()->MoveDistance(pVictim, 70.0f))
+            return;
+    }
+
     // Stop chasing targets if they are very far away
     if (pVictim)
     {
