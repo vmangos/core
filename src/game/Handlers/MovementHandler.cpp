@@ -177,6 +177,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             GetPlayer()->ResetPersonalInstanceOnLeaveDungeon(oldLoc.mapId);
     }
 
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
+
     // mount allow check
     if (!mEntry->IsMountAllowed())
         _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
@@ -187,6 +189,9 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
+
+    // stop drowning if not in water anymore
+    GetPlayer()->UpdateTerainEnvironmentFlags();
 
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();

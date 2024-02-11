@@ -1,4 +1,3 @@
-
 @ECHO Off
 SETLOCAL ENABLEDELAYEDEXPANSION
 
@@ -8,26 +7,26 @@ REM Get the UTC date-time string to use
 CALL :GetFormattedCurrentUTCDate UTC
 ECHO "Formatted UTC Date time : %UTC%"
 
-SET "output=%UTC%_world.sql"
+SET "output=migrations\%UTC%_world.sql"
 
-ECHO DROP PROCEDURE IF EXISTS add_migration;>> migrations/%output%
-ECHO delimiter ??>> migrations/%output%
-ECHO CREATE PROCEDURE `add_migration`()>> migrations/%output%
-ECHO BEGIN>> migrations/%output%
-ECHO DECLARE v INT DEFAULT 1;>> migrations/%output%
-ECHO SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='%UTC%');>> migrations/%output%
-ECHO IF v=0 THEN>> migrations/%output%
-ECHO INSERT INTO `migrations` VALUES ('%UTC%');>> migrations/%output%
-ECHO -- Add your query below.>> migrations/%output%
-ECHO.>> migrations/%output%
-ECHO.>> migrations/%output%
-ECHO.>> migrations/%output%
-ECHO -- End of migration.>> migrations/%output%
-ECHO END IF;>> migrations/%output%
-ECHO END??>> migrations/%output%
-ECHO delimiter ; >> migrations/%output%
-ECHO CALL add_migration();>> migrations/%output%
-ECHO DROP PROCEDURE IF EXISTS add_migration;>> migrations/%output%
+ECHO DROP PROCEDURE IF EXISTS add_migration;>> %output%
+ECHO DELIMITER ??>> %output%
+ECHO CREATE PROCEDURE `add_migration`()>> %output%
+ECHO BEGIN>> %output%
+ECHO DECLARE v INT DEFAULT 1;>> %output%
+ECHO SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='%UTC%');>> %output%
+ECHO IF v = 0 THEN>> %output%
+ECHO INSERT INTO `migrations` VALUES ('%UTC%');>> %output%
+ECHO -- Add your query below.>> %output%
+ECHO.>> %output%
+ECHO.>> %output%
+ECHO.>> %output%
+ECHO -- End of migration.>> %output%
+ECHO END IF;>> %output%
+ECHO END??>> %output%
+ECHO DELIMITER ;>> %output%
+ECHO CALL add_migration();>> %output%
+ECHO DROP PROCEDURE IF EXISTS add_migration;>> %output%
 
 REM End of the script Body
 :EndOfScriptBody

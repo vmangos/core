@@ -97,7 +97,7 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
         if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
             me->SatisfyItemRequirements(pItem->GetProto());
-            me->StoreNewItemInBestSlots(pItem->GetEntry(), 1);
+            me->StoreNewItemInBestSlots(pItem->GetEntry(), 1, pItem->GetEnchantmentId(EnchantmentSlot(0)));
         }   
     }
 }
@@ -946,7 +946,7 @@ void PartyBotAI::UpdateInCombatAI()
             // Taunt target if its attacking someone else.
             if (pVictim && pVictim->GetVictim() != me)
             {
-                for (const auto& pSpellEntry : spellListTaunt)
+                for (const auto& pSpellEntry : m_spellListTaunt)
                 {
                     if (CanTryToCastSpell(pVictim, pSpellEntry))
                     {

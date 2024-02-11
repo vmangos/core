@@ -414,11 +414,11 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
             }
             case SCRIPT_COMMAND_REMOVE_AURA:
             {
-                if (!sSpellMgr.GetSpellEntry(tmp.removeAura.spellId))
+                if (tmp.removeAura.spellId && !sSpellMgr.GetSpellEntry(tmp.removeAura.spellId))
                 {
                     if (!sSpellMgr.IsExistingSpellId(tmp.removeAura.spellId))
                     {
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA or SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA for script id %u",
                             tablename, tmp.removeAura.spellId, tmp.id);
                         continue;
                     }
@@ -433,7 +433,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 {
                     if (!sSpellMgr.IsExistingSpellId(tmp.castSpell.spellId))
                     {
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA or SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
                             tablename, tmp.castSpell.spellId, tmp.id);
                         continue;
                     }

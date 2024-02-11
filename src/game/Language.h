@@ -76,7 +76,7 @@ enum MangosStrings
     LANG_NON_EXIST_CHARACTER            = 47,
     LANG_FRIEND_IGNORE_UNKNOWN          = 48,
     LANG_LEVEL_MINREQUIRED              = 49,
-    //                                  = 50, not used
+    LANG_COMMAND_UNAVAILABLE            = 50,
     LANG_NPC_TAINER_HELLO               = 51,
     LANG_COMMAND_INVALID_ITEM_COUNT     = 52,
     LANG_COMMAND_MAIL_ITEMS_LIMIT       = 53,
@@ -188,7 +188,9 @@ enum MangosStrings
     LANG_XP_RATE_MIN                    = 177,
     LANG_XP_RATE_MAX                    = 178,
     LANG_XP_RATE_SET                    = 179,
-    // Room for more level 1              180-199 not used
+    LANG_ALLIANCE_BATTLEBOT_ADDED       = 180,
+    LANG_HORDE_BATTLEBOT_ADDED          = 181,
+    // Room for more level 1              182-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,

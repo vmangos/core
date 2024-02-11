@@ -1093,3 +1093,18 @@ bool SpellEntry::IsTargetInRange(WorldObject const* pCaster, WorldObject const* 
 
     return dist < max_range && dist >= min_range;
 }
+
+bool SpellEntry::HasAuraOrTriggersAnotherSpellWithAura(AuraType aura) const
+{
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (EffectApplyAuraName[i] == aura)
+            return true;
+
+        if (Effect[i] == SPELL_EFFECT_TRIGGER_SPELL)
+            if (SpellEntry const* pTriggeredSpell = sSpellMgr.GetSpellEntry(EffectTriggerSpell[i]))
+                if (pTriggeredSpell->HasAura(aura))
+                    return true;
+    }
+    return false;
+}

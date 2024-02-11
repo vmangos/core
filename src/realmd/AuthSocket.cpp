@@ -1005,6 +1005,22 @@ bool AuthSocket::_HandleRealmList()
     return true;
 }
 
+std::string AuthSocket::GetRealmAddress(Realm const& realm) const
+{
+    ACE_INET_Addr addr;
+    if (peer().get_remote_addr(addr) == 0)
+    {
+        ACE_INET_Addr localAddress;
+        if (localAddress.set(realm.localAddress.c_str()) == 0)
+        {
+            if ((addr.get_ip_address() & realm.localSubnetMask) == (localAddress.get_ip_address() & realm.localSubnetMask))
+                return realm.localAddress;
+        }
+    }
+
+    return realm.address;
+}
+
 void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
     if (m_build < 6299)        // before version 2.0.3 (exclusive)
@@ -1017,7 +1033,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             uint8 AmountOfCharacters;
 
             // No SQL injection. id of realm is controlled by the database.
-            QueryResult *result = LoginDatabase.PQuery("SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.m_ID, m_accountId);
+            QueryResult *result = LoginDatabase.PQuery("SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.id, m_accountId);
             if (result)
             {
                 Field *fields = result->Fetch();
@@ -1027,13 +1043,13 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             else
                 AmountOfCharacters = 0;
 
-            bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), m_build) != i->second.realmbuilds.end();
+            bool ok_build = std::find(i->second.realmBuilds.begin(), i->second.realmBuilds.end(), m_build) != i->second.realmBuilds.end();
 
             RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(m_build) : nullptr;
             if (!buildInfo)
                 buildInfo = &i->second.realmBuildInfo;
 
-            RealmFlags realmflags = i->second.realmflags;
+            RealmFlags realmflags = i->second.realmFlags;
 
             // 1.x clients not support explicitly REALM_FLAG_SPECIFYBUILD, so manually form similar name as show in more recent clients
             std::string name = i->first;
@@ -1045,16 +1061,16 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             }
 
             // Show offline state for unsupported client builds and locked realms (1.x clients not support locked state show)
-            if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.m_ID)))
+            if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.id)))
                 realmflags = RealmFlags(realmflags | REALM_FLAG_OFFLINE);
 
             pkt << uint32(i->second.icon);              // realm type
             pkt << uint8(realmflags);                   // realmflags
             pkt << name;                                // name
-            pkt << i->second.address;                   // address
+            pkt << GetRealmAddress(i->second);          // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
-            pkt << uint8(i->second.timezone);           // realm category
+            pkt << uint8(i->second.timeZone);           // realm category
             pkt << uint8(0x00);                         // unk, may be realm number/id?
         }
 
@@ -1070,7 +1086,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             uint8 AmountOfCharacters;
 
             // No SQL injection. id of realm is controlled by the database.
-            QueryResult *result = LoginDatabase.PQuery("SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.m_ID, m_accountId);
+            QueryResult *result = LoginDatabase.PQuery("SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.id, m_accountId);
             if (result)
             {
                 Field *fields = result->Fetch();
@@ -1080,15 +1096,15 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             else
                 AmountOfCharacters = 0;
 
-            bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), m_build) != i->second.realmbuilds.end();
+            bool ok_build = std::find(i->second.realmBuilds.begin(), i->second.realmBuilds.end(), m_build) != i->second.realmBuilds.end();
 
             RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(m_build) : nullptr;
             if (!buildInfo)
                 buildInfo = &i->second.realmBuildInfo;
 
-            uint8 lock = (i->second.allowedSecurityLevel > GetSecurityOn(i->second.m_ID)) ? 1 : 0;
+            uint8 lock = (i->second.allowedSecurityLevel > GetSecurityOn(i->second.id)) ? 1 : 0;
 
-            RealmFlags realmFlags = i->second.realmflags;
+            RealmFlags realmFlags = i->second.realmFlags;
 
             // Show offline state for unsupported client builds
             if (!ok_build)
@@ -1101,10 +1117,10 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             pkt << uint8(lock);                         // flags, if 0x01, then realm locked
             pkt << uint8(realmFlags);                   // see enum RealmFlags
             pkt << i->first;                            // name
-            pkt << i->second.address;                   // address
+            pkt << GetRealmAddress(i->second);          // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
-            pkt << uint8(i->second.timezone);           // realm category (Cfg_Categories.dbc)
+            pkt << uint8(i->second.timeZone);           // realm category (Cfg_Categories.dbc)
             pkt << uint8(0x2C);                         // unk, may be realm number/id?
 
             if (realmFlags & REALM_FLAG_SPECIFYBUILD)

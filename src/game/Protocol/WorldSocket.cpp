@@ -19,9 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 #include "Auth/AuthCrypt.h"
-
 #include "World.h"
 #include "AccountMgr.h"
 #include "SharedDefines.h"
@@ -29,9 +27,9 @@
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
 #include "AddonHandler.h"
-
 #include "Opcodes.h"
 #include "MangosSocketImpl.h"
+#include "ace/OS_NS_netdb.h"
 
 template class MangosSocket<WorldSession, WorldSocket, AuthCrypt>;
 
@@ -112,6 +110,29 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     ACE_NOTREACHED(return 0);
 }
 
+static std::set<std::string> GetServerAddresses()
+{
+    std::set<std::string> addresses;
+    char hostName[MAXHOSTNAMELEN] = {};
+
+    if (ACE_OS::hostname(hostName, MAXHOSTNAMELEN) != -1)
+    {
+        if (hostent* hp = ACE_OS::gethostbyname(hostName))
+        {
+            for (int i = 0; hp->h_addr_list[i] != 0; ++i)
+            {
+                in_addr addr;
+                memcpy(&addr, hp->h_addr_list[i], sizeof(in_addr));
+                addresses.insert(ACE_OS::inet_ntoa(addr));
+            }
+        }
+    }
+
+    addresses.insert("127.0.0.1");
+
+    return addresses;
+}
+
 int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 {
     // NOTE: ATM the socket is singlethread, have this in mind ...
@@ -124,6 +145,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     std::string account, os, platform;
     BigNumber v, s, g, N, K;
     WorldPacket packet, addonPacket;
+    static std::set<std::string> const serverAddressList = GetServerAddresses();
 
     // Read the content of the packet
     recvPacket >> clientBuild;
@@ -192,7 +214,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Prevent connecting directly to mangosd by checking
     // that same ip connected to realmd previously.
-    if (strcmp(fields[3].GetString(), GetRemoteAddress().c_str()))
+    if (strcmp(fields[3].GetString(), GetRemoteAddress().c_str()) &&
+        serverAddressList.find(GetRemoteAddress()) == serverAddressList.end())
     {
         packet.Initialize(SMSG_AUTH_RESPONSE, 1);
         packet << uint8(AUTH_FAILED);

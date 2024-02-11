@@ -233,7 +233,7 @@ struct boss_sapphironAI : public ScriptedAI
         {
             skeleton->Despawn();
             m_creature->SummonGameObject(GO_SAPPHIRON_SPAWN, skeleton->GetPositionX(), skeleton->GetPositionY(), skeleton->GetPositionZ(),
-                skeleton->GetRotation(), 0, 0, 0, 0, SPAWN_ANIM_TIMER);
+                skeleton->GetOrientation(), 0, 0, 0, 0, SPAWN_ANIM_TIMER);
         }
         else
         {

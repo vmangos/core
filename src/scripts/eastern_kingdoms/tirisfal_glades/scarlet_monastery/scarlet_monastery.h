@@ -7,7 +7,7 @@
 
 enum
 {
-    INSTANCE_SM_MAX_ENCOUNTER                   = 1,
+    INSTANCE_SM_MAX_ENCOUNTER       = 1,
 
     TYPE_MOGRAINE_AND_WHITE_EVENT   = 1,
 
