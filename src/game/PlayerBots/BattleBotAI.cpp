@@ -878,6 +878,58 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     Unit* pVictim = me->GetVictim();
 
+    // Stop chasing targets if they are very far away
+    if (pVictim)
+    {
+        if (IsMeleeDamageClass(me->GetClass()))
+        {
+            if (me->GetDistance(pVictim) > BB_MAX_MELEE_CHASE_RANGE)
+            {
+                if (Pet* pPet = me->GetPet())
+                {
+                    if (pPet->IsAlive())
+                        pPet->AttackStop();
+                }
+                me->AttackStop();
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                    ClearPath();
+                    StartNewPathFromBeginning();
+                }
+                return;
+            }
+
+        }
+        else if (m_role == ROLE_HEALER)
+        {
+            if (me->GetDistance(pVictim) > BB_MAX_HEALER_CHASE_RANGE)
+            {
+                me->AttackStop();
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                    ClearPath();
+                    StartNewPathFromBeginning();
+                }
+                return;
+            }
+        }
+        else if (me->GetDistance(pVictim) > BB_MAX_CHASE_RANGE)
+        {
+            if (Pet* pPet = me->GetPet())
+            {
+                if (pPet->IsAlive())
+                    pPet->AttackStop();
+            }
+            me->AttackStop();
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+            {
+                ClearPath();
+                StartNewPathFromBeginning();
+            }
+            return;
+        }
+    }
+
     if (!me->IsInCombat() && me->GetEnemyCountInRadiusAround(me, VISIBILITY_DISTANCE_SMALL) == 0)
     {
         if (DrinkAndEat())
@@ -1690,61 +1742,6 @@ void BattleBotAI::UpdateInCombatAI()
             me->AttackStop();
             AttackStart(pCapper);
             return;
-        }
-    }
-
-    // Stop chasing targets if they are very far away
-    if (pVictim)
-    {
-        if (IsMeleeDamageClass(me->GetClass()))
-        {
-            if (me->GetDistance(pVictim) > BB_MAX_MELEE_CHASE_RANGE)
-            {
-                if (Pet* pPet = me->GetPet())
-                {
-                    if (pPet->IsAlive())
-                        pPet->AttackStop();
-                }
-                me->AttackStop();
-                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                {
-                    ClearPath();
-                    StartNewPathFromBeginning();
-                }
-                return;
-            }
-
-        }
-        else if (m_role == ROLE_HEALER)
-        {
-            if (me->GetDistance(pVictim) > BB_MAX_HEALER_CHASE_RANGE)
-            {
-                me->AttackStop();
-                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                {
-                    ClearPath();
-                    StartNewPathFromBeginning();
-                }
-                return;
-            }
-        }
-        else
-        {
-            if (me->GetDistance(pVictim) > BB_MAX_CHASE_RANGE)
-            {
-                if (Pet* pPet = me->GetPet())
-                {
-                    if (pPet->IsAlive())
-                        pPet->AttackStop();
-                }
-                me->AttackStop();
-                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                {
-                    ClearPath();
-                    StartNewPathFromBeginning();
-                }
-                return;
-            }
         }
     }
 
