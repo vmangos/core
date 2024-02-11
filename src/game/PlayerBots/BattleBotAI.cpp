@@ -74,6 +74,7 @@ enum BattleBotSpells
 #define BB_MAX_CHASE_RANGE 41.0f
 #define BB_NS_DRUID 17116
 #define BB_NS_SHAMAN 16188
+#define BB_FEIGN_DEATH_AURA 5384
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
@@ -812,6 +813,12 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         }
     }
     
+    // Remove Feign death if > 25% HP
+    if ((me->GetClass() == CLASS_HUNTER) &&
+        (me->HasAura(BB_FEIGN_DEATH_AURA) &&
+            me->GetHealthPercent() > 25.0f))
+        me->RemoveAurasDueToSpell(BB_FEIGN_DEATH_AURA);
+
     if (me->IsDead())
     {
         if (!m_wasDead)
