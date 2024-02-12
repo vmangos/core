@@ -4450,9 +4450,11 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
             }
         }
     }
-    else
+    else if (bg && bg->GetStatus() == STATUS_IN_PROGRESS)
     {
-        if (m_spells.druid.pMarkoftheWild && CanTryToCastSpell(me, m_spells.druid.pMarkoftheWild))
+        if (m_spells.druid.pMarkoftheWild && 
+            IsValidBuffTarget(me, m_spells.druid.pMarkoftheWild) &&
+            CanTryToCastSpell(me, m_spells.druid.pMarkoftheWild))
         {
             if (DoCastSpell(me, m_spells.druid.pMarkoftheWild) == SPELL_CAST_OK)
             {
@@ -4461,7 +4463,9 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
             }
         }
 
-        if (m_spells.druid.pThorns && CanTryToCastSpell(me, m_spells.druid.pThorns))
+        if (m_spells.druid.pThorns && 
+            IsValidBuffTarget(me, m_spells.druid.pThorns) &&
+            CanTryToCastSpell(me, m_spells.druid.pThorns))
         {
             if (DoCastSpell(me, m_spells.druid.pThorns) == SPELL_CAST_OK)
             {
