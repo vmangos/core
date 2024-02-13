@@ -1758,9 +1758,9 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
     {
         if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneBrilliance))
         {
-            if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
+            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneBrilliance))
             {
-                if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+                if (DoCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
                     me->ClearTarget();
