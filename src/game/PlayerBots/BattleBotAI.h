@@ -107,8 +107,10 @@ public:
     bool m_temporary = false;
     bool m_wasDead = false;
     bool m_wasInBG = false;
+    bool m_isDefending = false;
 
     // Movement System
+    void DefendCheck();
     void UpdateWaypointMovement();
     void DoGraveyardJump();
     void MoveToNextPoint();
