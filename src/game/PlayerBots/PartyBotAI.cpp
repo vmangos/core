@@ -1563,15 +1563,19 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
 {
     if (m_spells.mage.pArcaneBrilliance)
     {
-        if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
+        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneBrilliance))
         {
-            if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneBrilliance))
             {
-                m_isBuffing = true;
-                me->ClearTarget();
-                return;
+                if (DoCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+                {
+                    m_isBuffing = true;
+                    me->ClearTarget();
+                    return;
+                }
             }
         }
+
     }
     else if (m_spells.mage.pArcaneIntellect)
     {
