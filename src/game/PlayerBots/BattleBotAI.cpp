@@ -2347,7 +2347,6 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
 
         if (m_spells.hunter.pFlare &&
             !me->IsMounted() &&
-            m_isDefending &&
             CanTryToCastSpell(me, m_spells.hunter.pFlare))
         {
             if (DoCastSpell(me, m_spells.hunter.pFlare) == SPELL_CAST_OK)
