@@ -4162,7 +4162,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Rogue()
     {
         if (me->HasAuraType(SPELL_AURA_MOD_STEALTH))
         {
-            if (me->GetCombatDistance(pVictim) <= 15.0f)
+            if (me->GetCombatDistance(pVictim) <= 15.0f && 
+                me->GetLevel() >= 26)
             {
                 if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_CHEAP_SHOT))
                 {
@@ -4194,7 +4195,8 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
             {
                 DoCastSpell(pVictim, m_spells.rogue.pPremeditation);
             }
-            if (me->GetCombatDistance(pVictim) <= 15.0f)
+            if (me->GetCombatDistance(pVictim) <= 15.0f && 
+                me->GetLevel() >= 26)
             {
                 if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_CHEAP_SHOT))
                 {
@@ -4515,7 +4517,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
 
         if (me->HasAuraType(SPELL_AURA_MOD_STEALTH))
         {
-            if (me->GetCombatDistance(pVictim) <= 15.0f)
+            if (me->GetCombatDistance(pVictim) <= 15.0f && 
+                me->GetLevel() >= 36)
             {
                 if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_POUNCE))
                 {
@@ -4809,7 +4812,8 @@ void BattleBotAI::UpdateInCombatAI_Druid()
 
             if (me->HasAuraType(SPELL_AURA_MOD_STEALTH))
             {
-                if (me->GetCombatDistance(pVictim) <= 15.0f)
+                if (me->GetCombatDistance(pVictim) <= 15.0f && 
+                    me->GetLevel() >= 36)
                 {
                     if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_POUNCE))
                     {
