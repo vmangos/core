@@ -184,7 +184,6 @@ void AtFlag(BattleBotAI* pAI, std::vector<uint32> const& vFlagIds)
         {
             pAI->ClearPath();
             pAI->StartNewPathFromBeginning();
-            pAI->DefendCheck();
             return;
         }
     }
@@ -203,13 +202,6 @@ void AtFlag(BattleBotAI* pAI, std::vector<uint32> const& vFlagIds)
 
                 pAI->ClearPath();
                 pAI->me->CastSpell(pGo, SPELL_CAPTURE_BANNER, false);
-                pAI->DefendCheck();
-                return;
-            }
-            if (pGo->isSpawned())
-            {
-                pAI->ClearPath();
-                pAI->DefendCheck();
                 return;
             }
         }
@@ -2184,17 +2176,6 @@ bool BattleBotAI::StartNewPathToObjective()
             }
             break;
         }
-        case BATTLEGROUND_AB: // TODO
-        {
-            if (me->GetTeam() == HORDE)
-            {
-
-            }
-            else // ALLIANCE
-            {
-            }
-            break;
-        }
     }
 
     return false;
@@ -2205,5 +2186,4 @@ void BattleBotAI::ClearPath()
     m_currentPath = nullptr;
     m_currentPoint = 0;
     m_movingInReverse = false;
-    m_isDefending = false;
 }

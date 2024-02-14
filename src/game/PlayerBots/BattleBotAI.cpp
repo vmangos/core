@@ -157,9 +157,6 @@ bool BattleBotAI::UseMount()
     if (me->IsMoving())
         return false;
 
-    if (m_isDefending)
-        return false;
-
     if (me->GetDisplayId() != me->GetNativeDisplayId())
         return false;
 
@@ -553,31 +550,10 @@ void BattleBotAI::OnPlayerLogin()
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 }
 
-void BattleBotAI::DefendCheck()
-{
-    //Find ally player in range.
-    std::list<Player*> players;
-    this->me->GetAlivePlayerListInRange(this->me, players, VISIBILITY_DISTANCE_TINY);
-    auto count = 0;
-    for (const auto& pTarget : players)
-    {
-        if (this->me->GetReactionTo(pTarget) == REP_FRIENDLY)
-        {
-            count++;
-        }
-    }
-    // Stay to guard flag if less than 3 allies are near it
-    this->m_isDefending = (count < 3);
-}
-
 void BattleBotAI::UpdateWaypointMovement()
 {
     // We already have a path.
     if (m_currentPath)
-        return;
-
-    // We are defending a node
-    if (m_isDefending)
         return;
 
     if (me->IsMoving())
