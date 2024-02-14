@@ -1760,12 +1760,9 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
         {
             if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneBrilliance))
             {
-                if (DoCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
+                m_isBuffing = true;
+                me->ClearTarget();
+                return;
             }
         }
         
@@ -2102,7 +2099,6 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
             }
         }
     }
-
 
     if (m_spells.priest.pPrayerofShadowProtection)
     {

@@ -30,279 +30,107 @@
 #include "HardcodedEvents.h"
 #include "CreatureGroups.h"
 
-enum
+struct go_wind_stoneAI: public GameObjectAI
 {
-    SPELL_SET_AURA            = 24746,
-    SPELL_RED_LIGHTNING       = 24240,
+    go_wind_stoneAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    ITEM_SET_ENTRY            = 492,
-
-    ITEM_SET_SHOULDERS        = 20406,
-    ITEM_SET_CHEST            = 20407,
-    ITEM_SET_HEAD             = 20408,
-
-    SPELL_APPARITION          = 25035,
-
-    GO_TYPE_PIERRE_ERR        = 0,
-    GO_TYPE_PIERRE_INF        = 1,
-    GO_TYPE_PIERRE_MOYENNE    = 2,
-    GO_TYPE_PIERRE_SUP        = 3,
-
-    // Pierre moyenne
-    ITEM_ACCES_PIERRE_MOYENNE = 20422,
-    AURA_ACCES_PIERRE_MOYENNE = 24748,
-
-    // Pierre superieure
-    ITEM_ACCES_PIERRE_SUP     = 20451,
-    AURA_ACCES_PIERRE_SUP     = 24782,
-
-    GOSSIP_STONE_FIRST_HELLO    = 69,
-    GOSSIP_STONE_FIRST_OPTION   = 10684
-};
-
-struct Silithus_WindStonesBossData
-{
-    int stoneType;
-    int action;
-    int summonEntry;
-    int reqItem;
-    int gossipOption;
-};
-static Silithus_WindStonesBossData const windStonesBosses[] =
-{
-    {GO_TYPE_PIERRE_INF,    1,  15209,  20416, 10685 },
-    {GO_TYPE_PIERRE_INF,    2,  15307,  20419, 10691 },
-    {GO_TYPE_PIERRE_INF,    3,  15212,  20418, 10690 },
-    {GO_TYPE_PIERRE_INF,    4,  15211,  20420, 10692 },
-
-    {GO_TYPE_PIERRE_MOYENNE,1,  15206,  20432, 10699 },
-    {GO_TYPE_PIERRE_MOYENNE,2,  15208,  20435, 10701 },
-    {GO_TYPE_PIERRE_MOYENNE,3,  15220,  20433, 10700 },
-    {GO_TYPE_PIERRE_MOYENNE,4,  15207,  20436, 10702 },
-
-    {GO_TYPE_PIERRE_SUP,    1,  15203,  20447, 10708 },
-    {GO_TYPE_PIERRE_SUP,    2,  15205,  20449, 10710 },
-    {GO_TYPE_PIERRE_SUP,    3,  15204,  20448, 10709 },
-    {GO_TYPE_PIERRE_SUP,    4,  15305,  20450, 10711 },
-};
-
-struct go_pierre_ventsAI: public GameObjectAI
-{
-    go_pierre_ventsAI(GameObject* pGo) : GameObjectAI(pGo) {}
-
-    uint32 GetStoneType()
+    static uint32 GetSpawnText(uint32 npcEntry)
     {
-        switch (me->GetEntry())
+        uint32 textId;
+        switch (npcEntry)
         {
-            // Pierre SUP
-            case 180466:
-            case 180539:
-            case 180559:
-                return GO_TYPE_PIERRE_SUP;
-            // Pierre MOYENNE
-            case 180554:
-            case 180534:
-            case 180502:
-            case 180461:
-                return GO_TYPE_PIERRE_MOYENNE;
-            // Pierre INF
-            case 180456:
-            case 180518:
-            case 180529:
-            case 180544:
-            case 180549:
-            case 180564:
-                return GO_TYPE_PIERRE_INF;
+            case 15209:
+            case 15307:
+            case 15212:
+            case 15211:
+                textId = PickRandomValue(10686, 10694, 10695, 10696);
+                break;
+            case 15206:
+            case 15208:
+            case 15220:
+            case 15207:
+                textId = PickRandomValue(10801, 10802, 10803, 10804);
+                break;
+            case 15203:
+            case 15205:
+            case 15204:
+            case 15305:
+                textId = PickRandomValue(10805, 10806, 10807, 10810);
+                break;
             default:
-                return GO_TYPE_PIERRE_ERR;
-        }
-    }
-    uint32 SelectRandomBoss(uint32 stoneType)
-    {
-        std::vector<uint32> possibleBosses;
-        for (const auto& stone : windStonesBosses)
-            if (stone.stoneType == stoneType)
-                possibleBosses.push_back(stone.summonEntry);
-        ASSERT(!possibleBosses.empty());
-        return possibleBosses[urand(0, possibleBosses.size() - 1)];
-    }
-
-    bool CheckPlayerHasAura(uint32 uiReqAura, Player *pUser, uint32 itemToDelete = 0)
-    {
-        if (uiReqAura && !pUser->HasAura(uiReqAura))
-            if (!pUser->IsGameMaster())
-                return false;
-        return true;
-    }
-
-    void UseFailed(Unit* user)
-    {
-        if (user->IsAlive())
-        {
-            user->CastSpell(user, SPELL_RED_LIGHTNING, true);
-            user->DealDamage(user, user->GetHealth() > 1000 ? 1000 : user->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-        }
-    }
-    bool CanUse(Player* user)
-    {
-        if (!user || !me->isSpawned())
-            return false;
-
-        bool playerHasAura = true;
-
-        // Check if allowed to use the stone ?
-        switch (GetStoneType())
-        {
-            // Pierre SUP
-            case GO_TYPE_PIERRE_SUP:
-                if (!user->HasItemWithIdEquipped(ITEM_ACCES_PIERRE_SUP))
-                    playerHasAura = false;
-            // Pierre MOYENNE
-            case GO_TYPE_PIERRE_MOYENNE:
-                if (!user->HasItemWithIdEquipped(ITEM_ACCES_PIERRE_MOYENNE))
-                    playerHasAura = false;
-            // Pierre INF
-            case GO_TYPE_PIERRE_INF:
-                if (!user->HasItemWithIdEquipped(ITEM_SET_HEAD) ||
-                    !user->HasItemWithIdEquipped(ITEM_SET_SHOULDERS) ||
-                    !user->HasItemWithIdEquipped(ITEM_SET_CHEST))
-                    playerHasAura = false;
+                textId = 0;
                 break;
         }
+        return textId;
+    }
 
-        if (!playerHasAura)
+    bool OnActivateBySpell(SpellCaster* caster, uint32 spellId, uint32 action) override
+    {
+        uint32 npcEntry = 0;
+        static constexpr uint32 templars[] = { 15209, 15211, 15212, 15307 };
+        static constexpr uint32 dukes[] = { 15206, 15207, 15208, 15220 };
+        static constexpr uint32 royals[] = { 15203, 15204, 15205, 15305 };
+
+        switch (spellId)
         {
-            UseFailed(user);
+            case 24734: npcEntry = templars[urand(0, 3)]; break; // Summon Templar Random
+            case 24763: npcEntry = dukes[urand(0, 3)];    break; // Summon Duke Random
+            case 24784: npcEntry = royals[urand(0, 3)];   break; // Summon Royal Random
+            case 24744: npcEntry = 15209;                 break; // Summon Templar (fire)
+            case 24756: npcEntry = 15212;                 break; // Summon Templar (air)
+            case 24758: npcEntry = 15307;                 break; // Summon Templar (earth)
+            case 24760: npcEntry = 15211;                 break; // Summon Templar (water)
+            case 24765: npcEntry = 15206;                 break; // Summon Duke (fire)
+            case 24768: npcEntry = 15220;                 break; // Summon Duke (air)
+            case 24770: npcEntry = 15208;                 break; // Summon Duke (earth)
+            case 24772: npcEntry = 15207;                 break; // Summon Duke (water)
+            case 24786: npcEntry = 15203;                 break; // Summon Royal (fire)
+            case 24788: npcEntry = 15204;                 break; // Summon Royal (air)
+            case 24789: npcEntry = 15205;                 break; // Summon Royal (earth)
+            case 24790: npcEntry = 15305;                 break; // Summon Royal (water)
+        }
+
+        if (!npcEntry)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "go_wind_stoneAI - Unhandled spell id %u!\n", spellId);
             return false;
         }
-        return true;
-    }
-
-    bool OnUse(Unit* user) override
-    {
-        Player* player = user->ToPlayer();
-        if (!CanUse(player))
-            return true;
-
-        uint32 stoneType = GetStoneType();
-        player->PlayerTalkClass->ClearMenus();
-        //FixMe: Positive ID is broadcast text. I don't understand the thing below.
-        //player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION + stoneType - 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-        for (const auto& stone : windStonesBosses)
-            if (stone.stoneType == stoneType)
-                if (player->HasItemCount(stone.reqItem, 1))
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, stone.gossipOption, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + stone.action);
-
-        player->SEND_GOSSIP_MENU(GOSSIP_STONE_FIRST_HELLO + stoneType - 1, me->GetGUID());
-        return true;
-    }
-
-    bool GossipSelect(Player* player, uint32 action)
-    {
-        if (!CanUse(player))
-            return true;
-
-        uint32 stoneType = GetStoneType();
-        if (!stoneType)
-            return true;
-
-        uint32 summonEntry = 0;
-        uint32 textId = 0;
-
-        // Let's find out which mob we have to summon.
-        switch (stoneType)
+        
+        if (Creature* pCreature = me->SummonCreature(npcEntry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, MINUTE * IN_MILLISECONDS))
         {
-            case GO_TYPE_PIERRE_SUP:
-                textId = 10805;
-                break;
-            case GO_TYPE_PIERRE_MOYENNE:
-                textId = 10802;
-                break;
-            case GO_TYPE_PIERRE_INF:
-                textId = 10686;
-                break;
-        }
-
-        for (const auto& stone : windStonesBosses)
-        {
-            if (stone.stoneType == stoneType && action == GOSSIP_ACTION_INFO_DEF + stone.action)
+            pCreature->m_Events.AddLambdaEventAtOffset([pCreature, casterGuid = caster->GetObjectGuid()]
             {
-                if (player->HasItemCount(stone.reqItem, 1))
+                if (Player* pPlayer = pCreature->GetMap()->GetPlayer(casterGuid))
+                    pCreature->SetFacingToObject(pPlayer);
+            }, 1500);
+
+            if (uint32 textId = GetSpawnText(npcEntry))
+            {
+                pCreature->m_Events.AddLambdaEventAtOffset([pCreature, textId, casterGuid = caster->GetObjectGuid()]
                 {
-                    summonEntry = stone.summonEntry;
-                    player->DestroyItemCount(stone.reqItem, 1, true, false);
-                }
-            }   
-        }
-
-        if (!summonEntry && action != GOSSIP_ACTION_INFO_DEF)
-        {
-            UseFailed(player);
-            return true;
-        }
-
-        if (!summonEntry)
-            summonEntry = SelectRandomBoss(stoneType);
-
-        if (!summonEntry)
-            return true;
-
-        // Destroy required items.
-        if (!player->ToPlayer()->IsGameMaster())
-        {
-            switch (stoneType)
-            {
-                case GO_TYPE_PIERRE_SUP:
-                    player->DestroyEquippedItem(ITEM_ACCES_PIERRE_SUP);
-                // no break
-                case GO_TYPE_PIERRE_MOYENNE:
-                    player->DestroyEquippedItem(ITEM_ACCES_PIERRE_MOYENNE);
-                // no break
-                case GO_TYPE_PIERRE_INF:
-                    player->DestroyEquippedItem(ITEM_SET_SHOULDERS);
-                    player->DestroyEquippedItem(ITEM_SET_CHEST);
-                    player->DestroyEquippedItem(ITEM_SET_HEAD);
-                    break;
+                    if (Player* pPlayer = pCreature->GetMap()->GetPlayer(casterGuid))
+                        DoScriptText(textId, pCreature, pPlayer);
+                }, 1600);
             }
+            
+            pCreature->m_Events.AddLambdaEventAtOffset([pCreature, casterGuid = caster->GetObjectGuid()]
+            {
+                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                if (Player* pPlayer = pCreature->GetMap()->GetPlayer(casterGuid))
+                {
+                    pCreature->AI()->AttackStart(pPlayer);
+                    pCreature->SetLootRecipient(pPlayer);
+                }
+            }, 8000);
         }
-
-        // Summon the creature
-        if (Creature* pInvoc = me->SummonCreature(summonEntry, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), me->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3600000, false, 5000))
-        {
-            player->CastSpell(player, SPELL_RED_LIGHTNING, true);
-            pInvoc->CastSpell(pInvoc, SPELL_APPARITION, true);
-            pInvoc->SetLootRecipient(player); // Force tag for summoner
-            if (textId)
-                pInvoc->MonsterSay(textId, 0, player);
-        }
-
-        // Mark stone as used.
-        me->UseDoorOrButton();
-        if (stoneType == GO_TYPE_PIERRE_SUP)
-            me->SetRespawnTime(3600);
-        else if (stoneType == GO_TYPE_PIERRE_MOYENNE)
-            me->SetRespawnTime(300);
-        else if (stoneType == GO_TYPE_PIERRE_INF)
-            me->SetRespawnTime(90);
-        else
-            me->SetRespawnTime(me->ComputeRespawnDelay());
+        me->Despawn();
         return true;
     }
 };
 
-GameObjectAI* GetAIgo_pierre_vents(GameObject *go)
+GameObjectAI* GetAIgo_wind_stone(GameObject *go)
 {
-    return new go_pierre_ventsAI(go);
-}
-
-bool GossipSelect_go_pierre_vents(Player* user, GameObject* gobj, uint32 sender, uint32 action)
-{
-    user->CLOSE_GOSSIP_MENU();
-    if (go_pierre_ventsAI* ai = dynamic_cast<go_pierre_ventsAI*>(gobj->AI()))
-        ai->GossipSelect(user, action);
-    return true;
+    return new go_wind_stoneAI(go);
 }
 
 enum
@@ -3198,9 +3026,8 @@ void AddSC_silithus()
     Script* pNewScript;
 
     pNewScript = new Script;
-    pNewScript->Name = "go_pierre_vents";
-    pNewScript->pGOGossipSelect =  &GossipSelect_go_pierre_vents;
-    pNewScript->GOGetAI = &GetAIgo_pierre_vents;
+    pNewScript->Name = "go_wind_stone";
+    pNewScript->GOGetAI = &GetAIgo_wind_stone;
     pNewScript->RegisterSelf();
 
     /*########################
