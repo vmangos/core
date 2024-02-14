@@ -2637,7 +2637,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 14297:
                 case 26546:
                 case 26555:
-                    minDist = 20.0f;
+                    minDist = 25.0f;
                     break;
             }
 #endif
