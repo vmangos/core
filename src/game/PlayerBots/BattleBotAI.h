@@ -29,7 +29,7 @@ enum BattleBotWsgWaitSpot
 
 enum FlagSpellsWS
 {
-    AURA_WARSONG_FLAG = 23333,
+    AURA_WARSONG_FLAG    = 23333,
     AURA_SILVERWING_FLAG = 23335
 };
 
@@ -38,7 +38,7 @@ class BattleBotAI : public CombatBotBaseAI
 public:
 
     BattleBotAI(uint8 race, uint8 class_, uint8 level, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, uint8 bgId, bool temporary)
-        : CombatBotBaseAI(), m_race(race), m_class(class_), m_level(level), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId), m_temporary(temporary)
+        : CombatBotBaseAI(),  m_race(race), m_class(class_), m_level(level), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId), m_temporary(temporary)
     {
         m_updateTimer.Reset(2000);
     }

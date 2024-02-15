@@ -31,46 +31,46 @@ using namespace Geometry;
 
 enum GameObjectsAB
 {
-    GO_AB_ALLIANCE_BANNER = 180058,
-    GO_AB_CONTESTED_BANNER1 = 180059,
-    GO_AB_HORDE_BANNER = 180060,
-    GO_AB_CONTESTED_BANNER2 = 180061,
-    GO_AB_STABLE_BANNER = 180087,
-    GO_AB_BLACKSMITH_BANNER = 180088,
-    GO_AB_FARM_BANNER = 180089,
+    GO_AB_ALLIANCE_BANNER    = 180058,
+    GO_AB_CONTESTED_BANNER1  = 180059,
+    GO_AB_HORDE_BANNER       = 180060,
+    GO_AB_CONTESTED_BANNER2  = 180061,
+    GO_AB_STABLE_BANNER      = 180087,
+    GO_AB_BLACKSMITH_BANNER  = 180088,
+    GO_AB_FARM_BANNER        = 180089,
     GO_AB_LUMBER_MILL_BANNER = 180090,
-    GO_AB_GOLD_MINE_BANNER = 180091
+    GO_AB_GOLD_MINE_BANNER   = 180091
 };
 
 enum GameObjectsAV
 {
-    GO_AV_HORDE_BANNER1 = 178364,
-    GO_AV_HORDE_BANNER2 = 178943,
-    GO_AV_ALLIANCE_BANNER1 = 178365,
-    GO_AV_ALLIANCE_BANNER2 = 178925,
+    GO_AV_HORDE_BANNER1     = 178364,
+    GO_AV_HORDE_BANNER2     = 178943,
+    GO_AV_ALLIANCE_BANNER1  = 178365,
+    GO_AV_ALLIANCE_BANNER2  = 178925,
     GO_AV_CONTESTED_BANNER1 = 178940, // usable by horde
     GO_AV_CONTESTED_BANNER2 = 179286, // usable by horde
     GO_AV_CONTESTED_BANNER3 = 179287, // usable by alliance
     GO_AV_CONTESTED_BANNER4 = 179435, // usable by alliance
-    GO_AV_SNOWFALL_BANNER = 180418
+    GO_AV_SNOWFALL_BANNER   = 180418
 };
 
 enum CreaturesAV
 {
     NPC_AV_GALVANGAR = 11947,
-    NPC_AV_BALINDA = 11949
+    NPC_AV_BALINDA   = 11949
 };
 
 enum GameObjectsWS
 {
     GO_WS_SILVERWING_FLAG = 179830,
-    GO_WS_WARSONG_FLAG = 179831
+    GO_WS_WARSONG_FLAG    = 179831
 };
 
 enum AreaTriggersWS
 {
     AT_SILVERWING_FLAG = 3646,
-    AT_WARSONG_FLAG = 3647
+    AT_WARSONG_FLAG    = 3647
 };
 
 void WSG_AtAllianceFlag(BattleBotAI* pAI)
@@ -104,7 +104,7 @@ void WSG_AtAllianceFlag(BattleBotAI* pAI)
             }
         }
     }
-
+    
     pAI->MoveToNextPoint();
 }
 
@@ -206,7 +206,7 @@ void AtFlag(BattleBotAI* pAI, std::vector<uint32> const& vFlagIds)
             }
         }
     }
-
+    
     pAI->MoveToNextPoint();
 }
 
@@ -1750,7 +1750,7 @@ std::vector<BattleBotPath*> const vPaths_NoReverseAllowed =
 void BattleBotAI::MovementInform(uint32 movementType, uint32 data)
 {
     if (movementType == POINT_MOTION_TYPE)
-    {
+    { 
         if (m_currentPath && m_currentPath->at(data).pFunc)
             (*m_currentPath->at(data).pFunc)(this);
         else
@@ -1798,23 +1798,23 @@ bool BattleBotAI::StartNewPathFromBeginning()
     std::vector<BattleBotPath*> const* vPaths;
     switch (me->GetBattleGround()->GetTypeID())
     {
-    case BATTLEGROUND_AB:
-    {
-        vPaths = &vPaths_AB;
-        break;
-    }
-    case BATTLEGROUND_AV:
-    {
-        vPaths = &vPaths_AV;
-        break;
-    }
-    case BATTLEGROUND_WS:
-    {
-        vPaths = &vPaths_WS;
-        break;
-    }
-    default:
-        return false;
+        case BATTLEGROUND_AB:
+        {
+            vPaths = &vPaths_AB;
+            break;
+        }
+        case BATTLEGROUND_AV:
+        {
+            vPaths = &vPaths_AV;
+            break;
+        }
+        case BATTLEGROUND_WS:
+        {
+            vPaths = &vPaths_WS;
+            break;
+        }
+        default:
+            return false;
     }
 
     for (const auto& pPath : *vPaths)
@@ -1852,23 +1852,23 @@ void BattleBotAI::StartNewPathFromAnywhere()
     std::vector<BattleBotPath*> const* vPaths;
     switch (me->GetBattleGround()->GetTypeID())
     {
-    case BATTLEGROUND_AB:
-    {
-        vPaths = &vPaths_AB;
-        break;
-    }
-    case BATTLEGROUND_AV:
-    {
-        vPaths = &vPaths_AV;
-        break;
-    }
-    case BATTLEGROUND_WS:
-    {
-        vPaths = &vPaths_WS;
-        break;
-    }
-    default:
-        return;
+        case BATTLEGROUND_AB:
+        {
+            vPaths = &vPaths_AB;
+            break;
+        }
+        case BATTLEGROUND_AV:
+        {
+            vPaths = &vPaths_AV;
+            break;
+        }
+        case BATTLEGROUND_WS:
+        {
+            vPaths = &vPaths_WS;
+            break;
+        }
+        default:
+            return;
     }
 
     for (const auto& pPath : *vPaths)
@@ -1891,7 +1891,7 @@ void BattleBotAI::StartNewPathFromAnywhere()
 
     m_currentPath = pClosestPath;
     m_movingInReverse = false;
-    m_currentPoint = closestPoint - 1;
+    m_currentPoint = closestPoint-1;
     MoveToNextPoint();
 }
 
@@ -1926,7 +1926,7 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
                 }
             }
         }
-
+        
         if (std::find(vPaths_NoReverseAllowed.begin(), vPaths_NoReverseAllowed.end(), pPath) != vPaths_NoReverseAllowed.end())
             continue;
 
@@ -1963,7 +1963,7 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
     {
         if (closestPoint == 0)
             return false;
-
+            
     }
     else
     {
@@ -2030,152 +2030,152 @@ bool BattleBotAI::StartNewPathToObjective()
 
     switch (bg->GetTypeID())
     {
-    case BATTLEGROUND_AV:
-    {
-        // Alliance and Horde code is intentionally different.
-        // Horde bots are more united and always go together.
-        // Alliance bots can pick random objective.
-
-        if (me->GetTeam() == HORDE)
+        case BATTLEGROUND_AV:
         {
-            // End Boss
-            if (!bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, ALLIANCE_CONTROLLED) &&
-                !bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, ALLIANCE_CONTROLLED) &&
-                !bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, ALLIANCE_CONTROLLED) &&
-                !bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, ALLIANCE_CONTROLLED) &&
-                !bg->IsActiveEvent(BG_AV_STORMPIKE_AID_STATION_GY, ALLIANCE_CONTROLLED))
-            {
-                if (Creature* pVanndar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_A, 0)))
-                    return StartNewPathToPosition(pVanndar->GetPosition(), vPaths_AV);
-            }
+            // Alliance and Horde code is intentionally different.
+            // Horde bots are more united and always go together.
+            // Alliance bots can pick random objective.
 
-            // Only go to Snowfall Graveyard if already close to it.
-            if (bg->IsActiveEvent(BG_AV_SNOWFALL_GY, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED))
+            if (me->GetTeam() == HORDE)
             {
-                if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED)))
-                    if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
-                        return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
-            }
-
-            if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
-            {
-                if (Creature* pBalinda = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_A, 0)))
-                    return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
-            }
-
-            for (const auto& objective : AV_HordeDefendObjectives)
-            {
-                if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED))
+                // End Boss
+                if (!bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, ALLIANCE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, ALLIANCE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, ALLIANCE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, ALLIANCE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_STORMPIKE_AID_STATION_GY, ALLIANCE_CONTROLLED))
                 {
-                    if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                    if (Creature* pVanndar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_A, 0)))
+                        return StartNewPathToPosition(pVanndar->GetPosition(), vPaths_AV);
+                }
+
+                // Only go to Snowfall Graveyard if already close to it.
+                if (bg->IsActiveEvent(BG_AV_SNOWFALL_GY, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED))
+                {
+                    if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED)))
                         if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
-                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);  
                 }
-            }
 
-            for (const auto& objective : AV_HordeAttackObjectives)
-            {
-                if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(objective.first, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
                 {
-                    if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                        return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                    if (Creature* pBalinda = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_A, 0)))
+                        return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
                 }
-            }
-        }
-        else // ALLIANCE
-        {
-            // End boss
-            if (!bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, HORDE_CONTROLLED) &&
-                !bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, HORDE_CONTROLLED) &&
-                !bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, HORDE_CONTROLLED) &&
-                !bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, HORDE_CONTROLLED) &&
-                !bg->IsActiveEvent(BG_AV_FROSTWOLF_RELIEF_HUT_GY, HORDE_CONTROLLED))
-            {
-                if (Creature* pDrek = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_H, 0)))
-                    return StartNewPathToPosition(pDrek->GetPosition(), vPaths_AV);
-            }
 
-            // Only go to Snowfall Graveyard if already close to it.
-            if (bg->IsActiveEvent(BG_AV_SNOWFALL_GY, HORDE_ASSAULTED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, HORDE_CONTROLLED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED))
-            {
-                if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED)))
-                    if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
-                        return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
-            }
-
-            // Chance to defend.
-            if (roll_chance_u(25))
-            {
-                for (const auto& objective : AV_AllianceDefendObjectives)
+                for (const auto& objective : AV_HordeDefendObjectives)
                 {
-                    if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED))
+                    if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED))
+                    {
+                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                            if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
+                                return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                    }
+                }
+
+                for (const auto& objective : AV_HordeAttackObjectives)
+                {
+                    if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(objective.first, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
                     {
                         if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
                             return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                     }
                 }
             }
-
-            // Attack closest objective.
-            WorldObject* pAttackObjectiveObject = nullptr;
-            float attackObjectiveDistance = FLT_MAX;
-
-            if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0))
+            else // ALLIANCE
             {
-                if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
+                // End boss
+                if (!bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, HORDE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, HORDE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, HORDE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, HORDE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_FROSTWOLF_RELIEF_HUT_GY, HORDE_CONTROLLED))
                 {
-                    pAttackObjectiveObject = pGalvangar;
-                    attackObjectiveDistance = me->GetDistance(pGalvangar);
+                    if (Creature* pDrek = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_H, 0)))
+                        return StartNewPathToPosition(pDrek->GetPosition(), vPaths_AV);
                 }
-            }
 
-            for (const auto& objective : AV_AllianceAttackObjectives)
-            {
-                if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                // Only go to Snowfall Graveyard if already close to it.
+                if (bg->IsActiveEvent(BG_AV_SNOWFALL_GY, HORDE_ASSAULTED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, HORDE_CONTROLLED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED))
                 {
-                    if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                    if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED)))
+                        if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
+                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                }
+                
+                // Chance to defend.
+                if (roll_chance_u(25))
+                {
+                    for (const auto& objective : AV_AllianceDefendObjectives)
                     {
-                        float const distance = me->GetDistance(pGO);
-                        if (attackObjectiveDistance > distance)
+                        if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED))
                         {
-                            pAttackObjectiveObject = pGO;
-                            attackObjectiveDistance = distance;
+                            if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                                return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                         }
                     }
                 }
-            }
 
-            if (pAttackObjectiveObject)
-                return StartNewPathToPosition(pAttackObjectiveObject->GetPosition(), vPaths_AV);
-        }
-        break;
-    }
-    case BATTLEGROUND_WS:
-    {
-        if (me->GetTeam() == HORDE)
-        {
-            if (me->HasAura(AURA_SILVERWING_FLAG))
-                return StartNewPathToPosition(WS_FLAG_POS_HORDE, vPaths_WS);
-            if (!static_cast<BattleGroundWS*>(bg)->IsAllianceFlagPickedup())
-            {
-                float const distance = me->GetDistance(WS_FLAG_POS_ALLIANCE);
-                if (distance > 20.0f && distance < 300.0f)
-                    return StartNewPathToPosition(WS_FLAG_POS_ALLIANCE, vPaths_WS);
+                // Attack closest objective.
+                WorldObject* pAttackObjectiveObject = nullptr;
+                float attackObjectiveDistance = FLT_MAX;
+
+                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0))
+                {
+                    if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
+                    {
+                        pAttackObjectiveObject = pGalvangar;
+                        attackObjectiveDistance = me->GetDistance(pGalvangar);
+                    }
+                }
+
+                for (const auto& objective : AV_AllianceAttackObjectives)
+                {
+                    if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                    {
+                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                        {
+                            float const distance = me->GetDistance(pGO);
+                            if (attackObjectiveDistance > distance)
+                            {
+                                pAttackObjectiveObject = pGO;
+                                attackObjectiveDistance = distance;
+                            }
+                        }
+                    }
+                }
+
+                if (pAttackObjectiveObject)
+                    return StartNewPathToPosition(pAttackObjectiveObject->GetPosition(), vPaths_AV);
             }
+            break;
         }
-        else
+        case BATTLEGROUND_WS:
         {
-            if (me->HasAura(AURA_WARSONG_FLAG))
-                return StartNewPathToPosition(WS_FLAG_POS_ALLIANCE, vPaths_WS);
-            if (!static_cast<BattleGroundWS*>(bg)->IsHordeFlagPickedup())
+            if (me->GetTeam() == HORDE)
             {
-                float const distance = me->GetDistance(WS_FLAG_POS_HORDE);
-                if (distance > 20.0f && distance < 300.0f)
+                if (me->HasAura(AURA_SILVERWING_FLAG))
                     return StartNewPathToPosition(WS_FLAG_POS_HORDE, vPaths_WS);
+                if (!static_cast<BattleGroundWS*>(bg)->IsAllianceFlagPickedup())
+                {
+                    float const distance = me->GetDistance(WS_FLAG_POS_ALLIANCE);
+                    if (distance > 20.0f && distance < 300.0f)
+                        return StartNewPathToPosition(WS_FLAG_POS_ALLIANCE, vPaths_WS);
+                }
             }
+            else
+            {
+                if (me->HasAura(AURA_WARSONG_FLAG))
+                    return StartNewPathToPosition(WS_FLAG_POS_ALLIANCE, vPaths_WS);
+                if (!static_cast<BattleGroundWS*>(bg)->IsHordeFlagPickedup())
+                {
+                    float const distance = me->GetDistance(WS_FLAG_POS_HORDE);
+                    if (distance > 20.0f && distance < 300.0f)
+                        return StartNewPathToPosition(WS_FLAG_POS_HORDE, vPaths_WS);
+                }
+            }
+            break;
         }
-        break;
-    }
     }
 
     return false;
