@@ -563,12 +563,6 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
     Player* target;
     if (!ExtractPlayerTarget(&args, &target))
         return false;
-    
-    if (!target->GetCheatOptions())
-    {
-        PSendSysMessage("No cheats enabled on %s.", target->GetName());
-        return true;
-    }
 
     PSendSysMessage("Cheats active on %s:", target->GetName());
     if (target->HasCheatOption(PLAYER_CHEAT_FLY))
