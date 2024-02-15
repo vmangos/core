@@ -91,6 +91,32 @@ bool ChatHandler::HandleModifyXpRateCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleCheatFlyCommand(char* args)
+{
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* target = GetSelectedPlayer();
+    if (!target)
+        target = m_session->GetPlayer();
+
+    target->SetCheatFly(value, true);
+
+    PSendSysMessage(LANG_YOU_SET_FLY, value ? "on" : "off", GetNameLink(target).c_str());
+    if (needReportToTarget(target))
+        ChatHandler(target).PSendSysMessage(LANG_YOUR_FLY_SET, value ? "on" : "off", GetNameLink().c_str());
+
+    if (value)
+        ChatHandler(target).SendSysMessage("WARNING: Do not jump or flying mode will be removed.");
+
+    return true;
+}
+
 bool ChatHandler::HandleCheatGodCommand(char* args)
 {
     if (*args)
@@ -545,7 +571,9 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
     }
 
     PSendSysMessage("Cheats active on %s:", target->GetName());
-    if (target->HasCheatOption(PLAYER_CHEAT_GOD))
+    if (target->HasCheatOption(PLAYER_CHEAT_FLY))
+        SendSysMessage("- Fly");
+    if (target->GetInvincibilityHpThreshold())
         SendSysMessage("- God");
     if (target->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
         SendSysMessage("- No cooldowns");
