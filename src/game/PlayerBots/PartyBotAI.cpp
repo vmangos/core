@@ -1107,7 +1107,7 @@ void PartyBotAI::UpdateInCombatAI()
             {
                 if (me->GetClass() == CLASS_DRUID && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
                 {
-                    if (m_role == ROLE_TANK && me->GetEnemyCountInRadiusAround(me, 10.0f) < 2)
+                    if (m_role == ROLE_TANK && GetAttackersInRangeCount(10.0f) < 2)
                     {
                         me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
                         UsePotionsOrRune(potion);
