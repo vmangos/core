@@ -16,18 +16,18 @@ struct HealSpellCompare
         {
             switch (lhs->Effect[i])
             {
-                case SPELL_EFFECT_HEAL:
-                    spell1dmg += lhs->EffectBasePoints[i];
-                    break;
+            case SPELL_EFFECT_HEAL:
+                spell1dmg += lhs->EffectBasePoints[i];
+                break;
             }
         }
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
         {
             switch (rhs->Effect[i])
             {
-                case SPELL_EFFECT_HEAL:
-                    spell2dmg += rhs->EffectBasePoints[i];
-                    break;
+            case SPELL_EFFECT_HEAL:
+                spell2dmg += rhs->EffectBasePoints[i];
+                break;
             }
         }
 
@@ -46,24 +46,24 @@ struct HealAuraCompare
         {
             switch (lhs->Effect[i])
             {
-                case SPELL_EFFECT_APPLY_AURA:
-                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-                    if (lhs->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
-                        spell1dmg += lhs->EffectBasePoints[i];
-                    break;
+            case SPELL_EFFECT_APPLY_AURA:
+            case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                if (lhs->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                    spell1dmg += lhs->EffectBasePoints[i];
+                break;
             }
         }
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
         {
             switch (rhs->Effect[i])
             {
-                case SPELL_EFFECT_APPLY_AURA:
-                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-                    if (rhs->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
-                        spell2dmg += rhs->EffectBasePoints[i];
-                    break;
+            case SPELL_EFFECT_APPLY_AURA:
+            case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                if (rhs->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                    spell2dmg += rhs->EffectBasePoints[i];
+                break;
             }
         }
 
@@ -98,7 +98,7 @@ public:
     void EquipRandomGearInEmptySlots();
     void AutoEquipGear(uint32 option);
     void LearnRandomTalents();
-    
+
     uint8 GetAttackersInRangeCount(float range) const;
     Unit* SelectAttackerDifferentFrom(Unit const* pExcept) const;
     Unit* SelectHealTarget(float selfHealPercent = 100.0f, float groupHealPercent = 100.0f) const;
@@ -122,9 +122,7 @@ public:
     bool AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee = true, bool checkSpells = true) const;
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
-    SpellCastResult DoCastPetSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     virtual bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
-    virtual bool CanTryToCastPetSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool IsWearingShield(Player* pPlayer) const;
     bool IsInDuel() const;
     CombatBotRoles GetRole() const;
@@ -165,13 +163,13 @@ public:
     {
         switch (playerClass)
         {
-            case CLASS_WARRIOR:
-            case CLASS_PALADIN:
-            case CLASS_ROGUE:
-            case CLASS_HUNTER:
-            case CLASS_SHAMAN:
-            case CLASS_DRUID:
-                return true;
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        case CLASS_ROGUE:
+        case CLASS_HUNTER:
+        case CLASS_SHAMAN:
+        case CLASS_DRUID:
+            return true;
         }
         return false;
     }
@@ -179,13 +177,13 @@ public:
     {
         switch (playerClass)
         {
-            case CLASS_HUNTER:
-            case CLASS_PRIEST:
-            case CLASS_SHAMAN:
-            case CLASS_MAGE:
-            case CLASS_WARLOCK:
-            case CLASS_DRUID:
-                return true;
+        case CLASS_HUNTER:
+        case CLASS_PRIEST:
+        case CLASS_SHAMAN:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+        case CLASS_DRUID:
+            return true;
         }
         return false;
     }
@@ -193,12 +191,12 @@ public:
     {
         switch (playerClass)
         {
-            case CLASS_WARRIOR:
-            case CLASS_PALADIN:
-            case CLASS_ROGUE:
-            case CLASS_SHAMAN:
-            case CLASS_DRUID:
-                return true;
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        case CLASS_ROGUE:
+        case CLASS_SHAMAN:
+        case CLASS_DRUID:
+            return true;
         }
         return false;
     }
@@ -206,11 +204,11 @@ public:
     {
         switch (playerClass)
         {
-            case CLASS_WARRIOR:
-            case CLASS_PALADIN:
-            case CLASS_ROGUE:
-            case CLASS_SHAMAN:
-                return true;
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        case CLASS_ROGUE:
+        case CLASS_SHAMAN:
+            return true;
         }
         return false;
     }
@@ -218,10 +216,10 @@ public:
     {
         switch (playerClass)
         {
-            case CLASS_WARRIOR:
-            case CLASS_PALADIN:
-            case CLASS_SHAMAN:
-                return true;
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        case CLASS_SHAMAN:
+            return true;
         }
         return false;
     }
@@ -229,10 +227,10 @@ public:
     {
         switch (playerClass)
         {
-            case CLASS_WARRIOR:
-            case CLASS_PALADIN:
-            case CLASS_DRUID:
-                return true;
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        case CLASS_DRUID:
+            return true;
         }
         return false;
     }
@@ -240,11 +238,11 @@ public:
     {
         switch (playerClass)
         {
-            case CLASS_PALADIN:
-            case CLASS_PRIEST:
-            case CLASS_SHAMAN:
-            case CLASS_DRUID:
-                return true;
+        case CLASS_PALADIN:
+        case CLASS_PRIEST:
+        case CLASS_SHAMAN:
+        case CLASS_DRUID:
+            return true;
         }
         return false;
     }
@@ -252,9 +250,9 @@ public:
     {
         switch (playerClass)
         {
-            case CLASS_ROGUE:
-            case CLASS_DRUID:
-                return true;
+        case CLASS_ROGUE:
+        case CLASS_DRUID:
+            return true;
         }
         return false;
     }
@@ -263,18 +261,18 @@ public:
     {
         switch (me->GetClass())
         {
-            case CLASS_PALADIN:
-                return m_spells.paladin.pHammerOfJustice;
-            case CLASS_MAGE:
-                return m_spells.mage.pPolymorph;
-            case CLASS_PRIEST:
-                return m_spells.priest.pShackleUndead;
-            case CLASS_WARLOCK:
-                return m_spells.warlock.pBanish;
-            case CLASS_ROGUE:
-                return m_spells.rogue.pBlind;
-            case CLASS_DRUID:
-                return m_spells.druid.pHibernate;
+        case CLASS_PALADIN:
+            return m_spells.paladin.pHammerOfJustice;
+        case CLASS_MAGE:
+            return m_spells.mage.pPolymorph;
+        case CLASS_PRIEST:
+            return m_spells.priest.pShackleUndead;
+        case CLASS_WARLOCK:
+            return m_spells.warlock.pBanish;
+        case CLASS_ROGUE:
+            return m_spells.rogue.pBlind;
+        case CLASS_DRUID:
+            return m_spells.druid.pHibernate;
         }
         return nullptr;
     }
@@ -311,7 +309,6 @@ public:
             SpellEntry const* pHolyWrath;
             SpellEntry const* pTurnEvil;
             SpellEntry const* pHolyShield;
-            SpellEntry const* pRepentance;
         } paladin;
         struct
         {
@@ -333,7 +330,6 @@ public:
             SpellEntry const* pWaterTotem;
             SpellEntry const* pManaTideTotem;
             SpellEntry const* pWeaponBuff;
-            SpellEntry const* pNaturesSwiftness;
         } shaman;
         struct
         {
@@ -353,25 +349,6 @@ public:
             SpellEntry const* pFeignDeath;
             SpellEntry const* pScareBeast;
             SpellEntry const* pVolley;
-            SpellEntry const* pTranquilizingShot;
-            SpellEntry const* pScatterShot;
-            SpellEntry const* pFreezingTrap;
-            SpellEntry const* pBestialWrath;
-            SpellEntry const* pGrowl;
-            SpellEntry const* pBite;
-            SpellEntry const* pClaw;
-            SpellEntry const* pDash;
-            SpellEntry const* pDive;
-            SpellEntry const* pThunderstomp;
-            SpellEntry const* pScorpidPoison;
-            SpellEntry const* pLightningBreath;
-            SpellEntry const* pCharge;
-            SpellEntry const* pFuriousHowl;
-            SpellEntry const* pViperSting;
-            SpellEntry const* pScorpidSting;
-            SpellEntry const* pDeterrence;
-            SpellEntry const* pCounterattack;
-            SpellEntry const* pFlare;
         } hunter;
         struct
         {
@@ -379,7 +356,6 @@ public:
             SpellEntry const* pArcaneIntellect;
             SpellEntry const* pArcaneBrilliance;
             SpellEntry const* pIceBarrier;
-            SpellEntry const* pFireWard;
             SpellEntry const* pManaShield;
             SpellEntry const* pPolymorph;
             SpellEntry const* pFrostbolt;
@@ -400,7 +376,6 @@ public:
             SpellEntry const* pBlizzard;
             SpellEntry const* pBlastWave;
             SpellEntry const* pCombustion;
-            SpellEntry const* pDampenMagic;
         } mage;
         struct
         {
@@ -429,9 +404,6 @@ public:
             SpellEntry const* pFade;
             SpellEntry const* pShackleUndead;
             SpellEntry const* pSmite;
-            SpellEntry const* pDesperatePrayer;
-            SpellEntry const* pFearWard;
-            SpellEntry const* pTouchofWeakness;
         } priest;
         struct
         {
@@ -460,18 +432,6 @@ public:
             SpellEntry const* pCurseofTongues;
             SpellEntry const* pCurseofExhaustion;
             SpellEntry const* pLifeTap;
-            SpellEntry const* pAmplifyCurse;
-            SpellEntry const* pSeduction;
-            SpellEntry const* pSpellLock;
-            SpellEntry const* pDevourMagic;
-            SpellEntry const* pParanoia;
-            SpellEntry const* pLashofPain;
-            SpellEntry const* pLesserInvisibility;
-            SpellEntry const* pTorment;
-            SpellEntry const* pSacrifice;
-            SpellEntry const* pSoulLink;
-            SpellEntry const* pInferno;
-            SpellEntry const* pSoulfire;
         } warlock;
         struct
         {
@@ -509,7 +469,6 @@ public:
             SpellEntry const* pSunderArmor;
             SpellEntry const* pConcussionBlow;
             SpellEntry const* pPiercingHowl;
-            SpellEntry const* pChallengingShout;
         } warrior;
         struct
         {
