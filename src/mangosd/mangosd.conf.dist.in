@@ -665,7 +665,7 @@ LogFile.DBErrorFix = ""
 LogFile.Loot = "Loot.log"
 LogFile.LevelUp = "LevelUp.log"
 LogFile.Performance = "Perf.log"
-LogFile.Gm = ""
+LogFile.Gm = "Gm.log"
 LogFile.GmCriticalCommands = "gm_critical.log"
 LogFile.Trades = "Trades.log"
 
