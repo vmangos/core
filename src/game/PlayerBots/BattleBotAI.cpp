@@ -145,9 +145,6 @@ bool BattleBotAI::UseMount()
     if (me->GetDisplayId() != me->GetNativeDisplayId())
         return false;
 
-    if (me->GetClass() == CLASS_ROGUE)
-        return false;
-
     if (BattleGround* bg = me->GetBattleGround())
         if (bg->GetStatus() == STATUS_WAIT_JOIN)
             return false;
