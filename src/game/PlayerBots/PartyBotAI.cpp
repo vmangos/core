@@ -1089,6 +1089,7 @@ void PartyBotAI::UpdateInCombatAI()
 
             if (newVictim && (newVictim != pVictim))
             {
+                me->AttackStop(true);
                 AttackStart(newVictim);
                 return;
             }
