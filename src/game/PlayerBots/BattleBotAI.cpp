@@ -34,8 +34,8 @@
 
 enum BattleBotSpells
 {
-    PB_SPELL_FOOD = 29073,
-    PB_SPELL_DRINK = 22734,
+    BB_SPELL_FOOD = 29073,
+    BB_SPELL_DRINK = 22734,
     BB_SPELL_AUTO_SHOT = 75,
     BB_SPELL_SHOOT_WAND = 5019,
 
@@ -1227,6 +1227,45 @@ void BattleBotAI::UpdateOutOfCombatAI()
 
 void BattleBotAI::UpdateInCombatAI()
 {
+    Unit* pVictim = me->GetVictim();
+
+    // Stop chasing targets if they are very far away
+    if (pVictim)
+    {
+        if (IsMeleeDamageClass(me->GetClass()))
+        {
+            if (me->GetDistance(pVictim) > 10.0f)
+            {
+                if (Pet* pPet = me->GetPet())
+                {
+                    if (pPet->IsAlive())
+                        pPet->AttackStop();
+                }
+                me->AttackStop();
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                    ClearPath();
+                    StartNewPathFromBeginning();
+                }
+                return;
+            }
+
+        }
+        else if (IsRangedDamageClass(me->GetClass()))
+        {
+            if (me->GetDistance(pVictim) > 30.0f)
+            {
+                me->AttackStop();
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                    ClearPath();
+                    StartNewPathFromBeginning();
+                }
+                return;
+            }
+        }
+    }
+
     switch (me->GetClass())
     {
         case CLASS_PALADIN:
