@@ -496,7 +496,7 @@ enum AtLoginFlags
 
 enum PlayerCheatOptions : uint16
 {
-    PLAYER_CHEAT_GOD               = 0x001,
+    PLAYER_CHEAT_FLY               = 0x001,
     PLAYER_CHEAT_NO_COOLDOWN       = 0x002,
     PLAYER_CHEAT_NO_CAST_TIME      = 0x004,
     PLAYER_CHEAT_NO_POWER          = 0x008,
@@ -1019,8 +1019,8 @@ class Player final: public Unit
         bool IsGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
         void SetGMVisible(bool on, bool notify = false);
         
+        void SetCheatFly(bool on, bool notify = false);
         void SetCheatGod(bool on, bool notify = false);
-        bool IsGod() const { return HasCheatOption(PLAYER_CHEAT_GOD); }
         void SetCheatNoCooldown(bool on, bool notify = false);
         void SetCheatInstantCast(bool on, bool notify = false);
         void SetCheatNoPowerCost(bool on, bool notify = false);

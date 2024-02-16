@@ -317,7 +317,6 @@ class CreatureEventAI : public BasicAI
         void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellEntry) override;
         void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpellEntry) override;
         void MovementInform(uint32 type, uint32 id) override;
-        void DamageTaken(Unit* done_by, uint32& damage) override;
         void UpdateAI(uint32 const diff) override;
         void ReceiveEmote(Player* pPlayer, uint32 text_emote) override;
         void GroupMemberJustDied(Creature* unit, bool isLeader) override;
@@ -330,7 +329,6 @@ class CreatureEventAI : public BasicAI
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* pActionInvoker = nullptr);
         bool ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
-        void SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent);
 
         uint8  m_Phase;                                     // Current phase, max 32 phases
 
@@ -342,7 +340,6 @@ class CreatureEventAI : public BasicAI
         //Variables used by Events themselves
         typedef std::vector<CreatureEventAIHolder> CreatureEventAIList;
         CreatureEventAIList m_CreatureEventAIList;          //Holder for events (stores enabled, time, and eventid)
-        uint32 m_InvinceabilityHpLevel;                     // Minimal health level allowed at damage apply
 
         void UpdateEventsOn_UpdateAI(uint32 const diff, bool Combat);
         void UpdateEventsOn_MoveInLineOfSight(Unit* pWho);

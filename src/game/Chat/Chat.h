@@ -195,6 +195,7 @@ class ChatHandler
 
         //Cheats
         bool HandleCheatStatusCommand(char *);
+        bool HandleCheatFlyCommand(char* args);
         bool HandleCheatGodCommand(char *);
         bool HandleCheatCooldownCommand(char *);
         bool HandleCheatCastTimeCommand(char *);
@@ -535,7 +536,6 @@ class ChatHandler
 
         bool HandleGMCommand(char* args);
         bool HandleGMChatCommand(char* args);
-        bool HandleGMFlyCommand(char* args);
         bool HandleGMListFullCommand(char* args);
         bool HandleGMListIngameCommand(char* args);
         bool HandleGMVisibleCommand(char* args);
