@@ -954,7 +954,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         if (!pVictim)
         {
             // Healers should stay far away from danger
-            if (GetRole() == ROLE_HEALER && (pLeader->GetClass() == CLASS_WARRIOR || pLeader->GetClass() == CLASS_PALADIN || pLeader->GetClass() == CLASS_ROGUE))
+            if (GetRole() == ROLE_HEALER && IsMeleeDamageClass(pLeader->GetClass()))
             {
 
                 if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
