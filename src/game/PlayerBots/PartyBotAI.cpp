@@ -995,8 +995,8 @@ void PartyBotAI::UpdateOutOfCombatAI()
     {
         if (me->GetLevel() == 60 && RaidStratsIsInRaid())
         {
-            RaidStratsDefaultAurasOfRaid();
-            RaidStratsIsZGProtectionPotions();
+            RaidStratsDefaultPotionsInRaid();
+            RaidStratsInZGProtectionPotions();
         }
 
         if (m_resurrectionSpell)
@@ -1045,6 +1045,11 @@ void PartyBotAI::UpdateInCombatAI()
 {
     if (!IsInDuel())
     {
+        if (me->GetLevel() == 60 && RaidStratsIsInRaid())
+        {
+            RaidStratsInZGBosses();
+        }
+
         Player* pLeader = GetPartyLeader();
         Unit* pVictim = me->GetVictim();
 

@@ -64,7 +64,7 @@ bool PartyBotAI::RaidStratsIsInRaid()
         return false;
 }
 
-void PartyBotAI::RaidStratsDefaultAurasOfRaid()
+void PartyBotAI::RaidStratsDefaultPotionsInRaid()
 {
     // Elixir of Fortitude
     if (!me->HasAura((int)RaidStratsPotionAuraId::ELEXIR_OF_FORTITUDE))
@@ -215,7 +215,7 @@ void PartyBotAI::RaidStratsDefaultAurasOfRaid()
     }
 }
 
-void PartyBotAI::PartyBotAI::RaidStratsIsZGProtectionPotions()
+void PartyBotAI::RaidStratsInZGProtectionPotions()
 {
     if (me->GetZoneId() != 1977)
     {
@@ -315,5 +315,18 @@ void PartyBotAI::PartyBotAI::RaidStratsIsZGProtectionPotions()
                 return;
             }
         }
+    }
+}
+
+void PartyBotAI::RaidStratsInZGBosses() {
+
+    //Bloodlord Mandokir
+    const uint16 THREATENING_GAZE = 24314;
+    if (me->GetAreaId() == 3380 && me->HasAura(THREATENING_GAZE))
+    {
+        me->InterruptNonMeleeSpells(false);
+        me->AttackStop();
+        me->StopMoving();
+        me->ClearTarget();
     }
 }
