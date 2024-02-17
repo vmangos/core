@@ -100,6 +100,7 @@ public:
     bool RaidStratsIsInRaid();
     void RaidStratsDefaultPotionsInRaid();
     void RaidStratsInZGProtectionPotions();
+    void RaidStratsInMKProtectionPotions();
     void RaidStratsInZGBosses();
 
     std::vector<RaidTargetIcon> m_marksToCC;
