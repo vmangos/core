@@ -794,7 +794,7 @@ INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_co
 (84525, 12464, 1, 2),
 (84525, 12463, 1, 2);
 
--- Add pooling to BWL Death Talon Overseer pack in the firmaw room
+-- Add pooling to BWL Death Talon Overseer pack in the firemaw room
 -- Should be 1 Wyrmguard per pack, rest Overseer in random positions.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES 
 (14007, 1, 'BWL Overseer pack', 0, 0, 4, 10),
