@@ -2094,7 +2094,7 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
         charFlags |= CHARACTER_FLAG_HIDE_CLOAK;
     if (playerFlags & PLAYER_FLAGS_GHOST)
         charFlags |= CHARACTER_FLAG_GHOST;
-    if (charFlags & AT_LOGIN_RENAME)
+    if (atLoginFlags & AT_LOGIN_RENAME)
         charFlags |= CHARACTER_FLAG_RENAME;
 
     *p_data << uint32(charFlags);                           // character flags
