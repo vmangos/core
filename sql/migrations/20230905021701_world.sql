@@ -588,9 +588,10 @@ UPDATE `creature` SET `position_x`=-7711.3, `position_y`=-1076.48, `position_z`=
 DELETE FROM `creature_groups` WHERE  `member_guid`=300630;
 DELETE FROM `creature_groups` WHERE  `member_guid`=300629;
 DELETE FROM `creature_groups` WHERE  `member_guid`=300628;
-INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES (300629, 300629, 36.791, 4.30688, 1);
-INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES (300629, 300630, 1.81314, 5.67078, 1);
-INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES (300629, 300628, 1.6203, 0.818062, 1);
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(300629, 300628, 3, 3.12, 1),
+(300629, 300629, 0, 0, 1),
+(300629, 300630, 4, 1.56, 1);
 UPDATE `creature` SET `movement_type`=0 WHERE  `guid`=300630;
 UPDATE `creature` SET `movement_type`=2 WHERE  `guid`=300629;
 -- Pathing for Blackwing Taskmaster Entry: 12458
@@ -650,9 +651,10 @@ DELETE FROM `creature_groups` WHERE  `member_guid`=300632;
 DELETE FROM `creature_groups` WHERE  `member_guid`=300631;
 UPDATE `creature` SET `movement_type`=0 WHERE  `guid`=300632;
 UPDATE `creature` SET `movement_type`=2 WHERE  `guid`=300633;
-INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES (300633, 300633, 0.241592, 3.93372, 1);
-INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES (300633, 300632, 1.8308, 5.23155, 1);
-INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES (300633, 300631, 1.70373, 0.771854, 1);
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(300633, 300631, 3, 1.56, 1),
+(300633, 300632, 4, 3.12, 1),
+(300633, 300633, 0, 0, 1);
 -- Pathing for Blackwing Taskmaster pack 2 Entry: 12458
 SET @NPC := 300633;
 INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`waittime`,`wander_distance`,`script_id`) VALUES
@@ -703,6 +705,13 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 -- .go xyz -7711.666 -1063.976 445.3443
 
 -- Pathing for Blackwing Taskmaster pack 3 Entry: 12458
+DELETE FROM `creature_groups` WHERE  `member_guid`=300634;
+DELETE FROM `creature_groups` WHERE  `member_guid`=300635;
+DELETE FROM `creature_groups` WHERE  `member_guid`=300636;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(300636, 300634, 3, 3.12, 1),
+(300636, 300635, 4, 1.56, 1),
+(300636, 300636, 0, 0, 1);
 SET @NPC := 300636;
 INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`waittime`,`wander_distance`,`script_id`) VALUES
 (@NPC,1,-7712.01,-1073.5797,445.36597,100,0,0,0),
@@ -775,23 +784,95 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (84525, 84529, 0, 0, 46),
 (84525, 84530, 0, 0, 46);
 -- Max one Captain per pack, max 2 NPCs of other entries
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84519, 12467, 1, 1);
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84519, 12465, 1, 2);
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84519, 12464, 1, 2);
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84519, 12463, 1, 2);
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84525, 12467, 1, 1);
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84525, 12465, 1, 2);
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84525, 12464, 1, 2);
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84525, 12463, 1, 2);
+INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES 
+(84519, 12467, 1, 1),
+(84519, 12465, 1, 2),
+(84519, 12464, 1, 2),
+(84519, 12463, 1, 2),
+(84525, 12467, 1, 1),
+(84525, 12465, 1, 2),
+(84525, 12464, 1, 2),
+(84525, 12463, 1, 2);
 
--- Correct position of Death Talon Pack in Firemaw Room
-UPDATE `creature` SET `id`=12460, `id2`=12461, `position_x`=-7461.63, `position_y`=-985.513, `position_z`=449.782, `orientation`=4.13643 WHERE `guid`=84592;
-UPDATE `creature` SET `id`=12460, `id2`=12461, `position_x`=-7467.69, `position_y`=-995.597, `position_z`=449.325, `orientation`=0.453786 WHERE `guid`=84591;
-UPDATE `creature` SET `id`=12460, `id2`=12461, `position_x`=-7459.26, `position_y`=-995.384, `position_z`=449.785, `orientation`=2.3911 WHERE `guid`=84590;
-UPDATE `creature` SET `id`=12460, `id2`=12461, `position_x`=-7471.39, `position_y`=-988.327, `position_z`=449.844, `orientation`=5.53269 WHERE `guid`=84589;
--- Max one Wrymguard, rest Overseer
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84592, 12460, 1, 1);
-INSERT INTO `creature_groups_entry_limit` (`leader_guid`, `creature_id`, `min_count`, `max_count`) VALUES (84592, 12461, 3, 3);
+-- Add pooling to BWL Death Talon Overseer pack in the firmaw room
+-- Should be 1 Wyrmguard per pack, rest Overseer in random positions.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES 
+(14007, 1, 'BWL Overseer pack', 0, 0, 4, 10),
+(14008, 4, 'BWL Overseer pack Variant 1', 0, 0, 4, 10),
+(14009, 4, 'BWL Overseer pack Variant 2', 0, 0, 4, 10),
+(14010, 4, 'BWL Overseer pack Variant 3', 0, 0, 4, 10),
+(14011, 4, 'BWL Overseer pack Variant 4', 0, 0, 4, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES 
+(14008, 14007, 25, 'BWL Overseer pack Variant 1', 0),
+(14009, 14007, 25, 'BWL Overseer pack Variant 2', 0),
+(14010, 14007, 25, 'BWL Overseer pack Variant 3', 0),
+(14011, 14007, 25, 'BWL Overseer pack Variant 4', 0);
+-- BWL Overseer pack Variant 1
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES 
+(84592, 14008, 100, 'BWL Overseer pack v1 Death Talon Wyrmguard', 0, 4, 10),
+(84591, 14008, 100, 'BWL Overseer pack v1 Death Talon Overseer', 0, 4, 10),
+(84590, 14008, 100, 'BWL Overseer pack v1 Death Talon Overseer', 0, 4, 10),
+(84589, 14008, 100, 'BWL Overseer pack v1 Death Talon Overseer', 0, 4, 10);
+-- BWL Overseer pack Variant 2
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES 
+(166514, 14009, 100, 'BWL Overseer pack v2 Death Talon Overseer', 0, 4, 10),
+(166515, 14009, 100, 'BWL Overseer pack v2 Death Talon Wyrmguard', 0, 4, 10),
+(166516, 14009, 100, 'BWL Overseer pack v2 Death Talon Overseer', 0, 4, 10),
+(166517, 14009, 100, 'BWL Overseer pack v2 Death Talon Overseer', 0, 4, 10);
+-- BWL Overseer pack Variant 3
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES 
+(166518, 14010, 100, 'BWL Overseer pack v3 Death Talon Overseer', 0, 4, 10),
+(166519, 14010, 100, 'BWL Overseer pack v3 Death Talon Overseer', 0, 4, 10),
+(166520, 14010, 100, 'BWL Overseer pack v3 Death Talon Wyrmguard', 0, 4, 10),
+(166521, 14010, 100, 'BWL Overseer pack v3 Death Talon Overseer', 0, 4, 10);
+-- BWL Overseer pack Variant 4
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES 
+(166522, 14011, 100, 'BWL Overseer pack v4 Death Talon Overseer', 0, 4, 10),
+(166523, 14011, 100, 'BWL Overseer pack v4 Death Talon Overseer', 0, 4, 10),
+(166524, 14011, 100, 'BWL Overseer pack v4 Death Talon Overseer', 0, 4, 10),
+(166525, 14011, 100, 'BWL Overseer pack v4 Death Talon Wyrmguard', 0, 4, 10);
+
+-- Add groups
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+-- BWL Overseer pack Variant 1
+(84592, 84592, 0, 0, 46),
+-- BWL Overseer pack Variant 2
+(166515, 166514, 0, 0, 46),
+(166515, 166515, 0, 0, 46),
+(166515, 166516, 0, 0, 46),
+(166515, 166517, 0, 0, 46),
+-- BWL Overseer pack Variant 3
+(166520, 166518, 0, 0, 46),
+(166520, 166519, 0, 0, 46),
+(166520, 166520, 0, 0, 46),
+(166520, 166521, 0, 0, 46),
+-- BWL Overseer pack Variant 4
+(166525, 166522, 0, 0, 46),
+(166525, 166523, 0, 0, 46),
+(166525, 166524, 0, 0, 46),
+(166525, 166525, 0, 0, 46);
+
+-- Correct position for BWL Overseer pack Variant 1
+UPDATE `creature` SET `id`=12460, `position_x`=-7461.63, `position_y`=-985.513, `position_z`=449.782, `orientation`=4.13643 WHERE `guid`=84592;
+UPDATE `creature` SET `id`=12461, `position_x`=-7467.69, `position_y`=-995.597, `position_z`=449.325, `orientation`=0.453786 WHERE `guid`=84591;
+UPDATE `creature` SET `id`=12461, `position_x`=-7459.26, `position_y`=-995.384, `position_z`=449.785, `orientation`=2.3911 WHERE `guid`=84590;
+UPDATE `creature` SET `id`=12461, `position_x`=-7471.39, `position_y`=-988.327, `position_z`=449.844, `orientation`=5.53269 WHERE `guid`=84589;
+-- Spawn BWL Overseer pack Variant 2
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES 
+(166514, 12461, 0, 0, 0, 0, 469, -7461.63, -985.513, 449.782, 4.13643, 604800, 604800, 0, 100, 0, 0, 0, 0, 4, 10),
+(166515, 12460, 0, 0, 0, 0, 469, -7467.69, -995.597, 449.325, 0.453786, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10),
+(166516, 12461, 0, 0, 0, 0, 469, -7459.26, -995.384, 449.785, 2.3911, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10),
+(166517, 12461, 0, 0, 0, 0, 469, -7471.39, -988.327, 449.844, 5.53269, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10),
+-- Spawn BWL Overseer pack Variant 3
+(166518, 12461, 0, 0, 0, 0, 469, -7461.63, -985.513, 449.782, 4.13643, 604800, 604800, 0, 100, 0, 0, 0, 0, 4, 10),
+(166519, 12461, 0, 0, 0, 0, 469, -7467.69, -995.597, 449.325, 0.453786, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10),
+(166520, 12460, 0, 0, 0, 0, 469, -7459.26, -995.384, 449.785, 2.3911, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10),
+(166521, 12461, 0, 0, 0, 0, 469, -7471.39, -988.327, 449.844, 5.53269, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10),
+-- Spawn BWL Overseer pack Variant 4
+(166522, 12461, 0, 0, 0, 0, 469, -7461.63, -985.513, 449.782, 4.13643, 604800, 604800, 0, 100, 0, 0, 0, 0, 4, 10),
+(166523, 12461, 0, 0, 0, 0, 469, -7467.69, -995.597, 449.325, 0.453786, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10),
+(166524, 12461, 0, 0, 0, 0, 469, -7459.26, -995.384, 449.785, 2.3911, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10),
+(166525, 12460, 0, 0, 0, 0, 469, -7471.39, -988.327, 449.844, 5.53269, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10);
 
 -- Add random movement to Death Talon Overseer
 UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE  `guid`=300980;
@@ -1007,6 +1088,17 @@ UPDATE `creature` SET `position_x`=-7448.25, `position_y`=-944.38, `position_z`=
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (401, 0, 0, 15, 22313, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blackwing Spellbinder - Cast Spell Purple Hands'),
 (401, 4, 0, 5, 0, 22313, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blackwing Spellbinder - Cast Spell Purple Hands');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=12458;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12458, 0, 0, 15, 22458, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blackwing Taskmaster Cast Healing Circle');
+
+-- Make Blackwing Taskmaster cast Healing Circle OOC
+-- Events list for Blackwing Taskmaster
+DELETE FROM `creature_ai_events` WHERE `creature_id`=12458;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(1245802, 12458, 0, 1, 0, 100, 1, 15000, 35000, 15000, 35000, 12458, 0, 0, 'Blackwing Taskmaster Healing Circle OOC');
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry`=12458;
 
 
 -- End of migration.
