@@ -101,6 +101,7 @@ public:
     void RaidStratsDefaultPotionsInRaid();
     void RaidStratsInZGProtectionPotions();
     void RaidStratsInMKProtectionPotions();
+    void RaidStratsInOnyxiaProtectionPotions();
     void RaidStratsInZGBosses();
 
     std::vector<RaidTargetIcon> m_marksToCC;

@@ -353,6 +353,23 @@ void PartyBotAI::RaidStratsInMKProtectionPotions()
     }
 }
 
+void PartyBotAI::RaidStratsInOnyxiaProtectionPotions()
+{
+    if (me->GetZoneId() != 2159)
+    {
+        return;
+    }
+
+    if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_FIRE_PROTECTION_POTION))
+    {
+        if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_FIRE_PROTECTION_POTION))
+        {
+            UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_FIRE_PROTECTION_POTION);
+            return;
+        }
+    }
+}
+
 void PartyBotAI::RaidStratsInZGBosses() {
 
     //Bloodlord Mandokir
