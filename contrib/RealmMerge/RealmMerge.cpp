@@ -207,8 +207,8 @@ bool UpdateCharacterGuids()
         CharacterDatabase2.PExecute("UPDATE `character_stats` SET `guid` = (`guid` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `corpse` SET `player_guid` = (`player_guid` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `guid` = (`guid` + %u)", maxCharGuid1);
-        CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `closed_by` = (`closed_by` + %u)", maxCharGuid1);
-        CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `assigned_to` = (`assigned_to` + %u)", maxCharGuid1);
+        CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `closed_by` = (`closed_by` + %u) WHERE `closed_by` != 0", maxCharGuid1);
+        CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `assigned_to` = (`assigned_to` + %u) WHERE `assigned_to` != 0", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `groups` SET `leader_guid` = (`leader_guid` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `groups` SET `main_tank_guid` = (`main_tank_guid` + %u) WHERE `main_tank_guid` != 0", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `groups` SET `main_assistant_guid` = (`main_assistant_guid` + %u) WHERE `main_assistant_guid` != 0", maxCharGuid1);
