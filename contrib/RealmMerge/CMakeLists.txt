@@ -33,8 +33,8 @@ add_executable(RealmMerge RealmMerge.cpp)
 SET_TARGET_PROPERTIES (RealmMerge PROPERTIES FOLDER Tools)
 target_link_libraries(RealmMerge 
                     ${ACE_LIBRARIES}
-                    framework
                     shared
+                    framework
 )
 
 if(WIN32)
