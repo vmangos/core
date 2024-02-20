@@ -168,7 +168,7 @@ bool UpdateCharacterGuids()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Updating character names...");
     for (auto const& itr : characterNames2)
     {
-        if (characterNames1.find(itr.second) != characterNames1.end())
+        if (!itr.second.empty() && characterNames1.find(itr.second) != characterNames1.end())
         {
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Name of character %s (%u) is taken. Marking for rename.", itr.second.c_str(), itr.first);
             CharacterDatabase2.PExecute("UPDATE `characters` SET `name` = guid, `at_login_flags` = (`at_login_flags` | %u) WHERE `guid` = %u", AT_LOGIN_RENAME, itr.first);
@@ -207,9 +207,12 @@ bool UpdateCharacterGuids()
         CharacterDatabase2.PExecute("UPDATE `character_stats` SET `guid` = (`guid` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `corpse` SET `player_guid` = (`player_guid` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `guid` = (`guid` + %u)", maxCharGuid1);
+        CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `closed_by` = (`closed_by` + %u)", maxCharGuid1);
+        CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `assigned_to` = (`assigned_to` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `groups` SET `leader_guid` = (`leader_guid` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `groups` SET `main_tank_guid` = (`main_tank_guid` + %u) WHERE `main_tank_guid` != 0", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `groups` SET `main_assistant_guid` = (`main_assistant_guid` + %u) WHERE `main_assistant_guid` != 0", maxCharGuid1);
+        CharacterDatabase2.PExecute("UPDATE `groups` SET `looter_guid` = (`looter_guid` + %u) WHERE `looter_guid` != 0", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `group_instance` SET `leader_guid` = (`leader_guid` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `group_member` SET `member_guid` = (`member_guid` + %u)", maxCharGuid1);
         CharacterDatabase2.PExecute("UPDATE `guild` SET `leader_guid` = (`leader_guid` + %u)", maxCharGuid1);
@@ -263,9 +266,12 @@ bool UpdateCharacterGuids()
                 CharacterDatabase2.PExecute("UPDATE `character_stats` SET `guid` = %u WHERE `guid` = %u", newGuid.first, guid);
                 CharacterDatabase2.PExecute("UPDATE `corpse` SET `player_guid` = %u WHERE `player_guid` = %u", newGuid.first, guid);
                 CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `guid` = %u WHERE `guid` = %u", newGuid.first, guid);
+                CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `closed_by` = %u WHERE `closed_by` = %u", newGuid.first, guid);
+                CharacterDatabase2.PExecute("UPDATE `gm_tickets` SET `assigned_to` = %u WHERE `assigned_to` = %u", newGuid.first, guid);
                 CharacterDatabase2.PExecute("UPDATE `groups` SET `leader_guid` = %u WHERE `leader_guid` = %u", newGuid.first, guid);
                 CharacterDatabase2.PExecute("UPDATE `groups` SET `main_tank_guid` = %u WHERE `main_tank_guid` = %u", newGuid.first, guid);
                 CharacterDatabase2.PExecute("UPDATE `groups` SET `main_assistant_guid` = %u WHERE `main_assistant_guid` = %u", newGuid.first, guid);
+                CharacterDatabase2.PExecute("UPDATE `groups` SET `looter_guid` = %u WHERE `looter_guid` = %u", newGuid.first, guid);
                 CharacterDatabase2.PExecute("UPDATE `group_instance` SET `leader_guid` = %u WHERE `leader_guid` = %u", newGuid.first, guid);
                 CharacterDatabase2.PExecute("UPDATE `group_member` SET `member_guid` = %u WHERE `member_guid` = %u", newGuid.first, guid);
                 CharacterDatabase2.PExecute("UPDATE `guild` SET `leader_guid` = %u WHERE `leader_guid` = %u", newGuid.first, guid);
