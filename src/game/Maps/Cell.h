@@ -25,7 +25,6 @@
 #include "GameSystem/TypeContainer.h"
 #include "GameSystem/TypeContainerVisitor.h"
 #include "GridDefines.h"
-#include <cmath>
 
 class Map;
 class WorldObject;
@@ -49,8 +48,7 @@ struct CellArea
 
 struct Cell
 {
-    Cell() { data.All = 0; }
-    Cell(Cell const& cell) { data.All = cell.data.All; }
+    Cell() : data() { };
     explicit Cell(CellPair const& p);
 
     void Compute(uint32& x, uint32& y) const
@@ -87,26 +85,19 @@ struct Cell
             data.Part.grid_y*MAX_NUMBER_OF_CELLS+data.Part.cell_y);
     }
 
-    Cell& operator=(Cell const& cell)
-    {
-        data.All = cell.data.All;
-        return *this;
-    }
-
     bool operator==(Cell const& cell) const { return (data.All == cell.data.All); }
     bool operator!=(Cell const& cell) const { return !operator==(cell); }
     union
     {
         struct
         {
-            unsigned grid_x : 6;
-            unsigned grid_y : 6;
-            unsigned cell_x : 6;
-            unsigned cell_y : 6;
-            unsigned nocreate : 1;
-            unsigned reserved : 7;
+            uint8  grid_x : 8;
+            uint8  grid_y : 8;
+            uint8  cell_x : 8;
+            uint8  cell_y : 8;
+            uint8  nocreate : 8;
         } Part;
-        uint32 All;
+        uint64 All;
     } data;
 
     template<class T, class CONTAINER> void Visit(CellPair const& cellPair, TypeContainerVisitor<T, CONTAINER>& visitor, Map& m, float x, float y, float radius) const;

@@ -1607,12 +1607,11 @@ bool Map::ScriptCommand_Invincibility(ScriptInfo const& script, WorldObject* sou
         return ShouldAbortScript(script);
     }
 
-    auto* pAI = dynamic_cast<CreatureEventAI*>(pSource->AI());
-
-    if (!pAI)
-        return ShouldAbortScript(script);
-
-    pAI->SetInvincibilityHealthLevel(script.invincibility.health, script.invincibility.isPercent);
+    uint32 hp = script.invincibility.isPercent ?
+                pSource->GetMaxHealth() * script.invincibility.health / 100
+                :
+                script.invincibility.health;
+    pSource->SetInvincibilityHpThreshold(hp);
 
     return false;
 }

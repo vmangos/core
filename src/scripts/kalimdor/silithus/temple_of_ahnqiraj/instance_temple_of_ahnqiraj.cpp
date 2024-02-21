@@ -641,7 +641,7 @@ bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
     for (auto iter = playersInStomach.begin(); iter != playersInStomach.end();) {
         if (Player* p = GetMap()->GetPlayer(iter->first)) {
             // Not killing people with god on, makes debugging easier
-            if (p->IsGod()) {
+            if (p->GetInvincibilityHpThreshold()) {
                 ++iter;
                 continue;
             }
