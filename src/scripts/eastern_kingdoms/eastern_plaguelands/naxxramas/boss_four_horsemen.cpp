@@ -342,10 +342,13 @@ struct boss_four_horsemen_shared : public ScriptedAI
         if (m_creature->GetMapId() != 533)
             return;
 
-        if (Unit* pVictim = m_creature->GetVictim())
+        if (!m_bIsSpirit)
         {
-            if (!m_creature->IsWithinDistInMap(pVictim, VISIBILITY_DISTANCE_NORMAL))
-                m_creature->CastSpell(pVictim, SPELL_SUMMON_PLAYER, true);
+            if (Unit* pVictim = m_creature->GetVictim())
+            {
+                if (!m_creature->IsWithinDistInMap(pVictim, VISIBILITY_DISTANCE_NORMAL))
+                    m_creature->CastSpell(pVictim, SPELL_SUMMON_PLAYER, true);
+            }
         }
 
         m_events.Update(uiDiff);
