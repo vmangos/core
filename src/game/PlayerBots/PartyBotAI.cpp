@@ -43,8 +43,6 @@ enum PartyBotSpells
 #define PB_MAX_FOLLOW_DIST 6.0f
 #define PB_MIN_FOLLOW_ANGLE 0.0f
 #define PB_MAX_FOLLOW_ANGLE 6.0f
-#define PB_HEALER_MIN_FOLLOW_DIST 10.0f
-#define PB_HEALER_MAX_FOLLOW_DIST 16.0f
 
 // Use potions start
 enum ManaPotionsId
@@ -953,19 +951,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     {
         if (!pVictim)
         {
-            // Healers should stay far away from danger
-            if (GetRole() == ROLE_HEALER && IsMeleeDamageClass(pLeader->GetClass()))
-            {
-
-                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-                    me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_HEALER_MIN_FOLLOW_DIST, PB_HEALER_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
-            }
-            else
-            {
-
-                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-                    me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
-            }
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
+                me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
         }
         else
         {
