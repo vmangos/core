@@ -371,6 +371,10 @@ void PartyBotAI::RaidStratsInOnyxiaProtectionPotions()
 }
 
 void PartyBotAI::RaidStratsInZGBosses() {
+    if (me->GetZoneId() != 1977)
+    {
+        return;
+    }
 
     //Bloodlord Mandokir
     const uint16 THREATENING_GAZE = 24314;
