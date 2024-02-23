@@ -2253,6 +2253,11 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
 
 Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
 {
+    if (IsValidDispelTarget(me, pSpellEntry))
+    {
+        return me;
+    }
+
     Group* pGroup = me->GetGroup();
     if (pGroup)
     {
