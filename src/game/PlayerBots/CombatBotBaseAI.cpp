@@ -2258,7 +2258,9 @@ Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
         return me;
     }
 
+    std::vector<Player*> pMembersHaveDebuff;
     Group* pGroup = me->GetGroup();
+    
     if (pGroup)
     {
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -2270,9 +2272,14 @@ Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
                     IsValidDispelTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
                     me->IsWithinDist(pMember, 30.0f))
-                    return pMember;
+                    pMembersHaveDebuff.push_back(pMember);
             }
         }
+    }
+
+    if (!pMembersHaveDebuff.empty())
+    {
+        return pMembersHaveDebuff[rand() % pMembersHaveDebuff.size()];
     }
 
     return nullptr;
