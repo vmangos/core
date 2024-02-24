@@ -397,7 +397,7 @@ void PartyBotAI::RaidStratsInMKBosses()
     //Lava bomb
     if (me->FindNearestGameObject(177704, 5.0f))
     {        
-        if (!me->IsMoving())
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE)
         {   
             me->InterruptNonMeleeSpells(false);
             me->AttackStop();
@@ -406,9 +406,9 @@ void PartyBotAI::RaidStratsInMKBosses()
             newAngle += (M_PI_F * 2) * 0.25;
             newAngle = MapManager::NormalizeOrientation(newAngle);
             me->SetOrientation(newAngle);
-            me->GetMotionMaster()->MoveDistance(me, 7.0f);            
+            if (me->GetMotionMaster()->MoveDistance(me, 10.0f))
+                return;
         }
-        return;
     }
    
     //Magmadar
