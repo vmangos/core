@@ -1037,6 +1037,7 @@ void PartyBotAI::UpdateInCombatAI()
         if (me->GetLevel() == 60 && RaidStratsIsInRaid())
         {
             RaidStratsInZGBosses();
+            RaidStratsInMKBosses();
         }
 
         Player* pLeader = GetPartyLeader();

@@ -386,3 +386,45 @@ void PartyBotAI::RaidStratsInZGBosses() {
         me->ClearTarget();
     }
 }
+
+void PartyBotAI::RaidStratsInMKBosses()
+{
+    if (me->GetZoneId() != 2717)
+    {
+        return;
+    }
+
+    //Lava bomb
+    if (me->FindNearestGameObject(177704, 5.0f))
+    {
+        me->InterruptNonMeleeSpells(false);
+        me->AttackStop();
+        if (!me->IsMoving())
+        {
+            me->SetOrientation(me->GetOrientation() + frand(-45, 45));
+            me->GetMotionMaster()->MoveDistance(me, 7.0f);            
+        }
+        return;
+    }
+   
+    //Magmadar
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (pVictim->GetEntry() == 11982)
+        {
+            // HUNTER
+            if (me->GetClass() == CLASS_HUNTER)
+            {
+                if (pVictim->HasAura(19451))
+                {
+                    if (m_spells.hunter.pTranquilizingShot
+                        && CanTryToCastSpell(me, m_spells.hunter.pTranquilizingShot))
+                    {
+                        if (DoCastSpell(pVictim, m_spells.hunter.pTranquilizingShot) == SPELL_CAST_OK)
+                            return;
+                    }
+                }
+            }
+        }
+    }
+}

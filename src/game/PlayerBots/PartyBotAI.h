@@ -103,6 +103,7 @@ public:
     void RaidStratsInMKProtectionPotions();
     void RaidStratsInOnyxiaProtectionPotions();
     void RaidStratsInZGBosses();
+    void RaidStratsInMKBosses();
 
     std::vector<RaidTargetIcon> m_marksToCC;
     std::vector<RaidTargetIcon> m_marksToFocus;
