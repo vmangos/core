@@ -396,12 +396,16 @@ void PartyBotAI::RaidStratsInMKBosses()
 
     //Lava bomb
     if (me->FindNearestGameObject(177704, 5.0f))
-    {
-        me->InterruptNonMeleeSpells(false);
-        me->AttackStop();
+    {        
         if (!me->IsMoving())
-        {
-            me->SetOrientation(me->GetOrientation() + frand(-180, 180));
+        {   
+            me->InterruptNonMeleeSpells(false);
+            me->AttackStop();
+
+            float newAngle = me->GetOrientation();
+            newAngle += (M_PI_F * 2) * 0.25;
+            newAngle = MapManager::NormalizeOrientation(newAngle);
+            me->SetOrientation(newAngle);
             me->GetMotionMaster()->MoveDistance(me, 7.0f);            
         }
         return;
