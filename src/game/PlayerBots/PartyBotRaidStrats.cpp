@@ -401,7 +401,7 @@ void PartyBotAI::RaidStratsInMKBosses()
         me->AttackStop();
         if (!me->IsMoving())
         {
-            me->SetOrientation(me->GetOrientation() + frand(-45, 45));
+            me->SetOrientation(me->GetOrientation() + frand(-180, 180));
             me->GetMotionMaster()->MoveDistance(me, 7.0f);            
         }
         return;
