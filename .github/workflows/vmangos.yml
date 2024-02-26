@@ -57,7 +57,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get -qq update
-        sudo apt-get -qq install build-essential cmake cppcheck git libace-dev libiberty-dev libmysql++-dev libssl-dev libtbb-dev make openssl
+        sudo apt-get -qq install build-essential cmake cppcheck git libace-dev libiberty-dev libmysql++-dev libssl-dev libtbb-dev make openssl libreadline-dev
       #windows dependencies
     - name: windows dependencies
       if: matrix.os == 'windows-2019'
