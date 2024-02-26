@@ -146,7 +146,9 @@ jobs:
 
     - name: Get current date
       id: date
-      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      uses: Kaven-Universe/github-action-current-date-time@v1
+      with:
+        format: "YYYY-MM-DD"
 
     - name: Upload snapshot
       uses: "crowbarmaster/GH-Automatic-Releases@latest"
@@ -154,5 +156,5 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: "Development Build(${{ steps.date.outputs.date }})"
+        title: "Development Build(${{ steps.date.outputs.time }})"
         files: all_snapshots
