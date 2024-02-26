@@ -149,7 +149,7 @@ jobs:
       run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
     - name: Upload snapshot
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: "crowbarmaster/GH-Automatic-Releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
