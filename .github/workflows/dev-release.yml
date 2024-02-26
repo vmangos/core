@@ -91,7 +91,7 @@ jobs:
     - name: Archive this artefact
       uses: actions/upload-artifact@v4
       with:
-          name: snapshot-devbuild
+          name: snapshot-devbuild-without-anticheat
           path: "${{github.workspace}}/bin/${{env.ARCHIVE_FILENAME}}"
 
     #build with anticheat and install
@@ -134,13 +134,14 @@ jobs:
     - name: Archive this artefact
       uses: actions/upload-artifact@v4
       with:
-          name: snapshot-devbuild
+          name: snapshot-devbuild-with-anticheat
           path: "${{github.workspace}}/bin/${{env.ARCHIVE_FILENAME}}"
 
     - name: Download artifact snapshot-Release
       uses: actions/download-artifact@v4
       with:
-        name: snapshot-devbuild
+        pattern: snapshot-devbuild-*
+        merge-multiple: true
         path: all_snapshots
 
     - name: Get current date
