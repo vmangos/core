@@ -79,7 +79,8 @@ jobs:
 
     - name: Install SQLite dependencies
       run: |
-        sudo apt install sqlite3 mawk -y
+        sudo apt-get -qq update
+        sudo apt-get -qq install mawk sqlite3
         git clone https://github.com/dumblob/mysql2sqlite
         chmod +x ${{github.workspace}}/mysql2sqlite/mysql2sqlite
 
