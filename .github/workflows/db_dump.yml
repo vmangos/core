@@ -30,7 +30,7 @@ jobs:
 
 
     - name: Checkout update sql
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Checkout base sql
       run: |
@@ -108,7 +108,7 @@ jobs:
 
     - name: Set sha short outputs
       id: vars
-      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
     - name: Archive files
       run: |
@@ -117,32 +117,32 @@ jobs:
         7z a -tzip db-sqlite-${{steps.vars.outputs.sha_short}}.zip sqlite_dump
 
     - name: Archive SQL artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
           name: snapshot-db-dump
           path: "${{github.workspace}}/dbexport/db-${{steps.vars.outputs.sha_short}}.zip"
 
     - name: Archive SQLite artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
           name: snapshot-db-sqlite-dump
           path: "${{github.workspace}}/dbexport/db-sqlite-${{steps.vars.outputs.sha_short}}.zip"
 
     - name: Download artifact snapshot-db-dump
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: snapshot-db-dump
         path: all_snapshots
 
     - name: Download artifact snapshot-db-sqlite-dump
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: snapshot-db-sqlite-dump
         path: all_snapshots
 
     - name: Get current date
       id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
     - name: Upload snapshot
       uses: "marvinpinto/action-automatic-releases@latest"
