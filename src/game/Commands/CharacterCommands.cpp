@@ -1270,6 +1270,34 @@ bool ChatHandler::HandleWhisperRestrictionCommand(char* args)
     return false;
 }
 
+//hardcore
+bool ChatHandler::HandleHCAnnounceRestrictionCommand(char* args)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_HARDCORE_ENABLED))
+    {
+        SendSysMessage("Hardcore is NOT enabled on this server.");
+        return true;
+    }
+
+    if (!*args)
+    {
+        PSendSysMessage("Recieve Hardcore announcements is %s", GetSession()->GetPlayer()->IsEnabledHardcoreAnnouncements() ? "ON" : "OFF");
+        return true;
+    }
+
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    GetSession()->GetPlayer()->SetHardcoreAnnouncements(value);
+    PSendSysMessage("Recieve Hardcore announcements is %s", GetSession()->GetPlayer()->IsEnabledHardcoreAnnouncements() ? "ON" : "OFF");
+    return false;
+}
+
 //Enable\Disable accept whispers (for GM)
 bool ChatHandler::HandleWhispersCommand(char* args)
 {

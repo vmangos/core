@@ -2981,3 +2981,10 @@ DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
 
+###################################################################################################################
+#    Hardcore mode
+###################################################################################################################
+#   Hardcore.Enable
+#   Enable Hardcore command.
+
+Hardcore.Enable = 1

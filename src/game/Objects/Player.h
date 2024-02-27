@@ -256,6 +256,9 @@ struct PvPInfo
     bool isPvPFlagCarrier = false;
     uint32 timerPvPRemaining = 0;
     uint32 timerPvPContestedRemaining = 0;
+    //hardcore
+    uint32 timerPvPHardcoreRemaining = 0;
+    bool isHardcoreImmune = false;
 };
 
 struct DuelInfo
@@ -973,7 +976,7 @@ class Player final: public Unit
         // Initializes a new Player object that was not loaded from the database.
         bool Create(uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
         void Update(uint32 update_diff, uint32 time) override;
-        static bool BuildEnumData(QueryResult* result,  WorldPacket* p_data);
+        static bool BuildEnumData(QueryResult* result,  WorldPacket* p_data, AccountTypes security);
 
         /**
          * @brief Can only be called from Master server (or ASSERT will fail)
@@ -1018,6 +1021,12 @@ class Player final: public Unit
         void SetPvPDeath(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_PVP_DEATH; else m_ExtraFlags &= ~PLAYER_EXTRA_PVP_DEATH; }
         bool IsGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
         void SetGMVisible(bool on, bool notify = false);
+
+        //hardcore
+        void SetHardcore(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_HARDCORE; else m_ExtraFlags &= ~PLAYER_EXTRA_HARDCORE; }
+        bool IsHardcore(bool output = false) const { return output ? (m_ExtraFlags & PLAYER_EXTRA_HARDCORE) : (m_ExtraFlags & PLAYER_EXTRA_HARDCORE) && (GetLevel() < 60); } // Output = true if data is used for output. for ingame interactions output=false
+        void SetHardcorePermaDeath() { m_ExtraFlags |= PLAYER_EXTRA_HARDCORE_DEATH; }
+        bool IsPermaDeath() const { return m_ExtraFlags & PLAYER_EXTRA_HARDCORE_DEATH; } // Used for updating playercache
         
         void SetCheatFly(bool on, bool notify = false);
         void SetCheatGod(bool on, bool notify = false);
@@ -2333,6 +2342,10 @@ class Player final: public Unit
         bool IsEnabledWhisperRestriction() const { return m_ExtraFlags & PLAYER_EXTRA_WHISP_RESTRICTION; }
         void SetWhisperRestriction(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_WHISP_RESTRICTION; else m_ExtraFlags &= ~PLAYER_EXTRA_WHISP_RESTRICTION; }
 
+        // Handle restrictions for hardcore announcements
+        bool IsEnabledHardcoreAnnouncements() const { return m_ExtraFlags & PLAYER_EXTRA_HARDCORE_ANNOUNCE_RESTRICTION; }
+        void SetHardcoreAnnouncements(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_HARDCORE_ANNOUNCE_RESTRICTION; else m_ExtraFlags &= ~PLAYER_EXTRA_HARDCORE_ANNOUNCE_RESTRICTION; }
+
         bool IsAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
         void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
         uint32 GetExtraFlags() const { return m_ExtraFlags; }
@@ -2396,7 +2409,7 @@ class Player final: public Unit
         void UpdatePvPContestedFlagTimer(uint32 diff);
     public:
         PvPInfo pvpInfo;
-        void UpdatePvP(bool state, bool overriding = false);
+        void UpdatePvP(bool state, bool overriding = false, bool isPlayerCombat = false);
         void UpdatePvPContested(bool state, bool overriding = false);
 
         bool IsPvPDesired() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED); }

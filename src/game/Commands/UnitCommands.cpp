@@ -2696,3 +2696,59 @@ bool ChatHandler::HandleKnockBackCommand(char* args)
 
     return true;
 }
+
+//hardcore
+bool ChatHandler::HandleHardcoreCommand(char* args)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_HARDCORE_ENABLED))
+    {
+        SendSysMessage("Hardcore is NOT enabled on this server.");
+        return false;
+    }
+
+    Player* target = m_session->GetPlayer();
+
+    PSendSysMessage("Hardcore: %s", GetSession()->GetPlayer()->IsHardcore(true) ? "ON" : "OFF");
+    PSendSysMessage("Recieve Hardcore announcements:", GetSession()->GetPlayer()->IsEnabledHardcoreAnnouncements() ? "OFF" : "ON");
+    PSendSysMessage("You can enable/disable Hardcore announcements by typing: .hardcore message");
+
+    if (!target->IsHardcore() && target->GetLevel() == 1)
+    {
+        SendSysMessage("You can enable Hardcore by typing: .hardcore on");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleHardcoreONCommand(char* args)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_HARDCORE_ENABLED))
+    {
+        SendSysMessage("Hardcore is NOT enabled on this server.");
+        return false;
+    }
+
+    Player* target = m_session->GetPlayer();
+
+    if (target->IsHardcore())
+    {
+        SendSysMessage("You are already Hardcore!");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (target->GetLevel() != 1)
+    {
+        SendSysMessage("You can only enable Hardcore at level 1!");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    target->SetHardcore(true);
+    target->SetHardcoreAnnouncements(true);
+    target->RemoveFromGroup();
+    SendSysMessage("Hardcore activated!");
+    return true;
+}

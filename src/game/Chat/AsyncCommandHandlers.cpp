@@ -54,6 +54,10 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
         data->m_locale = target->GetSession()->GetSessionDbcLocale();
         data->m_online = true;
 
+        //hardcore
+        data->hardcore = target->IsHardcore(true);
+        data->permadeath = false; // Player is online. Permadeath would kick player after 15 sec.
+
         if (auto const warden = target->GetSession()->GetWarden())
         {
             warden->GetPlayerInfo(data->m_wardenClock, data->m_wardenFingerprint, data->m_wardenHypervisors,
@@ -67,8 +71,8 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
     {
         data->m_targetGuid = target_guid;
         CharacterDatabase.AsyncPQuery(&PInfoHandler::HandlePlayerLookupResult, data,
-            //       0                    1        2        3          4       5
-            "SELECT `played_time_total`, `level`, `money`, `account`, `race`, `class` FROM `characters` WHERE `guid` = '%u'",
+            //       0                    1        2        3          4       5        6
+            "SELECT `played_time_total`, `level`, `money`, `account`, `race`, `class`, `extra_flags` FROM `characters` WHERE `guid` = '%u'",
             target_guid.GetCounter());
     }
 }
@@ -88,6 +92,10 @@ void PInfoHandler::HandlePlayerLookupResult(QueryResult* result, PInfoData *data
     data->m_accountId = fields[3].GetUInt32();
     data->m_race = fields[4].GetUInt8();
     data->m_class = fields[5].GetUInt8();
+
+    //hardcore
+    data->hardcore = fields[6].GetUInt32() & PLAYER_EXTRA_HARDCORE;
+    data->permadeath = fields[6].GetUInt32() & PLAYER_EXTRA_HARDCORE_DEATH;
 
     delete result;
 
@@ -223,6 +231,9 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
     cHandler.PSendSysMessage(LANG_PINFO_LEVEL, timeStr.c_str(), data->m_level, gold, silv, copp, gold_in, silv_in, copp_in, gold_out, silv_out, copp_out);
     if (Guild* guild = sGuildMgr.GetPlayerGuild(data->m_targetGuid))
         cHandler.PSendSysMessage("Guild: %s", cHandler.playerLink(guild->GetName()).c_str());
+
+    //hardcore
+    cHandler.PSendSysMessage("Hardcore: %s - Permadeath: %s", data->hardcore ? "ON" : "OFF", data->permadeath ? "YES" : "NO");
 
     if (!data->m_wardenClock.empty())
         cHandler.SendSysMessage(data->m_wardenClock.c_str());
