@@ -266,6 +266,12 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
         return;
     }
 
+    //Fix long 180 days auc Without a buyout price.
+    if (!buyout)
+    {
+        buyout = bid;
+    }
+
     if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_TRADES) && GetSecurity() > SEC_PLAYER)
         return;
 
