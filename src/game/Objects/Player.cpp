@@ -5217,19 +5217,10 @@ void Player::KillPlayer()
 
     if (IsHardcore())
     {
-        if (pvpInfo.isHardcoreImmune)
-        {
-            ChatHandler(this).PSendSysMessage("[Hardcore] You died. But PVP immunity saved you! Extra life granted!");
-            pvpInfo.isHardcoreImmune = false;
-        }
-        else
-        {
-            ChatHandler(this).PSendSysMessage("[Hardcore] Game over! Exiting game in 15 seconds.");
-            SetHardcorePermaDeath();
-            SaveToDB();
-            m_saveDisabled = true;
-            pvpInfo.timerPvPHardcoreRemaining = 15 * 1000; // 15 sec to forced logout
-        }
+        ChatHandler(this).PSendSysMessage("[Hardcore] Game over! Exiting game in 15 seconds.");
+        SetHardcorePermaDeath();
+        SaveToDB();
+        m_saveDisabled = true;
     }
 
     // don't create corpse at this moment, player might be falling
@@ -17712,8 +17703,6 @@ void Player::UpdatePvPFlagTimer(uint32 diff)
     if (!pvpInfo.inPvPCombat && !pvpInfo.inPvPEnforcedArea && !pvpInfo.inPvPCapturePoint && !pvpInfo.isPvPFlagCarrier && !IsPvPDesired())
         pvpInfo.timerPvPRemaining -= std::min(pvpInfo.timerPvPRemaining, diff);
 
-    pvpInfo.timerPvPHardcoreRemaining -= std::min(pvpInfo.timerPvPHardcoreRemaining, diff);
-
     // Timer tries to drop flag if all conditions are met and time has passed
     UpdatePvP(false);
 }
@@ -18964,52 +18953,8 @@ void Player::UpdateHomebindTime(uint32 time)
     }
 }
 
-void Player::UpdatePvP(bool state, bool overriding, bool isPlayerCombat)
+void Player::UpdatePvP(bool state, bool overriding)
 {
-    if (isPlayerCombat && IsHardcore())
-    {
-        pvpInfo.isHardcoreImmune = true;
-
-        //if (pvpInfo.timerPvPHardcoreRemaining < 90 * 1000) // Only announce timer if more than 30 secs difference to avoid spam
-        //    ChatHandler(this).PSendSysMessage("[Hardcore] PVP immunity engaged for 2 minutes.");
-        pvpInfo.timerPvPHardcoreRemaining = 45 * 1000;
-        /*
-        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(28126);
-        SpellAuraHolder* holder = CreateSpellAuraHolder(spellInfo, m_session->GetPlayer(), m_session->GetPlayer(), m_session->GetPlayer());
-
-        holder->SetAuraDuration(2 * 60 * 1000);
-
-        for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-        {
-            uint8 eff = spellInfo->Effect[i];
-            if (eff >= TOTAL_SPELL_EFFECTS)
-                continue;
-
-            if (Spells::IsAreaAuraEffect(eff) || eff == SPELL_EFFECT_APPLY_AURA || eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
-            {
-                Aura* aur = CreateAura(spellInfo, SpellEffectIndex(i), nullptr, holder, m_session->GetPlayer());
-                holder->AddAura(aur, SpellEffectIndex(i));
-            }
-        }
-
-        if (!m_session->GetPlayer()->AddSpellAuraHolder(holder))
-            holder = nullptr;
-        */
-    }
-
-    if (!pvpInfo.timerPvPHardcoreRemaining && (m_ExtraFlags & PLAYER_EXTRA_HARDCORE_DEATH))
-    {
-        sObjectMgr.UpdatePlayerCache(this);
-        m_session->KickPlayer();
-    }
-
-    if (!pvpInfo.timerPvPHardcoreRemaining && pvpInfo.isHardcoreImmune)
-    {
-        pvpInfo.isHardcoreImmune = false;
-        // ChatHandler(this).PSendSysMessage("Hardcore: PVP immunity ended.");
-        // m_session->GetPlayer()->RemoveAurasDueToSpell(28126);
-    }
-
     if (!state)
     {
         // Updating into unset state or overriding anything

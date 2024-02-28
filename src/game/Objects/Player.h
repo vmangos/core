@@ -256,9 +256,6 @@ struct PvPInfo
     bool isPvPFlagCarrier = false;
     uint32 timerPvPRemaining = 0;
     uint32 timerPvPContestedRemaining = 0;
-    //hardcore
-    uint32 timerPvPHardcoreRemaining = 0;
-    bool isHardcoreImmune = false;
 };
 
 struct DuelInfo
@@ -2409,7 +2406,7 @@ class Player final: public Unit
         void UpdatePvPContestedFlagTimer(uint32 diff);
     public:
         PvPInfo pvpInfo;
-        void UpdatePvP(bool state, bool overriding = false, bool isPlayerCombat = false);
+        void UpdatePvP(bool state, bool overriding = false);
         void UpdatePvPContested(bool state, bool overriding = false);
 
         bool IsPvPDesired() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED); }

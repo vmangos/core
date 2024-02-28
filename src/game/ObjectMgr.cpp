@@ -694,7 +694,7 @@ void ObjectMgr::LoadPlayerCacheData(uint32 lowGuid)
         {
             //hardcore
             bool isLocked = false;
-            if ((fields[14].GetUInt32() & PLAYER_EXTRA_HARDCORE_DEATH) || (fields[14].GetUInt32() & PLAYER_EXTRA_LOCKED))
+            if ((fields[14].GetUInt32() & PLAYER_EXTRA_HARDCORE_DEATH))
                 isLocked = true;
 
             PlayerCacheData* data = InsertPlayerInCache(fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt32(),

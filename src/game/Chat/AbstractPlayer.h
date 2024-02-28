@@ -27,7 +27,6 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_HARDCORE = 0x0800,
     PLAYER_EXTRA_HARDCORE_DEATH = 0x1000,
     PLAYER_EXTRA_HARDCORE_ANNOUNCE_RESTRICTION = 0x2000,    // 0 = restrict announcement
-    PLAYER_EXTRA_LOCKED = 0x4000                            // no login if permdead
 };
 
 class MasterPlayer;
