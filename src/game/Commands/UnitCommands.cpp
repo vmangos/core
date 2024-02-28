@@ -2696,3 +2696,34 @@ bool ChatHandler::HandleKnockBackCommand(char* args)
 
     return true;
 }
+
+bool ChatHandler::HandleHardcoreONCommand(char* args)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_HARDCORE_ENABLED))
+    {
+        SendSysMessage("Hardcore is NOT enabled on this server.");
+        return false;
+    }
+
+    Player* target = m_session->GetPlayer();
+
+    if (target->IsHardcore())
+    {
+        SendSysMessage("You are already Hardcore!");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (target->GetLevel() != 1)
+    {
+        SendSysMessage("You can only enable Hardcore at level 1!");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    target->SetHardcore(true);
+    target->SetHardcoreAnnouncements(true);
+    target->RemoveFromGroup();
+    SendSysMessage("Hardcore activated!");
+    return true;
+}

@@ -2033,14 +2033,14 @@ void Player::AutoReSummonPet()
 }
 
 
-bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
+bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data, AccountTypes security)
 {
     //                0                1                2                3                 4                  5                6                7                      8                      9                       10
     //    "SELECT characters.guid, characters.name, characters.race, characters.class, characters.gender, characters.skin, characters.face, characters.hair_style, characters.hair_color, characters.facial_hair, characters.level, "
     //         11               12              13                     14                     15                     16                     17
     //    "characters.zone, characters.map, characters.position_x, characters.position_y, characters.position_z, guild_member.guild_id, characters.player_flags, "
-    //         18                         19                   20                        21                   22
-    //    "characters.at_login_flags, character_pet.entry, character_pet.display_id, character_pet.level, characters.equipment_cache "
+    //         18                         19                   20                        21                   22                          23
+    //    "characters.at_login_flags, character_pet.entry, character_pet.display_id, character_pet.level, characters.equipment_cache, characters.extra_flags "
 
     Field* fields = result->Fetch();
 
@@ -2056,7 +2056,17 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
     }
 
     *p_data << ObjectGuid(HIGHGUID_PLAYER, guid);
-    *p_data << fields[1].GetString();                       // name
+    
+    //hardcore
+    if (fields[23].GetUInt32() & PLAYER_EXTRA_HARDCORE_DEATH)
+    {
+        char name[24];
+        sprintf(name, "%s %s", fields[1].GetString(), " DEATH");
+        *p_data << name;
+    }
+    else
+        *p_data << fields[1].GetString();                   // name
+
     *p_data << uint8(pRace);                                // race
     *p_data << uint8(pClass);                               // class
     *p_data << uint8(fields[4].GetUInt8());                 // gender
@@ -2927,6 +2937,9 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask) c
     if (!guid || !IsInWorld())
         return nullptr;
 
+    if ((npcflagmask == UNIT_NPC_FLAG_AUCTIONEER) && (IsHardcore())) // Prevent Hardcore players interacting with autioneers
+        return nullptr;
+
     // exist (we need look pets also for some interaction (quest/etc)
     Creature* pCreature = GetMap()->GetAnyTypeCreature(guid);
     
@@ -2999,6 +3012,9 @@ GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameo
 {
     // some basic checks
     if (!guid || !IsInWorld())
+        return nullptr;
+
+    if ((gameobject_type == GAMEOBJECT_TYPE_MEETINGSTONE) && (IsHardcore())) // Prevent Hardcore player interacting with meeting stones
         return nullptr;
 
     GameObject* pGo = GetMap()->GetGameObject(guid);
@@ -3494,6 +3510,55 @@ void Player::GiveLevel(uint32 level)
 {
     if (level == GetLevel())
         return;
+
+    // Hardcore
+    if (IsHardcore())
+    {
+        if (level == 60)
+        {
+            std::stringstream message;
+            message << GetName() << " has reached level 60!";
+
+            sWorld.SendHardcoreWorldText(LANG_HARDCORE, message.str().c_str());
+
+            //Add Maount
+            MailDraft draft;
+            draft.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
+            MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+
+            Item* item = Item::CreateItem(23720, 1, 0);
+            item->SaveToDB();
+            draft.AddItem(item);
+            draft.SendMailTo(MailReceiver(this), sender);
+
+            // Add Pet
+            MailDraft draft;
+            draft.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
+            MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+
+            std::vector<uint32> ITEM_PETS = { 13582, 13584 };
+
+            Item* item = Item::CreateItem(ITEM_PETS[rand() % ITEM_PETS.size()], 1, 0);
+            item->SaveToDB();
+            draft.AddItem(item);
+            draft.SendMailTo(MailReceiver(this), sender);
+
+            // Add bags
+            for (size_t i = 0; i < 3; i++)
+            {                
+                MailDraft draft;
+                draft.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
+                MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+
+                std::vector<uint32> ITEM_PETS = { 13582, 13584 };
+
+                Item* item = Item::CreateItem(1977, 1, 0);
+                item->SaveToDB();
+                draft.AddItem(item);
+                draft.SendMailTo(MailReceiver(this), sender);
+            }            
+        }
+    }
 
     uint32 numInstanceMembers = 0;
     uint32 numGroupMembers = 0;
@@ -5152,6 +5217,14 @@ void Player::KillPlayer()
     GetCheatData()->OnDeath();
 
     UpdateCorpseReclaimDelay();                             // dependent at use SetDeathPvP() call before kill
+
+    if (IsHardcore())
+    {
+        ChatHandler(this).PSendSysMessage("[Hardcore] Game over! Exiting game in 15 seconds.");
+        SetHardcorePermaDeath();
+        SaveToDB();
+        m_saveDisabled = true;
+    }
 
     // don't create corpse at this moment, player might be falling
 
@@ -15312,6 +15385,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     uint32 extraflags = fields[34].GetUInt32();
 
+    // Prevent players from logging in - if they died in hardcode
+    if (extraflags & PLAYER_EXTRA_HARDCORE_DEATH)
+        return false;
+
     m_stableSlots = fields[35].GetUInt32();
     if (m_stableSlots > MAX_PET_STABLES)
     {
@@ -15557,6 +15634,11 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
         SetCheatGod(sWorld.getConfig(CONFIG_BOOL_GM_CHEAT_GOD));
     }
+
+    if (extraflags & PLAYER_EXTRA_HARDCORE)
+        SetHardcore(true);
+
+    SetHardcoreAnnouncements(extraflags & PLAYER_EXTRA_HARDCORE_ANNOUNCE_RESTRICTION);
 
     if (extraflags & PLAYER_EXTRA_WHISP_RESTRICTION)
         SetWhisperRestriction(true);

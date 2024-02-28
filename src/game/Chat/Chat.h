@@ -1021,6 +1021,10 @@ class ChatHandler
         bool HandleStableCommand(char* args);
         bool HandleQuitCommand(char* args);
 
+        //hardcore
+        bool HandleHardcoreONCommand(char* args);
+        bool HandleHCAnnounceRestrictionCommand(char* args);
+
         //! Development Commands
         bool HandleSaveAllCommand(char* args);
         bool HandleDebugMoveCommand(char* args);

@@ -1211,6 +1211,9 @@ bool Map::ScriptCommand_MeetingStone(ScriptInfo const& script, WorldObject* sour
         return ShouldAbortScript(script);
     }
 
+    if (pPlayer->IsHardcore())
+        return ShouldAbortScript(script);
+
     sLFGMgr.AddToQueue(pPlayer, script.meetingstone.areaId);
 
     return false;

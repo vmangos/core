@@ -155,7 +155,7 @@ void WorldSession::HandleCharEnum(QueryResult* result)
                 m_characterMaxLevel = level;
 
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
-            if (Player::BuildEnumData(result, &data))
+            if (Player::BuildEnumData(result, &data, GetSecurity()))
                 ++num;
         }
         while (result->NextRow());
@@ -177,8 +177,8 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
                                   "SELECT `characters`.`guid`, `characters`.`name`, `characters`.`race`, `characters`.`class`, `characters`.`gender`, `characters`.`skin`, `characters`.`face`, `characters`.`hair_style`, `characters`.`hair_color`, `characters`.`facial_hair`, `characters`.`level`, "
                                   //    11                   12                  13                         14                         15                         16                         17
                                   "`characters`.`zone`, `characters`.`map`, `characters`.`position_x`, `characters`.`position_y`, `characters`.`position_z`, `guild_member`.`guild_id`, `characters`.`player_flags`, "
-                                  //    18                             19                       20                            21                       22
-                                  "`characters`.`at_login_flags`, `character_pet`.`entry`, `character_pet`.`display_id`, `character_pet`.`level`, `characters`.`equipment_cache` "
+                                  //    18                             19                       20                            21                       22                              23
+                                  "`characters`.`at_login_flags`, `character_pet`.`entry`, `character_pet`.`display_id`, `character_pet`.`level`, `characters`.`equipment_cache`, `characters`.`extra_flags` "
                                   "FROM `characters` LEFT JOIN `character_pet` ON `characters`.`guid`=`character_pet`.`owner_guid` AND `character_pet`.`slot`='%u' "
                                   "LEFT JOIN `guild_member` ON `characters`.`guid` = `guild_member`.`guid` "
                                   "WHERE `characters`.`account` = '%u' ORDER BY `characters`.`guid` "
@@ -395,9 +395,14 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
 {
     ObjectGuid playerGuid;
     recv_data >> playerGuid;
+    //hardcore
+    bool isLocked = false; // Overwritten by cachedata - if there is no cachedata the character couldn't be locked.
+    //hardcore
+    PlayerCacheData* cacheData = sObjectMgr.GetPlayerDataByGUID(playerGuid);
+    if (cacheData)
+        isLocked = cacheData->bCharIsLocked; 
 
-    if ((!sWorld.getConfig(CONFIG_BOOL_WORLD_AVAILABLE) && GetSecurity() == SEC_PLAYER) ||
-        PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer())
+    if ((!sWorld.getConfig(CONFIG_BOOL_WORLD_AVAILABLE) && GetSecurity() == SEC_PLAYER) || PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer() || (isLocked && GetSecurity() == SEC_PLAYER))
     {
         WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
         data << (uint8)1;
