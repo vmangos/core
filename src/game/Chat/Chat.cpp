@@ -1309,7 +1309,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "gold",           SEC_BASIC_ADMIN,    true, nullptr,                                         "", goldCommandTable },
         { "wareffort",      SEC_DEVELOPER,      true, nullptr,                                         "", warEffortCommandTable },
         //hardcore
-        { "hardcore",       SEC_PLAYER,         true,  &ChatHandler::HandleHardcoreCommand,            "", hardcoreCommandTable },
+        { "hardcore",       SEC_PLAYER,         true,  nullptr,                                        "", hardcoreCommandTable },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 

@@ -1022,7 +1022,6 @@ class ChatHandler
         bool HandleQuitCommand(char* args);
 
         //hardcore
-        bool HandleHardcoreCommand(char* args);
         bool HandleHardcoreONCommand(char* args);
         bool HandleHCAnnounceRestrictionCommand(char* args);
 
