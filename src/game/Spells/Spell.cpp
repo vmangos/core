@@ -5857,8 +5857,8 @@ SpellCastResult Spell::CheckCast(bool strict)
             if (pPlayer->IsHardcore())
             {
                 // Prevent bubble hs in hardmode
-                //if ((m_spellInfo->Id == 8690) && (pPlayer->IsImmuneToSchoolMask(SPELL_SCHOOL_MASK_NORMAL)) && pPlayer->GetClass() == CLASS_PALADIN)
-                //    return SPELL_FAILED_IMMUNE;
+                if ((m_spellInfo->Id == 8690) && (pPlayer->IsImmuneToSchoolMask(SPELL_SCHOOL_MASK_NORMAL)) && pPlayer->GetClass() == CLASS_PALADIN)
+                    return SPELL_FAILED_IMMUNE; 
             }
         }
 
