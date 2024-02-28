@@ -875,6 +875,14 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     if (!pPlayer)
         return false;
 
+    //TODO: LANG
+    if (pPlayer->IsHardcore())
+    {
+        SendSysMessage("It is forbidden in HC mode.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     if (!PartyBotAddRequirementCheck(pPlayer, nullptr))
     {
         SetSentErrorMessage(true);
@@ -1031,6 +1039,14 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     if (!pPlayer)
         return false;
 
+    //TODO: LANG
+    if (pPlayer->IsHardcore())
+    {
+        SendSysMessage("It is forbidden in HC mode.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     Player* pTarget = GetSelectedPlayer();
     if (!pTarget)
     {
@@ -1069,6 +1085,14 @@ bool ChatHandler::HandlePartyBotLoadCommand(char* args)
     Player* pPlayer = m_session->GetPlayer();
     if (!pPlayer)
         return false;
+
+    //TODO: LANG
+    if (pPlayer->IsHardcore())
+    {
+        SendSysMessage("It is forbidden in HC mode.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     std::string name = ExtractPlayerNameFromLink(&args);
     if (name.empty())
