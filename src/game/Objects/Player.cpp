@@ -3521,41 +3521,42 @@ void Player::GiveLevel(uint32 level)
 
             sWorld.SendHardcoreWorldText(LANG_HARDCORE, message.str().c_str());
 
-            //Add Maount
-            MailDraft draft;
-            draft.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
-            MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+            //Add Mount
+            MailDraft draftMount;
+            draftMount.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
+            MailSender senderMount(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
-            Item* item = Item::CreateItem(23720, 1, 0);
-            item->SaveToDB();
-            draft.AddItem(item);
-            draft.SendMailTo(MailReceiver(this), sender);
+            Item* itemMount = Item::CreateItem(23720, 1, 0);
+            itemMount->SaveToDB();
+            draftMount.AddItem(itemMount);
+            draftMount.SendMailTo(MailReceiver(this), senderMount);
 
             // Add Pet
-            MailDraft draft;
-            draft.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
-            MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+            MailDraft draftPet;
+            draftPet.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
+            MailSender senderPet(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
             std::vector<uint32> ITEM_PETS = { 13582, 13584 };
 
-            Item* item = Item::CreateItem(ITEM_PETS[rand() % ITEM_PETS.size()], 1, 0);
-            item->SaveToDB();
-            draft.AddItem(item);
-            draft.SendMailTo(MailReceiver(this), sender);
+            Item* itemPet = Item::CreateItem(ITEM_PETS[rand() % ITEM_PETS.size()], 1, 0);
+            itemPet->SaveToDB();
+            draftPet.AddItem(itemPet);
+            draftPet.SendMailTo(MailReceiver(this), senderPet);
 
             // Add bags
-            for (size_t i = 0; i < 3; i++)
-            {                
-                MailDraft draft;
-                draft.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
-                MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+            for (size_t i = 0; i < 4; i++)
+            {
+                
+                MailDraft draftBags;
+                draftBags.SetSubjectAndBody("Congratulations!", "You did it! You beat Hardcore!");
+                MailSender senderBags(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
                 std::vector<uint32> ITEM_PETS = { 13582, 13584 };
 
-                Item* item = Item::CreateItem(1977, 1, 0);
-                item->SaveToDB();
-                draft.AddItem(item);
-                draft.SendMailTo(MailReceiver(this), sender);
+                Item* itemBags = Item::CreateItem(1977, 1, 0);
+                itemBags->SaveToDB();
+                draftBags.AddItem(itemBags);
+                draftBags.SendMailTo(MailReceiver(this), senderBags);
             }            
         }
     }
