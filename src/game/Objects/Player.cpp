@@ -6592,40 +6592,44 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
     float const old_z = GetPositionZ();
     float const old_r = GetOrientation();
     bool const positionChanged = teleport || old_x != x || old_y != y || old_z != z;
+    bool const hasMovingFlags = m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING);
 
-    if (positionChanged || old_r != orientation)
+    if (positionChanged || hasMovingFlags || old_r != orientation)
     {
-        HandleInterruptsOnMovement(positionChanged);
+        HandleInterruptsOnMovement(positionChanged || hasMovingFlags);
 
-        // move and update visible state if need
-        m->PlayerRelocation(this, x, y, z, orientation);
-
-        // reread after Map::Relocation
-        m = GetMap();
-        x = GetPositionX();
-        y = GetPositionY();
-        z = GetPositionZ();
-
-        if (positionChanged)
+        if (positionChanged || old_r != orientation)
         {
-            // group update
-            if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
-                SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
+            // move and update visible state if need
+            m->PlayerRelocation(this, x, y, z, orientation);
 
-            if (Player* pTrader = GetTrader())
-                if (!IsWithinDistInMap(pTrader, INTERACTION_DISTANCE))
-                    TradeCancel(true, TRADE_STATUS_TRADE_CANCELED);   // will close both side trade windows
+            // reread after Map::Relocation
+            m = GetMap();
+            x = GetPositionX();
+            y = GetPositionY();
+            z = GetPositionZ();
 
-            if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
+            if (positionChanged)
             {
-                if (!m_areaCheckTimer)
-                    m_areaCheckTimer = timerMax;
-            }
-            else
-            {
-                UpdateTerainEnvironmentFlags();
-                CheckAreaExploreAndOutdoor();
-                LoadMapCellsAround(GetMap()->GetGridActivationDistance());
+                // group update
+                if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
+                    SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
+
+                if (Player* pTrader = GetTrader())
+                    if (!IsWithinDistInMap(pTrader, INTERACTION_DISTANCE))
+                        TradeCancel(true, TRADE_STATUS_TRADE_CANCELED);   // will close both side trade windows
+
+                if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
+                {
+                    if (!m_areaCheckTimer)
+                        m_areaCheckTimer = timerMax;
+                }
+                else
+                {
+                    UpdateTerainEnvironmentFlags();
+                    CheckAreaExploreAndOutdoor();
+                    LoadMapCellsAround(GetMap()->GetGridActivationDistance());
+                }
             }
         }
     }

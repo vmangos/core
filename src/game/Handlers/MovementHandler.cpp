@@ -342,7 +342,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     // reset knockback state when fall to ground or water
     if (pPlayerMover)
     {
-        if ((opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM) && pPlayerMover->IsLaunched())
+        if (IsFallEndOpcode(opcode) && pPlayerMover->IsLaunched())
         {
             pPlayerMover->SetLaunched(false);
             pPlayerMover->SetXYSpeed(0.0f);

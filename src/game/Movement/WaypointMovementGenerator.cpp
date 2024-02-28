@@ -256,6 +256,21 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
         return true;
     }
 
+    // prevent movement while casting spells with cast time or channel time
+    // don't stop creature movement for spells without interrupt movement flags
+    if (creature.IsNoMovementSpellCasted())
+    {
+        if (!creature.IsStopped())
+        {
+            creature.StopMoving();
+            i_nextMoveTime.Reset(1);
+            m_isArrivalDone = false;
+        }
+
+        creature.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
+        return true;
+    }
+
     if (Stopped())
     {
         if (CanMove(diff))
@@ -507,8 +522,20 @@ bool PatrolMovementGenerator::Update(Creature &creature, uint32 const& diff)
         return true;
     }
 
+    // prevent movement while casting spells with cast time or channel time
+    // don't stop creature movement for spells without interrupt movement flags
+    if (creature.IsNoMovementSpellCasted())
+    {
+        if (!creature.IsStopped())
+            creature.StopMoving();
+
+        creature.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
+        return true;
+    }
+
     if (creature.movespline->Finalized())
         StartMove(creature);
+
     return true;
 }
 

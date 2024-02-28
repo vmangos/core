@@ -3908,13 +3908,8 @@ void Unit::DeleteAuraHolder(SpellAuraHolder* holder)
 
 void Unit::RemoveSpellAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode)
 {
-    // Statue unsummoned at holder remove
-    Totem* statue = nullptr;
     SpellCaster* caster = holder->GetRealCaster();
     bool isChanneled = holder->IsChanneled(); // cache for after the holder is deleted
-    if (isChanneled && caster)
-        if (caster->IsCreature() && ((Creature*)caster)->IsTotem() && ((Totem*)caster)->GetTotemType() == TOTEM_STATUE)
-            statue = ((Totem*)caster);
 
     if (m_spellAuraHoldersUpdateIterator != m_spellAuraHolders.end() && m_spellAuraHoldersUpdateIterator->second == holder)
         ++m_spellAuraHoldersUpdateIterator;
@@ -3947,9 +3942,6 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode)
 
     if (mode != AURA_REMOVE_BY_DELETE)
         holder->HandleSpellSpecificBoosts(false);
-
-    if (statue)
-        statue->UnSummon();
 
     uint32 auraSpellId = holder->GetId();
 
@@ -10105,7 +10097,7 @@ void Unit::HandleInterruptsOnMovement(bool positionChanged)
 
     // Fix bug after 1.11 where client doesn't send stand state update while casting.
     // Test case: Begin eating or drinking, then start casting Hearthstone and run.
-    if (HasUnitMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN)) // sitting on chair teleports you, so we need to check flags
+    if (m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN)) // sitting on chair teleports you, so we need to check flags
         SetStandState(UNIT_STAND_STATE_STAND);
 }
 
