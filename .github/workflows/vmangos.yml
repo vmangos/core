@@ -49,15 +49,15 @@ jobs:
     steps:
 
     #git checkout
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     #before install dependencies
     - name: ubuntu dependencies
       #ubuntu dependencies
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get -qq install libmysql++-dev libace-dev libtbb-dev
-        sudo apt-get -qq install cmake build-essential cppcheck git make libiberty-dev openssl libssl-dev
+        sudo apt-get -qq update
+        sudo apt-get -qq install build-essential cmake cppcheck git libace-dev libiberty-dev libmysql++-dev libssl-dev libtbb-dev make openssl
       #windows dependencies
     - name: windows dependencies
       if: matrix.os == 'windows-2019'
