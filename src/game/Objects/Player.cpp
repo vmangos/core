@@ -2064,12 +2064,6 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data, AccountType
         sprintf(name, "%s %s", fields[1].GetString(), " DEATH");
         *p_data << name;
     }
-    else if ((fields[23].GetUInt32() & PLAYER_EXTRA_LOCKED) && (security == SEC_PLAYER))
-    {
-        char name[24];
-        sprintf(name, "%s %s", fields[1].GetString(), " LOCKED");
-        *p_data << name;
-    }
     else
         *p_data << fields[1].GetString();                   // name
 
