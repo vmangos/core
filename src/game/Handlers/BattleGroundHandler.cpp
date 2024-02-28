@@ -165,6 +165,14 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
     // ignore if player is already in BG
     if (_player->InBattleGround())
         return;
+
+    //hardcore
+    // TODO: LANG
+    if (_player->IsHardcore())
+    {
+        ChatHandler(_player).PSendSysMessage("Battleground: no available in HC mode.");
+        return;
+    }
     
     // get bg instance or bg template if instance not found
     BattleGround *bg = nullptr;
