@@ -439,10 +439,12 @@ DELETE FROM `gameobject` WHERE `guid`=397016;
 
 -- Delete custom Nefarian object, it has no use
 DELETE FROM `gameobject_template` WHERE `entry`=200000;
+DELETE FROM `locales_gameobject` WHERE `entry`=200000;
 DELETE FROM `gameobject` WHERE `guid`=35829;
 
 -- Delete custom Vael object, it has no use
 DELETE FROM `gameobject_template` WHERE `entry`=300500;
+DELETE FROM `locales_gameobject` WHERE `entry`=300500;
 DELETE FROM `gameobject` WHERE `guid`=397002;
 
 -- Delete custom spawned 2nd Alchemy Lab
@@ -564,6 +566,8 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 -- .go xyz -7624.887 -1036.406 449.3443
 
 -- Correct Blackwing Taskmaster
+-- Delete old scripts for Blackwing Taskmaster
+DELETE FROM `creature_movement_scripts` WHERE (`id` IN (25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54));
 -- Delete waypoints
 -- First pack
 DELETE FROM `creature_movement` WHERE `id` IN (300628, 300629, 300630);
@@ -574,6 +578,7 @@ DELETE FROM `creature_movement` WHERE `id` IN (300634, 300635, 300636);
 -- Delete 4th pack, custom spawn
 DELETE FROM `creature_movement` WHERE `id` IN (300637, 300638, 300639);
 DELETE FROM `creature` WHERE `guid` IN (300637, 300638, 300639);
+DELETE FROM `creature_groups` WHERE `leader_guid`=300637;
 -- Update position to true sniff spawn
 UPDATE `creature` SET `position_x`=-7594.02, `position_y`=-987.55, `position_z`=440.449, `orientation`=6.05629 WHERE `guid`=300628;
 UPDATE `creature` SET `position_x`=-7596.28, `position_y`=-987.925, `position_z`=440.176, `orientation`=0.0349066 WHERE `guid`=300629;
@@ -748,19 +753,19 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 -- Correct Death Talon packs
 -- First Pack
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7527.61, `position_y`=-904.831, `position_z`=428.011, `orientation`=4.45059 WHERE `guid`=84519;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7539.27, `position_y`=-905.861, `position_z`=428.093, `orientation`=5.91667 WHERE `guid`=84520;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7534.13, `position_y`=-924.27, `position_z`=428.045, `orientation`=0.855211 WHERE `guid`=84521;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7517.52, `position_y`=-912.762, `position_z`=428.026, `orientation`=3.36849 WHERE `guid`=84522;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7541.13, `position_y`=-917.746, `position_z`=428.11, `orientation`=0.0523599 WHERE `guid`=84523;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7522.07, `position_y`=-924.434, `position_z`=428.001, `orientation`=2.07694 WHERE `guid`=84524;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7527.61, `position_y`=-904.831, `position_z`=428.011, `orientation`=4.45059, `mana_percent`=100 WHERE `guid`=84519;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7539.27, `position_y`=-905.861, `position_z`=428.093, `orientation`=5.91667, `mana_percent`=100 WHERE `guid`=84520;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7534.13, `position_y`=-924.27, `position_z`=428.045, `orientation`=0.855211, `mana_percent`=100 WHERE `guid`=84521;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7517.52, `position_y`=-912.762, `position_z`=428.026, `orientation`=3.36849, `mana_percent`=100 WHERE `guid`=84522;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7541.13, `position_y`=-917.746, `position_z`=428.11, `orientation`=0.0523599, `mana_percent`=100 WHERE `guid`=84523;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7522.07, `position_y`=-924.434, `position_z`=428.001, `orientation`=2.07694, `mana_percent`=100 WHERE `guid`=84524;
 -- Second pack
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7576.75, `position_y`=-922.269, `position_z`=428.383, `orientation`=3.76991 WHERE `guid`=84525;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7587.03, `position_y`=-916.311, `position_z`=428.462, `orientation`=5.00909 WHERE `guid`=84526;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7580.12, `position_y`=-940.164, `position_z`=428.259, `orientation`=2.04204 WHERE `guid`=84527;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7591.24, `position_y`=-941.373, `position_z`=428.301, `orientation`=1.27409 WHERE `guid`=84528;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7572.26, `position_y`=-932.452, `position_z`=428.302, `orientation`=2.87979 WHERE `guid`=84529;
-UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7595.81, `position_y`=-931.231, `position_z`=428.359, `orientation`=0.20944 WHERE `guid`=84530;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7576.75, `position_y`=-922.269, `position_z`=428.383, `orientation`=3.76991, `mana_percent`=100 WHERE `guid`=84525;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7587.03, `position_y`=-916.311, `position_z`=428.462, `orientation`=5.00909, `mana_percent`=100 WHERE `guid`=84526;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7580.12, `position_y`=-940.164, `position_z`=428.259, `orientation`=2.04204, `mana_percent`=100 WHERE `guid`=84527;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7591.24, `position_y`=-941.373, `position_z`=428.301, `orientation`=1.27409, `mana_percent`=100 WHERE `guid`=84528;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7572.26, `position_y`=-932.452, `position_z`=428.302, `orientation`=2.87979, `mana_percent`=100 WHERE `guid`=84529;
+UPDATE `creature` SET `id`=12467, `id2`=12465, `id3`=12464, `id4`=12463, `position_x`=-7595.81, `position_y`=-931.231, `position_z`=428.359, `orientation`=0.20944, `mana_percent`=100 WHERE `guid`=84530;
 -- Delete custom spawns
 DELETE FROM `creature` WHERE `guid` IN (84531, 84532);
 DELETE FROM `creature_groups` WHERE  `member_guid`=84531;
@@ -875,14 +880,14 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `positi
 (166525, 12460, 0, 0, 0, 0, 469, -7471.39, -988.327, 449.844, 5.53269, 604800, 604800, 0, 100, 100, 0, 0, 0, 4, 10);
 
 -- Add random movement to Death Talon Overseer
-UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE  `guid`=300980;
-UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE  `guid`=300979;
-UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE  `guid`=84840;
-UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE  `guid`=84625;
-DELETE FROM `creature_movement` WHERE `id` = 300980;
-DELETE FROM `creature_movement` WHERE `id` = 300979;
-DELETE FROM `creature_movement` WHERE `id` = 84840;
-DELETE FROM `creature_movement` WHERE `id` = 84625;
+UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE `guid`=300980;
+UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE `guid`=300979;
+UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE `guid`=84840;
+UPDATE `creature` SET `movement_type`=1, `wander_distance`=2 WHERE `guid`=84625;
+DELETE FROM `creature_movement` WHERE `id`=300980;
+DELETE FROM `creature_movement` WHERE `id`=300979;
+DELETE FROM `creature_movement` WHERE `id`=84840;
+DELETE FROM `creature_movement` WHERE `id`=84625;
 
 -- Pathing for Death Talon Overseer Entry: 12461
 SET @NPC := 84557;
@@ -1099,6 +1104,154 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=12458;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
 (1245802, 12458, 0, 1, 0, 100, 1, 15000, 35000, 15000, 35000, 12458, 0, 0, 'Blackwing Taskmaster Healing Circle OOC');
 UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry`=12458;
+
+-- Delete Vaelastrasz Blackwing Technician packs
+DELETE FROM `creature_groups` WHERE `leader_guid`=300738;
+-- 1st pack
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(59768, 59768, 0, 0, 46),
+(59768, 59767, 0, 0, 46),
+(59768, 59770, 0, 0, 46),
+-- 2nd pack
+(59771, 59771, 0, 0, 46),
+(59771, 59769, 0, 0, 46),
+(59771, 59766, 0, 0, 46);
+
+-- Entrance lab pack right
+DELETE FROM `creature_groups` WHERE `leader_guid`=300985;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(84542, 84542, 0, 0, 46),
+(84542, 59719, 0, 0, 46),
+(84542, 59730, 0, 0, 46),
+(84542, 59724, 0, 0, 46),
+-- Entrance lab pack left
+(84542, 59722, 0, 0, 46),
+(84542, 59728, 0, 0, 46),
+(84542, 59726, 0, 0, 46),
+(84542, 84541, 0, 0, 46);
+
+-- Right pack lab
+DELETE FROM `creature_groups` WHERE `leader_guid`=84557;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(84557, 59717, 0, 0, 46),
+(84557, 59725, 0, 0, 46),
+(84557, 59731, 0, 0, 46),
+(84557, 84546, 0, 0, 46),
+(84557, 59720, 0, 0, 46),
+(84557, 59727, 0, 0, 46),
+(84557, 59723, 0, 0, 46),
+(84557, 59729, 0, 0, 46),
+(84557, 59718, 0, 0, 46),
+(84557, 59734, 0, 0, 46),
+(84557, 84553, 0, 0, 46),
+(84557, 59737, 0, 0, 46),
+(84557, 84557, 0, 0, 46),
+(84557, 84548, 0, 0, 46);
+
+-- Left pack lab
+DELETE FROM `creature_groups` WHERE `leader_guid`=84558;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(84558, 59732, 0, 0, 46),
+(84558, 59721, 0, 0, 46),
+(84558, 59738, 0, 0, 46),
+(84558, 59733, 0, 0, 46),
+(84558, 84560, 0, 0, 46),
+(84558, 59736, 0, 0, 46),
+(84558, 59735, 0, 0, 46),
+(84558, 59740, 0, 0, 46),
+(84558, 59749, 0, 0, 46),
+(84558, 59745, 0, 0, 46),
+(84558, 59744, 0, 0, 46),
+(84558, 84561, 0, 0, 46),
+(84558, 84558, 0, 0, 46),
+(84558, 300976, 0, 0, 46);
+
+-- Stairs pack lab
+DELETE FROM `creature_groups` WHERE `leader_guid`=84625;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(84625, 59742, 0, 0, 46),
+(84625, 59747, 0, 0, 46),
+(84625, 59741, 0, 0, 46),
+(84625, 59746, 0, 0, 46),
+(84625, 59743, 0, 0, 46),
+(84625, 59748, 0, 0, 46),
+(84625, 59739, 0, 0, 46),
+(84625, 59750, 0, 0, 46),
+(84625, 84598, 0, 0, 46),
+(84625, 59757, 0, 0, 46),
+(84625, 59758, 0, 0, 46),
+(84625, 84599, 0, 0, 46),
+(84625, 84625, 0, 0, 46),
+(84625, 300977, 0, 0, 46);
+
+-- 2nd floor left lab pack
+DELETE FROM `creature_groups` WHERE `leader_guid`=84840;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(84840, 59762, 0, 0, 46),
+(84840, 59716, 0, 0, 46),
+(84840, 59763, 0, 0, 46),
+(84840, 84653, 0, 0, 46),
+(84840, 84840, 0, 0, 46),
+(84840, 59764, 0, 0, 46),
+(84840, 59765, 0, 0, 46),
+(84840, 59777, 0, 0, 46),
+(84840, 59781, 0, 0, 46),
+(84840, 59785, 0, 0, 46),
+(84840, 59784, 0, 0, 46),
+(84840, 59772, 0, 0, 46),
+(84840, 84652, 0, 0, 46),
+(84840, 300978, 0, 0, 46);
+
+-- 2nd floor right 1st lab pack
+DELETE FROM `creature_groups` WHERE `leader_guid`=300980;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(300980, 59715, 0, 0, 46),
+(300980, 59751, 0, 0, 46),
+(300980, 59753, 0, 0, 46),
+(300980, 85757, 0, 0, 46),
+(300980, 59755, 0, 0, 46),
+(300980, 59754, 0, 0, 46),
+(300980, 59752, 0, 0, 46),
+(300980, 59756, 0, 0, 46),
+(300980, 85768, 0, 0, 46),
+(300980, 300980, 0, 0, 46),
+(300980, 85775, 0, 0, 46),
+(300980, 59760, 0, 0, 46),
+(300980, 59761, 0, 0, 46),
+(300980, 59759, 0, 0, 46),
+(300980, 85758, 0, 0, 46);
+
+-- 2nd floor right 2nd lab pack
+DELETE FROM `creature_groups` WHERE `leader_guid`=300979;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(300979, 59778, 0, 0, 46),
+(300979, 59786, 0, 0, 46),
+(300979, 59783, 0, 0, 46),
+(300979, 85581, 0, 0, 46),
+(300979, 59775, 0, 0, 46),
+(300979, 59779, 0, 0, 46),
+(300979, 85613, 0, 0, 46),
+(300979, 59776, 0, 0, 46),
+(300979, 59782, 0, 0, 46),
+(300979, 300979, 0, 0, 46),
+(300979, 59780, 0, 0, 46),
+(300979, 59773, 0, 0, 46),
+(300979, 59774, 0, 0, 46),
+(300979, 85601, 0, 0, 46),
+(300979, 85621, 0, 0, 46);
+
+-- Correct grouping for Death Talon Wyrmguard in lab
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES 
+(84628, 84628, 0, 0, 46),
+(84628, 84627, 0, 0, 46);
+
+-- Pooling for a few Blackwing Technician spawns
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES 
+(59744, 14012, 0, 'BWL Blackwing Technician', 0, 4, 10),
+(59716, 14012, 0, 'BWL Blackwing Technician', 0, 4, 10),
+(59753, 14012, 0, 'BWL Blackwing Technician', 0, 4, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES 
+(14012, 1, 'BWL Blackwing Technician', 0, 0, 4, 10);
 
 
 -- End of migration.
