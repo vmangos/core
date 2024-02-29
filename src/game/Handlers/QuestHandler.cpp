@@ -146,6 +146,12 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
             return;
         }
 
+        // hardcore no mount quest
+        if (qInfo->GetQuestId() == 10123)
+        {
+            return;
+        }
+
         if (Player* pPlayer = ObjectAccessor::FindPlayer(_player->GetDividerGuid()))
         {
             pPlayer->SendPushToPartyResponse(_player, QUEST_PARTY_MSG_ACCEPT_QUEST);
