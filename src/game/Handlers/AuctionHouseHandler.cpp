@@ -267,7 +267,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
     }
 
     //Fix long 180 days auc Without a buyout price.
-    if (!buyout)
+    if (CONFIG_FLOAT_RATE_AUCTION_TIME > 1 && !buyout)
     {
         buyout = bid;
     }
