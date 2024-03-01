@@ -540,6 +540,7 @@ Player* PartyBotAI::SelectResurrectionTarget() const
     if (IsInDuel())
         return nullptr;
 
+    std::vector<Player*> pMembersNeedRevive;
     Group* pGroup = me->GetGroup();
     for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -555,9 +556,19 @@ Player* PartyBotAI::SelectResurrectionTarget() const
             if (!me->IsWithinLOSInMap(pMember))
                 continue;
 
-            if (m_resurrectionSpell->IsTargetInRange(me, pMember))
+            if (IsHealerClass(pMember->GetClass()))
+            {
                 return pMember;
+            }
+
+            if (m_resurrectionSpell->IsTargetInRange(me, pMember))
+                pMembersNeedRevive.push_back(pMember);
         }
+    }
+
+    if (!pMembersNeedRevive.empty())
+    {
+        return pMembersNeedRevive[rand() % pMembersNeedRevive.size()];
     }
 
     return nullptr;
