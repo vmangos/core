@@ -1601,7 +1601,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         // Send log damage message to client
         pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
-        pCaster->DealSpellDamage(&damageInfo, true);
 
         procEx = CreateProcExtendMask(&damageInfo, missInfo);
         procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
@@ -1626,6 +1625,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 m_spellInfo,
                 this));
         }
+
+        // Damage is done after procs so it can trigger auras on the victim that affect the caster in case of killing blow.
+        pCaster->DealSpellDamage(&damageInfo, true);
 
         if (!triggerWeaponProcs && m_caster->IsPlayer())
         {
