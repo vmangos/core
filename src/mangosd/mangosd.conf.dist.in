@@ -2946,7 +2946,7 @@ PlayerBot.ShowInWhoList = 0
 PartyBot.MaxBots = 0
 PartyBot.SkipChecks = 0
 PartyBot.AutoEquip = 1
-PartyBot.RandomGearLevelDifference = 10
+PartyBot.RandomGearLevelDifference = 5
 
 BattleBot.AutoEquip = 1
 BattleBot.AutoJoin = 1
