@@ -2061,7 +2061,13 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data, AccountType
     if (fields[23].GetUInt32() & PLAYER_EXTRA_HARDCORE_DEATH)
     {
         char name[24];
-        sprintf(name, "%s %s", fields[1].GetString(), " DEATH");
+        sprintf(name, "%s %s", fields[1].GetString(), " [DEATH]");
+        *p_data << name;
+    }
+    else if (fields[23].GetUInt32() & PLAYER_EXTRA_HARDCORE)
+    {
+        char name[24];
+        sprintf(name, "[HC] %s", fields[1].GetString());
         *p_data << name;
     }
     else
