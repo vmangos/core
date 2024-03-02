@@ -2556,7 +2556,7 @@ inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
     return ITEM_MOD_STAMINA;
 }
 
-void CombatBotBaseAI::EquipRandomGearInEmptySlots()
+void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
 {
     LearnArmorProficiencies();
 
@@ -2604,8 +2604,17 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         }
 
         // Avoid low level items
-        if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        if (pLeaderItl)
+        {
+            if (pProto->ItemLevel < pLeaderItl)
+            {
+                continue;
+            }
+        }
+        else if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        {
             continue;
+        }     
 
         if (me->CanUseItem(pProto, onlyPvE) != EQUIP_ERR_OK)
             continue;
@@ -2750,7 +2759,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
     }
 }
 
-void CombatBotBaseAI::AutoEquipGear(uint32 option)
+void CombatBotBaseAI::AutoEquipGear(uint32 option, uint8 pLeaderItl)
 {
     switch (option)
     {
@@ -2758,7 +2767,7 @@ void CombatBotBaseAI::AutoEquipGear(uint32 option)
             me->AddStartingItems();
             break;
         case PLAYER_BOT_AUTO_EQUIP_RANDOM_GEAR:
-            EquipRandomGearInEmptySlots();
+            EquipRandomGearInEmptySlots(pLeaderItl);
             break;
         case PLAYER_BOT_AUTO_EQUIP_PREMADE_GEAR:
             EquipPremadeGearTemplate();

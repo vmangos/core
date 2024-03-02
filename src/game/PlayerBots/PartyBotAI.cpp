@@ -719,8 +719,35 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
                 if (m_role == ROLE_INVALID)
                     AutoAssignRole();
+                
+                uint8 pLeaderItl = 0;
+                if (Player* pLeader = GetPartyLeader())
+                {                    
+                    uint32 countItems = 0;
+                    uint32 pLeaderAverageItle = 0;
 
-                AutoEquipGear(sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP));
+                    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
+                    {
+                        if (i == EQUIPMENT_SLOT_BODY || i == EQUIPMENT_SLOT_TABARD)
+                        {
+                            continue;
+                        }
+
+                        if (Item* pItem = pLeader->GetItemByPos(INVENTORY_SLOT_BAG_0, i)) 
+                        {
+                            ItemPrototype const* pProto = pItem->GetProto();
+                            pLeaderAverageItle += pProto->ItemLevel;
+                            countItems += 1;
+                        }
+                    }
+
+                    if (countItems && countItems >= 15) //prevent overestimation of the parameter.
+                    {
+                        pLeaderItl = pLeaderAverageItle / countItems;
+                    }
+                }
+
+                AutoEquipGear(sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP), pLeaderItl);
 
                 // fix client bug causing some item slots to not be visible
                 if (Player* pLeader = GetPartyLeader())
