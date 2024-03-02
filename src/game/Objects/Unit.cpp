@@ -6040,7 +6040,7 @@ void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/
                 if (pThisPlayer != pAggressorPlayer && !pThisPlayer->IsInDuelWith(pAggressorPlayer) && !(pThisPlayer->IsFFAPvP() && pAggressorPlayer->IsFFAPvP()))
                 {
                     pThisPlayer->pvpInfo.inPvPCombat = (pThisPlayer->pvpInfo.inPvPCombat || !touchOnly);
-                    pThisPlayer->UpdatePvP(true, false);
+                    pThisPlayer->UpdatePvP(true);
                 }
             }
         }
@@ -6079,7 +6079,7 @@ void Unit::SetInCombatWithAssisted(Unit* pAssisted)
                     if (pAssistedPlayer->pvpInfo.inPvPCombat)
                         pThisPlayer->pvpInfo.inPvPCombat = true;
 
-                    pThisPlayer->UpdatePvP(true, false);
+                    pThisPlayer->UpdatePvP(true);
 
                     if (pAssistedPlayer->IsPvPContested())
                         pThisPlayer->UpdatePvPContested(true);
@@ -6110,7 +6110,7 @@ void Unit::TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly
             if (!pVictimPlayer || ((pThisPlayer != pVictimPlayer) && !pThisPlayer->IsInDuelWith(pVictimPlayer) && !(pThisPlayer->IsFFAPvP() && pVictimPlayer->IsFFAPvP())))
             {
                 pThisPlayer->pvpInfo.inPvPCombat = (pThisPlayer->pvpInfo.inPvPCombat || !touchOnly);
-                pThisPlayer->UpdatePvP(true, false);
+                pThisPlayer->UpdatePvP(true);
 
                 if (pVictimPlayer)
                     pThisPlayer->UpdatePvPContested(true);
