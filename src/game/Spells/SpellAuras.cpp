@@ -2046,15 +2046,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             case 28169:                                     // Mutating Injection
             {
-                Unit* caster = GetCaster();
-                // Mutagen Explosion
-                if (m_removeMode == AuraRemoveMode::AURA_REMOVE_BY_DISPEL)
+                if (Unit* caster = GetCaster())
                 {
-                    caster->CastSpell(target, 28206, true);
-                }
-                else
-                {
-                    caster->CastSpell(target, 28206, true, nullptr, this);
+                    // Mutagen Explosion
+                    if (m_removeMode == AuraRemoveMode::AURA_REMOVE_BY_DISPEL)
+                    {
+                        caster->CastSpell(target, 28206, true);
+                    }
+                    else
+                    {
+                        caster->CastSpell(target, 28206, true, nullptr, this);
+                    }
                 }
 
                 // Summons Poison Cloud creature
