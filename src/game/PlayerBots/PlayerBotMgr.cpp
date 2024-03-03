@@ -1784,9 +1784,9 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     if (pause && !duration)
         duration = 5 * MINUTE * IN_MILLISECONDS;
 
+    Player* pPlayer = GetSession()->GetPlayer();
     if (all)
-    {
-        Player* pPlayer = GetSession()->GetPlayer();
+    {        
         Group* pGroup = pPlayer->GetGroup();
         if (!pGroup)
         {
@@ -1802,6 +1802,20 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
             {
                 if (pMember == pPlayer)
                     continue;
+
+                // Only the owner can.                
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (pAI->m_personalControls)
+                    {
+                        Player* pLeader = pAI->GetPartyLeader();
+
+                        if (pPlayer != pLeader)
+                        {
+                            continue;
+                        }
+                    }
+                }
 
                 if (HandlePartyBotPauseApplyHelper(pMember, duration))
                     success = true;
@@ -1826,6 +1840,21 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
             SendSysMessage(LANG_NO_CHAR_SELECTED);
             SetSentErrorMessage(true);
             return false;
+        }
+
+        // Only the owner can.
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            if (pAI->m_personalControls)
+            {
+                Player* pLeader = pAI->GetPartyLeader();
+
+                if (pPlayer != pLeader)
+                {
+                    PSendSysMessage("%s is not your bot or it cannot pause.", pTarget->GetName());
+                    return false;
+                }
+            }
         }
 
         if (HandlePartyBotPauseApplyHelper(pTarget, duration))
