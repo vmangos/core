@@ -21279,7 +21279,7 @@ void Player::SendSpellRemoved(uint32 spellId) const
 void Player::SendChannelUpdate(uint32 time) const
 {
     WorldPacket data(MSG_CHANNEL_UPDATE, 4);
-    data << uint32(0);
+    data << uint32(time);
     SendDirectMessage(&data);
 }
 
