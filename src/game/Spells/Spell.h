@@ -393,6 +393,7 @@ class Spell
         void SendSpellCooldown();
         void SendLogExecute();
         void SendInterrupted(uint8 result);
+        void SendAllTargetsMiss();
         void SendChannelUpdate(uint32 time, bool interrupted = false);
         void SendChannelStart(uint32 duration);
         void SendResurrectRequest(Player* target, bool sickness);

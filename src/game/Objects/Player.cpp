@@ -15809,8 +15809,8 @@ bool Player::IsAllowedToLoot(Creature const* creature)
 
 float Player::GetMaxLootDistance(Unit const* pUnit) const
 {
-    float distance = GetCombatReach() + 1.333333373069763f + pUnit->GetCombatReach();
-    return std::max(INTERACTION_DISTANCE, distance);
+    float distance = GetCombatReachToTarget(pUnit, false, 0.0f, true);
+    return distance;
 }
 
 void Player::_LoadAuras(QueryResult* result, uint32 timediff)
@@ -21371,7 +21371,7 @@ void Player::SendSpellRemoved(uint32 spellId) const
 void Player::SendChannelUpdate(uint32 time) const
 {
     WorldPacket data(MSG_CHANNEL_UPDATE, 4);
-    data << uint32(0);
+    data << uint32(time);
     SendDirectMessage(&data);
 }
 
