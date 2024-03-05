@@ -1061,7 +1061,7 @@ PerformanceLog.SlowPacketBroadcast      = 0
 
 GameType = 1
 RealmZone = 1
-TimeZoneOffset = 0
+TimeZoneOffset = -3
 DBC.Locale = 255
 DeclinedNames = 0
 StrictPlayerNames = 1
