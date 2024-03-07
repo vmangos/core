@@ -419,7 +419,6 @@ void AddScripts()
 #endif
     AddSC_boss_omen();
 
-
     //AddSC_alterac_mountains();
     AddSC_arathi_highlands();
     AddSC_blasted_lands();
