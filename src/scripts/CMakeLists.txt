@@ -371,7 +371,6 @@ if(${PATCH_NUMBER} LESS 6)
     )
 endif()
 
-
 if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   list(APPEND SCRIPTS_SRCS
         PrecompiledHeaders/scriptPCH.cpp
