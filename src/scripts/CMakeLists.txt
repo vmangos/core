@@ -260,6 +260,118 @@ set (SCRIPTS_SRCS
 
 )
 
+# Retrieve the value of SUPPORTED_CLIENT_BUILD from the CMake cache
+set(SUPPORTED_CLIENT_BUILD "${SUPPORTED_CLIENT_BUILD}" CACHE STRING "Client version the core will support")
+
+# Extract major patch
+string(REGEX MATCH "1_([0-9]+)_" PATCH_NUMBER "${SUPPORTED_CLIENT_BUILD}")
+
+set(PATCH_NUMBER ${CMAKE_MATCH_1})
+
+# Remove Naxxramas scripts if the client build is below patch 1.11
+if(${PATCH_NUMBER} LESS 11)
+    list(REMOVE_ITEM SCRIPTS_SRCS
+    eastern_kingdoms/eastern_plaguelands/naxxramas/naxxramas.h
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_anubrekhan.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_faerlina.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_four_horsemen.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_gluth.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_gothik.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_grobbulus.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_heigan.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_kelthuzad.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_loatheb.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_maexxna.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_noth.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_patchwerk.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_razuvious.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_sapphiron.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/boss_thaddius.cpp
+    eastern_kingdoms/eastern_plaguelands/naxxramas/instance_naxxramas.cpp
+    world/scourge_invasion.cpp
+    world/scourge_invasion.h
+)
+endif()
+
+# Remove Ahn'Qiraj scripts if the client build is below patch 1.9
+if(${PATCH_NUMBER} LESS 9)
+    list(REMOVE_ITEM SCRIPTS_SRCS
+    kalimdor/silithus/ruins_of_ahnqiraj/ruins_of_ahnqiraj.h
+    kalimdor/silithus/temple_of_ahnqiraj/temple_of_ahnqiraj.h
+    kalimdor/silithus/ruins_of_ahnqiraj/boss_ayamiss.cpp
+    kalimdor/silithus/ruins_of_ahnqiraj/boss_buru.cpp
+    kalimdor/silithus/ruins_of_ahnqiraj/boss_kurinnaxx.cpp
+    kalimdor/silithus/ruins_of_ahnqiraj/boss_moam.cpp
+    kalimdor/silithus/ruins_of_ahnqiraj/boss_ossirian.cpp
+    kalimdor/silithus/ruins_of_ahnqiraj/instance_ruins_of_ahnqiraj.cpp
+    kalimdor/silithus/ruins_of_ahnqiraj/npc_sandstalker.cpp
+    kalimdor/silithus/ruins_of_ahnqiraj/ruins_of_ahnqiraj.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_bug_trio.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_cthun.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_fankriss.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_huhuran.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_ouro.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_sartura.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_skeram.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_twinemperors.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/boss_viscidus.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/instance_temple_of_ahnqiraj.cpp
+    kalimdor/silithus/temple_of_ahnqiraj/mob_anubisath_sentinel.cpp
+    )
+endif()
+
+# Remove Dragons of Nightmare scripts if the client build is below patch 1.8
+if(${PATCH_NUMBER} LESS 8)
+    list(REMOVE_ITEM SCRIPTS_SRCS
+    world/dragons_of_nightmare/boss_dragon_of_nightmare.h
+    world/dragons_of_nightmare/boss_dragon_of_nightmare.cpp
+    world/dragons_of_nightmare/boss_emeriss.cpp
+    world/dragons_of_nightmare/boss_lethon.cpp
+    world/dragons_of_nightmare/boss_taerar.cpp
+    world/dragons_of_nightmare/boss_ysondre.cpp
+    )
+endif()
+
+# Remove Zul'Gurub scripts if the client build is below patch 1.7
+if(${PATCH_NUMBER} LESS 7)
+    list(REMOVE_ITEM SCRIPTS_SRCS
+    eastern_kingdoms/stranglethorn_vale/zulgurub/zulgurub.h
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_arlokk.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_gahzranka.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_grilek.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_hakkar.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_hazzarah.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_jeklik.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_jindo.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_mandokir.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_marli.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_renataki.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_thekal.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_venoxis.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_wushoolay.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/instance_zulgurub.cpp
+    eastern_kingdoms/stranglethorn_vale/zulgurub/zulgurub_trash.cpp
+    )
+endif()
+
+# Remove Blackwing scripts if the client build is below patch 1.6
+if(${PATCH_NUMBER} LESS 6)
+    list(REMOVE_ITEM SCRIPTS_SRCS
+    eastern_kingdoms/burning_steppes/blackwing_lair/blackwing_lair.h
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_broodlord_lashlayer.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_chromaggus.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_ebonroc.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_firemaw.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_flamegor.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_nefarian.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_razorgore.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_vaelastrasz.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/boss_victor_nefarius.cpp
+    eastern_kingdoms/burning_steppes/blackwing_lair/instance_blackwing_lair.cpp
+    )
+endif()
+
+
 if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   list(APPEND SCRIPTS_SRCS
         PrecompiledHeaders/scriptPCH.cpp
