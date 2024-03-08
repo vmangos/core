@@ -1688,20 +1688,23 @@ void WarEffortEvent::UpdateHiveColossusEvents()
 
 void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
 {
-    auto invasion = new ElementalInvasion();
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_2
-    auto darkmoon = new DarkmoonFaire();
-    eventList = { invasion, darkmoon };
-#elif SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_8_4
-    auto nightmare = new DragonsOfNightmare();
-    auto fireworks = new FireworksShow();
-    auto goblets = new ToastingGoblets();
-    eventList = { invasion, nightmare, darkmoon, fireworks, goblets };
-#elif SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
-    auto war_effort = new WarEffortEvent();
-    eventList = { invasion, nightmare, darkmoon, fireworks, goblets, war_effort };
-#else
-    auto scourge_invasion = new ScourgeInvasionEvent();
-    eventList = { invasion, nightmare, darkmoon, fireworks, goblets, war_effort, scourge_invasion };
+    eventList.emplace_back(new ElementalInvasion());
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+    eventList.emplace_back(new DarkmoonFaire());
+#endif
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_8_4
+    eventList.emplace_back(new DragonsOfNightmare());
+    eventList.emplace_back(new FireworksShow());
+    eventList.emplace_back(new ToastingGoblets());
+#endif
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
+    eventList.emplace_back(new WarEffortEvent());
+#endif
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
+    eventList.emplace_back(new ScourgeInvasionEvent());
 #endif
 }
