@@ -293,7 +293,7 @@ if(${PATCH_NUMBER} LESS 11)
 )
 endif()
 
-# Remove Ahn'Qiraj scripts if the client build is below patch 1.9
+# Remove Ahn'Qiraj and Omen scripts if the client build is below patch 1.9
 if(${PATCH_NUMBER} LESS 9)
     list(REMOVE_ITEM SCRIPTS_SRCS
     kalimdor/silithus/ruins_of_ahnqiraj/ruins_of_ahnqiraj.h
@@ -317,6 +317,10 @@ if(${PATCH_NUMBER} LESS 9)
     kalimdor/silithus/temple_of_ahnqiraj/boss_viscidus.cpp
     kalimdor/silithus/temple_of_ahnqiraj/instance_temple_of_ahnqiraj.cpp
     kalimdor/silithus/temple_of_ahnqiraj/mob_anubisath_sentinel.cpp
+    world/world_event_wareffort.cpp
+    world/world_event_wareffort.h
+    kalimdor/moonglade/boss_omen.h
+    kalimdor/moonglade/boss_omen.cpp
     )
 endif()
 

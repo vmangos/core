@@ -155,6 +155,7 @@ void ElementalInvasion::ResetThings()
     }
 }
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_8_4
 /*
 * Dragons of Nightmare
 */
@@ -318,7 +319,9 @@ void DragonsOfNightmare::PermutateDragons()
     sObjectMgr.SetSavedVariable(VAR_PERM_3, permutation[2], true);
     sObjectMgr.SetSavedVariable(VAR_PERM_4, permutation[3], true);
 }
+#endif
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
 /*
 * Darkmoon Faire
 */
@@ -382,7 +385,9 @@ DarkmoonState DarkmoonFaire::GetDarkmoonState()
 
     return DARKMOON_NONE;
 }
+#endif
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_8_4
 /*
  * Fireworks Show
  */
@@ -489,6 +494,12 @@ bool ToastingGoblets::ShouldEnable() const
 
     return timeinfo->tm_min >= 10 && timeinfo->tm_min <= 20;
 }
+#endif
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
+/*
+* Scourge Invasion
+*/
 
 ScourgeInvasionEvent::ScourgeInvasionEvent()
     :WorldEvent(GAME_EVENT_SCOURGE_INVASION),
@@ -1251,7 +1262,9 @@ void ScourgeInvasionEvent::UpdateWorldState()
         pl->SendUpdateWorldState(WS_SI_WINTERSPRING_REMAINING, REMAINING_WINTERSPRING);
     }
 }
+#endif
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
 /*
 world_event_wareffort
 The Gates of Ahn'Qiraj War Effort. Automatic transition from collection through
@@ -1668,19 +1681,27 @@ void WarEffortEvent::UpdateHiveColossusEvents()
             sGameEventMgr.StartEvent(event, true);
     }
 }
-
 /*
 *
 */
+#endif
 
 void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
 {
     auto invasion = new ElementalInvasion();
-    auto nightmare = new DragonsOfNightmare();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_2
     auto darkmoon = new DarkmoonFaire();
+    eventList = { invasion, darkmoon };
+#elif SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_8_4
+    auto nightmare = new DragonsOfNightmare();
     auto fireworks = new FireworksShow();
     auto goblets = new ToastingGoblets();
-    auto scourge_invasion = new ScourgeInvasionEvent();
+    eventList = { invasion, nightmare, darkmoon, fireworks, goblets };
+#elif SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     auto war_effort = new WarEffortEvent();
-    eventList = { invasion, nightmare, darkmoon, fireworks, goblets, scourge_invasion, war_effort };
+    eventList = { invasion, nightmare, darkmoon, fireworks, goblets, war_effort };
+#else
+    auto scourge_invasion = new ScourgeInvasionEvent();
+    eventList = { invasion, nightmare, darkmoon, fireworks, goblets, war_effort, scourge_invasion };
+#endif
 }

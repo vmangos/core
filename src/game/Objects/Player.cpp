@@ -8715,12 +8715,13 @@ void Player::SendInitWorldStates(uint32 zoneid) const
             break;
     }
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     // Ahn'Qiraj War Effort
     if (sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT))
     {
         count += BuildWarEffortWorldStates(data);
     }
-
+#endif
     data << uint32(0) << uint32(0);     // [-ZERO] Add terminator to prevent repeating audio bug.
     data.put<uint16>(count_pos, count); // set actual world state amount
     GetSession()->SendPacket(&data);

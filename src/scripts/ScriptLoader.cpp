@@ -168,7 +168,6 @@ void AddSC_boss_venoxis();
 void AddSC_instance_zulgurub();
 void AddSC_zg_trash();
 #endif
-void AddSC_boss_omen();
 
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
@@ -223,6 +222,7 @@ void AddSC_boss_skeram();
 void AddSC_boss_twinemperors();
 void AddSC_mob_anubisath_sentinel();
 void AddSC_instance_temple_of_ahnqiraj();
+void AddSC_boss_omen();
 #endif
 void AddSC_instance_wailing_caverns();               //Wailing caverns
 void AddSC_wailing_caverns();
@@ -248,7 +248,9 @@ void AddSC_the_barrens();
 void AddSC_thousand_needles();
 void AddSC_ungoro_crater();
 void AddSC_winterspring();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
 void AddSC_war_effort();
+#endif
 
 void AddSC_npc_j_eevee();                            // J'Eevee, the Imp in a Jar
 
@@ -292,7 +294,9 @@ void AddScripts()
     AddSC_scourge_invasion();
 #endif
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     AddSC_war_effort();
+#endif
 
     //eastern kingdoms
     AddSC_blackrock_depths();                               //blackrock_depths
@@ -417,7 +421,6 @@ void AddScripts()
     AddSC_instance_zulgurub();
     AddSC_zg_trash();
 #endif
-    AddSC_boss_omen();
 
     //AddSC_alterac_mountains();
     AddSC_arathi_highlands();
@@ -472,6 +475,7 @@ void AddScripts()
     AddSC_boss_twinemperors();
     AddSC_mob_anubisath_sentinel();
     AddSC_instance_temple_of_ahnqiraj();
+    AddSC_boss_omen();
 #endif
     AddSC_wailing_caverns();                               //Wailing caverns
     AddSC_instance_wailing_caverns();

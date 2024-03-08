@@ -1157,7 +1157,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "remove",             SEC_BASIC_ADMIN,    false, &ChatHandler::HandleGoldRemoval,               "", nullptr },
         { nullptr,              0,                  false, nullptr,                                       "", nullptr }
     };
-
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     static ChatCommand warEffortCommandTable[] =
     {
         { "info",           SEC_DEVELOPER,    true,  &ChatHandler::HandleWarEffortInfoCommand,         "", nullptr },
@@ -1167,7 +1167,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "setresource",    SEC_DEVELOPER,    true,  &ChatHandler::HandleWarEffortSetResource,         "", nullptr },
         { nullptr,          0,                false, nullptr,                                          "", nullptr }
     };
-
+#endif
     static ChatCommand commandTable[] =
     {
         { "account",        SEC_PLAYER,         true, nullptr,                                         "", accountCommandTable  },
@@ -1298,7 +1298,9 @@ ChatCommand * ChatHandler::getCommandTable()
         { "spamer",         SEC_MODERATOR,      true, nullptr,                                         "", spamerCommandTable },
         { "antispam",       SEC_TICKETMASTER,   true, nullptr,                                         "", AntiSpamCommandTable },
         { "gold",           SEC_BASIC_ADMIN,    true, nullptr,                                         "", goldCommandTable },
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
         { "wareffort",      SEC_DEVELOPER,      true, nullptr,                                         "", warEffortCommandTable },
+#endif
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
