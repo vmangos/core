@@ -2569,8 +2569,8 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         ItemPrototype const* pProto = &itr.second;
 
         // Only items that have already been discovered by someone
-        if (!pProto->Discovered)
-            continue;
+        //if (!pProto->Discovered)
+        //    continue;
 
         // Skip unobtainable items
         if (pProto->HasExtraFlag(ITEM_EXTRA_NOT_OBTAINABLE))
