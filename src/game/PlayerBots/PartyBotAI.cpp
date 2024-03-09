@@ -805,32 +805,25 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
     // NO PvP whith partybot
     bool needRemoval = false;    
-    if (pLeader->IsInCombat())
-    {        
-        if (Unit* lVictim = pLeader->GetVictim())
-        {
-            if (Player* thisTarget = lVictim->ToPlayer())
-            {
-                if (!botEntry->requestRemoval && !thisTarget->IsBot() && lVictim->IsPlayer())
-                {
-                    needRemoval = true;
-                }
-            }
-            
-        }        
-    } 
-
-    if (me->IsInCombat())
+    if (Unit* lVictim = pLeader->GetVictim())
     {
-        if (Unit* myVictim = me->GetVictim())
+        if (Player* thisTarget = lVictim->ToPlayer())
         {
-            if (Player* thisTarget = myVictim->ToPlayer())
+            if (!botEntry->requestRemoval && !thisTarget->IsBot() && lVictim->IsPlayer())
             {
-                if (!botEntry->requestRemoval && !thisTarget->IsBot() && myVictim->IsPlayer())
-                {
-                    needRemoval = true;
-                }
-            }            
+                needRemoval = true;
+            }
+        }
+    }
+
+    if (Unit* myVictim = me->GetVictim())
+    {
+        if (Player* thisTarget = myVictim->ToPlayer())
+        {
+            if (!botEntry->requestRemoval && !thisTarget->IsBot() && myVictim->IsPlayer())
+            {
+                needRemoval = true;
+            }
         }
     }
 
