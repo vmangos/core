@@ -829,9 +829,6 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
     if (needRemoval)
     {
-        me->AttackStop();
-        me->InterruptNonMeleeSpells(false);
-        me->StopMoving();
         botEntry->requestRemoval = true;
         return;
     }
