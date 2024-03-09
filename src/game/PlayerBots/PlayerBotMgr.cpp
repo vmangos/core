@@ -1279,6 +1279,14 @@ bool ChatHandler::HandlePartyBotAoECommand(char* args)
 {
     Player* pPlayer = GetSession()->GetPlayer();
     Unit* pTarget = GetSelectedUnit();
+
+    if (!pPlayer->GetMap()->Instanceable())
+    {
+        SendSysMessage("AOE not avalible in open world.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     if (!pTarget || !pPlayer->IsValidAttackTarget(pTarget, true))
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
