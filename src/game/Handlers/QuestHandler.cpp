@@ -147,7 +147,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
         }
 
         // hardcore no mount quest
-        if (qInfo->GetQuestId() == 10123)
+        if (_player->IsHardcore() && qInfo->GetQuestId() == 10123)
         {
             return;
         }
