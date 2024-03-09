@@ -173,6 +173,26 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
         ChatHandler(_player).PSendSysMessage("Battleground: no available in HC mode.");
         return;
     }
+
+    // Battleground: no available with PB
+    if (Group* pGroup = _player->GetGroup())
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next()) 
+        {      
+            if (Player* pMember = itr->getSource())
+            {
+                // Player not PB.
+                if (pMember == _player)
+                    continue;
+
+                if (pMember->IsBot())
+                {
+                    ChatHandler(_player).PSendSysMessage("Battleground: no available with PB.");
+                    return;
+                }
+            }
+        }
+    }
     
     // get bg instance or bg template if instance not found
     BattleGround *bg = nullptr;
