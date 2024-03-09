@@ -199,7 +199,7 @@ void instance_blackrock_spire::Initialize()
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
     memset(&m_auiRoomRuneGUID, 0, sizeof(m_auiRoomRuneGUID));
 #ifdef DEBUG_ON
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Instance BlackRockSpire : Initialize");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Instance BlackRockSpire : Initialize");
 #endif
 }
 
@@ -855,7 +855,7 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
     if (GetData(TYPE_ROOM_EVENT) != NOT_STARTED)
         return;
 #ifdef DEBUG_ON
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "instance_blackrock_spire::DoSortRoomEventMobs");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "instance_blackrock_spire::DoSortRoomEventMobs");
 #endif
     for (uint8 i = 0; i < MAX_ROOMS; i++)
     {
@@ -869,7 +869,7 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
                         m_alRoomEventMobGUIDSorted[i].push_back(guid);
                 }
 #ifdef DEBUG_ON
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Alcove %u : %u mobs", i,  m_alRoomEventMobGUIDSorted[i].size());
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Alcove %u : %u mobs", i,  m_alRoomEventMobGUIDSorted[i].size());
 #endif
             }
         }

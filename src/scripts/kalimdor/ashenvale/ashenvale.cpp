@@ -59,7 +59,7 @@ struct npc_ruul_snowhoofAI : public npc_escortAI
     void WaypointReached(uint32 uiPointId) override
     {
         //m_creature->MonsterYell("DEBUG : WayPoint reached", 0); //The hell, still skipping waypoints 13/02/2015
-        //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DEBUG : Ruul : WayPoint n° %u", uiPointId);
+        //sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "DEBUG : Ruul : WayPoint n° %u", uiPointId);
         switch (uiPointId)
         {
             case 13:

@@ -97,7 +97,7 @@ struct mob_webwrapAI : public ScriptedAI
     {
         if (!pVictim || pVictim->GetTypeId() != TYPEID_PLAYER)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "mob_webwrapAI::SetVictim called for non-player");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "mob_webwrapAI::SetVictim called for non-player");
             return;
         }
 

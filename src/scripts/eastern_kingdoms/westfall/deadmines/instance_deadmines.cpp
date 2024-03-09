@@ -289,7 +289,7 @@ struct instance_deadmines : public ScriptedInstance
                             DoScriptText(INST_SAY_ALARM2, pMrSmite);
                             m_uiDoor_Step = 0;
                             m_uiIronDoor_Timer = 0;
-                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Deadmines: Iron door event reached end.");
+                            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Deadmines: Iron door event reached end.");
                             break;
                     }
                 }

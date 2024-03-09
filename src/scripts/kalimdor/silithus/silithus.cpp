@@ -92,7 +92,7 @@ struct go_wind_stoneAI: public GameObjectAI
 
         if (!npcEntry)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "go_wind_stoneAI - Unhandled spell id %u!\n", spellId);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "go_wind_stoneAI - Unhandled spell id %u!\n", spellId);
             return false;
         }
         

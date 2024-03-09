@@ -22678,7 +22678,8 @@ static char const* type_strings[] =
     "MoneyTrade",
     "GM",
     "GMCritical",
-    "Anticheat"
+    "Anticheat",
+    "Scripts"
 };
 
 static_assert(sizeof(type_strings) / sizeof(type_strings[0]) == LOG_TYPE_MAX, "type_strings must be updated");
@@ -22845,7 +22846,7 @@ if (IsPlayerLoggingEnabledToDB(logType, logLevel))                            \
 #define LOG_TO_FILE_HELPER(logLevel,logType,subType,session,accountId,format,ap) \
 if (logFiles[logType] && m_fileLevel >= logLevel)                             \
 {                                                                             \
-    outTimestamp(logFiles[logType]);                                          \
+    OutTimestamp(logFiles[logType]);                                          \
     if (logLevel == LOG_LVL_ERROR)                                            \
         fputs("ERROR: ", logFiles[logType]);                                  \
     PlayerLogHeaderToFile(accountId, session, logType, subType);              \
@@ -22862,7 +22863,7 @@ if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= l
     auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;           \
     SetColor(where, g_logColors[logLevel]);                                   \
     if (m_includeTime)                                                        \
-        outTime(where);                                                       \
+        OutTime(where);                                                       \
     if (logLevel == LOG_LVL_ERROR)                                            \
         fprintf(where, "ERROR: ");                                            \
     PlayerLogHeaderToConsole(accountId, session, logType, subType);           \

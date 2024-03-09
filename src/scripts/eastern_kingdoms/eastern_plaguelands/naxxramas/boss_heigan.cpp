@@ -232,7 +232,7 @@ struct boss_heiganAI : public ScriptedAI
         Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_WAVE, 2773.0f, -3684.0f, 292.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000);
         if (!fissureCreature)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Heigan: failed spawning fissure creature");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Heigan: failed spawning fissure creature");
             return;
         }
 
