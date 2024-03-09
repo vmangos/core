@@ -7267,6 +7267,12 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
             break;
     }
 
+    // hardcore
+    if (IsHardcore())
+    {
+        pvpInfo.inPvPEnforcedArea = false;
+    }
+
     if (pvpInfo.inPvPEnforcedArea && !IsTaxiFlying()) // in hostile area
         UpdatePvP(true);
 
