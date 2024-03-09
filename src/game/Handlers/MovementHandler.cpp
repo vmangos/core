@@ -170,6 +170,14 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             GetPlayer()->SendInstanceResetWarning(mEntry->id, timeleft);
         }
     }
+    else if (!mEntry->IsDungeon())
+    {
+        MapEntry const* oldMapEntry = sMapStorage.LookupEntry<MapEntry>(oldLoc.mapId);
+        if (oldMapEntry->IsDungeon())
+            GetPlayer()->ResetPersonalInstanceOnLeaveDungeon(oldLoc.mapId);
+    }
+
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
 
     // mount allow check
     if (!mEntry->IsMountAllowed())
@@ -181,6 +189,9 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
+
+    // stop drowning if not in water anymore
+    GetPlayer()->UpdateTerainEnvironmentFlags();
 
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
@@ -331,7 +342,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     // reset knockback state when fall to ground or water
     if (pPlayerMover)
     {
-        if ((opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM) && pPlayerMover->IsLaunched())
+        if (IsFallEndOpcode(opcode) && pPlayerMover->IsLaunched())
         {
             pPlayerMover->SetLaunched(false);
             pPlayerMover->SetXYSpeed(0.0f);

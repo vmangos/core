@@ -101,7 +101,7 @@ enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
     CHARACTER_FLAG_UNK1                 = 0x00000001,
-    CHARACTER_FLAG_UNK2                 = 0x00000002,
+    CHARACTER_FLAG_RESTING              = 0x00000002,
     CHARACTER_LOCKED_FOR_TRANSFER       = 0x00000004,
     CHARACTER_FLAG_UNK4                 = 0x00000008,
     CHARACTER_FLAG_UNK5                 = 0x00000010,
@@ -2083,19 +2083,21 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
 
     *p_data << uint32(fields[16].GetUInt32());              // guild id
 
-    uint32 char_flags = 0;
+    uint32 charFlags = 0;
     uint32 playerFlags = fields[17].GetUInt32();
     uint32 atLoginFlags = fields[18].GetUInt32();
+    if (playerFlags & PLAYER_FLAGS_RESTING)
+        charFlags |= CHARACTER_FLAG_RESTING;
     if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
-        char_flags |= CHARACTER_FLAG_HIDE_HELM;
+        charFlags |= CHARACTER_FLAG_HIDE_HELM;
     if (playerFlags & PLAYER_FLAGS_HIDE_CLOAK)
-        char_flags |= CHARACTER_FLAG_HIDE_CLOAK;
+        charFlags |= CHARACTER_FLAG_HIDE_CLOAK;
     if (playerFlags & PLAYER_FLAGS_GHOST)
-        char_flags |= CHARACTER_FLAG_GHOST;
+        charFlags |= CHARACTER_FLAG_GHOST;
     if (atLoginFlags & AT_LOGIN_RENAME)
-        char_flags |= CHARACTER_FLAG_RENAME;
+        charFlags |= CHARACTER_FLAG_RENAME;
 
-    *p_data << uint32(char_flags);                          // character flags
+    *p_data << uint32(charFlags);                           // character flags
 
     // First login
     *p_data << uint8(atLoginFlags & AT_LOGIN_FIRST ? 1 : 0);
@@ -2270,9 +2272,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         return false;
     }
 
-    // preparing unsummon pet if lost (we must get pet before teleportation or will not find it later)
-    Pet* pet = GetPet();
-
     MapEntry const* mEntry = sMapStorage.LookupEntry<MapEntry>(mapid);
 
     // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
@@ -2300,9 +2299,17 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             DuelComplete(DUEL_FLED);
 
     // reset movement flags at teleport, because player will continue move with these flags after teleport
+    m_movementInfo.ctime = 0;
     m_movementInfo.RemoveMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
     if (!(options & TELE_TO_NOT_LEAVE_TRANSPORT) || !m_transport)
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
+
+    // Interrupt channeled spells before teleport.
+    // This fixes pet spells being lost if channeling Eye of Kilrogg during teleport.
+    InterruptSpellsWithChannelFlags(AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
+
+    // Preparing unsummon pet if lost (we must get pet before teleportation or will not find it later).
+    Pet* pet = GetPet();
 
     // Near teleport, let it happen immediately since we remain in the same map
     if ((GetMapId() == mapid) && (!m_transport) && !(options & TELE_TO_FORCE_MAP_CHANGE))
@@ -2335,9 +2342,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             CombatStop();
         }
 
-        if (!IsWithinDist3d(x, y, z, GetMap()->GetVisibilityDistance()))
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
-
         // this will be used instead of the current location in SaveToDB
         m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
         DisableSpline();
@@ -2362,7 +2366,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 m_teleportRecover = wps;
             wps();
         }
-        m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN; // For extrapolation
     }
     else
     {
@@ -2433,7 +2436,6 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
         SetSelectionGuid(ObjectGuid());
         CombatStop();
         UpdatePvPContested(false, true);
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
 
         // reset extraAttack counter
         ResetExtraAttacks();
@@ -2589,13 +2591,13 @@ void Player::ProcessDelayedOperations()
     {
         ResurrectPlayer(0.0f, false);
 
-        if (GetMaxHealth() > m_resurrectHealth)
-            SetHealth(m_resurrectHealth);
+        if (GetMaxHealth() > m_resurrectData.health)
+            SetHealth(m_resurrectData.health);
         else
             SetHealth(GetMaxHealth());
 
-        if (GetMaxPower(POWER_MANA) > m_resurrectMana)
-            SetPower(POWER_MANA, m_resurrectMana);
+        if (GetMaxPower(POWER_MANA) > m_resurrectData.mana)
+            SetPower(POWER_MANA, m_resurrectData.mana);
         else
             SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
 
@@ -2644,7 +2646,7 @@ void Player::RemoveFromWorld()
         UnsummonAllTotems();
         RemoveMiniPet();
         sZoneScriptMgr.HandlePlayerLeaveZone(this, m_zoneUpdateId);
-        TradeCancel(false);
+        TradeCancel(!GetSession()->PlayerLogout());
 
         if (ObjectGuid lootGuid = GetLootGuid())
             GetSession()->DoLootRelease(lootGuid);
@@ -3040,7 +3042,8 @@ bool Player::CanSeeHealthOf(Unit const* pTarget) const
 
 bool Player::CanSeeSpecialInfoOf(Unit const* pTarget) const
 {
-    return pTarget->HasAuraTypeByCaster(SPELL_AURA_EMPATHY, GetObjectGuid());
+    return HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO) ||
+           pTarget->HasAuraTypeByCaster(SPELL_AURA_EMPATHY, GetObjectGuid());
 }
 
 struct SetGameMasterOnHelper
@@ -3195,13 +3198,24 @@ void Player::SetGMVisible(bool on, bool notify)
     CharacterDatabase.PExecute("UPDATE characters SET extra_flags = %u WHERE guid = %u", m_ExtraFlags, GetGUIDLow());
 }
 
-void Player::SetCheatGod(bool on, bool notify)
+void Player::SetCheatFly(bool on, bool notify)
 {
-    SetCheatOption(PLAYER_CHEAT_GOD, on);
+    SetCheatOption(PLAYER_CHEAT_FLY, on);
+    SetFly(on);
 
     if (notify)
     {
-        GetSession()->SendNotification(on ? LANG_GOD_ON : LANG_GOD_OFF);
+        GetSession()->SendNotification(on ? LANG_CHEAT_FLY_ON : LANG_CHEAT_FLY_OFF);
+    }
+}
+
+void Player::SetCheatGod(bool on, bool notify)
+{
+    SetInvincibilityHpThreshold(on ? 1 : 0);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_GOD_ON : LANG_CHEAT_GOD_OFF);
     }
 }
 
@@ -3292,6 +3306,39 @@ void Player::SetCheatIgnoreTriggers(bool on, bool notify)
     if (notify)
     {
         GetSession()->SendNotification(on ? LANG_CHEAT_IGNORE_TRIGGERS_ON : LANG_CHEAT_IGNORE_TRIGGERS_OFF);
+    }
+}
+
+void Player::SetCheatDebugTargetInfo(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_DEBUG_TARGET_INFO_ON : LANG_CHEAT_DEBUG_TARGET_INFO_OFF);
+
+        for (auto const& guid : m_visibleGUIDs)
+        {
+            if (!guid.IsUnit())
+                continue;
+
+            Unit* pUnit = GetMap()->GetUnit(guid);
+            if (!pUnit)
+                continue;
+
+            uint16 updateFlags = UF_FLAG_DYNAMIC;
+            if (on)
+                updateFlags |= UF_FLAG_SPECIAL_INFO;
+
+            UpdateData newData;
+            pUnit->BuildValuesUpdateBlockForPlayerWithFlags(newData, this, UpdateFieldFlags(updateFlags), true);
+            if (newData.HasData())
+            {
+                WorldPacket newDataPacket;
+                newData.BuildPacket(&newDataPacket);
+                SendDirectMessage(&newDataPacket);
+            }
+        }
     }
 }
 
@@ -4931,7 +4978,7 @@ void Player::DeleteOldCharacters()
  */
 void Player::DeleteOldCharacters(uint32 keepDays)
 {
-    QueryResult* resultChars = CharacterDatabase.PQuery("SELECT `guid`, `deleted_account` FROM `characters` WHERE `deleted_time` IS NOT NULL AND `deleted_time` < '" UI64FMTD "' LIMIT 0,2", uint64(time(nullptr) - time_t(keepDays * DAY)));
+    QueryResult* resultChars = CharacterDatabase.PQuery("SELECT `guid`, `deleted_account` FROM `characters` WHERE `deleted_account` IS NOT NULL AND `deleted_time` IS NOT NULL AND `deleted_time` < '" UI64FMTD "' LIMIT 0,2", uint64(time(nullptr) - time_t(keepDays * DAY)));
     if (resultChars)
     {
         do
@@ -4956,14 +5003,12 @@ void Player::SetFly(bool enable)
             pTransport->RemovePassenger(this);
             StopMoving(true);
         }
-            
+        
         m_movementInfo.moveFlags = (MOVEFLAG_LEVITATING | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING);
-        AddUnitState(UNIT_STAT_FLYING_ALLOWED);
     }
     else
     {
         m_movementInfo.moveFlags = (MOVEFLAG_NONE);
-        ClearUnitState(UNIT_STAT_FLYING_ALLOWED);
     }
 
     SendHeartBeat(true);
@@ -6459,39 +6504,44 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
     float const old_z = GetPositionZ();
     float const old_r = GetOrientation();
     bool const positionChanged = teleport || old_x != x || old_y != y || old_z != z;
+    bool const hasMovingFlags = m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING);
 
-    if (positionChanged || old_r != orientation)
+    if (positionChanged || hasMovingFlags || old_r != orientation)
     {
-        HandleInterruptsOnMovement(positionChanged);
+        HandleInterruptsOnMovement(positionChanged || hasMovingFlags);
 
-        // move and update visible state if need
-        m->PlayerRelocation(this, x, y, z, orientation);
-
-        // reread after Map::Relocation
-        m = GetMap();
-        x = GetPositionX();
-        y = GetPositionY();
-        z = GetPositionZ();
-
-        if (positionChanged)
+        if (positionChanged || old_r != orientation)
         {
-            // group update
-            if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
-                SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
+            // move and update visible state if need
+            m->PlayerRelocation(this, x, y, z, orientation);
 
-            if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-                GetSession()->SendCancelTrade();   // will close both side trade windows
+            // reread after Map::Relocation
+            m = GetMap();
+            x = GetPositionX();
+            y = GetPositionY();
+            z = GetPositionZ();
 
-            if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
+            if (positionChanged)
             {
-                if (!m_areaCheckTimer)
-                    m_areaCheckTimer = timerMax;
-            }
-            else
-            {
-                UpdateTerainEnvironmentFlags();
-                CheckAreaExploreAndOutdoor();
-                LoadMapCellsAround(GetMap()->GetGridActivationDistance());
+                // group update
+                if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
+                    SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
+
+                if (Player* pTrader = GetTrader())
+                    if (!IsWithinDistInMap(pTrader, INTERACTION_DISTANCE))
+                        TradeCancel(true, TRADE_STATUS_TRADE_CANCELED);   // will close both side trade windows
+
+                if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
+                {
+                    if (!m_areaCheckTimer)
+                        m_areaCheckTimer = timerMax;
+                }
+                else
+                {
+                    UpdateTerainEnvironmentFlags();
+                    CheckAreaExploreAndOutdoor();
+                    LoadMapCellsAround(GetMap()->GetGridActivationDistance());
+                }
             }
         }
     }
@@ -7356,6 +7406,10 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
             _ApplyAmmoBonuses();
     }
 
+    // Some bonus parry talents are weapon specific in early patches.
+    if (slot == EQUIPMENT_SLOT_MAINHAND)
+        UpdateParryPercentage();
+
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "_ApplyItemMods complete.");
 }
 
@@ -7512,10 +7566,6 @@ void Player::_ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackTy
 
 void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, Aura* aura, bool apply)
 {
-    // don't apply mod if item is broken or cannot be used
-    if (item->IsBroken() || !CanUseEquippedWeapon(attackType))
-        return;
-
     // generic not weapon specific case processes in aura code
     if (aura->GetSpellProto()->EquippedItemClass == -1)
         return;
@@ -7526,6 +7576,14 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attac
 
     // auras without itemCaster not applied in offhand crit and not removing mods if has eligible weapon
     if (!aura->GetCastItemGuid() && attackType == OFF_ATTACK)
+        return;
+
+    // dont apply or unapply twice
+    if (aura->IsApplied() == apply)
+        return;
+
+    // don't apply mod if item is broken or cannot be used
+    if (apply && (item->IsBroken() || !CanUseEquippedWeapon(attackType)))
         return;
 
     BaseModGroup mod = BASEMOD_END;
@@ -7543,7 +7601,10 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attac
     }
 
     if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
+    {
         HandleBaseModValue(mod, FLAT_MOD, aura->GetModifier()->m_amount, apply);
+        aura->m_applied = apply;
+    }
 }
 
 void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, Aura* aura, bool apply)
@@ -8342,9 +8403,6 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                             case NEED_BEFORE_GREED:
                                 group->NeedBeforeGreed(creature, loot);
                                 break;
-                            case MASTER_LOOT:
-                                group->MasterLoot(creature, loot);
-                                break;
                             default:
                                 break;
                         }
@@ -8384,6 +8442,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                             switch (group->GetLootMethod())
                             {
                                 case MASTER_LOOT:
+                                    group->MasterLoot(creature, loot, this);
                                     permission = MASTER_PERMISSION;
                                     break;
                                 case FREE_FOR_ALL:
@@ -8964,7 +9023,7 @@ Item* Player::GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bo
     return item;
 }
 
-bool Player::HasWeaponForParry() const
+Item* Player::GetWeaponForParry() const
 {
     Item* pWeapon = GetWeaponForAttack(BASE_ATTACK, true, true);
 
@@ -8984,7 +9043,7 @@ bool Player::HasWeaponForParry() const
         pWeapon = nullptr;
 #endif
 
-    return pWeapon != nullptr;
+    return pWeapon;
 }
 
 uint32 Player::GetAttackBySlot(uint8 slot)
@@ -11962,7 +12021,7 @@ void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemG
     GetSession()->SendPacket(&data);
 }
 
-void Player::TradeCancel(bool sendback)
+void Player::TradeCancel(bool sendback, TradeStatus status /*= TRADE_STATUS_TRADE_CANCELED*/)
 {
     if (m_trade)
     {
@@ -11970,9 +12029,9 @@ void Player::TradeCancel(bool sendback)
 
         // send yellow "Trade canceled" message to both traders
         if (sendback)
-            GetSession()->SendCancelTrade();
+            GetSession()->SendCancelTrade(status);
 
-        trader->GetSession()->SendCancelTrade();
+        trader->GetSession()->SendCancelTrade(status);
 
         // cleanup
         delete m_trade;
@@ -15658,8 +15717,8 @@ bool Player::IsAllowedToLoot(Creature const* creature)
 
 float Player::GetMaxLootDistance(Unit const* pUnit) const
 {
-    float distance = GetCombatReach() + 1.333333373069763f + pUnit->GetCombatReach();
-    return std::max(INTERACTION_DISTANCE, distance);
+    float distance = GetCombatReachToTarget(pUnit, false, 0.0f, true);
+    return distance;
 }
 
 void Player::_LoadAuras(QueryResult* result, uint32 timediff)
@@ -16213,15 +16272,6 @@ void Player::_LoadBoundInstances(QueryResult* result)
                 continue;
             }
 
-            if (!perm && group)
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_LoadBoundInstances: %s is in group (Id: %d) but has a non-permanent character bind to map %d,%d",
-                              GetGuidStr().c_str(), group->GetId(), mapId, instanceId);
-                CharacterDatabase.PExecute("DELETE FROM `character_instance` WHERE `guid` = '%u' AND `instance` = '%u'",
-                                           GetGUIDLow(), instanceId);
-                continue;
-            }
-
             // since non permanent binds are always solo bind, they can always be reset
             DungeonPersistentState* state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, instanceId, resetTime, !perm, true);
             if (state) BindToInstance(state, perm, true);
@@ -16232,6 +16282,7 @@ void Player::_LoadBoundInstances(QueryResult* result)
 
 InstancePlayerBind* Player::GetBoundInstance(uint32 mapid)
 {
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     BoundInstancesMap::iterator itr = m_boundInstances.find(mapid);
     if (itr != m_boundInstances.end())
         return &itr->second;
@@ -16241,6 +16292,7 @@ InstancePlayerBind* Player::GetBoundInstance(uint32 mapid)
 
 void Player::UnbindInstance(uint32 mapid, bool unload)
 {
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     BoundInstancesMap::iterator itr = m_boundInstances.find(mapid);
     UnbindInstance(itr, unload);
 }
@@ -16262,6 +16314,7 @@ InstancePlayerBind* Player::BindToInstance(DungeonPersistentState* state, bool p
     if (state)
     {
         ASSERT(state->GetMapId() > 1);
+        std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
         InstancePlayerBind& bind = m_boundInstances[state->GetMapId()];
 
         if (bind.state)
@@ -16309,9 +16362,8 @@ DungeonPersistentState* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapid)
     InstancePlayerBind* pBind = GetBoundInstance(mapid);
     DungeonPersistentState* state = pBind ? pBind->state : nullptr;
 
-    // the player's permanent player bind is taken into consideration first
-    // then the player's group bind and finally the solo bind.
-    if (!pBind || !pBind->perm)
+    // the player's personal or permanent bind is taken into consideration first
+    if (!pBind)
     {
         if (Group* group = GetGroup())
             if (InstanceGroupBind* groupBind = group->GetBoundInstance(mapid))
@@ -16330,6 +16382,7 @@ void Player::SendRaidInfo() const
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
 
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)
@@ -16360,6 +16413,7 @@ void Player::SendSavedInstances() const
     bool hasBeenSaved = false;
     WorldPacket data;
 
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)                               // only permanent binds are sent
@@ -16409,6 +16463,7 @@ void Player::ConvertInstancesToGroup(Player* player, Group* group, ObjectGuid pl
 
     if (player)
     {
+        std::lock_guard<std::mutex> guard(player->m_boundInstancesMutex);
         for (BoundInstancesMap::iterator itr = player->m_boundInstances.begin(); itr != player->m_boundInstances.end();)
         {
             has_binds = true;
@@ -17447,11 +17502,19 @@ void Player::SendResetFailedNotify()
 void Player::ResetInstances(InstanceResetMethod method)
 {
     // method can be INSTANCE_RESET_ALL, INSTANCE_RESET_GROUP_JOIN
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (BoundInstancesMap::iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
     {
         DungeonPersistentState* state = itr->second.state;
         MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(itr->first);
         if (!entry || !state->CanReset())
+        {
+            ++itr;
+            continue;
+        }
+
+        // cannot reset instance while inside
+        if (IsInWorld() && itr->first == GetMapId())
         {
             ++itr;
             continue;
@@ -17465,29 +17528,55 @@ void Player::ResetInstances(InstanceResetMethod method)
                 ++itr;
                 continue;
             }
-
-            // solo player cannot reset instance while inside
-            if (IsInWorld() && itr->first == GetMapId())
-            {
-                ++itr;
-                continue;
-            }
         }
 
-        // if the map is loaded, reset it
-        if (Map* map = sMapMgr.FindMap(state->GetMapId(), state->GetInstanceId()))
-            if (map->IsDungeon())
-                ((DungeonMap*)map)->Reset(method);
+        ResetInstance(method, itr);
+    }
+}
 
-        // since this is a solo instance there should not be any players inside
-        if (method == INSTANCE_RESET_ALL)
-            SendResetInstanceSuccess(state->GetMapId());
+void Player::ResetInstance(InstanceResetMethod method, BoundInstancesMap::iterator& itr)
+{
+    DungeonPersistentState* state = itr->second.state;
 
-        state->DeleteFromDB();
-        m_boundInstances.erase(itr++);
+    // if the map is loaded, reset it
+    if (Map* map = sMapMgr.FindMap(state->GetMapId(), state->GetInstanceId()))
+        if (map->IsDungeon())
+            ((DungeonMap*)map)->Reset(method);
 
-        // the following should remove the instance save from the manager and delete it as well
-        state->RemovePlayer(this);
+    // since this is a solo instance there should not be any players inside
+    if (method == INSTANCE_RESET_ALL)
+        SendResetInstanceSuccess(state->GetMapId());
+
+    state->DeleteFromDB();
+    m_boundInstances.erase(itr++);
+
+    // the following should remove the instance save from the manager and delete it as well
+    state->RemovePlayer(this);
+}
+
+// should only be called on teleport from inside dungeon to outside
+// if player was inside a different instance of a dungeon when he got invited to group
+// it should only be reset once he leaves the dungeon, not immediately on accepting group
+void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
+{
+    MANGOS_ASSERT(GetMapId() != mapId);
+
+    Group* pGroup = GetGroup();
+    if (!pGroup)
+        return;
+
+    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
+    BoundInstancesMap::iterator itr = m_boundInstances.find(mapId);
+    if (itr == m_boundInstances.end() || itr->second.perm)
+        return;
+
+    // the group save replaces the personal save
+    if (InstanceGroupBind* pGroupBind = pGroup->GetBoundInstance(mapId))
+    {
+        if (itr->second.state != pGroupBind->state)
+            ResetInstance(INSTANCE_RESET_GROUP_JOIN, itr);
+        else
+            UnbindInstance(itr, false);
     }
 }
 
@@ -18784,7 +18873,7 @@ void Player::UpdateHomebindTime(uint32 time)
 
 void Player::UpdatePvP(bool state, bool overriding)
 {
-    if (!state || overriding)
+    if (!state)
     {
         // Updating into unset state or overriding anything
         if (!pvpInfo.timerPvPRemaining || overriding)
@@ -20264,8 +20353,33 @@ uint32 Player::GetBaseWeaponSkillValue(WeaponAttackType attType) const
 void Player::ResurectUsingRequestData()
 {
     // Teleport before resurrecting by player, otherwise the player might get attacked from creatures near his corpse
-    if (m_resurrectGuid.IsPlayer())
-        TeleportTo(m_resurrectMap, m_resurrectX, m_resurrectY, m_resurrectZ, GetOrientation());
+    if (m_resurrectData.resurrectorGuid.IsPlayer())
+    {
+        // If player is no longer saved the same instance, teleport to entrance instead.
+        // Prevents death exploit to reset dungeon and teleport directly to end boss.
+        if (m_resurrectData.instanceId && m_resurrectData.location.mapId != GetMapId() &&
+            sMapStorage.LookupEntry<MapEntry>(m_resurrectData.location.mapId)->IsDungeon())
+        {
+            DungeonPersistentState* state = GetBoundInstanceSaveForSelfOrGroup(m_resurrectData.location.mapId);
+            if (!state || state->GetInstanceId() != m_resurrectData.instanceId)
+            {
+                if (AreaTriggerTeleport const* at = sObjectMgr.GetMapEntranceTrigger(m_resurrectData.location.mapId))
+                    m_resurrectData.location = at->destination;
+                else if (AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(m_resurrectData.location.mapId))
+                    m_resurrectData.location = at->destination;
+                else
+                {
+                    m_resurrectData.location.mapId = GetMapId();
+                    m_resurrectData.location.x = GetPositionX();
+                    m_resurrectData.location.y = GetPositionY();
+                    m_resurrectData.location.z = GetPositionZ();
+                    m_resurrectData.location.o = GetOrientation();
+                }
+            }
+        }
+
+        TeleportTo(m_resurrectData.location);
+    }
 
     // We cannot resurrect player when we triggered any kind of teleport
     // Player will be resurrected upon teleportation (in MSG_MOVE_TELEPORT_ACK handler)
@@ -20277,13 +20391,13 @@ void Player::ResurectUsingRequestData()
 
     ResurrectPlayer(0.0f, false);
 
-    if (GetMaxHealth() > m_resurrectHealth)
-        SetHealth(m_resurrectHealth);
+    if (GetMaxHealth() > m_resurrectData.health)
+        SetHealth(m_resurrectData.health);
     else
         SetHealth(GetMaxHealth());
 
-    if (GetMaxPower(POWER_MANA) > m_resurrectMana)
-        SetPower(POWER_MANA, m_resurrectMana);
+    if (GetMaxPower(POWER_MANA) > m_resurrectData.mana)
+        SetPower(POWER_MANA, m_resurrectData.mana);
     else
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
 
@@ -20521,7 +20635,7 @@ void Player::UpdateTerainEnvironmentFlags()
     GetPosition(x, y, z);
 
     GridMapLiquidData liquid_status;
-    GridMapLiquidStatus res = m->GetTerrain()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
+    GridMapLiquidStatus res = m->GetTerrain()->getLiquidStatus(x, y, z + 0.01f, MAP_ALL_LIQUIDS, &liquid_status);
     if (!res)
     {
         SetEnvironmentFlags(ENVIRONMENT_MASK_LIQUID_FLAGS, false);
@@ -21162,6 +21276,13 @@ void Player::SendSpellRemoved(uint32 spellId) const
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendChannelUpdate(uint32 time) const
+{
+    WorldPacket data(MSG_CHANNEL_UPDATE, 4);
+    data << uint32(time);
+    SendDirectMessage(&data);
+}
+
 bool Player::HasMovementFlag(MovementFlags f) const
 {
     return m_movementInfo.HasMovementFlag(f);
@@ -21209,6 +21330,21 @@ bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown)
         }
     }
     return TeleportTo(m_homebind, (options | TELE_TO_FORCE_MAP_CHANGE));
+}
+
+Unit* Player::GetSelectedUnit()
+{
+    return GetMap()->GetUnit(m_curSelectionGuid);
+}
+
+Creature* Player::GetSelectedCreature()
+{
+    return GetMap()->GetCreature(m_curSelectionGuid);
+}
+
+Player* Player::GetSelectedPlayer()
+{
+    return GetMap()->GetPlayer(m_curSelectionGuid);
 }
 
 Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)

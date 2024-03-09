@@ -32,8 +32,7 @@
 //================= ThreatCalcHelper ===========================
 //==============================================================
 
-// The pHatingUnit is not used yet
-float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell)
+float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell)
 {
     // all flat mods applied early
     if (!threat)
@@ -41,9 +40,6 @@ float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, floa
 
     if (pThreatSpell)
     {
-        if (pThreatSpell->AttributesEx & SPELL_ATTR_EX_NO_THREAT)
-            return 0.0f;
-
         if (Player* modOwner = pHatedUnit->GetSpellModOwner())
             modOwner->ApplySpellMod(pThreatSpell->Id, SPELLMOD_THREAT, threat);
 
@@ -59,9 +55,9 @@ float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, floa
 //================= HostileReference ==========================
 //============================================================
 
-HostileReference::HostileReference(Unit* pUnit, ThreatManager *pThreatManager, float pThreat)
+HostileReference::HostileReference(Unit* pUnit, ThreatManager *pThreatManager, float threat)
 {
-    iThreat = pThreat;
+    iThreat = threat;
     iTempThreatModifyer = 0.0f;
     link(pUnit, pThreatManager);
     iUnitGuid = pUnit->GetObjectGuid();
@@ -235,14 +231,14 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* pVictim)
 //============================================================
 // Add the threat, if we find the reference
 
-HostileReference* ThreatContainer::addThreat(Unit* pVictim, float pThreat)
+HostileReference* ThreatContainer::addThreat(Unit* pVictim, float threat)
 {
     if (!pVictim)
         return nullptr;
 
     HostileReference* ref = getReferenceByTarget(pVictim);
     if (ref)
-        ref->addThreat(pThreat);
+        ref->addThreat(threat);
     return ref;
 }
 
@@ -320,17 +316,22 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
                 continue;
             }
 
-            float attackDistance = pAttacker->GetMaxChaseDistance(target);
             // Skip this unit if low priority
-            if (!allowLowPriorityTargets && (target->IsImmuneToDamage(pAttacker->GetMeleeDamageSchoolMask()) ||
-                                            target->IsSecondaryThreatTarget() ||
-                                           (attackerImmobilized && !target->IsWithinDist(pAttacker, attackDistance))))
+            if (!allowLowPriorityTargets)
             {
-                // current victim is a second choice target, so don't compare threat with it below
-                if (currentRef == pCurrentVictim)
-                    pCurrentVictim = nullptr;
-                ++iter;
-                continue;
+                float attackDistance = pAttacker->GetMaxChaseDistance(target);
+                // second choice targets are: immune to attacker's autoattack damage school / is secondary threat target (fear, gouge etc) /
+                // is outside of attacker's caster chase distance if rooted caster / is unreachable by attacker's melee attacks if rooted melee.
+                if ( target->IsImmuneToDamage(pAttacker->GetMeleeDamageSchoolMask()) || target->IsSecondaryThreatTarget() ||
+                   ( attackerImmobilized && pAttacker->HasDistanceCasterMovement() &&!target->IsWithinDist(pAttacker, attackDistance, true, SizeFactor::None)) ||
+                   ( attackerImmobilized && !pAttacker->CanReachWithMeleeAutoAttack(target)))
+                {
+                    // current victim is a second choice target, so don't compare threat with it below
+                    if (currentRef == pCurrentVictim)
+                        pCurrentVictim = nullptr;
+                    ++iter;
+                    continue;
+                }
             }
 
             if (pCurrentVictim)                             // select 1.3/1.1 better target in comparison current target
@@ -384,7 +385,7 @@ void ThreatManager::clearReferences()
 
 //============================================================
 
-void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell, bool isAssistThreat)
+void ThreatManager::addThreat(Unit* pVictim, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell, bool isAssistThreat)
 {
     //function deals with adding threat and adding players and pets into ThreatList
     //mobs, NPCs, guards have ThreatList and HateOfflineList
@@ -409,19 +410,18 @@ void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellScho
     // check for fear, blind, freezing trap, reckless charge, banish, etc.
     if (isAssistThreat)
     {
-        if (getOwner()->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED)
-            || (getOwner()->HasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
+        if (getOwner()->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED) ||
+           (getOwner()->HasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
         {
-            pThreat = 0.0f;
+            threat = 0.0f;
         }
     }
 
-    float threat = ThreatCalcHelper::CalcThreat(pVictim, iOwner, pThreat, crit, schoolMask, pThreatSpell);
-
-    addThreatDirectly(pVictim, threat);
+    float totalThreat = ThreatCalcHelper::CalcThreat(pVictim, threat, crit, schoolMask, pThreatSpell);
+    addThreatDirectly(pVictim, totalThreat, pThreatSpell && pThreatSpell->HasAttribute(SPELL_ATTR_EX_NO_THREAT));
 }
 
-void ThreatManager::addThreatDirectly(Unit* pVictim, float threat)
+void ThreatManager::addThreatDirectly(Unit* pVictim, float threat, bool noNew)
 {
     if (!pVictim || pVictim == getOwner() || !pVictim->IsAlive() || !pVictim->IsInMap(getOwner()))
         return;
@@ -431,7 +431,8 @@ void ThreatManager::addThreatDirectly(Unit* pVictim, float threat)
     if (!ref)
         ref = iThreatOfflineContainer.addThreat(pVictim, threat);
 
-    if (!ref)                                               // there was no ref => create a new one
+    // there was no ref => create a new one
+    if (!ref && !noNew)
     {
         // threat has to be 0 here
         HostileReference* hostileReference = new HostileReference(pVictim, this, 0);

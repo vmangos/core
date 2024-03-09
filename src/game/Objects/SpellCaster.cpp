@@ -201,7 +201,7 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         if (reflectchance > 0 && roll_chance_i(reflectchance))
         {
             // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
-            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKE_HARMFUL_SPELL, PROC_EX_REFLECT, 1, BASE_ATTACK, spell));
+            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKE_HARMFUL_SPELL, PROC_EX_REFLECT, 1, 1, BASE_ATTACK, spell));
             return SPELL_MISS_REFLECT;
         }
     }
@@ -219,9 +219,9 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     return SPELL_MISS_NONE;
 }
 
-ProcSystemArguments::ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_,
+ProcSystemArguments::ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, uint32 originalAmount_, WeaponAttackType attType_,
     SpellEntry const* procSpell_, Spell const* spell)
-    : pVictim(pVictim_), procFlagsAttacker(procFlagsAttacker_), procFlagsVictim(procFlagsVictim_), procExtra(procExtra_), amount(amount_),
+    : pVictim(pVictim_), procFlagsAttacker(procFlagsAttacker_), procFlagsVictim(procFlagsVictim_), procExtra(procExtra_), amount(amount_), originalAmount(originalAmount_),
     attType(attType_), procSpell(procSpell_), isSpellTriggeredByAuraOrItem(spell && (spell->IsTriggeredByAura() || spell->IsTriggered() && spell->IsCastByItem())), procTime(sWorld.GetGameTime())
 {
     if (spell)
@@ -312,7 +312,7 @@ void SpellCaster::ProcDamageAndSpell_real(ProcSystemArguments& data, ProcessProc
     }
 
     if (Unit* pUnit = ToUnit())
-        pUnit->HandleTriggers(data.pVictim, data.procExtra, data.amount, data.procSpell, procTriggered);
+        pUnit->HandleTriggers(data.pVictim, data.procExtra, data.amount, data.originalAmount, data.procSpell, procTriggered);
 }
 
 // Melee based spells can be miss, parry or dodge on this step
@@ -345,10 +345,7 @@ float SpellCaster::MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType,
             modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, hitChance, spellPtr);
 
         // Bonuses from attacker aura and ratings
-        if (attType == RANGED_ATTACK)
-            hitChance += pUnit->m_modRangedHitChance;
-        else
-            hitChance += pUnit->m_modMeleeHitChance;
+        hitChance += pUnit->GetWeaponBasedAuraModifier(attType, SPELL_AURA_MOD_HIT_CHANCE);
     } 
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
@@ -756,7 +753,7 @@ int32 SpellCaster::DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* s
 
     SpellCaster* pHealer = this;
 
-    if (IsCreature() && ((Creature*)this)->IsTotem() && ((Totem*)this)->GetTotemType() != TOTEM_STATUE)
+    if (IsCreature() && ((Creature*)this)->IsTotem())
         pHealer = pUnit->GetOwner();
 
     if (IsPlayer() || pVictim->IsPlayer())
@@ -1183,8 +1180,8 @@ float SpellCaster::SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spellP
 {
     Unit* pUnit = ToUnit();
 
-    // For totems get healing bonus from owner (statue isn't totem in fact)
-    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsTotem() && ((Totem*)this)->GetTotemType() != TOTEM_STATUE)
+    // For totems get healing bonus from owner
+    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsTotem())
         if (Unit* owner = pUnit->GetOwner())
             return owner->SpellHealingBonusDone(pVictim, spellProto, effectIndex, healamount, damagetype, stack, spell);
 
@@ -1299,8 +1296,8 @@ float SpellCaster::SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellPr
 
     Unit* pUnit = ToUnit();
 
-    // For totems get damage bonus from owner (statue isn't totem in fact)
-    if (pUnit && GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsTotem() && ((Totem*)this)->GetTotemType() != TOTEM_STATUE)
+    // For totems get damage bonus from owner
+    if (pUnit && GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsTotem())
     {
         if (Unit* owner = pUnit->GetOwner())
             return owner->SpellDamageBonusDone(pVictim, spellProto, effectIndex, pdamage, damagetype, stack, spell);

@@ -19,7 +19,7 @@
 #include "vmapexport.h"
 #include "model.h"
 #include "wmo.h"
-#include "mpq_libmpq04.h"
+#include "libmpq/mpq_libmpq.h"
 #include "adtfile.h"
 #include <G3D/Quat.h>
 #include <cassert>

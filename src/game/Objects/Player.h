@@ -26,11 +26,12 @@
 #include "Unit.h"
 #include "Database/DatabaseEnv.h"
 #include "GroupReference.h"
+#include "MapReference.h"
 #include "WorldSession.h"
 #include "Pet.h"
 #include "Util.h"                                           // for Tokens typedef
 #include "ReputationMgr.h"
-#include "BattleGround.h"
+#include "BattleGroundDefines.h"
 #include "SharedDefines.h"
 #include "GameObjectDefines.h"
 #include "SpellMgr.h"
@@ -39,6 +40,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <shared_mutex>
 
 struct Mail;
 struct ItemPrototype;
@@ -56,7 +58,7 @@ class Item;
 class ZoneScript;
 class PlayerAI;
 class PlayerBroadcaster;
-class MapReference;
+class BattleGround;
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_EXPLORED_ZONES_SIZE  64
@@ -494,16 +496,17 @@ enum AtLoginFlags
 
 enum PlayerCheatOptions : uint16
 {
-    PLAYER_CHEAT_GOD             = 0x001,
-    PLAYER_CHEAT_NO_COOLDOWN     = 0x002,
-    PLAYER_CHEAT_NO_CAST_TIME    = 0x004,
-    PLAYER_CHEAT_NO_POWER        = 0x008,
-    PLAYER_CHEAT_DEBUFF_IMMUNITY = 0x010,
-    PLAYER_CHEAT_ALWAYS_CRIT     = 0x020,
-    PLAYER_CHEAT_NO_CHECK_CAST   = 0x040,
-    PLAYER_CHEAT_ALWAYS_PROC     = 0x080,
-    PLAYER_CHEAT_TRIGGER_PASS    = 0x100,
-    PLAYER_CHEAT_IGNORE_TRIGGERS = 0x200,
+    PLAYER_CHEAT_FLY               = 0x001,
+    PLAYER_CHEAT_NO_COOLDOWN       = 0x002,
+    PLAYER_CHEAT_NO_CAST_TIME      = 0x004,
+    PLAYER_CHEAT_NO_POWER          = 0x008,
+    PLAYER_CHEAT_DEBUFF_IMMUNITY   = 0x010,
+    PLAYER_CHEAT_ALWAYS_CRIT       = 0x020,
+    PLAYER_CHEAT_NO_CHECK_CAST     = 0x040,
+    PLAYER_CHEAT_ALWAYS_PROC       = 0x080,
+    PLAYER_CHEAT_TRIGGER_PASS      = 0x100,
+    PLAYER_CHEAT_IGNORE_TRIGGERS   = 0x200,
+    PLAYER_CHEAT_DEBUG_TARGET_INFO = 0x400,
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -754,6 +757,15 @@ enum PlayerRestState
     REST_STATE_RESTED           = 0x01,
     REST_STATE_NORMAL           = 0x02,
     REST_STATE_RAF_LINKED       = 0x04                      // Exact use unknown
+};
+
+struct ResurrectionData
+{
+    ObjectGuid resurrectorGuid;
+    WorldLocation location;
+    uint32 instanceId = 0;
+    uint32 health = 0;
+    uint32 mana = 0;
 };
 
 class PlayerTaxi
@@ -1007,8 +1019,8 @@ class Player final: public Unit
         bool IsGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
         void SetGMVisible(bool on, bool notify = false);
         
+        void SetCheatFly(bool on, bool notify = false);
         void SetCheatGod(bool on, bool notify = false);
-        bool IsGod() const { return HasCheatOption(PLAYER_CHEAT_GOD); }
         void SetCheatNoCooldown(bool on, bool notify = false);
         void SetCheatInstantCast(bool on, bool notify = false);
         void SetCheatNoPowerCost(bool on, bool notify = false);
@@ -1018,6 +1030,7 @@ class Player final: public Unit
         void SetCheatAlwaysProc(bool on, bool notify = false);
         void SetCheatTriggerPass(bool on, bool notify = false);
         void SetCheatIgnoreTriggers(bool on, bool notify = false);
+        void SetCheatDebugTargetInfo(bool on, bool notify = false);
         uint16 GetCheatOptions() const { return m_cheatOptions; }
         bool HasCheatOption(PlayerCheatOptions o) const { return (m_cheatOptions & o); }
         void EnableCheatOption(PlayerCheatOptions o)    { m_cheatOptions |= o; }
@@ -1093,7 +1106,7 @@ class Player final: public Unit
         Item* GetItemByPos(uint8 bag, uint8 slot) const;
         Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }
         Item* GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bool useable) const;
-        bool HasWeaponForParry() const;
+        Item* GetWeaponForParry() const;
         static uint32 GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
         uint32 GetHighestKnownArmorProficiency() const;
         std::vector<Item*>& GetItemUpdateQueue() { return m_itemUpdateQueue; }
@@ -1202,7 +1215,7 @@ class Player final: public Unit
 
         Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
         TradeData* GetTradeData() const { return m_trade; }
-        void TradeCancel(bool sendback);
+        void TradeCancel(bool sendback, TradeStatus status = TRADE_STATUS_TRADE_CANCELED);
 
         uint32 GetMoney() const { return GetUInt32Value(PLAYER_FIELD_COINAGE); }
         void LogModifyMoney(int32 d, char const* type, ObjectGuid fromGuid = ObjectGuid(), uint32 data = 0);
@@ -1526,6 +1539,7 @@ class Player final: public Unit
         void LearnQuestRewardedSpells(Quest const* quest);
         void LearnSpellHighRank(uint32 spellid);
         uint32 GetSpellRank(SpellEntry const* spellInfo) const final;
+        void SendChannelUpdate(uint32 time) const;
 
         void CastItemCombatSpell(Unit* Target, WeaponAttackType attType);
         void CastItemUseSpell(Item* item, SpellCastTargets const& targets);
@@ -1678,6 +1692,7 @@ class Player final: public Unit
         void UpdateAllSpellCritChances();
         void UpdateSpellCritChance(uint32 school);
         void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, float& min_damage, float& max_damage, uint8 index = 0) const;
+        float GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const final;
 
         uint32 GetShieldBlockValue() const override;                 // overwrite Unit version (virtual)
         bool CanParry() const { return m_canParry; }
@@ -2203,10 +2218,7 @@ class Player final: public Unit
         uint32 m_DetectInvTimer;
         uint32 m_ExtraFlags;
         ObjectGuid m_curSelectionGuid;
-        ObjectGuid m_resurrectGuid;
-        uint32 m_resurrectMap;
-        float m_resurrectX, m_resurrectY, m_resurrectZ;
-        uint32 m_resurrectHealth, m_resurrectMana;
+        ResurrectionData m_resurrectData;
         uint32 m_drunkTimer;
         uint16 m_drunk;
         void HandleSobering();
@@ -2241,25 +2253,27 @@ class Player final: public Unit
         void SetSelectedGobj(ObjectGuid guid) { m_selectedGobj = guid; }
         ObjectGuid const& GetSelectionGuid() const { return m_curSelectionGuid; }
         void SetSelectionGuid(ObjectGuid guid) { m_curSelectionGuid = guid; SetTargetGuid(guid); }
-        Unit* GetSelectedUnit() { return GetMap()->GetUnit(m_curSelectionGuid); }
-        Creature* GetSelectedCreature() { return GetMap()->GetCreature(m_curSelectionGuid); }
-        Player* GetSelectedPlayer() { return GetMap()->GetPlayer(m_curSelectionGuid); }
+        Unit* GetSelectedUnit();
+        Creature* GetSelectedCreature();
+        Player* GetSelectedPlayer();
         Object* GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask);
 
-        void SetResurrectRequestData(ObjectGuid guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
+        void SetResurrectRequestData(ObjectGuid guid, uint16 mapId, uint32 instanceId, float x, float y, float z, float o, uint32 health, uint32 mana)
         {
-            m_resurrectGuid = guid;
-            m_resurrectMap = mapId;
-            m_resurrectX = X;
-            m_resurrectY = Y;
-            m_resurrectZ = Z;
-            m_resurrectHealth = health;
-            m_resurrectMana = mana;
+            m_resurrectData.resurrectorGuid = guid;
+            m_resurrectData.location.mapId = mapId;
+            m_resurrectData.location.x = x;
+            m_resurrectData.location.y = y;
+            m_resurrectData.location.z = z;
+            m_resurrectData.location.o = o;
+            m_resurrectData.instanceId = instanceId;
+            m_resurrectData.health = health;
+            m_resurrectData.mana = mana;
         }
-        void ClearResurrectRequestData() { SetResurrectRequestData(ObjectGuid(), 0, 0.0f, 0.0f, 0.0f, 0, 0); }
-        bool IsRessurectRequestedBy(ObjectGuid guid) const { return m_resurrectGuid == guid; }
-        bool IsRessurectRequested() const { return !m_resurrectGuid.IsEmpty(); }
-        ObjectGuid const& GetResurrector() const { return m_resurrectGuid; }
+        void ClearResurrectRequestData() { SetResurrectRequestData(ObjectGuid(), 0, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0); }
+        bool IsRessurectRequestedBy(ObjectGuid guid) const { return m_resurrectData.resurrectorGuid == guid; }
+        bool IsRessurectRequested() const { return !m_resurrectData.resurrectorGuid.IsEmpty(); }
+        ObjectGuid const& GetResurrector() const { return m_resurrectData.resurrectorGuid; }
         void ResurectUsingRequestData();
 
         static bool IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player* player);
@@ -2567,27 +2581,32 @@ class Player final: public Unit
         /***                 INSTANCE SYSTEM                   ***/
         /*********************************************************/
 
+    public:
+        typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
+
     private:
         bool   m_enableInstanceSwitch;
         bool   m_smartInstanceRebind;
         uint32 m_HomebindTimer;
+
+        void ResetInstance(InstanceResetMethod method, BoundInstancesMap::iterator& itr);
     public:
         void SendTransferAborted(uint8 reason) const;
         void SendInstanceResetWarning(uint32 mapid, uint32 time) const;
-
+        
         void ResetInstances(InstanceResetMethod method);
+        void ResetPersonalInstanceOnLeaveDungeon(uint32 mapId);
         void SendResetInstanceSuccess(uint32 MapId) const;
         void SendResetInstanceFailed(uint32 reason, uint32 MapId) const;
         void SendResetFailedNotify();
         bool CheckInstanceCount(uint32 instanceId) const;
         void AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const;
 
-        typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
-
         void UpdateHomebindTime(uint32 time);
         bool m_InstanceValid;
         // permanent binds and solo binds
         BoundInstancesMap m_boundInstances;
+        mutable std::mutex m_boundInstancesMutex;
         InstancePlayerBind* GetBoundInstance(uint32 mapid);
         BoundInstancesMap& GetBoundInstances() { return m_boundInstances; }
         void UnbindInstance(uint32 mapid, bool unload = false);

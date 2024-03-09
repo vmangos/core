@@ -1284,16 +1284,15 @@ Map::Remove(T* obj, bool remove)
         UpdateObjectVisibility(obj, cell, p); // i think will be better to call this function while object still in grid, this changes nothing but logically is better(as for me)
     RemoveFromGrid(obj, grid, cell);
 
-    obj->ResetMap();
     if (remove)
-    {
         // if option set then object already saved at this moment
         if (!sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATELY))
-            obj->SaveRespawnTime();
+            obj->SaveRespawnTime(); // requires map not being reset
 
-        // Note: In case resurrectable corpse and pet its removed from global lists in own destructor
+    obj->ResetMap();
+    
+    if (remove) // Note: In case resurrectable corpse and pet its removed from global lists in own destructor
         delete obj;
-    }
 }
 
 template<>
@@ -1788,6 +1787,14 @@ void Map::RemoveAllObjectsInRemoveList()
     }
 }
 
+bool Map::HaveRealPlayers() const
+{
+    for (const auto& itr : m_mapRefManager)
+        if (!itr.getSource()->IsBot())
+            return true;
+    return false;
+}
+
 uint32 Map::GetPlayersCountExceptGMs() const
 {
     uint32 count = 0;
@@ -2182,28 +2189,42 @@ void DungeonMap::BindPlayerOrGroupOnEnter(Player* player)
         {
             // solo saves should be reset when entering a group
             InstanceGroupBind *groupBind = pGroup->GetBoundInstance(GetId());
-            if (playerBind)
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "InstanceMap::Add: %s is being put in instance %d,%d,%d,%d,%d but he is in group (Id: %d) and is bound to instance %d,%d,%d,%d,%d!",
-                    player->GetObjectGuid().GetString().c_str(), playerBind->state->GetMapId(), playerBind->state->GetInstanceId(),
-                    playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(),
-                    playerBind->state->CanReset(), pGroup->GetId(),
-                    playerBind->state->GetMapId(), playerBind->state->GetInstanceId(),
-                    playerBind->state->GetPlayerCount(), playerBind->state->GetGroupCount(), playerBind->state->CanReset());
-
-                if (groupBind)
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "InstanceMap::Add: the group (Id: %d) is bound to instance %d,%d,%d,%d,%d",
-                        pGroup->GetId(),
-                        groupBind->state->GetMapId(), groupBind->state->GetInstanceId(),
-                        groupBind->state->GetPlayerCount(), groupBind->state->GetGroupCount(), groupBind->state->CanReset());
-
-                // no reason crash if we can fix state
-                player->UnbindInstance(GetId());
-            }
 
             // bind to the group or keep using the group save
             if (!groupBind)
+            {
                 pGroup->BindToInstance(GetPersistanceState(), false);
+
+                // the personal save has become a group save
+                if (playerBind)
+                {
+                    // cannot jump to a different instance without resetting it
+                    MANGOS_ASSERT(playerBind->state == GetPersistentState());
+                    player->UnbindInstance(GetId());
+                }
+
+                // reset personal saves of other members now that group save is created
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    if (Player* pMember = itr->getSource())
+                    {
+                        if (pMember == player)
+                            continue;
+
+                        if (pMember->GetMapId() != GetId())
+                        {
+                            InstancePlayerBind* memberBind = pMember->GetBoundInstance(GetId());
+                            if (memberBind && !memberBind->perm)
+                                pMember->UnbindInstance(GetId());
+                        }
+                    }
+                }
+            }
+            else if (playerBind)
+            {
+                // cannot jump to a different instance without resetting it
+                MANGOS_ASSERT(playerBind->state == GetPersistentState());
+            }
             else
             {
                 // cannot jump to a different instance without resetting it
@@ -2314,6 +2335,14 @@ void DungeonMap::PermBindAllPlayers(Player* player)
     for (const auto& itr : m_mapRefManager)
     {
         Player* plr = itr.getSource();
+
+        if (m_resetAfterUnload)
+        {
+            sLog.Player(plr->GetSession(), LOG_BASIC, LOG_LVL_ERROR, "Attempt to permanently save player to raid (map %u, instance %u) scheduled for reset on unload and already deleted from DB!", GetId(), GetInstanceId());
+            plr->TeleportToHomebind();
+            continue;
+        }
+
         // players inside an instance cannot be bound to other instances
         // some players may already be permanently bound, in this case nothing happens
         InstancePlayerBind *bind = plr->GetBoundInstance(GetId());
@@ -2493,12 +2522,14 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid 
     sScriptMgr.IncreaseScheduledScriptsCount();
 }
 
-void Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+bool Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
     if ((script.command != SCRIPT_COMMAND_DISABLED) && 
         FindScriptFinalTargets(source, target, script) && 
         (!script.condition || IsConditionSatisfied(script.condition, target, this, source, CONDITION_FROM_DBSCRIPTS)))
-        (this->*(m_ScriptCommands[script.command]))(script, source, target);
+        return (this->*(m_ScriptCommands[script.command]))(script, source, target);
+
+    return (script.raw.data[4] & SF_GENERAL_ABORT_ON_FAILURE) != 0;
 }
 
 bool Map::FindScriptInitialTargets(WorldObject*& source, WorldObject*& target, ScriptAction const& step)
@@ -3316,6 +3347,16 @@ VMAP::ModelInstance* Map::FindCollisionModel(float x1, float y1, float z1, float
     ASSERT(MaNGOS::IsValidMapCoord(x1, y1, z1));
     ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
     return VMAP::VMapFactory::createOrGetVMapManager()->FindCollisionModel(GetId(), x1, y1, z1, x2, y2, z2);
+}
+
+GameObjectModel const* Map::FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2)
+{
+    ASSERT(MaNGOS::IsValidMapCoord(x1, y1, z1));
+    ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
+    Vector3 const pos1 = Vector3(x1, y1, z1);
+    Vector3 const pos2 = Vector3(x2, y2, z2);
+    std::shared_lock<std::shared_timed_mutex> lock(_dynamicTree_lock);
+    return _dynamicTree.getObjectHit(pos1, pos2);
 }
 
 void Map::RemoveGameObjectModel(const GameObjectModel &model)

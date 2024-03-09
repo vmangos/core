@@ -15,6 +15,7 @@ EndScriptData */
 #include "MovementGenerator.h"
 #include "Player.h"
 #include "Group.h"
+#include "Map.h"
 
 float const DEFAULT_MAX_PLAYER_DISTANCE = 100.0f;
 float const DEFAULT_MAX_ASSIST_DISTANCE =  40.0f;

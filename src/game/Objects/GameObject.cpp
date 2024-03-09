@@ -2386,6 +2386,36 @@ void GameObject::UpdateModelPosition()
     }
 }
 
+void GameObject::GetLosCheckPosition(float& x, float& y, float& z) const
+{
+    if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
+    {
+        float scale = GetObjectScale();
+
+        float minX = displayInfo->min_x * scale;
+        float minY = displayInfo->min_y * scale;
+        float minZ = displayInfo->min_z * scale;
+        float maxX = displayInfo->max_x * scale;
+        float maxY = displayInfo->max_y * scale;
+        float maxZ = displayInfo->max_z * scale;
+
+        QuaternionData worldRotation = GetLocalRotation();
+        G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
+
+        auto pos = G3D::CoordinateFrame{ { worldRotationQuat },{ GetPositionX(), GetPositionY(), GetPositionZ() } }
+        .toWorldSpace(G3D::Box{ { minX, minY, minZ },{ maxX, maxY, maxZ } }).center();
+
+        x = pos.x;
+        y = pos.y;
+        z = pos.z;
+    }
+    else
+    {
+        GetPosition(x, y, z);
+        z += 1.0f;
+    }
+}
+
 GameObjectData const* GameObject::GetGOData() const
 {
     return sObjectMgr.GetGOData(GetGUIDLow());

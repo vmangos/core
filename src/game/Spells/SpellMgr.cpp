@@ -319,7 +319,7 @@ void SpellMgr::LoadSpellProcEvents()
     mSpellProcEventMap.clear();                             // need for reload case
 
     //                                                                0        1             2                  3                   4                   5                   6            7         8          9               10
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown` FROM `spell_proc_event` WHERE (`build_min` <= %u) && (`build_max` >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown` FROM `spell_proc_event` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -1268,6 +1268,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
         return false;
 
     if (spellInfo_1->SpellFamilyName != spellInfo_2->SpellFamilyName)
+        return false;
+
+    // Why would a buff and a debuff ever be exclusive with each other?
+    // Fixes Corrupted Mind getting removed by Lightning Shield.
+    if (spellInfo_1->IsPositiveSpell() != spellInfo_2->IsPositiveSpell())
         return false;
 
     // potions work differently

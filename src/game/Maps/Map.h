@@ -442,6 +442,7 @@ class Map : public GridRefManager<NGridType>
         void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
 
         bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
+        bool HaveRealPlayers() const; // no bots
         uint32 GetPlayersCountExceptGMs() const;
         bool ActiveObjectsNearGrid(uint32 x,uint32 y) const;
 
@@ -480,7 +481,7 @@ class Map : public GridRefManager<NGridType>
         // Adds the provided command to the queue. Will be handled by ScriptsProcess.
         void ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid sourceGuid, ObjectGuid targetGuid);
         // Immediately executes the provided command.
-        void ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         // Removes all parts of script from the queue.
         void TerminateScript(ScriptAction const& step);
 
@@ -557,6 +558,7 @@ class Map : public GridRefManager<NGridType>
         bool GetWalkRandomPosition(GenericTransport* t, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags = 0xF) const;
         bool GetSwimRandomPosition(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status, bool randomRange = true) const;
         VMAP::ModelInstance* FindCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
+        GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
 
         void Balance() { _dynamicTree.balance(); }
         void RemoveGameObjectModel(const GameObjectModel& model);

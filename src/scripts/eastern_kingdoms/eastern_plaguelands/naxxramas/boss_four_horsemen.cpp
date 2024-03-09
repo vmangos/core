@@ -30,6 +30,7 @@ enum FourHorsemenData
     SPELL_SHIELDWALL         = 29061,
     SPELL_BESERK             = 26662,
     SPELL_MARK               = 28836,
+    SPELL_SUMMON_PLAYER      = 25104,
 
     // Lady Blaumeux
     SAY_BLAU_AGGRO           = 13010,
@@ -340,6 +341,15 @@ struct boss_four_horsemen_shared : public ScriptedAI
         // He is used for SM event too, sooo 
         if (m_creature->GetMapId() != 533)
             return;
+
+        if (!m_bIsSpirit)
+        {
+            if (Unit* pVictim = m_creature->GetVictim())
+            {
+                if (!m_creature->IsWithinDistInMap(pVictim, VISIBILITY_DISTANCE_NORMAL))
+                    m_creature->CastSpell(pVictim, SPELL_SUMMON_PLAYER, true);
+            }
+        }
 
         m_events.Update(uiDiff);
         killSayCooldown -= std::min(killSayCooldown, uiDiff);

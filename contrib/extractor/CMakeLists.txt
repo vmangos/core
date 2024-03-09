@@ -25,7 +25,6 @@ include_directories (
 
 add_executable (mapextractor
     dbcfile.cpp
-    mpq_libmpq.cpp
     System.cpp
     loadlib/loadlib.cpp 
     loadlib/adt.cpp

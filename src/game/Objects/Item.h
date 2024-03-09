@@ -271,6 +271,7 @@ class Item : public Object
         void DeleteFromInventoryDB();
         void LoadLootFromDB(Field* fields);
 
+        void DeleteAllFromDB();
         static void DeleteAllFromDB(uint32 guidLow);
 
         bool isWeapon() const{ return GetProto()->Class == ITEM_CLASS_WEAPON; }
@@ -291,6 +292,7 @@ class Item : public Object
         void SetInTrade(bool b = true) { mb_in_trade = b; }
         bool IsInTrade() const { return mb_in_trade; }
 
+        static bool IsFitToSpellRequirements(SpellEntry const* spellInfo, uint32 itemClass, uint32 itemSubClass, uint32 itemInventoryType);
         bool IsFitToSpellRequirements(SpellEntry const* spellInfo) const;
         bool IsTargetValidForItemUse(Unit* pUnitTarget);
         bool IsLimitedToAnotherMapOrZone(uint32 cur_mapId, uint32 cur_zoneId) const;

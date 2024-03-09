@@ -723,6 +723,8 @@ class WorldObject : public Object
             // angle to face `obj` to `this` using distance includes size of `obj`
             GetNearPoint(obj, x, y, z, obj->GetObjectBoundingRadius(), distance2d, GetAngle(obj));
         }
+        virtual void GetLosCheckPosition(float& x, float& y, float& z) const;
+
         virtual float GetObjectBoundingRadius() const { return DEFAULT_WORLD_OBJECT_SIZE; }
         virtual float GetCombatReach() const { return 0.f; }
 
@@ -868,6 +870,8 @@ class WorldObject : public Object
         virtual void SendMessageToSetInRange(WorldPacket* data, float dist, bool self) const;
         void SendMessageToSetExcept(WorldPacket* data, Player const* skipped_receiver) const;
         void DirectSendPublicValueUpdate(uint32 index, uint32 count = 1);
+        void DirectSendPublicValueUpdate(UpdateMask& updateMask);
+        void DirectSendPublicValueUpdate(std::initializer_list<uint32> indexes);
 
         void PlayDistanceSound(uint32 sound_id, Player const* target = nullptr) const;
         void PlayDirectSound(uint32 sound_id, Player const* target = nullptr) const;

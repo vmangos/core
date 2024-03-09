@@ -16,17 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 #ifndef MPQ_H
 #define MPQ_H
 
-#include "loadlib/loadlib.h"
 #include "libmpq/mpq.h"
 #include <string.h>
 #include <ctype.h>
 #include <vector>
 #include <iostream>
 #include <deque>
+#include <cstdint>
 
 using namespace std;
 
@@ -41,7 +40,7 @@ class MPQArchive
 
         void GetFileListTo(vector<string>& filelist)
         {
-            uint32 filenum;
+            uint32_t filenum;
             if (libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
             libmpq__off_t size, transferred;
             libmpq__file_size_unpacked(mpq_a, filenum, &size);
@@ -54,7 +53,7 @@ class MPQArchive
             char* token;
 
             token = strtok(buffer, seps);
-            uint32 counter = 0;
+            uint32_t counter = 0;
             while ((token != NULL) && (counter < size))
             {
                 //cout << token << endl;
@@ -90,8 +89,8 @@ class MPQFile
         char* getBuffer() { return buffer; }
         char* getPointer() { return buffer + pointer; }
         bool isEof() { return eof; }
-        void seek(int offset);
-        void seekRelative(int offset);
+        void seek(libmpq__off_t offset);
+        void seekRelative(libmpq__off_t offset);
         void close();
 };
 

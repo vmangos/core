@@ -91,6 +91,32 @@ bool ChatHandler::HandleModifyXpRateCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleCheatFlyCommand(char* args)
+{
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* target = GetSelectedPlayer();
+    if (!target)
+        target = m_session->GetPlayer();
+
+    target->SetCheatFly(value, true);
+
+    PSendSysMessage(LANG_YOU_SET_FLY, value ? "on" : "off", GetNameLink(target).c_str());
+    if (needReportToTarget(target))
+        ChatHandler(target).PSendSysMessage(LANG_YOUR_FLY_SET, value ? "on" : "off", GetNameLink().c_str());
+
+    if (value)
+        ChatHandler(target).SendSysMessage("WARNING: Do not jump or flying mode will be removed.");
+
+    return true;
+}
+
 bool ChatHandler::HandleCheatGodCommand(char* args)
 {
     if (*args)
@@ -506,20 +532,42 @@ bool ChatHandler::HandleCheatWallclimbCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleCheatDebugTargetInfoCommand(char* args)
+{
+    if (*args)
+    {
+        bool value;
+        if (!ExtractOnOff(&args, value))
+        {
+            SendSysMessage(LANG_USE_BOL);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target;
+        if (!ExtractPlayerTarget(&args, &target))
+            return false;
+
+        target->SetCheatDebugTargetInfo(value, true);
+
+        PSendSysMessage(LANG_YOU_SET_DEBUG_TARGET_INFO, value ? "on" : "off", GetNameLink(target).c_str());
+        if (needReportToTarget(target))
+            ChatHandler(target).PSendSysMessage(LANG_YOUR_DEBUG_TARGET_INFO_SET, value ? "on" : "off", GetNameLink().c_str());
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandleCheatStatusCommand(char* args)
 {
     Player* target;
     if (!ExtractPlayerTarget(&args, &target))
         return false;
-    
-    if (!target->GetCheatOptions())
-    {
-        PSendSysMessage("No cheats enabled on %s.", target->GetName());
-        return true;
-    }
 
     PSendSysMessage("Cheats active on %s:", target->GetName());
-    if (target->HasCheatOption(PLAYER_CHEAT_GOD))
+    if (target->HasCheatOption(PLAYER_CHEAT_FLY))
+        SendSysMessage("- Fly");
+    if (target->GetInvincibilityHpThreshold())
         SendSysMessage("- God");
     if (target->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
         SendSysMessage("- No cooldowns");
@@ -549,6 +597,8 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
         SendSysMessage("- Water walking");
     if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0))
         SendSysMessage("- Wall climbing");
+    if (target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+        SendSysMessage("- Debug target info");
 
     return true;
 }
@@ -5233,6 +5283,48 @@ bool ChatHandler::HandleQuestCompleteCommand(char* args)
     player->FullQuestComplete(entry);
 
     PSendSysMessage("Quest %u completed for %s.", entry, player->GetName());
+    return true;
+}
+
+bool ChatHandler::HandlePetLearnSpellCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Pet* pet = GetSelectedPet();
+    if (!pet)
+        return false;
+
+    int32 spellId;
+    if (!ExtractOptInt32(&args, spellId, 1))
+        return false;
+
+    if (pet->LearnSpell(spellId))
+        PSendSysMessage("Added spell %u to pet %s.", spellId, pet->GetName());
+    else
+        PSendSysMessage("Failed to add spell %u to pet %s.", spellId, pet->GetName());
+
+    return true;
+}
+
+bool ChatHandler::HandlePetUnlearnSpellCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Pet* pet = GetSelectedPet();
+    if (!pet)
+        return false;
+
+    int32 spellId;
+    if (!ExtractOptInt32(&args, spellId, 1))
+        return false;
+
+    if (pet->unlearnSpell(spellId, false, true))
+        PSendSysMessage("Removed spell %u from pet %s.", spellId, pet->GetName());
+    else
+        PSendSysMessage("Failed to remove spell %u from pet %s.", spellId, pet->GetName());
+
     return true;
 }
 

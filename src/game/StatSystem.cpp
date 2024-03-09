@@ -469,6 +469,31 @@ void Player::UpdateDamagePhysical(WeaponAttackType attType)
     }
 }
 
+float Player::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const
+{
+    float chance = 0.0f;
+    AuraList const& hitAurasList = GetAurasByType(auraType);
+    if (hitAurasList.empty())
+        return chance;
+
+    Item* pWeapon = GetWeaponForAttack(attType);
+    for (auto const& i : hitAurasList)
+    {
+        SpellEntry const* pSpellEntry = i->GetSpellProto();
+        if (pSpellEntry->EquippedItemClass >= 0)
+        {
+            if (!pWeapon)
+                continue;
+
+            if (!pWeapon->IsFitToSpellRequirements(pSpellEntry))
+                continue;
+        }
+
+        chance += i->GetModifier()->m_amount;
+    }
+    return chance;
+}
+
 void Player::UpdateDefenseBonusesMod()
 {
     UpdateBlockPercentage();
@@ -563,7 +588,7 @@ void Player::UpdateParryPercentage()
         // Modify value from defense skill
         value += (int32(GetDefenseSkillValue()) - int32(GetSkillMaxForLevel())) * 0.04f;
         // Parry from SPELL_AURA_MOD_PARRY_PERCENT aura
-        value += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
+        value += GetWeaponBasedAuraModifier(BASE_ATTACK, SPELL_AURA_MOD_PARRY_PERCENT);
         value = value < 0.0f ? 0.0f : value;
     }
     SetStatFloatValue(PLAYER_PARRY_PERCENTAGE, value);
@@ -934,6 +959,27 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 
     SetStatFloatValue(fieldmin, mindamage);
     SetStatFloatValue(fieldmax, maxdamage);
+}
+
+float Creature::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const
+{
+    float chance = 0.0f;
+    AuraList const& mTotalAuraList = GetAurasByType(auraType);
+    for (auto const& i : mTotalAuraList)
+    {
+        SpellEntry const* pSpellEntry = i->GetSpellProto();
+        if (pSpellEntry->EquippedItemClass >= 0)
+        {
+            if (!GetVirtualItemDisplayId(attType))
+                continue;
+
+            if (!Item::IsFitToSpellRequirements(pSpellEntry, GetVirtualItemClass(attType), GetVirtualItemSubclass(attType), GetVirtualItemInventoryType(attType)))
+                continue;
+        }
+
+        chance += i->GetModifier()->m_amount;
+    }
+    return chance;
 }
 
 /*#######################################

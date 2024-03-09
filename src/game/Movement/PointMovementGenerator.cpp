@@ -236,7 +236,7 @@ void ChargeMovementGenerator<T>::Initialize(T& unit)
         return;
 
     unit.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    unit.m_movementInfo.moveFlags = unit.m_movementInfo.moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN;
+    unit.m_movementInfo.RemoveMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
     unit.m_movementInfo.ctime = 0;
 
     Movement::MoveSplineInit init(unit, "ChargeMovementGenerator<T>::Initialize");
@@ -307,14 +307,13 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
         {
             victim.UpdateAllowedPositionZ(victimPos.x, victimPos.y, victimPos.z);
             path.calculate(victimPos.x, victimPos.y, victimPos.z, false);
-            path.UpdateForMelee(&victim, attacker.GetMeleeReach());
+            path.UpdateForMelee(&victim, m_meleeReach);
         }
-    }
+    } 
     else
     {
-        // TODO: PvE victim position prediction?
-        // Relocate last path point to hitbox rather than exact position of victim
-        path.UpdateForMelee(&victim, attacker.GetMeleeReach());
+        // TODO: PvE victim position prediction. Is it blizzlike to have position prediction?
+        path.UpdateForMelee(&victim, m_meleeReach); // Relocate last path point to hitbox rather than exact position of victim
     }
 }
 

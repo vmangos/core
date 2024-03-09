@@ -27,6 +27,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "CreatureGroups.h"
+#include "Map.h"
 
 #include <cassert>
 
@@ -251,6 +252,21 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
     // prevent a crash at empty waypoint path.
     if (shouldWait)
     {
+        creature.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
+        return true;
+    }
+
+    // prevent movement while casting spells with cast time or channel time
+    // don't stop creature movement for spells without interrupt movement flags
+    if (creature.IsNoMovementSpellCasted())
+    {
+        if (!creature.IsStopped())
+        {
+            creature.StopMoving();
+            i_nextMoveTime.Reset(1);
+            m_isArrivalDone = false;
+        }
+
         creature.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
         return true;
     }
@@ -506,8 +522,20 @@ bool PatrolMovementGenerator::Update(Creature &creature, uint32 const& diff)
         return true;
     }
 
+    // prevent movement while casting spells with cast time or channel time
+    // don't stop creature movement for spells without interrupt movement flags
+    if (creature.IsNoMovementSpellCasted())
+    {
+        if (!creature.IsStopped())
+            creature.StopMoving();
+
+        creature.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
+        return true;
+    }
+
     if (creature.movespline->Finalized())
         StartMove(creature);
+
     return true;
 }
 
@@ -557,6 +585,10 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     uint32 totalLeaderPoints = leader->movespline->CountSplinePoints();
     Vector3 last = leader->movespline->GetPoint(totalLeaderPoints);
     Vector3 direction = last - leader->movespline->GetPoint(totalLeaderPoints - 1);
+
+    if (direction.isZero())
+        return;
+
     float angle = atan2(direction.y, direction.x);
     float x, y, z;
     m_groupMember.ComputeRelativePosition(angle, x, y);

@@ -393,6 +393,7 @@ class Spell
         void SendSpellCooldown();
         void SendLogExecute();
         void SendInterrupted(uint8 result);
+        void SendAllTargetsMiss();
         void SendChannelUpdate(uint32 time, bool interrupted = false);
         void SendChannelStart(uint32 duration);
         void SendResurrectRequest(Player* target, bool sickness);
@@ -788,12 +789,15 @@ class SpellEvent : public BasicEvent
 class ChannelResetEvent : public BasicEvent
 {
     public:
-        ChannelResetEvent(Unit* _caster) : caster(_caster) {}
+        ChannelResetEvent(Unit* caster) : m_caster(caster)
+        {
+            caster->AddUnitState(UNIT_STAT_PENDING_CHANNEL_RESET);
+        }
         ~ChannelResetEvent() override {}
 
         bool Execute(uint64 e_time, uint32 p_time) override;
         void Abort(uint64 e_time) override;
     protected:
-        Unit* caster;
+        Unit* m_caster;
 };
 #endif

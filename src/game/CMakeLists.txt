@@ -284,6 +284,7 @@ set (game_SRCS
     Battlegrounds/BattleGroundAB.h
     Battlegrounds/BattleGroundAV.h
     Battlegrounds/BattleGroundMgr.h
+    Battlegrounds/BattleGroundDefines.h
     Battlegrounds/BattleGroundWS.h
     Chat/Channel.h
     Chat/ChannelMgr.h

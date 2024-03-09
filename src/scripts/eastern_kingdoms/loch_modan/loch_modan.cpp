@@ -141,50 +141,6 @@ static const Position darkIronAmbusherSpawns[] =
     { -5757.629883f, -3437.680908f, 304.265106f, 2.610265f }
 };
 
-struct npc_saeanAI : public ScriptedAI
-{
-    Creature* m_darkIronAmbusher[2];
-    // num summoned dark iron ambushers used to guarantee that there will be no duplicate spawns.
-    uint32 m_numSummonedAmbushers;
-    // this one is modified inside area-trigger script.
-    bool m_eventStarted;
-
-    npc_saeanAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        // zero init required to prevent crash
-        for (auto& i : m_darkIronAmbusher)
-            i = nullptr;
-        m_numSummonedAmbushers = 0;
-
-        m_eventStarted = false;
-    }
-
-    void Reset() override { }
-
-    // called when Saean summons his guards
-    void JustSummoned(Creature* pSummoned) override
-    {
-        // optimization: safely assume, that m_numSummonedAmbushers don't go outside range
-        m_darkIronAmbusher[m_numSummonedAmbushers] = pSummoned;
-        ++m_numSummonedAmbushers;
-    }
-
-    void JustDied(Unit* pVictim) override
-    {
-        // It is safe to forget about ambushers, they will despawn automatically.
-        for (auto& i : m_darkIronAmbusher)
-            i = nullptr;
-        m_numSummonedAmbushers = 0;
-
-        m_eventStarted = false;
-    }
-};
-
-CreatureAI* GetAI_npc_saean(Creature* pCreature)
-{
-    return new npc_saeanAI(pCreature);
-}
-
 //-----------------------------------------------------------------------------
 // Miran and Huldar are ambushed when Area Trigger id:171 is triggered and if quest 273 is active
 bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
@@ -242,34 +198,23 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     {
         if (saean->IsAlive())
         {
-            npc_saeanAI* saeanAI = dynamic_cast<npc_saeanAI*>(saean->AI());
-            if (saeanAI)
+            // set temporary faction to hostile
+            saean->SetFactionTemporary(FACTION_HOSTILE, TEMPFACTION_RESTORE_RESPAWN);
+
+            // rare case: prevent any possible duplicate spawns
+            // 1 player pulled ambushers too far away, while the second one triggers this event
+            if (!saean->FindNearestCreature(NPC_DARK_IRON_AMBUSHER, 100.0f))
             {
-                // very rare case: Miran and Huldar are not in combat. Wrong faction in DB, etc.
-                if (!saeanAI->m_eventStarted)
-                {
-                    // set event started
-                    saeanAI->m_eventStarted = true;
-
-                    // set temporary faction to hostile
-                    saean->SetFactionTemporary(FACTION_HOSTILE, TEMPFACTION_RESTORE_RESPAWN);
-
-                    // rare case: prevent any possible duplicate spawns
-                    // 1 player pulled ambushers too far away, while the second one triggers this event
-                    if (!saeanAI->m_numSummonedAmbushers)
-                    {
-                        // summon ambushers
-                        saean->SummonCreature(NPC_DARK_IRON_AMBUSHER, darkIronAmbusherSpawns[0].x, darkIronAmbusherSpawns[0].y, darkIronAmbusherSpawns[0].z, darkIronAmbusherSpawns[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
-                        saean->SummonCreature(NPC_DARK_IRON_AMBUSHER, darkIronAmbusherSpawns[1].x, darkIronAmbusherSpawns[1].y, darkIronAmbusherSpawns[1].z, darkIronAmbusherSpawns[1].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
-                        // Saean focuses Miran.
-                        saeanAI->AttackStart(miran);
-                    }
-                    else
-                    {
-                        // ambushers were summoned, so event is already started
-                        return false;
-                    }
-                }
+                // summon ambushers
+                saean->SummonCreature(NPC_DARK_IRON_AMBUSHER, darkIronAmbusherSpawns[0].x, darkIronAmbusherSpawns[0].y, darkIronAmbusherSpawns[0].z, darkIronAmbusherSpawns[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                saean->SummonCreature(NPC_DARK_IRON_AMBUSHER, darkIronAmbusherSpawns[1].x, darkIronAmbusherSpawns[1].y, darkIronAmbusherSpawns[1].z, darkIronAmbusherSpawns[1].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                // Saean focuses Miran.
+                saean->AI()->AttackStart(miran);
+            }
+            else
+            {
+                // ambushers were summoned, so event is already started
+                return false;
             }
         }
     }
@@ -285,11 +230,6 @@ void AddSC_loch_modan()
     newscript->Name = "npc_miran";
     newscript->GetAI = &GetAI_npc_miran;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_miran;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_saean";
-    newscript->GetAI = &GetAI_npc_saean;
     newscript->RegisterSelf();
 
     newscript = new Script;

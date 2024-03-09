@@ -68,11 +68,12 @@ enum EventAI_Type
     EVENT_T_TARGET_MISSING_AURA     = 28,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
     EVENT_T_MOVEMENT_INFORM         = 29,                   // Param1 = motion type, Param2 = point ID, RepeatMin, RepeatMax
     EVENT_T_LEAVE_COMBAT            = 30,                   // NONE
-    EVENT_T_MAP_SCRIPT_EVENT        = 31,                   // Param1 = EventID, Param2 = Data
+    EVENT_T_SCRIPT                  = 31,                   // Param1 = EventID, Param2 = Data
     EVENT_T_GROUP_MEMBER_DIED       = 32,                   // Param1 = CreatureId, Param2 = IsLeader
     EVENT_T_VICTIM_ROOTED           = 33,                   // RepeatMin, RepeatMax
     EVENT_T_HIT_BY_AURA             = 34,                   // AuraType, Unused, RepeatMin, RepeatMax
     EVENT_T_STEALTH_ALERT           = 35,                   // RepeatMin, RepeatMax
+    EVENT_T_SPELL_HIT_TARGET        = 36,                   // SpellID, School, RepeatMin, RepeatMax
 
     EVENT_T_END,
 };
@@ -81,15 +82,10 @@ enum EventFlags
 {
     EFLAG_REPEATABLE            = 0x01,                     //Event repeats
     EFLAG_RANDOM_ACTION         = 0x02,                     //Event only execute one from existed actions instead each action.
-    EFLAG_DEBUG_ONLY            = 0x04,                     //Event only occurs in debug build
+    EFLAG_NOT_CASTING           = 0x04,                     //Event will not occur while creature is casting a spell
+    EFLAG_CHECK_RESULT          = 0x08,                     //Event will not go on cooldown if script actions fail
+    EFLAG_DEBUG_ONLY            = 0x10,                     //Event only occurs in debug build
     // uint8 field
-};
-
-enum SpawnedEventMode
-{
-    SPAWNED_EVENT_ALWAY = 0,
-    SPAWNED_EVENT_MAP   = 1,
-    SPAWNED_EVENT_ZONE  = 2
 };
 
 enum UnitInLosReaction
@@ -143,6 +139,7 @@ struct CreatureEventAI_Event
             uint32 playerOnly;
         } kill;
         // EVENT_T_HIT_BY_SPELL                             = 8
+        // EVENT_T_SPELL_HIT_TARGET                         = 36
         struct
         {
             uint32 spellId;
@@ -235,12 +232,12 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } move_inform;
-        // EVENT_T_MAP_SCRIPT_EVENT                         = 31
+        // EVENT_T_SCRIPT                                   = 31
         struct
         {
             uint32 eventId;
             uint32 data;
-        } map_event;
+        } script_event;
         // EVENT_T_GROUP_MEMBER_DIED                        = 32
         struct
         {
@@ -317,9 +314,9 @@ class CreatureEventAI : public BasicAI
         void KilledUnit(Unit* victim) override;
         void JustSummoned(Creature* pUnit) override;
         void MoveInLineOfSight(Unit* who) override;
-        void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override;
+        void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellEntry) override;
+        void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpellEntry) override;
         void MovementInform(uint32 type, uint32 id) override;
-        void DamageTaken(Unit* done_by, uint32& damage) override;
         void UpdateAI(uint32 const diff) override;
         void ReceiveEmote(Player* pPlayer, uint32 text_emote) override;
         void GroupMemberJustDied(Creature* unit, bool isLeader) override;
@@ -331,8 +328,7 @@ class CreatureEventAI : public BasicAI
         static int Permissible(Creature const*);
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* pActionInvoker = nullptr);
-        void ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
-        void SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent);
+        bool ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
 
         uint8  m_Phase;                                     // Current phase, max 32 phases
 
@@ -344,7 +340,6 @@ class CreatureEventAI : public BasicAI
         //Variables used by Events themselves
         typedef std::vector<CreatureEventAIHolder> CreatureEventAIList;
         CreatureEventAIList m_CreatureEventAIList;          //Holder for events (stores enabled, time, and eventid)
-        uint32 m_InvinceabilityHpLevel;                     // Minimal health level allowed at damage apply
 
         void UpdateEventsOn_UpdateAI(uint32 const diff, bool Combat);
         void UpdateEventsOn_MoveInLineOfSight(Unit* pWho);

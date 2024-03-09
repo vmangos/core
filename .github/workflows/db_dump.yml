@@ -26,11 +26,12 @@ jobs:
         sudo docker pull mysql
         sudo docker run --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql:5.6 --max_allowed_packet=128M
         sudo docker start mysqldb
+        until nc -z localhost 3306 ; do sleep 5 ; echo "Waiting for database availability..." ; done
 
-    
+
     - name: Checkout update sql
-      uses: actions/checkout@v2
-      
+      uses: actions/checkout@v4
+
     - name: Checkout base sql
       run: |
         cd ${{github.workspace}}
@@ -67,18 +68,19 @@ jobs:
         docker exec mysqldb sh -c 'exec mysqldump -u root -proot realmd' > ${{github.workspace}}/dbexport/db_dump/logon.sql
         docker exec mysqldb sh -c 'exec mysqldump -u root -proot logs' > ${{github.workspace}}/dbexport/db_dump/logs.sql
         docker exec mysqldb sh -c 'exec mysqldump -u root -proot characters' > ${{github.workspace}}/dbexport/db_dump/characters.sql
-        
-        
+
+
         # cd db_dump
         # mkdir update_check_only_do_not_import
-        # cp ${{github.workspace}}/sql/migrations/world_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/world_db_updates.sql 
+        # cp ${{github.workspace}}/sql/migrations/world_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/world_db_updates.sql
         # cp ${{github.workspace}}/sql/migrations/logon_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/logon_db_updates.sql
         # cp ${{github.workspace}}/sql/migrations/logs_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/logs_db_updates.sql
         # cp ${{github.workspace}}/sql/migrations/characters_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/characters_db_updates.sql
 
     - name: Install SQLite dependencies
       run: |
-        sudo apt install sqlite3 mawk -y
+        sudo apt-get -qq update
+        sudo apt-get -qq install mawk sqlite3
         git clone https://github.com/dumblob/mysql2sqlite
         chmod +x ${{github.workspace}}/mysql2sqlite/mysql2sqlite
 
@@ -97,7 +99,7 @@ jobs:
         docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS characters2 DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
         docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS mangos2 DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
         docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS logs2 DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
-        
+
     - name: Import data back in to verify the dump data
       run: |
         docker exec -i mysqldb sh -c 'exec mysql -u root -proot realmd2' < ${{github.workspace}}/dbexport/db_dump/logon.sql
@@ -107,47 +109,49 @@ jobs:
 
     - name: Set sha short outputs
       id: vars
-      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-      
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
     - name: Archive files
       run: |
         cd ${{github.workspace}}/dbexport
         7z a -tzip db-${{steps.vars.outputs.sha_short}}.zip db_dump
         7z a -tzip db-sqlite-${{steps.vars.outputs.sha_short}}.zip sqlite_dump
-          
+
     - name: Archive SQL artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
           name: snapshot-db-dump
           path: "${{github.workspace}}/dbexport/db-${{steps.vars.outputs.sha_short}}.zip"
 
     - name: Archive SQLite artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
           name: snapshot-db-sqlite-dump
           path: "${{github.workspace}}/dbexport/db-sqlite-${{steps.vars.outputs.sha_short}}.zip"
 
     - name: Download artifact snapshot-db-dump
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: snapshot-db-dump
         path: all_snapshots
 
     - name: Download artifact snapshot-db-sqlite-dump
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: snapshot-db-sqlite-dump
         path: all_snapshots
 
     - name: Get current date
       id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      uses: Kaven-Universe/github-action-current-date-time@v1
+      with:
+        format: "YYYY-MM-DD"
 
     - name: Upload snapshot
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: "crowbarmaster/GH-Automatic-Releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "db_latest"
         prerelease: true
-        title: "Development DB Dump(${{ steps.date.outputs.date }})"
+        title: "Development DB Dump(${{ steps.date.outputs.time }})"
         files: all_snapshots

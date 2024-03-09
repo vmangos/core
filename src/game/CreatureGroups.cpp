@@ -20,6 +20,7 @@
 #include "CreatureGroups.h"
 #include "ObjectMgr.h"
 #include "CreatureAI.h"
+#include "BattleGround.h"
 
 void CreatureGroup::AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags)
 {
@@ -288,6 +289,15 @@ void CreatureGroup::DisbandGroup(Creature* pLeader)
     }
 
     m_members.clear();
+}
+
+void CreatureGroup::DoForAllMembers(Map* pMap, std::function<void(Creature*)>&& pFunc)
+{
+    for (auto const& it : m_members)
+    {
+        if (Creature* pMember = pMap->GetCreature(it.first))
+            pFunc(pMember);
+    }
 }
 
 void CreatureGroup::DeleteFromDb()

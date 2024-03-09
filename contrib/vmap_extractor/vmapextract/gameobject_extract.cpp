@@ -22,8 +22,14 @@ bool ExtractSingleModel(std::string& origPath, std::string& fixedName, StringSet
     }
     // >= 3.1.0 ADT MMDX section store filename.m2 filenames for corresponded .m2 file
     // nothing do
+	
+    // Fix a few models with spaces instead of underscores in their filenames (razorfen leanto03)
+    std::string s = GetPlainName(origPath.c_str());
+    std::transform(s.begin(), s.end(), s.begin(), [](char ch) {
+        return ch == ' ' ? '_' : ch;
+        });
 
-    fixedName = GetPlainName(origPath.c_str());
+    fixedName = s;
 
     std::string output(szWorkDirWmo);                       // Stores output filename (possible changed)
     output += "/";

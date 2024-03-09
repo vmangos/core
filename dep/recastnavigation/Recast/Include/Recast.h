@@ -873,6 +873,22 @@ bool rcRasterizeTriangles(rcContext* ctx, const float* verts, const int nv,
 						  const int* tris, const unsigned char* areas, const int nt,
 						  rcHeightfield& solid, const int flagMergeThr = 1);
 
+/// Rasterizes and sort an indexed triangle mesh into the specified heightfield.
+///  @ingroup recast
+///  @param[in,out]	ctx				The build context to use during the operation.
+///  @param[in]		verts			The vertices. [(x, y, z) * @p nv]
+///  @param[in]		nv				The number of vertices.
+///  @param[in]		tris			The triangle indices. [(vertA, vertB, vertC) * @p nt]
+///  @param[in]		areas			The area id's of the triangles. [Limit: <= #RC_WALKABLE_AREA] [Size: @p nt]
+///  @param[in]		nt				The number of triangles.
+///  @param[in,out]	solid			An initialized heightfield.
+///  @param[in]		flagMergeThr	The distance where the walkable flag is favored over the non-walkable flag. 
+///  								[Limit: >= 0] [Units: vx]
+///  @returns True if the operation completed successfully.
+bool SortAndRasterizeTriangles(rcContext* ctx, const float* verts, const int nv,
+	const int* tris, const unsigned char* areas, const int nt,
+	rcHeightfield& solid, const int flagMergeThr = 1);
+
 /// Rasterizes an indexed triangle mesh into the specified heightfield.
 ///  @ingroup recast
 ///  @param[in,out]	ctx			The build context to use during the operation.

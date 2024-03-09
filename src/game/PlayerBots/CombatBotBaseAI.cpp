@@ -126,9 +126,9 @@ void CombatBotBaseAI::ResetSpellData()
         ptr = nullptr;
 
     m_resurrectionSpell = nullptr;
-    spellListDirectHeal.clear();
-    spellListPeriodicHeal.clear();
-    spellListTaunt.clear();
+    m_spellListDirectHeal.clear();
+    m_spellListPeriodicHeal.clear();
+    m_spellListTaunt.clear();
 }
 
 void CombatBotBaseAI::PopulateSpellData()
@@ -821,6 +821,11 @@ void CombatBotBaseAI::PopulateSpellData()
                 {
                     if (IsHigherRankSpell(m_spells.priest.pPrayerofFortitude))
                         m_spells.priest.pPrayerofFortitude = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Prayer of Shadow Protection") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.priest.pPrayerofShadowProtection))
+                        m_spells.priest.pPrayerofShadowProtection = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Inner Fire") != std::string::npos)
                 {
@@ -1602,10 +1607,10 @@ void CombatBotBaseAI::PopulateSpellData()
             switch (pSpellEntry->Effect[i])
             {
                 case SPELL_EFFECT_HEAL:
-                    spellListDirectHeal.insert(pSpellEntry);
+                    m_spellListDirectHeal.insert(pSpellEntry);
                     break;
                 case SPELL_EFFECT_ATTACK_ME:
-                    spellListTaunt.push_back(pSpellEntry);
+                    m_spellListTaunt.push_back(pSpellEntry);
                     break;
                 case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_RESURRECT_NEW:
@@ -1616,10 +1621,10 @@ void CombatBotBaseAI::PopulateSpellData()
                     switch (pSpellEntry->EffectApplyAuraName[i])
                     {
                         case SPELL_AURA_PERIODIC_HEAL:
-                            spellListPeriodicHeal.insert(pSpellEntry);
+                            m_spellListPeriodicHeal.insert(pSpellEntry);
                             break;
                         case SPELL_AURA_MOD_TAUNT:
-                            spellListTaunt.push_back(pSpellEntry);
+                            m_spellListTaunt.push_back(pSpellEntry);
                             break;
                     }
                     break;
@@ -1837,7 +1842,6 @@ void CombatBotBaseAI::AddAllSpellReagents()
     }
 }
 
-
 bool CombatBotBaseAI::AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee, bool checkSpells) const
 {
     Group* pGroup = me->GetGroup();
@@ -1952,7 +1956,7 @@ bool CombatBotBaseAI::HealInjuredTarget(Unit* pTarget)
 
 bool CombatBotBaseAI::HealInjuredTargetPeriodic(Unit* pTarget)
 {
-    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, spellListPeriodicHeal))
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, m_spellListPeriodicHeal))
     {
         if (CanTryToCastSpell(pTarget, pHealSpell))
         {
@@ -1966,7 +1970,7 @@ bool CombatBotBaseAI::HealInjuredTargetPeriodic(Unit* pTarget)
 
 bool CombatBotBaseAI::HealInjuredTargetDirect(Unit* pTarget)
 {
-    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, spellListDirectHeal))
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, m_spellListDirectHeal))
         if (DoCastSpell(pTarget, pHealSpell) == SPELL_CAST_OK)
             return true;
 
@@ -1976,7 +1980,7 @@ bool CombatBotBaseAI::HealInjuredTargetDirect(Unit* pTarget)
 bool CombatBotBaseAI::IsValidHealTarget(Unit const* pTarget, float healthPercent) const
 {
     return (pTarget->GetHealthPercent() < healthPercent) &&
-            pTarget->IsAlive() &&
+            me->IsValidHelpfulTarget(pTarget) &&
             me->IsWithinLOSInMap(pTarget) &&
             me->IsWithinDist(pTarget, 30.0f);
 }
@@ -1985,6 +1989,9 @@ Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent, float groupHealPe
 {
     if (me->GetHealthPercent() < selfHealPercent)
         return me;
+
+    if (IsInDuel())
+        return nullptr;
 
     Unit* pTarget = nullptr;
     float healthPercent = 100.0f;
@@ -2029,6 +2036,9 @@ Unit* CombatBotBaseAI::SelectPeriodicHealTarget(float selfHealPercent, float gro
        !me->HasAuraType(SPELL_AURA_PERIODIC_HEAL))
         return me;
 
+    if (IsInDuel())
+        return nullptr;
+
     if (Group* pGroup = me->GetGroup())
     {
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -2055,30 +2065,33 @@ bool CombatBotBaseAI::FindAndPreHealTarget()
     Unit* pTarget = me;
     int32 maxIncomingDamage = GetIncomingdamage(me);
 
-    if (Group* pGroup = me->GetGroup())
+    if (!IsInDuel())
     {
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        if (Group* pGroup = me->GetGroup())
         {
-            if (Unit* pMember = itr->getSource())
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
-                // We already checked self.
-                if (pMember == me)
-                    continue;
-
-                // Avoid all healers picking same target.
-                if (pTarget && !IsTankClass(pMember->GetClass()) && AreOthersOnSameTarget(pMember->GetObjectGuid(), false, true))
-                    continue;
-
-                int32 incomingDamage = GetIncomingdamage(pMember);
-                if (!incomingDamage)
-                    continue;
-
-                // Check if we should heal party member.
-                if (incomingDamage > maxIncomingDamage &&
-                    IsValidHealTarget(pMember))
+                if (Unit* pMember = itr->getSource())
                 {
-                    maxIncomingDamage = incomingDamage;
-                    pTarget = pMember;
+                    // We already checked self.
+                    if (pMember == me)
+                        continue;
+
+                    // Avoid all healers picking same target.
+                    if (pTarget && !IsTankClass(pMember->GetClass()) && AreOthersOnSameTarget(pMember->GetObjectGuid(), false, true))
+                        continue;
+
+                    int32 incomingDamage = GetIncomingdamage(pMember);
+                    if (!incomingDamage)
+                        continue;
+
+                    // Check if we should heal party member.
+                    if (incomingDamage > maxIncomingDamage &&
+                        IsValidHealTarget(pMember))
+                    {
+                        maxIncomingDamage = incomingDamage;
+                        pTarget = pMember;
+                    }
                 }
             }
         }
@@ -2092,7 +2105,7 @@ bool CombatBotBaseAI::FindAndPreHealTarget()
     if (maxIncomingDamage < int32(pTarget->GetMaxHealth() / 2))
         return false;
 
-    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, maxIncomingDamage, spellListDirectHeal))
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, maxIncomingDamage, m_spellListDirectHeal))
     {
         if (pHealSpell->GetCastTime(me) > 1000 && CanTryToCastSpell(pTarget, pHealSpell))
         {
@@ -2225,7 +2238,7 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
         {
             if (Player* pMember = itr->getSource())
             {
-                if (pMember->IsAlive() &&
+                if (me->IsValidHelpfulTarget(pMember) &&
                    !pMember->IsGameMaster() &&
                     IsValidBuffTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
@@ -2247,7 +2260,7 @@ Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
         {
             if (Player* pMember = itr->getSource())
             {
-                if (pMember->IsAlive() &&
+                if (me->IsValidHelpfulTarget(pMember) &&
                    !pMember->IsGameMaster() &&
                     IsValidDispelTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
@@ -2451,37 +2464,39 @@ void CombatBotBaseAI::EquipPremadeGearTemplate()
     for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
     {
         if (itr.second.requiredClass == me->GetClass() &&
-            itr.second.level == me->GetLevel())
-            vGear.push_back(&itr.second);
-    }
-    // Use lower level gear template if there are no templates for the current level.
-    if (vGear.empty())
-    {
-        for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+            itr.second.level <= me->GetLevel())
         {
-            if (itr.second.requiredClass == me->GetClass() &&
-                itr.second.level < me->GetLevel())
-                vGear.push_back(&itr.second);
+            if (!vGear.empty())
+            {
+                if (vGear.front()->level < itr.second.level)
+                    vGear.clear();
+                else if (vGear.front()->level > itr.second.level)
+                    continue;
+            }
+            vGear.push_back(&itr.second);
         }
     }
+
     if (!vGear.empty())
     {
-        PlayerPremadeGearTemplate const* pGear = nullptr;
+        std::vector<PlayerPremadeGearTemplate const*> vGear2;
+
         // Try to find a role appropriate gear template.
         if (m_role != ROLE_INVALID)
         {
             for (const auto itr : vGear)
             {
-                if (itr->role == m_role &&
-                   (!pGear || pGear->level < itr->level))
-                {
-                    pGear = itr;
-                }
+                if (itr->role == m_role)
+                    vGear2.push_back(itr);
             }
         }
-        // There is no gear template for this role, pick randomly.
-        if (!pGear)
+
+        PlayerPremadeGearTemplate const* pGear;
+        if (vGear2.empty())
             pGear = SelectRandomContainerElement(vGear);
+        else
+            pGear = SelectRandomContainerElement(vGear2);
+
         sObjectMgr.ApplyPremadeGearTemplateToPlayer(pGear->entry, me);
     }
 }
@@ -3033,6 +3048,24 @@ bool CombatBotBaseAI::IsWearingShield(Player* pPlayer) const
         return true;
 
     return false;
+}
+
+bool CombatBotBaseAI::IsInDuel() const
+{
+    return me->duel && me->duel->startTime != 0;
+}
+
+CombatBotRoles CombatBotBaseAI::GetRole() const
+{
+    if (m_role == ROLE_HEALER && IsInDuel())
+    {
+        if (IsMeleeDamageClass(me->GetClass()))
+            return ROLE_MELEE_DPS;
+        else
+            return ROLE_RANGE_DPS;
+    }
+
+    return m_role;
 }
 
 void CombatBotBaseAI::SendBattlefieldPortPacket()

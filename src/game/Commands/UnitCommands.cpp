@@ -446,6 +446,9 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Frost spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_FROST));
     PSendSysMessage("Shadow spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Arcane spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_ARCANE));
+    PSendSysMessage("Melee hit chance: %g", pPlayer->GetWeaponBasedAuraModifier(BASE_ATTACK, SPELL_AURA_MOD_HIT_CHANCE));
+    PSendSysMessage("Ranged hit chance: %g", pPlayer->GetWeaponBasedAuraModifier(RANGED_ATTACK, SPELL_AURA_MOD_HIT_CHANCE));
+    PSendSysMessage("Spell hit chance: %g", pPlayer->m_modSpellHitChance);
     PSendSysMessage("Positive strength: %g", pPlayer->GetPosStat(STAT_STRENGTH));
     PSendSysMessage("Positive agility: %g", pPlayer->GetPosStat(STAT_AGILITY));
     PSendSysMessage("Positive stamina: %g", pPlayer->GetPosStat(STAT_STAMINA));
@@ -852,6 +855,28 @@ bool ChatHandler::HandleUnitShowCreateSpellCommand(char* args)
 
     PSendSysMessage("Create spell for %s:", pTarget->GetObjectGuid().GetString().c_str());
     PSendSysMessage("%s (%u)", pSpellEntry ? pSpellEntry->SpellName[0].c_str() : "Unknown", createdBySpell);
+
+    return true;
+}
+
+bool ChatHandler::HandlePvPCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget)
+        return false;
+    
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (Player* pPlayer = pTarget->ToPlayer())
+        pPlayer->UpdatePvP(value, true);
+    else
+        pTarget->SetPvP(value);
 
     return true;
 }
@@ -2591,7 +2616,7 @@ bool ChatHandler::HandleDieHelper(Unit* target)
         if (HasLowerSecurity((Player*)target, ObjectGuid(), false))
             return false;
 
-        if (player->IsGod())
+        if (player->GetInvincibilityHpThreshold())
             player->SetCheatGod(false);
     }
 

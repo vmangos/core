@@ -50,7 +50,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/burning_steppes.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/arena_challenge_ai.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/blackrock_depths.cpp
-    eastern_kingdoms/burning_steppes/blackrock_depths/boss_ambassador_flamelash.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_anubshiah.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_emperor_dagran_thaurissan.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_general_angerforge.cpp
@@ -160,7 +159,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_high_inquisitor_fairbanks.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_houndmaster_loksey.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_interrogator_vishas.cpp
-    eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_mograine_and_whitemane.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/instance_scarlet_monastery.cpp
     eastern_kingdoms/uldaman/boss_archaedas.cpp
     eastern_kingdoms/uldaman/boss_ironaya.cpp

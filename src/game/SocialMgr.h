@@ -25,6 +25,7 @@
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include <shared_mutex>
 
 class SocialMgr;
 class PlayerSocial;

@@ -114,7 +114,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleAuraModBlockPercent,                       // 51 SPELL_AURA_MOD_BLOCK_PERCENT
     &Aura::HandleAuraModCritPercent,                        // 52 SPELL_AURA_MOD_CRIT_PERCENT
     &Aura::HandlePeriodicLeech,                             // 53 SPELL_AURA_PERIODIC_LEECH
-    &Aura::HandleModHitChance,                              // 54 SPELL_AURA_MOD_HIT_CHANCE
+    &Aura::HandleNoImmediateEffect,                         // 54 SPELL_AURA_MOD_HIT_CHANCE implemented in SpellCaster::MeleeSpellMissChance and Unit::MeleeMissChanceCalc
     &Aura::HandleModSpellHitChance,                         // 55 SPELL_AURA_MOD_SPELL_HIT_CHANCE
     &Aura::HandleAuraTransform,                             // 56 SPELL_AURA_TRANSFORM
     &Aura::HandleModSpellCritChance,                        // 57 SPELL_AURA_MOD_SPELL_CRIT_CHANCE
@@ -1529,7 +1529,7 @@ void Aura::TriggerSpell()
                     return;
 
                 // Talent 'Entrapment' for example (chance to root)
-                caster->ProcDamageAndSpell(ProcSystemArguments(target, PROC_FLAG_ON_TRAP_ACTIVATION, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, BASE_ATTACK, GetSpellProto()));
+                caster->ProcDamageAndSpell(ProcSystemArguments(target, PROC_FLAG_ON_TRAP_ACTIVATION, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, 1, BASE_ATTACK, GetSpellProto()));
                 break;
             }
             // Thaddius negative charge
@@ -2077,15 +2077,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             case 28169:                                     // Mutating Injection
             {
-                Unit* caster = GetCaster();
-                // Mutagen Explosion
-                if (m_removeMode == AuraRemoveMode::AURA_REMOVE_BY_DISPEL)
+                if (Unit* caster = GetCaster())
                 {
-                    caster->CastSpell(target, 28206, true);
-                }
-                else
-                {
-                    caster->CastSpell(target, 28206, true, nullptr, this);
+                    // Mutagen Explosion
+                    if (m_removeMode == AuraRemoveMode::AURA_REMOVE_BY_DISPEL)
+                    {
+                        caster->CastSpell(target, 28206, true);
+                    }
+                    else
+                    {
+                        caster->CastSpell(target, 28206, true, nullptr, this);
+                    }
                 }
 
                 // Summons Poison Cloud creature
@@ -2151,6 +2153,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                     return;
                 }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
                 case 24658:                                 // Unstable Power
                 {
                     if (apply)
@@ -2165,6 +2168,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->RemoveAurasDueToSpell(24659);
                     return;
                 }
+#endif
                 case 26681:                             // Love is in the Air - Cologne
                 case 26682:                             // Love is in the Air - Perfume
                 {
@@ -3427,8 +3431,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->SetCharmerGuid(GetCasterGuid());
         target->SetFactionTemplateId(caster->GetFactionTemplateId());
-        if (target != caster)
-            target->InterruptNonMeleeSpells(false);
         caster->SetCharm(target);
 
         target->CombatStop(true);
@@ -3561,6 +3563,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
 
         target->UpdateControl();
+        target->InterruptNonMeleeSpells(true);
 
         if (pPlayerTarget)
             pPlayerTarget->SetFactionForRace(target->GetRace());
@@ -3568,9 +3571,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (pPlayerTarget && pPlayerTarget->IsAlive() && caster && caster->IsAlive() && caster->IsInCombat())
         {
             pPlayerTarget->SendAttackSwingCancelAttack();
-
-            if (target->IsNonMeleeSpellCasted(false))
-                target->InterruptNonMeleeSpells(false);
 
             target->AttackStop();
             target->RemoveAllAttackers();
@@ -3589,7 +3589,6 @@ void Aura::HandleModCharm(bool apply, bool Real)
             target->GetHostileRefManager().deleteReferences();
         }
 
-        //target->SetUnitMovementFlags(MOVEFLAG_NONE);
         target->StopMoving();
         target->GetMotionMaster()->Clear(false);
         target->GetMotionMaster()->MoveIdle();
@@ -3726,18 +3725,6 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
     }
     else
         target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, apply);
-
-    // Warrior 'Disarm' skill generates 104 base threat
-    // http://wowwiki.wikia.com/wiki/Disarm?direction=prev&oldid=200198 (2006) implies it
-    // generates a large amount
-    // http://wowwiki.wikia.com/wiki/Threat has threat listed at 104, which is in line
-    // with the values of other warrior abilities
-    // We can suppose that the same is true for all spells which apply disarm
-    if (apply)
-    {
-        float threat = 104.0f * sSpellMgr.GetSpellThreatMultiplier(GetHolder()->GetSpellProto());
-        target->AddThreat(GetCaster(), threat, false, SPELL_SCHOOL_MASK_NONE, GetHolder()->GetSpellProto());
-    }
 
     // Don't update damage if in feral
     if (!target->IsNoWeaponShapeShift())
@@ -4432,6 +4419,22 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
 
     switch (GetId())
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1 && SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        case 24658:                                 // Zandalarian Hero Charm - Unstable Power
+        {
+            if (apply)
+            {
+                Unit* caster = GetCaster();
+                if (!caster)
+                    return;
+
+                caster->CastSpell(GetTarget(), 24659, true, nullptr, nullptr, GetCasterGuid());
+            }
+            else
+                GetTarget()->RemoveAurasDueToSpell(24659);
+            break;
+        }
+#endif
         // some spell have charges by functionality not have its in spell data
         case 28200:                                         // Ascendance (Talisman of Ascendance trinket)
         {
@@ -5227,18 +5230,6 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    // apply item specific bonuses for already equipped weapon
-    if (Real)
-    {
-        for (int i = 0; i < MAX_ATTACK; ++i)
-            if (Item* pItem = ((Player*)target)->GetWeaponForAttack(WeaponAttackType(i), true, false))
-                ((Player*)target)->_ApplyWeaponDependentAuraCritMod(pItem, WeaponAttackType(i), this, apply);
-    }
-
-    // mods must be applied base at equipped weapon class and subclass comparison
-    // with spell->EquippedItemClass and  EquippedItemSubClassMask and EquippedItemInventoryTypeMask
-    // m_modifier.m_miscvalue comparison with item generated damage types
-
     if (GetSpellProto()->EquippedItemClass == -1)
     {
         ((Player*)target)->HandleBaseModValue(CRIT_PERCENTAGE,         FLAT_MOD, m_modifier.m_amount, apply);
@@ -5246,17 +5237,20 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
     }
     else
     {
-        // done in Player::_ApplyWeaponDependentAuraMods
+        // apply item specific bonuses for already equipped weapon
+        if (Real)
+        {
+            // whether aura was really applied will be set in _ApplyWeaponDependentAuraCritMod
+            m_applied = !m_applied;
+
+            // mods must be applied base at equipped weapon class and subclass comparison
+            // with spell->EquippedItemClass and  EquippedItemSubClassMask and EquippedItemInventoryTypeMask
+            // m_modifier.m_miscvalue comparison with item generated damage types
+            for (int i = 0; i < MAX_ATTACK; ++i)
+                if (Item* pItem = ((Player*)target)->GetWeaponForAttack(WeaponAttackType(i), true, false))
+                    ((Player*)target)->_ApplyWeaponDependentAuraCritMod(pItem, WeaponAttackType(i), this, apply);
+        }
     }
-}
-
-void Aura::HandleModHitChance(bool apply, bool /*Real*/)
-{
-    Unit* target = GetTarget();
-
-    if (GetId() != 22780) // [Ranged Hit Bonus +3] as stated in name ...
-        target->m_modMeleeHitChance += apply ? m_modifier.m_amount : (-m_modifier.m_amount);
-    target->m_modRangedHitChance += apply ? m_modifier.m_amount : (-m_modifier.m_amount);
 }
 
 void Aura::HandleModSpellHitChance(bool apply, bool /*Real*/)
@@ -5805,6 +5799,20 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 if (spell->m_spellInfo->IsRemovedOnShapeLostSpell())
                     target->InterruptSpell(CurrentSpellTypes(i), false);
     }
+
+    // Effects like Elemental Sharpening Stone should not apply in cat and bear form.
+    if (target->IsPlayer() && IsAttackSpeedOverridenForm(form))
+    {
+        for (int i = 0; i < MAX_ATTACK; ++i)
+        {
+            if (Item* pItem = ((Player*)target)->GetWeaponForAttack(WeaponAttackType(i), true, false))
+            {
+                auto const& auraCritList = target->GetAurasByType(SPELL_AURA_MOD_CRIT_PERCENT);
+                for (const auto itr : auraCritList)
+                    ((Player*)target)->_ApplyWeaponDependentAuraCritMod(pItem, WeaponAttackType(i), itr, !apply);
+            }
+        }
+    }
 }
 
 void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
@@ -6071,6 +6079,12 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // Consecration: recalculate the damage on each tick
             if (spellProto->IsFitToFamily<SPELLFAMILY_PALADIN, CF_PALADIN_CONSECRATION>())
                 fdamage = pCaster->SpellDamageBonusDone(target, GetSpellProto(), GetEffIndex(), m_currentBasePoints, DOT, GetStackAmount());
+            // Curse of Agony damage-per-tick calculation
+            else if (spellProto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CURSE_OF_AGONY>())
+                fdamage += (-1 + ((int)GetAuraTicks() - 1) / 4) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0) / 2.0);
+            // Starshards damage-per-tick calculation
+            else if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_STARSHARDS>())
+                fdamage += (-1 + ((int)GetAuraTicks() - 1) / 2) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0) / 3.0);
 
             // SpellDamageBonus for magic spells
             if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
@@ -6082,15 +6096,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 fdamage = target->MeleeDamageBonusTaken(pCaster, fdamage, attackType, spellProto, GetEffIndex(), DOT, GetStackAmount());
             }
 
-            // Curse of Agony damage-per-tick calculation
-            if (spellProto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CURSE_OF_AGONY>())
-                fdamage += ( -1 + ((int)GetAuraTicks() -1)/4) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/2.0);
-
-            // Starshards damage-per-tick calculation
-            if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_STARSHARDS>())
-                fdamage += ( -1 + ((int)GetAuraTicks() -1)/2) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/3.0);
-
             uint32 pdamage = ditheru(std::max(fdamage, 0.f)); // prevent negative damage due to sickness
+            uint32 const originalDamage = pdamage;
 
             target->CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), DOT, pdamage, &absorb, &resist, spellProto);
 
@@ -6114,7 +6121,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (pdamage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
 
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, BASE_ATTACK, spellProto));
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, originalDamage, BASE_ATTACK, spellProto));
 
             cleanDamage.absorb = absorb;
             cleanDamage.resist = resist;
@@ -6163,8 +6170,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             CleanDamage cleanDamage =  CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL, 0, 0);
 
             uint32 pdamage = ditheru(m_modifier.m_amount > 0 ? m_modifier.m_amount : 0);
-
             pdamage = target->SpellDamageBonusTaken(pCaster, spellProto, GetEffIndex(), pdamage, DOT, GetStackAmount());
+            uint32 const originalDamage = pdamage;
 
             target->CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), DOT, pdamage, &absorb, &resist, spellProto);
 
@@ -6194,7 +6201,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             cleanDamage.absorb = absorb;
             cleanDamage.resist = resist;
 
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, BASE_ATTACK, spellProto));
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, originalDamage, BASE_ATTACK, spellProto));
             int32 new_damage = pCaster->DealDamage(target, pdamage, &cleanDamage, DOT, spellProto->GetSpellSchoolMask(), spellProto, false, nullptr, GetHolder()->IsReflected());
 
             if (!target->IsAlive() && pCaster->IsNonMeleeSpellCasted(false))
@@ -6223,18 +6230,6 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (!pCaster)
                 return;
 
-            // Don't heal target if it is already at max health. We still need
-            // to do procs on the tick, however
-            if (target->GetHealth() == target->GetMaxHealth())
-            {
-                uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
-                uint32 procVictim = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
-                uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
-                pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, 1, BASE_ATTACK, spellProto));
-
-                return;
-            }
-
             // heal for caster damage (must be alive)
             if (target != pCaster && spellProto->SpellVisual == 163 && !pCaster->IsAlive())
                 return;
@@ -6261,13 +6256,23 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 #endif
 
             float fdamage;
-
             if (m_modifier.m_auraname == SPELL_AURA_OBS_MOD_HEALTH)
                 fdamage = target->GetMaxHealth() * amount / 100;
             else
                 fdamage = amount;
 
             uint32 pdamage = ditheru(target->SpellHealingBonusTaken(pCaster, spellProto, GetEffIndex(), fdamage, DOT, GetStackAmount()));
+
+            // Don't heal target if it is already at max health. We still need
+            // to do procs on the tick, however
+            if (target->GetHealth() == target->GetMaxHealth())
+            {
+                uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
+                uint32 procVictim = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
+                uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
+                pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, 1, pdamage, BASE_ATTACK, spellProto));
+                return;
+            }
 
             DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %s heal of %s for %u health inflicted by %u",
                               GetCasterGuid().GetString().c_str(), target->GetGuidStr().c_str(), pdamage, GetId());
@@ -6280,7 +6285,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
             uint32 procVictim   = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
             uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, gain, BASE_ATTACK, spellProto));
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, gain, pdamage, BASE_ATTACK, spellProto));
 
             target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
 
@@ -6525,6 +6530,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             bool isCrit = pCaster->IsSpellCrit(damageInfo.target, spellProto, GetSchoolMask(damageInfo.school), BASE_ATTACK);
             pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto, GetEffIndex(), BASE_ATTACK, nullptr, isCrit);
 
+            uint32 const originalDamage = damageInfo.damage;
+
             damageInfo.target->CalculateAbsorbResistBlock(pCaster, &damageInfo, spellProto);
 
             pCaster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
@@ -6538,7 +6545,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (damageInfo.damage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
 
-            pCaster->ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, procAttacker, procVictim, procEx, damageInfo.damage, BASE_ATTACK, spellProto));
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, procAttacker, procVictim, procEx, damageInfo.damage, originalDamage, BASE_ATTACK, spellProto));
 
             pCaster->DealSpellDamage(&damageInfo, true);
             break;

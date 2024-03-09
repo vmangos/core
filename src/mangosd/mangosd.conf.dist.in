@@ -845,6 +845,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Min kills that players must obtain to enter in weekly honor calculation
 #        Default: 0 (auto select based on patch)
 #
+#    RpDecay
+#        Determines the percentage of rank points (RP) decay per week
+#        If set to 0 there will be no decay
+#        Default: 0.2 (20%)
+#
 #    MaintenanceDay
 #        The day of the week on which server maintenance is performed ( currently used for Honor distribution )
 #        range (0..6): 0 is the first day of the week (normally sunday), 6 is the latest
@@ -1076,6 +1081,7 @@ MaxPlayerLevel = 60
 StartPlayerLevel = 1
 StartPlayerMoney = 0
 MinHonorKills = 0
+RpDecay = 0.2
 MaintenanceDay = 3
 InstantLogout = 1
 ForceLogoutDelay = 0

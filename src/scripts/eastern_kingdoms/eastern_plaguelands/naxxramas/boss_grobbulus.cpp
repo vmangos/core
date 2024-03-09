@@ -45,7 +45,7 @@ enum GrobbulusData
     SPELL_BERSERK = 26662,
 
     SPELL_POISON_CLOUD          = 28240, // Summons a poison cloud npc
-    SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
+    //SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
 
     //SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes EventAI
 
@@ -229,47 +229,9 @@ struct boss_grobbulusAI : public ScriptedAI
     }
 };
 
-struct grob_poison_cloud : public ScriptedAI
-{
-    grob_poison_cloud(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 untilDespawn;
-
-    void Reset() override
-    {
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
-        m_creature->StopMoving();
-        m_creature->SetRooted(true);
-        untilDespawn = 70000;
-    }
-
-    void AttackStart(Unit* /*pWho*/) override { }
-    void MoveInLineOfSight(Unit* /*pWho*/) override { }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (untilDespawn == 70000)
-            m_creature->CastSpell(m_creature, SPELL_POISON_CLOUD_PASSIVE, true);
-        if (untilDespawn < uiDiff)
-        {
-            m_creature->ForcedDespawn();
-        }
-        else
-            untilDespawn -= uiDiff;
-    }
-};
-
 CreatureAI* GetAI_boss_grobbulus(Creature* pCreature)
 {
     return new boss_grobbulusAI(pCreature);
-}
-
-CreatureAI* GetAI_grob_poison_cloud(Creature* pCreature)
-{
-    return new grob_poison_cloud(pCreature);
 }
 
 void AddSC_boss_grobbulus()
@@ -279,10 +241,5 @@ void AddSC_boss_grobbulus()
     pNewScript = new Script;
     pNewScript->Name = "boss_grobbulus";
     pNewScript->GetAI = &GetAI_boss_grobbulus;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "boss_grobbulus_cloud";
-    pNewScript->GetAI = &GetAI_grob_poison_cloud;
     pNewScript->RegisterSelf();
 }

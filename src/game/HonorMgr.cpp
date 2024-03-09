@@ -549,7 +549,9 @@ float HonorMaintenancer::CalculateRpEarning(float cp, HonorScores sc)
 
 float HonorMaintenancer::CalculateRpDecay(float rpEarning, float rp)
 {
-    float decay = floor((0.2f * rp) + 0.5f);
+    float decayMultiplier = sWorld.getConfig(CONFIG_FLOAT_RP_DECAY);
+
+    float decay = floor((decayMultiplier * rp) + 0.5f);
     float delta = rpEarning - decay;
 
     if (delta < 0)
@@ -582,11 +584,11 @@ void HonorMaintenancer::CheckMaintenanceDay()
 {
     if (sWorld.GetGameDay() >= m_nextMaintenanceDay && !m_markerToStart)
     {
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
+
         // Restart 15 minutes after honor weekend by server time
         if (sWorld.getConfig(CONFIG_BOOL_AUTO_HONOR_RESTART))
             sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
-        else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
 
         ToggleMaintenanceMarker();
     }

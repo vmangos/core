@@ -360,12 +360,63 @@ bool Creature::InitEntry(uint32 entry, GameEventCreatureData const* eventData /*
 #else
     SetInt32Value(UNIT_MOD_CAST_SPEED, 0);
 #endif
+
     // update speed for the new CreatureInfo base speed mods
     UpdateSpeed(MOVE_WALK, false);
     UpdateSpeed(MOVE_RUN,  false);
     SetFly(CanFly());
-
     m_defaultMovementType = MovementGeneratorType(m_creatureData ? m_creatureData->movement_type : cinfo->movement_type);
+
+    // Apply Poison & Disease immunities for Elemental and Mechanical type creatures
+    switch (GetCreatureInfo()->type)
+    {
+        case CREATURE_TYPE_MECHANICAL:
+        {
+            ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEAL, true);
+            ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEAL_MAX_HEALTH, true);
+            ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_HEAL, true);
+            ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_LEECH, true);
+            // no break
+        }
+        case CREATURE_TYPE_ELEMENTAL:
+        {
+            ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_DISEASE, true);
+            ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
+            break;
+        }
+    }
+
+    if (HasImmunityFlag(CREATURE_IMMUNITY_TAUNT))
+    {
+        ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+        ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+    }
+
+    if (HasImmunityFlag(CREATURE_IMMUNITY_MOD_STAT))
+    {
+        ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_STAT, true);
+        ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true);
+    }
+
+    if (HasImmunityFlag(CREATURE_IMMUNITY_MOD_CAST_SPEED))
+    {
+        ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, true);
+    }
+
+    if (HasImmunityFlag(CREATURE_IMMUNITY_DISEASE))
+    {
+        ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_DISEASE, true);
+    }
+
+    if (HasImmunityFlag(CREATURE_IMMUNITY_POISON))
+    {
+        ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
+    }
+
+    if (HasImmunityFlag(CREATURE_IMMUNITY_CURSE))
+    {
+        ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_CURSE, true);
+    }
 
     return true;
 }
@@ -989,10 +1040,24 @@ void Creature::RegenerateHealth()
     ModifyHealth(addvalue);
 }
 
-void Creature::DoFlee()
+bool Creature::DoFlee()
 {
-    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
-        return;
+    /*
+    Some observations from tests on classic regarding what happens if creature
+    cant flee at the moment its health reaches the amount it should flee at.
+
+    In these cases both emote and move is delayed:
+    - Casting a spell.
+    - Mind controlled.
+
+    In these cases emote is shown instantly:
+    - Stunned
+    - Feared.
+    */
+
+    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) ||
+        HasUnitState(UNIT_STAT_FEIGN_DEATH | UNIT_STAT_POSSESSED | UNIT_STAT_DISTRACTED | UNIT_STAT_CONFUSED))
+        return false;
 
     float hpPercent = GetHealthPercent();
     ModifyAuraState(AURA_STATE_HEALTHLESS_15_PERCENT, hpPercent < 16.0f);
@@ -1005,12 +1070,14 @@ void Creature::DoFlee()
     MonsterTextEmote(CREATURE_FLEE_TEXT, GetVictim());
     UpdateSpeed(MOVE_RUN, false);
     InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+    return true;
 }
 
-void Creature::DoFleeToGetAssistance()
+bool Creature::DoFleeToGetAssistance()
 {
-    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
-        return;
+    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) ||
+        HasUnitState(UNIT_STAT_FEIGN_DEATH | UNIT_STAT_POSSESSED | UNIT_STAT_DISTRACTED | UNIT_STAT_CONFUSED))
+        return false;
 
     float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
 
@@ -1034,7 +1101,10 @@ void Creature::DoFleeToGetAssistance()
         MonsterTextEmote(CREATURE_FLEE_TEXT, GetVictim());
         UpdateSpeed(MOVE_RUN, false);
         InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+        return true;
     }
+
+    return false;
 }
 
 
@@ -1150,13 +1220,6 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
         default:
             m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_NORMAL);
             break;
-    }
-
-    // Apply Poison & Disease immunities for Elemental and Mechanical type creatures
-    if (GetCreatureInfo()->type == CREATURE_TYPE_ELEMENTAL || (GetCreatureInfo()->type == CREATURE_TYPE_MECHANICAL))
-    {
-        ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_DISEASE, true);
-        ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
     }
 
     // Add to CreatureLinkingHolder if needed
@@ -1836,7 +1899,7 @@ void Creature::LoadEquipment(uint32 equipmentId, bool force)
         if (force)
         {
             for (uint8 i = 0; i < MAX_VIRTUAL_ITEM_SLOT; ++i)
-                SetVirtualItem(VirtualItemSlot(i), 0);
+                SetVirtualItem(WeaponAttackType(i), 0);
             m_equipmentId = 0;
         }
         return;
@@ -1848,7 +1911,7 @@ void Creature::LoadEquipment(uint32 equipmentId, bool force)
         if (EquipmentEntry const* pEquipEntry = pEquipTemplate->ChooseEquipmentEntry())
         {
             for (uint8 i = 0; i < MAX_VIRTUAL_ITEM_SLOT; ++i)
-                SetVirtualItem(VirtualItemSlot(i), pEquipEntry->item[i]);
+                SetVirtualItem(WeaponAttackType(i), pEquipEntry->item[i]);
         }
     }
 }
@@ -2186,7 +2249,7 @@ bool Creature::IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf) con
         if (spellInfo->Mechanic && GetCreatureInfo()->mechanic_immune_mask & (1 << (spellInfo->Mechanic - 1)))
             return true;
 
-        if (GetCreatureInfo()->school_immune_mask & (1 << spellInfo->School))
+        if ((GetCreatureInfo()->school_immune_mask & (1 << spellInfo->School)) && !spellInfo->IsPositiveSpell())
             return true;
     }
 
@@ -2218,50 +2281,10 @@ bool Creature::IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry cons
     return Unit::IsImmuneToDamage(meleeSchoolMask, spellInfo);
 }
 
-// hacky - seems to be the only way of doing this without wasting more time
-void Creature::SetTauntImmunity(bool immune)
-{
-    if (immune)
-    {
-        auto info = const_cast<CreatureInfo*>(m_creatureInfo);
-        info->flags_extra |= CREATURE_FLAG_EXTRA_NOT_TAUNTABLE;
-    }
-    else
-    {
-        auto info = const_cast<CreatureInfo*>(m_creatureInfo);
-        info->flags_extra ^= CREATURE_FLAG_EXTRA_NOT_TAUNTABLE;
-    }
-}
-
 bool Creature::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const
 {
     if (!castOnSelf && spellInfo->EffectMechanic[index] && GetCreatureInfo()->mechanic_immune_mask & (1 << (spellInfo->EffectMechanic[index] - 1)))
         return true;
-
-    // Taunt immunity special flag check
-    if (HasExtraFlag(CREATURE_FLAG_EXTRA_NOT_TAUNTABLE))
-    {
-        // Taunt aura apply check
-        if (spellInfo->Effect[index] == SPELL_EFFECT_APPLY_AURA)
-        {
-            if (spellInfo->EffectApplyAuraName[index] == SPELL_AURA_MOD_TAUNT)
-                return true;
-        }
-        // Spell effect taunt check
-        else if (spellInfo->Effect[index] == SPELL_EFFECT_ATTACK_ME)
-            return true;
-    }
-
-    // Ustaag <Nostalrius> : Mechanical Creature Type check
-    if (GetCreatureInfo()->type && GetCreatureInfo()->type == CREATURE_TYPE_MECHANICAL)
-    {
-        // Periodic leech aura apply check
-        if (spellInfo->Effect[index] == SPELL_EFFECT_APPLY_AURA)
-        {
-            if (spellInfo->EffectApplyAuraName[index] == SPELL_AURA_PERIODIC_LEECH)
-                return true;
-        }
-    }
 
     return Unit::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);
 }
@@ -2641,19 +2664,19 @@ void Creature::UpdateLeashExtensionTime()
 
 void Creature::LoadDefaultAuras(uint32 const* auras)
 {
-    for (uint32 const* cAura = auras; *cAura; ++cAura)
+    for (uint32 const* pSpellId = auras; *pSpellId; ++pSpellId)
     {
-        SpellEntry const* AdditionalSpellInfo = sSpellMgr.GetSpellEntry(*cAura);
-        if (!AdditionalSpellInfo)
+        SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(*pSpellId);
+        if (!pSpellEntry)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *cAura);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *pSpellId);
             continue;
         }
 
-        if (HasAura(*cAura))
+        if (HasAura(*pSpellId))
             continue;
 
-        CastSpell(this, AdditionalSpellInfo, true);
+        CastSpell(this, pSpellEntry, true);
     }
 }
 
@@ -2675,9 +2698,7 @@ void Creature::LoadCreatureAddon(bool reload)
 
         SetStandState(cainfo->stand_state);
         SetSheath(SheathState(cainfo->sheath_state));
-
-        if (cainfo->emote_state != 0)
-            SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote_state);
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote_state);
 
         if (cainfo->auras)
             LoadDefaultAuras(cainfo->auras);
@@ -2694,6 +2715,7 @@ void Creature::LoadCreatureAddon(bool reload)
 
         SetStandState(UNIT_STAND_STATE_STAND);
         SetSheath(SHEATH_STATE_MELEE);
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
         if (m_creatureInfo->auras)
             LoadDefaultAuras(m_creatureInfo->auras);
@@ -3058,11 +3080,10 @@ bool Creature::IsInEvadeMode() const
 
 bool Creature::HasSpell(uint32 spellId) const
 {
-    uint8 i;
-    for (i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
         if (spellId == m_spells[i])
-            break;
-    return i < CREATURE_MAX_SPELLS;                         // break before end of iteration of known spells
+            return true;
+    return false;
 }
 
 void Creature::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
@@ -4055,7 +4076,7 @@ uint32 Creature::GetDBTableGUIDLow() const
     return 0;
 }
 
-void Creature::SetVirtualItem(VirtualItemSlot slot, uint32 item_id)
+void Creature::SetVirtualItem(WeaponAttackType slot, uint32 item_id)
 {
     if (item_id == 0)
     {
@@ -4079,6 +4100,26 @@ void Creature::SetVirtualItem(VirtualItemSlot slot, uint32 item_id)
     SetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_INVENTORYTYPE, proto->InventoryType);
 
     SetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 1, VIRTUAL_ITEM_INFO_1_OFFSET_SHEATH,        proto->Sheath);
+}
+
+uint32 Creature::GetVirtualItemDisplayId(WeaponAttackType slot) const
+{
+    return GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + slot);
+}
+
+uint32 Creature::GetVirtualItemClass(WeaponAttackType slot) const
+{
+    return GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
+}
+
+uint32 Creature::GetVirtualItemSubclass(WeaponAttackType slot) const
+{
+    return GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_SUBCLASS);
+}
+
+uint32 Creature::GetVirtualItemInventoryType(WeaponAttackType slot) const
+{
+    return GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (slot * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_INVENTORYTYPE);
 }
 
 void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint32 options)
