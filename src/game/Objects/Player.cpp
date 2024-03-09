@@ -5231,6 +5231,7 @@ void Player::KillPlayer()
         SetHardcorePermaDeath();
         SaveToDB();
         m_saveDisabled = true;
+        pvpInfo.timerHardcoreForcedLogout = 15 * 1000; // 15 sec to forced logout
     }
 
     // don't create corpse at this moment, player might be falling
@@ -17713,6 +17714,9 @@ void Player::UpdatePvPFlagTimer(uint32 diff)
     if (!pvpInfo.inPvPCombat && !pvpInfo.inPvPEnforcedArea && !pvpInfo.inPvPCapturePoint && !pvpInfo.isPvPFlagCarrier && !IsPvPDesired())
         pvpInfo.timerPvPRemaining -= std::min(pvpInfo.timerPvPRemaining, diff);
 
+    // hardcore
+    pvpInfo.timerHardcoreForcedLogout -= std::min(pvpInfo.timerHardcoreForcedLogout, diff);
+
     // Timer tries to drop flag if all conditions are met and time has passed
     UpdatePvP(false);
 }
@@ -18965,6 +18969,13 @@ void Player::UpdateHomebindTime(uint32 time)
 
 void Player::UpdatePvP(bool state, bool overriding)
 {
+    //hardcore
+    if (!pvpInfo.timerHardcoreForcedLogout && (m_ExtraFlags & PLAYER_EXTRA_HARDCORE_DEATH))
+    {
+        sObjectMgr.UpdatePlayerCache(this);
+        m_session->KickPlayer();
+    }
+
     if (!state)
     {
         // Updating into unset state or overriding anything

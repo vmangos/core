@@ -256,6 +256,8 @@ struct PvPInfo
     bool isPvPFlagCarrier = false;
     uint32 timerPvPRemaining = 0;
     uint32 timerPvPContestedRemaining = 0;
+    // hardcore
+    uint32 timerHardcoreForcedLogout = 0;
 };
 
 struct DuelInfo
