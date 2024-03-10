@@ -7267,10 +7267,21 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
             break;
     }
 
-    // hardcore
+    // hardcore play as PvE server
     if (IsHardcore())
     {
-        pvpInfo.inPvPEnforcedArea = false;
+        if (zoneEntry->Team == AREATEAM_ALLY)
+        {
+            pvpInfo.inPvPEnforcedArea = GetTeam() != ALLIANCE && zoneEntry->Flags & AREA_FLAG_CAPITAL;
+        }
+        else if (zoneEntry->Team == AREATEAM_HORDE)
+        {
+            pvpInfo.inPvPEnforcedArea = GetTeam() != HORDE && zoneEntry->Flags & AREA_FLAG_CAPITAL;
+        }
+        else
+        {
+            pvpInfo.inPvPEnforcedArea = false;
+        }        
     }
 
     if (pvpInfo.inPvPEnforcedArea && !IsTaxiFlying()) // in hostile area
