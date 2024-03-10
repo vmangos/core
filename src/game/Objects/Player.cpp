@@ -3527,6 +3527,8 @@ void Player::GiveLevel(uint32 level)
     {
         if (level == 60)
         {
+            SetHardcore(false);
+
             std::stringstream message;
             message << GetName() << " has reached level 60!";
 
@@ -7370,6 +7372,7 @@ void Player::CheckDuelDistance(time_t currTime)
 
 bool Player::IsOutdoorPvPActive() const
 {
+    // hardcore play as PvE server
     if (IsHardcore() && IsAlive() && !IsGameMaster())
     {
         return false;
