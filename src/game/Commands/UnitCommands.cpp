@@ -27,6 +27,8 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "Bag.h"
+#include "Guild.h"
+#include "GuildMgr.h"
 
 bool ChatHandler::HandleGUIDCommand(char* /*args*/)
 {
@@ -2706,16 +2708,16 @@ bool ChatHandler::HandleHardcoreONCommand(char* args)
         return false;
     }
 
-    Player* pTarget = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
-    if (pTarget->IsHardcore())
+    if (pPlayer->IsHardcore())
     {
         SendSysMessage("You are already Hardcore!");
         SetSentErrorMessage(true);
         return false;
     }
 
-    if (pTarget->GetLevel() != 1)
+    if (pPlayer->GetLevel() != 1)
     {
         SendSysMessage("You can only enable Hardcore at level 1!");
         SetSentErrorMessage(true);
@@ -2726,26 +2728,26 @@ bool ChatHandler::HandleHardcoreONCommand(char* args)
 
     for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
-        if (Item* pItem = pTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
             if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
                 continue;
                 
-            pTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+            pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
         }
     }
     for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     {
-        if (Item* pItem = pTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
             if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
                 continue;
-            pTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+            pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
         }
     }
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
     {
-        if (Bag* pBag = (Bag*)pTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Bag* pBag = (Bag*)pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
             for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
             {
@@ -2754,24 +2756,24 @@ bool ChatHandler::HandleHardcoreONCommand(char* args)
                     if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
                         continue;
 
-                    pTarget->DestroyItem(i, j, true);
+                    pPlayer->DestroyItem(i, j, true);
                 }
             }
         }
     }
     for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
     {
-        if (Item* pItem = pTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
             if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
                 continue;
 
-            pTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+            pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
         }
     }
     for (int i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
     {
-        if (Bag* pBag = (Bag*)pTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        if (Bag* pBag = (Bag*)pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
             for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
             {
@@ -2780,17 +2782,30 @@ bool ChatHandler::HandleHardcoreONCommand(char* args)
                     if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
                         continue;
 
-                    pTarget->DestroyItem(i, j, true);
+                    pPlayer->DestroyItem(i, j, true);
                 }
             }
         }
     }
 
-    pTarget->SetMoney(0);
+    pPlayer->SetMoney(0);
 
-    pTarget->SetHardcore(true);
-    pTarget->SetHardcoreAnnouncements(true);
-    pTarget->RemoveFromGroup();
+    pPlayer->SetHardcore(true);
+    pPlayer->SetHardcoreAnnouncements(true);
+    pPlayer->RemoveFromGroup();
     SendSysMessage("Hardcore activated!");
+
+    //inv in guild
+    if (pPlayer->GetTeam() == ALLIANCE)
+    {
+        if (Guild* targetGuild = sGuildMgr.GetGuildByName("HardCore"))
+            auto status = targetGuild->AddMember(pPlayer->GetObjectGuid(), targetGuild->GetLowestRank());        
+    }
+    if (pPlayer->GetTeam() == HORDE)
+    {
+        if (Guild* targetGuild = sGuildMgr.GetGuildByName("Hard Core"))
+            auto status = targetGuild->AddMember(pPlayer->GetObjectGuid(), targetGuild->GetLowestRank());
+    }
+
     return true;
 }
