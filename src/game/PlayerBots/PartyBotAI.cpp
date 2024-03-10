@@ -804,14 +804,14 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
 
     // NO PvP whith partybot
-    bool needRemoval = false;    
+    bool isPvPRemoval = false;    
     if (Unit* lVictim = pLeader->GetVictim())
     {
         if (Player* thisTarget = lVictim->ToPlayer())
         {
             if (!botEntry->requestRemoval && !thisTarget->IsBot() && lVictim->IsPlayer())
             {
-                needRemoval = true;
+                isPvPRemoval = true;
             }
         }
     }
@@ -822,12 +822,12 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         {
             if (!botEntry->requestRemoval && !thisTarget->IsBot() && myVictim->IsPlayer())
             {
-                needRemoval = true;
+                isPvPRemoval = true;
             }
         }
     }
 
-    if (needRemoval)
+    if (isPvPRemoval)
     {
         botEntry->requestRemoval = true;
         return;
@@ -835,11 +835,30 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     // NO PvP whith partybot
 
     // Disable in city
+    bool isCityRemoval = false;
     std::vector<uint16> citysId = { 1497, 1519, 1537, 1637, 1638, 1657 };
     if (std::find(citysId.begin(), citysId.end(), me->GetZoneId()) != citysId.end())
-        if (pLeader->GetLevel() > 30)
-            botEntry->requestRemoval = true;
+    {
+        if (me->GetZoneId() == 1519 && me->GetDistance2dToCenter(-8778, 835) < 40)
+        {
+            isCityRemoval = false;
+        }
+        else if (me->GetZoneId() == 1637 && me->GetDistance2dToCenter(1798, -4397) < 40)
+        {
+            isCityRemoval = false;
+        }
+        else
+        {
+            isCityRemoval = true;
+        }
+    }
 
+    if (isCityRemoval)
+    {
+        botEntry->requestRemoval = true;
+        return;
+    }
+    // Disable in city
 
     if (pLeader->InBattleGround() &&
         !me->InBattleGround())
