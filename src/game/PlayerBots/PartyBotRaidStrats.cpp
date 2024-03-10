@@ -213,6 +213,63 @@ void PartyBotAI::RaidStratsDefaultPotionsInRaid()
             }
         }
     }
+
+    // Weapon buff: Brilliant Mana Oil
+    if (m_role == ROLE_HEALER)
+    {
+        SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(25123);
+        if (CanTryToCastSpell(me, pSpell))
+            if (CastWeaponBuff(pSpell, EQUIPMENT_SLOT_MAINHAND) == SPELL_CAST_OK)
+                return;
+    }
+    
+    // Weapon buff: Brilliant Wizard Oil
+    if (m_role == ROLE_RANGE_DPS && me->IsCaster())
+    {
+        SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(25122);
+        if (CanTryToCastSpell(me, pSpell))
+            if (CastWeaponBuff(pSpell, EQUIPMENT_SLOT_MAINHAND) == SPELL_CAST_OK)
+                return;
+    }
+
+    if ((m_role == ROLE_MELEE_DPS || m_role == ROLE_TANK) && (me->GetClass() != CLASS_ROGUE || me->GetClass() != CLASS_SHAMAN))
+    {
+        {
+            //Sharpen Blade V
+            SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(16138);
+            if (CanTryToCastSpell(me, pSpell))
+                if (CastWeaponBuff(pSpell, EQUIPMENT_SLOT_MAINHAND) == SPELL_CAST_OK)
+                    return;
+        }
+        {
+            //Enhance Blunt Weapon V
+            SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(16622);
+            if (CanTryToCastSpell(me, pSpell))
+                if (CastWeaponBuff(pSpell, EQUIPMENT_SLOT_MAINHAND) == SPELL_CAST_OK)
+                    return;
+        }
+
+        if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+        {
+            if (pItem->isWeapon())
+            {
+                {
+                    //Sharpen Blade V
+                    SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(16138);
+                    if (CanTryToCastSpell(me, pSpell))
+                        if (CastWeaponBuff(pSpell, EQUIPMENT_SLOT_MAINHAND) == SPELL_CAST_OK)
+                            return;
+                }
+                {
+                    //Enhance Blunt Weapon V
+                    SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(16622);
+                    if (CanTryToCastSpell(me, pSpell))
+                        if (CastWeaponBuff(pSpell, EQUIPMENT_SLOT_MAINHAND) == SPELL_CAST_OK)
+                            return;
+                }
+            }
+        }
+    }
 }
 
 void PartyBotAI::RaidStratsInZGProtectionPotions()
