@@ -834,6 +834,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     }
     // NO PvP whith partybot
 
+    // Disable in city
+    std::vector<uint16> citysId = { 1497, 1519, 1537, 1637, 1638, 1657 };
+    if (std::find(citysId.begin(), citysId.end(), me->GetZoneId()) != citysId.end())
+        if (pLeader->GetLevel() > 30)
+            botEntry->requestRemoval = true;
+
+
     if (pLeader->InBattleGround() &&
         !me->InBattleGround())
     {
