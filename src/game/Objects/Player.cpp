@@ -1521,6 +1521,11 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     if (!IsInWorld())
         return;
 
+    if (IsHardcore() && !pvpInfo.timerPvPRemaining)
+    {
+        SetPvP(false);
+    }
+
     UpdateMirrorTimers(update_diff);
 
     //used to implement delayed far teleports
@@ -7365,6 +7370,11 @@ void Player::CheckDuelDistance(time_t currTime)
 
 bool Player::IsOutdoorPvPActive() const
 {
+    if (IsHardcore() && IsAlive() && !IsGameMaster())
+    {
+        return false;
+    }
+
     return (IsAlive() && !IsGameMaster() && !HasInvisibilityAura() && !HasStealthAura() &&
             (IsPvPDesired() || sWorld.IsPvPRealm()) && !IsTaxiFlying());
 }
