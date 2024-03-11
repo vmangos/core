@@ -3371,15 +3371,28 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder* holder)
     holder->HandleSpellSpecificBoosts(true);
 
     // Check debuff limit
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "AddSpellAuraHolder: Adding spell %d, debuff limit affected: %d", holder->GetId(), holder->IsAffectedByDebuffLimit());
-    if (holder->IsAffectedByDebuffLimit())
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "AddSpellAuraHolder: Adding spell %d, debuff limit affected: %d", holder->GetId(), holder->IsAffectedByVisibleSlotLimit());
+    if (holder->IsAffectedByVisibleSlotLimit())
     {
-        uint32 negativeAuras = GetNegativeAurasCount();
-        if (negativeAuras > sWorld.getConfig(CONFIG_UINT32_DEBUFF_LIMIT))
+        if (holder->IsPositive())
         {
-            // We may have removed the aura we just applied ...
-            if (RemoveAuraDueToDebuffLimit(holder))
-                return false; // The holder has been deleted with 'RemoveSpellAuraHolder'
+            uint32 positveAuras = GetVisibleAurasCount(true);
+            if (positveAuras > MAX_POSITIVE_AURAS)
+            {
+                // We may have removed the aura we just applied ...
+                if (RemoveAuraDueToVisibleSlotLimit(holder))
+                    return false; // The holder has been deleted with 'RemoveSpellAuraHolder'
+            }
+        }
+        else
+        {
+            uint32 negativeAuras = GetVisibleAurasCount(false);
+            if (negativeAuras > sWorld.getConfig(CONFIG_UINT32_DEBUFF_LIMIT))
+            {
+                // We may have removed the aura we just applied ...
+                if (RemoveAuraDueToVisibleSlotLimit(holder))
+                    return false; // The holder has been deleted with 'RemoveSpellAuraHolder'
+            }
         }
     }
     // When we call _AddSpellAuraHolder, we must have a free aura slot
@@ -3388,12 +3401,12 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder* holder)
 }
 
 // Debuff limit
-uint32 Unit::GetNegativeAurasCount()
+uint32 Unit::GetVisibleAurasCount(bool positive)
 {
     uint32 count = 0;
     for (const auto& i : m_spellAuraHolders)
     {
-        if (!i.second || !i.second->IsAffectedByDebuffLimit())
+        if (!i.second || !i.second->IsAffectedByVisibleSlotLimit() || positive != i.second->IsPositive())
             continue;
 
         ++count;
@@ -3401,22 +3414,25 @@ uint32 Unit::GetNegativeAurasCount()
     return count;
 }
 
-bool Unit::RemoveAuraDueToDebuffLimit(SpellAuraHolder* currentAura)
+bool Unit::RemoveAuraDueToVisibleSlotLimit(SpellAuraHolder* currentAura)
 {
-    SpellAuraHolderMap::const_iterator i, uselessDebuff;
-    uselessDebuff = m_spellAuraHolders.end();
+    SpellAuraHolderMap::const_iterator i, uselessAura;
+    uselessAura = m_spellAuraHolders.end();
     for (i = m_spellAuraHolders.begin(); i != m_spellAuraHolders.end(); ++i)
     {
-        if (!i->second || !i->second->IsAffectedByDebuffLimit() || i->second->IsInUse())
+        if (!i->second || !i->second->IsAffectedByVisibleSlotLimit() || i->second->IsInUse())
             continue;
 
-        if (uselessDebuff == m_spellAuraHolders.end() || uselessDebuff->second->IsMoreImportantDebuffThan(i->second))
-            uselessDebuff = i;
+        if (i->second->IsPositive() != currentAura->IsPositive())
+            continue;
+
+        if (uselessAura == m_spellAuraHolders.end() || uselessAura->second->IsMoreImportantVisualAuraThan(i->second))
+            uselessAura = i;
     }
 
     SpellAuraHolder* removeAuraHolder = currentAura;
-    if (uselessDebuff != m_spellAuraHolders.end())
-        removeAuraHolder = uselessDebuff->second;
+    if (uselessAura != m_spellAuraHolders.end())
+        removeAuraHolder = uselessAura->second;
     RemoveSpellAuraHolder(removeAuraHolder);
     return currentAura == removeAuraHolder;
 }
