@@ -197,6 +197,11 @@ BindIP = "0.0.0.0"
 #        Default: 1 (Enabled)
 #                 0 (Disabled)
 #
+#    mmap.randomMovement
+#        Enable/Disable using mmaps for creature random movement
+#        Default: 1 (Enabled)
+#                 0 (Disabled)
+#
 #    Collision.Models.Unload
 #        Free model when no one uses it anymore
 #        Default: 1 (Enabled)
@@ -264,6 +269,7 @@ vmap.enableLOS = 1
 vmap.enableHeight = 1
 vmap.enableIndoorCheck = 1
 mmap.enabled = 1
+mmap.randomMovement = 1
 Collision.Models.Unload = 1
 DetectPosCollision = 1
 TargetPosRecalculateRange = 1.5
