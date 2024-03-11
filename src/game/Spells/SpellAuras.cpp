@@ -6855,8 +6855,10 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
 
     m_duration = m_maxDuration = spellproto->CalculateDuration(unitCaster);
 
-    if (m_maxDuration == -1 || (m_isPassive && spellproto->DurationIndex == 0))
+    // Checking visual because of The Green Tower shield equip effect and Natural Shapeshifter talent.
+    if (m_maxDuration == -1 || (m_isPassive && (spellproto->DurationIndex == 0 || !spellproto->SpellVisual)))
         m_permanent = true;
+
     // Fix de l'affichage dans le journal de combat des buffs tres cours.
     // Exemple: immunite des trinket PvP.
     else if (m_maxDuration < 200)
@@ -7729,7 +7731,7 @@ void SpellAuraHolder::UpdateAuraApplication()
 
 void SpellAuraHolder::UpdateAuraDuration() const
 {
-    if (GetAuraSlot() >= MAX_AURAS || m_isPassive)
+    if (GetAuraSlot() >= MAX_AURAS || m_permanent)
         return;
 
     if (m_target->GetTypeId() == TYPEID_PLAYER)
