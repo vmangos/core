@@ -21,6 +21,7 @@ enum class RaidStratsPotionItemId {
     GREATER_ARCANE_ELIXIR = 13454,
     WINTERFALL_FIREWATER = 12820,
     ELIXIR_OF_FROST_POWER = 17708,
+    DISTILLED_WISDOM = 13511,
 
     GREATER_FROST_PROTECTION_POTION = 13456,
     GREATER_FIRE_PROTECTION_POTION = 13457,
@@ -45,6 +46,7 @@ enum class RaidStratsPotionAuraId {
     GREATER_ARCANE_ELIXIR = 17539,
     WINTERFALL_FIREWATER = 17038,
     ELIXIR_OF_FROST_POWER = 21920,
+    DISTILLED_WISDOM = 17627,
 
     GREATER_FIRE_PROTECTION_POTION = 17543,
     GREATER_FROST_PROTECTION_POTION = 17544,
@@ -83,6 +85,19 @@ void PartyBotAI::RaidStratsDefaultPotionsInRaid()
         {
             UsePotionsOrRune((int)RaidStratsPotionItemId::MAJOR_TROLLS_BLOOD_POTION);
             return;
+        }
+    }
+
+    // Flask of Distilled Wisdom
+    if (me->GetPowerType() == POWER_MANA)
+    {
+        if (!me->HasAura((int)RaidStratsPotionAuraId::DISTILLED_WISDOM))
+        {
+            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::DISTILLED_WISDOM))
+            {
+                UsePotionsOrRune((int)RaidStratsPotionItemId::DISTILLED_WISDOM);
+                return;
+            }
         }
     }
     
