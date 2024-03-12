@@ -835,10 +835,11 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     // NO PvP whith partybot
 
     // Disable in city
-    bool isCityRemoval = true;
+    bool isCityRemoval = false;
     std::vector<uint16> citysId = { 1497, 1519, 1537, 1637, 1638, 1657 };
     if (std::find(citysId.begin(), citysId.end(), me->GetZoneId()) != citysId.end())
     {
+        isCityRemoval = true;
         if (me->GetZoneId() == 1519 && me->GetDistance2dToCenter(-8778, 835) < 40)
         {
             isCityRemoval = false;
