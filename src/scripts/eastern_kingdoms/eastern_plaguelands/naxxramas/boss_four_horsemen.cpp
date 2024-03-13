@@ -131,7 +131,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         if (!m_pInstance)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_four_horsemen_shared ctor could not get instance data");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_four_horsemen_shared ctor could not get instance data");
 
         if (m_bIsSpirit)
             SetCombatMovement(false);

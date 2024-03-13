@@ -142,11 +142,11 @@ void WorldSession::HandleCharEnum(QueryResult* result)
     WorldPacket data(SMSG_CHAR_ENUM, 100);                  // we guess size
 
     uint8 num = 0;
-
     data << num;
 
     if (result)
     {
+        std::set<uint32> guildsToSend;
         do
         {
             uint32 guidlow = (*result)[0].GetUInt32();
@@ -154,15 +154,30 @@ void WorldSession::HandleCharEnum(QueryResult* result)
             if (m_characterMaxLevel < level)
                 m_characterMaxLevel = level;
 
+            bool hasGuildTabard = false;
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
-            if (Player::BuildEnumData(result, &data, GetSecurity()))
+
+            if (Player::BuildEnumData(result, &data, hasGuildTabard, GetSecurity()))
+            {
                 ++num;
+
+                if (hasGuildTabard)
+                    if (uint32 guildId = (*result)[16].GetUInt32())
+                        guildsToSend.insert(guildId);
+            }
         }
         while (result->NextRow());
 
+        // send guild data or guild tabard will appear blank
+        for (auto const& guildId : guildsToSend)
+        {
+            if (Guild* pGuild = sGuildMgr.GetGuildById(guildId))
+                pGuild->Query(this);
+        }
+
         delete result;
     }
-
+    
     data.put<uint8>(0, num);
     m_charactersCount = num;
 

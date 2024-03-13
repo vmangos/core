@@ -190,7 +190,7 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
         else if (uiEntry == NPC_STALAGG)
             m_bToFeugen = false;
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "npc_tesla_coilAI::ReApplyChain got entry which was not stalagg or feugen.");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "npc_tesla_coilAI::ReApplyChain got entry which was not stalagg or feugen.");
 
         DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN);
     }
@@ -567,7 +567,7 @@ struct boss_thaddiusAI : public ScriptedAI
             if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(addCreature))
                 tmpSumm->UnSummon();
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Thaddius: HandleCheckSpawnAdd addCreature was not temp summon");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Thaddius: HandleCheckSpawnAdd addCreature was not temp summon");
             addCreature = nullptr;
         }
         if(!addCreature)
@@ -580,7 +580,7 @@ struct boss_thaddiusAI : public ScriptedAI
                 addGuids[whichAdd] = pC->GetObjectGuid();
             }
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Thaddius: failed spawning add %d", whichAdd);
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Thaddius: failed spawning add %d", whichAdd);
         }
 
         if (coilCreature)
@@ -588,7 +588,7 @@ struct boss_thaddiusAI : public ScriptedAI
             if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(coilCreature))
                 tmpSumm->UnSummon();
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Thaddius: HandleCheckSpawnAdd coilCreature was not temp summon");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Thaddius: HandleCheckSpawnAdd coilCreature was not temp summon");
         }
         // Summoning a new coil
         if (Creature* tc = m_creature->SummonCreature(NPC_TESLA_COIL, teslaCoilPositions[whichAdd][0], teslaCoilPositions[whichAdd][1], teslaCoilPositions[whichAdd][2], 0, TEMPSUMMON_MANUAL_DESPAWN))
@@ -597,10 +597,10 @@ struct boss_thaddiusAI : public ScriptedAI
             if (npc_tesla_coilAI* pTeslaAI = dynamic_cast<npc_tesla_coilAI*>(tc->AI()))
                 pTeslaAI->ReApplyChain(addEntry, addGuids[whichAdd]);
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_thaddiusAddsAI::EstablishLink failed to cast tesla coil to npc_tesla_coilAI*");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_thaddiusAddsAI::EstablishLink failed to cast tesla coil to npc_tesla_coilAI*");
         }
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_thaddiusAddsAI::EstablishLink failed to spawn teslaCoil");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_thaddiusAddsAI::EstablishLink failed to spawn teslaCoil");
 
         // Making sure the coil GO does its animation
         uint32 coilGOEntry = whichAdd == eSTALAGG ? GO_CONS_NOX_TESLA_STALAGG : GO_CONS_NOX_TESLA_FEUGEN;
@@ -781,7 +781,7 @@ struct boss_thaddiusAI : public ScriptedAI
                 m_events.ScheduleEvent(EVENT_CHAIN, ChainLightningTimer());
                 break;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_thaddiusAI in undefined phase-state");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_thaddiusAI in undefined phase-state");
         }
     }
 
@@ -1003,7 +1003,7 @@ struct boss_thaddiusAI : public ScriptedAI
                 UpdateP2(uiDiff);
                 break;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_thaddiusAI in undefined phase-state");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_thaddiusAI in undefined phase-state");
         }
     }
 };

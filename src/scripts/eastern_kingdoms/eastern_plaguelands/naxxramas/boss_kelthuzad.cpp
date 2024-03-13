@@ -548,7 +548,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                             uint32 repeat_next = std::max(uint32(3750 - 25 * numSkeletons), uint32(2000));
                             events.Repeat(repeat_next);
                             ++numSkeletons;
-                            //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
+                            //sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
                         }
                         else
                             events.Repeat(100);
@@ -559,14 +559,14 @@ struct boss_kelthuzadAI : public ScriptedAI
                 {
                     SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
                     ++numAboms;
-                    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%d] Spawn ABOM #%d", p1Timer, numAboms);
+                    //sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "[%d] Spawn ABOM #%d", p1Timer, numAboms);
                     break;
                 }
                 case EVENT_SOUL_WEAVER:
                 {
                     SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
                     ++numBanshees;
-                    //sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%d] Spawn SOUL #%d", p1Timer, numBanshees);
+                    //sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "[%d] Spawn SOUL #%d", p1Timer, numBanshees);
                     break;
                 }
                 case EVENT_PHASE_TWO_INTRO:
@@ -580,17 +580,17 @@ struct boss_kelthuzadAI : public ScriptedAI
                     if (numBanshees < 14)
                     {
                         SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "(post)[%d] Spawn bansh #%d, next in %dms", p1Timer, ++numBanshees, nextBanshee);
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "(post)[%d] Spawn bansh #%d, next in %dms", p1Timer, ++numBanshees, nextBanshee);
                     }
                     if (numAboms < 14)
                     {
                         SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "(post)[%d] Spawn abom #%d, next in %dms", p1Timer, ++numAboms, nextBanshee);
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "(post)[%d] Spawn abom #%d, next in %dms", p1Timer, ++numAboms, nextBanshee);
                     }
                     if (numSkeletons < 120)
                     {
                         SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN);
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "(post)[%d] Spawn skele #%d, next in %dms", p1Timer, ++numSkeletons, nextBanshee);
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "(post)[%d] Spawn skele #%d, next in %dms", p1Timer, ++numSkeletons, nextBanshee);
                     }
 
                     DoScriptText(urand(SAY_AGGRO1, SAY_AGGRO3), m_creature);

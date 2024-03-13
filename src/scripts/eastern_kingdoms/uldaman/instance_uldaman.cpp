@@ -139,7 +139,7 @@ struct instance_uldaman : public ScriptedInstance
 
     void OnObjectCreate(GameObject* pGo) override
     {
-        //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s %u",pGo->GetNameForLocaleIdx(0),pGo->GetEntry());
+        //sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "%s %u",pGo->GetNameForLocaleIdx(0),pGo->GetEntry());
         switch (pGo->GetEntry())
         {
             case GO_ALTAR_ARCHAEDAS:

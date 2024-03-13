@@ -47,10 +47,12 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
     if (i_randomPoints.empty())
         return;
 
+    bool const usePathfinding = sWorld.getConfig(CONFIG_BOOL_MMAP_RANDOM_MOVEMENT);
+
     G3D::Vector3 dest;
     if (i_randomPoints.size() < MAX_RANDOM_POINTS)
     {
-        if (!creature.GetRandomPoint(i_startPosition.x, i_startPosition.y, i_startPosition.z, i_wanderDistance, dest.x, dest.y, dest.z))
+        if (!creature.GetRandomPoint(i_startPosition.x, i_startPosition.y, i_startPosition.z, i_wanderDistance, dest.x, dest.y, dest.z, usePathfinding))
             return;
 
         i_randomPoints.push_back(dest);
@@ -62,7 +64,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
 
     creature.AddUnitState(UNIT_STAT_ROAMING_MOVE);
     Movement::MoveSplineInit init(creature, "RandomMovementGenerator");
-    init.MoveTo(dest.x, dest.y, dest.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
+    init.MoveTo(dest.x, dest.y, dest.z, usePathfinding ? (MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES) : 0);
     init.SetWalk(!creature.HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN));
     init.Launch();
 

@@ -2037,8 +2037,7 @@ void Player::AutoReSummonPet()
     pet->SetHealth(pet->GetMaxHealth());
 }
 
-
-bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data, AccountTypes security)
+bool Player::BuildEnumData(QueryResult* result, WorldPacket* pData, bool& hasGuildTabard, AccountTypes security)
 {
     //                0                1                2                3                 4                  5                6                7                      8                      9                       10
     //    "SELECT characters.guid, characters.name, characters.race, characters.class, characters.gender, characters.skin, characters.face, characters.hair_style, characters.hair_color, characters.facial_hair, characters.level, "
@@ -2060,49 +2059,50 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data, AccountType
         return false;
     }
 
-    *p_data << ObjectGuid(HIGHGUID_PLAYER, guid);
-    
+    *pData << ObjectGuid(HIGHGUID_PLAYER, guid);  
     //hardcore
     if (fields[23].GetUInt32() & PLAYER_EXTRA_HARDCORE_DEATH)
     {
         char name[24];
         sprintf(name, "%s %s", fields[1].GetString(), " [DEATH]");
-        *p_data << name;
+        *pData << name;                                    // name [DEATH]
     }
     else if (fields[23].GetUInt32() & PLAYER_EXTRA_HARDCORE)
     {
         char name[24];
         sprintf(name, "[HC] %s", fields[1].GetString());
-        *p_data << name;
+        *pData << name;                                    // [HC] name
     }
     else
-        *p_data << fields[1].GetString();                   // name
-
-    *p_data << uint8(pRace);                                // race
-    *p_data << uint8(pClass);                               // class
-    *p_data << uint8(fields[4].GetUInt8());                 // gender
+    {
+      *pData << fields[1].GetString();                     // name
+    }
+    //hardcore
+    *pData << uint8(pRace);                                // race
+    *pData << uint8(pClass);                               // class
+    *pData << uint8(fields[4].GetUInt8());                 // gender
 
     uint8 skin = fields[5].GetUInt8();
     uint8 face = fields[6].GetUInt8();
     uint8 hairStyle = fields[7].GetUInt8();
     uint8 hairColor = fields[8].GetUInt8();
-    *p_data << uint8(skin);                                 // skin
-    *p_data << uint8(face);                                 // face
-    *p_data << uint8(hairStyle);                            // hair style
-    *p_data << uint8(hairColor);                            // hair color
+    *pData << uint8(skin);                                 // skin
+    *pData << uint8(face);                                 // face
+    *pData << uint8(hairStyle);                            // hair style
+    *pData << uint8(hairColor);                            // hair color
 
     uint8 facialHair = fields[9].GetUInt8();
-    *p_data << uint8(facialHair);                           // facial hair
+    *pData << uint8(facialHair);                           // facial hair
 
-    *p_data << uint8(fields[10].GetUInt8());                // level
-    *p_data << uint32(fields[11].GetUInt32());              // zone
-    *p_data << uint32(fields[12].GetUInt32());              // map
+    *pData << uint8(fields[10].GetUInt8());                // level
+    *pData << uint32(fields[11].GetUInt32());              // zone
+    *pData << uint32(fields[12].GetUInt32());              // map
 
-    *p_data << fields[13].GetFloat();                       // x
-    *p_data << fields[14].GetFloat();                       // y
-    *p_data << fields[15].GetFloat();                       // z
+    *pData << fields[13].GetFloat();                       // x
+    *pData << fields[14].GetFloat();                       // y
+    *pData << fields[15].GetFloat();                       // z
 
-    *p_data << uint32(fields[16].GetUInt32());              // guild id
+    *pData << uint32(fields[16].GetUInt32());              // guild id
 
     uint32 charFlags = 0;
     uint32 playerFlags = fields[17].GetUInt32();
@@ -2118,10 +2118,10 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data, AccountType
     if (atLoginFlags & AT_LOGIN_RENAME)
         charFlags |= CHARACTER_FLAG_RENAME;
 
-    *p_data << uint32(charFlags);                           // character flags
+    *pData << uint32(charFlags);                           // character flags
 
     // First login
-    *p_data << uint8(atLoginFlags & AT_LOGIN_FIRST ? 1 : 0);
+    *pData << uint8(atLoginFlags & AT_LOGIN_FIRST ? 1 : 0);
 
     // Pets info
     {
@@ -2142,9 +2142,9 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data, AccountType
             }
         }
 
-        *p_data << uint32(petDisplayId);
-        *p_data << uint32(petLevel);
-        *p_data << uint32(petFamily);
+        *pData << uint32(petDisplayId);
+        *pData << uint32(petLevel);
+        *pData << uint32(petFamily);
     }
 
 
@@ -2152,17 +2152,20 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data, AccountType
     for (uint8 slot = 0; slot < INVENTORY_SLOT_BAG_START + 1; slot++)
     {
         uint32 visualbase = slot * 2;                       // entry, perm ench., temp ench.
-        uint32 item_id = GetUInt32ValueFromArray(data, visualbase);
-        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item_id);
+        uint32 itemId = GetUInt32ValueFromArray(data, visualbase);
+        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
         if (!proto)
         {
-            *p_data << uint32(0);
-            *p_data << uint8(0);
+            *pData << uint32(0);
+            *pData << uint8(0);
             continue;
         }
 
-        *p_data << uint32(proto->DisplayInfoID);
-        *p_data << uint8(proto->InventoryType);
+        if (itemId == 5976)
+            hasGuildTabard = true;
+
+        *pData << uint32(proto->DisplayInfoID);
+        *pData << uint8(proto->InventoryType);
     }
 
     return true;
@@ -22811,7 +22814,8 @@ static char const* type_strings[] =
     "MoneyTrade",
     "GM",
     "GMCritical",
-    "Anticheat"
+    "Anticheat",
+    "Scripts"
 };
 
 static_assert(sizeof(type_strings) / sizeof(type_strings[0]) == LOG_TYPE_MAX, "type_strings must be updated");
@@ -22978,7 +22982,7 @@ if (IsPlayerLoggingEnabledToDB(logType, logLevel))                            \
 #define LOG_TO_FILE_HELPER(logLevel,logType,subType,session,accountId,format,ap) \
 if (logFiles[logType] && m_fileLevel >= logLevel)                             \
 {                                                                             \
-    outTimestamp(logFiles[logType]);                                          \
+    OutTimestamp(logFiles[logType]);                                          \
     if (logLevel == LOG_LVL_ERROR)                                            \
         fputs("ERROR: ", logFiles[logType]);                                  \
     PlayerLogHeaderToFile(accountId, session, logType, subType);              \
@@ -22995,7 +22999,7 @@ if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= l
     auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;           \
     SetColor(where, g_logColors[logLevel]);                                   \
     if (m_includeTime)                                                        \
-        outTime(where);                                                       \
+        OutTime(where);                                                       \
     if (logLevel == LOG_LVL_ERROR)                                            \
         fprintf(where, "ERROR: ");                                            \
     PlayerLogHeaderToConsole(accountId, session, logType, subType);           \
