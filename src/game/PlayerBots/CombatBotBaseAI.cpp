@@ -654,6 +654,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.hunter.pVolley))
                         m_spells.hunter.pVolley = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Tranquilizing Shot") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.hunter.pTranquilizingShot))
+                        m_spells.hunter.pTranquilizingShot = pSpellEntry;
+                }
                 break;
             }
             case CLASS_MAGE:
@@ -2231,6 +2236,7 @@ bool CombatBotBaseAI::IsValidBuffTarget(Unit const* pTarget, SpellEntry const* p
 
 Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
 {
+    std::vector<Player*> pMembersNeedBuff;
     Group* pGroup = me->GetGroup();
     if (pGroup)
     {
@@ -2239,13 +2245,18 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
             if (Player* pMember = itr->getSource())
             {
                 if (me->IsValidHelpfulTarget(pMember) &&
-                   !pMember->IsGameMaster() &&
+                    !pMember->IsGameMaster() &&
                     IsValidBuffTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
                     me->IsWithinDist(pMember, 30.0f))
-                    return pMember;
+                    pMembersNeedBuff.push_back(pMember);
             }
         }
+    }
+
+    if (!pMembersNeedBuff.empty())
+    {
+        return pMembersNeedBuff[rand() % pMembersNeedBuff.size()];
     }
 
     return nullptr;
@@ -2253,7 +2264,14 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
 
 Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
 {
+    if (IsValidDispelTarget(me, pSpellEntry))
+    {
+        return me;
+    }
+
+    std::vector<Player*> pMembersHaveDebuff;
     Group* pGroup = me->GetGroup();
+    
     if (pGroup)
     {
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -2265,9 +2283,14 @@ Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
                     IsValidDispelTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
                     me->IsWithinDist(pMember, 30.0f))
-                    return pMember;
+                    pMembersHaveDebuff.push_back(pMember);
             }
         }
+    }
+
+    if (!pMembersHaveDebuff.empty())
+    {
+        return pMembersHaveDebuff[rand() % pMembersHaveDebuff.size()];
     }
 
     return nullptr;
@@ -2533,7 +2556,7 @@ inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
     return ITEM_MOD_STAMINA;
 }
 
-void CombatBotBaseAI::EquipRandomGearInEmptySlots()
+void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
 {
     LearnArmorProficiencies();
 
@@ -2546,8 +2569,8 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         ItemPrototype const* pProto = &itr.second;
 
         // Only items that have already been discovered by someone
-        if (!pProto->Discovered)
-            continue;
+        //if (!pProto->Discovered)
+        //    continue;
 
         // Skip unobtainable items
         if (pProto->HasExtraFlag(ITEM_EXTRA_NOT_OBTAINABLE))
@@ -2581,8 +2604,17 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         }
 
         // Avoid low level items
-        if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        if (pLeaderItl)
+        {
+            if (pProto->ItemLevel < pLeaderItl)
+            {
+                continue;
+            }
+        }
+        else if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        {
             continue;
+        }     
 
         if (me->CanUseItem(pProto, onlyPvE) != EQUIP_ERR_OK)
             continue;
@@ -2727,7 +2759,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
     }
 }
 
-void CombatBotBaseAI::AutoEquipGear(uint32 option)
+void CombatBotBaseAI::AutoEquipGear(uint32 option, uint8 pLeaderItl)
 {
     switch (option)
     {
@@ -2735,7 +2767,7 @@ void CombatBotBaseAI::AutoEquipGear(uint32 option)
             me->AddStartingItems();
             break;
         case PLAYER_BOT_AUTO_EQUIP_RANDOM_GEAR:
-            EquipRandomGearInEmptySlots();
+            EquipRandomGearInEmptySlots(pLeaderItl);
             break;
         case PLAYER_BOT_AUTO_EQUIP_PREMADE_GEAR:
             EquipPremadeGearTemplate();

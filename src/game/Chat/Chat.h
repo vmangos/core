@@ -278,6 +278,7 @@ class ChatHandler
         bool HandlePartyBotFocusMarkCommand(char * args);
         bool HandlePartyBotClearMarksCommand(char * args);
         bool HandlePartyBotComeToMeCommand(char * args);
+        bool HandlePartyBotControls(char* args);
         bool HandlePartyBotUseGObjectCommand(char * args);
         bool HandlePartyBotPauseCommand(char * args);
         bool HandlePartyBotUnpauseCommand(char * args);
@@ -1019,6 +1020,10 @@ class ChatHandler
         bool HandleRepairitemsCommand(char* args);
         bool HandleStableCommand(char* args);
         bool HandleQuitCommand(char* args);
+
+        //hardcore
+        bool HandleHardcoreONCommand(char* args);
+        bool HandleHCAnnounceRestrictionCommand(char* args);
 
         //! Development Commands
         bool HandleSaveAllCommand(char* args);

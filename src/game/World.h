@@ -608,6 +608,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_GM_CHEAT_GOD,
     CONFIG_BOOL_LFG_MATCHMAKING,
     CONFIG_BOOL_LIMIT_PLAY_TIME,
+    CONFIG_BOOL_HARDCORE_ENABLED,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -809,6 +810,7 @@ class World
         void SendBroadcastTextToWorld(uint32 textId);
 
         // Only for GMs with ticket notification ON
+        void SendHardcoreWorldText(int32 string_id, ...);
         void SendGMTicketText(int32 string_id, ...);
         void SendGMTicketText(char const* text);
         void SendGMText(int32 string_id, ...);
