@@ -657,7 +657,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void CustomSpellCasted(uint32 spellId, Unit* caster, Unit* target) override
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
         switch (spellId)
         {
             // BRD : Invocation de Theldren
@@ -745,7 +745,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void SetData(uint32 uiType, uint32 uiData) override
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
 
         switch (uiType)
         {

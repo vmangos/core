@@ -16,7 +16,13 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+if (USE_EXTRACTORS)
 add_subdirectory(extractor)
 add_subdirectory(vmap_assembler)
 add_subdirectory(vmap_extractor)
 add_subdirectory(mmap)
+endif()
+
+if (USE_REALMMERGE)
+add_subdirectory(RealmMerge)
+endif()

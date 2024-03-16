@@ -2033,7 +2033,7 @@ void Player::AutoReSummonPet()
 }
 
 
-bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
+bool Player::BuildEnumData(QueryResult* result, WorldPacket* pData)
 {
     //                0                1                2                3                 4                  5                6                7                      8                      9                       10
     //    "SELECT characters.guid, characters.name, characters.race, characters.class, characters.gender, characters.skin, characters.face, characters.hair_style, characters.hair_color, characters.facial_hair, characters.level, "
@@ -2055,33 +2055,33 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
         return false;
     }
 
-    *p_data << ObjectGuid(HIGHGUID_PLAYER, guid);
-    *p_data << fields[1].GetString();                       // name
-    *p_data << uint8(pRace);                                // race
-    *p_data << uint8(pClass);                               // class
-    *p_data << uint8(fields[4].GetUInt8());                 // gender
+    *pData << ObjectGuid(HIGHGUID_PLAYER, guid);
+    *pData << fields[1].GetString();                       // name
+    *pData << uint8(pRace);                                // race
+    *pData << uint8(pClass);                               // class
+    *pData << uint8(fields[4].GetUInt8());                 // gender
 
     uint8 skin = fields[5].GetUInt8();
     uint8 face = fields[6].GetUInt8();
     uint8 hairStyle = fields[7].GetUInt8();
     uint8 hairColor = fields[8].GetUInt8();
-    *p_data << uint8(skin);                                 // skin
-    *p_data << uint8(face);                                 // face
-    *p_data << uint8(hairStyle);                            // hair style
-    *p_data << uint8(hairColor);                            // hair color
+    *pData << uint8(skin);                                 // skin
+    *pData << uint8(face);                                 // face
+    *pData << uint8(hairStyle);                            // hair style
+    *pData << uint8(hairColor);                            // hair color
 
     uint8 facialHair = fields[9].GetUInt8();
-    *p_data << uint8(facialHair);                           // facial hair
+    *pData << uint8(facialHair);                           // facial hair
 
-    *p_data << uint8(fields[10].GetUInt8());                // level
-    *p_data << uint32(fields[11].GetUInt32());              // zone
-    *p_data << uint32(fields[12].GetUInt32());              // map
+    *pData << uint8(fields[10].GetUInt8());                // level
+    *pData << uint32(fields[11].GetUInt32());              // zone
+    *pData << uint32(fields[12].GetUInt32());              // map
 
-    *p_data << fields[13].GetFloat();                       // x
-    *p_data << fields[14].GetFloat();                       // y
-    *p_data << fields[15].GetFloat();                       // z
+    *pData << fields[13].GetFloat();                       // x
+    *pData << fields[14].GetFloat();                       // y
+    *pData << fields[15].GetFloat();                       // z
 
-    *p_data << uint32(fields[16].GetUInt32());              // guild id
+    *pData << uint32(fields[16].GetUInt32());              // guild id
 
     uint32 charFlags = 0;
     uint32 playerFlags = fields[17].GetUInt32();
@@ -2094,13 +2094,13 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
         charFlags |= CHARACTER_FLAG_HIDE_CLOAK;
     if (playerFlags & PLAYER_FLAGS_GHOST)
         charFlags |= CHARACTER_FLAG_GHOST;
-    if (charFlags & AT_LOGIN_RENAME)
+    if (atLoginFlags & AT_LOGIN_RENAME)
         charFlags |= CHARACTER_FLAG_RENAME;
 
-    *p_data << uint32(charFlags);                           // character flags
+    *pData << uint32(charFlags);                           // character flags
 
     // First login
-    *p_data << uint8(atLoginFlags & AT_LOGIN_FIRST ? 1 : 0);
+    *pData << uint8(atLoginFlags & AT_LOGIN_FIRST ? 1 : 0);
 
     // Pets info
     {
@@ -2121,9 +2121,9 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
             }
         }
 
-        *p_data << uint32(petDisplayId);
-        *p_data << uint32(petLevel);
-        *p_data << uint32(petFamily);
+        *pData << uint32(petDisplayId);
+        *pData << uint32(petLevel);
+        *pData << uint32(petFamily);
     }
 
 
@@ -2131,17 +2131,17 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
     for (uint8 slot = 0; slot < INVENTORY_SLOT_BAG_START + 1; slot++)
     {
         uint32 visualbase = slot * 2;                       // entry, perm ench., temp ench.
-        uint32 item_id = GetUInt32ValueFromArray(data, visualbase);
-        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item_id);
+        uint32 itemId = GetUInt32ValueFromArray(data, visualbase);
+        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
         if (!proto)
         {
-            *p_data << uint32(0);
-            *p_data << uint8(0);
+            *pData << uint32(0);
+            *pData << uint8(0);
             continue;
         }
 
-        *p_data << uint32(proto->DisplayInfoID);
-        *p_data << uint8(proto->InventoryType);
+        *pData << uint32(proto->DisplayInfoID);
+        *pData << uint8(proto->InventoryType);
     }
 
     return true;
@@ -6504,40 +6504,44 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
     float const old_z = GetPositionZ();
     float const old_r = GetOrientation();
     bool const positionChanged = teleport || old_x != x || old_y != y || old_z != z;
+    bool const hasMovingFlags = m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING);
 
-    if (positionChanged || old_r != orientation)
+    if (positionChanged || hasMovingFlags || old_r != orientation)
     {
-        HandleInterruptsOnMovement(positionChanged);
+        HandleInterruptsOnMovement(positionChanged || hasMovingFlags);
 
-        // move and update visible state if need
-        m->PlayerRelocation(this, x, y, z, orientation);
-
-        // reread after Map::Relocation
-        m = GetMap();
-        x = GetPositionX();
-        y = GetPositionY();
-        z = GetPositionZ();
-
-        if (positionChanged)
+        if (positionChanged || old_r != orientation)
         {
-            // group update
-            if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
-                SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
+            // move and update visible state if need
+            m->PlayerRelocation(this, x, y, z, orientation);
 
-            if (Player* pTrader = GetTrader())
-                if (!IsWithinDistInMap(pTrader, INTERACTION_DISTANCE))
-                    TradeCancel(true, TRADE_STATUS_TRADE_CANCELED);   // will close both side trade windows
+            // reread after Map::Relocation
+            m = GetMap();
+            x = GetPositionX();
+            y = GetPositionY();
+            z = GetPositionZ();
 
-            if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
+            if (positionChanged)
             {
-                if (!m_areaCheckTimer)
-                    m_areaCheckTimer = timerMax;
-            }
-            else
-            {
-                UpdateTerainEnvironmentFlags();
-                CheckAreaExploreAndOutdoor();
-                LoadMapCellsAround(GetMap()->GetGridActivationDistance());
+                // group update
+                if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
+                    SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
+
+                if (Player* pTrader = GetTrader())
+                    if (!IsWithinDistInMap(pTrader, INTERACTION_DISTANCE))
+                        TradeCancel(true, TRADE_STATUS_TRADE_CANCELED);   // will close both side trade windows
+
+                if (uint32 const timerMax = sWorld.getConfig(CONFIG_UINT32_RELOCATION_VMAP_CHECK_TIMER))
+                {
+                    if (!m_areaCheckTimer)
+                        m_areaCheckTimer = timerMax;
+                }
+                else
+                {
+                    UpdateTerainEnvironmentFlags();
+                    CheckAreaExploreAndOutdoor();
+                    LoadMapCellsAround(GetMap()->GetGridActivationDistance());
+                }
             }
         }
     }
@@ -15713,8 +15717,8 @@ bool Player::IsAllowedToLoot(Creature const* creature)
 
 float Player::GetMaxLootDistance(Unit const* pUnit) const
 {
-    float distance = GetCombatReach() + 1.333333373069763f + pUnit->GetCombatReach();
-    return std::max(INTERACTION_DISTANCE, distance);
+    float distance = GetCombatReachToTarget(pUnit, false, 0.0f, true);
+    return distance;
 }
 
 void Player::_LoadAuras(QueryResult* result, uint32 timediff)
@@ -21275,7 +21279,7 @@ void Player::SendSpellRemoved(uint32 spellId) const
 void Player::SendChannelUpdate(uint32 time) const
 {
     WorldPacket data(MSG_CHANNEL_UPDATE, 4);
-    data << uint32(0);
+    data << uint32(time);
     SendDirectMessage(&data);
 }
 
@@ -22674,7 +22678,8 @@ static char const* type_strings[] =
     "MoneyTrade",
     "GM",
     "GMCritical",
-    "Anticheat"
+    "Anticheat",
+    "Scripts"
 };
 
 static_assert(sizeof(type_strings) / sizeof(type_strings[0]) == LOG_TYPE_MAX, "type_strings must be updated");
@@ -22841,7 +22846,7 @@ if (IsPlayerLoggingEnabledToDB(logType, logLevel))                            \
 #define LOG_TO_FILE_HELPER(logLevel,logType,subType,session,accountId,format,ap) \
 if (logFiles[logType] && m_fileLevel >= logLevel)                             \
 {                                                                             \
-    outTimestamp(logFiles[logType]);                                          \
+    OutTimestamp(logFiles[logType]);                                          \
     if (logLevel == LOG_LVL_ERROR)                                            \
         fputs("ERROR: ", logFiles[logType]);                                  \
     PlayerLogHeaderToFile(accountId, session, logType, subType);              \
@@ -22858,7 +22863,7 @@ if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= l
     auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;           \
     SetColor(where, g_logColors[logLevel]);                                   \
     if (m_includeTime)                                                        \
-        outTime(where);                                                       \
+        OutTime(where);                                                       \
     if (logLevel == LOG_LVL_ERROR)                                            \
         fprintf(where, "ERROR: ");                                            \
     PlayerLogHeaderToConsole(accountId, session, logType, subType);           \

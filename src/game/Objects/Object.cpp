@@ -1541,9 +1541,11 @@ float WorldObject::GetSizeFactorForDistance(WorldObject const* obj, SizeFactor d
         }
         case SizeFactor::CombatReachWithMelee:
         {
-            sizefactor = std::max(1.5f, GetCombatReach());
+            sizefactor = BASE_MELEERANGE_OFFSET + GetCombatReach();
             if (obj)
-                sizefactor += std::max(1.5f, obj->GetCombatReach());
+                sizefactor += obj->GetCombatReach();
+            if (sizefactor < ATTACK_DISTANCE)
+                sizefactor = ATTACK_DISTANCE;
             break;
         }
         default:
@@ -1777,7 +1779,7 @@ bool WorldObject::CanReachWithMeleeSpellAttack(WorldObject const* pVictim, float
         return false;
 
     float reach = IsUnit() && pVictim->IsUnit() ? 
-        static_cast<Unit const*>(this)->GetCombatReach(static_cast<Unit const*>(pVictim), true, flat_mod) : ATTACK_DISTANCE;
+        static_cast<Unit const*>(this)->GetCombatReachToTarget(static_cast<Unit const*>(pVictim), true, flat_mod) : ATTACK_DISTANCE;
 
     // This check is not related to bounding radius
     float dx = GetPositionX() - pVictim->GetPositionX();
@@ -1894,7 +1896,7 @@ bool WorldObject::IsFacingTarget(WorldObject const* target) const
     return (GetDistance2dToCenter(target) < NO_FACING_CHECKS_DISTANCE) || HasInArc(target);
 }
 
-bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z) const
+bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z, bool useMMaps) const
 {
     if (distance < 0.1f)
     {
@@ -1949,7 +1951,7 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         rand_x = x;
         rand_y = y;
         rand_z = z;
-        if (pMap->GetWalkRandomPosition(GetTransport(), rand_x, rand_y, rand_z, distance, moveAllowed))
+        if (pMap->GetWalkRandomPosition(GetTransport(), rand_x, rand_y, rand_z, distance, moveAllowed, useMMaps))
         {
             // Giant type creatures walk underwater
             if ((pUnit && !pUnit->CanSwim()) ||

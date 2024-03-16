@@ -43,7 +43,7 @@ void Handle_NightmareCorruption(/*const*/ Player* player)
 
         if (!corrupter)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Handle_NightmareCorruption: Could not summon creature %u for quest %u for player %s",
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Handle_NightmareCorruption: Could not summon creature %u for quest %u for player %s",
                 NPC_TWILIGHT_CORRUPTER, QUEST_NIGHTMARE_CORRUPTION, player->GetName());
             return;
         }
@@ -645,7 +645,7 @@ struct npc_stitchesAI : npc_escortAI
             {
                 if (!HasEscortState(STATE_ESCORT_ESCORTING))
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Duskwood.Stitches] Emergency launch.");
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[Duskwood.Stitches] Emergency launch.");
                     Start();
                 }
 
@@ -713,7 +713,7 @@ void elloEbonlockeAI::LaunchStitches(Creature* pStitches) const
         stitchesAI->Start();
     }
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Duskwood.Stitches] Failed to cast AI.");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[Duskwood.Stitches] Failed to cast AI.");
 }
 
 CreatureAI* GetAI_ElloEbonlocke(Creature* pCreature)

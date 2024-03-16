@@ -2635,7 +2635,7 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
                         break;
 
                     default:
-                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Alterac] QuestComplete_npc_AVBlood_collector called with quest %u reqItem=%u unknown !", pQuest->GetQuestId(), pQuest->ReqItemId[0]);
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[Alterac] QuestComplete_npc_AVBlood_collector called with quest %u reqItem=%u unknown !", pQuest->GetQuestId(), pQuest->ReqItemId[0]);
                         return false;
                 }
             }

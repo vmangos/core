@@ -14,14 +14,14 @@ on:
       - 'LICENSE'
       - '.gitignore'
       - 'CONTRIBUTING.md'
-   
+
 jobs:
   build:
     runs-on: windows-2019
-    
+
     steps:
     #git checkout
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: windows dependencies
       #Sets versions for ACE/TBB
@@ -29,25 +29,21 @@ jobs:
         ACE_VERSION: 6.5.11
         ACE_VERSION2: 6_5_11
         TBB_VERSION: 2020.3
-      
+
       run: |
         #directory variables
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
         export TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb
-        #wget
-        choco install -y wget --version 1.20
         #ACE package download
-        wget http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
+        curl -LOJ http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
         unzip ACE-$ACE_VERSION.zip
         rm ACE-$ACE_VERSION.zip
         #configuration of ACE header
         echo "#include \"ace/config-win32.h\"" >> $ACE_ROOT/ace/config.h
         #TBB package download
-        wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
+        curl -LOJ https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
         unzip tbb-$TBB_VERSION-win.zip
         rm tbb-$TBB_VERSION-win.zip
-        #openssl
-        #choco install -y openssl --version=1.1.1.500
       #git bash shell
       shell: bash
 
@@ -89,9 +85,9 @@ jobs:
 
           7z a -tzip ${{env.ARCHIVE_FILENAME}} Release
     - name: Archive this artefact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-          name: snapshot-devbuild
+          name: snapshot-devbuild-without-anticheat
           path: "${{github.workspace}}/bin/${{env.ARCHIVE_FILENAME}}"
 
     #build with anticheat and install
@@ -132,26 +128,29 @@ jobs:
 
           7z a -tzip ${{env.ARCHIVE_FILENAME}} Release
     - name: Archive this artefact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-          name: snapshot-devbuild
+          name: snapshot-devbuild-with-anticheat
           path: "${{github.workspace}}/bin/${{env.ARCHIVE_FILENAME}}"
 
     - name: Download artifact snapshot-Release
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
-        name: snapshot-devbuild
+        pattern: snapshot-devbuild-*
+        merge-multiple: true
         path: all_snapshots
 
     - name: Get current date
       id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      uses: Kaven-Universe/github-action-current-date-time@v1
+      with:
+        format: "YYYY-MM-DD"
 
     - name: Upload snapshot
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: "crowbarmaster/GH-Automatic-Releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: "Development Build(${{ steps.date.outputs.date }})"
+        title: "Development Build(${{ steps.date.outputs.time }})"
         files: all_snapshots

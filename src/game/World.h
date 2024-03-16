@@ -481,6 +481,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_OUTDOORPVP_EP_ENABLE,
     CONFIG_BOOL_OUTDOORPVP_SI_ENABLE,
     CONFIG_BOOL_MMAP_ENABLED,
+    CONFIG_BOOL_MMAP_RANDOM_MOVEMENT,
     CONFIG_BOOL_SKIP_CINEMATICS,
     CONFIG_BOOL_PLAYER_COMMANDS,
     CONFIG_BOOL_FORCE_LOGOUT_DELAY,
@@ -756,7 +757,7 @@ class World
         typedef std::list<WorldSession*> Queue;
         void AddQueuedSession(WorldSession*);
         bool RemoveQueuedSession(WorldSession* session);
-        int32 GetQueuedSessionPos(WorldSession*);
+        uint32 GetQueuedSessionPos(WorldSession*);
 
         // Set a new Message of the Day
         void SetMotd(std::string const& motd) { m_motd = motd; }
@@ -881,7 +882,7 @@ class World
         void UpdateResultQueue();
         void InitResultQueue();
 
-        void UpdateRealmCharCount(uint32 accid);
+        void UpdateRealmCharCount(uint32 accountId);
 
         LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if (m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
 

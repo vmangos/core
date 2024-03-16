@@ -147,7 +147,7 @@ void Opcodes::BuildOpcodeList()
     /*0x051*/  StoreOpcode(SMSG_NAME_QUERY_RESPONSE,          "SMSG_NAME_QUERY_RESPONSE",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x052*/  StoreOpcode(CMSG_PET_NAME_QUERY,               "CMSG_PET_NAME_QUERY",              STATUS_LOGGEDIN,  PACKET_PROCESS_MAP,           &WorldSession::HandlePetNameQueryOpcode);
     /*0x053*/  StoreOpcode(SMSG_PET_NAME_QUERY_RESPONSE,      "SMSG_PET_NAME_QUERY_RESPONSE",     STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
-    /*0x054*/  StoreOpcode(CMSG_GUILD_QUERY,                  "CMSG_GUILD_QUERY",                 STATUS_AUTHED,    PACKET_PROCESS_MAP,           &WorldSession::HandleGuildQueryOpcode);
+    /*0x054*/  StoreOpcode(CMSG_GUILD_QUERY,                  "CMSG_GUILD_QUERY",                 STATUS_AUTHED,    PACKET_PROCESS_GUILD,         &WorldSession::HandleGuildQueryOpcode);
     /*0x055*/  StoreOpcode(SMSG_GUILD_QUERY_RESPONSE,         "SMSG_GUILD_QUERY_RESPONSE",        STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x056*/  StoreOpcode(CMSG_ITEM_QUERY_SINGLE,            "CMSG_ITEM_QUERY_SINGLE",           STATUS_LOGGEDIN,  PACKET_PROCESS_DB_QUERY,      &WorldSession::HandleItemQuerySingleOpcode);
     /*0x057*/  StoreOpcode(CMSG_ITEM_QUERY_MULTIPLE,          "CMSG_ITEM_QUERY_MULTIPLE",         STATUS_NEVER,     PACKET_PROCESS_DB_QUERY,      &WorldSession::Handle_NULL);

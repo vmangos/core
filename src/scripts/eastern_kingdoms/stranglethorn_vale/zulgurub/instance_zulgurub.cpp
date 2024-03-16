@@ -324,7 +324,7 @@ void instance_zulgurub::Create()
 
 void instance_zulgurub::OnCreatureDeath(Creature * pCreature)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OnCreatureDeath %u", pCreature->GetEntry());
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "OnCreatureDeath %u", pCreature->GetEntry());
     if (pCreature->GetEntry() >= 15082 && pCreature->GetEntry() <= 15085)
         SetData(TYPE_RANDOM_BOSS, DONE);
 
@@ -342,7 +342,7 @@ uint32 instance_zulgurub::GenerateRandomBoss()
     uint32 weekmod = ((dayCount - (dayCount % 14)) / 14) % 3;
     uint32 bossId = 15082 + weekmod;
     randomBossEntry = bossId;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "GenerateRandomBoss %u -> %u", weekmod, bossId);
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "GenerateRandomBoss %u -> %u", weekmod, bossId);
     return bossId;
 }
 

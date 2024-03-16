@@ -906,7 +906,7 @@ bool LearnAllRecipesInProfession(Player *pPlayer, SkillType skill)
 
     if (!SkillInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Profession NPC: received non-valid skill ID");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Profession NPC: received non-valid skill ID");
         return false;
     }
 

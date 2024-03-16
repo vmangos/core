@@ -199,7 +199,7 @@ void instance_blackrock_spire::Initialize()
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
     memset(&m_auiRoomRuneGUID, 0, sizeof(m_auiRoomRuneGUID));
 #ifdef DEBUG_ON
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Instance BlackRockSpire : Initialize");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Instance BlackRockSpire : Initialize");
 #endif
 }
 
@@ -417,7 +417,7 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[TYPE_EVENT_DOOR_UBRS] = uiData;
             break;
         case TYPE_SOLAKAR:
-            if ((uiData == FAIL && m_uiFatherFlame_timer != 0) || uiData == SPECIAL)
+            if (uiData == FAIL && m_uiFatherFlame_timer != 0)
             {
                 //DoRespawnGameObject(m_uiFatherFlameGUID, HOUR*IN_MILLISECONDS);
                 m_uiFatherFlame_timer = 0;
@@ -855,7 +855,7 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
     if (GetData(TYPE_ROOM_EVENT) != NOT_STARTED)
         return;
 #ifdef DEBUG_ON
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "instance_blackrock_spire::DoSortRoomEventMobs");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "instance_blackrock_spire::DoSortRoomEventMobs");
 #endif
     for (uint8 i = 0; i < MAX_ROOMS; i++)
     {
@@ -869,7 +869,7 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
                         m_alRoomEventMobGUIDSorted[i].push_back(guid);
                 }
 #ifdef DEBUG_ON
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Alcove %u : %u mobs", i,  m_alRoomEventMobGUIDSorted[i].size());
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Alcove %u : %u mobs", i,  m_alRoomEventMobGUIDSorted[i].size());
 #endif
             }
         }
@@ -940,141 +940,6 @@ GameObjectAI* GetAIgo_father_flame(GameObject *pGo)
     return new go_father_flameAI(pGo);
 }
 
-/****************************************
-** Rookery Hatcher npc_rookery_hatcher **
-****************************************/
-
-enum
-{
-    SPELL_SUNDER_ARMOR       = 15572,
-    SPELL_STRIKE             = 15580,
-    SPELL_HATCH_ROOKERY_EGG  = 15746
-};
-
-struct npc_rookery_hatcherAI : public ScriptedAI
-{
-    npc_rookery_hatcherAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (instance_blackrock_spire*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 SunderArmor_Timer;
-    uint32 Strike_Timer;
-    uint32 HatchRookeryEgg_Timer;
-
-    void Reset() override
-    {
-        SunderArmor_Timer = urand(8000, 12000);
-        Strike_Timer = urand(5000, 7000);
-        HatchRookeryEgg_Timer = urand(5000, 10000);
-    }
-
-    void JustReachedHome() override
-    {
-        if (m_pInstance->GetData(TYPE_SOLAKAR) == SPECIAL)
-            HatchRookeryEgg();
-        else
-            m_pInstance->SetData(TYPE_SOLAKAR, FAIL);
-        m_creature->ForcedDespawn();
-    }
-
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-        // Do not aggro players in the Hall of Binding.
-        if (pWho->GetPositionX() > 110.0f)
-            return;
-
-        ScriptedAI::MoveInLineOfSight(pWho);
-    }
-
-    void HatchRookeryEgg()
-    {
-        uint8 uiHatchedEgg = 0;
-        uint8 uiMaxHatchedEgg = 4;
-        std::list<GameObject*> listRookeryEgg;
-        GetGameObjectListWithEntryInGrid(listRookeryEgg, m_creature, 175124, 50.0f);
-        for (std::list<GameObject*>::const_iterator itr = listRookeryEgg.begin(); itr != listRookeryEgg.end(); ++itr)
-        {
-            if (listRookeryEgg.empty())
-                break;
-            if (!(*itr)->isSpawned())
-                continue;
-
-            if (uiHatchedEgg < uiMaxHatchedEgg)
-            {
-                (*itr)->SetLootState(GO_JUST_DEACTIVATED);
-
-                Creature* pWhelp = m_creature->SummonCreature(10161, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
-                if (m_pInstance->GetData(TYPE_SOLAKAR) == SPECIAL)
-                {
-                    if (pWhelp)
-                        pWhelp->SetInCombatWithZone(true);
-                    uiMaxHatchedEgg = 24;
-                }
-
-                uiHatchedEgg++;
-            }
-            else
-                break;
-        }
-        listRookeryEgg.clear();
-    }
-
-    void JustSummoned(Creature* pSummoned) override
-    {
-        if (pSummoned->GetEntry() == 10161)
-        {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                pSummoned->AI()->AttackStart(pTarget);
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        //  Sunder Armor
-        if (SunderArmor_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
-                SunderArmor_Timer = urand(10000, 15000);
-        }
-        else
-            SunderArmor_Timer -= uiDiff;
-
-        //  Strike
-        if (Strike_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE) == CAST_OK)
-                Strike_Timer = urand(4000, 6000);
-        }
-        else
-            Strike_Timer -= uiDiff;
-
-        //  Hatch Rookery Egg
-        if (HatchRookeryEgg_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_HATCH_ROOKERY_EGG) == CAST_OK)
-            {
-                HatchRookeryEgg();
-                HatchRookeryEgg_Timer = urand(15000, 20000);
-            }
-        }
-        else
-            HatchRookeryEgg_Timer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_rookery_hatcher(Creature* pCreature)
-{
-    return new npc_rookery_hatcherAI(pCreature);
-}
-
 bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pPlayer->IsDead())
@@ -1107,17 +972,7 @@ void AddSC_instance_blackrock_spire()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_rookery_hatcher";
-    pNewScript->GetAI = &GetAI_npc_rookery_hatcher;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
     pNewScript->Name = "at_ubrs_the_beast";
     pNewScript->pAreaTrigger = &AreaTrigger_at_ubrs_the_beast;
     pNewScript->RegisterSelf();
-
-    /*    pNewScript = new Script;
-        pNewScript->Name = "go_rookey_egg";
-        pNewScript->GOGetAI = &GetAIgo_rookey_egg;
-        pNewScript->RegisterSelf();*/
 }

@@ -249,7 +249,7 @@ struct boss_arlokkAI : public ScriptedAI
                         if (m_uiMarkedGUID)
                             m_uiMarkedGUID = 0;
 
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_arlokk could not accuire a new target to mark.");
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_arlokk could not accuire a new target to mark.");
                     }
                 }
             }

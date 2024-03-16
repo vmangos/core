@@ -611,7 +611,7 @@ bool PathInfo::BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest)
     
     maxSteps *= 2;
 
-    bool ok = BuildPathStep(dest, start, m_sourceUnit->FindMap(), m_pathPoints, checkedPositions, stepSize, maxSteps, m_sourceUnit->GetAngle(dest.x, dest.y));
+    bool ok = BuildPathStep(dest, start, m_sourceUnit->FindMap(), m_pathPoints, checkedPositions, stepSize, maxSteps, Geometry::GetAngle(start, dest));
     m_pathPoints.push_back(dest);
     return ok;
 }
@@ -1033,8 +1033,8 @@ bool PathInfo::UpdateForCaster(Unit* pTarget, float castRange)
 
 bool PathInfo::UpdateForMelee(Unit* pTarget, float meleeReach)
 {
-    // Si deja en ligne de vision, et a distance, c'est bon.
-    if (pTarget->IsWithinDist3d(m_sourceUnit->GetPositionX(), m_sourceUnit->GetPositionY(), m_sourceUnit->GetPositionZ(), meleeReach))
+    // If already within melee range, all good.
+    if (m_sourceUnit->CanReachWithMeleeAutoAttack(pTarget))
     {
         clear();
         m_type = PathType(PATHFIND_SHORTCUT | PATHFIND_NORMAL | PATHFIND_CASTER);
@@ -1048,12 +1048,13 @@ bool PathInfo::UpdateForMelee(Unit* pTarget, float meleeReach)
     // We have always keep at least 2 points (else, there is no mvt !)
     for (uint32 i = 1; i <= maxIndex; ++i)
     {
-        if (pTarget->IsWithinDist3d(m_pathPoints[i].x, m_pathPoints[i].y, m_pathPoints[i].z, meleeReach))
+        if (pTarget->IsWithinDist3d(m_pathPoints[i].x, m_pathPoints[i].y, m_pathPoints[i].z, meleeReach, SizeFactor::None))
         {
             Vector3 dirVect;
             pTarget->GetPosition(dirVect.x, dirVect.y, dirVect.z);
             dirVect -= m_pathPoints[i - 1];
-            float targetDist = pTarget->GetDistance(m_pathPoints[i - 1].x, m_pathPoints[i - 1].y, m_pathPoints[i - 1].z) - meleeReach;
+            float targetDist = pTarget->GetDistance(m_pathPoints[i - 1].x, m_pathPoints[i - 1].y, m_pathPoints[i - 1].z, SizeFactor::None);
+            targetDist -= meleeReach;
             float directionLength = sqrt(dirVect.squaredLength());
             m_pathPoints[i] = m_pathPoints[i - 1] + dirVect * targetDist / directionLength;
             m_pathPoints.resize(i + 1);
