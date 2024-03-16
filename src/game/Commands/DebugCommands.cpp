@@ -2594,21 +2594,13 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
     if (GenericTransport* transport = player->GetTransport())
     {
         if (!MMAP::MMapFactory::createOrGetMMapManager()->GetGONavMesh(transport->GetDisplayId()))
-        {
-            PSendSysMessage("NavMesh not loaded for current map.");
-            return true;
-        }
+            PSendSysMessage("NavMesh not loaded for current transport.");
     }
     else
     {
         if (!MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(m_session->GetPlayer()->GetMapId()))
-        {
             PSendSysMessage("NavMesh not loaded for current map.");
-            return true;
-        }
     }
-
-    PSendSysMessage("mmap path:");
 
     // units
     Unit* target = GetSelectedUnit();
@@ -2640,12 +2632,13 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
     PSendSysMessage("Building %s", useStraightPath ? "StraightPath" : "SmoothPath");
     PSendSysMessage("length %i (dist %f) type %u", pointPath.size(), path.Length(), path.getPathType());
 
-    for (auto& i : pointPath)
+    for (uint32 i = 0; i < pointPath.size(); ++i)
     {
         if (transport)
-            transport->CalculatePassengerPosition(i.x, i.y, i.z);
-        if (Creature* wp = player->SummonCreature(VISUAL_WAYPOINT, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN, 18000))
+            transport->CalculatePassengerPosition(pointPath[i].x, pointPath[i].y, pointPath[i].z);
+        if (Creature* wp = player->SummonCreature(VISUAL_WAYPOINT, pointPath[i].x, pointPath[i].y, pointPath[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 18000))
         {
+            wp->SetLevel(i + 1);
             wp->SetFly(true);
             if (transport)
             {
