@@ -611,7 +611,7 @@ bool PathInfo::BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest)
     
     maxSteps *= 2;
 
-    bool ok = BuildPathStep(dest, start, m_sourceUnit->FindMap(), m_pathPoints, checkedPositions, stepSize, maxSteps, Geometry::GetAngle(start, dest));
+    bool ok = BuildPathStep(dest, start, m_sourceUnit->FindMap(), m_pathPoints, checkedPositions, stepSize, maxSteps, m_sourceUnit->GetAngle(dest.x, dest.y));
     m_pathPoints.push_back(dest);
     return ok;
 }
