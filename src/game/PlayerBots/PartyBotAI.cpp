@@ -804,33 +804,36 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
 
     // NO PvP whith partybot
-    bool isPvPRemoval = false;    
-    if (Unit* lVictim = pLeader->GetVictim())
+    if (!me->GetMap()->Instanceable())
     {
-        if (Player* thisTarget = lVictim->ToPlayer())
+        bool isPvPRemoval = false;
+        if (Unit* lVictim = pLeader->GetVictim())
         {
-            if (!botEntry->requestRemoval && !thisTarget->IsBot() && lVictim->IsPlayer())
+            if (Player* thisTarget = lVictim->ToPlayer())
             {
-                isPvPRemoval = true;
+                if (!botEntry->requestRemoval && !thisTarget->IsBot() && lVictim->IsPlayer())
+                {
+                    isPvPRemoval = true;
+                }
             }
         }
-    }
 
-    if (Unit* myVictim = me->GetVictim())
-    {
-        if (Player* thisTarget = myVictim->ToPlayer())
+        if (Unit* myVictim = me->GetVictim())
         {
-            if (!botEntry->requestRemoval && !thisTarget->IsBot() && myVictim->IsPlayer())
+            if (Player* thisTarget = myVictim->ToPlayer())
             {
-                isPvPRemoval = true;
+                if (!botEntry->requestRemoval && !thisTarget->IsBot() && myVictim->IsPlayer())
+                {
+                    isPvPRemoval = true;
+                }
             }
         }
-    }
 
-    if (isPvPRemoval)
-    {
-        botEntry->requestRemoval = true;
-        return;
+        if (isPvPRemoval)
+        {
+            botEntry->requestRemoval = true;
+            return;
+        }
     }
     // NO PvP whith partybot
 
