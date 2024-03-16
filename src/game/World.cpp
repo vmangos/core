@@ -939,7 +939,6 @@ void World::LoadConfigSettings(bool reload)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i", enableLOS, enableHeight, getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) ? 1 : 0);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "WORLD: VMap data directory is: %svmaps", m_dataPath.c_str());
     setConfig(CONFIG_BOOL_MMAP_ENABLED, "mmap.enabled", true);
-    setConfig(CONFIG_BOOL_MMAP_RANDOM_MOVEMENT, "mmap.randomMovement", true);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "WORLD: mmap pathfinding %sabled", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "en" : "dis");
 
     setConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME, "MapUpdate.Empty.UpdateTime", 0);
