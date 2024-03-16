@@ -2863,11 +2863,11 @@ CharDelete.KeepDays = 30
 #
 ###################################################################################################################
 AHBot.Enable = 1
-AHBot.ah.id = 7
+AHBot.ah.id = 1
 AHBot.ah.fid = 120
-AHBot.itemcount = 3620
-#AHBot.bot.guid = 7
-#AHBot.bot.account = 5
+AHBot.itemcount = 3610
+AHBot.bot.guid = 697196
+AHBot.bot.account = 2125
 
 ###################################################################################################################
 # PLAYER BOTS

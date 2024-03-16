@@ -166,7 +166,7 @@ void AuctionHouseBotMgr::AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auc
     auctionEntry->auctionHouseEntry  = m_auctionHouseEntry;
     auctionEntry->itemGuidLow        = item->GetGUIDLow();
     auctionEntry->itemTemplate       = item->GetEntry();
-    auctionEntry->owner              = 0;
+    auctionEntry->owner              = m_config->botguid;
     auctionEntry->startbid           = e.bid;
     auctionEntry->buyout             = e.buyout;
     auctionEntry->bidder             = 0;

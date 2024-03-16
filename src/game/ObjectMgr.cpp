@@ -655,8 +655,8 @@ void ObjectMgr::LoadPlayerCacheData(uint32 lowGuid)
         m_playerNameToGuid.clear();
 
         result.reset(CharacterDatabase.Query(
-            //       0       1       2        3         4          5       6        7          8      9             10            11            12             13
-            "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters`;"));
+            //       0       1       2        3         4          5       6        7          8      9             10            11            12             13                 14
+            "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path`, `extra_flags` FROM `characters`;"));
     }
     else
     {
