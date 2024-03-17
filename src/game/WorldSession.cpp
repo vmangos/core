@@ -1189,7 +1189,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
         (cheatAction >= CHEAT_ACTION_KICK))
     {
         std::stringstream oss;
-        oss << "|r[|c1f40af20Announce by |cffff0000" << detector << "|r]: Player " << _player->GetName() << ", Cheat: " << reason << ", Penalty: " << action;
+        oss << "|r[|c1f40af20Announce by |cffff0000" << detector << "|r]: Player " << playerDesc << ", Cheat: " << reason << ", Penalty: " << action;
         sWorld.SendGlobalText(oss.str().c_str(), this);
     }
 
