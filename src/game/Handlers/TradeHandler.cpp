@@ -614,13 +614,6 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    //hardcore
-    if (GetPlayer()->IsHardcore())
-    {
-        SendTradeStatus(TRADE_STATUS_BUSY);
-        return;
-    }
-
     Player* pOther = GetPlayer()->GetMap()->GetPlayer(otherGuid);
 
     if (!pOther)
@@ -630,10 +623,28 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     }
 
     //hardcore
-    if (pOther->IsHardcore())
+    if (GetPlayer()->IsHardcore() || pOther->IsHardcore())
     {
-        SendTradeStatus(TRADE_STATUS_BUSY);
-        return;
+        bool cancel = true;
+        
+        if (GetPlayer()->IsHardcore() && pOther->IsHardcore())
+        {
+            uint32 myLevel = GetPlayer()->GetLevel();
+            uint32 otherLevel = pOther->GetLevel();
+
+            // me and other more 5
+            if (otherLevel - myLevel < 5)
+                cancel = false;
+            // me more 5
+            if (myLevel - otherLevel < 5)
+                cancel = false;
+        }        
+
+        if (cancel)
+        {
+            SendTradeStatus(TRADE_STATUS_BUSY);
+            return;
+        }        
     }
 
     if (pOther == GetPlayer() || pOther->m_trade)
