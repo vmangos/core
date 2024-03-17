@@ -950,7 +950,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     (1617202, 0, 2, 15, 27887, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, small'),
     (1617202, 0, 3, 15, 27886, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Disturb Minion Trap, Buttress'),
     (1617202, 0, 4, 18, 4000, 0, 0, 0, 16136, 5, 8, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Despawn Necrotic Shard');
-    --(1617202, 0, 5, 15, 27888, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, Buttress');
+    -- (1617202, 0, 5, 15, 27888, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard - Cast Minion Spawner, Buttress');
 
     -- Events list for Cultist Engineer
     DELETE FROM `creature_ai_events` WHERE `creature_id`=16230;
