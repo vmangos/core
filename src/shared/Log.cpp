@@ -73,51 +73,10 @@ Log::Log() :
             m_logsDir.append("/");
     }
 
-    auto const log_file_timestamp = sConfig.GetBoolDefault("LogFile.TimeStamp", false);
+    bool const log_file_timestamp = sConfig.GetBoolDefault("LogFile.TimeStamp", false);
 
     // Open specific log files
-
-    // GM log settings for per account case
-    m_gmlog_filename_format = sConfig.GetStringDefault("GMLogFile", "");
-    if (!m_gmlog_filename_format.empty())
-    {
-        bool m_gmlog_timestamp = sConfig.GetBoolDefault("GmLogTimestamp", false);
-
-        size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
-        if (dot_pos != m_gmlog_filename_format.npos)
-        {
-            if (m_gmlog_timestamp)
-                m_gmlog_filename_format.insert(dot_pos, m_logsTimestamp);
-
-            m_gmlog_filename_format.insert(dot_pos, "_#%u");
-        }
-        else
-        {
-            m_gmlog_filename_format += "_#%u";
-
-            if (m_gmlog_timestamp)
-                m_gmlog_filename_format += m_logsTimestamp;
-        }
-
-        m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
-    }
-
-    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", g_mainLogFileName, log_file_timestamp, true);
-    logFiles[LOG_CHAT] = openLogFile("LogFile.Chat", "Chat.log", log_file_timestamp, false);
-    logFiles[LOG_BG] = openLogFile("BgLogFile", "Bg.log", log_file_timestamp, false);
-    logFiles[LOG_CHAR] = openLogFile("LogFile.Char", "Char.log", log_file_timestamp, false);
-    logFiles[LOG_HONOR] = openLogFile("LogFile.Honor", "", log_file_timestamp, false);
-    logFiles[LOG_RA] = openLogFile("LogFile.Ra", "Ra.log", log_file_timestamp, false);
-    logFiles[LOG_DBERROR] = openLogFile("LogFile.DBError", "DBErrors.log", log_file_timestamp, true);
-    logFiles[LOG_DBERRFIX] = openLogFile("LogFile.DBErrorFix", "DBErrorFixes.sql", log_file_timestamp, true);
-    logFiles[LOG_LOOTS] = openLogFile("LootsLogFile", "Loot.log", log_file_timestamp, false);
-    logFiles[LOG_LEVELUP] = openLogFile("LevelupLogFile", "LevelUp.log", log_file_timestamp, false);
-    logFiles[LOG_PERFORMANCE] = openLogFile("LogFile.Performance", "Perf.log", log_file_timestamp, false);
-    logFiles[LOG_GM] = sConfig.GetBoolDefault("GmLogPerAccount", false) ?
-        openLogFile("LogFile.Gm", "", log_file_timestamp, false) : nullptr;
-    logFiles[LOG_MONEY_TRADES] = openLogFile("LogFile.Trades", "", log_file_timestamp, false);
-    logFiles[LOG_GM_CRITICAL] = openLogFile("LogFile.CriticalCommands", "gm_critical.log", log_file_timestamp, false);
-    logFiles[LOG_ANTICHEAT] = openLogFile("LogFile.Anticheat", "Anticheat.log", log_file_timestamp, false);
+    logFiles[LOG_BASIC] = OpenLogFile("LogFile.Basic", g_mainLogFileName, log_file_timestamp, true);
 
     // Main log file settings
     m_wardenDebug = sConfig.GetBoolDefault("Warden.DebugLog", false);
@@ -135,9 +94,27 @@ Log::Log() :
         if (*logFilterData[i].name)
             if (sConfig.GetBoolDefault(logFilterData[i].configName, logFilterData[i].defaultState))
                 m_logFilter |= (1 << i);
+}
 
-    // Char log settings
-    m_charLog_Dump = sConfig.GetBoolDefault("CharLogDump", false);
+void Log::OpenWorldLogFiles()
+{
+    bool const log_file_timestamp = sConfig.GetBoolDefault("LogFile.TimeStamp", false);
+    logFiles[LOG_CHAT] = OpenLogFile("LogFile.Chat", "Chat.log", log_file_timestamp, false);
+    logFiles[LOG_BG] = OpenLogFile("BgLogFile", "Bg.log", log_file_timestamp, false);
+    logFiles[LOG_CHAR] = OpenLogFile("LogFile.Char", "Char.log", log_file_timestamp, false);
+    logFiles[LOG_HONOR] = OpenLogFile("LogFile.Honor", "", log_file_timestamp, false);
+    logFiles[LOG_RA] = OpenLogFile("LogFile.Ra", "Ra.log", log_file_timestamp, false);
+    logFiles[LOG_DBERROR] = OpenLogFile("LogFile.DBError", "DBErrors.log", log_file_timestamp, true);
+    logFiles[LOG_DBERRFIX] = OpenLogFile("LogFile.DBErrorFix", "DBErrorFixes.sql", log_file_timestamp, true);
+    logFiles[LOG_LOOTS] = OpenLogFile("LootsLogFile", "Loot.log", log_file_timestamp, false);
+    logFiles[LOG_LEVELUP] = OpenLogFile("LevelupLogFile", "LevelUp.log", log_file_timestamp, false);
+    logFiles[LOG_PERFORMANCE] = OpenLogFile("LogFile.Performance", "Perf.log", log_file_timestamp, false);
+    logFiles[LOG_MONEY_TRADES] = OpenLogFile("LogFile.Trades", "", log_file_timestamp, false);
+    logFiles[LOG_GM] = sConfig.GetBoolDefault("GmLogPerAccount", false) ?
+        OpenLogFile("LogFile.Gm", "", log_file_timestamp, false) : nullptr;
+    logFiles[LOG_GM_CRITICAL] = OpenLogFile("LogFile.CriticalCommands", "gm_critical.log", log_file_timestamp, false);
+    logFiles[LOG_ANTICHEAT] = OpenLogFile("LogFile.Anticheat", "Anticheat.log", log_file_timestamp, false);
+    logFiles[LOG_SCRIPTS] = OpenLogFile("LogFile.Scripts", "Scripts.log", log_file_timestamp, false);
 }
 
 void Log::InitSmartlogEntries(std::string const& str)
@@ -296,7 +273,7 @@ void Log::SetFileLevel(LogLevel level)
     printf("File log level set to %u\n", m_fileLevel);
 }
 
-FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile, bool overwriteOnOpen) const
+FILE* Log::OpenLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile, bool overwriteOnOpen) const
 {
     std::string logfn = sConfig.GetStringDefault(configFileName, defaultFileName);
     if (logfn.empty())
@@ -320,17 +297,7 @@ FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, 
     return fopen((m_logsDir + logfn).c_str(), mode);
 }
 
-FILE* Log::openGmlogPerAccount(uint32 account) const
-{
-    if (m_gmlog_filename_format.empty())
-        return nullptr;
-
-    char namebuf[MANGOS_PATH_MAX];
-    snprintf(namebuf, MANGOS_PATH_MAX, m_gmlog_filename_format.c_str(), account);
-    return fopen(namebuf, "a");
-}
-
-void Log::outTimestamp(FILE* file)
+void Log::OutTimestamp(FILE* file)
 {
     time_t t = time(nullptr);
     tm* aTm = localtime(&t);
@@ -343,7 +310,7 @@ void Log::outTimestamp(FILE* file)
     fprintf(file, "%-4d-%02d-%02d %02d:%02d:%02d ", aTm->tm_year + 1900, aTm->tm_mon + 1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
 }
 
-void Log::outTime(FILE* where)
+void Log::OutTime(FILE* where)
 {
     time_t t = time(nullptr);
     tm* aTm = localtime(&t);
@@ -376,7 +343,7 @@ if (logFiles[logType] && m_fileLevel >= logLevel)                             \
 {                                                                             \
     if (logType != LOG_DBERRFIX)                                              \
     {                                                                         \
-        outTimestamp(logFiles[logType]);                                      \
+        OutTimestamp(logFiles[logType]);                                      \
         if (logLevel == LOG_LVL_ERROR)                                        \
             fputs("ERROR: ", logFiles[logType]);                              \
     }                                                                         \
@@ -393,7 +360,7 @@ if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= l
     auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;           \
     SetColor(where, g_logColors[logLevel]);                                   \
     if (m_includeTime)                                                        \
-        outTime(where);                                                       \
+        OutTime(where);                                                       \
     if (logLevel == LOG_LVL_ERROR)                                            \
         fprintf(where, "ERROR: ");                                            \
                                                                               \
@@ -440,7 +407,7 @@ void Log::OutConsole(LogType logType, LogLevel logLevel, std::string const& log)
     SetColor(where, g_logColors[logLevel]);
 
     if (m_includeTime)
-        outTime(where);
+        OutTime(where);
 
     if (logLevel == LOG_LVL_ERROR)
         fprintf(where, "ERROR: ");
@@ -467,7 +434,7 @@ void Log::OutFile(LogType logType, LogLevel logLevel, std::string const& str) co
     // LOG_DBERRFIX should not get timestamp, but all others should
     if (logType != LOG_DBERRFIX)
     {
-        outTimestamp(logFiles[logType]);
+        OutTimestamp(logFiles[logType]);
 
         if (logLevel == LOG_LVL_ERROR)
             fputs("ERROR: ", logFiles[logType]);

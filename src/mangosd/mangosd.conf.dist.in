@@ -517,6 +517,11 @@ DebuffLimit = 0
 #        Default: "Anticheat.log"
 #                 "" - Empty name disable creating log file
 #
+#    LogFile.Scripts
+#        Log file for script errors and debug info
+#        Default: "Scripts.log"
+#                 "" - Empty name disable creating log file
+#
 #    LogFile.Chat
 #        Log file for player chat.
 #        Default: "Chat.log"
@@ -655,6 +660,7 @@ LogFilter_Honor = 1
 LogFile.Timestamp = 0
 LogFile.Basic = "Server.log"
 LogFile.Anticheat = "Anticheat.log"
+LogFile.Scripts = "Scripts.log"
 LogFile.Chat = "Chat.log"
 LogFile.Bg = "Bg.log"
 LogFile.Char = "Char.log"

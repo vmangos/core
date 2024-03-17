@@ -739,11 +739,11 @@ class Unit : public SpellCaster
         void RemoveAllNegativeAuras(AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAuraTypeOnDeath(AuraType auraType);
         void RemoveAllAurasOnDeath();
-        bool RemoveAuraDueToDebuffLimit(SpellAuraHolder* currentAura); // Returns true if we remove 'currentAura'
+        bool RemoveAuraDueToVisibleSlotLimit(SpellAuraHolder* currentAura); // Returns true if we remove 'currentAura'
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
         void RemoveAurasByDamageTaken(uint32 damage, uint32 exceptSpellId);
 #endif
-        uint32 GetNegativeAurasCount(); // Limit debuffs to 16
+        uint32 GetVisibleAurasCount(bool positive);
 
         // removing specific aura FROM stack by diff reasons and selections
         void RemoveAuraHolderFromStack(uint32 spellId, uint32 stackAmount = 1, ObjectGuid casterGuid = ObjectGuid(), AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);

@@ -416,7 +416,7 @@ struct boss_fankrissAI : public ScriptedAI
         {
             creature_spawn_fankrissAI* ai = dynamic_cast<creature_spawn_fankrissAI*>(pC->AI());
             if (!ai) {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "unable to cast spawn of fankriss AI to creature_spawn_fankrissAI");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "unable to cast spawn of fankriss AI to creature_spawn_fankrissAI");
                 return;
             }
             ai->enrageTimer = enrageTimer;

@@ -4933,19 +4933,10 @@ void Spell::SendSpellGo()
         data << m_caster->GetGUID();
 #endif
 
-    // (HACK) Don't display cast animation for Flametongue Weapon proc
-    // TODO - figure out the rule for why some procs should or should not have cast animations
-    // e.g. rogue poison proc should have animation
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    if (m_spellInfo->Id == 10444)
-        data << PackedGuid();
-     else
-        data << m_caster->GetPackGUID();
+    data << m_caster->GetPackGUID();
 #else
-    if (m_spellInfo->Id == 10444)
-        data << uint64();
-    else
-        data << m_caster->GetGUID();
+    data << m_caster->GetGUID();
 #endif
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint16(castFlags);                              // cast flags

@@ -501,7 +501,7 @@ void npc_doctorAI::UpdateAI(uint32 const uiDiff)
                         case DOCTOR_ALLIANCE: patientEntry = AllianceSoldierId[urand(0, 2)]; break;
                         case DOCTOR_HORDE:    patientEntry = HordeSoldierId[urand(0, 2)];    break;
                         default:
-                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
+                            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
                             return;
                     }
 

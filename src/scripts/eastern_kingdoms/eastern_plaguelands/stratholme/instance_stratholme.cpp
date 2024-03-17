@@ -194,7 +194,7 @@ struct instance_stratholme : public ScriptedInstance
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Cannot open slaugther square yet.");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Cannot open slaugther square yet.");
             return false;
         }
     }
@@ -382,7 +382,7 @@ struct instance_stratholme : public ScriptedInstance
                             break;
                         m_uiBaronRun_Timer = 45*MINUTE*IN_MILLISECONDS;
                         m_phaseBaron = 0;
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Baron run in progress.");
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Baron run in progress.");
                         if (Creature* pYsidaT = instance->GetCreature(m_uiYsidaTriggerGUID))
                             pYsidaT->SummonCreature(NPC_YSIDA,
                                                     4044.163f, -3334.2f, 115.0596f, 4.2f,
@@ -472,7 +472,7 @@ struct instance_stratholme : public ScriptedInstance
                         SummonRamstein();
                     }
                     else
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: %u Abomnation left to kill.", uiCount);
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: %u Abomnation left to kill.", uiCount);
                     m_summoningRammstein = false;
                 }
                 if (uiData == DONE) // on ramstein death OK
@@ -496,7 +496,7 @@ struct instance_stratholme : public ScriptedInstance
                     }
                     //UpdateGoState(m_uiZiggurat4GUID,GO_STATE_ACTIVE,false);
                     m_uiSlaugtherSquare_Timer = 60000;
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Slaugther event will continue in 60 sec.");
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Slaugther event will continue in 60 sec.");
                 }
                 if (uiData == FAIL) // on mob Evade // on ramstein evade
                 {
@@ -768,7 +768,7 @@ struct instance_stratholme : public ScriptedInstance
                 m_uiGateTrapTimers[i][0] -= uiDiff;
                 if (m_uiGateTrapTimers[i][0] <= uiDiff)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SD2: Instance Stratholme - Rat Trap reseted %u.", i);
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "SD2: Instance Stratholme - Rat Trap reseted %u.", i);
                     m_uiGateTrapTimers[i][0] = 0;
                 }
             }
@@ -892,7 +892,7 @@ struct instance_stratholme : public ScriptedInstance
                     pYsida->CastSpell(pYsida, 5, true); // deathtouch
                 }
 
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Baron run event reached end. Event has state %u.", GetData(TYPE_BARON_RUN));
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Baron run event reached end. Event has state %u.", GetData(TYPE_BARON_RUN));
             }
             else
                 m_uiBaronRun_Timer -= uiDiff;
@@ -939,7 +939,7 @@ struct instance_stratholme : public ScriptedInstance
                         UpdateGoState(m_uiZiggurat5GUID, GO_STATE_ACTIVE, false);
                         pBaron->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
 
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Black guard sentries spawned. Opening gates to baron.");
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Black guard sentries spawned. Opening gates to baron.");
                     }
                 }
                 m_uiSlaugtherSquare_Timer = 0;
@@ -979,7 +979,7 @@ struct instance_stratholme : public ScriptedInstance
             pRamstein->GetMotionMaster()->MovePoint(0, 4033.009f, -3404.3293f, 115.3554f);
             pRamstein->SetHomePosition(4033.009f, -3404.3293f, 115.3554f, 4.788970f);
             SetData(TYPE_RAMSTEIN_EVENT, DONE);
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Ramstein spawned.");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Ramstein spawned.");
         }
     }
     void DoGateTrap(uint8 uiGate)
@@ -988,7 +988,7 @@ struct instance_stratholme : public ScriptedInstance
         if (m_uiGateTrapTimers[uiGate][0])
             return;
 
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SD2: Instance Stratholme - Rat Trap activated %i.", uiGate);
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "SD2: Instance Stratholme - Rat Trap activated %i.", uiGate);
         // close the gates
         DoUseDoorOrButton(m_ratTrapGateGUID[2 * uiGate]);
         DoUseDoorOrButton(m_ratTrapGateGUID[2 * uiGate + 1]);

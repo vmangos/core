@@ -759,7 +759,7 @@ class World
         typedef std::list<WorldSession*> Queue;
         void AddQueuedSession(WorldSession*);
         bool RemoveQueuedSession(WorldSession* session);
-        int32 GetQueuedSessionPos(WorldSession*);
+        uint32 GetQueuedSessionPos(WorldSession*);
 
         // Set a new Message of the Day
         void SetMotd(std::string const& motd) { m_motd = motd; }
@@ -884,7 +884,7 @@ class World
         void UpdateResultQueue();
         void InitResultQueue();
 
-        void UpdateRealmCharCount(uint32 accid);
+        void UpdateRealmCharCount(uint32 accountId);
 
         LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if (m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
 
