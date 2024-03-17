@@ -105,7 +105,7 @@ void AuctionHouseBotMgr::Update(bool force /* = false */)
         return;
     }
 
-    uint32 auctions     = auctionHouse->GetAccountAuctionCount(0);
+    uint32 auctions     = auctionHouse->GetAccountAuctionCount(m_config->botaccount);
     uint32 items        = m_config->itemcount;
     uint32 entriesCount = m_items.size();
 
