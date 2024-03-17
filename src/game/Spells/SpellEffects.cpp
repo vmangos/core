@@ -692,6 +692,8 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         pCreature->DisappearAndDie();
                         pCreature->RemoveFromWorld();
                     }
+                    return;
+                }
                 case 32061: // EPL PvP A Game of Towers: (TXT) ToWoW - Tower Kill Credit (DND)
                 {
                     if (Player* pPlayer = ToPlayer(m_casterUnit))
@@ -2193,7 +2195,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
         sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, effIdx, gameObjTarget);
     else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
         sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, effIdx, (Creature*)unitTarget);
-}
 }
 
 void Spell::EffectTriggerSpell(SpellEffectIndex effIdx)

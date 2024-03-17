@@ -146,6 +146,8 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     DELETE FROM `creature_ai_scripts` WHERE `dataint`=12366 AND `dataint2`=12367 AND `dataint3`=12368 AND `dataint4`=12369;
     DELETE FROM `creature_ai_scripts` WHERE `dataint`=12370 AND `dataint2`=12371 AND `dataint3`=12372 AND `dataint4`=12373;
 
+    UPDATE `creature_ai_scripts` SET `datalong`=0 WHERE `id`=1614103 OR `id`=1638002 OR `id`=1469702 OR `id`=1629802 OR `id`=1629902 OR `id`=1637902;
+
     -- Remove some old conditions
     DELETE FROM `conditions` WHERE `condition_entry`=3319;
     DELETE FROM `conditions` WHERE `condition_entry`=3320;
