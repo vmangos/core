@@ -260,7 +260,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction)
     uint32 ahbot_guid = sConfig.GetIntDefault("AHBot.bot.guid", 1123);
 
     // owner exist
-    if ((owner || owner_accId) && !(ahbot_guid == auction->owner)) //owner not a ahbot
+    if ((owner || owner_accId) && ahbot_guid != auction->owner) //owner not a ahbot
     {
         std::ostringstream subject;
         subject << auction->itemTemplate << ":0:" << AUCTION_EXPIRED;
