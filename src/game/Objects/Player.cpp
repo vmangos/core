@@ -2037,7 +2037,7 @@ void Player::AutoReSummonPet()
     pet->SetHealth(pet->GetMaxHealth());
 }
 
-bool Player::BuildEnumData(QueryResult* result, WorldPacket* pData, bool& hasGuildTabard, AccountTypes security)
+bool Player::BuildEnumData(QueryResult* result, WorldPacket* pData, AccountTypes security)
 {
     //                0                1                2                3                 4                  5                6                7                      8                      9                       10
     //    "SELECT characters.guid, characters.name, characters.race, characters.class, characters.gender, characters.skin, characters.face, characters.hair_style, characters.hair_color, characters.facial_hair, characters.level, "
@@ -2160,9 +2160,6 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* pData, bool& hasGui
             *pData << uint8(0);
             continue;
         }
-
-        if (itemId == 5976)
-            hasGuildTabard = true;
 
         *pData << uint32(proto->DisplayInfoID);
         *pData << uint8(proto->InventoryType);

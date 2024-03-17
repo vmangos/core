@@ -975,8 +975,8 @@ class Player final: public Unit
         // Initializes a new Player object that was not loaded from the database.
         bool Create(uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
         void Update(uint32 update_diff, uint32 time) override;
-        static bool BuildEnumData(QueryResult* result,  WorldPacket* pData, bool& hasGuildTabard, AccountTypes security);
-
+        static bool BuildEnumData(QueryResult* result,  WorldPacket* pData, AccountTypes security);
+        
         /**
          * @brief Can only be called from Master server (or ASSERT will fail)
          * @return player social structure.
