@@ -34,6 +34,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Mail.h"
+#include "Config/Config.h"
 
 #include "Policies/SingletonImp.h"
 
@@ -254,9 +255,12 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction)
     uint32 owner_accId = 0;
     if (!owner)
         owner_accId = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
+    
+    // owner is AHBot
+    uint32 ahbot_guid = sConfig.GetIntDefault("AHBot.bot.guid", 1123);
 
     // owner exist
-    if (owner || owner_accId)
+    if ((owner || owner_accId) && !(ahbot_guid == auction->owner)) //owner not a ahbot
     {
         std::ostringstream subject;
         subject << auction->itemTemplate << ":0:" << AUCTION_EXPIRED;
@@ -268,8 +272,8 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction)
 
         // will delete item or place to receiver mail list
         MailDraft(subject.str())
-        .AddItem(pItem)
-        .SendMailTo(MailReceiver(owner, owner_guid), auction, MAIL_CHECK_MASK_COPIED);
+            .AddItem(pItem)
+            .SendMailTo(MailReceiver(owner, owner_guid), auction, MAIL_CHECK_MASK_COPIED);
     }
     // owner not found
     else
