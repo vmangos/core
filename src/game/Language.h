@@ -1141,5 +1141,8 @@ enum MangosStrings
     // opvp si
     LANG_OPVP_SI_CAPTURE_H              = 10049,
     LANG_OPVP_SI_CAPTURE_A              = 10050,
+
+    //hardcore
+    LANG_HARDCORE = 50001
 };
 #endif

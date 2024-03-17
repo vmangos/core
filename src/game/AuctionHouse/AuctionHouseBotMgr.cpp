@@ -105,7 +105,7 @@ void AuctionHouseBotMgr::Update(bool force /* = false */)
         return;
     }
 
-    uint32 auctions     = auctionHouse->GetCount();
+    uint32 auctions     = auctionHouse->GetAccountAuctionCount(m_config->botaccount);
     uint32 items        = m_config->itemcount;
     uint32 entriesCount = m_items.size();
 
@@ -166,7 +166,8 @@ void AuctionHouseBotMgr::AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auc
     auctionEntry->auctionHouseEntry  = m_auctionHouseEntry;
     auctionEntry->itemGuidLow        = item->GetGUIDLow();
     auctionEntry->itemTemplate       = item->GetEntry();
-    auctionEntry->owner              = 0;
+    auctionEntry->owner              = m_config->botguid;
+    auctionEntry->ownerAccount       = m_config->botaccount;
     auctionEntry->startbid           = e.bid;
     auctionEntry->buyout             = e.buyout;
     auctionEntry->bidder             = 0;
