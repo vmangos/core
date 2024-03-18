@@ -132,7 +132,7 @@ class WorkerThread(threading.Thread):
             bin_path = move_map_gen_dir / "MoveMapGen"
 
         subprocess.call(
-            (bin_path, str(self.map_id), "--silent"),
+            (bin_path, str(self.map_id), "--silent", *sys.argv[1:]),
             startupinfo=startup_info,
             creationflags=creation_flags,
         )
@@ -154,8 +154,14 @@ if __name__ == "__main__":
                 map_ids.add(spawn.map_id)
 
     # Process maps
-    max_workers = max(cpu_count() - 0, 1)  # You can reduce the load by putting 1 instead of 0 if you need to free 1 core/cpu
-    print("I will always maintain", max_workers, "MoveMapGen tasks running in background.\n")
+    max_workers = max(
+        cpu_count() - 0, 1 # You can reduce the load by putting 1 instead of 0 if you need to free 1 core/cpu
+    )
+    print(
+        "I will always maintain",
+        max_workers,
+        "MoveMapGen tasks running in background.\n",
+    )
     map_queue = deque(map_ids)
     while map_queue:
         if threading.active_count() <= max_workers:
