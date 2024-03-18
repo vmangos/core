@@ -29,6 +29,10 @@
 #include "Util.h"
 #include "CliRunnable.h"
 #include "Database/DatabaseEnv.h"
+#ifdef linux
+#include "readline/readline.h"
+#include "readline/history.h"
+#endif
 
 void utf8print(void* /*arg*/, const char* str)
 {
@@ -55,24 +59,28 @@ void utf8print(void* /*arg*/, const char* str)
 
 void commandFinished(void*, bool /*sucess*/)
 {
+#ifdef WIN32
     printf("mangos>");
+#endif
     fflush(stdout);
+    #ifdef linux
+    rl_on_new_line();
+    #endif
 }
 
 // @}
 
 #ifdef linux
-// Non-blocking keypress detector, when return pressed, return 1, else always return 0
-int kb_hit_return()
+int checkStopped()
 {
-    struct timeval tv;
-    fd_set fds;
-    tv.tv_sec = 0;
-    tv.tv_usec = 0;
-    FD_ZERO(&fds);
-    FD_SET(STDIN_FILENO, &fds);
-    select(STDIN_FILENO+1, &fds, nullptr, nullptr, &tv);
-    return FD_ISSET(STDIN_FILENO, &fds);
+    if (World::IsStopped())
+    {
+        rl_clear_message();
+        rl_done = 1;
+        rl_free_line_state();
+        rl_cleanup_after_signal();
+    }
+    return 0;
 }
 #endif
 
@@ -90,75 +98,52 @@ void CliRunnable::operator()()
 
     // print this here the first time
     // later it will be printed after command queue updates
+    #ifdef WIN32
     printf("\nmangos>");
+    #endif
 
     // As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
     {
         fflush(stdout);
-        #ifdef linux
-        while (!kb_hit_return() && !World::IsStopped())
-            // With this, we limit CLI to 10commands/second
-            usleep(100);
-        if (World::IsStopped())
-            break;
-        #endif
 
-#ifndef WIN32
-
-        int retval;
-        do
-        {
-            fd_set rfds;
-            struct timeval tv;
-            tv.tv_sec = 1;
-            tv.tv_usec = 0;
-
-            FD_ZERO(&rfds);
-            FD_SET(0, &rfds);
-
-            retval = select(1, &rfds, nullptr, nullptr, &tv);
-        } while (!retval);
-
-        if (retval == -1)
-        {
-            World::StopNow(SHUTDOWN_EXIT_CODE);
-            break;
-        }
-#endif
-
+        #ifdef WIN32
         char *command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
+        #else
+        rl_event_hook = &checkStopped;
+        //TDO: tab completion
+        rl_bind_key ('\t', rl_insert);
+        char *command_str = readline("vmangos>");
+        // don't save empty commands
+        if (command_str && *command_str)
+            add_history(command_str);
+        #endif
         if (command_str != nullptr)
         {
             for(int x=0;command_str[x];x++)
                 if(command_str[x]=='\r'||command_str[x]=='\n')
-            {
-                command_str[x]=0;
-                break;
-            }
-
+                {
+                    command_str[x]=0;
+                    break;
+                }
 
             if(!*command_str)
             {
+                #ifdef WIN32
                 printf("mangos>");
+                #endif
                 continue;
             }
 
             std::string command;
             if(!consoleToUtf8(command_str,command))         // convert from console encoding to utf8
             {
+                #ifdef WIN32
                 printf("mangos>");
+                #endif
                 continue;
             }
-
             sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, nullptr, command.c_str(), &utf8print, &commandFinished));
         }
-        else if (feof(stdin))
-        {
-            World::StopNow(SHUTDOWN_EXIT_CODE);
-        }
     }
-
-    // End the database thread
-    WorldDatabase.ThreadEnd();                                  // free mySQL thread resources
 }
