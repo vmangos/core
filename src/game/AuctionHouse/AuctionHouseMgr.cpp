@@ -208,11 +208,8 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction)
     if (!owner)
         owner_accId = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
 
-    // owner is AHBot
-    uint32 ahbot_guid = sConfig.GetIntDefault("AHBot.bot.guid", 1123);
-
     // owner exist
-    if ((owner || owner_accId) && ahbot_guid != auction->owner) //owner not a ahbot
+    if (owner || owner_accId) //owner not a ahbot
     {
         std::ostringstream msgAuctionSuccessfulSubject;
         msgAuctionSuccessfulSubject << auction->itemTemplate << ":0:" << AUCTION_SUCCESSFUL;
@@ -259,8 +256,11 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction)
     if (!owner)
         owner_accId = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
 
+    // owner is AHBot
+    uint32 ahbot_guid = sConfig.GetIntDefault("AHBot.bot.guid", 0);
+
     // owner exist
-    if (owner || owner_accId)
+    if ((owner || owner_accId) && ahbot_guid != auction->owner) //owner not a ahbot
     {
         std::ostringstream subject;
         subject << auction->itemTemplate << ":0:" << AUCTION_EXPIRED;
