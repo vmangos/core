@@ -257,7 +257,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction)
         owner_accId = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
     
     // owner is AHBot
-    uint32 ahbot_guid = sConfig.GetIntDefault("AHBot.bot.guid", 1123);
+    uint32 ahbot_guid = sConfig.GetIntDefault("AHBot.bot.guid", 0);
 
     // owner exist
     if ((owner || owner_accId) && ahbot_guid != auction->owner) //owner not a ahbot
