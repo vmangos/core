@@ -5253,17 +5253,14 @@ float Unit::SpellDamageBonusTaken(SpellCaster* pCaster, SpellEntry const* spellP
 
 int32 Unit::SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask) const
 {
-    int32 TakenAdvertisedBenefit = 0;
+    int32 advertisedBenefit = 0;
 
-    // ..taken
-    AuraList const& mDamageTaken = GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
-    for (const auto& i : mDamageTaken)
-    {
-        if ((i->GetModifier()->m_miscvalue & schoolMask) != 0)
-            TakenAdvertisedBenefit += i->GetModifier()->m_amount;
-    }
+    AuraList const& damageTakenAuras = GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
+    for (const auto& i : damageTakenAuras)
+        if (i->GetModifier()->m_miscvalue & schoolMask)
+            advertisedBenefit += i->GetModifier()->m_amount;
 
-    return TakenAdvertisedBenefit;
+    return advertisedBenefit;
 }
 
 bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType, Spell* spell) const
@@ -5446,8 +5443,9 @@ float Unit::SpellHealingBonusTaken(SpellCaster* pCaster, SpellEntry const* spell
 int32 Unit::SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask) const
 {
     int32 advertisedBenefit = 0;
-    AuraList const& mDamageTaken = GetAurasByType(SPELL_AURA_MOD_HEALING);
-    for (const auto& i : mDamageTaken)
+
+    AuraList const& healingTakenAuras = GetAurasByType(SPELL_AURA_MOD_HEALING);
+    for (const auto& i : healingTakenAuras)
         if (i->GetModifier()->m_miscvalue & schoolMask)
             advertisedBenefit += i->GetModifier()->m_amount;
 
