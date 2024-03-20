@@ -450,9 +450,12 @@ int Master::Run()
         b[3].Event.KeyEvent.wRepeatCount = 1;
         DWORD numb;
         WriteConsoleInput(hStdIn, b, 4, &numb);
-#else
-        fclose(stdin);
 #endif
+        World::StopNow(SHUTDOWN_EXIT_CODE);
+        // End the database thread
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stopping WorldDatabase thread...");
+        WorldDatabase.ThreadEnd(); // free mySQL thread resources
+
         if (cliThread->joinable())
             cliThread->join();
 
