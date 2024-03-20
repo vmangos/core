@@ -196,73 +196,73 @@ typedef std::vector<CreatureSpellsEntry> CreatureSpellsList;
 // from `creature_template` table
 struct CreatureInfo
 {
-    uint32  entry;
-    char*   name;
-    char*   subname;
-    uint32  level_min;
-    uint32  level_max;
-    uint32  faction;
-    uint32  npc_flags;
-    uint32  gossip_menu_id;
-    uint32  display_id[MAX_DISPLAY_IDS_PER_CREATURE];
-    float   display_scale[MAX_DISPLAY_IDS_PER_CREATURE];
-    uint32  display_probability[MAX_DISPLAY_IDS_PER_CREATURE];
-    uint32  display_total_probability;
-    uint32  mount_display_id;
-    float   speed_walk;
-    float   speed_run;
-    float   detection_range;                                // Detection Range for Line of Sight aggro
-    float   call_for_help_range;                            // Radius for combat assistance call
-    float   leash_range;                                    // Hard limit on allowed chase distance
-    uint32  rank;
-    float   xp_multiplier;
-    float   health_multiplier;
-    float   mana_multiplier;
-    float   armor_multiplier;
-    float   damage_multiplier;
-    float   damage_variance;
-    uint32  damage_school;
-    uint32  base_attack_time;
-    uint32  ranged_attack_time;
-    int32   holy_res;
-    int32   fire_res;
-    int32   nature_res;
-    int32   frost_res;
-    int32   shadow_res;
-    int32   arcane_res;
-    uint32  unit_class;                                     // enum Classes. Note only 4 classes are known for creatures.
-    uint32  unit_flags;                                     // enum UnitFlags mask values
-    uint32  pet_family;                                     // enum CreatureFamily values (optional)
-    uint32  trainer_type;
-    uint32  trainer_spell;
-    uint32  trainer_class;
-    uint32  trainer_race;
-    uint32  type;                                           // enum CreatureType values
-    uint32  type_flags;                                     // enum CreatureTypeFlags mask values
-    uint32  loot_id;
-    uint32  pickpocket_loot_id;
-    uint32  skinning_loot_id;
-    uint32  gold_min;
-    uint32  gold_max;
-    uint32  spells[CREATURE_MAX_SPELLS];
-    uint32  spell_list_id;
-    uint32  pet_spell_list_id;
-    uint32  spawn_spell_id;
-    uint32 const* auras;
-    char const* ai_name;
-    uint32  movement_type;
-    uint32  inhabit_type;
-    uint32  civilian;
-    bool    racial_leader;
-    uint32  regeneration;
-    uint32  equipment_id;
-    uint32  trainer_id;
-    uint32  vendor_id;
-    uint32  mechanic_immune_mask;
-    uint32  school_immune_mask;
-    uint32  immunity_flags;
-    uint32  flags_extra;
-    uint32  script_id;
+    uint32  entry = 0;
+    std::string name;
+    std::string subname;
+    uint32  level_min = 1;
+    uint32  level_max = 1;
+    uint32  faction = 0;
+    uint32  npc_flags = 0;
+    uint32  gossip_menu_id = 0;
+    uint32  display_id[MAX_DISPLAY_IDS_PER_CREATURE] = {};
+    float   display_scale[MAX_DISPLAY_IDS_PER_CREATURE] = {};
+    uint32  display_probability[MAX_DISPLAY_IDS_PER_CREATURE] = {};
+    uint32  display_total_probability = 0;
+    uint32  mount_display_id = 0;
+    float   speed_walk = 1.0f;
+    float   speed_run = 1.14286f;
+    float   detection_range = 18.0f;                        // Detection Range for Line of Sight aggro
+    float   call_for_help_range = 5.0f;                     // Radius for combat assistance call
+    float   leash_range = 0.0f;                             // Hard limit on allowed chase distance
+    uint32  rank = 0;
+    float   xp_multiplier = 1.0f;
+    float   health_multiplier = 1.0f;
+    float   mana_multiplier = 1.0f;
+    float   armor_multiplier = 1.0f;
+    float   damage_multiplier = 1.0f;
+    float   damage_variance = 0.14f;
+    uint32  damage_school = 0;
+    uint32  base_attack_time = 2000;
+    uint32  ranged_attack_time = 2000;
+    int32   holy_res = 0;
+    int32   fire_res = 0;
+    int32   nature_res = 0;
+    int32   frost_res = 0;
+    int32   shadow_res = 0;
+    int32   arcane_res = 0;
+    uint32  unit_class = 0;                                 // enum Classes. Note only 4 classes are known for creatures.
+    uint32  unit_flags = 0;                                 // enum UnitFlags mask values
+    uint32  pet_family = 0;                                 // enum CreatureFamily values (optional)
+    uint32  trainer_type = 0;
+    uint32  trainer_spell = 0;
+    uint32  trainer_class = 0;
+    uint32  trainer_race = 0;
+    uint32  type = 0;                                       // enum CreatureType values
+    uint32  type_flags = 0;                                 // enum CreatureTypeFlags mask values
+    uint32  loot_id = 0;
+    uint32  pickpocket_loot_id = 0;
+    uint32  skinning_loot_id = 0;
+    uint32  gold_min = 0;
+    uint32  gold_max = 0;
+    uint32  spells[CREATURE_MAX_SPELLS] = {};
+    uint32  spell_list_id = 0;
+    uint32  pet_spell_list_id = 0;
+    uint32  spawn_spell_id = 0;
+    uint32 const* auras = nullptr;
+    std::string ai_name;
+    uint32  movement_type = 0;
+    uint32  inhabit_type = 3;
+    bool    civilian = false;
+    bool    racial_leader = false;
+    uint32  regeneration = 3;
+    uint32  equipment_id = 0;
+    uint32  trainer_id = 0;
+    uint32  vendor_id = 0;
+    uint32  mechanic_immune_mask = 0;
+    uint32  school_immune_mask = 0;
+    uint32  immunity_flags = 0;
+    uint32  flags_extra = 0;
+    uint32  script_id = 0;
 
     // helpers
     static HighGuid GetHighGuid()

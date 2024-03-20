@@ -708,7 +708,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recv_data)
     }
 
     uint32 creatureId = petData->entry;
-    CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(creatureId);
+    CreatureInfo const* creatureInfo = sObjectMgr.GetCreatureTemplate(creatureId);
     if (!creatureInfo || !creatureInfo->isTameable())
     {
         SendStableResult(STABLE_ERR_STABLE);
@@ -810,7 +810,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recv_data)
         return;
     }
 
-    CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(creature_id);
+    CreatureInfo const* creatureInfo = sObjectMgr.GetCreatureTemplate(creature_id);
     if (!creatureInfo || !creatureInfo->isTameable())
     {
         SendStableResult(STABLE_ERR_STABLE);

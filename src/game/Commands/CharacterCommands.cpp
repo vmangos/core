@@ -2806,9 +2806,9 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
     else
     {
         std::set<uint32> checkedTrainerTemplates;
-        for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
+        for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
         {
-            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i);
+            CreatureInfo const* cInfo = itr.second.get();
             if (!cInfo)
                 continue;
 
@@ -2831,7 +2831,7 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
                 }
             }
 
-            if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(i))
+            if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
                 HandleLearnTrainerHelper(pPlayer, cSpells);
 
             if (trainerId = cInfo->trainer_id) // assignment
@@ -2939,9 +2939,9 @@ bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
 {
     Player* player = m_session->GetPlayer();
 
-    for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
+    for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
     {
-        if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
+        if (CreatureInfo const* cInfo = itr.second.get())
             if (cInfo->npc_flags & UNIT_NPC_FLAG_FLIGHTMASTER)
             {
                 FindCreatureData worker(cInfo->entry, player);

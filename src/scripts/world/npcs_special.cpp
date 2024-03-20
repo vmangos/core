@@ -1335,7 +1335,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (m_creature->IsTemporarySummon())
         {
             if (Player* pSummoner = m_creature->GetMap()->GetPlayer(static_cast<TemporarySummon*>(m_creature)->GetSummonerGuid()))
-                if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
+                if (CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
                     pSummoner->KilledMonster(cInfo, ObjectGuid());
         }
 
