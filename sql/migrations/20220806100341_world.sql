@@ -56,7 +56,7 @@ INSERT INTO `migrations` VALUES ('20220806100341');
     -- creature_template:
     UPDATE `creature_template` SET `regeneration`=0 WHERE `entry`=16136;
     UPDATE `creature_template` SET `regeneration`=0 WHERE `entry`=16172;
-    UPDATE `creature_template` SET `auras`=NULL, `flags_extra`=0 WHERE `entry`=16230;
+    UPDATE `creature_template` SET `auras`=NULL, `flags_extra`=196608 WHERE `entry`=16230;
     UPDATE `creature_template` SET `spawn_spell_id`=28234 WHERE `entry` IN (16141, 16230, 16298, 16299, 16379, 16380, 16383, 16394, 16422, 16423, 16437, 16438);
     UPDATE `creature_template` SET `auras`='28346 27887' WHERE `entry` IN (16136, 16172);
     UPDATE `creature_template` SET `spell_list_id`=163830, `ai_name`='EventAI', `script_name`='', `flags_extra`=4096 WHERE `entry`=16383;
@@ -972,7 +972,6 @@ INSERT INTO `migrations` VALUES ('20220806100341');
 
     DELETE FROM `generic_scripts` WHERE `id`=1623001;
     INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (1623001, 0, 0, 2, 16, 2, 0, 0, 16172, 15, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Field Set'),
     (1623001, 0, 1, 35, 0, 0, 0, 0, 16172, 15, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Face Damaged Necrotic Shard'),
     (1623001, 0, 3, 44, 1, 1, 0, 0, 16172, 10, 8, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Set Phase for Damaged Necrotic Shard'),
     (1623001, 2, 2, 15, 28132, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cultist Engineer - Cast Create Summoner Shield'),
