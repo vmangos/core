@@ -90,7 +90,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/molten_core/boss_sulfuron_harbinger.cpp
     eastern_kingdoms/burning_steppes/molten_core/instance_molten_core.cpp
     eastern_kingdoms/burning_steppes/molten_core/molten_core.cpp
-    eastern_kingdoms/dun_morogh/dun_morogh.cpp
     eastern_kingdoms/dun_morogh/gnomeregan/boss_thermaplugg.cpp
     eastern_kingdoms/dun_morogh/gnomeregan/gnomeregan.cpp
     eastern_kingdoms/dun_morogh/gnomeregan/instance_gnomeregan.cpp
