@@ -355,6 +355,13 @@ void WorldSession::HandlePetRename(WorldPacket& recv_data)
             pet->GetOwnerGuid() != _player->GetObjectGuid() || !pet->GetCharmInfo())
         return;
 
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Hunters are now able to rename their pets while mounted.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    if (_player->IsMounted())
+        return;
+#endif
+
     PetNameInvalidReason res = ObjectMgr::CheckPetName(name);
     if (res != PET_NAME_SUCCESS)
     {

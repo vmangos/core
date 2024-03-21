@@ -532,10 +532,12 @@ int32 SpellCaster::MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, S
     //   lower level ranks of the spell (affected spells were Blizzard,
     //   Consecration,Explosive Trap, Flamestrike, Hurricane, Rain of Fire and
     //   Volley).
+    // - The resist rate for hunter traps is now based on the hunter's skill
+    //   rather than the level of the trap.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     int32 leveldif = int32(pVictim->GetLevelForTarget(this)) - int32(GetLevelForTarget(pVictim));
 #else
-    int32 leveldif = (!spellPtr && spell->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA)) ?
+    int32 leveldif = (spellPtr ? spellPtr->GetOriginalCasterGuid().IsGameObject() : spell->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA)) ?
         int32(pVictim->GetLevelForTarget(this)) - std::max<int32>(1, spell->spellLevel) :
         int32(pVictim->GetLevelForTarget(this)) - int32(GetLevelForTarget(pVictim));
 #endif
