@@ -1427,6 +1427,18 @@ bool ChatHandler::HandlePartyBotFocusMarkCommand(char* args)
         {
             if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
             {
+                // Only the owner can.
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s is not your bot or it cannot focus.", pTarget->GetName());
+                        return false;
+                    }
+                }
+
                 if (std::find(pAI->m_marksToFocus.begin(), pAI->m_marksToFocus.end(), itrMark->second) != pAI->m_marksToFocus.end()) 
                 {
                     PSendSysMessage("%s already have focus %s.", pTarget->GetName(), args);
@@ -1457,6 +1469,20 @@ bool ChatHandler::HandlePartyBotFocusMarkCommand(char* args)
         {
             if (pMember == pPlayer)
                 continue;
+
+            // Only the owner can.                
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        continue;
+                    }
+                }
+            }
 
             if (pMember->AI())
             {
