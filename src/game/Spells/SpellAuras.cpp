@@ -1792,6 +1792,37 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         m_modifier.periodictime = 5 * IN_MILLISECONDS; // expected to tick with 5 sec period
                         return;
                     }
+                    case 17680: // [Event: Scourge Invasion] Spirit Spawn-out
+                    {
+                        if (Creature* pCreature = ToCreature(GetCaster()))
+                        {
+                            if (pCreature->IsAlive() && !pCreature->HasCreatureState(CSTATE_DESPAWNING))
+                                pCreature->DespawnOrUnsummon(2000);
+                        }
+                        return;
+                    }
+                    case 27852: // [Event: Scourge Invasion] [PH] Kill Summoner Buff
+                    {
+                        if (Creature* pCreature = ToCreature(GetCaster())) // Casted by Cultist Engineer
+                        {
+                            if (Player* pPlayer = ToPlayer(target)) // Target is Player
+                            {
+                                pPlayer->CastSpell(pCreature, 27894, true); // Kill Summoner, who will Summon Boss
+                            }
+                        }
+                        return;
+                    }
+                    case 31316: // [Event: Scourge Invasion] Summon Boss Buff
+                    {
+                        if (Creature* pCreature = ToCreature(GetCaster())) // Casted by Cultist Engineer
+                        {
+                            if (Player* pPlayer = ToPlayer(target)) // Target is Player
+                            {
+                                pPlayer->CastSpell(pPlayer, 31315, true); // Summon Boss
+                            }
+                        }
+                        return;
+                    }
                     case 16739: // Orb of Deception (before patch 1.7)
                         return HandleAuraTransform(apply, Real);
                     case 21827: // Frostwolf Aura DND

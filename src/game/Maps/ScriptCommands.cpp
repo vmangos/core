@@ -2240,7 +2240,10 @@ bool Map::ScriptCommand_JoinCreatureGroup(ScriptInfo const& script, WorldObject*
         return ShouldAbortScript(script);
     }
 
-    pSource->JoinCreatureGroup(pTarget, script.x, script.o, script.joinCreatureGroup.options);
+    if (script.x == 0 && script.o == 0)
+        pSource->JoinCreatureGroup(pTarget, pSource->GetDistance3dToCenter(pTarget), pSource->GetAngle(pTarget), script.joinCreatureGroup.options);
+    else
+        pSource->JoinCreatureGroup(pTarget, script.x, script.o, script.joinCreatureGroup.options);
 
     return false;
 }
