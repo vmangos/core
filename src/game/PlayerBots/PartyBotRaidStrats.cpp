@@ -423,6 +423,15 @@ void PartyBotAI::RaidStratsInMKProtectionPotions()
             return;
         }
     }
+
+    if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_ARCANE_PROTECTION_POTION))
+    {
+        if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_ARCANE_PROTECTION_POTION))
+        {
+            UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_ARCANE_PROTECTION_POTION);
+            return;
+        }
+    }
 }
 
 void PartyBotAI::RaidStratsInOnyxiaProtectionPotions()
