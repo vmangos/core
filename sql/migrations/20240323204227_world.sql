@@ -92,6 +92,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `f
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`) VALUES (325571, 3976, 25, 'Dire Mail - Warpwood Pod 8 - Summon', 0);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`) VALUES (325572, 3977, 25, 'Dire Mail - Warpwood Pod 9 - Summon', 0);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`) VALUES (325573, 3978, 25, 'Dire Mail - Warpwood Pod 10 - Summon', 0);
+UPDATE `pool_template` SET `patch_min`=1 WHERE `entry` IN (3969, 3970, 3971, 3972, 3973, 3974, 3975, 3976, 3977, 3978);
+UPDATE `pool_gameobject` SET `patch_min`=1 WHERE `pool_entry` IN (3969, 3970, 3971, 3972, 3973, 3974, 3975, 3976, 3977, 3978);
 
 -- Assign AI to the fake pods so I don't have to spawn every kind of trap at every position.
 UPDATE `gameobject_template` SET `script_name`='go_warpwood_pod' WHERE `entry` IN (179526, 179532, 179533);
