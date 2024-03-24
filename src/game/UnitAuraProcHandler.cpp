@@ -347,6 +347,12 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
             return SPELL_PROC_TRIGGER_FAILED;
         }
 
+        // Ravager Whirlwind should allow triggered spells
+        if (procSpell->Id == 9633)
+        {
+            isSpellTriggeredByAuraOrItem = false;
+        }
+
         // World of Warcraft Client Patch 1.10.0 (2006-03-28)
         // - Execute - This ability will now work with Sweeping Strikes again. If
         //   the second victim is below 20 % health, they will be hit with the full
@@ -590,8 +596,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     if (!pVictim)
                         return SPELL_AURA_PROC_FAILED;
 
-                    // Prevent chain of triggered spell from same triggered spell
-                    if (procSpell && (procSpell->Id == 26654 || procSpell->Id == 12723))
+                    // Prevent chain of triggered spell from same triggered spell or Ravager Whirlwind
+                    if (procSpell && (procSpell->Id == 26654 || procSpell->Id == 12723 || procSpell->Id == 9633))
                         return SPELL_AURA_PROC_FAILED;
 
                     // Fix range for target selection when proccing SS with whirlwind. Whirlwind doesn't
