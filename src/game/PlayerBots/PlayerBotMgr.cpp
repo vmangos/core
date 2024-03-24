@@ -833,6 +833,36 @@ bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player cons
     return true;
 }
 
+bool IsClass(std::string option)
+{
+    if (
+        option == "warrior" ||
+        option == "paladin" ||
+        option == "hunter" ||
+        option == "rogue" ||
+        option == "priest" ||
+        option == "shaman" ||
+        option == "mage" ||
+        option == "warlock" ||
+        option == "druid"
+        )
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool IsRole(std::string option)
+{
+    if (option == "tank" || option == "dps" || option == "healer")
+    {
+        return true;
+    }
+
+    return false;
+}
+
 bool ChatHandler::HandlePartyBotAddCommand(char* args)
 {
     Player* pPlayer = m_session->GetPlayer();
@@ -856,59 +886,114 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     uint32 botLevel = pPlayer->GetLevel();
     CombatBotRoles botRole = ROLE_INVALID;
 
-    if (char* arg1 = ExtractArg(&args))
+    bool haveClass = false;
+    bool haveRole = false;
+    std::string optionClass;
+    std::string optionRole;
+
+    while (char* arg = ExtractArg(&args))
     {
-        std::string option = arg1;
-        if (option == "warrior")
-            botClass = CLASS_WARRIOR;
-        else if (option == "paladin" && pPlayer->GetTeam() == ALLIANCE)
-            botClass = CLASS_PALADIN;
-        else if (option == "hunter")
-            botClass = CLASS_HUNTER;
-        else if (option == "rogue")
-            botClass = CLASS_ROGUE;
-        else if (option == "priest")
-            botClass = CLASS_PRIEST;
-        else if (option == "shaman" && pPlayer->GetTeam() == HORDE)
-            botClass = CLASS_SHAMAN;
-        else if (option == "mage")
-            botClass = CLASS_MAGE;
-        else if (option == "warlock")
-            botClass = CLASS_WARLOCK;
-        else if (option == "druid")
-            botClass = CLASS_DRUID;
-        else if (option == "dps")
+        std::string option = arg;
+
+        if (IsClass(option))
         {
-            botClass = PickRandomValue(CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK);
-            botRole = CombatBotBaseAI::IsMeleeDamageClass(botClass) ? ROLE_MELEE_DPS : ROLE_RANGE_DPS;
-        }
-        else if (option == "healer")
-        {
-            std::vector<uint32> dpsClasses = { CLASS_PRIEST, CLASS_DRUID };
-            if (pPlayer->GetTeam() == HORDE)
-                dpsClasses.push_back(CLASS_SHAMAN);
-            else
-                dpsClasses.push_back(CLASS_PALADIN);
-            botClass = SelectRandomContainerElement(dpsClasses);
-            botRole = ROLE_HEALER;
-        }
-        else if (option == "tank")
-        {
-            botClass = CLASS_WARRIOR;
-            botRole = ROLE_TANK;
+            haveClass = true;
+            optionClass = option;
         }
 
-        // Prevent setting a custom level for bots unless the account is a GM or skipping checks is enabled.
-        if (GetSession()->GetSecurity() > SEC_PLAYER || sWorld.getConfig(CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS))
-            ExtractUInt32(&args, botLevel);
+        if (IsRole(option))
+        {
+            haveRole = true;
+            optionRole = option;
+        }
     }
 
-    if (!botClass)
+    if (!haveClass && !haveRole)
     {
         SendSysMessage("Incorrect syntax. Expected role or class.");
         SetSentErrorMessage(true);
         return false;
     }
+
+    if (haveClass)
+    {
+        if (optionClass == "warrior")
+            botClass = CLASS_WARRIOR;
+        if (optionClass == "paladin" && pPlayer->GetTeam() == ALLIANCE)
+            botClass = CLASS_PALADIN;
+        if (optionClass == "hunter")
+            botClass = CLASS_HUNTER;
+        if (optionClass == "rogue")
+            botClass = CLASS_ROGUE;
+        if (optionClass == "priest")
+            botClass = CLASS_PRIEST;
+        if (optionClass == "shaman" && pPlayer->GetTeam() == HORDE)
+            botClass = CLASS_SHAMAN;
+        if (optionClass == "mage")
+            botClass = CLASS_MAGE;
+        if (optionClass == "warlock")
+            botClass = CLASS_WARLOCK;
+        if (optionClass == "druid")
+            botClass = CLASS_DRUID;
+    }
+
+    if (haveRole)
+    {
+        if (optionRole == "dps")
+        {
+            if (!haveClass)
+            {
+                std::vector<uint32> dpsClasses = { CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_PRIEST, CLASS_MAGE, CLASS_WARLOCK, CLASS_DRUID };
+
+                if (pPlayer->GetTeam() == HORDE)
+                    dpsClasses.push_back(CLASS_SHAMAN);
+                else
+                    dpsClasses.push_back(CLASS_PALADIN);
+
+                botClass = SelectRandomContainerElement(dpsClasses);
+                SendSysMessage("The wrong combination of role and class. Class set random.");
+            }
+            botRole = CombatBotBaseAI::IsMeleeDamageClass(botClass) ? ROLE_MELEE_DPS : ROLE_RANGE_DPS;
+        }
+        if (optionRole == "healer")
+        {
+            if (!haveClass || (botClass != CLASS_PRIEST && botClass != CLASS_DRUID && botClass != CLASS_SHAMAN && botClass != CLASS_PALADIN))
+            {
+                std::vector<uint32> healerClasses = { CLASS_PRIEST, CLASS_DRUID };
+
+                if (pPlayer->GetTeam() == HORDE)
+                    healerClasses.push_back(CLASS_SHAMAN);
+                else
+                    healerClasses.push_back(CLASS_PALADIN);
+
+                botClass = SelectRandomContainerElement(healerClasses);
+                SendSysMessage("The wrong combination of role and class. Class set random.");
+            }
+            botRole = ROLE_HEALER;
+        }
+        if (optionRole == "tank")
+        {
+            if (!haveClass || (botClass != CLASS_WARRIOR && botClass != CLASS_DRUID && botClass != CLASS_PALADIN))
+            {
+                std::vector<uint32> tankClasses = { CLASS_WARRIOR, CLASS_DRUID };
+
+                if (pPlayer->GetTeam() == ALLIANCE)
+                {
+                    tankClasses.push_back(CLASS_PALADIN);
+                }
+
+                botClass = SelectRandomContainerElement(tankClasses);
+                SendSysMessage("The wrong combination of role and class. Class set random.");
+            }
+
+            botRole = ROLE_TANK;
+        }
+    }
+
+
+    // Prevent setting a custom level for bots unless the account is a GM or skipping checks is enabled.
+    if (GetSession()->GetSecurity() > SEC_PLAYER || sWorld.getConfig(CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS))
+        ExtractUInt32(&args, botLevel);
 
     uint8 botRace = SelectRandomRaceForClass(botClass, pPlayer->GetTeam());
     if (!botRace)
