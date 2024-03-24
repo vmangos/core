@@ -488,11 +488,19 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
     }
 
     // Who is attacking me.
-    for (const auto pAttacker : me->GetAttackers())
+    if (me->IsInCombat())
     {
-        if (IsValidHostileTarget(pAttacker))
-            return pAttacker;
-    }
+        for (const auto pAttacker : me->GetAttackers())
+        {
+            if (pAttacker->IsPlayer())
+            {
+                continue;
+            }
+
+            if (IsValidHostileTarget(pAttacker))
+                return pAttacker;
+        }
+    }    
 
     if (!IsInDuel())
     {
