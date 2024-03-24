@@ -1514,6 +1514,18 @@ bool ChatHandler::HandlePartyBotClearMarksCommand(char* args)
         {
             if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
             {
+                // Only the owner can.
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s is not your bot or it cannot cleared focus.", pTarget->GetName());
+                        return false;
+                    }
+                }
+
                 PSendSysMessage("All mark assignments cleared for %s.", pTarget->GetName());
                 pAI->m_marksToCC.clear();
                 pAI->m_marksToFocus.clear();
@@ -1539,6 +1551,20 @@ bool ChatHandler::HandlePartyBotClearMarksCommand(char* args)
         {
             if (pMember == pPlayer)
                 continue;
+
+            // Only the owner can.                
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        continue;
+                    }
+                }
+            }
 
             if (pMember->AI())
             {
