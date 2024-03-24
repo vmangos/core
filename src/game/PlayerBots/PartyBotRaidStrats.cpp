@@ -440,6 +440,12 @@ void PartyBotAI::RaidStratsInOnyxiaProtectionPotions()
     {
         return;
     }
+    
+    // Drink potion only when onyxia is around.
+    if (me->GetDistance2dToCenter(-121.35, -214.09) < 10)
+    {
+        return;
+    }
 
     if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_FIRE_PROTECTION_POTION))
     {
