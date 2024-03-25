@@ -369,7 +369,17 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 
     pl->ModifyMoney(-int32(deposit));
 
-    uint32 auction_time = uint32(etime * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_TIME));
+    // The items that the bot puts up for auction, the character puts on a short period of time.
+    uint32 auction_time;
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `item` FROM `auctionhousebot` WHERE `item` = '%u'", it->GetEntry()));
+    if (!result)
+    {
+        auction_time = uint32(etime * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_TIME));
+    }
+    else
+    {
+        auction_time = etime;
+    }
 
     AuctionEntry* AH = new AuctionEntry;
     AH->Id = sObjectMgr.GenerateAuctionID();
