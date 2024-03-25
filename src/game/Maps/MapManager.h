@@ -28,6 +28,8 @@
 #include "Map.h"
 #include "GridStates.h"
 #include <condition_variable>
+#include <future>
+#include "Player.h"
 
 class BattleGround;
 
@@ -73,6 +75,28 @@ struct MapID
     uint32 nInstanceId;
 };
 
+struct ScheduledInstance {
+    ScheduledTeleportData* data;
+    uint32 instanceId;
+    Player* player;
+    std::shared_future<void> job;
+
+    bool operator==(ScheduledInstance const& c) const { return hash() == c.hash(); }
+
+    ScheduledInstance(ScheduledTeleportData* d, Player* p): data(d), player(p){}
+    ScheduledInstance(ScheduledTeleportData* d, Player* p, std::shared_future<void> job): data(d), player(p), job(job){}
+
+    std::size_t hash() const;
+};
+
+template<> struct std::hash<ScheduledInstance>
+{
+    std::size_t operator()(const ScheduledInstance& t) const noexcept
+    {
+        return t.hash();
+    }
+};
+
 class ThreadPool;
 struct ScheduledTeleportData;
 
@@ -93,8 +117,8 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         Map* CreateTestMap(uint32 mapid, bool instanced, float posX, float posY);
         void DeleteTestMap(Map* map);
         Map* FindMap(uint32 mapid, uint32 instanceId = 0) const;
-        void ScheduleNewWorldOnFarTeleport(Player* pPlayer);
-        void CancelInstanceCreationForPlayer(Player* pPlayer) { m_scheduledNewInstancesForPlayers.erase(pPlayer); }
+        void ScheduleNewInstanceForPlayer(Player* player, ScheduledTeleportData* data);
+        void CancelInstanceCreationForPlayer(Player* player);
 
         void UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid, GridInfo& ginfo, uint32 const& x, uint32 const& y, uint32 const& t_diff);
 
@@ -233,8 +257,8 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         std::map<Player*, uint16 /* new instance */> m_scheduledInstanceSwitches[LAST_CONTINENT_ID]; // 2 continents
 
         // Handle creation of new maps for teleport while continents are being updated.
-        void CreateNewInstancesForPlayers();
-        std::unordered_set<Player*> m_scheduledNewInstancesForPlayers;
+        std::unordered_set<ScheduledInstance> m_scheduledNewInstances;
+        std::mutex m_scheduledNewInstancesLock;
 
         std::mutex m_scheduledFarTeleportsLock;
         typedef std::map<Player*, ScheduledTeleportData*> ScheduledTeleportMap;

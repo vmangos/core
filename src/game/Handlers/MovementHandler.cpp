@@ -95,14 +95,21 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     if (!GetPlayer()->m_InstanceValid && !mEntry->IsDungeon())
         GetPlayer()->m_InstanceValid = true;
 
-    // relocate the player to the teleport destination
     if (!map)
     {
+        DungeonPersistentState* state = GetPlayer()->GetBoundInstanceSaveForSelfOrGroup(loc.mapId);
+        uint32 instanceId = 0;
+        if (state)
+            instanceId = state->GetInstanceId();
         if (loc.mapId <= 1)
-            GetPlayer()->SetLocationInstanceId(sMapMgr.GetContinentInstanceId(loc.mapId, loc.x, loc.y));
-        map = sMapMgr.CreateMap(loc.mapId, GetPlayer());
+            instanceId = sMapMgr.GetContinentInstanceId(loc.mapId, loc.x, loc.y);
+        map = sMapMgr.FindMap(loc.mapId, instanceId);
     }
+    
+    //we shouldn't be here if there is no map
+    MANGOS_ASSERT(map);
 
+    // relocate the player to the teleport destination
     GetPlayer()->SetMap(map);
     if (GenericTransport* t = GetPlayer()->GetTransport()) // Transport position may have changed while loading
         t->UpdatePassengerPosition(GetPlayer());
