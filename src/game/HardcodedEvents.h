@@ -298,6 +298,8 @@ enum WarEffortEnums
     WAR_EFFORT_REGAL_REWARD                 = 0x04
 };
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
+
 struct WarEffortEvent : WorldEvent
 {
     WarEffortEvent();
@@ -324,3 +326,4 @@ private:
     void DisableAndStopEvent(uint16 event_id);
     void UpdateHiveColossusEvents();
 };
+#endif

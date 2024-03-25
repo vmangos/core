@@ -877,7 +877,6 @@ enum HolidayIds
     HOLIDAY_BREWFEST                 = 372,
     HOLIDAY_DARKMOON_FAIRE_ELWYNN    = 374,
     HOLIDAY_DARKMOON_FAIRE_THUNDER   = 375,
-    HOLIDAY_DARKMOON_FAIRE_SHATTRATH = 376,
 };
 
 // Values based on QuestSort.dbc

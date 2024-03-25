@@ -424,6 +424,22 @@ set (game_SRCS
 
 )
 
+# Retrieve the value of SUPPORTED_CLIENT_BUILD from the CMake cache
+set(SUPPORTED_CLIENT_BUILD "${SUPPORTED_CLIENT_BUILD}" CACHE STRING "Client version the core will support")
+
+# Extract major patch
+string(REGEX MATCH "1_([0-9]+)_" PATCH_NUMBER "${SUPPORTED_CLIENT_BUILD}")
+
+set(PATCH_NUMBER ${CMAKE_MATCH_1})
+
+# Remove Arathi Basin script if the client build is below patch 1.7
+if(${PATCH_NUMBER} LESS 7)
+    list(REMOVE_ITEM game_SRCS
+    Battlegrounds/BattleGroundAB.h
+    Battlegrounds/BattleGroundAB.cpp
+)
+endif()
+
 if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   list(APPEND game_SRCS
       pchdef.cpp
