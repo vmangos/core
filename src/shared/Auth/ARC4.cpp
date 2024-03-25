@@ -15,15 +15,9 @@
  */
 
 #include "ARC4.h"
-#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
-#include <openssl/provider.h>
-#endif
 
 ARC4::ARC4(uint8 len) : m_ctx()
 {
-    #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
-        OSSL_PROVIDER_load(NULL, "legacy");
-    #endif
     m_ctx = EVP_CIPHER_CTX_new();
     EVP_EncryptInit_ex(m_ctx, EVP_rc4(), nullptr, nullptr, nullptr);
     EVP_CIPHER_CTX_set_key_length(m_ctx, len);
@@ -31,9 +25,6 @@ ARC4::ARC4(uint8 len) : m_ctx()
 
 ARC4::ARC4(uint8* seed, uint8 len) : m_ctx()
 {
-    #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
-        OSSL_PROVIDER_load(NULL, "legacy");
-    #endif
     m_ctx = EVP_CIPHER_CTX_new();
     EVP_EncryptInit_ex(m_ctx, EVP_rc4(), nullptr, nullptr, nullptr);
     EVP_CIPHER_CTX_set_key_length(m_ctx, len);
