@@ -1734,6 +1734,93 @@ bool ChatHandler::HandlePartyBotControls(char* args)
     return false;
 }
 
+bool ChatHandler::HandlePartyBotChleader(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (Group* pGroup = pPlayer->GetGroup())
+    {
+        if (pTarget && pTarget != pPlayer)
+        {
+            // Bot is not your party
+            bool isPartyMember = false;            
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pTarget)
+                    {
+                        isPartyMember = true;
+                    }
+                }
+            }
+
+            if (!isPartyMember)
+            {
+                PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
+                return false;
+            }
+
+            // Only the owner can.
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
+                        return false;
+                    }
+                }
+                pAI->ChangePartyLeader(pPlayer->GetObjectGuid());
+                pTarget->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
+            }
+
+            PSendSysMessage("%s has changed its leader..", pTarget->GetName());
+            return true;
+        }
+
+        if (!pTarget)
+        {
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pPlayer)
+                        continue;
+
+                    // Only the owner can.
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    {
+                        if (pAI->m_personalControls)
+                        {
+                            Player* pLeader = pAI->GetPartyLeader();
+
+                            if (pPlayer != pLeader)
+                            {
+                                continue;
+                            }
+                        }
+
+                        pAI->ChangePartyLeader(pPlayer->GetObjectGuid());
+                        pMember->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
+                    }
+                }
+            }
+
+            SendSysMessage("The leader has been changed for bots.");
+            return true;
+        }
+    } 
+
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
 bool HandlePartyBotUseGObjectHelper(Player* pTarget, GameObject* pGo)
 {
     if (pTarget->AI())
