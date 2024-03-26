@@ -1779,7 +1779,7 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                 pTarget->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
             }
 
-            PSendSysMessage("%s has changed its leader..", pTarget->GetName());
+            PSendSysMessage("%s has changed its leader.", pTarget->GetName());
             return true;
         }
 
@@ -1882,6 +1882,179 @@ bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
         else
             SendSysMessage("There are no party bots in range of the object.");
         return ok;
+    }
+
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotStayCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (Group* pGroup = pPlayer->GetGroup())
+    {
+        if (pTarget && pTarget != pPlayer)
+        {
+            // Bot is not your party
+            bool isPartyMember = false;
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pTarget)
+                    {
+                        isPartyMember = true;
+                    }
+                }
+            }
+
+            if (!isPartyMember)
+            {
+                PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
+                return false;
+            }
+
+            // Only the owner can.
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
+                        return false;
+                    }
+                }
+                pTarget->StopMoving();
+                pTarget->GetMotionMaster()->MoveIdle();
+                pAI->m_stay = true;
+            }
+
+            PSendSysMessage("%s won't move.", pTarget->GetName());
+            return true;
+        }
+
+        if (!pTarget)
+        {
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pPlayer)
+                        continue;
+
+                    // Only the owner can.
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    {
+                        if (pAI->m_personalControls)
+                        {
+                            Player* pLeader = pAI->GetPartyLeader();
+
+                            if (pPlayer != pLeader)
+                            {
+                                continue;
+                            }
+                        }
+
+                        pTarget->StopMoving();
+                        pTarget->GetMotionMaster()->MoveIdle();
+                        pAI->m_stay = true;
+                    }
+                }
+            }
+
+            SendSysMessage("The partybot won't move.");
+            return true;
+        }
+    }
+
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotMoveCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (Group* pGroup = pPlayer->GetGroup())
+    {
+        if (pTarget && pTarget != pPlayer)
+        {
+            // Bot is not your party
+            bool isPartyMember = false;
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pTarget)
+                    {
+                        isPartyMember = true;
+                    }
+                }
+            }
+
+            if (!isPartyMember)
+            {
+                PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
+                return false;
+            }
+
+            // Only the owner can.
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
+                        return false;
+                    }
+                }
+                pAI->m_stay = false;
+            }
+
+            PSendSysMessage("%s won't move.", pTarget->GetName());
+            return true;
+        }
+
+        if (!pTarget)
+        {
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pPlayer)
+                        continue;
+
+                    // Only the owner can.
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    {
+                        if (pAI->m_personalControls)
+                        {
+                            Player* pLeader = pAI->GetPartyLeader();
+
+                            if (pPlayer != pLeader)
+                            {
+                                continue;
+                            }
+                        }
+                        pAI->m_stay = false;
+                    }
+                }
+            }
+
+            SendSysMessage("The partybot won't move.");
+            return true;
+        }
     }
 
     SendSysMessage("You are not in a group.");

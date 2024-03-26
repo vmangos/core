@@ -122,6 +122,7 @@ public:
     float m_o = 0.0f;
     bool m_resetSpellData = false;
     bool m_personalControls = false;
+    bool m_stay = false;
 };
 
 #endif

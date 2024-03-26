@@ -1050,27 +1050,33 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
     if (!me->IsMoving())
     {
-        if (!pVictim)
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(me->AI()))
         {
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-                me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
-        }
-        else
-        {
-            if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
-               (GetRole() == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
-                IsValidHostileTarget(pVictim) &&
-                AttackStart(pVictim))
-                return;
-
-            switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+            if (!pAI->m_stay)
             {
-                case IDLE_MOTION_TYPE:
-                case FOLLOW_MOTION_TYPE:
-                    me->GetMotionMaster()->MoveChase(pVictim);
-                    break;
+                if (!pVictim)
+                {
+                    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
+                        me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
+                }
+                else
+                {
+                    if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
+                        (GetRole() == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
+                        IsValidHostileTarget(pVictim) &&
+                        AttackStart(pVictim))
+                        return;
+
+                    switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                    {
+                    case IDLE_MOTION_TYPE:
+                    case FOLLOW_MOTION_TYPE:
+                        me->GetMotionMaster()->MoveChase(pVictim);
+                        break;
+                    }
+                }
             }
-        }
+        }        
     }
 
     if (me->IsInCombat())
