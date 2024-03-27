@@ -2133,7 +2133,7 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* pData, AccountTypes
         if (result && !(playerFlags & PLAYER_FLAGS_GHOST) && (pClass == CLASS_WARLOCK || pClass == CLASS_HUNTER))
         {
             uint32 entry = fields[19].GetUInt32();
-            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(entry);
+            CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(entry);
             if (cInfo)
             {
                 petDisplayId = fields[20].GetUInt32();
@@ -2315,8 +2315,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // The player was ported to another map and looses the duel immediately.
     // We have to perform this check before the teleport, otherwise the
     // ObjectAccessor won't find the flag.
-    if (duel && GetMapId() != mapid)
-        if (GameObject* obj = GetMap()->GetGameObject(GetGuidValue(PLAYER_DUEL_ARBITER)))
+    if (duel && GetMapId() != mapid && FindMap())
+        if (GameObject* obj = FindMap()->GetGameObject(GetGuidValue(PLAYER_DUEL_ARBITER)))
             DuelComplete(DUEL_FLED);
 
     // reset movement flags at teleport, because player will continue move with these flags after teleport
@@ -2329,11 +2329,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // This fixes pet spells being lost if channeling Eye of Kilrogg during teleport.
     InterruptSpellsWithChannelFlags(AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
 
-    // Preparing unsummon pet if lost (we must get pet before teleportation or will not find it later).
-    Pet* pet = GetPet();
-
     // Near teleport, let it happen immediately since we remain in the same map
-    if ((GetMapId() == mapid) && (!m_transport) && !(options & TELE_TO_FORCE_MAP_CHANGE))
+    if (FindMap() && (GetMapId() == mapid) && (!m_transport) && !(options & TELE_TO_FORCE_MAP_CHANGE))
     {
         //lets reset far teleport flag if it wasn't reset during chained teleports
         SetSemaphoreTeleportFar(false);
@@ -2352,6 +2349,9 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         if (!(options & TELE_TO_NOT_UNSUMMON_PET))
         {
+            // Preparing unsummon pet if lost (we must get pet before teleportation or will not find it later).
+            Pet* pet = GetPet();
+
             //same map, only remove pet if out of range for new position
             if (pet && !pet->IsWithinDist3d(x, y, z, GetMap()->GetGridActivationDistance()))
                 UnsummonPetTemporaryIfAny();
@@ -13523,7 +13523,7 @@ void Player::FullQuestComplete(uint32 questId)
         }
         else if (creature > 0)
         {
-            if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(creature))
+            if (CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(creature))
                 for (uint16 z = 0; z < creaturecount; ++z)
                     KilledMonster(cInfo, ObjectGuid());
         }

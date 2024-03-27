@@ -2011,8 +2011,25 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
 
             // Damage can be splitted only if aura has an alive caster
             Unit* reflectTo = (*i)->GetCaster();
-            if (!reflectTo || reflectTo == this || !reflectTo->IsInWorld() || !reflectTo->IsAlive())
+            if (!reflectTo || reflectTo == this || !reflectTo->IsInWorld())
                 continue;
+
+            // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+            // - Blessing of Sacrifice no longer shares damage with dead Paladins
+            //  (You can no longer kill Paladin Ghosts).
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            if (!reflectTo->IsAlive())
+                continue;
+#else
+            if (reflectTo->GetDeathState() == DEAD && reflectTo->IsPlayer())
+            {
+                // revive the paladin with 1 hp so we can kill him again
+                static_cast<Player*>(reflectTo)->ResurrectPlayer(0);
+                static_cast<Player*>(reflectTo)->SpawnCorpseBones();
+            }
+            else if (reflectTo->GetDeathState() != ALIVE)
+                continue;
+#endif
 
             int32 currentAbsorb;
             if (remainingDamage >= (*i)->GetModifier()->m_amount)
@@ -2058,6 +2075,17 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
 
             uint32 split_absorb = 0;
             pCaster->DealDamageMods(caster, splitted, &split_absorb);
+
+            // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+            // - Fixed a bug where Soul Link and Power Word: Sheild, when used together,
+            //   would heal the Warlock instead of splitting or absorbing damage.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+            if (HasAuraType(SPELL_AURA_SCHOOL_ABSORB))
+            {
+                ModifyHealth(splitted);
+                continue;
+            }
+#endif
 
             pCaster->SendSpellNonMeleeDamageLog(caster, (*i)->GetSpellProto()->Id, splitted, schoolMask, split_absorb, 0, (damagetype == DOT), 0, false, true);
 
@@ -5258,40 +5286,30 @@ float Unit::SpellDamageBonusTaken(SpellCaster* pCaster, SpellEntry const* spellP
     float takenTotalMod = 1.0f;
     takenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, schoolMask);
 
-    float tmpDamage;
-
     // Taken fixed damage bonus auras
-    int32 takenFlatMod = SpellBaseDamageBonusTaken(spellProto->GetSpellSchoolMask());
-    if (takenFlatMod < 0)
-    {
-        if ((-takenFlatMod > (pdamage / 2)))
-            takenFlatMod = -int(pdamage / 2);
+    float takenFlatMod = SpellBaseDamageBonusTaken(spellProto->GetSpellSchoolMask());
 
-        tmpDamage = (pdamage + takenFlatMod) * takenTotalMod;
-    }
-    else
-    {
-        // apply benefit affected by spell power implicit coeffs and spell level penalties
-        float takenTotal = SpellBonusWithCoeffs(spellProto, effectIndex, 0, takenFlatMod, 0, damagetype, false, pCaster, spell);
-        tmpDamage = (pdamage + takenTotal * int32(stack)) * takenTotalMod;
-    }
+    // apply benefit affected by spell power implicit coeffs and spell level penalties
+    takenFlatMod = SpellBonusWithCoeffs(spellProto, effectIndex, 0, takenFlatMod, 0, damagetype, false, pCaster, spell) * int32(stack);
 
+    if ((takenFlatMod < 0) && (-takenFlatMod > (pdamage / 2)))
+        takenFlatMod = -(pdamage / 2);
+
+    // use float as more appropriate for negative values and percent applying
+    float tmpDamage = (pdamage + takenFlatMod) * takenTotalMod;
     return tmpDamage > 0 ? tmpDamage : 0;
 }
 
 int32 Unit::SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask) const
 {
-    int32 TakenAdvertisedBenefit = 0;
+    int32 advertisedBenefit = 0;
 
-    // ..taken
-    AuraList const& mDamageTaken = GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
-    for (const auto& i : mDamageTaken)
-    {
-        if ((i->GetModifier()->m_miscvalue & schoolMask) != 0)
-            TakenAdvertisedBenefit += i->GetModifier()->m_amount;
-    }
+    AuraList const& damageTakenAuras = GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
+    for (const auto& i : damageTakenAuras)
+        if (i->GetModifier()->m_miscvalue & schoolMask)
+            advertisedBenefit += i->GetModifier()->m_amount;
 
-    return TakenAdvertisedBenefit;
+    return advertisedBenefit;
 }
 
 bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType, Spell* spell) const
@@ -5409,30 +5427,38 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
  */
 float Unit::SpellHealingBonusTaken(SpellCaster* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float healamount, DamageEffectType damagetype, uint32 stack, Spell* spell) const
 {
-    float  TakenTotalMod = 1.0f;
+    float takenTotalMod = 1.0f;
 
     // Healing taken percent
     float minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
     if (minval)
-        TakenTotalMod *= (100.0f + minval) / 100.0f;
+        takenTotalMod *= (100.0f + minval) / 100.0f;
 
     float maxval = float(GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
     if (maxval)
-        TakenTotalMod *= (100.0f + maxval) / 100.0f;
+        takenTotalMod *= (100.0f + maxval) / 100.0f;
 
     // No heal amount for this class spells
     if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE)
     {
-        healamount = healamount * TakenTotalMod;
+        healamount = healamount * takenTotalMod;
         return healamount < 0 ? 0 : healamount;
+    }
+
+    // Taken mods
+    // Healing Wave cast
+    if (spellProto->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_HEALING_WAVE>())
+    {
+        // Search for Healing Way on Victim
+        Unit::AuraList const& auraDummy = GetAurasByType(SPELL_AURA_DUMMY);
+        for (const auto& itr : auraDummy)
+            if (itr->GetId() == 29203)
+                takenTotalMod *= (itr->GetModifier()->m_amount + 100.0f) / 100.0f;
     }
 
     // Healing Done
     // Done total percent damage auras
-    float  TakenTotal = 0;
-
-    // Taken fixed damage bonus auras
-    float TakenAdvertisedBenefit = SpellBaseHealingBonusTaken(spellProto->GetSpellSchoolMask());
+    float takenFlatMod = SpellBaseHealingBonusTaken(spellProto->GetSpellSchoolMask());
 
     // Blessing of Light dummy effects healing taken from Holy Light and Flash of Light
     if (spellProto->IsFitToFamily<SPELLFAMILY_PALADIN, CF_PALADIN_FLASH_OF_LIGHT1, CF_PALADIN_HOLY_LIGHT2>())
@@ -5444,43 +5470,35 @@ float Unit::SpellHealingBonusTaken(SpellCaster* pCaster, SpellEntry const* spell
             {
                 // Holy Light
                 if (spellProto->IsFitToFamilyMask<CF_PALADIN_HOLY_LIGHT2>() && i->GetEffIndex() == EFFECT_INDEX_0)
-                    TakenTotal += i->GetModifier()->m_amount;
+                    takenFlatMod += i->GetModifier()->m_amount;
                 // Flash of Light
                 else if (spellProto->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT1>() && i->GetEffIndex() == EFFECT_INDEX_1)
-                    TakenTotal += i->GetModifier()->m_amount;
+                    takenFlatMod += i->GetModifier()->m_amount;
             }
         }
     }
+
     // apply benefit affected by spell power implicit coeffs and spell level penalties
-    TakenTotal = SpellBonusWithCoeffs(spellProto, effectIndex, TakenTotal, TakenAdvertisedBenefit, 0, damagetype, false, pCaster, spell);
+    takenFlatMod = SpellBonusWithCoeffs(spellProto, effectIndex, 0, takenFlatMod, 0, damagetype, false, pCaster, spell) * int32(stack);
 
-    // Taken mods
-    // Healing Wave cast
-    if (spellProto->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_HEALING_WAVE>())
-    {
-        // Search for Healing Way on Victim
-        Unit::AuraList const& auraDummy = GetAurasByType(SPELL_AURA_DUMMY);
-        for (const auto& itr : auraDummy)
-            if (itr->GetId() == 29203)
-                TakenTotalMod *= (itr->GetModifier()->m_amount + 100.0f) / 100.0f;
-    }
-
+    if ((takenFlatMod < 0) && (-takenFlatMod > (healamount / 2)))
+        takenFlatMod = -(healamount / 2);
 
     // use float as more appropriate for negative values and percent applying
-    float heal = (healamount + TakenTotal * int32(stack)) * TakenTotalMod;
-
+    float heal = (healamount + takenFlatMod) * takenTotalMod;
     return heal < 0 ? 0 : heal;
 }
 
 int32 Unit::SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask) const
 {
-    int32 AdvertisedBenefit = 0;
-    AuraList const& mDamageTaken = GetAurasByType(SPELL_AURA_MOD_HEALING);
-    for (const auto& i : mDamageTaken)
-        if (i->GetModifier()->m_miscvalue & schoolMask)
-            AdvertisedBenefit += i->GetModifier()->m_amount;
+    int32 advertisedBenefit = 0;
 
-    return AdvertisedBenefit;
+    AuraList const& healingTakenAuras = GetAurasByType(SPELL_AURA_MOD_HEALING);
+    for (const auto& i : healingTakenAuras)
+        if (i->GetModifier()->m_miscvalue & schoolMask)
+            advertisedBenefit += i->GetModifier()->m_amount;
+
+    return advertisedBenefit;
 }
 
 bool Unit::IsImmuneToDamage(SpellSchoolMask shoolMask, SpellEntry const* spellInfo) const
@@ -8856,7 +8874,15 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag,
                         if (Player* me = ToPlayer())
                             me->AddComboPoints(pTarget, 1);
                     }
+
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // - Riposte - Fixed a bug where the ability was not usable when a special
+                    //   attack(e.g.Gouge) is parried.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                     else
+#else
+                    else if (!(GetClass() == CLASS_ROGUE && procSpell))
+#endif
                     {
                         ModifyAuraState(AURA_STATE_DEFENSE, true);
                         StartReactiveTimer(REACTIVE_DEFENSE, pTarget->GetObjectGuid());

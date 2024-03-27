@@ -306,7 +306,7 @@ bool Creature::InitEntry(uint32 entry, GameEventCreatureData const* eventData /*
     if (eventData && eventData->entry_id)
         entry = eventData->entry_id;
 
-    CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(entry);
+    CreatureInfo const* normalInfo = sObjectMgr.GetCreatureTemplate(entry);
     if (!normalInfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature::UpdateEntry creature entry %u does not exist.", entry);
@@ -1795,7 +1795,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
     sCreatureGroupsManager->LoadCreatureGroup(fullGuid, m_creatureGroup);
 
     uint32 const creatureId = m_creatureGroup ? m_creatureGroup->ChooseCreatureId(fullGuid, data, map) : data->ChooseCreatureId();
-    CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(creatureId);
+    CreatureInfo const* cinfo = sObjectMgr.GetCreatureTemplate(creatureId);
     if (!cinfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) not found in table `creature_template`, can't load. ", creatureId);
@@ -3218,9 +3218,9 @@ void Creature::AllLootRemovedFromCorpse()
     }
 }
 
-std::string Creature::GetAIName() const
+std::string const& Creature::GetAIName() const
 {
-    return ObjectMgr::GetCreatureTemplate(GetEntry())->ai_name;
+    return GetCreatureInfo()->ai_name;
 }
 
 std::string Creature::GetScriptName() const
@@ -3230,7 +3230,7 @@ std::string Creature::GetScriptName() const
 
 uint32 Creature::GetScriptId() const
 {
-    return ObjectMgr::GetCreatureTemplate(GetEntry())->script_id;
+    return GetCreatureInfo()->script_id;
 }
 
 VendorItemData const* Creature::GetVendorItems() const

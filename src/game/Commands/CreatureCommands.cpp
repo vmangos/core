@@ -933,7 +933,7 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
     if (!ExtractUint32KeyFromLink(&args, "Hcreature_entry", id))
         return false;
 
-    CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(id);
+    CreatureInfo const* cinfo = sObjectMgr.GetCreatureTemplate(id);
     if (!cinfo)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, id);
@@ -984,7 +984,7 @@ bool ChatHandler::HandleNpcSummonCommand(char* args)
     if (!ExtractUint32KeyFromLink(&args, "Hcreature_entry", id))
         return false;
 
-    CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(id);
+    CreatureInfo const* cinfo = sObjectMgr.GetCreatureTemplate(id);
     if (!cinfo)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, id);
@@ -1078,7 +1078,7 @@ bool ChatHandler::HandleNpcAddEntryCommand(char* args)
     if (!ExtractUInt32(&args, uiCreatureId))
         return false;
 
-    if (!ObjectMgr::GetCreatureTemplate(uiCreatureId))
+    if (!sObjectMgr.GetCreatureTemplate(uiCreatureId))
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, uiCreatureId);
         SetSentErrorMessage(true);
@@ -1767,7 +1767,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DEBUG: HandleWpAddCommand");
 
-    CreatureInfo const* waypointInfo = ObjectMgr::GetCreatureTemplate(VISUAL_WAYPOINT);
+    CreatureInfo const* waypointInfo = sObjectMgr.GetCreatureTemplate(VISUAL_WAYPOINT);
     if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
         return false;                                       // must exist as normal creature in mangos.sql 'creature_template'
 
@@ -1946,7 +1946,7 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
     if (!*args)
         { return false; }
 
-    CreatureInfo const* waypointInfo = ObjectMgr::GetCreatureTemplate(VISUAL_WAYPOINT);
+    CreatureInfo const* waypointInfo = sObjectMgr.GetCreatureTemplate(VISUAL_WAYPOINT);
     if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
         { return false; }                                       // must exist as normal creature in mangos.sql 'creature_template'
 
@@ -2166,7 +2166,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
     if (!*args)
         { return false; }
 
-    CreatureInfo const* waypointInfo = ObjectMgr::GetCreatureTemplate(VISUAL_WAYPOINT);
+    CreatureInfo const* waypointInfo = sObjectMgr.GetCreatureTemplate(VISUAL_WAYPOINT);
     if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
         { return false; }                                       // must exist as normal creature in mangos.sql 'creature_template'
 
@@ -2517,7 +2517,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DEBUG: HandleEscortShowWpCommand");
 
-    auto waypointInfo = ObjectMgr::GetCreatureTemplate(VISUAL_WAYPOINT);
+    auto waypointInfo = sObjectMgr.GetCreatureTemplate(VISUAL_WAYPOINT);
     if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
         return false; // must exist as normal creature in mangos.sql 'creature_template'
 
@@ -2527,7 +2527,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
 
     // optional number or [name] Shift-click form |color|Hcreature_entry:creature_id|h[name]|h|r
     if (*args && ExtractUint32KeyFromLink(&args, "Hcreature_entry", cr_id))
-        cInfo = ObjectMgr::GetCreatureTemplate(cr_id);
+        cInfo = sObjectMgr.GetCreatureTemplate(cr_id);
     else if (pCreature)
         cInfo = pCreature->GetCreatureInfo();
 

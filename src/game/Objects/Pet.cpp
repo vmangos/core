@@ -176,7 +176,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
         return false;
     }
 
-    CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(petEntry);
+    CreatureInfo const* creatureInfo = sObjectMgr.GetCreatureTemplate(petEntry);
     if (!creatureInfo)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet entry %u does not exist but used at pet load (owner: %s).", petEntry, owner->GetGuidStr().c_str());

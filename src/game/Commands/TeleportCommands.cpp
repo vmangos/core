@@ -404,7 +404,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
         if (!tEntry)
             return false;
 
-        if (!ObjectMgr::GetCreatureTemplate(tEntry))
+        if (!sObjectMgr.GetCreatureTemplate(tEntry))
         {
             SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
             SetSentErrorMessage(true);

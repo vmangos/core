@@ -2281,6 +2281,40 @@ CreatureAI* GetAI_boss_magister_kalendris(Creature* pCreature)
     return new boss_magister_kalendrisAI(pCreature);
 }
 
+/*######
+## go_warpwood_pod
+######*/
+
+struct go_warpwood_pod : public GameObjectAI
+{
+    go_warpwood_pod(GameObject* gobj) : GameObjectAI(gobj)
+    {
+    }
+
+    bool OnUse(Unit* pUser) override
+    {
+        if (GameObjectInfo const* pInfo = me->GetGOInfo())
+        {
+            if (pInfo->type == GAMEOBJECT_TYPE_CHEST && pInfo->chest.linkedTrapId)
+            {
+                if (GameObjectInfo const* pTrap = sObjectMgr.GetGameObjectInfo(pInfo->chest.linkedTrapId))
+                {
+                    if (pTrap->trap.spellId)
+                    {
+                        pUser->CastSpell(pUser, pTrap->trap.spellId, true);
+                        me->SetLootState(GO_JUST_DEACTIVATED);
+                    }
+                }
+            }
+        }
+        return true;
+    }
+};
+
+GameObjectAI* GetAI_go_warpwood_pod(GameObject* gobj)
+{
+    return new go_warpwood_pod(gobj);
+}
 
 void AddSC_instance_dire_maul()
 {
@@ -2372,4 +2406,9 @@ void AddSC_instance_dire_maul()
     pNewScript->Name = "npc_alzzins_minion";
     pNewScript->GetAI = &GetAI_npc_alzzins_minion;
     pNewScript->RegisterSelf(); 
+
+    pNewScript = new Script;
+    pNewScript->Name = "go_warpwood_pod";
+    pNewScript->GOGetAI = &GetAI_go_warpwood_pod;
+    pNewScript->RegisterSelf();
 }
