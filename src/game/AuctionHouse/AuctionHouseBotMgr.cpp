@@ -67,8 +67,8 @@ void AuctionHouseBotMgr::Load()
     m_config                 = std::make_unique<AuctionHouseBotConfig>();
     m_config->enable         = sConfig.GetBoolDefault("AHBot.Enable", false);
     m_config->ahid           = sConfig.GetIntDefault("AHBot.ah.id", 7);
-    m_config->botguid        = sConfig.GetIntDefault("AHBot.bot.guid", 1123);
-    m_config->botaccount     = sConfig.GetIntDefault("AHBot.bot.account", 32377);
+    m_config->botguid        = sConfig.GetIntDefault("AHBot.bot.guid", 0);
+    m_config->botaccount     = sConfig.GetIntDefault("AHBot.bot.account", 0);
     m_config->ahfid          = sConfig.GetIntDefault("AHBot.ah.fid", 120);
     m_config->itemcount      = sConfig.GetIntDefault("AHBot.itemcount", 2);
 
@@ -105,7 +105,7 @@ void AuctionHouseBotMgr::Update(bool force /* = false */)
         return;
     }
 
-    uint32 auctions     = auctionHouse->GetCount();
+    uint32 auctions     = auctionHouse->GetAccountAuctionCount(m_config->botaccount);
     uint32 items        = m_config->itemcount;
     uint32 entriesCount = m_items.size();
 
@@ -166,7 +166,8 @@ void AuctionHouseBotMgr::AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auc
     auctionEntry->auctionHouseEntry  = m_auctionHouseEntry;
     auctionEntry->itemGuidLow        = item->GetGUIDLow();
     auctionEntry->itemTemplate       = item->GetEntry();
-    auctionEntry->owner              = 0;
+    auctionEntry->ownerAccount       = m_config->botaccount;
+    auctionEntry->owner              = m_config->botguid;
     auctionEntry->startbid           = e.bid;
     auctionEntry->buyout             = e.buyout;
     auctionEntry->bidder             = 0;
