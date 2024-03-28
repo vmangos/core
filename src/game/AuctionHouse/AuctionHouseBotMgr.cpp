@@ -135,7 +135,8 @@ void AuctionHouseBotMgr::AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auc
         return;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "AHBot::AddItem() : Adding item %u.", e.item);
+    // To many spam in logs
+    //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "AHBot::AddItem() : Adding item %u.", e.item);
 
     uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(e.item);
     if (randomPropertyId != 0)
