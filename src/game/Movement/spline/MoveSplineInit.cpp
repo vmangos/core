@@ -207,10 +207,6 @@ int32 MoveSplineInit::Launch()
     if (args.velocity > 4 * realSpeedRun && !args.flags.done)
         mvtData.SetUnitSpeed(SMSG_SPLINE_SET_RUN_SPEED, unit.GetObjectGuid(), realSpeedRun);
 
-    // Restore correct walk mode for players
-    if (unit.GetTypeId() == TYPEID_PLAYER && (moveFlags & MOVEFLAG_WALK_MODE) != (oldMoveFlags & MOVEFLAG_WALK_MODE))
-        mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
-
     if (compress)
     {
         WorldPacket data2;
