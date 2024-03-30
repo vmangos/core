@@ -161,15 +161,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH))
         m_bReachable = true;
 
-    // Enforce stricter checking inside dungeons
-    if (m_bReachable && owner.GetMap() && owner.GetMap()->IsDungeon())
-    {
-        // Check dest coords to ensure reachability
-        G3D::Vector3 dest = path.getActualEndPosition();
-        if (!owner.CanReachWithMeleeAutoAttackAtPosition(i_target.getTarget(), dest[0], dest[1], dest[2]))
-            m_bReachable = false;
-    }
-
     m_bRecalculateTravel = false;
     if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
         if (path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
