@@ -1223,6 +1223,11 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT, "MaxCreatureSummonLimit", DEFAULT_CREATURE_SUMMON_LIMIT);
 
+    // Scourge Invasion
+    setConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MIN, "ScourgeInvasion.ZonesAttackTimerMin", 45);
+    setConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_ATTACK_TIMER_MAX, "ScourgeInvasion.ZonesAttackTimerMax", 60);
+    setConfig(CONFIG_UINT32_SCOURGE_INVASION_ZONE_LIMIT, "ScourgeInvasion.MaxZonesAttackable", 2);
+
     // Smartlog data
     sLog.InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
     sLog.InitSmartlogGuids(sConfig.GetStringDefault("Smartlog.ExtraGuids", ""));

@@ -49,6 +49,7 @@
 #include "InstanceData.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
+#include "TemporarySummon.h"
 #include "scriptPCH.h"
 
 using namespace Spells;
@@ -414,9 +415,33 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             damage = 0;
                         break;
                     }
-                    case 24933:                             // Cannon (Darkmoon Steam Tonk)
+                    case 24933: // Cannon (Darkmoon Steam Tonk)
                     {
                         m_caster->CastSpell(unitTarget, 27766, true);
+                        break;
+                    }
+                    case 28056: // [Event: Scourge Invasion] Zap Crystal Corpse
+                    {
+                        if (unitTarget->GetEntry() == 16172) // Damaged Necrotic Shard
+                        {
+                            if (m_caster->GetEntry() == 16143) // Casted by Shadow of Doom.
+                                damage = unitTarget->CountPctFromMaxHealth(25);
+                            else // Casted by Damaged Necrotic Shard. https://classic.wowhead.com/spell=348571/zap-crystal-corpse
+                                damage = unitTarget->CountPctFromMaxHealth(6);
+                        }
+                        break;
+                    }
+                    case 28386: // [Event: Scourge Invasion] Zap Necropolis
+                    {
+                        if (unitTarget->GetEntry() == 16421) // Necropolis health
+                        {
+                            /*
+                            This Spell is castet on the NPC "Necropolis Health" if a Shard dies.
+                            There are always 3 Necrotic Shards spawns per Necropolis.
+                            */
+                            unitTarget->SetArmor(0);
+                            damage = unitTarget->CountPctFromMaxHealth(34);
+                        }
                         break;
                     }
                 }
@@ -588,13 +613,60 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     pCaster->m_Events.AddLambdaEventAtOffset([pCaster, spellId]
                     {
                         pCaster->CastSpell(pCaster, spellId, false);
-                    }, 1);
+                    }, 500);
+                    return;
+                }
+                case 10389: // [Event: Scourge Invasion] Spawn Smoke
+                {
+                    if (Creature* pCreature = ToCreature(m_casterUnit))
+                    {
+                        // This should be already set in creature_template, otherwise the player will quickly enter and leave combat on spawn and thats not Blizzlike.
+                        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+
+                        // This is the only way to get it Blizzlike... (And who knows? maybe it is!)
+                        pCreature->m_Events.AddLambdaEventAtOffset([pCreature]
+                        {
+                            if (pCreature->IsTemporarySummon())
+                            {
+                                if (Player* player = pCreature->GetMap()->GetPlayer(((TemporarySummon*)pCreature)->GetSummonerGuid()))
+                                {
+                                    pCreature->GetThreatManager().addThreat(player, 1.0f);
+                                    DoScriptText(PickRandomValue(12420, 12421, 12422, 12243), pCreature, player, CHAT_TYPE_SAY);
+                                }
+                            }
+                        }, 1);
+                    }
+                    return;
+                }
+                case 27894: // [Event: Scourge Invasion] Kill Summoner, who will Summon Boss
+                {
+                    Player* pPlayer = ToPlayer(m_casterUnit);
+                    {
+                        if (Creature* pCreature = ToCreature(unitTarget)) // Target is Cultist Engineer
+                        {
+                            pCreature->CastSpell(pPlayer, 31316, true); // Summon Boss Buff
+                            pCreature->CastSpell(pCreature, 3617, true);  // Quiet Suicide
+                        }
+                    }
                     return;
                 }
                 case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
-                    if (!m_casterUnit->IsInCombat())
-                        m_casterUnit->CastSpell(m_casterUnit, 17680, false);
+                    m_casterUnit->CastSpell(m_casterUnit, 17680, false);
+                    return;
+                }
+                case 28203: // [Event: Scourge Invasion] Find Camp Type
+                {
+
+                    // Lets the finder spawn the associated spawner.
+                    if (unitTarget->HasAura(28197))
+                        m_casterUnit->CastSpell(m_casterUnit, 28186, true);
+                    else if (unitTarget->HasAura(28198))
+                        m_casterUnit->CastSpell(m_casterUnit, 27883, true);
+                    else if (unitTarget->HasAura(28199))
+                        m_casterUnit->CastSpell(m_casterUnit, 28187, true);
+
                     return;
                 }
                 case 28345: // [Event: Scourge Invasion] (Communique Trigger) triggers (Communique, Camp-to-Relay)?
@@ -602,12 +674,31 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     unitTarget->CastSpell(unitTarget, 28281, true);
                     return;
                 }
+                case 28349: // [Event: Scourge Invasion] Despawner, other
+                {
+                    std::list<GameObject*> necropolisList;
+                    GetGameObjectListWithEntryInGrid(necropolisList, unitTarget, { 181154,181373,181374,181215,181223 }, ATTACK_DISTANCE);
+                    for (const auto pNecropolis : necropolisList)
+                        pNecropolis->Despawn();
+
+                    unitTarget->ToCreature()->RemoveFromWorld();
+                    m_casterUnit->ToCreature()->RemoveFromWorld();
+                    return;
+                }
+                case 28351: // [Event: Scourge Invasion] Communique, Camp-to-Relay, Death
+                {
+                    if (Creature* pCreature = ToCreature(m_casterUnit))
+                    {
+                        pCreature->DisappearAndDie();
+                        pCreature->RemoveFromWorld();
+                    }
+                    return;
+                }
                 case 32061: // EPL PvP A Game of Towers: (TXT) ToWoW - Tower Kill Credit (DND)
                 {
                     if (Player* pPlayer = ToPlayer(m_casterUnit))
                         if (Creature* pCreature = ToCreature(unitTarget))
                             pPlayer->KilledMonsterCredit(pCreature->GetEntry(), 0);
-
                     return;
                 }
                 case 23383: // Alliance Flag Click
@@ -5090,6 +5181,58 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     unitTarget->CastSpell(unitTarget, 27697, true);
                     unitTarget->CastSpell(unitTarget, 27698, true);
                     unitTarget->CastSpell(unitTarget, 27699, true);
+                    return;
+                }
+                case 28201:                                 // [Event: Scourge Invasion] Choose Camp Type
+                {
+                    // Casted by Necrotic Shard and Damaged Necrotic Shard on spawn. They should have 0 Armor and a huge visibility.
+                    m_casterUnit->SetActiveObjectState(true);
+                    m_casterUnit->SetVisibilityModifier(VISIBILITY_DISTANCE_LARGE); // Visibility distance in Classic is 200 yards.
+                    m_casterUnit->CastSpell(m_casterUnit, PickRandomValue(28199, 28198, 28197), true);
+                    return;
+                }
+                case 28314:                                 // [Event: Scourge Invasion] Flameshocker's Touch
+                {
+                    m_casterUnit->CastSpell(unitTarget, 28329, true);
+                    return;
+                }
+                case 28183:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghost/ghoul)
+                case 28184:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghost/skeleton)
+                case 28185:                                 // [Event: Scourge Invasion] [PH] Summon Minion parent (ghoul/skeleton)
+                {
+                    bool UncommonMinionspawner = false;
+                    bool CanSummon = true;
+
+                    // 0.2% Chance of a Rare Spawn.
+                    if (roll_chance_f(0.2f)) 
+                        UncommonMinionspawner = true;
+
+                    uint32 Entry = PickRandomValue(16298, 16141, 16299); // just in case.
+
+                    switch (m_spellInfo->Id)
+                    {
+                        case 28183: Entry = UncommonMinionspawner ? PickRandomValue(16379, 14697) : PickRandomValue(16298, 16141); break;
+                        case 28184: Entry = UncommonMinionspawner ? PickRandomValue(16379, 16380) : PickRandomValue(16298, 16299); break;
+                        case 28185: Entry = UncommonMinionspawner ? PickRandomValue(14697, 16380) : PickRandomValue(16141, 16299); break;
+                        default:    Entry = PickRandomValue(16298, 16141, 16299); break;
+                    }
+
+                    std::list<Creature*> minions;
+                    GetCreatureListWithEntryInGrid(minions, m_casterUnit, { 16299, 16141, 16298, 14697, 16380, 16379 }, INTERACTION_DISTANCE);
+
+                    for (const auto pMinion : minions)
+                        if (pMinion->IsAlive())
+                            CanSummon = false;
+
+                    if (CanSummon)
+                    {
+                        if (Creature* pMinion = m_casterUnit->SummonCreature(Entry, m_casterUnit->GetPositionX(), m_casterUnit->GetPositionY(), m_casterUnit->GetPositionZ(), m_casterUnit->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, IN_MILLISECONDS * 2))
+                        {
+                            UncommonMinionspawner ? pMinion->SetWanderDistance(10.0f) : pMinion->SetWanderDistance(1.0f); // Seems to be very low for common Minions but not for Rares.
+                            pMinion->SetActiveObjectState(true);
+                        }
+                    }
+
                     return;
                 }
                 case 28374:                                 // Decimate (Naxxramas: Gluth)

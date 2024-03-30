@@ -44,6 +44,8 @@
 #include "PathFinder.h"
 #include "CharacterDatabaseCache.h"
 #include "ZoneScript.h"
+#include "scriptPCH.h"
+
 
 using namespace Spells;
 
@@ -2800,13 +2802,17 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, x, y, z, radius);
                     MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
                     Cell::VisitGridObjects(m_caster, checker, radius);
+                    tempTargetGOList.sort(TargetDistanceOrderNear(m_caster));
                 }
             }
 
             if (!tempTargetGOList.empty())
             {
                 for (const auto& iter : tempTargetGOList)
-                    AddGOTarget(iter, effIndex);
+                {
+                    if (iter->isSpawned()) // Makes sense?
+                        AddGOTarget(iter, effIndex);
+                }
             }
 
             break;

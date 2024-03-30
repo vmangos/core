@@ -8670,7 +8670,7 @@ void Player::SendInitWorldStates(uint32 zoneid) const
     // Scourge Invasion - Patch 1.11
     if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
     {
-        int victories = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
+        int victories = sObjectMgr.GetSavedVariable(VARIABLE_SI_VICTORIES);
         int remainingAzshara = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
         int remainingBlastedLands = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
         int remainingBurningSteppes = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
@@ -8678,21 +8678,21 @@ void Player::SendInitWorldStates(uint32 zoneid) const
         int remainingTanaris = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
         int remainingWinterspring = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
-        WriteInitialWorldStatePair(data, WS_SI_AZSHARA_INVADED,             remainingAzshara > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_BLASTED_LANDS_INVADED,       remainingBlastedLands > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_BURNING_STEPPES_INVADED,     remainingBurningSteppes > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_EASTERN_PLAGUELANDS_INVADED, remainingEasternPlaguelands > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_TANARIS_INVADED,             remainingTanaris > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_WINTERSPRING_INVADED,        remainingWinterspring > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WORLDSTATE_AZSHARA,             remainingAzshara > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WORLDSTATE_BLASTED_LANDS,       remainingBlastedLands > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WORLDSTATE_BURNING_STEPPES,     remainingBurningSteppes > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WORLDSTATE_EASTERN_PLAGUELANDS, remainingEasternPlaguelands > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WORLDSTATE_TANARIS,             remainingTanaris > 0 ? 1 : 0);
+        WriteInitialWorldStatePair(data, WORLDSTATE_WINTERSPRING,        remainingWinterspring > 0 ? 1 : 0);
 
         // Battles & remaining necropolisses
-        WriteInitialWorldStatePair(data, WS_SI_BATTLES_WON,               victories);
-        WriteInitialWorldStatePair(data, WS_SI_AZSHARA_REMAINING,         remainingAzshara);
-        WriteInitialWorldStatePair(data, WS_SI_BLASTED_LANDS_REMAINING,   remainingBlastedLands);
-        WriteInitialWorldStatePair(data, WS_SI_BURNING_STEPPES_REMAINING, remainingBurningSteppes);
-        WriteInitialWorldStatePair(data, WS_SI_PLAGUELANDS_REMAINING,     remainingEasternPlaguelands);
-        WriteInitialWorldStatePair(data, WS_SI_TANARIS_REMAINING,         remainingTanaris);
-        WriteInitialWorldStatePair(data, WS_SI_WINTERSPRING_REMAINING,    remainingWinterspring);
+        WriteInitialWorldStatePair(data, WORLDSTATE_SI_VICTORIES,               victories);
+        WriteInitialWorldStatePair(data, WORLDSTATE_SI_AZSHARA_REMAINING,         remainingAzshara);
+        WriteInitialWorldStatePair(data, WORLDSTATE_SI_BLASTED_LANDS_REMAINING,   remainingBlastedLands);
+        WriteInitialWorldStatePair(data, WORLDSTATE_SI_BURNING_STEPPES_REMAINING, remainingBurningSteppes);
+        WriteInitialWorldStatePair(data, WORLDSTATE_SI_EASTERN_PLAGUELANDS,     remainingEasternPlaguelands);
+        WriteInitialWorldStatePair(data, WORLDSTATE_SI_TANARIS,         remainingTanaris);
+        WriteInitialWorldStatePair(data, WORLDSTATE_SI_WINTERSPRING,    remainingWinterspring);
 
         count += 13;
     }

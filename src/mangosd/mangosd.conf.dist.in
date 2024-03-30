@@ -22,9 +22,9 @@ ConfVersion=2010100901
 #        Default: "" - no log directory prefix. if used log names aren't absolute paths
 #                      then logs will be stored in the current directory of the running program.
 #
-#	   HonorDir
-#		     Folder to store HCR files. These are logs of weekly honor calculation.
-#		     By default logs are stored in the current directory of the running program.	                    
+#      HonorDir
+#            Folder to store HCR files. These are logs of weekly honor calculation.
+#            By default logs are stored in the current directory of the running program.
 #
 #    LoginDatabase.Info
 #    WorldDatabase.Info
@@ -41,12 +41,12 @@ ConfVersion=2010100901
 #                    hostname;port;username;password;database
 #                    .;/path/to/unix_socket/DIRECTORY or . for default path;username;password;database - use Unix sockets at Unix/Linux
 #
-#	   LoginDatabase.Connections
-#	   WorldDatabase.Connections
-#	   CharacterDatabase.Connections
+#      LoginDatabase.Connections
+#      WorldDatabase.Connections
+#      CharacterDatabase.Connections
 #    LogsDatabase.Connections
-#		     Amount of connections to database which will be used for SELECT queries. Maximum 16 connections per database.
-#		     Default: 1 connection for SELECT statements
+#            Amount of connections to database which will be used for SELECT queries. Maximum 16 connections per database.
+#            Default: 1 connection for SELECT statements
 #
 #    LoginDatabase.WorkerThreads
 #    WorldDatabase.WorkerThreads
@@ -377,7 +377,7 @@ Anticrash.Rearm.Timer = 60000
 #    PvP.DishonorableKills
 #        Whether to give dishonorable kills to players who kill civilians.
 #        Default: 1
-#  
+#
 #    PvP.CityProtector
 #        Whether to assign City Protector titles on honor update or not.
 #        Default: 0
@@ -950,7 +950,7 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #                 1 (allowed)
 #
 #    Group.OfflineLeaderDelay
-#        A grace period for an offline group leader to reconnect before tranfering leadership to the next suitable member of the group (in secs) 
+#        A grace period for an offline group leader to reconnect before tranfering leadership to the next suitable member of the group (in secs)
 #        Default: 300 (5 minutes)
 #                   0 (Do not transfer group leadership)
 #
@@ -1400,7 +1400,7 @@ GuidReserveSize.GameObject = 1000
 #        Minimum level to /yell in chat
 #        Default: 0
 #
-#    YellRange.LinearScale.MaxLevel 
+#    YellRange.LinearScale.MaxLevel
 #    YellRange.QuadraticScale.MaxLevel
 #        Limit yell range based on level
 #        Default: 0
@@ -2951,6 +2951,26 @@ PartyBot.RandomGearLevelDifference = 10
 
 BattleBot.AutoEquip = 1
 BattleBot.AutoJoin = 0
+
+###################################################################################################################
+# EVENT SCOURGE INVASION
+#
+#    ScourgeInvasion.ZonesAttackTimerMin
+#        How many minutes it takes at least until another zone gets attacked (Invasion starts).
+#        Default: 45 minutes
+#
+#    ScourgeInvasion.ZonesAttackTimerMax
+#        How many minutes it takes at most until another zone gets attacked (Invasion starts).
+#        Default: 60 minutes
+#
+#    ScourgeInvasion.MaxZonesAttackable
+#        How many zones can be attacked at the same time (On event start all zones getting attacked)
+#        Default: 2
+#
+###################################################################################################################
+ScourgeInvasion.ZonesAttackTimerMin = 45
+ScourgeInvasion.ZonesAttackTimerMax = 60
+ScourgeInvasion.MaxZonesAttackable = 2
 
 ###################################################################################################################
 #    Database-based chat
