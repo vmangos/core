@@ -171,9 +171,9 @@ class Creature : public Unit
 
         bool IsTrainerOf(Player* player, bool msg) const;
         bool CanInteractWithBattleMaster(Player* player, bool msg) const;
-        bool CanTrainAndResetTalentsOf(Player* pPlayer) const;
+        bool CanTrainAndResetTalentsOf(Player const* pPlayer) const;
 
-        bool IsOutOfThreatArea(Unit* pVictim) const;
+        bool IsOutOfThreatArea(Unit const* pVictim) const;
         void FillGuidsListFromThreatList(std::vector<ObjectGuid>& guids, uint32 maxamount = 0);
 
         bool IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf) const override;
@@ -306,7 +306,7 @@ class Creature : public Unit
         float GetFleeingSpeed() const;
         float GetBaseWalkSpeedRate() const;
         float GetBaseRunSpeedRate() const;
-        void MoveAwayFromTarget(Unit* pTarget, float distance);
+        void MoveAwayFromTarget(Unit const* pTarget, float distance);
         void CallForHelp(float radius);
         void CallAssistance();
         void SetNoCallAssistance(bool val)
@@ -367,7 +367,7 @@ class Creature : public Unit
 
         void StartGroupLoot(Group* group, uint32 timer);
 
-        void SendZoneUnderAttackMessage(Player* attacker);
+        void SendZoneUnderAttackMessage(Player const* attacker);
 
         void SetInCombatWithZone(bool initialPulse = true);
         void EnterCombatWithTarget(Unit* pTarget);
@@ -393,7 +393,7 @@ class Creature : public Unit
             else
                 ClearCreatureState(CSTATE_COMBAT_WITH_ZONE);
         }
-        void LogDeath(Unit* pKiller) const;
+        void LogDeath(Unit const* pKiller) const;
         void LogLongCombat() const;
         // Smartlog end
 
@@ -581,7 +581,7 @@ class Creature : public Unit
         uint32 GetOriginalEntry() const { return m_originalEntry; }
 
     protected:
-        bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
+        bool MeetsSelectAttackingRequirement(Unit const* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
 
         bool CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, uint32 firstCreatureId, GameEventCreatureData const* eventData = nullptr);
         bool InitEntry(uint32 entry, GameEventCreatureData const* eventData = nullptr);

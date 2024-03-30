@@ -549,7 +549,7 @@ uint64 Unit::GetNegativeAuraApplicationMask() const
     return mask;
 }
 
-void Unit::RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except)
+void Unit::RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder const* except)
 {
     for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
     {
@@ -1569,7 +1569,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
         damageInfo->HitInfo &= ~HITINFO_AFFECTS_VICTIM;
 }
 
-void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
+void Unit::DealMeleeDamage(CalcDamageInfo const* damageInfo, bool durabilityLoss)
 {
     if (damageInfo == nullptr) return;
     Unit* pVictim = damageInfo->target;
@@ -2444,7 +2444,7 @@ float Unit::CalculateDamage(WeaponAttackType attType, bool normalized, uint8 ind
     return frand(min_damage, max_damage);
 }
 
-void Unit::SendMeleeAttackStart(Unit* pVictim) const
+void Unit::SendMeleeAttackStart(Unit const* pVictim) const
 {
     WorldPacket data(SMSG_ATTACKSTART, 8 + 8);
     data << GetObjectGuid();
@@ -2453,7 +2453,7 @@ void Unit::SendMeleeAttackStart(Unit* pVictim) const
     SendObjectMessageToSet(&data, true);
 }
 
-void Unit::SendMeleeAttackStop(Unit* pVictim) const
+void Unit::SendMeleeAttackStop(Unit const* pVictim) const
 {
     if (!pVictim)
         return;
@@ -2471,7 +2471,7 @@ void Unit::SendMeleeAttackStop(Unit* pVictim) const
     DETAIL_FILTER_LOG(LOG_FILTER_COMBAT, "%s %u stopped attacking %s %u", (IsPlayer() ? "player" : "creature"), GetGUIDLow(), (pVictim->IsPlayer() ? "player" : "creature"), pVictim->GetGUIDLow());
 }
 
-bool Unit::IsSpellPartiallyBlocked(SpellCaster* pCaster, SpellEntry const* spellEntry, WeaponAttackType attackType) const
+bool Unit::IsSpellPartiallyBlocked(SpellCaster const* pCaster, SpellEntry const* spellEntry, WeaponAttackType attackType) const
 {
     if (!HasInArc(pCaster))
         return false;
@@ -2496,7 +2496,7 @@ bool Unit::IsSpellPartiallyBlocked(SpellCaster* pCaster, SpellEntry const* spell
     return RollSpellBlockChanceOutcome(pCaster, attackType);
 }
 
-bool Unit::RollSpellBlockChanceOutcome(SpellCaster* pCaster, WeaponAttackType attackType) const
+bool Unit::RollSpellBlockChanceOutcome(SpellCaster const* pCaster, WeaponAttackType attackType) const
 {
     float blockChance = GetUnitBlockChance();
 
@@ -2916,7 +2916,7 @@ void Unit::SetFacingTo(float ori)
     init.Launch();
 }
 
-void Unit::SetFacingToObject(WorldObject* pObject)
+void Unit::SetFacingToObject(WorldObject const* pObject)
 {
     // never face when already moving
     if (!IsStopped())
@@ -3819,7 +3819,7 @@ void Unit::RemoveSingleAuraDueToItemSet(uint32 spellId, AuraRemoveMode mode)
     }
 }
 
-void Unit::RemoveAurasDueToSpell(uint32 spellId, SpellAuraHolder* except, AuraRemoveMode mode)
+void Unit::RemoveAurasDueToSpell(uint32 spellId, SpellAuraHolder const* except, AuraRemoveMode mode)
 {
     SpellAuraHolderBounds bounds = GetSpellAuraHolderBounds(spellId);
     for (SpellAuraHolderMap::iterator iter = bounds.first; iter != bounds.second;)
@@ -3835,7 +3835,7 @@ void Unit::RemoveAurasDueToSpell(uint32 spellId, SpellAuraHolder* except, AuraRe
     }
 }
 
-void Unit::RemoveAurasDueToItemSpell(Item* castItem, uint32 spellId)
+void Unit::RemoveAurasDueToItemSpell(Item const* castItem, uint32 spellId)
 {
     SpellAuraHolderBounds bounds = GetSpellAuraHolderBounds(spellId);
     for (SpellAuraHolderMap::iterator iter = bounds.first; iter != bounds.second;)
@@ -4270,7 +4270,7 @@ void Unit::RemoveAllGameObjects()
     m_spellGameObjects.clear();
 }
 
-void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo, AuraType auraTypeOverride) const
+void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo const* pInfo, AuraType auraTypeOverride) const
 {
     Aura* aura = pInfo->aura;
     Modifier* mod = aura->GetModifier();
@@ -4439,7 +4439,7 @@ void Unit::HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, uint32
     }
 }
 
-void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo) const
+void Unit::SendAttackStateUpdate(CalcDamageInfo const* damageInfo) const
 {
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "WORLD: Sending SMSG_ATTACKERSTATEUPDATE");
 
@@ -4460,7 +4460,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo) const
     // Sub damage description
     for (uint8 i = 0; i < m_weaponDamageCount[damageInfo->attackType]; i++)
     {
-        SubDamageInfo* subDamage = &damageInfo->subDamage[i];
+        SubDamageInfo const* subDamage = &damageInfo->subDamage[i];
 
         data << uint32(GetFirstSchoolInMask(subDamage->damageSchoolMask));
         data << float(subDamage->damage);
@@ -4477,12 +4477,12 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo) const
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
+void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
 {
     CalcDamageInfo dmgInfo;
     dmgInfo.HitInfo = HitInfo;
     dmgInfo.attacker = const_cast<Unit*>(this);
-    dmgInfo.target = target;
+    dmgInfo.target = const_cast<Unit*>(target);
     dmgInfo.attackType = BASE_ATTACK;
     dmgInfo.totalDamage = Damage;
     dmgInfo.totalDamage += (Resist < 0 ? uint32(std::abs(Resist)) : 0);
@@ -5254,7 +5254,7 @@ uint32 Unit::GetSpellRank(SpellEntry const* spellInfo) const
  * Calculates target part of spell damage bonuses,
  * will be called on each tick for periodic damage over time auras
  */
-float Unit::SpellDamageBonusTaken(SpellCaster* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float pdamage, DamageEffectType damagetype, uint32 stack, Spell* spell) const
+float Unit::SpellDamageBonusTaken(SpellCaster const* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float pdamage, DamageEffectType damagetype, uint32 stack, Spell* spell) const
 {
     if (!spellProto || !pCaster || damagetype == DIRECT_DAMAGE || spellProto->HasAttribute(SPELL_ATTR_EX4_IGNORE_DAMAGE_TAKEN_MODIFIERS))
         return pdamage;
@@ -5404,7 +5404,7 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
  * Calculates target part of healing spell bonuses,
  * will be called on each tick for periodic damage over time auras
  */
-float Unit::SpellHealingBonusTaken(SpellCaster* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float healamount, DamageEffectType damagetype, uint32 stack, Spell* spell) const
+float Unit::SpellHealingBonusTaken(SpellCaster const* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float healamount, DamageEffectType damagetype, uint32 stack, Spell* spell) const
 {
     float takenTotalMod = 1.0f;
 
@@ -5754,7 +5754,7 @@ bool Unit::IsTotalImmune() const
  * Calculates target part of melee damage bonuses,
  * will be called on each tick for periodic damage over time auras
  */
-float Unit::MeleeDamageBonusTaken(SpellCaster* pCaster, float pdamage, WeaponAttackType attType, SpellEntry const* spellProto, SpellEffectIndex effectIndex, DamageEffectType damagetype, uint32 stack, Spell* spell, bool flat)
+float Unit::MeleeDamageBonusTaken(SpellCaster const* pCaster, float pdamage, WeaponAttackType attType, SpellEntry const* spellProto, SpellEffectIndex effectIndex, DamageEffectType damagetype, uint32 stack, Spell* spell, bool flat)
 {
     if (!pCaster)
         return pdamage;
@@ -9475,7 +9475,7 @@ void Unit::GetEnemyListInRadiusAround(Unit const* pTarget, float radius, std::li
     Cell::VisitAllObjects(pTarget, searcher, radius);
 }
 
-Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= nullptr*/, float radius /*= ATTACK_DISTANCE*/, bool inFront /*= false*/, bool isValidAttackTarget /*= false*/) const
+Unit* Unit::SelectRandomUnfriendlyTarget(Unit const* except /*= nullptr*/, float radius /*= ATTACK_DISTANCE*/, bool inFront /*= false*/, bool isValidAttackTarget /*= false*/) const
 {
     std::list<Unit*> targets;
 
@@ -9485,7 +9485,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= nullptr*/, float radiu
 
     // remove current target
     if (except)
-        targets.remove(except);
+        targets.remove(const_cast<Unit*>(except));
 
     // remove not LoS targets
     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
@@ -9513,7 +9513,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= nullptr*/, float radiu
     return *tcIter;
 }
 
-Unit* Unit::SelectRandomFriendlyTarget(Unit* except /*= nullptr*/, float radius /*= ATTACK_DISTANCE*/, bool inCombat) const
+Unit* Unit::SelectRandomFriendlyTarget(Unit const* except /*= nullptr*/, float radius /*= ATTACK_DISTANCE*/, bool inCombat) const
 {
     std::list<Unit*> targets;
 
@@ -9524,7 +9524,7 @@ Unit* Unit::SelectRandomFriendlyTarget(Unit* except /*= nullptr*/, float radius 
 
     // remove current target
     if (except)
-        targets.remove(except);
+        targets.remove(const_cast<Unit*>(except));
 
     // remove not LoS targets
     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
@@ -9594,7 +9594,7 @@ Unit* Unit::FindLowestHpFriendlyUnit(float fRange, uint32 uiMinHPDiff, bool bPer
 }
 
 // Returns friendly unit that does not have an aura from the provided spellid
-Unit* Unit::FindFriendlyUnitMissingBuff(float range, uint32 spellid, Unit* except) const
+Unit* Unit::FindFriendlyUnitMissingBuff(float range, uint32 spellid, Unit const* except) const
 {
     std::list<Unit*> targets;
 
@@ -9605,7 +9605,7 @@ Unit* Unit::FindFriendlyUnitMissingBuff(float range, uint32 spellid, Unit* excep
 
     // remove current target
     if (except)
-        targets.remove(except);
+        targets.remove(const_cast<Unit*>(except));
 
     // no appropriate targets
     if (targets.empty())
@@ -9895,7 +9895,7 @@ void Unit::SetPvP(bool state)
     CallForAllControlledUnits(SetPvPHelper(state), CONTROLLED_PET | CONTROLLED_TOTEMS | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
 }
 
-void Unit::KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed)
+void Unit::KnockBackFrom(WorldObject const* target, float horizontalSpeed, float verticalSpeed)
 {
     if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
         return;
@@ -10925,14 +10925,14 @@ Unit* Unit::SelectNearestTarget(float dist) const
     return target;
 }
 
-float Unit::GetMinChaseDistance(Unit* victim) const
+float Unit::GetMinChaseDistance(Unit const* victim) const
 {
     if (m_casterChaseDistance > 1.0f)
         return m_casterChaseDistance;
     return GetObjectBoundingRadius();
 }
 
-float Unit::GetMaxChaseDistance(Unit* victim) const
+float Unit::GetMaxChaseDistance(Unit const* victim) const
 {
     if (m_casterChaseDistance > 1.0f)
         return m_casterChaseDistance + GetCombatReach() + victim->GetCombatReach();

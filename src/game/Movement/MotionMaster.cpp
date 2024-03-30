@@ -877,7 +877,7 @@ void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack
         Mutate(new ChargeMovementGenerator<Creature>(*(m_owner->ToCreature()), *target, delay, triggerAutoAttack, 0.0f, meleeReach));
 }
 
-bool MotionMaster::MoveDistance(Unit* pTarget, float distance)
+bool MotionMaster::MoveDistance(Unit const* pTarget, float distance)
 {
     if (m_owner->GetTransport())
         return false;

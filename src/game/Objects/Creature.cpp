@@ -1160,7 +1160,7 @@ float Creature::GetBaseRunSpeedRate() const
     return DEFAULT_NPC_RUN_SPEED_RATE;
 }
 
-void Creature::MoveAwayFromTarget(Unit* pTarget, float distance)
+void Creature::MoveAwayFromTarget(Unit const* pTarget, float distance)
 {
     if (HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
@@ -1400,7 +1400,7 @@ bool Creature::CanInteractWithBattleMaster(Player* pPlayer, bool msg) const
     return true;
 }
 
-bool Creature::CanTrainAndResetTalentsOf(Player* pPlayer) const
+bool Creature::CanTrainAndResetTalentsOf(Player const* pPlayer) const
 {
     return pPlayer->GetLevel() >= 10
            && GetCreatureInfo()->trainer_type == TRAINER_TYPE_CLASS
@@ -2610,7 +2610,7 @@ void Creature::SaveRespawnTime()
         GetMap()->GetPersistentState()->SaveCreatureRespawnTime(GetGUIDLow(), time(nullptr) + m_respawnDelay + m_corpseDecayTimer / IN_MILLISECONDS);
 }
 
-bool Creature::IsOutOfThreatArea(Unit* pVictim) const
+bool Creature::IsOutOfThreatArea(Unit const* pVictim) const
 {
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_LEASH_EVADE))
         return false;
@@ -2723,7 +2723,7 @@ void Creature::LoadCreatureAddon(bool reload)
 }
 
 // Send a message to LocalDefense channel for players opposition team in the zone
-void Creature::SendZoneUnderAttackMessage(Player* attacker)
+void Creature::SendZoneUnderAttackMessage(Player const* attacker)
 {
     uint32 areaId = GetAreaId();
     time_t now = time(nullptr);
@@ -2792,7 +2792,7 @@ void Creature::SetInCombatWithZone(bool initialPulse)
 }
 
 
-bool Creature::MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const
+bool Creature::MeetsSelectAttackingRequirement(Unit const* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const
 {
     if (selectFlags)
     {
@@ -2847,7 +2847,7 @@ bool Creature::MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* 
 }
 
 
-void Creature::LogDeath(Unit* pKiller) const
+void Creature::LogDeath(Unit const* pKiller) const
 {
     if (!LogsDatabase || !sWorld.getConfig(CONFIG_BOOL_SMARTLOG_DEATH))
         return;

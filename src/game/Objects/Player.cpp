@@ -1830,7 +1830,7 @@ void Player::RelocateToLastClientPosition()
     }
 }
 
-void Player::GetSafePosition(float &x, float &y, float &z, GenericTransport* onTransport) const
+void Player::GetSafePosition(float &x, float &y, float &z, GenericTransport const* onTransport) const
 {
     if (!onTransport && m_movementInfo.ctime >  0)
     {
@@ -2033,7 +2033,7 @@ void Player::AutoReSummonPet()
 }
 
 
-bool Player::BuildEnumData(QueryResult* result, WorldPacket* pData)
+bool Player::BuildEnumData(QueryResult const* result, WorldPacket* pData)
 {
     //                0                1                2                3                 4                  5                6                7                      8                      9                       10
     //    "SELECT characters.guid, characters.name, characters.race, characters.class, characters.gender, characters.skin, characters.face, characters.hair_style, characters.hair_color, characters.facial_hair, characters.level, "
@@ -2891,16 +2891,16 @@ bool Player::CanUseBank(ObjectGuid bankerGUID) const
     return true;
 }
 
-bool Player::CanInteractWithQuestGiver(Object* questGiver) const
+bool Player::CanInteractWithQuestGiver(Object const* questGiver) const
 {
     switch (questGiver->GetTypeId())
     {
         case TYPEID_UNIT:
-            return CanInteractWithNPC(static_cast<Creature*>(questGiver), UNIT_NPC_FLAG_QUESTGIVER);
+            return CanInteractWithNPC(static_cast<Creature const*>(questGiver), UNIT_NPC_FLAG_QUESTGIVER);
         case TYPEID_GAMEOBJECT:
-            return CanInteractWithGameObject(static_cast<GameObject*>(questGiver), GAMEOBJECT_TYPE_QUESTGIVER);
+            return CanInteractWithGameObject(static_cast<GameObject const*>(questGiver), GAMEOBJECT_TYPE_QUESTGIVER);
         case TYPEID_PLAYER:
-            return IsAlive() && static_cast<Player*>(questGiver)->IsAlive();
+            return IsAlive() && static_cast<Player const*>(questGiver)->IsAlive();
         case TYPEID_ITEM:
             return IsAlive();
         default:
@@ -3429,21 +3429,21 @@ uint32 Player::GetWhoListPartyStatus() const
 }
 #endif
 
-void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP) const
+void Player::SendLogXPGain(uint32 givenXP, Unit const* victim, uint32 restXP) const
 {
     WorldPacket data(SMSG_LOG_XPGAIN, 21);
     data << (victim ? victim->GetObjectGuid() : ObjectGuid());// guid
-    data << uint32(GivenXP + RestXP);                       // given experience
+    data << uint32(givenXP + restXP);                       // given experience
     data << uint8(victim ? 0 : 1);                          // 00-kill_xp type, 01-non_kill_xp type
     if (victim)
     {
-        data << uint32(GivenXP);                            // experience without rested bonus
+        data << uint32(givenXP);                            // experience without rested bonus
         data << float(1);                                   // 1 - none 0 - 100% group bonus output
     }
     GetSession()->SendPacket(&data);
 }
 
-void Player::GiveXP(uint32 xp, Unit* victim)
+void Player::GiveXP(uint32 xp, Unit const* victim)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
@@ -4641,7 +4641,7 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     Unit::BuildCreateUpdateBlockForPlayer(data, target);
 }
 
-void Player::DestroyForPlayer(Player* target) const
+void Player::DestroyForPlayer(Player const* target) const
 {
     Unit::DestroyForPlayer(target);
 
@@ -5892,7 +5892,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return true;
 }
 
-void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence)
+void Player::UpdateCombatSkills(Unit const* pVictim, WeaponAttackType attType, bool defence)
 {
     if (!pVictim)
         return;
@@ -6450,7 +6450,7 @@ void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
     }
 }
 
-bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player* player)
+bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player const* player)
 {
     if (button >= MAX_ACTION_BUTTONS)
         return false;
@@ -6901,7 +6901,7 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
 }
 
 //Calculates how many reputation points player gains in victim's enemy factions
-void Player::RewardReputation(Unit* pVictim, float rate)
+void Player::RewardReputation(Unit const* pVictim, float rate)
 {
     if (!pVictim || pVictim->IsPlayer())
         return;
@@ -7546,7 +7546,7 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
     }
 }
 
-void Player::_ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply)
+void Player::_ApplyWeaponDependentAuraMods(Item const* item, WeaponAttackType attackType, bool apply)
 {
     if (apply && !CanUseEquippedWeapon(attackType))
         return;
@@ -7564,7 +7564,7 @@ void Player::_ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackTy
         _ApplyWeaponDependentAuraDamageMod(item, attackType, itr, apply);
 }
 
-void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, Aura* aura, bool apply)
+void Player::_ApplyWeaponDependentAuraCritMod(Item const* item, WeaponAttackType attackType, Aura* aura, bool apply)
 {
     // generic not weapon specific case processes in aura code
     if (aura->GetSpellProto()->EquippedItemClass == -1)
@@ -7607,7 +7607,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attac
     }
 }
 
-void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, Aura* aura, bool apply)
+void Player::_ApplyWeaponDependentAuraDamageMod(Item const* item, WeaponAttackType attackType, Aura* aura, bool apply)
 {
     // ignore spell mods for not wands
     Modifier const* modifier = aura->GetModifier();
@@ -8126,7 +8126,7 @@ void Player::SendLootError(ObjectGuid guid, LootError error) const
     SendDirectMessage(&data);
 }
 
-void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
+void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player const* pVictim)
 {
     // Nostalrius : desactivation des loots / map
     if (Map* myMap = FindMap())
@@ -8896,7 +8896,7 @@ InventoryResult Player::CanUnequipItems(uint32 item, uint32 count) const
     return res;
 }
 
-uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
+uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item const* skipItem) const
 {
     uint32 count = 0;
     for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
@@ -9268,7 +9268,7 @@ bool Player::HasItemWithIdEquipped(uint32 item, uint32 count, uint8 except_slot)
     return false;
 }
 
-InventoryResult Player::_CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count) const
+InventoryResult Player::_CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item const* pItem, uint32* no_space_count) const
 {
     ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(entry);
     if (!pProto)
@@ -9295,7 +9295,7 @@ InventoryResult Player::_CanTakeMoreSimilarItems(uint32 entry, uint32 count, Ite
     return EQUIP_ERR_OK;
 }
 
-InventoryResult Player::_CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec &dest, ItemPrototype const* pProto, uint32& count, bool swap, Item* pSrcItem) const
+InventoryResult Player::_CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec &dest, ItemPrototype const* pProto, uint32& count, bool swap, Item const* pSrcItem) const
 {
     Item* pItem2 = GetItemByPos(bag, slot);
 
@@ -9371,7 +9371,7 @@ InventoryResult Player::_CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, Item
     return EQUIP_ERR_OK;
 }
 
-InventoryResult Player::_CanStoreItem_InBag(uint8 bag, ItemPosCountVec &dest, ItemPrototype const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const
+InventoryResult Player::_CanStoreItem_InBag(uint8 bag, ItemPosCountVec &dest, ItemPrototype const* pProto, uint32& count, bool merge, bool non_specialized, Item const* pSrcItem, uint8 skip_bag, uint8 skip_slot) const
 {
     // skip specific bag already processed in first called _CanStoreItem_InBag
     if (bag == skip_bag)
@@ -9445,7 +9445,7 @@ InventoryResult Player::_CanStoreItem_InBag(uint8 bag, ItemPosCountVec &dest, It
     return EQUIP_ERR_OK;
 }
 
-InventoryResult Player::_CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec &dest, ItemPrototype const* pProto, uint32& count, bool merge, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const
+InventoryResult Player::_CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec &dest, ItemPrototype const* pProto, uint32& count, bool merge, Item const* pSrcItem, uint8 skip_bag, uint8 skip_slot) const
 {
     // Fix dupe exploit (move non empty bag)
     if (pSrcItem && pSrcItem->IsBag() && !((Bag*)pSrcItem)->IsEmpty())
@@ -9506,7 +9506,7 @@ InventoryResult Player::_CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 s
 #define LAST_ITEM_SLOT_FIELD PLAYER_FIELD_VENDORBUYBACK_SLOT
 #endif
 
-InventoryResult Player::_CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec &dest, uint32 entry, uint32 count, Item* pItem, bool swap, uint32* no_space_count) const
+InventoryResult Player::_CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec &dest, uint32 entry, uint32 count, Item const* pItem, bool swap, uint32* no_space_count) const
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "STORAGE: CanStoreItem bag = %u, slot = %u, item = %u, count = %u", bag, slot, entry, count);
 
@@ -10121,7 +10121,7 @@ InventoryResult Player::CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, b
     return EQUIP_ERR_ITEM_NOT_FOUND;
 }
 
-InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading) const
+InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item const* pItem, bool swap, bool not_loading) const
 {
     dest = 0;
     if (pItem)
@@ -10287,7 +10287,7 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
     return EQUIP_ERR_OK;
 }
 
-InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec &dest, Item* pItem, bool swap, bool not_loading) const
+InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec &dest, Item const* pItem, bool swap, bool not_loading) const
 {
     if (!pItem)
         return swap ? EQUIP_ERR_ITEMS_CANT_BE_SWAPPED : EQUIP_ERR_ITEM_NOT_FOUND;
@@ -10469,7 +10469,7 @@ InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec &dest
     return EQUIP_ERR_BANK_FULL;
 }
 
-InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
+InventoryResult Player::CanUseItem(Item const* pItem, bool not_loading) const
 {
     if (pItem)
     {
@@ -10877,7 +10877,7 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
     }
 }
 
-void Player::SetVisibleItemSlot(uint8 slot, Item* pItem)
+void Player::SetVisibleItemSlot(uint8 slot, Item const* pItem)
 {
     if (pItem)
     {
@@ -11973,7 +11973,7 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
     }
 }
 
-void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint32 itemid /*= 0*/) const
+void Player::SendEquipError(InventoryResult msg, Item const* pItem, Item const* pItem2, uint32 itemid /*= 0*/) const
 {
     WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I ? 22 : (msg == EQUIP_ERR_OK ? 1 : 18)));
     data << uint8(msg);
@@ -11999,7 +11999,7 @@ void Player::SendOpenContainer() const
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint32 /*param*/) const
+void Player::SendBuyError(BuyResult msg, Creature const* pCreature, uint32 item, uint32 /*param*/) const
 {
     WorldPacket data(SMSG_BUY_FAILED, (8 + 4 + 1));
     data << (pCreature ? pCreature->GetObjectGuid() : ObjectGuid());
@@ -12010,7 +12010,7 @@ void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint3
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 /*param*/) const
+void Player::SendSellError(SellResult msg, Creature const* pCreature, ObjectGuid itemGuid, uint32 /*param*/) const
 {
     WorldPacket data(SMSG_SELL_ITEM, (8 + 8 + /*(param ? 4 : 0) +*/ 1)); // last check [ZERO]
     data << (pCreature ? pCreature->GetObjectGuid() : ObjectGuid());
@@ -12361,7 +12361,7 @@ void Player::SendItemDurations() const
         itr->SendTimeUpdate(this);
 }
 
-void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, bool broadcast /*=false*/, bool showInChat /*=true*/)
+void Player::SendNewItem(Item const* item, uint32 count, bool received, bool created, bool broadcast /*=false*/, bool showInChat /*=true*/)
 {
     if (!item)                                              // prevent crash
         return;
@@ -12741,7 +12741,7 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId)
     }
 }
 
-uint32 Player::GetGossipTextId(WorldObject* pSource)
+uint32 Player::GetGossipTextId(WorldObject const* pSource)
 {
     if (!pSource || !pSource->IsCreature() || pSource->IsPet())
         return DEFAULT_GOSSIP_MESSAGE;
@@ -14832,7 +14832,7 @@ void Player::SendCanTakeQuestResponse(uint32 msg) const
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver) const
+void Player::SendQuestConfirmAccept(Quest const* pQuest, Player const* pReceiver) const
 {
     if (pReceiver)
     {
@@ -14857,7 +14857,7 @@ void Player::SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver) cons
     }
 }
 
-void Player::SendPushToPartyResponse(Player* pPlayer, uint8 msg) const
+void Player::SendPushToPartyResponse(Player const* pPlayer, uint8 msg) const
 {
     if (pPlayer)
     {
@@ -17021,7 +17021,7 @@ void Player::_SaveAuras()
     }
 }
 
-bool Player::SaveAura(SpellAuraHolder* holder, AuraSaveStruct& saveStruct)
+bool Player::SaveAura(SpellAuraHolder const* holder, AuraSaveStruct& saveStruct)
 {
     // Do not save these auras to database.
     if (holder->GetSpellProto()->HasAuraInterruptFlag(SpellAuraInterruptFlags(AURA_INTERRUPT_LEAVE_WORLD_CANCELS | AURA_INTERRUPT_ENTER_WORLD_CANCELS)))
@@ -17968,7 +17968,7 @@ bool Player::HasInstantCastingSpellMod(SpellEntry const* spellInfo) const
     return false;
 }
 
-bool Player::IsAffectedBySpellmod(SpellEntry const* spellInfo, SpellModifier* mod, Spell* spell) const
+bool Player::IsAffectedBySpellmod(SpellEntry const* spellInfo, SpellModifier const* mod, Spell const* spell) const
 {
     if (!mod || !spellInfo)
         return false;
@@ -17976,10 +17976,10 @@ bool Player::IsAffectedBySpellmod(SpellEntry const* spellInfo, SpellModifier* mo
     // Mod out of charges
     if (spell)
     {
-        std::list<SpellModifier*>::iterator iterMod = spell->m_appliedMods.begin();
-        while (iterMod != spell->m_appliedMods.end() && (*iterMod) != mod)
+        std::list<SpellModifier*>::const_iterator iterMod = spell->m_appliedMods.cbegin();
+        while (iterMod != spell->m_appliedMods.cend() && (*iterMod) != mod)
             ++iterMod;
-        if (mod->charges == -1 && iterMod == spell->m_appliedMods.end())
+        if (mod->charges == -1 && iterMod == spell->m_appliedMods.cend())
             return false;
     }
 
@@ -18184,7 +18184,7 @@ void Player::SetRestBonus(float rest_bonus_new)
     SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, uint32(m_restBonus));
 }
 
-bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc /*= nullptr*/, uint32 spellid /*= 0*/, bool nocheck)
+bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const* npc /*= nullptr*/, uint32 spellid /*= 0*/, bool nocheck)
 {
     if (nodes.size() < 2)
         return false;
@@ -18933,7 +18933,7 @@ void Player::SetBattleGroundEntryPoint(uint32 mapId, float x, float y, float z, 
     m_bgData.m_needSave = true;
 }
 
-void Player::SetBattleGroundEntryPoint(Player* leader /*= nullptr*/, bool queuedAtBGPortal /*= false*/)
+void Player::SetBattleGroundEntryPoint(Player const* leader /*= nullptr*/, bool queuedAtBGPortal /*= false*/)
 {
     // Already in BG ? Then we already have a teleport back point
     if (InBattleGround())
@@ -19048,7 +19048,7 @@ bool Player::IsVisibleInGridForPlayer(Player const* pl) const
     return false;
 }
 
-bool Player::IsVisibleGloballyFor(Player* viewer) const
+bool Player::IsVisibleGloballyFor(Player const* viewer) const
 {
     if (!viewer)
         return false;
@@ -19535,7 +19535,7 @@ void Player::SendInstanceResetWarning(uint32 mapid, uint32 _time) const
 #endif
 }
 
-void Player::ApplyEquipCooldown(Item* pItem)
+void Player::ApplyEquipCooldown(Item const* pItem)
 {
     if (pItem->GetProto()->Flags & ITEM_FLAG_NO_EQUIP_COOLDOWN)
         return;
@@ -19980,7 +19980,7 @@ void Player::SummonIfPossible(bool agree)
     TeleportTo(m_summon_mapid, m_summon_x, m_summon_y, m_summon_z, GetOrientation());
 }
 
-void Player::RemoveItemDurations(Item* item)
+void Player::RemoveItemDurations(Item const* item)
 {
     for (ItemDurationList::iterator itr = m_itemDuration.begin(); itr != m_itemDuration.end(); ++itr)
     {
@@ -20101,7 +20101,7 @@ bool Player::HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item cons
     return false;
 }
 
-void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
+void Player::RemoveItemDependentAurasAndCasts(Item const* pItem)
 {
     ItemPrototype const* itemProto = pItem->GetProto();
     // Nostalrius: certains items ne retirent pas de buff.
@@ -20223,7 +20223,7 @@ uint32 Player::SelectResurrectionSpellId() const
 }
 
 // Used in triggers for check "Only to targets that grant experience or honor" req
-bool Player::IsHonorOrXPTarget(Unit* pVictim) const
+bool Player::IsHonorOrXPTarget(Unit const* pVictim) const
 {
     uint32 v_level = pVictim->GetLevel();
     uint32 k_grey  = MaNGOS::XP::GetGrayLevel(GetLevel());
@@ -20234,19 +20234,19 @@ bool Player::IsHonorOrXPTarget(Unit* pVictim) const
 
     if (pVictim->GetTypeId() == TYPEID_UNIT)
     {
-        if (((Creature*)pVictim)->IsTotem() ||
-            ((Creature*)pVictim)->IsPet() ||
-            ((Creature*)pVictim)->GetCreatureInfo()->xp_multiplier==0 ||
+        if (((Creature const*)pVictim)->IsTotem() ||
+            ((Creature const*)pVictim)->IsPet() ||
+            ((Creature const*)pVictim)->GetCreatureInfo()->xp_multiplier==0 ||
             pVictim->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
             return false;
     }
     return true;
 }
 
-void Player::RewardSinglePlayerAtKill(Unit* pVictim)
+void Player::RewardSinglePlayerAtKill(Unit const* pVictim)
 {
     bool PvP = pVictim->IsCharmerOrOwnerPlayerOrPlayerItself();
-    uint32 xp = PvP ? 0 : MaNGOS::XP::Gain(this, static_cast<Creature*>(pVictim));
+    uint32 xp = PvP ? 0 : MaNGOS::XP::Gain(this, static_cast<Creature const*>(pVictim));
     
     // honor can be in PvP and !PvP (racial leader) cases
     RewardHonor(pVictim, 1);
@@ -20261,7 +20261,7 @@ void Player::RewardSinglePlayerAtKill(Unit* pVictim)
         if (xp)
         {
             if (Pet* pet = GetPet())
-                pet->GivePetXP(MaNGOS::XP::Gain(pet, static_cast<Creature*>(pVictim)));
+                pet->GivePetXP(MaNGOS::XP::Gain(pet, static_cast<Creature const*>(pVictim)));
         }
 
         // normal creature (not pet/etc) can be only in !PvP case
@@ -20270,7 +20270,7 @@ void Player::RewardSinglePlayerAtKill(Unit* pVictim)
     }
 }
 
-void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewardSource)
+void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject const* pRewardSource)
 {
     ObjectGuid creature_guid = pRewardSource->GetTypeId() == TYPEID_UNIT ? pRewardSource->GetObjectGuid() : ObjectGuid();
 
@@ -20295,7 +20295,7 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
         KilledMonsterCredit(creature_id, creature_guid);
 }
 
-void Player::RewardPlayerAndGroupAtCast(WorldObject* pRewardSource, uint32 spellid)
+void Player::RewardPlayerAndGroupAtCast(WorldObject const* pRewardSource, uint32 spellid)
 {
     // prepare data for near group iteration
     if (Group* pGroup = GetGroup())
@@ -20408,7 +20408,7 @@ void Player::ResurectUsingRequestData()
     SpawnCorpseBones();
 }
 
-void Player::SetClientControl(Unit* target, uint8 allowMove)
+void Player::SetClientControl(Unit const* target, uint8 allowMove)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
@@ -20943,7 +20943,7 @@ void Player::LoadSkillsFromFields()
     }
 }
 
-InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot) const
+InventoryResult Player::CanEquipUniqueItem(Item const* pItem, uint8 eslot) const
 {
     ItemPrototype const* pProto = pItem->GetProto();
 
@@ -21245,7 +21245,7 @@ void Player::RemoveAtLoginFlag(AtLoginFlags f, bool in_db_also /*= false*/)
         CharacterDatabase.PExecute("UPDATE `characters` SET `at_login_flags` = `at_login_flags` & ~ %u WHERE `guid` ='%u'", uint32(f), GetGUIDLow());
 }
 
-void Player::SendClearCooldown(uint32 spellId, Unit* target) const
+void Player::SendClearCooldown(uint32 spellId, Unit const* target) const
 {
     WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
     data << uint32(spellId);
@@ -21253,7 +21253,7 @@ void Player::SendClearCooldown(uint32 spellId, Unit* target) const
     SendDirectMessage(&data);
 }
 
-void Player::SendClearAllCooldowns(Unit* target) const
+void Player::SendClearAllCooldowns(Unit const* target) const
 {
     WorldPacket data(SMSG_COOLDOWN_CHEAT, 8);
     data << target->GetObjectGuid();
@@ -22019,7 +22019,7 @@ void Player::SetSession(WorldSession* s)
     PlayerTalkClass = new PlayerMenu(GetSession());
 }
 
-void Player::InterruptSpellsWithCastItem(Item* item)
+void Player::InterruptSpellsWithCastItem(Item const* item)
 {
     // Interrupt current spells
     for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; i++)
@@ -22069,7 +22069,7 @@ void Player::LootMoney(int32 money, Loot* loot)
     LogModifyMoney(money, "Loot", target ? target->GetObjectGuid() : ObjectGuid());
 }
 
-void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
+void Player::RewardHonor(Unit const* uVictim, uint32 groupSize)
 {
     // Honor System was added in 1.4.
     if (sWorld.GetWowPatch() < WOW_PATCH_104 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_TIMELINE))
@@ -22079,12 +22079,12 @@ void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
         return;
 
     // Honorless Target
-    if (uVictim->GetAura(2479, EFFECT_INDEX_0))
+    if (uVictim->HasAura(2479, EFFECT_INDEX_0))
         return;
 
     if (uVictim->GetTypeId() == TYPEID_UNIT)
     {
-        Creature* cVictim = (Creature*)uVictim;
+        Creature const* cVictim = (Creature const*)uVictim;
         if (cVictim->IsCivilian() && !IsHonorOrXPTarget(cVictim))
         {
             if (!sWorld.getConfig(CONFIG_BOOL_ENABLE_DK))
@@ -22180,7 +22180,7 @@ void Player::RewardHonorOnDeath()
     m_damageTakenHistory.clear();
 }
 
-void Player::OnReceivedItem(Item* item)
+void Player::OnReceivedItem(Item const* item)
 {
     if (item->GetProto()->Quality >= sWorld.getConfig(CONFIG_UINT32_ITEM_INSTANTSAVE_QUALITY))
         SetSaveTimer(1);
