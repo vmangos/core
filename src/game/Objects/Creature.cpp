@@ -2315,7 +2315,7 @@ bool Creature::IsVisibleInGridForPlayer(Player const* pl) const
     }
 
     // Dead player can see ghosts
-    if (GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_GHOST_VISIBLE)
+    if (GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_VISIBLE_TO_GHOSTS)
         return true;
 
     // and not see any other

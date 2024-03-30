@@ -87,13 +87,13 @@ enum CreatureFamily
 
 enum CreatureTypeFlags
 {
-    CREATURE_TYPEFLAGS_TAMEABLE             = 0x00000001,       // Tameable by any hunter
-    CREATURE_TYPEFLAGS_GHOST_VISIBLE        = 0x00000002,       // Creatures which can _also_ be seen when player is a ghost, used in CanInteract function by client, can't be attacked
-    CREATURE_TYPEFLAGS_BOSS                 = 0x00000004,       // Changes creature's visible level to "??" in the creature's portrait
-    CREATURE_TYPEFLAGS_NO_WOUND_ANIM        = 0x00000008,       // Disables "wounded" animations at spell taken
-    CREATURE_TYPEFLAGS_HIDE_FACTION_TOOLTIP = 0x00000010,       // Controls something in client tooltip related to creature faction
-    CREATURE_TYPEFLAGS_UNK6                 = 0x00000020,       // May be sound related
-    CREATURE_TYPEFLAGS_SPELL_ATTACKABLE     = 0x00000040,       // May be related to attackable / not attackable creatures with spells, used together with lua_IsHelpfulSpell/lua_IsHarmfulSpell
+    CREATURE_TYPEFLAGS_TAMEABLE                   = 0x00000001, // Derived from CREATURE_STATIC_FLAG_TAMEABLE (0x00000010)
+    CREATURE_TYPEFLAGS_VISIBLE_TO_GHOSTS          = 0x00000002, // Derived from CREATURE_STATIC_FLAG_VISIBLE_TO_GHOSTS (0x00200000)
+    CREATURE_TYPEFLAGS_RAID_BOSS_MOB              = 0x00000004, // Derived from CREATURE_STATIC_FLAG_RAID_BOSS_MOB (0x00010000)
+    CREATURE_TYPEFLAGS_DO_NOT_PLAY_WOUND_ANIM     = 0x00000008, // Derived from CREATURE_STATIC_FLAG_DO_NOT_PLAY_WOUND_ANIM (0x00800000)
+    CREATURE_TYPEFLAGS_NO_FACTION_TOOLTIP         = 0x00000010, // Derived from CREATURE_STATIC_FLAG_NO_FACTION_TOOLTIP (0x01000000)
+    CREATURE_TYPEFLAGS_MORE_AUDIBLE               = 0x00000020, // Derived from CREATURE_STATIC_FLAG_MORE_AUDIBLE (0x40000000)
+    CREATURE_TYPEFLAGS_NO_HARMFUL_VERTEX_COLORING = 0x00000040, // Derived from CREATURE_STATIC_FLAG_2_NO_HARMFUL_VERTEX_COLORING (0x00000008)
 };
 
 enum CreatureEliteType
