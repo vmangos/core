@@ -1937,8 +1937,7 @@ bool ChatHandler::HandlePartyBotStayCommand(char* args)
             PSendSysMessage("%s won't move.", pTarget->GetName());
             return true;
         }
-
-        if (!pTarget)
+        else
         {
             for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
@@ -2024,8 +2023,7 @@ bool ChatHandler::HandlePartyBotMoveCommand(char* args)
             PSendSysMessage("%s won't move.", pTarget->GetName());
             return true;
         }
-
-        if (!pTarget)
+        else
         {
             for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
