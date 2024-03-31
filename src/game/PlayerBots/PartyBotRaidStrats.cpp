@@ -21,7 +21,8 @@ enum class RaidStratsPotionItemId {
     GREATER_ARCANE_ELIXIR = 13454,
     WINTERFALL_FIREWATER = 12820,
     ELIXIR_OF_FROST_POWER = 17708,
-    DISTILLED_WISDOM = 13511,
+    FLASK_OF_DISTILLED_WISDOM = 13511,
+    FLASK_OF_SUPREME_POWER = 13512,
 
     GREATER_FROST_PROTECTION_POTION = 13456,
     GREATER_FIRE_PROTECTION_POTION = 13457,
@@ -29,6 +30,7 @@ enum class RaidStratsPotionItemId {
     GREATER_SHADOW_PROTECTION_POTION = 13459,
     GREATER_HOLY_PROTECTION_POTION = 13460,
     GREATER_ARCANE_PROTECTION_POTION = 13461,
+
     FLASK_OF_CHROMATIC_RESISTANCE = 13513,
 };
 
@@ -46,7 +48,8 @@ enum class RaidStratsPotionAuraId {
     GREATER_ARCANE_ELIXIR = 17539,
     WINTERFALL_FIREWATER = 17038,
     ELIXIR_OF_FROST_POWER = 21920,
-    DISTILLED_WISDOM = 17627,
+    FLASK_OF_DISTILLED_WISDOM = 17627,
+    FLASK_OF_SUPREME_POWER = 17628,
 
     GREATER_FIRE_PROTECTION_POTION = 17543,
     GREATER_FROST_PROTECTION_POTION = 17544,
@@ -54,6 +57,7 @@ enum class RaidStratsPotionAuraId {
     GREATER_NATURE_PROTECTION_POTION = 17546,
     GREATER_SHADOW_PROTECTION_POTION = 17548,
     GREATER_ARCANE_PROTECTION_POTION = 17549,
+
     FLASK_OF_CHROMATIC_RESISTANCE = 17629,
 };
 
@@ -91,14 +95,29 @@ void PartyBotAI::RaidStratsDefaultPotionsInRaid()
     // Flask of Distilled Wisdom
     if (me->GetPowerType() == POWER_MANA)
     {
-        if (!me->HasAura((int)RaidStratsPotionAuraId::DISTILLED_WISDOM))
+        if (m_role == ROLE_HEALER || m_class == CLASS_HUNTER)
         {
-            if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::DISTILLED_WISDOM))
+            if (!me->HasAura((int)RaidStratsPotionAuraId::FLASK_OF_DISTILLED_WISDOM))
             {
-                UsePotionsOrRune((int)RaidStratsPotionItemId::DISTILLED_WISDOM);
-                return;
+                if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::FLASK_OF_DISTILLED_WISDOM))
+                {
+                    UsePotionsOrRune((int)RaidStratsPotionItemId::FLASK_OF_DISTILLED_WISDOM);
+                    return;
+                }
             }
         }
+        else
+        {
+            if (!me->HasAura((int)RaidStratsPotionAuraId::FLASK_OF_SUPREME_POWER))
+            {
+                if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::FLASK_OF_SUPREME_POWER))
+                {
+                    UsePotionsOrRune((int)RaidStratsPotionItemId::FLASK_OF_SUPREME_POWER);
+                    return;
+                }
+            }
+        }
+        
     }
     
     if (m_role == ROLE_TANK || m_role == ROLE_MELEE_DPS || me->GetClass() == CLASS_HUNTER)
