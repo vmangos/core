@@ -2625,6 +2625,22 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         if (pProto->RequiredReputationFaction && uint32(me->GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
             continue;
 
+        // Avoid things with inappropriate status.
+        std::vector<uint32> healItemSpells = { 7675, 7676, 7677, 7678, 7679, 7680, 7681, 446470, 9406, 9407, 9408, 23796, 9314, 9315, 9316, 25067, 9317, 9318, 18029, 18030, 18031, 18032, 17371, 18033, 18034, 18035, 15696, 22748, 18036, 18037, 18038, 18039, 18040, 18041, 18042, 18043, 18044, 18045, 18046, 18047, 18048, 17320, 26154, 23593, 26225, 23264, 26690, 26228, 29369, 26461, 28686, 28736, 26814, 28805, 28151, 28152 };
+        bool isHealItem = false;
+        for (const auto& itr : pProto->Spells)
+        {
+            if (m_role != ROLE_HEALER)
+            {
+                if (std::find(healItemSpells.begin(), healItemSpells.end(), itr.SpellId) != healItemSpells.end())
+                    isHealItem = true;
+            }
+        }
+
+        if (isHealItem)
+            continue;
+
+
         if (uint32 skill = pProto->GetProficiencySkill())
         {
             // Don't equip cloth items on warriors, etc unless bot is a healer
