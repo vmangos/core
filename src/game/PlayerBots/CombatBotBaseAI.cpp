@@ -2625,7 +2625,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         if (pProto->RequiredReputationFaction && uint32(me->GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
             continue;
 
-        // Avoid things with inappropriate status.
+        // Avoid things with heal status.
         std::vector<uint32> healItemSpells = { 7675, 7676, 7677, 7678, 7679, 7680, 7681, 446470, 9406, 9407, 9408, 23796, 9314, 9315, 9316, 25067, 9317, 9318, 18029, 18030, 18031, 18032, 17371, 18033, 18034, 18035, 15696, 22748, 18036, 18037, 18038, 18039, 18040, 18041, 18042, 18043, 18044, 18045, 18046, 18047, 18048, 17320, 26154, 23593, 26225, 23264, 26690, 26228, 29369, 26461, 28686, 28736, 26814, 28805, 28151, 28152 };
         bool isHealItem = false;
         for (const auto& itr : pProto->Spells)
@@ -2638,6 +2638,21 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         }
 
         if (isHealItem)
+            continue;
+
+        // Avoid things with mp status.
+        std::vector<uint32> mpItemSpells = { 21360, 18379, 21618, 21359, 21621, 21633, 21638, 25114, 21622, 21631, 25115, 21363, 21630, 21362, 21626, 21637, 21642, 21644, 23795, 26647, 21365, 21624, 21625, 21364, 21636, 21640, 20959, 21628, 21366, 21620, 21627, 21632, 18378, 21361, 21629, 21634, 21635, 21641, 23212, 21623, 21643, 21619, 21639 };
+        bool isMpItem = false;
+        for (const auto& itr : pProto->Spells)
+        {
+            if (m_role != ROLE_HEALER)
+            {
+                if (std::find(mpItemSpells.begin(), mpItemSpells.end(), itr.SpellId) != mpItemSpells.end())
+                    isMpItem = true;
+            }
+        }
+
+        if (isMpItem)
             continue;
 
 
