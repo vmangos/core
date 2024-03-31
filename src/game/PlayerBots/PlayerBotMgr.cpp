@@ -1782,8 +1782,7 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
             PSendSysMessage("%s has changed its leader.", pTarget->GetName());
             return true;
         }
-
-        if (!pTarget)
+        else
         {
             for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
