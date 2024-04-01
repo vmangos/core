@@ -156,35 +156,26 @@ enum CreatureTypeFlags
 
 enum CreatureFlagsExtra
 {
-                                                                   // 1        unused
+    CREATURE_FLAG_EXTRA_NO_LEASH_EVADE               = 0x00000001, // 1        Creature will not evade due to target running away
     CREATURE_FLAG_EXTRA_NO_AGGRO                     = 0x00000002, // 2        Creature is defensive and does not attack nearby hostile targets
     CREATURE_FLAG_EXTRA_NO_PARRY                     = 0x00000004, // 4        Creature can't parry
-                                                                   // 8        unused
+    CREATURE_FLAG_EXTRA_NO_UNREACHABLE_EVADE         = 0x00000008, // 8        Creature will not evade due to target being unreachable
     CREATURE_FLAG_EXTRA_NO_BLOCK                     = 0x00000010, // 16       Creature can't block
-                                                                   // 32       unused
-                                                                   // 64       unused
+    CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE            = 0x00000020, // 32       Creature will not pause movement when player talks to it
+    CREATURE_FLAG_EXTRA_ALWAYS_RUN                   = 0x00000040, // 64       Creature will use run speed out of combat
     CREATURE_FLAG_EXTRA_INVISIBLE                    = 0x00000080, // 128      Creature is always invisible for player (mostly trigger creatures)
-                                                                   // 256      unused
-                                                                   // 512      unused
+    CREATURE_FLAG_EXTRA_GIGANTIC_AOI                 = 0x00000100, // 256      CREATURE_DIFFICULTYFLAGS_3_GIGANTIC_AOI (400 yards)
+    CREATURE_FLAG_EXTRA_INFINITE_AOI                 = 0x00000200, // 512      CREATURE_DIFFICULTYFLAGS_3_INFINITE_AOI
     CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400, // 1024     Creature is a guard
     CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800, // 2048     Creature does not select targets based on threat
     CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000, // 4096     Creature keeps positive auras at reset
     CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000, // 8192     Creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
-                                                                   // 16384    unused
+    CREATURE_FLAG_EXTRA_APPEAR_DEAD                  = 0x00004000, // 16384    Creature will have UNIT_DYNFLAG_DEAD applied
     CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING         = 0x00008000, // 32768    Creature does not move back when target is within bounding radius
     CREATURE_FLAG_EXTRA_NO_ASSIST                    = 0x00010000, // 65536    Creature does not aggro when nearby creatures aggro
     CREATURE_FLAG_EXTRA_NO_TARGET                    = 0x00020000, // 131072   Creature is passive and does not acquire targets
     CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY     = 0x00040000, // 262144   Creature can only be seen by friendly units
-                                                                   // 524288   unused
-    CREATURE_FLAG_EXTRA_CAN_ASSIST                   = 0x00100000, // 1048576  CREATURE_TYPEFLAGS_CAN_ASSIST from TBC
-                                                                   // 2097152  unused
-    CREATURE_FLAG_EXTRA_GIGANTIC_AOI                 = 0x00400000, // 4194304  CREATURE_DIFFICULTYFLAGS_3_GIGANTIC_AOI (400 yards)
-    CREATURE_FLAG_EXTRA_INFINITE_AOI                 = 0x00800000, // 8388608  CREATURE_DIFFICULTYFLAGS_3_INFINITE_AOI
-    CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE            = 0x01000000, // 16777216 Creature will not pause movement when player talks to it
-    CREATURE_FLAG_EXTRA_ALWAYS_RUN                   = 0x02000000, // 33554432 Creature will use run speed out of combat
-    CREATURE_FLAG_EXTRA_NO_UNREACHABLE_EVADE         = 0x04000000, // 67108864 Creature will not evade due to target being unreachable
-    CREATURE_FLAG_EXTRA_APPEAR_DEAD                  = 0x08000000, // 134217728 Creature will have UNIT_DYNFLAG_DEAD applied
-    CREATURE_FLAG_EXTRA_NO_LEASH_EVADE               = 0x10000000, // 268435456 Creature will not evade due to target running away
+    CREATURE_FLAG_EXTRA_CAN_ASSIST                   = 0x00080000, // 524288   CREATURE_TYPEFLAGS_CAN_ASSIST from TBC
 };
 
 enum CreatureImmunityFlags
