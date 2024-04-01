@@ -85,6 +85,64 @@ enum CreatureFamily
     CREATURE_FAMILY_REMOTE_CONTROL = 28,
 };
 
+enum CreatureEliteType
+{
+    CREATURE_ELITE_NORMAL          = 0,
+    CREATURE_ELITE_ELITE           = 1,
+    CREATURE_ELITE_RAREELITE       = 2,
+    CREATURE_ELITE_WORLDBOSS       = 3,
+    CREATURE_ELITE_RARE            = 4,
+    CREATURE_UNKNOWN               = 5                      // found in 2.2.3 for 2 mobs
+};
+
+enum CreatureStaticFlags
+{
+    CREATURE_STATIC_FLAG_MOUNTABLE                         = 0x00000001, // Not used by core.
+    CREATURE_STATIC_FLAG_NO_XP                             = 0x00000002, // No experience will be gained from killing the creature.
+    CREATURE_STATIC_FLAG_NO_LOOT                           = 0x00000004, // Not used by core.
+    CREATURE_STATIC_FLAG_UNKILLABLE                        = 0x00000008, // Invincibility threshold set to 1 HP.
+    CREATURE_STATIC_FLAG_TAMEABLE                          = 0x00000010, // Can be tamed by hunters.
+    CREATURE_STATIC_FLAG_IMMUNE_TO_PC                      = 0x00000020, // Applies UNIT_FLAG_IMMUNE_TO_PLAYER on spawn.
+    CREATURE_STATIC_FLAG_IMMUNE_TO_NPC                     = 0x00000040, // Applies UNIT_FLAG_IMMUNE_TO_NPC on spawn.
+    CREATURE_STATIC_FLAG_CAN_WIELD_LOOT                    = 0x00000080, // Will generate loot on spawn and equip any weapons.
+    CREATURE_STATIC_FLAG_SESSILE                           = 0x00000100, // Cannot move.
+    CREATURE_STATIC_FLAG_UNINTERACTIBLE                    = 0x00000200, // Applies UNIT_FLAG_NOT_SELECTABLE on spawn.
+    CREATURE_STATIC_FLAG_NO_AUTOMATIC_REGEN                = 0x00000400, // Will not regen health and mana.
+    CREATURE_STATIC_FLAG_DESPAWN_INSTANTLY                 = 0x00000800, // Despawn corpse instantly on death.
+    CREATURE_STATIC_FLAG_CORPSE_RAID                       = 0x00001000, // Does not check distance upon death for loot and xp eligibility.
+    CREATURE_STATIC_FLAG_CREATOR_LOOT                      = 0x00002000, // Can be looted by the player who created it.
+    CREATURE_STATIC_FLAG_NO_DEFENSE                        = 0x00004000, // Defense skill is 0.
+    CREATURE_STATIC_FLAG_NO_SPELL_DEFENSE                  = 0x00008000, // Cannot resist spells.
+    CREATURE_STATIC_FLAG_RAID_BOSS_MOB                     = 0x00010000, // Not used by core.
+    CREATURE_STATIC_FLAG_COMBAT_PING                       = 0x00020000, // Send mini map ping packet upon entering combat.
+    CREATURE_STATIC_FLAG_AQUATIC                           = 0x00040000, // Inhabit Type = INHABIT_WATER ; Original Comment: "aka Water Only"
+    CREATURE_STATIC_FLAG_AMPHIBIOUS                        = 0x00080000, // Inhabit Type = INHABIT_GROUND | INHABIT_WATER
+    CREATURE_STATIC_FLAG_NO_MELEE                          = 0x00100000, // Does not auto attack ; Original Comment: "Flee"
+    CREATURE_STATIC_FLAG_VISIBLE_TO_GHOSTS                 = 0x00200000, // Spirit Healers.
+    CREATURE_STATIC_FLAG_PVP_ENABLING                      = 0x00400000, // Flagged for PvP, makes it possible to target creature with beneficial spells as well.
+    CREATURE_STATIC_FLAG_DO_NOT_PLAY_WOUND_ANIM            = 0x00800000, // Will not play EMOTE_ONESHOT_WOUNDCRITICAL.
+    CREATURE_STATIC_FLAG_NO_FACTION_TOOLTIP                = 0x01000000, // Not used by core.
+    CREATURE_STATIC_FLAG_IGNORE_COMBAT                     = 0x02000000, // React State = Passive
+    CREATURE_STATIC_FLAG_ONLY_ATTACK_PVP_ENABLING          = 0x04000000, // No proximity aggro for players who are not PvP flagged.
+    CREATURE_STATIC_FLAG_CALLS_GUARDS                      = 0x08000000, // Summons a guard if an opposite faction player gets near or attacks.
+    CREATURE_STATIC_FLAG_CAN_SWIM                          = 0x10000000, // Applies UNIT_FLAG_USE_SWIM_ANIMATION on spawn.
+    CREATURE_STATIC_FLAG_FLOATING                          = 0x20000000, // Applies MOVEFLAG_FIXED_Z on spawn ; Original Comment: "Don't use"
+    CREATURE_STATIC_FLAG_MORE_AUDIBLE                      = 0x40000000, // Original Comment: "Caution, Expensive"
+    CREATURE_STATIC_FLAG_LARGE_AOI                         = 0x80000000  // Increases visibility distance to 200 yards ; Original Comment: "Caution, Expensive"
+};
+
+enum CreatureStaticFlags2
+{
+    CREATURE_STATIC_FLAG_2_NO_PET_SCALING                  = 0x00000001, // Not used by core.
+    CREATURE_STATIC_FLAG_2_FORCE_RAID_COMBAT               = 0x00000002, // Enters combat with zone on aggro.
+    CREATURE_STATIC_FLAG_2_LOCK_TAPPERS_TO_RAID_ON_DEATH   = 0x00000004, // Killing this creature will bind players to the raid.
+    CREATURE_STATIC_FLAG_2_NO_HARMFUL_VERTEX_COLORING      = 0x00000008, // Not used by core.
+    CREATURE_STATIC_FLAG_2_NO_CRUSHING_BLOWS               = 0x00000010, // Will not do crushing blows.
+    CREATURE_STATIC_FLAG_2_NO_OWNER_THREAT                 = 0x00000020, // Does not put owner in combat when it enters combat.
+    CREATURE_STATIC_FLAG_2_NO_WOUNDED_SLOWDOWN             = 0x00000040, // Does not reduce run speed at low health.
+};
+
+// This is a censured version of the static flags to be sent to client after 1.10.
 enum CreatureTypeFlags
 {
     CREATURE_TYPEFLAGS_TAMEABLE                   = 0x00000001, // Derived from CREATURE_STATIC_FLAG_TAMEABLE (0x00000010)
@@ -96,28 +154,18 @@ enum CreatureTypeFlags
     CREATURE_TYPEFLAGS_NO_HARMFUL_VERTEX_COLORING = 0x00000040, // Derived from CREATURE_STATIC_FLAG_2_NO_HARMFUL_VERTEX_COLORING (0x00000008)
 };
 
-enum CreatureEliteType
-{
-    CREATURE_ELITE_NORMAL          = 0,
-    CREATURE_ELITE_ELITE           = 1,
-    CREATURE_ELITE_RAREELITE       = 2,
-    CREATURE_ELITE_WORLDBOSS       = 3,
-    CREATURE_ELITE_RARE            = 4,
-    CREATURE_UNKNOWN               = 5                      // found in 2.2.3 for 2 mobs
-};
-
 enum CreatureFlagsExtra
 {
-    CREATURE_FLAG_EXTRA_INSTANCE_BIND                = 0x00000001, // 1        Killing this creature will bind players to the raid
+                                                                   // 1        unused
     CREATURE_FLAG_EXTRA_NO_AGGRO                     = 0x00000002, // 2        Creature is defensive and does not attack nearby hostile targets
     CREATURE_FLAG_EXTRA_NO_PARRY                     = 0x00000004, // 4        Creature can't parry
-    CREATURE_FLAG_EXTRA_SUMMON_GUARD                 = 0x00000008, // 8        Creature summons a guard if an opposite faction player gets near or attacks
+                                                                   // 8        unused
     CREATURE_FLAG_EXTRA_NO_BLOCK                     = 0x00000010, // 16       Creature can't block
-    CREATURE_FLAG_EXTRA_NO_CRUSH                     = 0x00000020, // 32       Creature can't do crush attacks
-    CREATURE_FLAG_EXTRA_FIXED_Z                      = 0x00000040, // 64       Creature does not fall
+                                                                   // 32       unused
+                                                                   // 64       unused
     CREATURE_FLAG_EXTRA_INVISIBLE                    = 0x00000080, // 128      Creature is always invisible for player (mostly trigger creatures)
                                                                    // 256      unused
-    CREATURE_FLAG_EXTRA_AGGRO_ZONE                   = 0x00000200, // 512      Creature sets itself in combat with zone on aggro
+                                                                   // 512      unused
     CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400, // 1024     Creature is a guard
     CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800, // 2048     Creature does not select targets based on threat
     CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000, // 4096     Creature keeps positive auras at reset
@@ -127,9 +175,9 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_ASSIST                    = 0x00010000, // 65536    Creature does not aggro when nearby creatures aggro
     CREATURE_FLAG_EXTRA_NO_TARGET                    = 0x00020000, // 131072   Creature is passive and does not acquire targets
     CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY     = 0x00040000, // 262144   Creature can only be seen by friendly units
-    CREATURE_FLAG_EXTRA_PVP                          = 0x00080000, // 524288   Creature has pvp unit flag set by default
+                                                                   // 524288   unused
     CREATURE_FLAG_EXTRA_CAN_ASSIST                   = 0x00100000, // 1048576  CREATURE_TYPEFLAGS_CAN_ASSIST from TBC
-    CREATURE_FLAG_EXTRA_LARGE_AOI                    = 0x00200000, // 2097152  CREATURE_DIFFICULTYFLAGS_LARGE_AOI (200 yards)
+                                                                   // 2097152  unused
     CREATURE_FLAG_EXTRA_GIGANTIC_AOI                 = 0x00400000, // 4194304  CREATURE_DIFFICULTYFLAGS_3_GIGANTIC_AOI (400 yards)
     CREATURE_FLAG_EXTRA_INFINITE_AOI                 = 0x00800000, // 8388608  CREATURE_DIFFICULTYFLAGS_3_INFINITE_AOI
     CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE            = 0x01000000, // 16777216 Creature will not pause movement when player talks to it
@@ -137,7 +185,6 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_UNREACHABLE_EVADE         = 0x04000000, // 67108864 Creature will not evade due to target being unreachable
     CREATURE_FLAG_EXTRA_APPEAR_DEAD                  = 0x08000000, // 134217728 Creature will have UNIT_DYNFLAG_DEAD applied
     CREATURE_FLAG_EXTRA_NO_LEASH_EVADE               = 0x10000000, // 268435456 Creature will not evade due to target running away
-    CREATURE_FLAG_EXTRA_DESPAWN_INSTANTLY            = 0x20000000, // 536870912 CREATURE_STATIC_FLAG_DESPAWN_INSTANTLY (despawn on death)
 };
 
 enum CreatureImmunityFlags
@@ -214,7 +261,10 @@ struct CreatureInfo
     float   detection_range = 18.0f;                        // Detection Range for Line of Sight aggro
     float   call_for_help_range = 5.0f;                     // Radius for combat assistance call
     float   leash_range = 0.0f;                             // Hard limit on allowed chase distance
+    uint32  type = 0;                                       // enum CreatureType values
+    uint32  pet_family = 0;                                 // enum CreatureFamily values (optional)
     uint32  rank = 0;
+    uint32  unit_class = 0;                                 // enum Classes. Note only 4 classes are known for creatures.
     float   xp_multiplier = 1.0f;
     float   health_multiplier = 1.0f;
     float   mana_multiplier = 1.0f;
@@ -230,15 +280,10 @@ struct CreatureInfo
     int32   frost_res = 0;
     int32   shadow_res = 0;
     int32   arcane_res = 0;
-    uint32  unit_class = 0;                                 // enum Classes. Note only 4 classes are known for creatures.
-    uint32  unit_flags = 0;                                 // enum UnitFlags mask values
-    uint32  pet_family = 0;                                 // enum CreatureFamily values (optional)
     uint32  trainer_type = 0;
     uint32  trainer_spell = 0;
     uint32  trainer_class = 0;
     uint32  trainer_race = 0;
-    uint32  type = 0;                                       // enum CreatureType values
-    uint32  type_flags = 0;                                 // enum CreatureTypeFlags mask values
     uint32  loot_id = 0;
     uint32  pickpocket_loot_id = 0;
     uint32  skinning_loot_id = 0;
@@ -254,13 +299,14 @@ struct CreatureInfo
     uint32  inhabit_type = 3;
     bool    civilian = false;
     bool    racial_leader = false;
-    uint32  regeneration = 3;
     uint32  equipment_id = 0;
     uint32  trainer_id = 0;
     uint32  vendor_id = 0;
     uint32  mechanic_immune_mask = 0;
     uint32  school_immune_mask = 0;
     uint32  immunity_flags = 0;
+    uint32  static_flags1 = 0;
+    uint32  static_flags2 = 0;
     uint32  flags_extra = 0;
     uint32  script_id = 0;
 
@@ -272,9 +318,29 @@ struct CreatureInfo
 
     ObjectGuid GetObjectGuid(uint32 lowguid) const { return ObjectGuid(GetHighGuid(), entry, lowguid); }
 
-    bool isTameable() const
+    bool IsTameable() const
     {
-        return type == CREATURE_TYPE_BEAST && pet_family != 0 && type_flags & CREATURE_TYPEFLAGS_TAMEABLE;
+        return type == CREATURE_TYPE_BEAST && pet_family != 0 && static_flags1 & CREATURE_STATIC_FLAG_TAMEABLE;
+    }
+
+    uint32 GetTypeFlags() const
+    {
+        uint32 typeFlags = 0;
+        if (static_flags1 & CREATURE_STATIC_FLAG_TAMEABLE)
+            typeFlags |= CREATURE_TYPEFLAGS_TAMEABLE;
+        if (static_flags1 & CREATURE_STATIC_FLAG_VISIBLE_TO_GHOSTS)
+            typeFlags |= CREATURE_TYPEFLAGS_VISIBLE_TO_GHOSTS;
+        if (static_flags1 & CREATURE_STATIC_FLAG_RAID_BOSS_MOB)
+            typeFlags |= CREATURE_TYPEFLAGS_RAID_BOSS_MOB;
+        if (static_flags1 & CREATURE_STATIC_FLAG_DO_NOT_PLAY_WOUND_ANIM)
+            typeFlags |= CREATURE_TYPEFLAGS_DO_NOT_PLAY_WOUND_ANIM;
+        if (static_flags1 & CREATURE_STATIC_FLAG_NO_FACTION_TOOLTIP)
+            typeFlags |= CREATURE_TYPEFLAGS_NO_FACTION_TOOLTIP;
+        if (static_flags1 & CREATURE_STATIC_FLAG_MORE_AUDIBLE)
+            typeFlags |= CREATURE_TYPEFLAGS_MORE_AUDIBLE;
+        if (static_flags2 & CREATURE_STATIC_FLAG_2_NO_HARMFUL_VERTEX_COLORING)
+            typeFlags |= CREATURE_TYPEFLAGS_NO_HARMFUL_VERTEX_COLORING;
+        return typeFlags;
     }
 };
 

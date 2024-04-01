@@ -41,31 +41,33 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
     owner.ModifyAuraState(AURA_STATE_HEALTHLESS_10_PERCENT, false);
     owner.ModifyAuraState(AURA_STATE_HEALTHLESS_5_PERCENT, false);
 
-    
-    float x, y, z, o;
-    bool setFacing = false;
-    // at apply we can select more nice return points base at current movegen
-    if (owner.GetMotionMaster()->empty() || !owner.GetMotionMaster()->top()->GetResetPosition(owner, x, y, z))
+    if (!owner.HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE))
     {
-        owner.GetRespawnCoord(x, y, z, &o);
-        setFacing = true;
+        float x, y, z, o;
+        bool setFacing = false;
+        // at apply we can select more nice return points base at current movegen
+        if (owner.GetMotionMaster()->empty() || !owner.GetMotionMaster()->top()->GetResetPosition(owner, x, y, z))
+        {
+            owner.GetRespawnCoord(x, y, z, &o);
+            setFacing = true;
+        }
+
+        PathFinder path(&owner);
+        path.calculate(x, y, z, true);
+        if (path.getPathType() & PATHFIND_NORMAL)
+        {
+            Movement::MoveSplineInit init(owner, "HomeMovementGenerator");
+
+            if (setFacing)
+                init.SetFacing(o);
+
+            init.Move(&path);
+            init.SetWalk(false);
+            init.Launch();
+        }
+        else // too far away or no path
+            owner.NearTeleportTo(x, y, z, setFacing ? o : owner.GetOrientation());
     }
-
-    PathFinder path(&owner);
-    path.calculate(x, y, z, true);
-    if (path.getPathType() & PATHFIND_NORMAL)
-    {
-        Movement::MoveSplineInit init(owner, "HomeMovementGenerator");
-
-        if (setFacing)
-            init.SetFacing(o);
-
-        init.Move(&path);
-        init.SetWalk(false);
-        init.Launch();
-    }
-    else // too far away or no path
-        owner.NearTeleportTo(x, y, z, setFacing ? o : owner.GetOrientation());
     
     arrived = false;
 

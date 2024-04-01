@@ -492,10 +492,6 @@ void Loot::AddItem(LootStoreItem const& item)
 // Calls processor of corresponding LootTemplate (which handles everything including references)
 bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError, WorldObject const* looted)
 {
-    // Must be provided
-    if (!loot_owner)
-        return false;
-
     LootTemplate const* tab = store.GetLootFor(loot_id);
 
     if (!tab)
@@ -511,12 +507,20 @@ bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
 
     tab->Process(*this, store, store.IsRatesAllowed());     // Processing is done there, callback via Loot::AddItem()
 
+    if (loot_owner)
+        FillPlayerDependentLoot(loot_owner, personal, looted);
+
+    return true;
+}
+
+void Loot::FillPlayerDependentLoot(Player* loot_owner, bool personal, WorldObject const* looted)
+{
     // Setting access rights for group loot case
     Group* group = loot_owner->GetGroup();
     if (!personal && group)
     {
         roundRobinPlayer = loot_owner->GetGUID();
-        m_personal        = false;
+        m_personal = false;
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* pl = itr->getSource())
             {
@@ -534,8 +538,6 @@ bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
     // ... for personal loot
     else
         FillNotNormalLootFor(loot_owner);
-
-    return true;
 }
 
 bool Loot::IsAllowedLooter(ObjectGuid guid, bool doPersonalCheck) const

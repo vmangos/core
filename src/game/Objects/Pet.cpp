@@ -202,7 +202,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
     PetType pet_type = PetType(m_pTmpCache->petType);
     if (pet_type == HUNTER_PET)
     {
-        if (!creatureInfo->isTameable())
+        if (!creatureInfo->IsTameable())
         {
             m_pTmpCache = nullptr;
             m_loading = false;
@@ -1487,7 +1487,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit const* owner)
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
 
-            SetUInt32Value(UNIT_FIELD_FLAGS, cinfo->unit_flags);
+            ToggleUnitFlagsFromStaticFlags();
 
             CreatureClassLevelStats const* pCLS = GetClassLevelStats();
             SetCreateHealth(pCLS->health * cinfo->health_multiplier * healthMod);

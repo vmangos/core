@@ -150,6 +150,10 @@ uint32 SpellCaster::GetDefenseSkillValue(SpellCaster const* target) const
         return value;
     }
 
+    if (Creature const* pCreature = ToCreature())
+        if (pCreature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_DEFENSE))
+            return 0;
+
     return GetUnitMeleeSkill(target);
 }
 
@@ -164,7 +168,7 @@ uint32 SpellCaster::GetDefenseSkillValue(SpellCaster const* target) const
 SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool CanReflect, Spell* spellPtr)
 {
     // Return evade for units in evade mode
-    if (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
+    if (pVictim->IsCreature() && ((Creature*)pVictim)->IsInEvadeMode())
         return SPELL_MISS_EVADE;
 
     // World of Warcraft Client Patch 1.7.0 (2005-09-13)
@@ -502,6 +506,9 @@ SpellMissInfo SpellCaster::MagicSpellHitResult(Unit const* pVictim, SpellEntry c
 
     // Spell cannot be resisted (not exist on dbc, custom flag)
     if (spell->AttributesEx4 & SPELL_ATTR_EX4_IGNORE_RESISTANCES)
+        return SPELL_MISS_NONE;
+
+    if (pVictim->IsCreature() && ((Creature*)pVictim)->HasStaticFlag(CREATURE_STATIC_FLAG_NO_SPELL_DEFENSE))
         return SPELL_MISS_NONE;
 
     int32 hitChance = MagicSpellHitChance(pVictim, spell, spellPtr);

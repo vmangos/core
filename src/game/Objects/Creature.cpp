@@ -418,6 +418,16 @@ bool Creature::InitEntry(uint32 entry, GameEventCreatureData const* eventData /*
         ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_CURSE, true);
     }
 
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE))
+    {
+        ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_DISTRACT, true);
+        ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_PULL, true);
+        ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+        ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+        ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_FEAR, true);
+        ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ROOT, true);
+    }
+
     return true;
 }
 
@@ -427,6 +437,29 @@ uint32 Creature::GetSpawnFlags() const
     if (m_creatureData)
         return m_creatureData->spawn_flags;
     return 0;
+}
+
+void Creature::ToggleUnitFlagsFromStaticFlags()
+{
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_IMMUNE_TO_PC))
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+    else
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_IMMUNE_TO_NPC))
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+    else
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_UNINTERACTIBLE))
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+    else
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_CAN_SWIM))
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION);
+    else
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION);
 }
 
 bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData /*=nullptr*/, bool preserveHPAndPower /*=true*/)
@@ -483,15 +516,16 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
         LoadCreatureAddon(true);
     }
 
-    if (GetCreatureInfo()->regeneration & REGEN_FLAG_HEALTH)
-        AddCreatureState(CSTATE_REGEN_HEALTH);
-    else
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_NO_AUTOMATIC_REGEN))
+    {
         ClearCreatureState(CSTATE_REGEN_HEALTH);
-
-    if (GetCreatureInfo()->regeneration & REGEN_FLAG_POWER)
-        AddCreatureState(CSTATE_REGEN_MANA);
-    else
         ClearCreatureState(CSTATE_REGEN_MANA);
+    }
+    else
+    {
+        AddCreatureState(CSTATE_REGEN_HEALTH);
+        AddCreatureState(CSTATE_REGEN_MANA);
+    }
 
     // creatures always have melee weapon ready if any
     SetSheath(SHEATH_STATE_MELEE);
@@ -513,34 +547,37 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
     SetCanModifyStats(true);
     UpdateAllStats();
 
+    if (m_invincibilityHpThreshold)
+    {
+        if (!HasStaticFlag(CREATURE_STATIC_FLAG_UNKILLABLE))
+            m_invincibilityHpThreshold = 0;
+    }
+    else
+    {
+        if (HasStaticFlag(CREATURE_STATIC_FLAG_UNKILLABLE))
+            m_invincibilityHpThreshold = 1;
+    }
+
     SetFactionTemplateId(GetCreatureInfo()->faction);
     SetDefaultGossipMenuId(GetCreatureInfo()->gossip_menu_id);
     SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npc_flags);
 
-    uint32 unitFlags = GetCreatureInfo()->unit_flags;
-    // we may need to append or remove additional flags
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT))
-        unitFlags |= UNIT_FLAG_IN_COMBAT;
-    // Nostalrius: we need this flag to get a proper animation
-    // Giant type creatures walk underwater
-    if (CanSwim() && GetCreatureInfo()->type != CREATURE_TYPE_GIANT)
-        unitFlags |= UNIT_FLAG_USE_SWIM_ANIMATION;
-    SetUInt32Value(UNIT_FIELD_FLAGS, unitFlags);
+    ToggleUnitFlagsFromStaticFlags();
+
+    SetFly(CanFly());
+
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_FLOATING))
+        AddUnitMovementFlag(MOVEFLAG_FIXED_Z);
 
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_APPEAR_DEAD))
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-
-    if (HasExtraFlag(CREATURE_FLAG_EXTRA_FIXED_Z))
-        AddUnitMovementFlag(MOVEFLAG_FIXED_Z);
-
-    SetFly(CanFly());
 
     m_reputationId = -1;
     if (FactionTemplateEntry const* pFactionTemplate = sObjectMgr.GetFactionTemplateEntry(GetCreatureInfo()->faction))
         if (FactionEntry const* pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction))
             m_reputationId = pFaction->reputationListID;
 
-    if (HasExtraFlag(CREATURE_FLAG_EXTRA_PVP))
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_PVP_ENABLING))
         SetPvP(true);
     else
         SetPvP(false);
@@ -557,7 +594,7 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
     SetLeashDistance(GetCreatureInfo()->leash_range);
     SetDetectionDistance(GetCreatureInfo()->detection_range);
 
-    if (HasExtraFlag(CREATURE_FLAG_EXTRA_LARGE_AOI))
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_LARGE_AOI))
     {
         SetVisibilityModifier(VISIBILITY_DISTANCE_LARGE);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
@@ -590,7 +627,7 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
 
 void Creature::InitializeReactState()
 {
-    if (IsTotem() || IsTrigger() || !CanHaveTarget())
+    if (IsTotem() || IsTrigger() || !CanHaveTarget() || HasStaticFlag(CREATURE_STATIC_FLAG_IGNORE_COMBAT))
         SetCreatureReactState(REACT_PASSIVE);
     else if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO))
         SetCreatureReactState(REACT_DEFENSIVE);
@@ -1512,6 +1549,33 @@ bool Creature::IsTappedBy(Player const* player) const
     return true;
 }
 
+void Creature::GenerateLootForBody(Player* looter, Group const* pGroupTap)
+{
+    if (lootForPickPocketed)
+        lootForPickPocketed = false;
+
+    loot.clear();
+    if (!(AI() && AI()->FillLoot(&loot, looter)))
+    {
+        if (uint32 lootid = GetCreatureInfo()->loot_id)
+        {
+            loot.SetTeam(pGroupTap ? pGroupTap->GetTeam() : (looter ? looter->GetTeam() : TEAM_NONE));
+            loot.FillLoot(lootid, LootTemplates_Creature, looter, false, false, this);
+        }
+    }
+
+    loot.GenerateMoneyLoot(GetCreatureInfo()->gold_min,GetCreatureInfo()->gold_max);
+}
+
+void Creature::GeneratePlayerDependentLoot(Player* looter, Group const* pGroupTap)
+{
+    if (uint32 lootid = GetCreatureInfo()->loot_id)
+    {
+        loot.SetTeam(pGroupTap ? pGroupTap->GetTeam() : looter->GetTeam());
+        loot.FillPlayerDependentLoot(looter, false, this);
+    }
+}
+
 void Creature::SaveToDB()
 {
     // this should only be used when the creature has already been loaded
@@ -1930,6 +1994,54 @@ void Creature::LoadDefaultEquipment(GameEventCreatureData const* eventData)
     }
     else
     {
+        if (HasStaticFlag(CREATURE_STATIC_FLAG_CAN_WIELD_LOOT))
+        {
+            LoadEquipment(0, true);
+            GenerateLootForBody(nullptr, nullptr);
+            
+            bool usingLoot = false;
+            for (auto const& itr : loot.items)
+            {
+                if (ItemPrototype const* pItem = sObjectMgr.GetItemPrototype(itr.itemid))
+                {
+                    if (!GetVirtualItemDisplayId(BASE_ATTACK))
+                    {
+                        if (pItem->InventoryType == INVTYPE_WEAPON ||
+                            pItem->InventoryType == INVTYPE_WEAPONMAINHAND ||
+                            pItem->InventoryType == INVTYPE_2HWEAPON && !GetVirtualItemDisplayId(OFF_ATTACK))
+                        {
+                            SetVirtualItem(BASE_ATTACK, itr.itemid);
+                            usingLoot = true;
+                            continue;
+                        }
+                    }
+
+                    if (!GetVirtualItemDisplayId(OFF_ATTACK) && GetVirtualItemInventoryType(BASE_ATTACK) != INVTYPE_2HWEAPON)
+                    {
+                        if (pItem->InventoryType == INVTYPE_WEAPON ||
+                            pItem->InventoryType == INVTYPE_WEAPONOFFHAND ||
+                            pItem->InventoryType == INVTYPE_SHIELD ||
+                            pItem->InventoryType == INVTYPE_HOLDABLE)
+                        {
+                            SetVirtualItem(OFF_ATTACK, itr.itemid);
+                            usingLoot = true;
+                            continue;
+                        }
+                    }
+
+                    if (!GetVirtualItemDisplayId(RANGED_ATTACK) && pItem->IsRangedWeapon())
+                    {
+                        SetVirtualItem(RANGED_ATTACK, itr.itemid);
+                        usingLoot = true;
+                        continue;
+                    }
+                }
+            }
+
+            if (usingLoot)
+                return;
+        }
+
         // use default from the template
         LoadEquipment(m_creatureInfo->equipment_id, true);
     }
@@ -2056,7 +2168,7 @@ void Creature::SetDeathState(DeathState s)
         ApplyDynamicRespawnDelay(respawnDelay);
 
         // the max/default time for corpse decay (before creature is looted/AllLootRemovedFromCorpse() is called)
-        m_corpseDecayTimer = HasExtraFlag(CREATURE_FLAG_EXTRA_DESPAWN_INSTANTLY) ? 1 : m_corpseDelay * IN_MILLISECONDS;
+        m_corpseDecayTimer = HasStaticFlag(CREATURE_STATIC_FLAG_DESPAWN_INSTANTLY) ? 1 : m_corpseDelay * IN_MILLISECONDS;
 
         if (m_creatureData)
         {
@@ -2315,7 +2427,7 @@ bool Creature::IsVisibleInGridForPlayer(Player const* pl) const
     }
 
     // Dead player can see ghosts
-    if (GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_VISIBLE_TO_GHOSTS)
+    if (HasStaticFlag(CREATURE_STATIC_FLAG_VISIBLE_TO_GHOSTS))
         return true;
 
     // and not see any other
@@ -3505,6 +3617,18 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
 
         if (Creature* pOwner = GetOwnerCreature())
             SetLastLeashExtensionTimePtr(pOwner->GetLastLeashExtensionTimePtr());
+
+        if (HasStaticFlag(CREATURE_STATIC_FLAG_COMBAT_PING))
+        {
+            if (Player* pOwner = GetOwnerPlayer())
+            {
+                WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
+                data << GetObjectGuid();
+                data << float(GetPositionX());
+                data << float(GetPositionY());
+                pOwner->SendDirectMessage(&data);
+            }
+        }
     }
 }
 

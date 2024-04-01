@@ -133,9 +133,11 @@ class Creature : public Unit
         void AddCreatureState(CreatureStateFlag f) { m_creatureStateFlags |= f; }
         bool HasCreatureState(CreatureStateFlag f) const { return m_creatureStateFlags & f; }
         void ClearCreatureState(CreatureStateFlag f) { m_creatureStateFlags &= ~f; }
-        bool HasTypeFlag(CreatureTypeFlags flag) const { return GetCreatureInfo()->type_flags & flag; }
+        bool HasStaticFlag(CreatureStaticFlags flag) const { return GetCreatureInfo()->static_flags1 & flag; }
+        bool HasStaticFlag(CreatureStaticFlags2 flag) const { return GetCreatureInfo()->static_flags2 & flag; }
         bool HasExtraFlag(CreatureFlagsExtra flag) const { return GetCreatureInfo()->flags_extra & flag; }
         bool HasImmunityFlag(CreatureImmunityFlags flag) const { return GetCreatureInfo()->immunity_flags & flag; }
+        void ToggleUnitFlagsFromStaticFlags();
 
         CreatureSubtype GetSubtype() const { return m_subtype; }
         bool IsPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }
@@ -282,6 +284,8 @@ class Creature : public Unit
         uint32 skinningForOthersTimer; // If == 0, then everyone can skin
         bool lootForCreator = false;
 
+        void GenerateLootForBody(Player* looter, Group const* pGroupTap);
+        void GeneratePlayerDependentLoot(Player* looter, Group const* pGroupTap);
         ObjectGuid GetLootRecipientGuid() const { return m_lootRecipientGuid; }
         uint32 GetLootGroupRecipientId() const { return m_lootGroupRecipientId; }
         Player* GetLootRecipient() const;                   // use group cases as prefered
@@ -577,7 +581,7 @@ class Creature : public Unit
         }
         bool IsEscortable() const { return HasCreatureState(CSTATE_ESCORTABLE); }
         bool CanAssistPlayers() { return HasFactionTemplateFlag(FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS) || HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
-        bool CanSummonGuards() { return HasExtraFlag(CREATURE_FLAG_EXTRA_SUMMON_GUARD); }
+        bool CanSummonGuards() { return HasStaticFlag(CREATURE_STATIC_FLAG_CALLS_GUARDS); }
         uint32 GetOriginalEntry() const { return m_originalEntry; }
 
     protected:

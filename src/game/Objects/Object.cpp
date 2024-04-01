@@ -1417,8 +1417,15 @@ bool WorldObject::IsWithinLootXPDist(WorldObject const* objToLoot) const
     if (!IsInMap(objToLoot))
         return false;
 
-    if (objToLoot->GetMap()->IsRaid())
-        return true;
+    if (objToLoot->GetMap()->Instanceable())
+    {
+        if (objToLoot->GetMap()->IsRaid())
+            return true;
+
+        if (Creature const* pCreature = objToLoot->ToCreature())
+            if (pCreature->HasStaticFlag(CREATURE_STATIC_FLAG_CORPSE_RAID))
+                return true;
+    }
 
     // Bosses have increased loot distance.
     float lootDistance = sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE);

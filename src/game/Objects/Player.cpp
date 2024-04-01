@@ -2962,7 +2962,7 @@ bool Player::CanInteractWithNPC(Creature const* pCreature, uint32 npcflagmask) c
     if (IsAlive() && pCreature->IsInvisibleForAlive())
         return false;
 
-    if (!IsAlive() && !pCreature->HasTypeFlag(CREATURE_TYPEFLAGS_VISIBLE_TO_GHOSTS))
+    if (!IsAlive() && !pCreature->HasStaticFlag(CREATURE_STATIC_FLAG_VISIBLE_TO_GHOSTS))
         return false;
 
     // not allow interaction under control, but allow with own pets
