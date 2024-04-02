@@ -3505,8 +3505,6 @@ void Spell::EffectSummonWild(SpellEffectIndex effIdx)
                 case 21565:
                     summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->EffectTriggerSpell[1]);
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
-                    *m_selfContainer = nullptr;
-                    m_caster->CastSpell(summon, m_spellInfo->EffectTriggerSpell[1], true);
                     break;
                 // Target Dummy
                 case 4071:
