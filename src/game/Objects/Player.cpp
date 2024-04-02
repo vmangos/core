@@ -14870,18 +14870,25 @@ void Player::SendPushToPartyResponse(Player const* pPlayer, uint8 msg) const
 
 void Player::SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32 current, uint32 count)
 {
-    MANGOS_ASSERT(count < 64 && "Quest slot count store is limited to 6 bits 2^6 = 64 (0..63)");
+    while (count > 0) {
+        uint32 batchCount = std::min(count, 63u); // Send up to 63 at a time (due to packet limitations)
 
-    // Update quest watcher and fire QUEST_WATCH_UPDATE
-    WorldPacket data(SMSG_QUESTUPDATE_ADD_ITEM, (4 + 4));
-    data << pQuest->ReqItemId[item_idx];
-    data << count;
-    GetSession()->SendPacket(&data);
+        MANGOS_ASSERT(batchCount < 64 && "Quest slot count store is limited to 6 bits 2^6 = 64 (0..63)");
 
-    // Update player field and fire UNIT_QUEST_LOG_CHANGED for self
-    uint16 slot = FindQuestSlot(pQuest->GetQuestId());
-    if (slot < MAX_QUEST_LOG_SIZE)
-        SetQuestSlotCounter(slot + pQuest->GetReqCreatureOrGOcount(), uint8(item_idx), uint8(current + count));
+        // Update quest watcher and fire QUEST_WATCH_UPDATE for the current batch
+        WorldPacket data(SMSG_QUESTUPDATE_ADD_ITEM, (4 + 4));
+        data << pQuest->ReqItemId[item_idx];
+        data << batchCount;
+        GetSession()->SendPacket(&data);
+
+        // Update player field and fire UNIT_QUEST_LOG_CHANGED for self for the current batch
+        uint16 slot = FindQuestSlot(pQuest->GetQuestId());
+        if (slot < MAX_QUEST_LOG_SIZE) {
+            SetQuestSlotCounter(slot + pQuest->GetReqCreatureOrGOcount(), uint8(item_idx), uint8(current + batchCount));
+        }
+
+        count -= batchCount;
+    }
 }
 
 void Player::SendQuestUpdateAddCreatureOrGo(Quest const* pQuest, ObjectGuid guid, uint32 creatureOrGO_idx, uint32 count)
