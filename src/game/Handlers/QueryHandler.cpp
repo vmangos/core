@@ -206,9 +206,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data.append(subName->c_str(), subNameLen + 1);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        data << uint32(ci->type_flags);                     // flags
+        data << uint32(ci->GetTypeFlags());                 // flags
 #else
-        data << uint32(ci->type_flags << 20);               // flags
+        data << uint32(ci->static_flags1);                  // flags
 #endif
         data << uint32(ci->type);
 

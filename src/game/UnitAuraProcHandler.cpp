@@ -1296,7 +1296,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 a
                 }
                 case 28200:                                 // Talisman of Ascendance
                 {
-                    if (procSpell && procSpell->IsAreaOfEffectSpell())
+                    if (procSpell && (procSpell->IsAreaOfEffectSpell() || procSpell->Effect[0] == SPELL_EFFECT_SCRIPT_EFFECT))
                         return SPELL_AURA_PROC_FAILED;
                     break;
                 }

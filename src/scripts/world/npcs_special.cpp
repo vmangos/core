@@ -2384,6 +2384,32 @@ CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
     return new npc_oozeling_jubjubAI(pCreature);
 }
 
+/*
+  Alliance Res Fixer
+  Horde Res Fixer
+*/
+
+bool GossipHello_npc_res_fixer(Player* pPlayer, Creature* pCreature)
+{
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, 8995, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->SEND_GOSSIP_MENU(6440, pCreature->GetObjectGuid());
+    return true;
+}
+
+bool GossipSelect_npc_res_fixer(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+    {
+        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(pPlayer->GetRace());
+        uint32 const spellId = raceEntry ? raceEntry->resSicknessSpellId : SPELL_ID_PASSIVE_RESURRECTION_SICKNESS;
+        pPlayer->RemoveAurasDueToSpell(spellId);
+        pPlayer->DurabilityRepairAll(false, 0);
+        pPlayer->CLOSE_GOSSIP_MENU();
+    }
+
+    return true;
+}
+
 void AddSC_npcs_special()
 {
     Script* newscript;
@@ -2518,5 +2544,11 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_oozeling_jubjub";
     newscript->GetAI = &GetAI_npc_oozeling_jubjub;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_res_fixes";
+    newscript->pGossipHello = &GossipHello_npc_res_fixer;
+    newscript->pGossipSelect = &GossipSelect_npc_res_fixer;
     newscript->RegisterSelf();
 }

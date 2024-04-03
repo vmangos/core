@@ -378,7 +378,7 @@ void MotionMaster::MoveTargetedHome()
 
     Clear(false);
 
-    if (m_owner->IsCreature() && !((Creature*)m_owner)->GetCharmerOrOwnerGuid())
+    if (m_owner->IsCreature() && (!((Creature*)m_owner)->GetCharmerOrOwnerGuid() || ((Creature*)m_owner)->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE)))
     {
         // Manual exception for linked mobs
         if (m_owner->IsLinkingEventTrigger() && m_owner->GetMap()->GetCreatureLinkingHolder()->TryFollowMaster((Creature*)m_owner))
@@ -877,7 +877,7 @@ void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack
         Mutate(new ChargeMovementGenerator<Creature>(*(m_owner->ToCreature()), *target, delay, triggerAutoAttack, 0.0f, meleeReach));
 }
 
-bool MotionMaster::MoveDistance(Unit* pTarget, float distance)
+bool MotionMaster::MoveDistance(Unit const* pTarget, float distance)
 {
     if (m_owner->GetTransport())
         return false;

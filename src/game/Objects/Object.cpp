@@ -441,7 +441,7 @@ void Object::BuildOutOfRangeUpdateBlock(UpdateData& data) const
     data.AddOutOfRangeGUID(GetObjectGuid());
 }
 
-void Object::SendOutOfRangeUpdateToPlayer(Player* player)
+void Object::SendOutOfRangeUpdateToPlayer(Player const* player)
 {
     UpdateData data;
     BuildOutOfRangeUpdateBlock(data);
@@ -450,7 +450,7 @@ void Object::SendOutOfRangeUpdateToPlayer(Player* player)
     player->SendDirectMessage(&packet);
 }
 
-void Object::DestroyForPlayer(Player* target) const
+void Object::DestroyForPlayer(Player const* target) const
 {
     MANGOS_ASSERT(target);
 
@@ -1079,7 +1079,7 @@ void Object::MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 fl
     }
 }
 
-void Object::_SetUpdateBits(UpdateMask& updateMask, Player* target) const
+void Object::_SetUpdateBits(UpdateMask& updateMask, Player const* target) const
 {
     uint16 const* flags = nullptr;
     uint16 visibleFlag = GetUpdateFieldFlagsForTarget(target, flags);
@@ -1092,7 +1092,7 @@ void Object::_SetUpdateBits(UpdateMask& updateMask, Player* target) const
     }
 }
 
-void Object::_SetCreateBits(UpdateMask& updateMask, Player* target) const
+void Object::_SetCreateBits(UpdateMask& updateMask, Player const* target) const
 {
     uint16 const* flags = nullptr;
     uint16 visibleFlag = GetUpdateFieldFlagsForTarget(target, flags);
@@ -1417,8 +1417,15 @@ bool WorldObject::IsWithinLootXPDist(WorldObject const* objToLoot) const
     if (!IsInMap(objToLoot))
         return false;
 
-    if (objToLoot->GetMap()->IsRaid())
-        return true;
+    if (objToLoot->GetMap()->Instanceable())
+    {
+        if (objToLoot->GetMap()->IsRaid())
+            return true;
+
+        if (Creature const* pCreature = objToLoot->ToCreature())
+            if (pCreature->HasStaticFlag(CREATURE_STATIC_FLAG_CORPSE_RAID))
+                return true;
+    }
 
     // Bosses have increased loot distance.
     float lootDistance = sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE);
@@ -3392,7 +3399,7 @@ void WorldObject::MonsterWhisper(int32 textId, Unit const* target, bool IsBossWh
     ((Player*)target)->GetSession()->SendPacket(&data);
 }
 
-void WorldObject::GetPosition(float &x, float &y, float &z, GenericTransport* t) const
+void WorldObject::GetPosition(float &x, float &y, float &z, GenericTransport const* t) const
 {
     if (t && m_movementInfo.t_guid == t->GetObjectGuid())
     {

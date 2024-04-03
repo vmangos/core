@@ -118,6 +118,10 @@ void PetAI::MoveInLineOfSight(Unit* pWho)
         return;
 #endif
 
+    if (m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_ONLY_ATTACK_PVP_ENABLING) &&
+        !pWho->IsPvP() && pWho->IsCharmerOrOwnerPlayerOrPlayerItself())
+        return;
+
     if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature))
     {
         float const attackRadius = m_creature->GetAttackDistance(pWho);
