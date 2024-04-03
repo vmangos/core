@@ -356,7 +356,6 @@ class WorldSession
         void SetLastPubChanMsgTime(time_t time) { m_lastPubChannelMsgTime = time; }
 
         // Bot system
-        std::stringstream m_chatBotHistory;
         PlayerBotEntry* GetBot() { return m_bot.get(); }
         void SetBot(std::shared_ptr<PlayerBotEntry> const& b) { m_bot = b; }
 
