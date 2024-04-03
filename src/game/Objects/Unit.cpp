@@ -758,6 +758,27 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 
     if (health <= damage && pVictim->GetInvincibilityHpThreshold() == 0)
     {
+        if (Player* pPlayer = pVictim->ToPlayer())
+        {
+            if (pPlayer->IsHardcore())
+            {
+                std::stringstream message;
+                message << pPlayer->GetName() << " was killed by ";
+                if (damagetype == 5)
+                    message << "enviromental damage.";
+                else
+                {
+                    message << this->GetName();
+                    if (spellProto)
+                        message << "s " << spellProto->SpellName[0];
+                    message << ".";
+                }
+
+                if (GetLevel() >= 20)
+                    sWorld.SendHardcoreWorldText(50001, message.str().c_str());
+            }
+        }
+
         DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamage: victim just died");
         Kill(pVictim, spellProto, durabilityLoss); // Function too long, we cut
         // last damage from non duel opponent or opponent controlled creature

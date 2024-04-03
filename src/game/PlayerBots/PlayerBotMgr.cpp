@@ -33,6 +33,7 @@ PlayerBotMgr::PlayerBotMgr()
     m_confEnableRandomBots      = false;
     m_confDebug                 = false;
     m_confBattleBotAutoJoin     = false;
+    m_confBattleBotAddAnnounce  = true;
 
     // Time
     m_elapsedTime = 0;
@@ -56,6 +57,7 @@ void PlayerBotMgr::LoadConfig()
     m_confDebug = sConfig.GetBoolDefault("PlayerBot.Debug", false);
     m_confUpdateDiff = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
     m_confBattleBotAutoJoin = sConfig.GetBoolDefault("BattleBot.AutoJoin", false);
+    m_confBattleBotAddAnnounce = sConfig.GetBoolDefault("BattleBot.AddAnnounce", true);
 
     if (!sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
         m_tempBots.clear();
@@ -587,16 +589,20 @@ void PlayerBotMgr::AddBattleBot(BattleGroundQueueTypeId queueType, Team botTeam,
     BattleBotAI* ai = new BattleBotAI(botRace, botClass, botLevel, 1, instanceId, 16224.356f, 16284.763f, 13.175f, 4.56f, queueType, temporary);
     AddBot(ai);
 
-    if (botTeam == ALLIANCE)
+    if (m_confBattleBotAddAnnounce) 
     {
-        sWorld.SendWorldText(LANG_ALLIANCE_BATTLEBOT_ADDED, botLevel, queueType);
-        sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+        if (botTeam == ALLIANCE)
+        {
+            sWorld.SendWorldText(LANG_ALLIANCE_BATTLEBOT_ADDED, botLevel, queueType);
+            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+        }
+        else
+        {
+            sWorld.SendWorldText(LANG_HORDE_BATTLEBOT_ADDED, botLevel, queueType);
+            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
+        }
     }
-    else
-    {
-        sWorld.SendWorldText(LANG_HORDE_BATTLEBOT_ADDED, botLevel, queueType);
-        sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
-    }
+    
 }
 
 void PlayerBotMgr::DeleteBattleBots()
@@ -833,11 +839,49 @@ bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player cons
     return true;
 }
 
+bool IsClass(std::string option)
+{
+    if (
+        option == "warrior" ||
+        option == "paladin" ||
+        option == "hunter" ||
+        option == "rogue" ||
+        option == "priest" ||
+        option == "shaman" ||
+        option == "mage" ||
+        option == "warlock" ||
+        option == "druid"
+        )
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool IsRole(std::string option)
+{
+    if (option == "tank" || option == "dps" || option == "healer")
+    {
+        return true;
+    }
+
+    return false;
+}
+
 bool ChatHandler::HandlePartyBotAddCommand(char* args)
 {
     Player* pPlayer = m_session->GetPlayer();
     if (!pPlayer)
         return false;
+
+    //TODO: LANG
+    if (pPlayer->IsHardcore())
+    {
+        SendSysMessage("It is forbidden in HC mode.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     if (!PartyBotAddRequirementCheck(pPlayer, nullptr))
     {
@@ -856,59 +900,114 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     uint32 botLevel = pPlayer->GetLevel();
     CombatBotRoles botRole = ROLE_INVALID;
 
-    if (char* arg1 = ExtractArg(&args))
+    bool haveClass = false;
+    bool haveRole = false;
+    std::string optionClass;
+    std::string optionRole;
+
+    while (char* arg = ExtractArg(&args))
     {
-        std::string option = arg1;
-        if (option == "warrior")
-            botClass = CLASS_WARRIOR;
-        else if (option == "paladin" && pPlayer->GetTeam() == ALLIANCE)
-            botClass = CLASS_PALADIN;
-        else if (option == "hunter")
-            botClass = CLASS_HUNTER;
-        else if (option == "rogue")
-            botClass = CLASS_ROGUE;
-        else if (option == "priest")
-            botClass = CLASS_PRIEST;
-        else if (option == "shaman" && pPlayer->GetTeam() == HORDE)
-            botClass = CLASS_SHAMAN;
-        else if (option == "mage")
-            botClass = CLASS_MAGE;
-        else if (option == "warlock")
-            botClass = CLASS_WARLOCK;
-        else if (option == "druid")
-            botClass = CLASS_DRUID;
-        else if (option == "dps")
+        std::string option = arg;
+
+        if (IsClass(option))
         {
-            botClass = PickRandomValue(CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK);
-            botRole = CombatBotBaseAI::IsMeleeDamageClass(botClass) ? ROLE_MELEE_DPS : ROLE_RANGE_DPS;
-        }
-        else if (option == "healer")
-        {
-            std::vector<uint32> dpsClasses = { CLASS_PRIEST, CLASS_DRUID };
-            if (pPlayer->GetTeam() == HORDE)
-                dpsClasses.push_back(CLASS_SHAMAN);
-            else
-                dpsClasses.push_back(CLASS_PALADIN);
-            botClass = SelectRandomContainerElement(dpsClasses);
-            botRole = ROLE_HEALER;
-        }
-        else if (option == "tank")
-        {
-            botClass = CLASS_WARRIOR;
-            botRole = ROLE_TANK;
+            haveClass = true;
+            optionClass = option;
         }
 
-        // Prevent setting a custom level for bots unless the account is a GM or skipping checks is enabled.
-        if (GetSession()->GetSecurity() > SEC_PLAYER || sWorld.getConfig(CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS))
-            ExtractUInt32(&args, botLevel);
+        if (IsRole(option))
+        {
+            haveRole = true;
+            optionRole = option;
+        }
     }
 
-    if (!botClass)
+    if (!haveClass && !haveRole)
     {
         SendSysMessage("Incorrect syntax. Expected role or class.");
         SetSentErrorMessage(true);
         return false;
     }
+
+    if (haveClass)
+    {
+        if (optionClass == "warrior")
+            botClass = CLASS_WARRIOR;
+        if (optionClass == "paladin" && pPlayer->GetTeam() == ALLIANCE)
+            botClass = CLASS_PALADIN;
+        if (optionClass == "hunter")
+            botClass = CLASS_HUNTER;
+        if (optionClass == "rogue")
+            botClass = CLASS_ROGUE;
+        if (optionClass == "priest")
+            botClass = CLASS_PRIEST;
+        if (optionClass == "shaman" && pPlayer->GetTeam() == HORDE)
+            botClass = CLASS_SHAMAN;
+        if (optionClass == "mage")
+            botClass = CLASS_MAGE;
+        if (optionClass == "warlock")
+            botClass = CLASS_WARLOCK;
+        if (optionClass == "druid")
+            botClass = CLASS_DRUID;
+    }
+
+    if (haveRole)
+    {
+        if (optionRole == "dps")
+        {
+            if (!haveClass)
+            {
+                std::vector<uint32> dpsClasses = { CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_PRIEST, CLASS_MAGE, CLASS_WARLOCK, CLASS_DRUID };
+
+                if (pPlayer->GetTeam() == HORDE)
+                    dpsClasses.push_back(CLASS_SHAMAN);
+                else
+                    dpsClasses.push_back(CLASS_PALADIN);
+
+                botClass = SelectRandomContainerElement(dpsClasses);
+                SendSysMessage("The wrong combination of role and class. Class set random.");
+            }
+            botRole = CombatBotBaseAI::IsMeleeDamageClass(botClass) ? ROLE_MELEE_DPS : ROLE_RANGE_DPS;
+        }
+        if (optionRole == "healer")
+        {
+            if (!haveClass || (botClass != CLASS_PRIEST && botClass != CLASS_DRUID && botClass != CLASS_SHAMAN && botClass != CLASS_PALADIN))
+            {
+                std::vector<uint32> healerClasses = { CLASS_PRIEST, CLASS_DRUID };
+
+                if (pPlayer->GetTeam() == HORDE)
+                    healerClasses.push_back(CLASS_SHAMAN);
+                else
+                    healerClasses.push_back(CLASS_PALADIN);
+
+                botClass = SelectRandomContainerElement(healerClasses);
+                SendSysMessage("The wrong combination of role and class. Class set random.");
+            }
+            botRole = ROLE_HEALER;
+        }
+        if (optionRole == "tank")
+        {
+            if (!haveClass || (botClass != CLASS_WARRIOR && botClass != CLASS_DRUID && botClass != CLASS_PALADIN))
+            {
+                std::vector<uint32> tankClasses = { CLASS_WARRIOR, CLASS_DRUID };
+
+                if (pPlayer->GetTeam() == ALLIANCE)
+                {
+                    tankClasses.push_back(CLASS_PALADIN);
+                }
+
+                botClass = SelectRandomContainerElement(tankClasses);
+                SendSysMessage("The wrong combination of role and class. Class set random.");
+            }
+
+            botRole = ROLE_TANK;
+        }
+    }
+
+
+    // Prevent setting a custom level for bots unless the account is a GM or skipping checks is enabled.
+    if (GetSession()->GetSecurity() > SEC_PLAYER || sWorld.getConfig(CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS))
+        ExtractUInt32(&args, botLevel);
 
     uint8 botRace = SelectRandomRaceForClass(botClass, pPlayer->GetTeam());
     if (!botRace)
@@ -939,6 +1038,14 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     Player* pPlayer = m_session->GetPlayer();
     if (!pPlayer)
         return false;
+
+    //TODO: LANG
+    if (pPlayer->IsHardcore())
+    {
+        SendSysMessage("It is forbidden in HC mode.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     Player* pTarget = GetSelectedPlayer();
     if (!pTarget)
@@ -978,6 +1085,14 @@ bool ChatHandler::HandlePartyBotLoadCommand(char* args)
     Player* pPlayer = m_session->GetPlayer();
     if (!pPlayer)
         return false;
+
+    //TODO: LANG
+    if (pPlayer->IsHardcore())
+    {
+        SendSysMessage("It is forbidden in HC mode.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     std::string name = ExtractPlayerNameFromLink(&args);
     if (name.empty())
@@ -1164,6 +1279,14 @@ bool ChatHandler::HandlePartyBotAoECommand(char* args)
 {
     Player* pPlayer = GetSession()->GetPlayer();
     Unit* pTarget = GetSelectedUnit();
+
+    if (!pPlayer->GetMap()->Instanceable())
+    {
+        SendSysMessage("AOE not avalible in open world.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     if (!pTarget || !pPlayer->IsValidAttackTarget(pTarget, true))
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1304,6 +1427,18 @@ bool ChatHandler::HandlePartyBotFocusMarkCommand(char* args)
         {
             if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
             {
+                // Only the owner can.
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s is not your bot or it cannot focus.", pTarget->GetName());
+                        return false;
+                    }
+                }
+
                 if (std::find(pAI->m_marksToFocus.begin(), pAI->m_marksToFocus.end(), itrMark->second) != pAI->m_marksToFocus.end()) 
                 {
                     PSendSysMessage("%s already have focus %s.", pTarget->GetName(), args);
@@ -1335,6 +1470,20 @@ bool ChatHandler::HandlePartyBotFocusMarkCommand(char* args)
             if (pMember == pPlayer)
                 continue;
 
+            // Only the owner can.                
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        continue;
+                    }
+                }
+            }
+
             if (pMember->AI())
             {
                 if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
@@ -1365,6 +1514,18 @@ bool ChatHandler::HandlePartyBotClearMarksCommand(char* args)
         {
             if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
             {
+                // Only the owner can.
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s is not your bot or it cannot cleared focus.", pTarget->GetName());
+                        return false;
+                    }
+                }
+
                 PSendSysMessage("All mark assignments cleared for %s.", pTarget->GetName());
                 pAI->m_marksToCC.clear();
                 pAI->m_marksToFocus.clear();
@@ -1390,6 +1551,20 @@ bool ChatHandler::HandlePartyBotClearMarksCommand(char* args)
         {
             if (pMember == pPlayer)
                 continue;
+
+            // Only the owner can.                
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        continue;
+                    }
+                }
+            }
 
             if (pMember->AI())
             {
@@ -1436,6 +1611,21 @@ bool ChatHandler::HandlePartyBotComeToMeCommand(char* args)
 
     if (pTarget && pTarget != pPlayer)
     {
+        // Only the owner can.
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            if (pAI->m_personalControls)
+            {
+                Player* pLeader = pAI->GetPartyLeader();
+
+                if (pPlayer != pLeader)
+                {
+                    PSendSysMessage("%s is not your bot or it cannot move.", pTarget->GetName());
+                    return ok;
+                }
+            }
+        }
+
         if (ok = HandlePartyBotComeToMeHelper(pTarget, pPlayer))
             PSendSysMessage("%s is coming to your position.", pTarget->GetName());
         else
@@ -1452,6 +1642,20 @@ bool ChatHandler::HandlePartyBotComeToMeCommand(char* args)
                 if (pMember == pPlayer)
                     continue;
 
+                // Only the owner can.
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (pAI->m_personalControls)
+                    {
+                        Player* pLeader = pAI->GetPartyLeader();
+
+                        if (pPlayer != pLeader)
+                        {
+                            continue;
+                        }
+                    }
+                }
+
                 ok = HandlePartyBotComeToMeHelper(pMember, pPlayer) || ok;
             }
         }
@@ -1462,6 +1666,154 @@ bool ChatHandler::HandlePartyBotComeToMeCommand(char* args)
             SendSysMessage("There are no party bots in the group or they cannot move.");
         return ok;
     }
+
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotControls(char* args)
+{
+    if (!*args)
+    {
+        SendSysMessage("Incorrect syntax. Expected self or all.");
+        return false;
+    }
+
+    std::string controlType = args;
+    bool personalControls = false;
+
+    if (controlType == "self")
+    {
+        personalControls = true;
+    }
+    else if (controlType == "all")
+    {
+        //Do nothing
+    }
+    else
+    {
+        SendSysMessage("Incorrect syntax. Expected self or all.");
+        return false;
+    }
+
+    Player* pPlayer = GetSession()->GetPlayer();
+    bool status = false;
+
+    if (Group* pGroup = pPlayer->GetGroup())
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* pMember = itr->getSource())
+            {
+                if (!pMember->AI()) {
+                    continue;
+                }
+
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    pAI->m_personalControls = personalControls;
+                    status = true;
+                }
+            }
+        }
+
+        if (status)
+        {
+            if (personalControls)
+                SendSysMessage("All party bots are controlled by the creators.");
+            else
+                SendSysMessage("All party bots are controlled by everyone.");
+        }
+        else
+            SendSysMessage("There are no party bots in the group or they cannot move.");
+        return status;
+    }
+
+    SendSysMessage("You are not in a group.");
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotChleader(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (Group* pGroup = pPlayer->GetGroup())
+    {
+        if (pTarget && pTarget != pPlayer)
+        {
+            // Bot is not your party
+            bool isPartyMember = false;            
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pTarget)
+                    {
+                        isPartyMember = true;
+                    }
+                }
+            }
+
+            if (!isPartyMember)
+            {
+                PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
+                return false;
+            }
+
+            // Only the owner can.
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
+                        return false;
+                    }
+                }
+                pAI->ChangePartyLeader(pPlayer->GetObjectGuid());
+                pTarget->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
+            }
+
+            PSendSysMessage("%s has changed its leader.", pTarget->GetName());
+            return true;
+        }
+        else
+        {
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pPlayer)
+                        continue;
+
+                    // Only the owner can.
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    {
+                        if (pAI->m_personalControls)
+                        {
+                            Player* pLeader = pAI->GetPartyLeader();
+
+                            if (pPlayer != pLeader)
+                            {
+                                continue;
+                            }
+                        }
+
+                        pAI->ChangePartyLeader(pPlayer->GetObjectGuid());
+                        pMember->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
+                    }
+                }
+            }
+
+            SendSysMessage("The leader has been changed for bots.");
+            return true;
+        }
+    } 
 
     SendSysMessage("You are not in a group.");
     SetSentErrorMessage(true);
@@ -1487,6 +1839,8 @@ bool HandlePartyBotUseGObjectHelper(Player* pTarget, GameObject* pGo)
 
 bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
 {
+    HandleGameObjectSelectCommand(args);
+
     Player* pPlayer = GetSession()->GetPlayer();
     Player* pTarget = GetSelectedPlayer();
 
@@ -1494,6 +1848,13 @@ bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
     if (!pGo)
     {
         SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
+        return false;
+    }
+
+
+    if (pGo->GetGOInfo()->type != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
+    {
+        SendSysMessage("Party bots can only use the altar.");
         return false;
     }
 
@@ -1520,6 +1881,177 @@ bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
         else
             SendSysMessage("There are no party bots in range of the object.");
         return ok;
+    }
+
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotStayCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (Group* pGroup = pPlayer->GetGroup())
+    {
+        if (pTarget && pTarget != pPlayer)
+        {
+            // Bot is not your party
+            bool isPartyMember = false;
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pTarget)
+                    {
+                        isPartyMember = true;
+                    }
+                }
+            }
+
+            if (!isPartyMember)
+            {
+                PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
+                return false;
+            }
+
+            // Only the owner can.
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
+                        return false;
+                    }
+                }
+                pTarget->StopMoving();
+                pTarget->GetMotionMaster()->MoveIdle();
+                pAI->m_stay = true;
+            }
+
+            PSendSysMessage("%s won't move.", pTarget->GetName());
+            return true;
+        }
+        else
+        {
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pPlayer)
+                        continue;
+
+                    // Only the owner can.
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    {
+                        if (pAI->m_personalControls)
+                        {
+                            Player* pLeader = pAI->GetPartyLeader();
+
+                            if (pPlayer != pLeader)
+                            {
+                                continue;
+                            }
+                        }
+
+                        pTarget->StopMoving();
+                        pTarget->GetMotionMaster()->MoveIdle();
+                        pAI->m_stay = true;
+                    }
+                }
+            }
+
+            SendSysMessage("The partybot won't move.");
+            return true;
+        }
+    }
+
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotMoveCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (Group* pGroup = pPlayer->GetGroup())
+    {
+        if (pTarget && pTarget != pPlayer)
+        {
+            // Bot is not your party
+            bool isPartyMember = false;
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pTarget)
+                    {
+                        isPartyMember = true;
+                    }
+                }
+            }
+
+            if (!isPartyMember)
+            {
+                PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
+                return false;
+            }
+
+            // Only the owner can.
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                if (pAI->m_personalControls)
+                {
+                    Player* pLeader = pAI->GetPartyLeader();
+
+                    if (pPlayer != pLeader)
+                    {
+                        PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
+                        return false;
+                    }
+                }
+                pAI->m_stay = false;
+            }
+
+            PSendSysMessage("%s won't move.", pTarget->GetName());
+            return true;
+        }
+        else
+        {
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pPlayer)
+                        continue;
+
+                    // Only the owner can.
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    {
+                        if (pAI->m_personalControls)
+                        {
+                            Player* pLeader = pAI->GetPartyLeader();
+
+                            if (pPlayer != pLeader)
+                            {
+                                continue;
+                            }
+                        }
+                        pAI->m_stay = false;
+                    }
+                }
+            }
+
+            SendSysMessage("The partybot won't move.");
+            return true;
+        }
     }
 
     SendSysMessage("You are not in a group.");
@@ -1569,9 +2101,9 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     if (pause && !duration)
         duration = 5 * MINUTE * IN_MILLISECONDS;
 
+    Player* pPlayer = GetSession()->GetPlayer();
     if (all)
-    {
-        Player* pPlayer = GetSession()->GetPlayer();
+    {        
         Group* pGroup = pPlayer->GetGroup();
         if (!pGroup)
         {
@@ -1587,6 +2119,20 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
             {
                 if (pMember == pPlayer)
                     continue;
+
+                // Only the owner can.                
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (pAI->m_personalControls)
+                    {
+                        Player* pLeader = pAI->GetPartyLeader();
+
+                        if (pPlayer != pLeader)
+                        {
+                            continue;
+                        }
+                    }
+                }
 
                 if (HandlePartyBotPauseApplyHelper(pMember, duration))
                     success = true;
@@ -1611,6 +2157,21 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
             SendSysMessage(LANG_NO_CHAR_SELECTED);
             SetSentErrorMessage(true);
             return false;
+        }
+
+        // Only the owner can.
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            if (pAI->m_personalControls)
+            {
+                Player* pLeader = pAI->GetPartyLeader();
+
+                if (pPlayer != pLeader)
+                {
+                    PSendSysMessage("%s is not your bot or it cannot pause.", pTarget->GetName());
+                    return false;
+                }
+            }
         }
 
         if (HandlePartyBotPauseApplyHelper(pTarget, duration))

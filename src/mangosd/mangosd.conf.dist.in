@@ -70,8 +70,8 @@ ConfVersion=2010100901
 ###################################################################################################################
 
 RealmID = 1
-DataDir = "."
-LogsDir = ""
+DataDir = "/wow/data"
+LogsDir = "/wow/logs"
 HonorDir = ""
 LoginDatabase.Info              = "127.0.0.1;3306;mangos;mangos;realmd"
 LoginDatabase.Connections       = 1
@@ -243,7 +243,7 @@ BindIP = "0.0.0.0"
 UseProcessors = 0
 ProcessPriority = 1
 Compression = 1
-PlayerLimit = 100
+PlayerLimit = 500
 PlayerHardLimit = 0
 LoginQueue.GracePeriodSecs = 0
 LoginPerTick = 0
@@ -258,8 +258,8 @@ ChangeWeatherInterval = 600000
 PlayerSave.Interval = 900000
 PlayerSave.Stats.MinLevel = 0
 PlayerSave.Stats.SaveOnlyOnLogout = 1
-Terrain.Preload.Continents = 0
-Terrain.Preload.Instances  = 0
+Terrain.Preload.Continents = 1
+Terrain.Preload.Instances  = 1
 vmap.enableLOS = 1
 vmap.enableHeight = 1
 vmap.enableIndoorCheck = 1
@@ -635,11 +635,11 @@ DebuffLimit = 0
 #
 ###################################################################################################################
 
-LogSQL = 1
+LogSQL = 0
 PidFile = ""
-LogLevel.Console = 2
-LogLevel.File = 2
-LogLevel.DB = 2
+LogLevel.Console = 1
+LogLevel.File = 1
+LogLevel.DB = 0
 LogTime = 0
 LogFilter_TransportMoves = 1
 LogFilter_CreatureMoves = 1
@@ -671,7 +671,7 @@ LogFile.DBErrorFix = ""
 LogFile.Loot = "Loot.log"
 LogFile.LevelUp = "LevelUp.log"
 LogFile.Performance = "Perf.log"
-LogFile.Gm = ""
+LogFile.Gm = "Gm.log"
 LogFile.GmCriticalCommands = "gm_critical.log"
 LogFile.Trades = "Trades.log"
 
@@ -690,7 +690,7 @@ LogsDB.Transactions         = 0
 LogsDB.Battlegrounds        = 0
 Smartlog.Death              = 0
 Smartlog.LongCombat         = 0
-Smartlog.LongCombatDuration = 1800
+Smartlog.LongCombatDuration = 0
 
 PerformanceLog.SlowWorldUpdate          = 100
 PerformanceLog.SlowMapSystemUpdate      = 100
@@ -1067,12 +1067,12 @@ PerformanceLog.SlowPacketBroadcast      = 0
 
 GameType = 1
 RealmZone = 1
-TimeZoneOffset = 0
+TimeZoneOffset = -3
 DBC.Locale = 255
 DeclinedNames = 0
-StrictPlayerNames = 0
-StrictCharterNames = 0
-StrictPetNames = 0
+StrictPlayerNames = 1
+StrictCharterNames = 1
+StrictPetNames = 1
 MinPlayerName = 2
 MinCharterName = 2
 MinPetName = 2
@@ -1125,7 +1125,7 @@ PetUnsummonAtMount = 0
 PetDefaultLoyalty = 1
 PlayerCommands = 1
 Event.Announce = 0
-AutoBroadcast.Timer = 1800000
+AutoBroadcast.Timer = 10800000
 Spell.EffectDelay = 400
 Spell.ProcDelay = 800
 BeepAtStart = 1
@@ -1172,7 +1172,7 @@ GM.JoinOppositeFactionChannels = 0
 AllowTwoSide.Interaction.Group = 0
 AllowTwoSide.Interaction.Guild = 0
 AllowTwoSide.Interaction.Trade = 0
-AllowTwoSide.Interaction.Auction = 0
+AllowTwoSide.Interaction.Auction = 1
 AllowTwoSide.Interaction.Mail = 0
 AllowTwoSide.WhoList = 0
 AllowTwoSide.AddFriend = 0
@@ -2545,7 +2545,7 @@ Rate.Rest.InGame = 1
 Rate.Rest.Offline.InTavernOrCity = 1
 Rate.Rest.Offline.InWilderness = 1
 Rate.Damage.Fall = 1
-Rate.Auction.Time = 1
+Rate.Auction.Time = 180
 Rate.Auction.Deposit = 1
 Rate.Auction.Cut = 1
 Auction.Deposit.Min = 0
@@ -2856,12 +2856,12 @@ CharDelete.KeepDays = 30
 #        Default: 50
 #
 ###################################################################################################################
-AHBot.Enable = 0
-AHBot.ah.id = 7
+AHBot.Enable = 1
+AHBot.ah.id = 1
 AHBot.ah.fid = 120
-AHBot.itemcount = 50
-#AHBot.bot.guid = 1123
-#AHBot.bot.account = 32377
+AHBot.itemcount = 3610
+AHBot.bot.guid = 697196
+AHBot.bot.account = 2125
 
 ###################################################################################################################
 # PLAYER BOTS
@@ -2933,6 +2933,11 @@ AHBot.itemcount = 50
 #        Default: 0 - off
 #                 1 - on
 #
+#    BattleBot.AddAnnounce
+#        Add message in chat when battlebots are added.
+#        Default: 1 - on
+#                 0 - off
+#
 ###################################################################################################################
 RandomBot.Enable = 0
 RandomBot.MinBots = 0
@@ -2947,10 +2952,11 @@ PlayerBot.ShowInWhoList = 0
 PartyBot.MaxBots = 0
 PartyBot.SkipChecks = 0
 PartyBot.AutoEquip = 1
-PartyBot.RandomGearLevelDifference = 10
+PartyBot.RandomGearLevelDifference = 5
 
 BattleBot.AutoEquip = 1
-BattleBot.AutoJoin = 0
+BattleBot.AutoJoin = 1
+BattleBot.AddAnnounce = 0
 
 ###################################################################################################################
 #    Database-based chat
@@ -2981,3 +2987,10 @@ DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
 
+###################################################################################################################
+#    Hardcore mode
+###################################################################################################################
+#   Hardcore.Enable
+#   Enable Hardcore command.
+
+Hardcore.Enable = 1
