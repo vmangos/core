@@ -1963,7 +1963,7 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         }
 
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-            && me->GetDistance(pVictim) > 30.0f)
+            && me->GetDistance(pVictim) > 30.0f && !m_stay)
         {
             me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
         }
