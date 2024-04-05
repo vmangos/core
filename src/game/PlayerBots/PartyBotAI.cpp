@@ -330,6 +330,11 @@ bool PartyBotAI::DrinkAndEat()
 
 bool PartyBotAI::ShouldAutoRevive() const
 {
+    if (me->GetMap()->IsRaid())
+    {
+        return false;
+    }
+
     if (me->GetDeathState() == DEAD)
         return true;
 
