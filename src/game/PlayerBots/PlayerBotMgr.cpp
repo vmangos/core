@@ -1897,45 +1897,52 @@ bool ChatHandler::HandlePartyBotStayCommand(char* args)
     {
         if (pTarget && pTarget != pPlayer)
         {
-            // Bot is not your party
-            bool isPartyMember = false;
-            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            if (pTarget->AI())
             {
-                if (Player* pMember = itr->getSource())
+                // Bot is not your party
+                bool isPartyMember = false;
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
-                    if (pMember == pTarget)
+                    if (Player* pMember = itr->getSource())
                     {
-                        isPartyMember = true;
+                        if (pMember == pTarget)
+                        {
+                            isPartyMember = true;
+                        }
                     }
                 }
-            }
 
-            if (!isPartyMember)
-            {
-                PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
-                return false;
-            }
-
-            // Only the owner can.
-            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
-            {
-                if (pAI->m_personalControls)
+                if (!isPartyMember)
                 {
-                    Player* pLeader = pAI->GetPartyLeader();
-
-                    if (pPlayer != pLeader)
-                    {
-                        PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
-                        return false;
-                    }
+                    PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
+                    return false;
                 }
-                pTarget->StopMoving();
-                pTarget->GetMotionMaster()->MoveIdle();
-                pAI->m_stay = true;
+
+                // Only the owner can.
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+                {
+                    if (pAI->m_personalControls)
+                    {
+                        Player* pLeader = pAI->GetPartyLeader();
+
+                        if (pPlayer != pLeader)
+                        {
+                            PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
+                            return false;
+                        }
+                    }
+                    pTarget->StopMoving();
+                    pTarget->GetMotionMaster()->MoveIdle();
+                    pAI->m_stay = true;
+                }
+
+                PSendSysMessage("%s won't move.", pTarget->GetName());
+                return true;
             }
 
-            PSendSysMessage("%s won't move.", pTarget->GetName());
-            return true;
+            SendSysMessage("Target is not a party bot.");
+            SetSentErrorMessage(true);
+            return false;
         }
         else
         {
@@ -1946,22 +1953,25 @@ bool ChatHandler::HandlePartyBotStayCommand(char* args)
                     if (pMember == pPlayer)
                         continue;
 
-                    // Only the owner can.
-                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    if (pMember->AI())
                     {
-                        if (pAI->m_personalControls)
+                        // Only the owner can.
+                        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
                         {
-                            Player* pLeader = pAI->GetPartyLeader();
-
-                            if (pPlayer != pLeader)
+                            if (pAI->m_personalControls)
                             {
-                                continue;
-                            }
-                        }
+                                Player* pLeader = pAI->GetPartyLeader();
 
-                        pTarget->StopMoving();
-                        pTarget->GetMotionMaster()->MoveIdle();
-                        pAI->m_stay = true;
+                                if (pPlayer != pLeader)
+                                {
+                                    continue;
+                                }
+                            }
+
+                            pMember->StopMoving();
+                            pMember->GetMotionMaster()->MoveIdle();
+                            pAI->m_stay = true;
+                        }
                     }
                 }
             }
@@ -1985,43 +1995,50 @@ bool ChatHandler::HandlePartyBotMoveCommand(char* args)
     {
         if (pTarget && pTarget != pPlayer)
         {
-            // Bot is not your party
-            bool isPartyMember = false;
-            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            if (pTarget->AI())
             {
-                if (Player* pMember = itr->getSource())
+                // Bot is not your party
+                bool isPartyMember = false;
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
-                    if (pMember == pTarget)
+                    if (Player* pMember = itr->getSource())
                     {
-                        isPartyMember = true;
+                        if (pMember == pTarget)
+                        {
+                            isPartyMember = true;
+                        }
                     }
                 }
-            }
 
-            if (!isPartyMember)
-            {
-                PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
-                return false;
-            }
-
-            // Only the owner can.
-            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
-            {
-                if (pAI->m_personalControls)
+                if (!isPartyMember)
                 {
-                    Player* pLeader = pAI->GetPartyLeader();
-
-                    if (pPlayer != pLeader)
-                    {
-                        PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
-                        return false;
-                    }
+                    PSendSysMessage("%s this bot does not party member.", pTarget->GetName());
+                    return false;
                 }
-                pAI->m_stay = false;
+
+                // Only the owner can.
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+                {
+                    if (pAI->m_personalControls)
+                    {
+                        Player* pLeader = pAI->GetPartyLeader();
+
+                        if (pPlayer != pLeader)
+                        {
+                            PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
+                            return false;
+                        }
+                    }
+                    pAI->m_stay = false;
+                }
+
+                PSendSysMessage("%s won't move.", pTarget->GetName());
+                return true;
             }
 
-            PSendSysMessage("%s won't move.", pTarget->GetName());
-            return true;
+            SendSysMessage("Target is not a party bot.");
+            SetSentErrorMessage(true);
+            return false;            
         }
         else
         {
@@ -2032,20 +2049,23 @@ bool ChatHandler::HandlePartyBotMoveCommand(char* args)
                     if (pMember == pPlayer)
                         continue;
 
-                    // Only the owner can.
-                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    if (pMember->AI())
                     {
-                        if (pAI->m_personalControls)
+                        // Only the owner can.
+                        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
                         {
-                            Player* pLeader = pAI->GetPartyLeader();
-
-                            if (pPlayer != pLeader)
+                            if (pAI->m_personalControls)
                             {
-                                continue;
+                                Player* pLeader = pAI->GetPartyLeader();
+
+                                if (pPlayer != pLeader)
+                                {
+                                    continue;
+                                }
                             }
+                            pAI->m_stay = false;
                         }
-                        pAI->m_stay = false;
-                    }
+                    }                    
                 }
             }
 
