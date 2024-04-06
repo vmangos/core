@@ -145,5 +145,8 @@ void CliRunnable::operator()()
             }
             sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, nullptr, command.c_str(), &utf8print, &commandFinished));
         }
+        #ifndef WIN32
+        free(command_str);
+        #endif
     }
 }
