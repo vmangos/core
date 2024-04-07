@@ -53,6 +53,8 @@
 #include <ace/Dev_Poll_Reactor.h>
 #include <signal.h>
 
+#include <algorithm>
+
 #ifdef WIN32
 #include "ServiceWin32.h"
 extern int m_ServiceStatus;
@@ -100,7 +102,7 @@ void remoteAccess()
 {
     #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
 
-    ACE_Dev_Poll_Reactor imp;
+    ACE_Dev_Poll_Reactor imp (std::min(1024, ACE::max_handles()));
 
     imp.max_notify_iterations (128);
     imp.restart (1);

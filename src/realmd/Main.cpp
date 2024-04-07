@@ -37,6 +37,8 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 
+#include <algorithm>
+
 #include <ace/Get_Opt.h>
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
@@ -226,7 +228,7 @@ extern int main(int argc, char **argv)
 #endif
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-    ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
+    ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(std::min(1024, ACE::max_handles()), 1), 1), true);
 #else
     ACE_Reactor::instance(new ACE_Reactor(new ACE_TP_Reactor(), true), true);
 #endif

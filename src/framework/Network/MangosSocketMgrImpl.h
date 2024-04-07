@@ -17,6 +17,7 @@
 
 #include <set>
 #include <atomic>
+#include <algorithm>
 
 #include "Log.h"
 #include "Common.h"
@@ -76,7 +77,7 @@ public:
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
 
-        imp = new ACE_Dev_Poll_Reactor();
+        imp = new ACE_Dev_Poll_Reactor(std::min(1024, ACE::max_handles()));
 
         imp->max_notify_iterations(128);
         imp->restart(1);
