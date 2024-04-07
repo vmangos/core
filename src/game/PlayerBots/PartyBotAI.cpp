@@ -1515,7 +1515,7 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
                     return;
             }
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-                && !me->CanReachWithMeleeAutoAttack(pVictim))
+                && !me->CanReachWithMeleeAutoAttack(pVictim) && !m_stay)
             {
                 me->GetMotionMaster()->MoveChase(pVictim);
             }
@@ -1718,7 +1718,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
     if (Unit* pVictim = me->GetVictim())
     {
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-            && me->GetDistance(pVictim) > 30.0f)
+            && me->GetDistance(pVictim) > 30.0f && !m_stay)
         {
             me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
         }
@@ -2457,7 +2457,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         }
 
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-            && me->GetDistance(pVictim) > 30.0f)
+            && me->GetDistance(pVictim) > 30.0f && !m_stay)
         {
             me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
         }
@@ -2655,7 +2655,7 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
         }
 
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-            && me->GetDistance(pVictim) > 30.0f)
+            && me->GetDistance(pVictim) > 30.0f && !m_stay)
         {
             me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
         }
@@ -2948,7 +2948,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-            && !me->CanReachWithMeleeAutoAttack(pVictim))
+            && !me->CanReachWithMeleeAutoAttack(pVictim) && !m_stay)
         {
             me->GetMotionMaster()->MoveChase(pVictim);
         }
@@ -3489,7 +3489,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                 me->SetCasterChaseDistance(0.0f);
 
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-                && !me->CanReachWithMeleeAutoAttack(pVictim))
+                && !me->CanReachWithMeleeAutoAttack(pVictim) && !m_stay)
             {
                 me->GetMotionMaster()->MoveChase(pVictim);
             }
@@ -3593,7 +3593,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                 me->SetCasterChaseDistance(0.0f);
 
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-                && !me->CanReachWithMeleeAutoAttack(pVictim))
+                && !me->CanReachWithMeleeAutoAttack(pVictim) && !m_stay)
             {
                 me->GetMotionMaster()->MoveChase(pVictim);
             }
@@ -3656,26 +3656,29 @@ void PartyBotAI::UpdateInCombatAI_Druid()
         case FORM_NONE:
         case FORM_MOONKIN:
         {
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE &&
-                me->GetDistance(pVictim) > 30.0f)
+            if (!m_stay)
             {
-                me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
-            }
-            else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE &&
+                    me->GetDistance(pVictim) > 30.0f)
+                {
+                    me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+                }
+                else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
                     (pVictim->GetVictim() == me) &&
                     !me->HasUnitState(UNIT_STAT_ROOT) &&
                     (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
-            {
-                if (m_spells.druid.pEntanglingRoots &&
-                    CanTryToCastSpell(pVictim, m_spells.druid.pEntanglingRoots))
                 {
-                    if (DoCastSpell(pVictim, m_spells.druid.pEntanglingRoots) == SPELL_CAST_OK)
+                    if (m_spells.druid.pEntanglingRoots &&
+                        CanTryToCastSpell(pVictim, m_spells.druid.pEntanglingRoots))
+                    {
+                        if (DoCastSpell(pVictim, m_spells.druid.pEntanglingRoots) == SPELL_CAST_OK)
+                            return;
+                    }
+                    me->SetCasterChaseDistance(25.0f);
+                    if (RunAwayFromTarget(pVictim))
                         return;
                 }
-                me->SetCasterChaseDistance(25.0f);
-                if (RunAwayFromTarget(pVictim))
-                    return;
-            }
+            }            
 
             if (m_spells.druid.pFaerieFire &&
                (pVictim->GetClass() == CLASS_ROGUE) &&
