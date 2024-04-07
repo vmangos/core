@@ -2655,6 +2655,35 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         if (isMpItem)
             continue;
 
+        // Trinkets for role
+        if (pProto->InventoryType == INVTYPE_TRINKET)
+        {
+            if (m_role == ROLE_TANK)
+            {
+                std::vector<uint32> tankTrinkets = { 11810, 10779, 19431, 18406, 19406, 13966, 11811 };
+                if (std::find(tankTrinkets.begin(), tankTrinkets.end(), pProto->ItemId) == tankTrinkets.end())
+                    continue;                
+            }
+            else if (m_role == ROLE_MELEE_DPS || me->GetClass() == CLASS_HUNTER)
+            {
+                std::vector<uint32> mDpsTrinkets = { 13965, 11815, 19406, 21670, 23570, 23041, 22954, 22321, 19289 };
+                if (std::find(mDpsTrinkets.begin(), mDpsTrinkets.end(), pProto->ItemId) == mDpsTrinkets.end())
+                    continue;
+            }
+            else if (m_role == ROLE_RANGE_DPS)
+            {
+                std::vector<uint32> rDpsTrinkets = { 12930, 13968, 18467, 18820, 19379, 18820, 23046, 19344, 11819, 18371, 19339 };
+                if (std::find(rDpsTrinkets.begin(), rDpsTrinkets.end(), pProto->ItemId) == rDpsTrinkets.end())
+                    continue;
+            }
+            else if (m_role == ROLE_HEALER)
+            {
+                std::vector<uint32> healTrinkets = { 19395, 17064, 18371, 12930, 11819, 18469, 23027, 23047, 18470 };
+                if (std::find(healTrinkets.begin(), healTrinkets.end(), pProto->ItemId) == healTrinkets.end())
+                    continue;
+            }     
+        }
+
 
         if (uint32 skill = pProto->GetProficiencySkill())
         {
