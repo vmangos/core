@@ -446,7 +446,11 @@ bool PartyBotAI::AttackStart(Unit* pVictim)
         else if (me->HasDistanceCasterMovement())
             me->SetCasterChaseDistance(0.0f);
 
-        me->GetMotionMaster()->MoveChase(pVictim, 1.0f, GetRole() == ROLE_MELEE_DPS ? 3.0f : 0.0f);
+        if (!m_stay)
+        {
+            me->GetMotionMaster()->MoveChase(pVictim, 1.0f, GetRole() == ROLE_MELEE_DPS ? 3.0f : 0.0f);
+        }
+        
         return true;
     }
 
@@ -1053,32 +1057,29 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
     }
 
-    if (!me->IsMoving())
+    if (!me->IsMoving() && !m_stay)
     {
         if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(me->AI()))
         {
-            if (!pAI->m_stay)
+            if (!pVictim)
             {
-                if (!pVictim)
-                {
-                    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-                        me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
-                }
-                else
-                {
-                    if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
-                        (GetRole() == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
-                        IsValidHostileTarget(pVictim) &&
-                        AttackStart(pVictim))
-                        return;
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
+                    me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
+            }
+            else
+            {
+                if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
+                    (GetRole() == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
+                    IsValidHostileTarget(pVictim) &&
+                    AttackStart(pVictim))
+                    return;
 
-                    switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                    {
-                    case IDLE_MOTION_TYPE:
-                    case FOLLOW_MOTION_TYPE:
-                        me->GetMotionMaster()->MoveChase(pVictim);
-                        break;
-                    }
+                switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                {
+                case IDLE_MOTION_TYPE:
+                case FOLLOW_MOTION_TYPE:
+                    me->GetMotionMaster()->MoveChase(pVictim);
+                    break;
                 }
             }
         }        
@@ -1967,50 +1968,53 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                 return;
         }
 
-        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-            && me->GetDistance(pVictim) > 30.0f && !m_stay)
+        if (!m_stay)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
-        }
-        else if (GetAttackersInRangeCount(10.0f))
-        {
-            if (m_spells.mage.pManaShield &&
-               (me->GetPowerPercent(POWER_MANA) > 20.0f) &&
-                CanTryToCastSpell(me, m_spells.mage.pManaShield))
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
+                && me->GetDistance(pVictim) > 30.0f)
             {
-                if (DoCastSpell(me, m_spells.mage.pManaShield) == SPELL_CAST_OK)
-                    return;
+                me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
             }
-
-            if ((GetRole() != ROLE_MELEE_DPS) &&
-                (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
+            else if (GetAttackersInRangeCount(10.0f))
             {
-                if (m_spells.mage.pBlink &&
-                    (me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE) ||
-                        me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
-                    CanTryToCastSpell(me, m_spells.mage.pBlink))
+                if (m_spells.mage.pManaShield &&
+                    (me->GetPowerPercent(POWER_MANA) > 20.0f) &&
+                    CanTryToCastSpell(me, m_spells.mage.pManaShield))
                 {
-                    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                        me->GetMotionMaster()->Clear();
-
-                    if (DoCastSpell(me, m_spells.mage.pBlink) == SPELL_CAST_OK)
+                    if (DoCastSpell(me, m_spells.mage.pManaShield) == SPELL_CAST_OK)
                         return;
                 }
 
-                if (!me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+                if ((GetRole() != ROLE_MELEE_DPS) &&
+                    (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
                 {
-                    if (m_spells.mage.pFrostNova &&
-                       !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
-                       !pVictim->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) &&
-                        CanTryToCastSpell(me, m_spells.mage.pFrostNova))
+                    if (m_spells.mage.pBlink &&
+                        (me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE) ||
+                            me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
+                        CanTryToCastSpell(me, m_spells.mage.pBlink))
                     {
-                        DoCastSpell(me, m_spells.mage.pFrostNova);
+                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+                            me->GetMotionMaster()->Clear();
+
+                        if (DoCastSpell(me, m_spells.mage.pBlink) == SPELL_CAST_OK)
+                            return;
                     }
 
-                    if (RunAwayFromTarget(pVictim))
+                    if (!me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
                     {
-                        me->SetCasterChaseDistance(25.0f);
-                        return;
+                        if (m_spells.mage.pFrostNova &&
+                            !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
+                            !pVictim->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) &&
+                            CanTryToCastSpell(me, m_spells.mage.pFrostNova))
+                        {
+                            DoCastSpell(me, m_spells.mage.pFrostNova);
+                        }
+
+                        if (RunAwayFromTarget(pVictim))
+                        {
+                            me->SetCasterChaseDistance(25.0f);
+                            return;
+                        }
                     }
                 }
             }
