@@ -462,6 +462,22 @@ void Creature::ToggleUnitFlagsFromStaticFlags()
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION);
 }
 
+void Creature::SetDefaultValuesFromStaticFlags()
+{
+    ToggleUnitFlagsFromStaticFlags();
+
+    if (m_invincibilityHpThreshold)
+    {
+        if (!HasStaticFlag(CREATURE_STATIC_FLAG_UNKILLABLE))
+            m_invincibilityHpThreshold = 0;
+    }
+    else
+    {
+        if (HasStaticFlag(CREATURE_STATIC_FLAG_UNKILLABLE))
+            m_invincibilityHpThreshold = 1;
+    }
+}
+
 bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData /*=nullptr*/, bool preserveHPAndPower /*=true*/)
 {
     bool addonReload = false;
@@ -547,22 +563,10 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
     SetCanModifyStats(true);
     UpdateAllStats();
 
-    if (m_invincibilityHpThreshold)
-    {
-        if (!HasStaticFlag(CREATURE_STATIC_FLAG_UNKILLABLE))
-            m_invincibilityHpThreshold = 0;
-    }
-    else
-    {
-        if (HasStaticFlag(CREATURE_STATIC_FLAG_UNKILLABLE))
-            m_invincibilityHpThreshold = 1;
-    }
-
     SetFactionTemplateId(GetCreatureInfo()->faction);
     SetDefaultGossipMenuId(GetCreatureInfo()->gossip_menu_id);
     SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npc_flags);
-
-    ToggleUnitFlagsFromStaticFlags();
+    SetDefaultValuesFromStaticFlags();
 
     SetFly(CanFly());
 
@@ -2228,6 +2232,7 @@ void Creature::SetDeathState(DeathState s)
         Unit::SetDeathState(ALIVE);
 
         SetMeleeDamageSchool(SpellSchools(cinfo->damage_school));
+        SetDefaultValuesFromStaticFlags();
 
         // Dynamic flags may be adjusted by spells. Clear them
         // first and let spell from *addon apply where needed.

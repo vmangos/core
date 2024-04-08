@@ -842,6 +842,12 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS;
         }
 
+        bool IsIgnoringCasterAndTargetRestrictions() const
+        {
+            return HasAttribute(SPELL_ATTR_EX_IGNORE_CASTER_AND_TARGET_RESTRICTIONS) ||
+                   HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS);
+        }
+
         bool IsDeathOnlySpell() const
         {
             return HasAttribute(SPELL_ATTR_EX3_ONLY_ON_GHOSTS) || 
