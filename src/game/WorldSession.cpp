@@ -793,7 +793,10 @@ void WorldSession::LogoutPlayer(bool Save)
             Map::DeleteFromWorld(_player);
         }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         m_movementPacketCompressor.ClearBuffer();
+#endif
+
         SetPlayer(nullptr);                                    // deleted in Remove/DeleteFromWorld call
 
         // Send the 'logout complete' packet to the client
