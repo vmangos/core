@@ -1039,6 +1039,7 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     if (!pPlayer)
         return false;
 
+    // hardcore
     //TODO: LANG
     if (pPlayer->IsHardcore())
     {
@@ -1047,13 +1048,39 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
         return false;
     }
 
-    Player* pTarget = GetSelectedPlayer();
-    if (!pTarget)
+    Player* pTarget;
+    if (char* arg = ExtractArg(&args))
     {
-        SendSysMessage(LANG_NO_CHAR_SELECTED);
-        SetSentErrorMessage(true);
-        return false;
+        std::string name = arg;
+
+        //todo: remove hardcode
+        strToLower(name);
+        if (name == "sana" || name == "dedzima")
+        {
+            SendSysMessage(LANG_NO_CHAR_SELECTED);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        pTarget = ObjectAccessor::FindPlayerByName(name.c_str());
+
+        if (!pTarget)
+        {
+            SendSysMessage(LANG_NO_CHAR_SELECTED);
+            SetSentErrorMessage(true);
+            return false;
+        }     
     }
+    else
+    {
+        pTarget = GetSelectedPlayer();
+        if (!pTarget)
+        {
+            SendSysMessage(LANG_NO_CHAR_SELECTED);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }    
 
     if (!PartyBotAddRequirementCheck(pPlayer, pTarget))
     {
