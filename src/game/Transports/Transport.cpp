@@ -202,6 +202,7 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
 void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 {
+    std::lock_guard<std::mutex> lock(m_passengerMutex);
     if (m_passengers.insert(passenger).second)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Unit %s boarded transport %s.", passenger->GetName(), GetName());
@@ -224,6 +225,8 @@ void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 void GenericTransport::RemovePassenger(Unit* passenger)
 {
     bool erased = false;
+
+    std::lock_guard<std::mutex> lock(m_passengerMutex);
     if (m_passengerTeleportItr != m_passengers.end())
     {
         PassengerSet::iterator itr = m_passengers.find(passenger);
@@ -417,7 +420,7 @@ void ElevatorTransport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
 
         Relocate(currentPos.x, currentPos.y, currentPos.z, GetOrientation());
         UpdateModelPosition();
-        UpdatePassengerPositions(GetPassengers());
+        UpdatePassengerPositions();
 
         //SummonCreature(1, currentPos.x, currentPos.y, currentPos.z, GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1000);
     }
@@ -428,12 +431,13 @@ void GenericTransport::UpdatePosition(float x, float y, float z, float o)
     Relocate(x, y, z, o);
     UpdateModelPosition();
 
-    UpdatePassengerPositions(m_passengers);
+    UpdatePassengerPositions();
 }
 
-void GenericTransport::UpdatePassengerPositions(PassengerSet& passengers)
+void GenericTransport::UpdatePassengerPositions()
 {
-    for (const auto passenger : passengers)
+    std::lock_guard<std::mutex> lock(m_passengerMutex);
+    for (const auto passenger : m_passengers)
         UpdatePassengerPosition(passenger);
 }
 
