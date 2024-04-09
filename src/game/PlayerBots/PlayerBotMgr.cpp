@@ -2148,6 +2148,13 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     if (pause && !duration)
         duration = 5 * MINUTE * IN_MILLISECONDS;
 
+    if (duration > 5 * HOUR * IN_MILLISECONDS)
+    {
+        SendSysMessage("The duration is too long, no more than 5 hours.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     Player* pPlayer = GetSession()->GetPlayer();
     if (all)
     {        
