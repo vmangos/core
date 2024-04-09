@@ -406,7 +406,12 @@ class WorldSession
                 m_sniffFile.reset();
         }
 
+    private:
+        void SendPacketImpl(WorldPacket const* packet);
+
+    public:
         void SendPacket(WorldPacket const* packet);
+        void SendMovementPacket(WorldPacket const* packet);
         void SendNotification(char const* format, ...) ATTR_PRINTF(2, 3);
         void SendNotification(int32 string_id, ...);
         void SendPetNameInvalid(uint32 error, std::string const& name);
@@ -904,6 +909,15 @@ class WorldSession
         AccountData m_accountData[NewAccountData::NUM_ACCOUNT_DATA_TYPES];
         uint32 m_tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;
+
+        // compressed moves packet does not exist in early clients
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        MovementData m_movementPacketCompressor;
+        void SendCompressedMovementPackets();
+        // dynamically decide when to enable or disable compression
+        uint32 m_movePacketsSentLastUpdate = 0;
+        uint32 m_movePacketsSentThisUpdate = 0;
+#endif
         
         // Clustering system (TODO remove this)
     public:

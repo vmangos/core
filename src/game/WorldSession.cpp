@@ -139,6 +139,11 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         return;
     }
 
+    SendPacketImpl(packet);
+}
+
+void WorldSession::SendPacketImpl(WorldPacket const* packet)
+{
 #ifdef _DEBUG
 
     // Code for network use statistic
@@ -182,6 +187,56 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (m_socket->SendPacket(*packet) == -1)
         m_socket->CloseSocket();
 }
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+void WorldSession::SendMovementPacket(WorldPacket const* packet)
+{
+    // There is a maximum size packet.
+    if (packet->size() > 0x8000)
+    {
+        // Packet will be rejected by client
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[NETWORK] Packet %s size %u is too large. Not sent [Account %u Player %s]", LookupOpcodeName(packet->GetOpcode()), packet->size(), GetAccountId(), GetPlayerName());
+        return;
+    }
+
+    if (!m_socket)
+    {
+        if (GetBot() && GetBot()->ai)
+            GetBot()->ai->OnPacketReceived(packet);
+        return;
+    }
+
+    if (++m_movePacketsSentThisUpdate < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT) &&
+        m_movePacketsSentLastUpdate < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT))
+        SendPacketImpl(packet);
+    else if (m_movementPacketCompressor.CanAddPacket(*packet))
+        m_movementPacketCompressor.AddPacket(*packet);
+    else
+    {
+        // send batched packets first to maintain order of packets
+        SendCompressedMovementPackets();
+        SendPacketImpl(packet);
+    }
+}
+
+void WorldSession::SendCompressedMovementPackets()
+{
+    if (m_movementPacketCompressor.HasData())
+    {
+        WorldPacket packet;
+        if (m_movementPacketCompressor.BuildPacket(packet))
+            SendPacket(&packet);
+        else
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Movement packet compression failed! Packets lost!");
+        m_movementPacketCompressor.ClearBuffer();
+    }
+}
+#else
+void WorldSession::SendMovementPacket(WorldPacket const* packet)
+{
+    SendPacket(packet);
+}
+#endif
 
 uint32 GetChatPacketProcessingType(uint32 chatType)
 {
@@ -384,6 +439,18 @@ bool WorldSession::Update(PacketFilter& updater)
             // Character stays IG for 2 minutes
             return ForcePlayerLogoutDelay();
         }
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        // send these out every world update
+        SendCompressedMovementPackets();
+
+        // only enable compression when there's a lot of movement around us
+        if (m_movePacketsSentThisUpdate)
+        {
+            m_movePacketsSentLastUpdate = m_movePacketsSentThisUpdate;
+            m_movePacketsSentThisUpdate = 0;
+        }
+#endif
 
         time_t currTime = time(nullptr);
         if (sWorld.getConfig(CONFIG_BOOL_LIMIT_PLAY_TIME) &&
@@ -726,6 +793,7 @@ void WorldSession::LogoutPlayer(bool Save)
             Map::DeleteFromWorld(_player);
         }
 
+        m_movementPacketCompressor.ClearBuffer();
         SetPlayer(nullptr);                                    // deleted in Remove/DeleteFromWorld call
 
         // Send the 'logout complete' packet to the client

@@ -102,10 +102,18 @@ BindIP = "0.0.0.0"
 #        Default: 1 (HIGH)
 #                 0 (Normal)
 #
-#    Compression
-#        Compression level for update packages sent to client (1..9)
+#    Compression.Level
+#        Compression level for update packets sent to client (1..9)
 #        Default: 1 (speed)
 #                 9 (best compression)
+#
+#    Compression.Update.Size
+#        Maxmimum size of update object packets allowed to be sent uncompressed.
+#        Default: 128
+#
+#    Compression.Movement.Count
+#        Maximum amount of movement packets sent per update before compression begins.
+#        Default: 30
 #
 #    PlayerLimit
 #        Initial realm capacity. Excluding Mods, GM's and Admins
@@ -242,7 +250,9 @@ BindIP = "0.0.0.0"
 
 UseProcessors = 0
 ProcessPriority = 1
-Compression = 1
+Compression.Level = 1
+Compression.Update.Size = 128
+Compression.Movement.Count = 30
 PlayerLimit = 100
 PlayerHardLimit = 0
 LoginQueue.GracePeriodSecs = 0

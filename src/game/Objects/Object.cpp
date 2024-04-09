@@ -2164,7 +2164,25 @@ struct ObjectViewersDeliverer
     template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
 };
 
-void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except) const
+struct ObjectViewersMovementDeliverer
+{
+    WorldPacket* i_message;
+    WorldObject const* i_sender;
+    WorldObject const* i_except;
+    explicit ObjectViewersMovementDeliverer(WorldObject const* sender, WorldPacket* msg, WorldObject const* except) : i_message(msg), i_sender(sender), i_except(except) {}
+    void Visit(CameraMapType& m)
+    {
+        for (const auto& iter : m)
+            if (Player* player = iter.getSource()->GetOwner())
+                if (player != i_except && player != i_sender)
+                    if (player->IsInVisibleList_Unsafe(i_sender))
+                        player->GetSession()->SendMovementPacket(i_message);
+    }
+    template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
+};
+
+template<class DelivererType>
+void WorldObject::SendObjectMessageToSetImpl(WorldPacket* data, bool self, WorldObject const* except) const
 {
     if (self && this != except)
         if (Player const* me = ToPlayer())
@@ -2184,9 +2202,14 @@ void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObje
     if (!GetMap()->IsLoaded(GetPositionX(), GetPositionY()))
         return;
 
-    ObjectViewersDeliverer post_man(this, data, except);
-    TypeContainerVisitor<ObjectViewersDeliverer, WorldTypeMapContainer> message(post_man);
+    DelivererType post_man(this, data, except);
+    TypeContainerVisitor<DelivererType, WorldTypeMapContainer> message(post_man);
     cell.Visit(p, message, *GetMap(), *this, std::max(GetMap()->GetVisibilityDistance(), GetVisibilityModifier()));
+}
+
+void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except) const
+{
+    SendObjectMessageToSetImpl<ObjectViewersDeliverer>(data, self, except);
 }
 
 void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except)
@@ -2195,7 +2218,7 @@ void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObj
         static_cast<Player*>(this)->GetCheatData()->LogMovementPacket(false, data);
 
     if (!IsPlayer() || !sWorld.GetBroadcaster()->IsEnabled())
-        SendObjectMessageToSet(&data, true, except);
+        SendObjectMessageToSetImpl<ObjectViewersMovementDeliverer>(&data, true, except);
     else
     {
         auto player_broadcast = ToPlayer()->m_broadcaster;
