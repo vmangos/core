@@ -206,8 +206,8 @@ void WorldSession::SendMovementPacket(WorldPacket const* packet)
         return;
     }
 
-    if (++m_movePacketsSentThisUpdate < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT) &&
-        m_movePacketsSentLastUpdate < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT))
+    if (++m_movePacketsSentThisInterval < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT) &&
+        m_movePacketsSentLastInterval < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT))
         SendPacketImpl(packet);
     else if (m_movementPacketCompressor.CanAddPacket(*packet))
         m_movementPacketCompressor.AddPacket(*packet);
@@ -440,19 +440,21 @@ bool WorldSession::Update(PacketFilter& updater)
             return ForcePlayerLogoutDelay();
         }
 
+        time_t const currTime = time(nullptr);
+
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         // send these out every world update
         SendCompressedMovementPackets();
 
         // only enable compression when there's a lot of movement around us
-        if (m_movePacketsSentThisUpdate)
+        if (m_movePacketTrackingIntervalStart + 10 < currTime)
         {
-            m_movePacketsSentLastUpdate = m_movePacketsSentThisUpdate;
-            m_movePacketsSentThisUpdate = 0;
+            m_movePacketTrackingIntervalStart = currTime;
+            m_movePacketsSentLastInterval = m_movePacketsSentThisInterval;
+            m_movePacketsSentThisInterval = 0;
         }
 #endif
-
-        time_t currTime = time(nullptr);
+        
         if (sWorld.getConfig(CONFIG_BOOL_LIMIT_PLAY_TIME) &&
             GetPlayer() && GetPlayer()->IsInWorld())
             CheckPlayedTimeLimit(currTime);

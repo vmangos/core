@@ -915,8 +915,9 @@ class WorldSession
         MovementData m_movementPacketCompressor;
         void SendCompressedMovementPackets();
         // dynamically decide when to enable or disable compression
-        uint32 m_movePacketsSentLastUpdate = 0;
-        uint32 m_movePacketsSentThisUpdate = 0;
+        uint32 m_movePacketsSentLastInterval = 0;
+        uint32 m_movePacketsSentThisInterval = 0;
+        time_t m_movePacketTrackingIntervalStart = 0;
 #endif
         
         // Clustering system (TODO remove this)

@@ -563,7 +563,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_ASYNC_QUERIES_TICK_TIMEOUT, "AsyncQueriesTickTimeout", 0);
     setConfigMinMax(CONFIG_UINT32_COMPRESSION_LEVEL, "Compression.Level", 1, 1, 9);
     setConfig(CONFIG_UINT32_COMPRESSION_UPDATE_SIZE, "Compression.Update.Size", 128);
-    setConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT, "Compression.Movement.Count", 30);
+    setConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT, "Compression.Movement.Count", 300);
     setConfig(CONFIG_BOOL_ADDON_CHANNEL, "AddonChannel", true);
     setConfig(CONFIG_BOOL_CLEAN_CHARACTER_DB, "CleanCharacterDB", true);
     setConfig(CONFIG_BOOL_GRID_UNLOAD, "GridUnload", true);

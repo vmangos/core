@@ -112,8 +112,8 @@ BindIP = "0.0.0.0"
 #        Default: 128
 #
 #    Compression.Movement.Count
-#        Maximum amount of movement packets sent per update before compression begins.
-#        Default: 30
+#        Amount of movement packets that need to be sent to a session within 10 seconds before compression is enabled.
+#        Default: 300
 #
 #    PlayerLimit
 #        Initial realm capacity. Excluding Mods, GM's and Admins
@@ -252,7 +252,7 @@ UseProcessors = 0
 ProcessPriority = 1
 Compression.Level = 1
 Compression.Update.Size = 128
-Compression.Movement.Count = 30
+Compression.Movement.Count = 300
 PlayerLimit = 100
 PlayerHardLimit = 0
 LoginQueue.GracePeriodSecs = 0
