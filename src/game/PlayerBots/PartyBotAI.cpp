@@ -330,7 +330,7 @@ bool PartyBotAI::DrinkAndEat()
 
 bool PartyBotAI::ShouldAutoRevive() const
 {
-    if (me->GetMap()->IsRaid())
+    if (me->GetMap()->IsRaid() && m_role != ROLE_HEALER)
     {
         return false;
     }
