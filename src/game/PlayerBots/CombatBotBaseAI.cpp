@@ -2606,6 +2606,12 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         // Avoid low level items
         if (pLeaderItl)
         {
+            //Fix when the itl is too high.
+            if (pLeaderItl > 65)
+            {
+                pLeaderItl = 65;
+            }
+
             if (pProto->ItemLevel < pLeaderItl)
             {
                 continue;
