@@ -3,8 +3,8 @@
 enum
 {
     SPELL_DARK_PLAGUE_AURA  = 12038,    // procs 18270
+    SPELL_FULL_HEAL         = 17683,
     SPELL_EXPLOSION         = 17689,
-   //SPELL_FEIGN_DEATH       = 19822,
 };
 
 /*
@@ -67,7 +67,7 @@ struct npc_reanimated_corpseAI : public ScriptedAI
     {
         m_uiHealTimer = 0;
         m_bHasRessed = false;
-        Resurrect();
+        m_creature->SetInvincibilityHpThreshold(1);
     }
 
     void Aggro(Unit* /*pWho*/) override
@@ -77,9 +77,10 @@ struct npc_reanimated_corpseAI : public ScriptedAI
 
     void Resurrect()
     {
-        m_creature->SetHealth(m_creature->GetMaxHealth());
+        m_creature->CastSpell(m_creature, SPELL_FULL_HEAL, true);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        m_creature->SetInvincibilityHpThreshold(0);
         m_creature->AttackStop();
     }
 
@@ -88,18 +89,14 @@ struct npc_reanimated_corpseAI : public ScriptedAI
         if (damage < m_creature->GetHealth())
             return;
 
-        if (!m_bHasRessed)
+        if (!m_bHasRessed && !m_uiHealTimer)
         {
-            damage = 0;
-            if (!m_uiHealTimer)
-            {
-                m_creature->SetHealth(0);
-                m_creature->GetMotionMaster()->Clear();
-                m_creature->GetMotionMaster()->MoveIdle();
-                m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-                m_creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                m_uiHealTimer = 10000;
-            }
+            m_creature->SetHealth(1);
+            m_creature->GetMotionMaster()->Clear();
+            m_creature->GetMotionMaster()->MoveIdle();
+            m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
+            m_creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+            m_uiHealTimer = 10000;
         }
     }
 
