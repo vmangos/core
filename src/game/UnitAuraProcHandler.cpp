@@ -879,7 +879,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                         bool notAtMaxStack = igniteAura->GetStackAmount() < 5;
                         
                         bool reapplyIgnite = igniteAura->GetAuraTicks() >= igniteAura->GetAuraMaxTicks();
-
+                        
                         if (!reapplyIgnite)
                         {
                             if (notAtMaxStack)
