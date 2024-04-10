@@ -171,10 +171,6 @@ int32 MoveSplineInit::Launch()
     else
         move_spline.setLastPointSent(PacketBuilder::WriteMonsterMove(move_spline, data));
 
-    // Nostalrius: client has a hardcoded limit to spline movement speed : 4*runSpeed.
-    // We need to fix this, in case of charges for example (if character has movement slowing effects)
-    if (args.velocity > 4 * realSpeedRun && !args.flags.done) // From client
-        MovementPacketSender::SendSpeedChangeToAll(&unit, MOVE_RUN, args.velocity);
     if ((oldMoveFlags & MOVEFLAG_ROOT) && !args.flags.done)
         MovementPacketSender::SendMovementFlagChangeToAll(&unit, MOVEFLAG_ROOT, false);
     if (oldMoveFlags & MOVEFLAG_WALK_MODE && !(moveFlags & MOVEFLAG_WALK_MODE)) // Switch to run mode
@@ -183,10 +179,6 @@ int32 MoveSplineInit::Launch()
         MovementPacketSender::SendToggleRunWalkToAll(&unit, false);
         
     unit.SendMovementMessageToSet(std::move(data), true);
-
-    // Do not forget to restore velocity after movement !
-    if (args.velocity > 4 * realSpeedRun && !args.flags.done)
-        MovementPacketSender::SendSpeedChangeToAll(&unit, MOVE_RUN, realSpeedRun);
 
     // Restore correct walk mode for players
     if (unit.GetTypeId() == TYPEID_PLAYER && (moveFlags & MOVEFLAG_WALK_MODE) != (oldMoveFlags & MOVEFLAG_WALK_MODE))
