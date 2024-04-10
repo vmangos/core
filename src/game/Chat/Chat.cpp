@@ -93,22 +93,26 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand partyBotCommandTable[] =
     {
-        { "add",        SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAddCommand,         "", nullptr },
-        { "clone",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotCloneCommand,       "", nullptr },
+        { "add",        SEC_PLAYER,      false, &ChatHandler::HandlePartyBotAddCommand,         "", nullptr },
+        { "clone",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotCloneCommand,       "", nullptr },
         { "load",       SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotLoadCommand,        "", nullptr },
-        { "setrole",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotSetRoleCommand,     "", nullptr },
+        { "setrole",    SEC_PLAYER,      false, &ChatHandler::HandlePartyBotSetRoleCommand,     "", nullptr },
         { "attackstart",SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAttackStartCommand, "", nullptr },
         { "attackstop", SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAttackStopCommand,  "", nullptr },
-        { "aoe",        SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAoECommand,         "", nullptr },
+        { "aoe",        SEC_PLAYER,      false, &ChatHandler::HandlePartyBotAoECommand,         "", nullptr },
         { "ccmark",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotControlMarkCommand, "", nullptr },
-        { "focusmark",  SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotFocusMarkCommand,   "", nullptr },
-        { "clearmarks", SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotClearMarksCommand,  "", nullptr },
-        { "cometome",   SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotComeToMeCommand,    "", nullptr },
-        { "usegobject", SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUseGObjectCommand,  "", nullptr },
-        { "pause",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotPauseCommand,       "", nullptr },
-        { "unpause",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnpauseCommand,     "", nullptr },
+        { "focusmark",  SEC_PLAYER,      false, &ChatHandler::HandlePartyBotFocusMarkCommand,   "", nullptr },
+        { "clearmarks", SEC_PLAYER,      false, &ChatHandler::HandlePartyBotClearMarksCommand,  "", nullptr },
+        { "cometome",   SEC_PLAYER,      false, &ChatHandler::HandlePartyBotComeToMeCommand,    "", nullptr },
+        { "usealtar",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotUseGObjectCommand,  "", nullptr },
+        { "stay",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotStayCommand,       "", nullptr },
+        { "move",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotMoveCommand,       "", nullptr },
+        { "pause",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotPauseCommand,       "", nullptr },
+        { "unpause",    SEC_PLAYER,      false, &ChatHandler::HandlePartyBotUnpauseCommand,     "", nullptr },
         { "unequip",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnequipCommand,     "", nullptr },
-        { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
+        { "remove",     SEC_PLAYER,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
+        { "controls",   SEC_PLAYER,      false, &ChatHandler::HandlePartyBotControls,           "", nullptr },
+        { "chleader",   SEC_PLAYER,      false, &ChatHandler::HandlePartyBotChleader,           "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
     static ChatCommand battleBotAddCommandTable[] =
@@ -1169,6 +1173,14 @@ ChatCommand * ChatHandler::getCommandTable()
         { nullptr,          0,                false, nullptr,                                          "", nullptr }
     };
 
+    //hardcore
+    static ChatCommand hardcoreCommandTable[] =
+    {
+        { "on",       SEC_PLAYER, true,  &ChatHandler::HandleHardcoreONCommand,            "", nullptr },
+        { "messages", SEC_PLAYER, true,  &ChatHandler::HandleHCAnnounceRestrictionCommand, "", nullptr },
+        { nullptr,    0,          false, nullptr,                                          "", nullptr }
+    };
+
     static ChatCommand commandTable[] =
     {
         { "account",        SEC_PLAYER,         true, nullptr,                                         "", accountCommandTable  },
@@ -1300,6 +1312,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "antispam",       SEC_TICKETMASTER,   true, nullptr,                                         "", AntiSpamCommandTable },
         { "gold",           SEC_BASIC_ADMIN,    true, nullptr,                                         "", goldCommandTable },
         { "wareffort",      SEC_DEVELOPER,      true, nullptr,                                         "", warEffortCommandTable },
+        //hardcore
+        { "hardcore",       SEC_PLAYER,         true,  nullptr,                                        "", hardcoreCommandTable },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
