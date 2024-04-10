@@ -3684,7 +3684,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         }
 
         // Fill cost data
-        m_powerCost = CalculatePowerCost(m_spellInfo, m_casterUnit, this, m_CastItem);
+        m_powerCost = CalculatePowerCost(m_spellInfo, m_casterUnit, this, m_CastItem, false);
 
         if (Player* pPlayer = m_caster->ToPlayer())
             if (pPlayer->HasCheatOption(PLAYER_CHEAT_NO_POWER))
@@ -3939,7 +3939,7 @@ void Spell::cast(bool skipCheck)
     {
         // Nostalrius - compute power cost once again at cast finished
         // (in case of mana reduction buff proc while casting)
-        m_powerCost = CalculatePowerCost(m_spellInfo, m_casterUnit, this, m_CastItem);
+        m_powerCost = CalculatePowerCost(m_spellInfo, m_casterUnit, this, m_CastItem, true);
         castResult = CheckPower();
         if (castResult != SPELL_CAST_OK)
         {
@@ -7498,7 +7498,7 @@ SpellCastResult Spell::CheckRange(bool strict)
     return SPELL_CAST_OK;
 }
 
-uint32 Spell::CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell, Item* castItem)
+uint32 Spell::CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell, Item* castItem, bool casting)
 {
     if (!caster)
         return 0;
@@ -7551,10 +7551,15 @@ uint32 Spell::CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spel
     powerCost += caster->GetInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + school);
 #endif
 
-    // Apply cost mod by spell
-    if (spell)
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COST, powerCost, spell);
+    // Apply cost mod by spell unless delayed
+    if (spell) {
+        if (Player *modOwner = caster->GetSpellModOwner()) {
+            // avoid consuming procs during prepare for melee swing spells
+            if(casting || !spellInfo->IsNextMeleeSwingSpell()) {
+                modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COST, powerCost, spell);
+            }
+        }
+    }
 
     if (spellInfo->Attributes & SPELL_ATTR_SCALES_WITH_CREATURE_LEVEL)
         powerCost = int32(powerCost / (1.117f * spellInfo->spellLevel / caster->GetLevel() - 0.1327f));

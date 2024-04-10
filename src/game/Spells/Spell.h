@@ -361,7 +361,7 @@ class Spell
         SpellCastResult CheckCasterAuras() const;
 
         float CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellEffectValue(target, m_spellInfo, i, &m_currentBasePoints[i], this); }
-        static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr);
+        static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr, bool casting = true);
 
         bool HaveTargetsForEffect(SpellEffectIndex effect) const;
         void Delayed();
