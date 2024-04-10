@@ -755,7 +755,7 @@ namespace MaNGOS
             //WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u) const
             {
-                if (u->IsAlive() && u->IsInCombat() && i_obj->IsFriendlyTo(u) && i_obj->IsWithinDistInMap(u, i_range))
+                if (u->IsAlive() && u->IsInCombat() && i_obj->IsFriendlyTo(u) && i_obj->IsWithinDistInMap(u, i_range) && !u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 {
                     if (i_percent)
                         return 100 - u->GetHealthPercent() > i_hp;
@@ -779,8 +779,8 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                return u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT));
+                return u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && !u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) &&
+                       i_obj->IsWithinDistInMap(u, i_range) && (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT));
             }
         private:
             SpellCaster const* i_obj;
@@ -795,7 +795,7 @@ namespace MaNGOS
             bool operator()(Unit* u)
             {
                 return u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    !(u->HasAura(i_spell, EFFECT_INDEX_0) || u->HasAura(i_spell, EFFECT_INDEX_1) || u->HasAura(i_spell, EFFECT_INDEX_2));
+                      !u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && !u->HasAura(i_spell);
             }
         private:
             SpellCaster const* i_obj;

@@ -863,7 +863,12 @@ class WorldObject : public Object
 
         // Send to players
         virtual void SendMessageToSet(WorldPacket* data, bool self) const;
+
         // Send to players who have object at client
+    private:
+        template<class DelivererType>
+        void SendObjectMessageToSetImpl(WorldPacket* data, bool self, WorldObject const* except = nullptr) const;
+    public:
         void SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except = nullptr) const;
         void SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except = nullptr);
 

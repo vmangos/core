@@ -266,19 +266,6 @@ struct boss_viscidusAI : public ScriptedAI
             m_pInstance->SetData(TYPE_VISCIDUS, DONE);
     }
 
-    void DamageTaken(Unit* pDealer, uint32 &damage) override
-    {
-        if (pDealer->IsCreature() && ((Creature*)pDealer)->GetEntry() == NPC_VISCIDUS)
-            return;
-
-        // Prevent Viscidus dying to the damage taken. We cannot modify the damage to be less,
-        // because it eventually hits 0. At which point any damage dealt will be considered
-        // 'absorbed' and have no effect. i.e. won't be able to shatter or freeze the
-        // boss once he hits 1 hp.
-        if (m_creature->GetHealthPercent() < 1.0f)
-            m_creature->SetHealthPercent(1.0f);
-    }
-
     void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_GLOB_OF_VISCIDUS)
@@ -363,6 +350,7 @@ struct boss_viscidusAI : public ScriptedAI
             if (m_creature->GetHealthPercent() < 5.0f)
             {
                 m_creature->SetVisibility(VISIBILITY_ON);
+                m_creature->SetInvincibilityHpThreshold(0);
 
                 if (DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SUICIDE, CF_TRIGGERED) == CAST_OK)
                     m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, nullptr, false);

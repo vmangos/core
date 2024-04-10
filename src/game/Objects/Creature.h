@@ -138,6 +138,7 @@ class Creature : public Unit
         bool HasExtraFlag(CreatureFlagsExtra flag) const { return GetCreatureInfo()->flags_extra & flag; }
         bool HasImmunityFlag(CreatureImmunityFlags flag) const { return GetCreatureInfo()->immunity_flags & flag; }
         void ToggleUnitFlagsFromStaticFlags();
+        void SetDefaultValuesFromStaticFlags();
 
         CreatureSubtype GetSubtype() const { return m_subtype; }
         bool IsPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }

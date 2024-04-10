@@ -145,7 +145,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_mandokir.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_marli.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_renataki.cpp
-    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_thekal.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_venoxis.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_wushoolay.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/instance_zulgurub.cpp

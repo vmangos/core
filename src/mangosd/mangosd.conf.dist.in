@@ -102,10 +102,18 @@ BindIP = "0.0.0.0"
 #        Default: 1 (HIGH)
 #                 0 (Normal)
 #
-#    Compression
-#        Compression level for update packages sent to client (1..9)
+#    Compression.Level
+#        Compression level for update packets sent to client (1..9)
 #        Default: 1 (speed)
 #                 9 (best compression)
+#
+#    Compression.Update.Size
+#        Maxmimum size of update object packets allowed to be sent uncompressed.
+#        Default: 128
+#
+#    Compression.Movement.Count
+#        Amount of movement packets that need to be sent to a session within 10 seconds before compression is enabled.
+#        Default: 300
 #
 #    PlayerLimit
 #        Initial realm capacity. Excluding Mods, GM's and Admins
@@ -242,7 +250,9 @@ BindIP = "0.0.0.0"
 
 UseProcessors = 0
 ProcessPriority = 1
-Compression = 1
+Compression.Level = 1
+Compression.Update.Size = 128
+Compression.Movement.Count = 300
 PlayerLimit = 500
 PlayerHardLimit = 0
 LoginQueue.GracePeriodSecs = 0
@@ -2957,14 +2967,6 @@ PartyBot.RandomGearLevelDifference = 5
 BattleBot.AutoEquip = 1
 BattleBot.AutoJoin = 1
 BattleBot.AddAnnounce = 0
-
-###################################################################################################################
-#    Database-based chat
-###################################################################################################################
-OfflineChat.Enable = 0
-OfflineChat.Port   = 3444
-OfflineChat.IP     = 0.0.0.0
-OfflineChat.Password= "p8zqkt"
 
 ###################################################################################################################
 #    Mail flooding mitigation
