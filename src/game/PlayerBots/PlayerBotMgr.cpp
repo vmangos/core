@@ -1847,66 +1847,6 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
     return false;
 }
 
-bool ChatHandler::HandlePartyBotPullCommand(char* args)
-{
-    Player* pPlayer = GetSession()->GetPlayer();
-    Unit* pTarget = GetSelectedUnit();
-    if (!pTarget || (pTarget == pPlayer))
-    {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    Group* pGroup = pPlayer->GetGroup();
-    if (!pGroup)
-    {
-        SendSysMessage("You are not in a group.");
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    bool back = false;
-    uint32 duration = 0;
-    if (char* arg1 = ExtractArg(&args))
-    {
-        duration = atoi(arg1);
-    }
-
-    if (!duration)
-        duration = 10 * IN_MILLISECONDS;
-
-    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-    {
-        if (Player* pMember = itr->getSource())
-        {
-            if (pMember == pPlayer)
-                continue;
-
-            if (pMember->AI())
-            {
-                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
-                {
-                    if (pAI->m_role == ROLE_MELEE_DPS || pAI->m_role == ROLE_RANGE_DPS)
-                    {
-                        HandlePartyBotPauseApplyHelper(pMember, duration);
-                        continue;
-                    }
-                    else if (pAI->m_role == ROLE_TANK)
-                    {
-                        if (pMember->IsValidAttackTarget(pTarget))
-                            pAI->AttackStart(pTarget);
-                    }
-                }
-            }
-        }
-    }
-
-    PSendSysMessage("Tank party bots are pulling %s, DPS party bots are paused for %d seconds.", pTarget->GetName(), (duration / IN_MILLISECONDS));
-    return true;
-}
-
-
 bool HandlePartyBotUseGObjectHelper(Player* pTarget, GameObject* pGo)
 {
     if (pTarget->AI())
@@ -2311,6 +2251,65 @@ bool ChatHandler::HandlePartyBotPauseCommand(char* args)
 bool ChatHandler::HandlePartyBotUnpauseCommand(char* args)
 {
     return HandlePartyBotPauseHelper(args, false);
+}
+
+bool ChatHandler::HandlePartyBotPullCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget || (pTarget == pPlayer))
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    bool back = false;
+    uint32 duration = 0;
+    if (char* arg1 = ExtractArg(&args))
+    {
+        duration = atoi(arg1);
+    }
+
+    if (!duration)
+        duration = 10 * IN_MILLISECONDS;
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (pAI->m_role == ROLE_MELEE_DPS || pAI->m_role == ROLE_RANGE_DPS)
+                    {
+                        HandlePartyBotPauseApplyHelper(pMember, duration);
+                        continue;
+                    }
+                    else if (pAI->m_role == ROLE_TANK)
+                    {
+                        if (pMember->IsValidAttackTarget(pTarget))
+                            pAI->AttackStart(pTarget);
+                    }
+                }
+            }
+        }
+    }
+
+    PSendSysMessage("Tank party bots are pulling %s, DPS party bots are paused for %d seconds.", pTarget->GetName(), (duration / IN_MILLISECONDS));
+    return true;
 }
 
 bool ChatHandler::HandlePartyBotUnequipCommand(char* args)
