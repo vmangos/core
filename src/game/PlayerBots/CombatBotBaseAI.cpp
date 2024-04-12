@@ -2606,7 +2606,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         // Avoid low level items
         if (pLeaderItl)
         {
-            if (pProto->ItemLevel < pLeaderItl)
+            if (pProto->ItemLevel < pLeaderItl || pProto->ItemLevel > pLeaderItl + 5)
             {
                 continue;
             }
@@ -2656,7 +2656,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
             continue;
 
         // Trinkets for role
-        if (pProto->InventoryType == INVTYPE_TRINKET)
+        if (pProto->InventoryType == INVTYPE_TRINKET && me->GetLevel() == 60)
         {
             if (m_role == ROLE_TANK)
             {
