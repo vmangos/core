@@ -4084,7 +4084,7 @@ void Spell::cast(bool skipCheck)
         // This aura has auraInterruptFlags = 4096 implying this flag triggers on negative spell casts.
         // Confirmed on classic that its removed at the end of the cast with Aimed Shot.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-        if (Spells::IsExplicitNegativeTarget(m_spellInfo->EffectImplicitTargetA[0]))
+        if (!Spells::IsPositiveTarget(m_spellInfo->EffectImplicitTargetA[0], m_spellInfo->EffectImplicitTargetB[0]))
 #else
         if (Spells::IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]) && m_casterUnit != m_targets.getUnitTarget())
 #endif
