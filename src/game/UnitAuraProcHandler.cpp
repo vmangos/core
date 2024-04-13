@@ -644,6 +644,15 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     if (!HasInArc(pVictim))
                         return SPELL_AURA_PROC_FAILED;
 
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // - Retaliation - Will now cause a maximum of 30 retaliatory strikes in
+                    //  15 seconds.In addition, retaliatory strikes will not be possible
+                    //  while stunned.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+                    if (HasUnitState(UNIT_STAT_CAN_NOT_REACT))
+                        return SPELL_AURA_PROC_FAILED;
+#endif
+
                     triggered_spell_id = 22858;
                     break;
                 }
@@ -945,16 +954,6 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                 if (!target)
                     return SPELL_AURA_PROC_FAILED;
                 triggered_spell_id = 26654;
-            }
-            // Retaliation
-            if (dummySpell->IsFitToFamilyMask<CF_WARRIOR_RETALIATION>())
-            {
-                // check attack comes not from behind
-                if (!HasInArc(pVictim))
-                    return SPELL_AURA_PROC_FAILED;
-
-                triggered_spell_id = 22858;
-                break;
             }
             break;
         }
