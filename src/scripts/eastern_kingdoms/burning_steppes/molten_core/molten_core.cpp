@@ -292,7 +292,9 @@ struct mob_core_houndAI : public ScriptedAI
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
         m_creature->AttackStop();
-        
+        SetMeleeAttack(true);
+        SetCombatMovement(true);
+
         m_bDead = false;
     }
 
@@ -309,6 +311,9 @@ struct mob_core_houndAI : public ScriptedAI
         m_creature->GetMotionMaster()->MoveIdle();
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
         m_creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        SetMeleeAttack(false);
+        SetCombatMovement(false);
+
         m_uiResurrectTimer = 10000;
         m_bDead = true;
     }
