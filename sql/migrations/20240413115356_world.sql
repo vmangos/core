@@ -9,6 +9,12 @@ INSERT INTO `migrations` VALUES ('20240413115356');
 -- Add your query below.
 
 
+-- Add build to primary key of table.
+ALTER TABLE `spell_threat`
+	DROP PRIMARY KEY,
+	ADD PRIMARY KEY (`entry`, `build_min`, `build_max`);
+
+
 /*
  World of Warcraft Client Patch 1.7.0 (2005-09-13)
  - Shield Slam - Threat caused increased.
