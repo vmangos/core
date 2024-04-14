@@ -454,10 +454,18 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
     data << uint32(maximum);
     data << uint32(roll);
     data << GetPlayer()->GetObjectGuid();
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Using /random will now send the text to your party or raid wherever
+    //   they are instead of the local area around the player that used /random.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (GetPlayer()->GetGroup())
         GetPlayer()->GetGroup()->BroadcastPacket(&data, false);
     else
         SendPacket(&data);
+#else
+    GetPlayer()->SendObjectMessageToSet(&data, true);
+#endif
 }
 
 void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recv_data)
