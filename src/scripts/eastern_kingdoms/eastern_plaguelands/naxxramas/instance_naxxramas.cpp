@@ -1760,7 +1760,7 @@ struct mob_poison_charge_stalkerAI : public ScriptedAI
 
 	void Reset() override
 	{
-		m_uiChargeTimer = 0;
+		m_uiChargeTimer = urand(8000, 12000);
 	}
 
     void UpdateAI(uint32 const uiDiff) override
