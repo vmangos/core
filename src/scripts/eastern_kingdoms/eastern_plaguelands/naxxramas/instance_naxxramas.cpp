@@ -307,40 +307,40 @@ void instance_naxxramas::UpdateTeleporters(uint32 uiType, uint32 uiData)
         case TYPE_MAEXXNA:
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_EYE_BOSS))
                 SetTeleporterVisualState(pGO, uiData);
-        
+
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_EYE_RAMP))
                 SetTeleporterVisualState(pGO, uiData);
-        
+
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_PORTAL))
                 SetTeleporterState(pGO, uiData);
             break;
         case TYPE_THADDIUS:
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_EYE_BOSS))
                 SetTeleporterVisualState(pGO, uiData);
-        
+
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_EYE_RAMP))
                 SetTeleporterVisualState(pGO, uiData);
-        
+
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_PORTAL))
                 SetTeleporterState(pGO, uiData);
             break;
         case TYPE_LOATHEB:
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_EYE_BOSS))
                 SetTeleporterVisualState(pGO, uiData);
-        
+
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_EYE_RAMP))
                 SetTeleporterVisualState(pGO, uiData);
-        
+
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_PORTAL))
                 SetTeleporterState(pGO, uiData);
             break;
         case TYPE_FOUR_HORSEMEN:
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_EYE_BOSS))
                 SetTeleporterVisualState(pGO, uiData);
-        
+
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_EYE_RAMP))
                 SetTeleporterVisualState(pGO, uiData);
-        
+
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_PORTAL))
                 SetTeleporterState(pGO, uiData);
             break;
@@ -1502,6 +1502,7 @@ enum
     SPELL_STONESKIN = 28995, // Periodic Heal and Damage Immunity
     SPELL_GARGOYLE_STONEFORM_VISUAL = 29153, // Dummy Aura
     SPELL_ACID_VOLLEY = 29325,
+    SPELL_POISONCHARGE = 28431,
 
     BCT_STRANGE_NOISE = 10755, // %s emits a strange noise.
 };
@@ -1748,6 +1749,46 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
     }
 };
 
+struct mob_poison_charge_stalkerAI : public ScriptedAI
+{
+    mob_poison_charge_stalkerAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 m_uiChargeTimer;
+
+	void Reset() override
+	{
+		m_uiChargeTimer = 0;
+	}
+
+    void UpdateAI(uint32 const uiDiff) override
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+            return;
+
+        // Charge Timer
+        if (m_uiChargeTimer < uiDiff)
+        {
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_FARTHEST, 0, SPELL_POISONCHARGE, SELECT_FLAG_PLAYER | SELECT_FLAG_IN_LOS))
+            {
+                if (DoCastSpellIfCan(pTarget, SPELL_POISONCHARGE) == CAST_OK)
+                    m_uiChargeTimer = urand(8000, 12000);
+            }
+        }
+        else
+            m_uiChargeTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_mob_poison_charge_stalker(Creature* pCreature)
+{
+    return new mob_poison_charge_stalkerAI(pCreature);
+}
+
 CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
 {
     return new mob_spiritOfNaxxramasAI(pCreature);
@@ -1889,7 +1930,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
             {
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Gloves", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_GLOVES);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Gauntlets", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_GLOVES);
-        
+
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Bracers", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_WRISTS);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Bracers", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_WRISTS);
             }
@@ -2083,5 +2124,10 @@ void AddSC_instance_naxxramas()
     pNewScript->Name = "mob_craftsman_omarion";
     pNewScript->pGossipHello = &GossipHello_npc_MasterCraftsmanOmarion;
     pNewScript->pGossipSelect = &GossipSelect_npc_MasterCraftsmanOmarion;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "poison_charge_stalker_ai";
+    pNewScript->GetAI = &GetAI_mob_poison_charge_stalker;
     pNewScript->RegisterSelf();
 }
