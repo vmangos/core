@@ -1537,6 +1537,11 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
 
 void PartyBotAI::UpdateOutOfCombatAI_Shaman()
 {
+    if (!me->IsInCombat())
+    {
+        me->UnsummonAllTotems();
+    }
+
     if (m_spells.shaman.pWeaponBuff &&
         CanTryToCastSpell(me, m_spells.shaman.pWeaponBuff))
     {
