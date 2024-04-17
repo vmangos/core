@@ -7300,9 +7300,16 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         // resting and not in tavern (leave city then); tavern leave handled in CheckAreaExploreAndOutdoor
         SetRestType(REST_TYPE_NO);
 
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Zone bound items, such as the Gordok Courtyard Key, will no longer
+    //   leave your inventory if you are a ghost outside their intended zone.
+    //   Reviving in a zone outside the item's listed zone binding will still
+    //   cause the item to disappear, however.
     // remove items with area/map limitations (delete only for alive player to allow back in ghost mode)
     // if player resurrected at teleport this will be applied in resurrect code
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (IsAlive())
+#endif
         DestroyZoneLimitedItem(true, newZone);
 
     // recent client version not send leave/join channel packets for built-in local channels
@@ -18964,6 +18971,14 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     return crItem->maxcount != 0;
 }
 
+void Player::SendRaidGroupOnlyError(uint32 timer, RaidGroupError error)
+{
+    WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
+    data << uint32(timer);
+    data << uint32(error);            // error used only when timer = 0
+    GetSession()->SendPacket(&data);
+}
+
 void Player::UpdateHomebindTime(uint32 time)
 {
     // GMs never get homebind timer online
@@ -18972,10 +18987,7 @@ void Player::UpdateHomebindTime(uint32 time)
         if (m_HomebindTimer)                                // instance valid, but timer not reset
         {
             // hide reminder
-            WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
-            data << uint32(0);
-            data << uint32(ERR_RAID_GROUP_REQUIRED);            // error used only when timer = 0
-            GetSession()->SendPacket(&data);
+            SendRaidGroupOnlyError(0, ERR_RAID_GROUP_REQUIRED);
         }
         // instance is valid, reset homebind timer
         m_HomebindTimer = 0;
@@ -18996,10 +19008,7 @@ void Player::UpdateHomebindTime(uint32 time)
         // instance is invalid, start homebind timer
         m_HomebindTimer = 60000;
         // send message to player
-        WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
-        data << uint32(m_HomebindTimer);
-        data << uint32(ERR_RAID_GROUP_REQUIRED);                // error used only when timer = 0
-        GetSession()->SendPacket(&data);
+        SendRaidGroupOnlyError(m_HomebindTimer, ERR_RAID_GROUP_REQUIRED);
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "PLAYER: Player '%s' (GUID: %u) will be teleported to homebind in 60 seconds", GetName(), GetGUIDLow());
     }
 }

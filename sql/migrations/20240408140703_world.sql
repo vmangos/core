@@ -125,7 +125,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 (1134703, 11347, 14509, 0, 5, 100, 1, 2000, 2000, 2000, 2000, 1134703, 0, 0, 'Zealot Lor\'Khan - Despawn on All Dead (Phase 1)'),
 (1134704, 11347, 14510, 0, 6, 100, 5, 10000, 10000, 10000, 10000, 1134704, 0, 0, 'Zealot Lor\'Khan - Revive Fallen Zealot (Phase 0)'),
 (1134705, 11347, 0, 7, 0, 100, 0, 0, 0, 0, 0, 1134705, 0, 0, 'Zealot Lor\'Khan - Reset Phase on Evade'),
-(1134706, 11347, 0, 11, 0, 100, 1, 0, 0, 0, 0, 1134706, 0, 0, 'Zealot Lor\'Khan - Reset Phase on Respawn');
+(1134706, 11347, 0, 11, 0, 100, 1, 0, 0, 0, 0, 1134705, 0, 0, 'Zealot Lor\'Khan - Reset Phase on Respawn');
 DELETE FROM `creature_ai_scripts` WHERE `id`=1134701;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1134701, 0, 0, 1, 5, 6, 273, 274, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Zealot Lor\'Khan - Emote');
