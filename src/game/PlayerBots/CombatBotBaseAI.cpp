@@ -2606,15 +2606,13 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         // Avoid low level items
         if (pLeaderItl)
         {
-            if (pProto->ItemLevel < pLeaderItl || pProto->ItemLevel > pLeaderItl + 5)
-            {
+            if (pProto->InventoryType != INVTYPE_TRINKET && (pProto->ItemLevel < pLeaderItl || pProto->ItemLevel > pLeaderItl + 5))
                 continue;
-            }
         }
-        else if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        else if (pProto->InventoryType != INVTYPE_TRINKET && (pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
         {
             continue;
-        }     
+        }            
 
         if (me->CanUseItem(pProto, onlyPvE) != EQUIP_ERR_OK)
             continue;
