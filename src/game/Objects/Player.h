@@ -1073,7 +1073,6 @@ class Player final: public Unit
         Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
         InventoryResult CanTakeMoreSimilarItems(Item const* pItem) const { return _CanTakeMoreSimilarItems(pItem->GetEntry(), pItem->GetCount(), pItem); }
         InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count) const { return _CanTakeMoreSimilarItems(entry, count, nullptr); }
-        InventoryResult CanEquipUniqueItem(Item const* pItem, uint8 except_slot = NULL_SLOT) const;
         InventoryResult CanEquipUniqueItem(ItemPrototype const* itemProto, uint8 except_slot = NULL_SLOT) const;
         InventoryResult _CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item const* pItem, uint32* no_space_count = nullptr) const;
         InventoryResult _CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item const* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
@@ -1138,6 +1137,7 @@ class Player final: public Unit
         InventoryResult CanStoreItems(Item** pItem,int count) const;
         InventoryResult CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const;
         InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item const* pItem, bool swap, bool not_loading = true) const;
+        InventoryResult CanEquipItem(uint8 slot, uint16& dest, ItemPrototype const* pProto, Item const* pItem = nullptr, bool swap = false, bool not_loading = true) const;
         InventoryResult CanUnequipItems(uint32 item, uint32 count) const;
         InventoryResult CanUnequipItem(uint16 src, bool swap) const;
         InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item const* pItem, bool swap, bool not_loading = true) const;
