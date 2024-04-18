@@ -22397,12 +22397,14 @@ void Player::AddGCD(SpellEntry const& spellEntry, uint32 /*forcedDuration = 0*/,
         gcdDuration = std::min(gcdDuration, 1500);
     }
 
-    if (!gcdDuration)
+    if (gcdDuration < 1)
         return;
 
-    // TODO: Remove this once spells are queuable and GCD is checked on execute
-    gcdDuration -= std::min<int32>(300, GetSession()->GetLatency());
-    gcdDuration -= std::min<int32>(200, sWorld.GetCurrentDiff());
+    // Spell packets are handled on Map update to substract the update interval.
+    gcdDuration -= int32(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
+
+    if (gcdDuration < 1)
+        gcdDuration = 1;
 
     SpellCaster::AddGCD(spellEntry, gcdDuration);
 

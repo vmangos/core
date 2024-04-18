@@ -318,7 +318,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         return;
     }
 
-    UpdateCooldowns(sWorld.GetCurrentClockTime());
+    UpdateCooldowns(GetMap()->GetCurrentClockTime());
 
     m_Events.Update(update_diff);
 
