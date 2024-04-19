@@ -470,6 +470,32 @@ void PartyBotAI::RaidStratsInOnyxiaProtectionPotions()
     }
 }
 
+void PartyBotAI::RaidStratsInBWLProtectionPotions()
+{
+    if (me->GetZoneId() != 2677)
+    {
+        return;
+    }
+
+    if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_FIRE_PROTECTION_POTION))
+    {
+        if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_FIRE_PROTECTION_POTION))
+        {
+            UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_FIRE_PROTECTION_POTION);
+            return;
+        }
+    }
+
+    if (!me->HasAura((int)RaidStratsPotionAuraId::GREATER_SHADOW_PROTECTION_POTION))
+    {
+        if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_SHADOW_PROTECTION_POTION))
+        {
+            UsePotionsOrRune((int)RaidStratsPotionItemId::GREATER_SHADOW_PROTECTION_POTION);
+            return;
+        }
+    }
+}
+
 void PartyBotAI::RaidStratsInZGBosses() {
     if (me->GetZoneId() != 1977)
     {

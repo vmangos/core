@@ -1099,6 +1099,7 @@ void PartyBotAI::UpdateOutOfCombatAI()
             RaidStratsInZGProtectionPotions();
             RaidStratsInMKProtectionPotions();
             RaidStratsInOnyxiaProtectionPotions();
+            RaidStratsInBWLProtectionPotions();
         }
 
         if (m_resurrectionSpell)

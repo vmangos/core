@@ -103,6 +103,7 @@ public:
     void RaidStratsInZGProtectionPotions();
     void RaidStratsInMKProtectionPotions();
     void RaidStratsInOnyxiaProtectionPotions();
+    void RaidStratsInBWLProtectionPotions();
     void RaidStratsInZGBosses();
     void RaidStratsInMKBosses();
 
