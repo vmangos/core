@@ -44,9 +44,9 @@ add_library(readline STATIC
 
 target_include_directories(readline
     PUBLIC
-    ${CMAKE_SOURCE_DIR}/dep/windows/include
+    ${CMAKE_SOURCE_DIR}/dep/include
     PRIVATE
-    ${CMAKE_SOURCE_DIR}/dep/windows/include/readline
+    ${CMAKE_SOURCE_DIR}/dep/include/readline
     )
 
 target_compile_definitions(readline PRIVATE
