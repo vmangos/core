@@ -654,6 +654,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.hunter.pVolley))
                         m_spells.hunter.pVolley = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Tranquilizing Shot") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.hunter.pTranquilizingShot))
+                        m_spells.hunter.pTranquilizingShot = pSpellEntry;
+                }
                 break;
             }
             case CLASS_MAGE:
@@ -2231,6 +2236,7 @@ bool CombatBotBaseAI::IsValidBuffTarget(Unit const* pTarget, SpellEntry const* p
 
 Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
 {
+    std::vector<Player*> pMembersNeedBuff;
     Group* pGroup = me->GetGroup();
     if (pGroup)
     {
@@ -2239,13 +2245,18 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
             if (Player* pMember = itr->getSource())
             {
                 if (me->IsValidHelpfulTarget(pMember) &&
-                   !pMember->IsGameMaster() &&
+                    !pMember->IsGameMaster() &&
                     IsValidBuffTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
                     me->IsWithinDist(pMember, 30.0f))
-                    return pMember;
+                    pMembersNeedBuff.push_back(pMember);
             }
         }
+    }
+
+    if (!pMembersNeedBuff.empty())
+    {
+        return pMembersNeedBuff[rand() % pMembersNeedBuff.size()];
     }
 
     return nullptr;
@@ -2253,7 +2264,14 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
 
 Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
 {
+    if (IsValidDispelTarget(me, pSpellEntry))
+    {
+        return me;
+    }
+
+    std::vector<Player*> pMembersHaveDebuff;
     Group* pGroup = me->GetGroup();
+    
     if (pGroup)
     {
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -2265,9 +2283,14 @@ Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
                     IsValidDispelTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
                     me->IsWithinDist(pMember, 30.0f))
-                    return pMember;
+                    pMembersHaveDebuff.push_back(pMember);
             }
         }
+    }
+
+    if (!pMembersHaveDebuff.empty())
+    {
+        return pMembersHaveDebuff[rand() % pMembersHaveDebuff.size()];
     }
 
     return nullptr;
@@ -2533,7 +2556,7 @@ inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
     return ITEM_MOD_STAMINA;
 }
 
-void CombatBotBaseAI::EquipRandomGearInEmptySlots()
+void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
 {
     LearnArmorProficiencies();
 
@@ -2546,8 +2569,8 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         ItemPrototype const* pProto = &itr.second;
 
         // Only items that have already been discovered by someone
-        if (!pProto->Discovered)
-            continue;
+        //if (!pProto->Discovered)
+        //    continue;
 
         // Skip unobtainable items
         if (pProto->HasExtraFlag(ITEM_EXTRA_NOT_OBTAINABLE))
@@ -2581,8 +2604,15 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         }
 
         // Avoid low level items
-        if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        if (pLeaderItl)
+        {
+            if (pProto->InventoryType != INVTYPE_TRINKET && (pProto->ItemLevel < pLeaderItl || pProto->ItemLevel > pLeaderItl + 5))
+                continue;
+        }
+        else if (pProto->InventoryType != INVTYPE_TRINKET && (pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+        {
             continue;
+        }            
 
         if (me->CanUseItem(pProto, onlyPvE) != EQUIP_ERR_OK)
             continue;
@@ -2592,6 +2622,66 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 
         if (pProto->RequiredReputationFaction && uint32(me->GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
             continue;
+
+        // Avoid things with heal status.
+        std::vector<uint32> healItemSpells = { 7675, 7676, 7677, 7678, 7679, 7680, 7681, 446470, 9406, 9407, 9408, 23796, 9314, 9315, 9316, 25067, 9317, 9318, 18029, 18030, 18031, 18032, 17371, 18033, 18034, 18035, 15696, 22748, 18036, 18037, 18038, 18039, 18040, 18041, 18042, 18043, 18044, 18045, 18046, 18047, 18048, 17320, 26154, 23593, 26225, 23264, 26690, 26228, 29369, 26461, 28686, 28736, 26814, 28805, 28151, 28152 };
+        bool isHealItem = false;
+        for (const auto& itr : pProto->Spells)
+        {
+            if (m_role != ROLE_HEALER)
+            {
+                if (std::find(healItemSpells.begin(), healItemSpells.end(), itr.SpellId) != healItemSpells.end())
+                    isHealItem = true;
+            }
+        }
+
+        if (isHealItem)
+            continue;
+
+        // Avoid things with mp status.
+        std::vector<uint32> mpItemSpells = { 21360, 18379, 21618, 21359, 21621, 21633, 21638, 25114, 21622, 21631, 25115, 21363, 21630, 21362, 21626, 21637, 21642, 21644, 23795, 26647, 21365, 21624, 21625, 21364, 21636, 21640, 20959, 21628, 21366, 21620, 21627, 21632, 18378, 21361, 21629, 21634, 21635, 21641, 23212, 21623, 21643, 21619, 21639 };
+        bool isMpItem = false;
+        for (const auto& itr : pProto->Spells)
+        {
+            if (m_role != ROLE_HEALER)
+            {
+                if (std::find(mpItemSpells.begin(), mpItemSpells.end(), itr.SpellId) != mpItemSpells.end())
+                    isMpItem = true;
+            }
+        }
+
+        if (isMpItem)
+            continue;
+
+        // Trinkets for role
+        if (pProto->InventoryType == INVTYPE_TRINKET && me->GetLevel() == 60)
+        {
+            if (m_role == ROLE_TANK)
+            {
+                std::vector<uint32> tankTrinkets = { 11810, 10779, 19431, 18406, 19406, 13966, 11811 };
+                if (std::find(tankTrinkets.begin(), tankTrinkets.end(), pProto->ItemId) == tankTrinkets.end())
+                    continue;                
+            }
+            else if (m_role == ROLE_MELEE_DPS || me->GetClass() == CLASS_HUNTER)
+            {
+                std::vector<uint32> mDpsTrinkets = { 13965, 11815, 19406, 21670, 23570, 23041, 22954, 22321, 19289 };
+                if (std::find(mDpsTrinkets.begin(), mDpsTrinkets.end(), pProto->ItemId) == mDpsTrinkets.end())
+                    continue;
+            }
+            else if (m_role == ROLE_RANGE_DPS)
+            {
+                std::vector<uint32> rDpsTrinkets = { 12930, 13968, 18467, 18820, 19379, 18820, 23046, 19344, 11819, 18371, 19339 };
+                if (std::find(rDpsTrinkets.begin(), rDpsTrinkets.end(), pProto->ItemId) == rDpsTrinkets.end())
+                    continue;
+            }
+            else if (m_role == ROLE_HEALER)
+            {
+                std::vector<uint32> healTrinkets = { 19395, 17064, 18371, 12930, 11819, 18469, 23027, 23047, 18470 };
+                if (std::find(healTrinkets.begin(), healTrinkets.end(), pProto->ItemId) == healTrinkets.end())
+                    continue;
+            }     
+        }
+
 
         if (uint32 skill = pProto->GetProficiencySkill())
         {
@@ -2727,7 +2817,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
     }
 }
 
-void CombatBotBaseAI::AutoEquipGear(uint32 option)
+void CombatBotBaseAI::AutoEquipGear(uint32 option, uint8 pLeaderItl)
 {
     switch (option)
     {
@@ -2735,7 +2825,7 @@ void CombatBotBaseAI::AutoEquipGear(uint32 option)
             me->AddStartingItems();
             break;
         case PLAYER_BOT_AUTO_EQUIP_RANDOM_GEAR:
-            EquipRandomGearInEmptySlots();
+            EquipRandomGearInEmptySlots(pLeaderItl);
             break;
         case PLAYER_BOT_AUTO_EQUIP_PREMADE_GEAR:
             EquipPremadeGearTemplate();

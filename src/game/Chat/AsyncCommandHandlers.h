@@ -55,6 +55,9 @@ struct PInfoData
     uint32 m_totalPlayedTime = 0;
     uint32 m_latency = 0;
     bool m_online = false;
+    //hardcore
+    bool hardcore;
+    bool permadeath;
 
     // Account data
     uint32 m_accountId = 0;

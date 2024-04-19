@@ -95,8 +95,8 @@ public:
     void LearnArmorProficiencies();
     void LearnPremadeSpecForClass();
     void EquipPremadeGearTemplate();
-    void EquipRandomGearInEmptySlots();
-    void AutoEquipGear(uint32 option);
+    void EquipRandomGearInEmptySlots(uint8 pLeaderItl);
+    void AutoEquipGear(uint32 option, uint8 pLeaderItl = 0);
     void LearnRandomTalents();
     
     uint8 GetAttackersInRangeCount(float range) const;
@@ -349,6 +349,7 @@ public:
             SpellEntry const* pFeignDeath;
             SpellEntry const* pScareBeast;
             SpellEntry const* pVolley;
+            SpellEntry const* pTranquilizingShot;
         } hunter;
         struct
         {

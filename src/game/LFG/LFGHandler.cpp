@@ -40,7 +40,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
     if (!_player->IsSelfMover())
         return;
 
-    GameObject* obj = _player->GetGameObjectIfCanInteractWith(guid);
+    GameObject* obj = _player->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_MEETINGSTONE); // hardcore
 
     if (!obj)
         return;
