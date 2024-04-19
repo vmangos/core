@@ -98,7 +98,7 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
         {
             me->SatisfyItemRequirements(pItem->GetProto());
             me->StoreNewItemInBestSlots(pItem->GetEntry(), 1, pItem->GetEnchantmentId(EnchantmentSlot(0)));
-        }   
+        }
     }
 }
 
@@ -137,7 +137,7 @@ bool PartyBotAI::IsValidDistancingTarget(Unit* pTarget, Unit* pEnemy)
             pTarget->GetDistance(pEnemy) >= 15.0f)
             return true;
     }
-     
+
     return false;
 }
 
@@ -299,7 +299,7 @@ bool PartyBotAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpell
                 {
                     float const myThreat = pEnemy->GetThreatManager().getThreat(me);
                     float const victimThreat = pEnemy->GetThreatManager().getThreat(pEnemy->GetVictim());
-                    
+
                     if (victimThreat < (myThreat + me->GetMaxHealth()))
                         return false;
                 }
@@ -543,7 +543,7 @@ void PartyBotAI::AddToPlayerGroup()
             me->RemoveFromGroup();
 
         group->AddMember(me->GetObjectGuid(), me->GetName());
-    } 
+    }
 }
 
 void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
@@ -678,7 +678,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             m_receivedBgInvite = false;
             return;
         }
-        
+
         // Remain idle until we can join battleground.
         return;
     }
@@ -723,7 +723,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 me->CastSpell(me, PB_SPELL_HONORLESS_TARGET, true);
             }
         }
-        
+
         return;
     }
 
@@ -851,7 +851,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                     me->CastSpell(me, (*auraList.begin())->GetId(), true);
                     me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, oldStateCastTime);
                     me->SetCheatOption(PLAYER_CHEAT_NO_POWER, oldStatePower);
-                } 
+                }
             }
         }
         else if (me->IsMounted())
@@ -1165,7 +1165,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Paladin()
                     me->ClearTarget();
                     return;
                 }
-            }  
+            }
         }
     }
 
@@ -1356,7 +1356,7 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
         if (DoCastSpell(me, m_spells.paladin.pBlessingOfFreedom) == SPELL_CAST_OK)
             return;
     }
-    
+
     if (GetRole() != ROLE_HEALER &&
         me->GetHealthPercent() < 30.0f)
         HealInjuredTarget(me);
@@ -1668,13 +1668,16 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
 {
     if (m_spells.mage.pArcaneBrilliance)
     {
-        if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
+        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneBrilliance))
         {
-            if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneBrilliance))
             {
-                m_isBuffing = true;
-                me->ClearTarget();
-                return;
+                if (DoCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+                {
+                    m_isBuffing = true;
+                    me->ClearTarget();
+                    return;
+                }
             }
         }
     }
@@ -1875,7 +1878,7 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         {
             if (DoCastSpell(me, m_spells.mage.pPresenceOfMind) == SPELL_CAST_OK)
                 return;
-        } 
+        }
 
         if (m_spells.mage.pScorch &&
            (pVictim->GetHealthPercent() < 20.0f) &&
@@ -2859,7 +2862,7 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
                 if (m_spells.rogue.pRupture)
                     vSpells.push_back(m_spells.rogue.pRupture);
             }
-            
+
             if (!vSpells.empty())
             {
                 SpellEntry const* pComboSpell = SelectRandomContainerElement(vSpells);
@@ -3108,7 +3111,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
         if (DoCastSpell(me, m_spells.druid.pBarkskin) == SPELL_CAST_OK)
             return;
     }
-    
+
     if (form == FORM_NONE)
     {
         if (m_spells.druid.pHibernate &&
@@ -3153,7 +3156,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
     Unit* pVictim = me->GetVictim();
     if (!pVictim)
         return;
-    
+
     if (form != FORM_NONE &&
         me->HasUnitState(UNIT_STATE_ROOT) &&
         me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT) &&
@@ -3162,7 +3165,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
 
     if (GetRole() == ROLE_HEALER)
         return;
-    
+
     switch (form)
     {
         case FORM_CAT:
@@ -3265,7 +3268,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                 if (DoCastSpell(pVictim, m_spells.druid.pClaw) == SPELL_CAST_OK)
                     return;
             }
-                
+
             break;
         }
         case FORM_BEAR:
