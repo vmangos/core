@@ -212,7 +212,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 
     // Buffer spell system update time to save on performance when players are updated twice per
     // world update. We do not need to update spells when the interval is only a few ms (~10ms)
-    UpdateCooldowns(sWorld.GetCurrentClockTime());
+    UpdateCooldowns(GetMap()->GetCurrentClockTime());
     m_spellUpdateTimeBuffer += update_diff;
     if (m_spellUpdateTimeBuffer >= UNIT_SPELL_UPDATE_TIME_BUFFER)
     {

@@ -10231,11 +10231,9 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
 InventoryResult Player::CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const
 {
     dest = 0;
-    Item* pItem = Item::CreateItem(item, 1, GetObjectGuid());
-    if (pItem)
+    if (ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(item))
     {
-        InventoryResult result = CanEquipItem(slot, dest, pItem, swap);
-        delete pItem;
+        InventoryResult result = CanEquipItem(slot, dest, pProto, nullptr, swap);
         return result;
     }
 
@@ -10246,119 +10244,129 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item const* pItem
 {
     dest = 0;
     if (pItem)
+        return CanEquipItem(slot, dest, pItem->GetProto(), pItem, swap, not_loading);
+
+    return !swap ? EQUIP_ERR_ITEM_NOT_FOUND : EQUIP_ERR_ITEMS_CANT_BE_SWAPPED;
+}
+
+InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, ItemPrototype const* pProto, Item const* pItem, bool swap, bool not_loading) const
+{
+    dest = 0;
+    if (pItem)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "STORAGE: CanEquipItem slot = %u, item = %u, count = %u", slot, pItem->GetEntry(), pItem->GetCount());
-        ItemPrototype const* pProto = pItem->GetProto();
-        if (pProto)
+        MANGOS_ASSERT(pProto == pItem->GetProto());
+
+        // item used
+        if (pItem->HasTemporaryLoot())
+            return EQUIP_ERR_ALREADY_LOOTED;
+
+        if (pItem->IsBindedNotWith(this))
+            return EQUIP_ERR_DONT_OWN_THAT_ITEM;
+    }
+
+    if (pProto)
+    {
+        // check count of items (skip for auto move for same player from bank)
+        InventoryResult res = pItem ? CanTakeMoreSimilarItems(pItem) : CanTakeMoreSimilarItems(pProto->ItemId, 1);
+        if (res != EQUIP_ERR_OK)
+            return res;
+
+        // check this only in game
+        if (not_loading)
         {
-            // item used
-            if (pItem->HasTemporaryLoot())
-                return EQUIP_ERR_ALREADY_LOOTED;
+            // May be here should be more stronger checks; STUNNED checked
+            // ROOT, CONFUSED, DISTRACTED, FLEEING this needs to be checked.
+            if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
+                return EQUIP_ERR_YOU_ARE_STUNNED;
 
-            if (pItem->IsBindedNotWith(this))
-                return EQUIP_ERR_DONT_OWN_THAT_ITEM;
-
-            // check count of items (skip for auto move for same player from bank)
-            InventoryResult res = CanTakeMoreSimilarItems(pItem);
-            if (res != EQUIP_ERR_OK)
-                return res;
-
-            // check this only in game
-            if (not_loading)
+            // do not allow equipping gear except weapons, offhands, projectiles, relics in
+            // - combat
+            if (!pProto->CanChangeEquipStateInCombat())
             {
-                // May be here should be more stronger checks; STUNNED checked
-                // ROOT, CONFUSED, DISTRACTED, FLEEING this needs to be checked.
-                if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
-                    return EQUIP_ERR_YOU_ARE_STUNNED;
-
-                // do not allow equipping gear except weapons, offhands, projectiles, relics in
-                // - combat
-                if (!pProto->CanChangeEquipStateInCombat())
-                {
-                    if (IsInCombat())
-                        return EQUIP_ERR_NOT_IN_COMBAT;
-                }
-
-                // prevent equip item in process logout
-                if (GetSession()->IsLogingOut())
-                    return EQUIP_ERR_YOU_ARE_STUNNED;
-
-                if (IsInCombat() && pProto->Class == ITEM_CLASS_WEAPON && m_weaponChangeTimer != 0)
-                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;         // maybe exist better err
-
-                // Check is possibly not in vanilla.
-                //if (IsNonMeleeSpellCasted(false, true, true))
-                //    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+                if (IsInCombat())
+                    return EQUIP_ERR_NOT_IN_COMBAT;
             }
 
-            uint8 eslot = FindEquipSlot(pProto, slot, swap);
-            if (eslot == NULL_SLOT)
-                return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
+            // prevent equip item in process logout
+            if (GetSession()->IsLogingOut())
+                return EQUIP_ERR_YOU_ARE_STUNNED;
 
-            InventoryResult msg = CanUseItem(pItem , not_loading);
-            if (msg != EQUIP_ERR_OK)
-                return msg;
-            if (!swap && GetItemByPos(INVENTORY_SLOT_BAG_0, eslot))
-                return EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE;
+            if (IsInCombat() && pProto->Class == ITEM_CLASS_WEAPON && m_weaponChangeTimer != 0)
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;         // maybe exist better err
 
-            // if swap ignore item (equipped also)
-            if (InventoryResult res2 = CanEquipUniqueItem(pItem, swap ? eslot : NULL_SLOT))
-                return res2;
+            // Check is possibly not in vanilla.
+            //if (IsNonMeleeSpellCasted(false, true, true))
+            //    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+        }
 
-            // check unique-equipped special item classes
-            if (pProto->Class == ITEM_CLASS_QUIVER)
+        uint8 eslot = FindEquipSlot(pProto, slot, swap);
+        if (eslot == NULL_SLOT)
+            return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
+
+        InventoryResult msg = pItem ? CanUseItem(pItem , not_loading) : CanUseItem(pProto, not_loading);
+        if (msg != EQUIP_ERR_OK)
+            return msg;
+        if (!swap && GetItemByPos(INVENTORY_SLOT_BAG_0, eslot))
+            return EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE;
+
+        // if swap ignore item (equipped also)
+        if (InventoryResult res2 = CanEquipUniqueItem(pProto, swap ? eslot : NULL_SLOT))
+            return res2;
+
+        // check unique-equipped special item classes
+        if (pProto->Class == ITEM_CLASS_QUIVER)
+        {
+            for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
             {
-                for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+                if (Item* pBag = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                 {
-                    if (Item* pBag = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                    if (pBag != pItem)
                     {
-                        if (pBag != pItem)
+                        if (ItemPrototype const* pBagProto = pBag->GetProto())
                         {
-                            if (ItemPrototype const* pBagProto = pBag->GetProto())
-                            {
-                                if (pBagProto->Class == pProto->Class && (!swap || pBag->GetSlot() != eslot))
-                                    return (pBagProto->SubClass == ITEM_SUBCLASS_AMMO_POUCH)
-                                           ? EQUIP_ERR_CAN_EQUIP_ONLY1_AMMOPOUCH
-                                           : EQUIP_ERR_CAN_EQUIP_ONLY1_QUIVER;
-                            }
+                            if (pBagProto->Class == pProto->Class && (!swap || pBag->GetSlot() != eslot))
+                                return (pBagProto->SubClass == ITEM_SUBCLASS_AMMO_POUCH)
+                                        ? EQUIP_ERR_CAN_EQUIP_ONLY1_AMMOPOUCH
+                                        : EQUIP_ERR_CAN_EQUIP_ONLY1_QUIVER;
                         }
                     }
                 }
             }
-
-            uint32 type = pProto->InventoryType;
-
-            if (eslot == EQUIPMENT_SLOT_OFFHAND)
-            {
-                if (type == INVTYPE_WEAPON || type == INVTYPE_WEAPONOFFHAND)
-                {
-                    if (!CanDualWield())
-                        return EQUIP_ERR_CANT_DUAL_WIELD;
-                }
-                else if (type == INVTYPE_2HWEAPON)
-                    return EQUIP_ERR_CANT_DUAL_WIELD;
-
-                if (IsTwoHandUsed())
-                    return EQUIP_ERR_CANT_EQUIP_WITH_TWOHANDED;
-            }
-
-            // equip two-hand weapon case (with possible unequip 2 items)
-            if (type == INVTYPE_2HWEAPON)
-            {
-                if (eslot != EQUIPMENT_SLOT_MAINHAND)
-                    return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
-
-                // offhand item must can be stored in inventory for offhand item and it also must be unequipped
-                Item* offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-                ItemPosCountVec off_dest;
-                if (offItem && (!not_loading ||
-                                CanUnequipItem(uint16(INVENTORY_SLOT_BAG_0) << 8 | EQUIPMENT_SLOT_OFFHAND, false) !=  EQUIP_ERR_OK ||
-                                CanStoreItem(NULL_BAG, NULL_SLOT, off_dest, offItem, false) !=  EQUIP_ERR_OK))
-                    return swap ? EQUIP_ERR_ITEMS_CANT_BE_SWAPPED : EQUIP_ERR_INVENTORY_FULL;
-            }
-            dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
-            return EQUIP_ERR_OK;
         }
+
+        uint32 type = pProto->InventoryType;
+
+        if (eslot == EQUIPMENT_SLOT_OFFHAND)
+        {
+            if (type == INVTYPE_WEAPON || type == INVTYPE_WEAPONOFFHAND)
+            {
+                if (!CanDualWield())
+                    return EQUIP_ERR_CANT_DUAL_WIELD;
+            }
+            else if (type == INVTYPE_2HWEAPON)
+                return EQUIP_ERR_CANT_DUAL_WIELD;
+
+            if (IsTwoHandUsed())
+                return EQUIP_ERR_CANT_EQUIP_WITH_TWOHANDED;
+        }
+
+        // equip two-hand weapon case (with possible unequip 2 items)
+        if (type == INVTYPE_2HWEAPON)
+        {
+            if (eslot != EQUIPMENT_SLOT_MAINHAND)
+                return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
+
+            // offhand item must can be stored in inventory for offhand item and it also must be unequipped
+            Item* offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+            ItemPosCountVec off_dest;
+            if (offItem && (!not_loading ||
+                            CanUnequipItem(uint16(INVENTORY_SLOT_BAG_0) << 8 | EQUIPMENT_SLOT_OFFHAND, false) !=  EQUIP_ERR_OK ||
+                            CanStoreItem(NULL_BAG, NULL_SLOT, off_dest, offItem, false) !=  EQUIP_ERR_OK))
+                return swap ? EQUIP_ERR_ITEMS_CANT_BE_SWAPPED : EQUIP_ERR_INVENTORY_FULL;
+        }
+        dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
+        return EQUIP_ERR_OK;
     }
 
     return !swap ? EQUIP_ERR_ITEM_NOT_FOUND : EQUIP_ERR_ITEMS_CANT_BE_SWAPPED;
@@ -10612,15 +10620,6 @@ InventoryResult Player::CanUseItem(Item const* pItem, bool not_loading) const
             if (msg != EQUIP_ERR_OK)
                 return msg;
 
-            if (uint32 skill = pProto->GetProficiencySkill())
-            {
-                // Fist weapons use unarmed skill calculations, but we must query fist weapon skill presence to use this item
-                if (pProto->SubClass == ITEM_SUBCLASS_WEAPON_FIST)
-                    skill = SKILL_FIST_WEAPONS;
-                if (!GetSkillValue(skill))
-                    return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
-            }
-
             if (pProto->RequiredReputationFaction && uint32(GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 return EQUIP_ERR_CANT_EQUIP_REPUTATION;
@@ -10661,6 +10660,15 @@ InventoryResult Player::CanUseItem(ItemPrototype const* pProto, bool not_loading
 
         if (GetLevel() < pProto->RequiredLevel)
             return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
+
+        if (uint32 skill = pProto->GetProficiencySkill())
+        {
+            // Fist weapons use unarmed skill calculations, but we must query fist weapon skill presence to use this item
+            if (pProto->SubClass == ITEM_SUBCLASS_WEAPON_FIST)
+                skill = SKILL_FIST_WEAPONS;
+            if (!GetSkillValue(skill))
+                return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
+        }
 
         return EQUIP_ERR_OK;
     }
@@ -21092,17 +21100,6 @@ void Player::LoadSkillsFromFields()
     }
 }
 
-InventoryResult Player::CanEquipUniqueItem(Item const* pItem, uint8 eslot) const
-{
-    ItemPrototype const* pProto = pItem->GetProto();
-
-    // proto based limitations
-    if (InventoryResult res = CanEquipUniqueItem(pProto, eslot))
-        return res;
-
-    return EQUIP_ERR_OK;
-}
-
 InventoryResult Player::CanEquipUniqueItem(ItemPrototype const* itemProto, uint8 except_slot) const
 {
     // check unique-equipped on item
@@ -22530,12 +22527,14 @@ void Player::AddGCD(SpellEntry const& spellEntry, uint32 /*forcedDuration = 0*/,
         gcdDuration = std::min(gcdDuration, 1500);
     }
 
-    if (!gcdDuration)
+    if (gcdDuration < 1)
         return;
 
-    // TODO: Remove this once spells are queuable and GCD is checked on execute
-    gcdDuration -= std::min<int32>(300, GetSession()->GetLatency());
-    gcdDuration -= std::min<int32>(200, sWorld.GetCurrentDiff());
+    // Spell packets are handled on Map update so substract the update interval.
+    gcdDuration -= int32(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
+
+    if (gcdDuration < 1)
+        gcdDuration = 1;
 
     SpellCaster::AddGCD(spellEntry, gcdDuration);
 

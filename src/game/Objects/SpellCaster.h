@@ -423,6 +423,7 @@ public:
     virtual void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration);
     void PrintCooldownList(ChatHandler& chat) const;
     bool CheckLockout(SpellSchoolMask schoolMask) const;
+    void UpdateCooldowns(TimePoint const& now);
 
     // Event handler
     EventProcessor m_Events;
@@ -430,7 +431,6 @@ protected:
     explicit SpellCaster() = default;
 
     // cooldown system
-    void UpdateCooldowns(TimePoint const& now);
     bool GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireTime, bool& isPermanent) const;
 
     GCDMap            m_GCDCatMap;

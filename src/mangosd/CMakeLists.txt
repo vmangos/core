@@ -145,9 +145,12 @@ if(UNIX)
     ${OPENSSL_LIBRARIES}
     ${OPENSSL_EXTRA_LIBRARIES}
     ${ZLIB_LIBRARIES}
-    readline
   )
 endif()
+
+target_link_libraries(${EXECUTABLE_NAME}
+    readline
+)
 
 set(EXECUTABLE_LINK_FLAGS "")
 
