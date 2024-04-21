@@ -42,7 +42,6 @@
 #include "Database/DatabaseEnv.h"
 #include "CliRunnable.h"
 #include "RASocket.h"
-#include "ChatSocket.h"
 #include "Util.h"
 #include "MaNGOSsoap.h"
 #include "MassMailMgr.h"
@@ -145,56 +144,6 @@ void remoteAccess()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "RARunnable thread ended");
 }
 
-void offlineChat()
-{
-#if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-
-    ACE_Dev_Poll_Reactor imp;
-
-    imp.max_notify_iterations(128);
-    imp.restart(1);
-
-#else
-
-    ACE_TP_Reactor imp;
-    imp.max_notify_iterations(128);
-
-#endif
-
-    ACE_Reactor m_Reactor(&imp);
-
-    OfflineChatSocket::Acceptor m_Acceptor;
-
-    LoginDatabase.ThreadStart();
-    uint16 raport = sConfig.GetIntDefault ("OfflineChat.Port", 3444);
-    std::string stringip = sConfig.GetStringDefault ("OfflineChat.IP", "0.0.0.0");
-
-    ACE_INET_Addr listen_addr(raport, stringip.c_str());
-
-    if (m_Acceptor.open (listen_addr, &m_Reactor, ACE_NONBLOCK) == -1)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
-    }
-
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting offline-chat listener on port %d on %s", raport, stringip.c_str ());
-
-    while (!m_Reactor.reactor_event_loop_done())
-    {
-        ACE_Time_Value interval (0, 10000);
-
-        if (m_Reactor.run_reactor_event_loop (interval) == -1)
-            break;
-
-        if (World::IsStopped())
-        {
-            m_Acceptor.close();
-            break;
-        }
-    }
-    LoginDatabase.ThreadEnd();
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "OfflineChatRunnable thread ended");
-}
-
 Master::Master()
 {
 }
@@ -271,9 +220,6 @@ int Master::Run()
     std::thread* rar_thread = nullptr;
     if (sConfig.GetBoolDefault ("Ra.Enable", false))
         rar_thread = new std::thread(&remoteAccess);
-    std::thread* offlinechat_thread = nullptr;
-    if (sConfig.GetBoolDefault ("OfflineChat.Enable", false))
-        offlinechat_thread = new std::thread(&offlineChat);
 
     // Handle affinity for multiple processors and process priority on Windows
     #ifdef WIN32
@@ -389,12 +335,6 @@ int Master::Run()
         delete rar_thread;
     }
 
-    if (offlinechat_thread)
-    {
-        offlinechat_thread->join();
-        delete offlinechat_thread;
-    }
-
     // Clean account database before leaving
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Cleaning character database...");
     clearOnlineAccounts();
@@ -450,9 +390,12 @@ int Master::Run()
         b[3].Event.KeyEvent.wRepeatCount = 1;
         DWORD numb;
         WriteConsoleInput(hStdIn, b, 4, &numb);
-#else
-        fclose(stdin);
 #endif
+        World::StopNow(SHUTDOWN_EXIT_CODE);
+        // End the database thread
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stopping WorldDatabase thread...");
+        WorldDatabase.ThreadEnd(); // free mySQL thread resources
+
         if (cliThread->joinable())
             cliThread->join();
 

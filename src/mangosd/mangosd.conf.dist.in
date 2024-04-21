@@ -24,7 +24,7 @@ ConfVersion=2010100901
 #
 #	   HonorDir
 #		     Folder to store HCR files. These are logs of weekly honor calculation.
-#		     By default logs are stored in the current directory of the running program.	                    
+#		     By default logs are stored in the current directory of the running program.
 #
 #    LoginDatabase.Info
 #    WorldDatabase.Info
@@ -102,10 +102,18 @@ BindIP = "0.0.0.0"
 #        Default: 1 (HIGH)
 #                 0 (Normal)
 #
-#    Compression
-#        Compression level for update packages sent to client (1..9)
+#    Compression.Level
+#        Compression level for update packets sent to client (1..9)
 #        Default: 1 (speed)
 #                 9 (best compression)
+#
+#    Compression.Update.Size
+#        Maxmimum size of update object packets allowed to be sent uncompressed.
+#        Default: 128
+#
+#    Compression.Movement.Count
+#        Amount of movement packets that need to be sent to a session within 10 seconds before compression is enabled.
+#        Default: 300
 #
 #    PlayerLimit
 #        Initial realm capacity. Excluding Mods, GM's and Admins
@@ -242,7 +250,9 @@ BindIP = "0.0.0.0"
 
 UseProcessors = 0
 ProcessPriority = 1
-Compression = 1
+Compression.Level = 1
+Compression.Update.Size = 128
+Compression.Movement.Count = 300
 PlayerLimit = 100
 PlayerHardLimit = 0
 LoginQueue.GracePeriodSecs = 0
@@ -377,7 +387,7 @@ Anticrash.Rearm.Timer = 60000
 #    PvP.DishonorableKills
 #        Whether to give dishonorable kills to players who kill civilians.
 #        Default: 1
-#  
+#
 #    PvP.CityProtector
 #        Whether to assign City Protector titles on honor update or not.
 #        Default: 0
@@ -950,7 +960,7 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #                 1 (allowed)
 #
 #    Group.OfflineLeaderDelay
-#        A grace period for an offline group leader to reconnect before tranfering leadership to the next suitable member of the group (in secs) 
+#        A grace period for an offline group leader to reconnect before tranfering leadership to the next suitable member of the group (in secs)
 #        Default: 300 (5 minutes)
 #                   0 (Do not transfer group leadership)
 #
@@ -1400,7 +1410,7 @@ GuidReserveSize.GameObject = 1000
 #        Minimum level to /yell in chat
 #        Default: 0
 #
-#    YellRange.LinearScale.MaxLevel 
+#    YellRange.LinearScale.MaxLevel
 #    YellRange.QuadraticScale.MaxLevel
 #        Limit yell range based on level
 #        Default: 0
@@ -2666,15 +2676,20 @@ Alterac.InitMaxPlayers = 0
 ###################################################################################################################
 # OUTDOOR PVP CONFIG
 #
-#    OutdoorPvp.SIEnabled               #Enable Silithus Outdoor pvp
-#    OutdoorPvp.EPEnabled               #Enable Eastern Plaguelands Outdoor pvp
+#    OutdoorPvP.SI.Enable
+#        Enable Silithus Outdoor PvP
+#        Default: 1 (enable)
+#                 0 (disable)
+#
+#    OutdoorPvP.EP.Enable
+#        Enable Eastern Plaguelands Outdoor PvP
 #        Default: 1 (enable)
 #                 0 (disable)
 #
 ###################################################################################################################
 
-OutdoorPvp.SIEnabled = 1
-OutdoorPvp.EPEnabled = 1
+OutdoorPvP.SI.Enable = 1
+OutdoorPvP.EP.Enable = 1
 
 ###################################################################################################################
 # MEETING STONE LFG CONFIG
@@ -2951,14 +2966,6 @@ PartyBot.RandomGearLevelDifference = 10
 
 BattleBot.AutoEquip = 1
 BattleBot.AutoJoin = 0
-
-###################################################################################################################
-#    Database-based chat
-###################################################################################################################
-OfflineChat.Enable = 0
-OfflineChat.Port   = 3444
-OfflineChat.IP     = 0.0.0.0
-OfflineChat.Password= "p8zqkt"
 
 ###################################################################################################################
 #    Mail flooding mitigation

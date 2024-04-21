@@ -356,7 +356,6 @@ class WorldSession
         void SetLastPubChanMsgTime(time_t time) { m_lastPubChannelMsgTime = time; }
 
         // Bot system
-        std::stringstream m_chatBotHistory;
         PlayerBotEntry* GetBot() { return m_bot.get(); }
         void SetBot(std::shared_ptr<PlayerBotEntry> const& b) { m_bot = b; }
 
@@ -366,7 +365,7 @@ class WorldSession
         Warden* GetWarden() const { return m_warden; }
         void InitCheatData(Player* pPlayer);
         MovementAnticheat* GetCheatData();
-        void ProcessAnticheatAction(char const* detector, char const* reason, uint32 action, uint32 banTime = 0 /* Perm ban */);
+        void ProcessAnticheatAction(char const* detector, char const* reason, uint32 cheatAction, uint32 banSeconds = 0 /* Perm ban */);
         uint32 GetFingerprint() const { return 0; } // TODO
         void CleanupFingerprintHistory() {} // TODO
         bool HasUsedClickToMove() const;
@@ -407,7 +406,12 @@ class WorldSession
                 m_sniffFile.reset();
         }
 
+    private:
+        void SendPacketImpl(WorldPacket const* packet);
+
+    public:
         void SendPacket(WorldPacket const* packet);
+        void SendMovementPacket(WorldPacket const* packet);
         void SendNotification(char const* format, ...) ATTR_PRINTF(2, 3);
         void SendNotification(int32 string_id, ...);
         void SendPetNameInvalid(uint32 error, std::string const& name);
@@ -905,6 +909,16 @@ class WorldSession
         AccountData m_accountData[NewAccountData::NUM_ACCOUNT_DATA_TYPES];
         uint32 m_tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;
+
+        // compressed moves packet does not exist in early clients
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        MovementData m_movementPacketCompressor;
+        void SendCompressedMovementPackets();
+        // dynamically decide when to enable or disable compression
+        uint32 m_movePacketsSentLastInterval = 0;
+        uint32 m_movePacketsSentThisInterval = 0;
+        time_t m_movePacketTrackingIntervalStart = 0;
+#endif
         
         // Clustering system (TODO remove this)
     public:

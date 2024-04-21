@@ -161,7 +161,7 @@ class HonorMgr
         void SaveStoredData();
         void Load(QueryResult* result);
 
-        bool Add(float CP, uint8 type, Unit* source = nullptr);
+        bool Add(float CP, uint8 type, Unit const* source = nullptr);
         void Update();
         void Reset();
         void ClearHonorData();
@@ -204,7 +204,7 @@ class HonorMgr
         
         HonorCPMap& GetHonorCP() { return m_honorCP; }
 
-        void SendPVPCredit(Unit* victim, float honor);
+        void SendPVPCredit(Unit const* victim, float honor);
 
     private:
         HonorCPMap m_honorCP;

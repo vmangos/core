@@ -3064,7 +3064,7 @@ void Spell::EffectSummon(SpellEffectIndex effIdx)
     if (!petEntry)
         return;
 
-    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(petEntry);
+    CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(petEntry);
     if (!cInfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell::DoSummon: creature entry %u not found for spell %u.", petEntry, m_spellInfo->Id);
@@ -3488,6 +3488,14 @@ void Spell::EffectSummonWild(SpellEffectIndex effIdx)
         if (Creature* summon = m_caster->SummonCreature(creature_entry, px, py, pz, m_caster->GetOrientation(), summonType, duration))
         {
             summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
+
+            if (m_casterUnit && summon->HasStaticFlag(CREATURE_STATIC_FLAG_CREATOR_LOOT))
+            {
+                summon->lootForCreator = true;
+                summon->SetCreatorGuid(m_casterUnit->GetObjectGuid());
+                summon->SetLootRecipient(m_casterUnit);
+            }
+
             // Exception for Alterac Shredder. The second effect of the spell (possess) can't target the shredder
             // because it is not summoned at target selection phase.
             switch (m_spellInfo->Id)
@@ -3497,19 +3505,13 @@ void Spell::EffectSummonWild(SpellEffectIndex effIdx)
                 case 21565:
                     summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->EffectTriggerSpell[1]);
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
-                    *m_selfContainer = nullptr;
-                    m_caster->CastSpell(summon, m_spellInfo->EffectTriggerSpell[1], true);
                     break;
                 // Target Dummy
                 case 4071:
                 case 4072:
                 case 19805:
                     summon->SetFactionTemporary(m_caster->GetFactionTemplateId(), TEMPFACTION_NONE);
-                    summon->lootForCreator = true;
-                    summon->SetCreatorGuid(m_caster->GetObjectGuid());
                     summon->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-                    if (m_casterUnit)
-                        summon->SetLootRecipient(m_casterUnit);
                     break;
                 // Rockwing Gargoyle
                 case 16381:
@@ -3549,7 +3551,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
     if (!petEntry)
         return;
 
-    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(petEntry);
+    CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(petEntry);
     if (!cInfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell::DoSummonGuardian: creature entry %u not found for spell %u.", petEntry, m_spellInfo->Id);
@@ -3997,7 +3999,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
     if (!UnsummonOldPetBeforeNewSummon(petEntry, true))
         return ObjectGuid();
 
-    CreatureInfo const* cInfo = petEntry ? sCreatureStorage.LookupEntry<CreatureInfo>(petEntry) : nullptr;
+    CreatureInfo const* cInfo = petEntry ? sObjectMgr.GetCreatureTemplate(petEntry) : nullptr;
 
     // == 0 in case call current pet, check only real summon case
     if (petEntry && !cInfo)
@@ -5892,7 +5894,7 @@ void Spell::EffectSummonTotem(SpellEffectIndex effIdx)
 
     CreatureCreatePos pos(m_casterUnit, m_casterUnit->GetOrientation(), 2.0f, angle);
 
-    CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(m_spellInfo->EffectMiscValue[effIdx]);
+    CreatureInfo const* cinfo = sObjectMgr.GetCreatureTemplate(m_spellInfo->EffectMiscValue[effIdx]);
     if (!cinfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature entry %u does not exist but used in spell %u totem summon.", m_spellInfo->EffectMiscValue[effIdx], m_spellInfo->Id);
@@ -6360,7 +6362,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
     if (!petEntry)
         return;
 
-    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(petEntry);
+    CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(petEntry);
     if (!cInfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell::DoSummonCritter: creature entry %u not found for spell %u.", petEntry, m_spellInfo->Id);

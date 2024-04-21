@@ -226,7 +226,7 @@ void WaypointManager::Load()
                 movementScriptSet.erase(script_id);
             }
 
-            CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(entry);
+            CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(entry);
 
             if (!cInfo)
             {

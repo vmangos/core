@@ -113,7 +113,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
         return false;
     }
 
-    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(cr_id);
+    CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(cr_id);
     if (!cInfo)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, cr_id);
@@ -157,9 +157,9 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
             int mapid = fields[4].GetUInt16();
 
             if (m_session)
-                PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), guid, cInfo->name, x, y, z, mapid);
+                PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), guid, cInfo->name.c_str(), x, y, z, mapid);
             else
-                PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), cInfo->name, x, y, z, mapid);
+                PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), cInfo->name.c_str(), x, y, z, mapid);
         }
         while (result->NextRow());
 
@@ -621,9 +621,10 @@ bool ChatHandler::HandleLookupCreatureCommand(char* args)
 
     uint32 counter = 0;
 
-    for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
+    for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
     {
-        CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo> (id);
+        uint32 id = itr.first;
+        CreatureInfo const* cInfo = itr.second.get();
         if (!cInfo)
             continue;
 
@@ -728,9 +729,10 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
         if (!modelId)
             break;
 
-        for (uint32 creature_id = 0; creature_id < sCreatureStorage.GetMaxEntry(); ++creature_id)
+        for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
         {
-            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creature_id);
+            uint32 creature_id = itr.first;
+            CreatureInfo const* cInfo = itr.second.get();
             if (!cInfo)
                 continue;
 
@@ -754,7 +756,7 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
                                     creatureCounter++;
                                     if (fileExport)
                                         toExport << creature_id << ", /* " << cInfo->name << " */\n";
-                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, creature_id, creature_id, cInfo->name);
+                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, creature_id, creature_id, cInfo->name.c_str());
                                 }
                             }
                             foundModelCounter++;

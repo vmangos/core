@@ -1179,9 +1179,9 @@ bool ChatHandler::HandlePoolSpawnsCommand(char* args)
     for (const auto itr : crSpawns)
         if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<Creature>(itr))
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr))
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
+                if (CreatureInfo const* info = sObjectMgr.GetCreatureTemplate(data->creature_id[0]))
                     PSendSysMessage(LANG_CREATURE_LIST_CHAT, itr, PrepareStringNpcOrGoSpawnInformation<Creature>(itr).c_str(),
-                                    itr, info->name, data->position.x, data->position.y, data->position.z, data->position.mapId);
+                                    itr, info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId);
 
     SpawnedPoolObjects const& goSpawns = spawns.GetSpawnedGameobjects();
     for (const auto itr : goSpawns)
@@ -1234,15 +1234,15 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
         {
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr.guid))
             {
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
+                if (CreatureInfo const* info = sObjectMgr.GetCreatureTemplate(data->creature_id[0]))
                 {
                     char const* active = crSpawns && crSpawns->find(itr.guid) != crSpawns->end() ? active_str.c_str() : "";
                     if (m_session)
                         PSendSysMessage(LANG_POOL_CHANCE_CREATURE_LIST_CHAT, itr.guid, PrepareStringNpcOrGoSpawnInformation<Creature>(itr.guid).c_str(),
-                                        itr.guid, info->name, data->position.x, data->position.y, data->position.z, data->position.mapId, itr.chance, active);
+                                        itr.guid, info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId, itr.chance, active);
                     else
                         PSendSysMessage(LANG_POOL_CHANCE_CREATURE_LIST_CONSOLE, itr.guid, PrepareStringNpcOrGoSpawnInformation<Creature>(itr.guid).c_str(),
-                                        info->name, data->position.x, data->position.y, data->position.z, data->position.mapId, itr.chance, active);
+                                        info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId, itr.chance, active);
                 }
             }
         }
@@ -1256,15 +1256,15 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
         {
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr.guid))
             {
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
+                if (CreatureInfo const* info = sObjectMgr.GetCreatureTemplate(data->creature_id[0]))
                 {
                     char const* active = crSpawns && crSpawns->find(itr.guid) != crSpawns->end() ? active_str.c_str() : "";
                     if (m_session)
                         PSendSysMessage(LANG_POOL_CREATURE_LIST_CHAT, itr.guid, PrepareStringNpcOrGoSpawnInformation<Creature>(itr.guid).c_str(),
-                                        itr.guid, info->name, data->position.x, data->position.y, data->position.z, data->position.mapId, active);
+                                        itr.guid, info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId, active);
                     else
                         PSendSysMessage(LANG_POOL_CREATURE_LIST_CONSOLE, itr.guid, PrepareStringNpcOrGoSpawnInformation<Creature>(itr.guid).c_str(),
-                                        info->name, data->position.x, data->position.y, data->position.z, data->position.mapId, active);
+                                        info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId, active);
                 }
             }
         }

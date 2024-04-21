@@ -1,0 +1,10 @@
+# CMake
+out/
+build/
+build_*/
+
+# Visual Studio
+.vs/
+
+# Visual Studio Code
+.vscode/

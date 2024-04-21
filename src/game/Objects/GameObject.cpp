@@ -318,7 +318,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         return;
     }
 
-    UpdateCooldowns(sWorld.GetCurrentClockTime());
+    UpdateCooldowns(GetMap()->GetCurrentClockTime());
 
     m_Events.Update(update_diff);
 
@@ -759,7 +759,7 @@ void GameObject::AddUniqueUse(Player* player)
         }
 }
 
-void GameObject::RemoveUniqueUse(Player* player)
+void GameObject::RemoveUniqueUse(Player const* player)
 {
     const std::lock_guard<std::shared_timed_mutex> guard(m_UniqueUsers_lock);
 
@@ -818,7 +818,7 @@ void GameObject::FinishRitual()
     }
 }
 
-bool GameObject::HasUniqueUser(Player* player)
+bool GameObject::HasUniqueUser(Player const* player)
 {
     const std::shared_lock<std::shared_timed_mutex> guard(m_UniqueUsers_lock);
     return m_UniqueUsers.find(player->GetObjectGuid()) != m_UniqueUsers.end();
@@ -1172,7 +1172,7 @@ void GameObject::Respawn()
     }
 }
 
-bool GameObject::ActivateToQuest(Player* pTarget) const
+bool GameObject::ActivateToQuest(Player const* pTarget) const
 {
     // if GO is ReqCreatureOrGoN for quest
     if (pTarget->HasQuestForGO(GetEntry()))
@@ -2275,12 +2275,12 @@ float GameObject::GetObjectBoundingRadius() const
     return DEFAULT_WORLD_OBJECT_SIZE;
 }
 
-bool GameObject::IsInSkillupList(Player* player) const
+bool GameObject::IsInSkillupList(Player const* player) const
 {
     return m_SkillupSet.find(player->GetObjectGuid()) != m_SkillupSet.end();
 }
 
-void GameObject::AddToSkillupList(Player* player)
+void GameObject::AddToSkillupList(Player const* player)
 {
     m_SkillupSet.insert(player->GetObjectGuid());
 }

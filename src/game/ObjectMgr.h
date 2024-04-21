@@ -203,6 +203,7 @@ typedef std::unordered_map<uint32, FactionEntry> FactionsMap;
 typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
 typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
 typedef std::unordered_map<uint32, ItemPrototype> ItemPrototypeMap;
+typedef std::unordered_map<uint32, std::unique_ptr<CreatureInfo>> CreatureInfoMap;
 
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
@@ -627,7 +628,6 @@ class ObjectMgr
         GroupMap::iterator GetGroupMapBegin() { return m_GroupMap.begin(); }
         GroupMap::iterator GetGroupMapEnd() { return m_GroupMap.end(); }
 
-        static CreatureInfo const* GetCreatureTemplate(uint32 id);
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoAddon(uint32 display_id);
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoRandomGender(uint32 display_id);
 
@@ -839,7 +839,20 @@ class ObjectMgr
         void LoadPetSpellData();
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
-        void CheckCreatureTemplates();
+        void LoadCreatureTemplate(uint32 entry);
+        void CheckCreatureTemplate(CreatureInfo* cInfo);
+        CreatureInfo const* GetCreatureTemplate(uint32 id) const
+        {
+            auto itr = m_creatureInfoMap.find(id);
+            if (itr != m_creatureInfoMap.end())
+                return itr->second.get();
+
+            return nullptr;
+        }
+        CreatureInfoMap const& GetCreatureInfoMap() const
+        {
+            return m_creatureInfoMap;
+        }
         void CorrectCreatureDisplayIds(uint32, uint32&);
 
         void LoadCreatures(bool reload = false);
@@ -1482,6 +1495,7 @@ class ObjectMgr
         uint32 m_OldMailCounter;
 
     private:
+        void LoadCreatureInfo(Field* result);
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
         void LoadVendors(char const* tableName, bool isTemplates);
@@ -1549,6 +1563,7 @@ class ObjectMgr
         FactionTemplatesMap m_FactionTemplatesMap;
 
         SoundEntryMap m_SoundEntriesMap;
+        CreatureInfoMap m_creatureInfoMap;
         ItemPrototypeMap m_itemPrototypesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;

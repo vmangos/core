@@ -192,7 +192,7 @@ class LootStore
 
         bool HaveLootFor(uint32 loot_id) const { return m_LootTemplates.find(loot_id) != m_LootTemplates.end(); }
         bool HaveQuestLootFor(uint32 loot_id) const;
-        bool HaveQuestLootForPlayer(uint32 loot_id,Player* player) const;
+        bool HaveQuestLootForPlayer(uint32 loot_id, Player const* player) const;
 
         LootTemplate const* GetLootFor(uint32 loot_id) const;
 
@@ -351,6 +351,7 @@ struct Loot
 
     void GenerateMoneyLoot(uint32 minAmount, uint32 maxAmount);
     bool FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError = false, WorldObject const* looted = nullptr);
+    void FillPlayerDependentLoot(Player* loot_owner, bool personal, WorldObject const* looted = nullptr);
 
     // Inserts the item into the loot (called by LootTemplate processors)
     void AddItem(LootStoreItem const& item);
