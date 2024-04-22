@@ -2370,6 +2370,82 @@ void CombatBotBaseAI::LearnArmorProficiencies()
     }
 }
 
+void CombatBotBaseAI::LearnAllTrainer()
+{
+    uint32 trainerId;
+    std::set<uint32> checkedTrainerTemplates;
+    for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
+    {
+        CreatureInfo const* cInfo = itr.second.get();
+        if (!cInfo)
+            continue;
+
+        if (!(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
+            continue;
+
+        switch (cInfo->trainer_type)
+        {
+        case TRAINER_TYPE_CLASS:
+        {
+            if (cInfo->trainer_class != me->GetClass())
+                continue;
+            break;
+        }
+        case TRAINER_TYPE_PETS:
+        {
+            if (me->GetClass() != CLASS_HUNTER)
+                continue;
+            break;
+        }
+        }
+
+        if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
+            LearnTrainerHelper(cSpells);
+
+        if (trainerId = cInfo->trainer_id) // assignment
+        {
+            if (checkedTrainerTemplates.find(trainerId) != checkedTrainerTemplates.end())
+                continue;
+
+            checkedTrainerTemplates.insert(trainerId);
+            if (TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId))
+                LearnTrainerHelper(tSpells);
+        }
+    }
+}
+
+void CombatBotBaseAI::LearnTrainerHelper(TrainerSpellData const* tSpells)
+{
+    bool learnedAnything;
+    do
+    {
+        learnedAnything = false;
+        for (const auto& itr : tSpells->spellList)
+        {
+            TrainerSpell const* tSpell = &itr.second;
+
+            TrainerSpellState state = me->GetTrainerSpellState(tSpell);
+            if (state != TRAINER_SPELL_GREEN)
+                continue;
+
+            for (auto const& spellId : sSpellMgr.GetSpellEntry(tSpell->spell)->EffectTriggerSpell)
+            {
+                if (!spellId)
+                    continue;
+
+                if (sSpellMgr.IsPrimaryProfessionFirstRankSpell(spellId))
+                    continue;
+
+                if (!me->IsSpellFitByClassAndRace(spellId))
+                    continue;
+
+                me->LearnSpell(spellId, false);
+                learnedAnything = true;
+            }
+        }
+    } while (learnedAnything);
+}
+
 void CombatBotBaseAI::LearnPremadeSpecForClass()
 {
     std::vector<PlayerPremadeSpecTemplate const*> vSpecs;
@@ -2559,6 +2635,7 @@ inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
 void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
 {
     LearnArmorProficiencies();
+    LearnAllTrainer();    
 
     bool const onlyPvE = urand(0, 1) != 0;
     uint8 const honorRank = onlyPvE ? 0 : urand(5, 18);
@@ -2606,7 +2683,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         // Avoid low level items
         if (pLeaderItl)
         {
-            if (pProto->InventoryType != INVTYPE_TRINKET && (pProto->ItemLevel < pLeaderItl || pProto->ItemLevel > pLeaderItl + 5))
+            if (pProto->InventoryType != INVTYPE_TRINKET && (pProto->ItemLevel < pLeaderItl || pProto->ItemLevel >= pLeaderItl + 10))
                 continue;
         }
         else if (pProto->InventoryType != INVTYPE_TRINKET && (pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
@@ -2623,65 +2700,74 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
         if (pProto->RequiredReputationFaction && uint32(me->GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
             continue;
 
-        // Avoid things with heal status.
-        std::vector<uint32> healItemSpells = { 7675, 7676, 7677, 7678, 7679, 7680, 7681, 446470, 9406, 9407, 9408, 23796, 9314, 9315, 9316, 25067, 9317, 9318, 18029, 18030, 18031, 18032, 17371, 18033, 18034, 18035, 15696, 22748, 18036, 18037, 18038, 18039, 18040, 18041, 18042, 18043, 18044, 18045, 18046, 18047, 18048, 17320, 26154, 23593, 26225, 23264, 26690, 26228, 29369, 26461, 28686, 28736, 26814, 28805, 28151, 28152 };
-        bool isHealItem = false;
-        for (const auto& itr : pProto->Spells)
+        if (me->GetLevel() == 60)
         {
-            if (m_role != ROLE_HEALER)
+            uint8 count;
+
+            // Avoid things with heal status.
+            std::vector<uint32> healItemSpells = { 7675, 7676, 7677, 7678, 7679, 7680, 7681, 446470, 9406, 9407, 9408, 23796, 9314, 9315, 9316, 25067, 9317, 9318, 18029, 18030, 18031, 18032, 17371, 18033, 18034, 18035, 15696, 22748, 18036, 18037, 18038, 18039, 18040, 18041, 18042, 18043, 18044, 18045, 18046, 18047, 18048, 17320, 26154, 23593, 26225, 23264, 26690, 26228, 29369, 26461, 28686, 28736, 26814, 28805, 28151, 28152 };
+            bool isHealItem = false;    
+            count = 0;
+            for (const auto& itr : pProto->Spells)
             {
-                if (std::find(healItemSpells.begin(), healItemSpells.end(), itr.SpellId) != healItemSpells.end())
-                    isHealItem = true;
+                if (m_role != ROLE_HEALER)
+                {
+                    if (std::find(healItemSpells.begin(), healItemSpells.end(), itr.SpellId) != healItemSpells.end())
+                    {
+                        isHealItem = true;
+                        count++;
+                    }                        
+                }
+            }
+
+            if (isHealItem && count == 1)
+                continue;
+
+            // Avoid things with mp status.
+            std::vector<uint32> mpItemSpells = { 21360, 18379, 21618, 21359, 21621, 21633, 21638, 25114, 21622, 21631, 25115, 21363, 21630, 21362, 21626, 21637, 21642, 21644, 23795, 26647, 21365, 21624, 21625, 21364, 21636, 21640, 20959, 21628, 21366, 21620, 21627, 21632, 18378, 21361, 21629, 21634, 21635, 21641, 23212, 21623, 21643, 21619, 21639 };
+            bool isMpItem = false;
+            count = 0;
+            for (const auto& itr : pProto->Spells)
+            {
+                if (m_role != ROLE_HEALER)
+                {
+                    if (std::find(mpItemSpells.begin(), mpItemSpells.end(), itr.SpellId) != mpItemSpells.end())
+                        isMpItem = true;
+                }
+            }
+
+            if (isMpItem && count == 1)
+                continue;
+
+            // Trinkets for role
+            if (pProto->InventoryType == INVTYPE_TRINKET && me->GetLevel() == 60)
+            {
+                if (m_role == ROLE_TANK)
+                {
+                    std::vector<uint32> tankTrinkets = { 11810, 10779, 19431, 18406, 19406, 13966, 11811 };
+                    if (std::find(tankTrinkets.begin(), tankTrinkets.end(), pProto->ItemId) == tankTrinkets.end())
+                        continue;
+                }
+                else if (m_role == ROLE_MELEE_DPS || me->GetClass() == CLASS_HUNTER)
+                {
+                    std::vector<uint32> mDpsTrinkets = { 13965, 11815, 19406, 21670, 23570, 23041, 22954, 22321, 19289 };
+                    if (std::find(mDpsTrinkets.begin(), mDpsTrinkets.end(), pProto->ItemId) == mDpsTrinkets.end())
+                        continue;
+                }
+                else if (m_role == ROLE_RANGE_DPS)
+                {
+                    std::vector<uint32> rDpsTrinkets = { 12930, 13968, 18467, 18820, 19379, 18820, 23046, 19344, 11819, 18371, 19339 };
+                    if (std::find(rDpsTrinkets.begin(), rDpsTrinkets.end(), pProto->ItemId) == rDpsTrinkets.end())
+                        continue;
+                }
+                else if (m_role == ROLE_HEALER)
+                {
+                    std::vector<uint32> healTrinkets = { 19395, 17064, 18371, 12930, 11819, 18469, 23027, 23047, 18470 };
+                    if (std::find(healTrinkets.begin(), healTrinkets.end(), pProto->ItemId) == healTrinkets.end())
+                        continue;
+                }
             }
         }
-
-        if (isHealItem)
-            continue;
-
-        // Avoid things with mp status.
-        std::vector<uint32> mpItemSpells = { 21360, 18379, 21618, 21359, 21621, 21633, 21638, 25114, 21622, 21631, 25115, 21363, 21630, 21362, 21626, 21637, 21642, 21644, 23795, 26647, 21365, 21624, 21625, 21364, 21636, 21640, 20959, 21628, 21366, 21620, 21627, 21632, 18378, 21361, 21629, 21634, 21635, 21641, 23212, 21623, 21643, 21619, 21639 };
-        bool isMpItem = false;
-        for (const auto& itr : pProto->Spells)
-        {
-            if (m_role != ROLE_HEALER)
-            {
-                if (std::find(mpItemSpells.begin(), mpItemSpells.end(), itr.SpellId) != mpItemSpells.end())
-                    isMpItem = true;
-            }
-        }
-
-        if (isMpItem)
-            continue;
-
-        // Trinkets for role
-        if (pProto->InventoryType == INVTYPE_TRINKET && me->GetLevel() == 60)
-        {
-            if (m_role == ROLE_TANK)
-            {
-                std::vector<uint32> tankTrinkets = { 11810, 10779, 19431, 18406, 19406, 13966, 11811 };
-                if (std::find(tankTrinkets.begin(), tankTrinkets.end(), pProto->ItemId) == tankTrinkets.end())
-                    continue;                
-            }
-            else if (m_role == ROLE_MELEE_DPS || me->GetClass() == CLASS_HUNTER)
-            {
-                std::vector<uint32> mDpsTrinkets = { 13965, 11815, 19406, 21670, 23570, 23041, 22954, 22321, 19289 };
-                if (std::find(mDpsTrinkets.begin(), mDpsTrinkets.end(), pProto->ItemId) == mDpsTrinkets.end())
-                    continue;
-            }
-            else if (m_role == ROLE_RANGE_DPS)
-            {
-                std::vector<uint32> rDpsTrinkets = { 12930, 13968, 18467, 18820, 19379, 18820, 23046, 19344, 11819, 18371, 19339 };
-                if (std::find(rDpsTrinkets.begin(), rDpsTrinkets.end(), pProto->ItemId) == rDpsTrinkets.end())
-                    continue;
-            }
-            else if (m_role == ROLE_HEALER)
-            {
-                std::vector<uint32> healTrinkets = { 19395, 17064, 18371, 12930, 11819, 18469, 23027, 23047, 18470 };
-                if (std::find(healTrinkets.begin(), healTrinkets.end(), pProto->ItemId) == healTrinkets.end())
-                    continue;
-            }     
-        }
-
 
         if (uint32 skill = pProto->GetProficiencySkill())
         {

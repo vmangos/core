@@ -93,6 +93,8 @@ public:
     void AddAllSpellReagents();
     void SummonPetIfNeeded();
     void LearnArmorProficiencies();
+    void LearnAllTrainer();
+    void LearnTrainerHelper(TrainerSpellData const* tSpells);
     void LearnPremadeSpecForClass();
     void EquipPremadeGearTemplate();
     void EquipRandomGearInEmptySlots(uint8 pLeaderItl);

@@ -1802,8 +1802,13 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                         return false;
                     }
                 }
+
                 pAI->ChangePartyLeader(pPlayer->GetObjectGuid());
-                pTarget->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
+
+                if (!pTarget->IsDead())
+                {
+                    pTarget->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
+                }
             }
 
             PSendSysMessage("%s has changed its leader.", pTarget->GetName());
@@ -1832,7 +1837,12 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                         }
 
                         pAI->ChangePartyLeader(pPlayer->GetObjectGuid());
-                        pMember->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
+
+                        if (!pMember->IsDead())
+                        {
+                            pMember->GetMotionMaster()->MoveFollow(pPlayer, urand(3.0f, 6.0f), frand(0.0f, 6.0f));
+                        }
+                        
                     }
                 }
             }
