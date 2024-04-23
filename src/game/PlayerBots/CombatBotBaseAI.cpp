@@ -2732,11 +2732,33 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
                 if (m_role != ROLE_HEALER)
                 {
                     if (std::find(mpItemSpells.begin(), mpItemSpells.end(), itr.SpellId) != mpItemSpells.end())
+                    {
                         isMpItem = true;
+                        count++;
+                    }
                 }
             }
 
             if (isMpItem && count == 1)
+                continue;
+
+            // Casters don't need attack power.
+            std::vector<uint32> apItemSpells = { 9136, 9137, 446450, 15819, 15820, 15823, 15825, 15827, 15828, 15830, 15831, 15832, 28735 };
+            bool isApItem = false;
+            count = 0;
+            for (const auto& itr : pProto->Spells)
+            {
+                if (m_role != ROLE_MELEE_DPS && (me->GetClass() != CLASS_PALADIN || me->GetClass() != CLASS_SHAMAN))
+                {
+                    if (std::find(apItemSpells.begin(), apItemSpells.end(), itr.SpellId) != apItemSpells.end())
+                    {
+                        isApItem = true;
+                        count++;
+                    }                        
+                }
+            }
+
+            if (isApItem && count == 1)
                 continue;
 
             // Trinkets for role
