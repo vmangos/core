@@ -612,7 +612,7 @@ void PlayerBotMgr::DeleteBattleBots()
         if (dynamic_cast<BattleBotAI*>(itr.second->ai.get()))
             itr.second->requestRemoval = true;
     }
-    m_confBattleBotAutoJoin = false;
+    //m_confBattleBotAutoJoin = false;
 }
 
 bool PlayerBotMgr::ForceAccountConnection(WorldSession* sess)
