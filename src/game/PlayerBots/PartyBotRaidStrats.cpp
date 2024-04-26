@@ -558,3 +558,38 @@ void PartyBotAI::RaidStratsInMKBosses()
         }
     }
 }
+
+void PartyBotAI::RaidStratsInOnyxiaBosses() {
+    if (me->GetZoneId() != 2159)
+    {
+        return;
+    }
+
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (pVictim->GetGUIDLow() == 10184)
+        {
+            if (pVictim->GetHealthPercent() < 66 && pVictim->GetHealthPercent() > 33)
+            {
+                if (pVictim->GetVictim() == me)
+                {
+                    std::list<Player*> players;
+                    me->GetAlivePlayerListInRange(me, players, 10.0f);
+
+                    if (!players.empty())
+                    {
+                        me->InterruptNonMeleeSpells(false);
+                        me->AttackStop();
+
+                        float newAngle = me->GetOrientation();
+                        newAngle += (M_PI_F * 2) * 0.25;
+                        newAngle = MapManager::NormalizeOrientation(newAngle);
+                        me->SetOrientation(newAngle);
+                        if (me->GetMotionMaster()->MoveDistance(me, 10.0f))
+                            return;
+                    }                    
+                }
+            }
+        }
+    }
+}

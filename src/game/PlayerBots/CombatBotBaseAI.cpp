@@ -2743,7 +2743,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
                 continue;
 
             // Casters don't need attack power.
-            std::vector<uint32> apItemSpells = { 9136, 9137, 446450, 15819, 15820, 15823, 15825, 15827, 15828, 15830, 15831, 15832, 28735 };
+            std::vector<uint32> apItemSpells = { 9136, 9137, 14027, 15819, 15820, 15823, 15825, 15827, 15828, 15830, 15831, 15832, 28735, 446450 };
             bool isApItem = false;
             count = 0;
             for (const auto& itr : pProto->Spells)

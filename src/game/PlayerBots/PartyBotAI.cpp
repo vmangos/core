@@ -1152,6 +1152,7 @@ void PartyBotAI::UpdateInCombatAI()
         {
             RaidStratsInZGBosses();
             RaidStratsInMKBosses();
+            RaidStratsInOnyxiaBosses();
         }
 
         Player* pLeader = GetPartyLeader();

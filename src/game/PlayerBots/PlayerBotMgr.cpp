@@ -2069,7 +2069,7 @@ bool ChatHandler::HandlePartyBotMoveCommand(char* args)
                     pAI->m_stay = false;
                 }
 
-                PSendSysMessage("%s won't move.", pTarget->GetName());
+                PSendSysMessage("%s now move.", pTarget->GetName());
                 return true;
             }
 
@@ -2106,7 +2106,7 @@ bool ChatHandler::HandlePartyBotMoveCommand(char* args)
                 }
             }
 
-            SendSysMessage("The partybot won't move.");
+            SendSysMessage("The partybot now move.");
             return true;
         }
     }
