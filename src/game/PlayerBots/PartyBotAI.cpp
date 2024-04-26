@@ -813,6 +813,12 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     Player* pLeader = GetPartyLeader();
     if (!pLeader)
     {
+        if (me->IsDead() && me->GetDeathState() == CORPSE)
+        {
+            me->BuildPlayerRepop();
+            me->SpawnCorpseBones();
+        }
+
         botEntry->requestRemoval = true;
         return;
     }
