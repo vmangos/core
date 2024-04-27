@@ -2193,55 +2193,59 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     }
     else if (Group* pGroup = pPlayer->GetGroup())
     {
-        if (option != "all" || option != "tank" || option != "dps" || option != "healer")
+        if (option == "all" || option == "tank" || option == "dps" || option == "healer")
+        {
+            bool success = false;
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    if (pMember == pPlayer)
+                        continue;
+
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    {
+                        // Only the owner can.     
+                        if (pAI->m_personalControls)
+                        {
+                            Player* pLeader = pAI->GetPartyLeader();
+                            if (pPlayer != pLeader)
+                                continue;
+                        }
+
+                        if (option == "tank" && pAI->m_role != ROLE_TANK)
+                            continue;
+                        if (option == "dps" && (pAI->m_role == ROLE_TANK || pAI->m_role == ROLE_HEALER))
+                            continue;
+                        if (option == "healer" && pAI->m_role != ROLE_HEALER)
+                            continue;
+                    }
+
+                    if (HandlePartyBotPauseApplyHelper(pMember, duration))
+                        success = true;
+                }
+            }
+
+            if (success)
+            {
+                if (pause)
+                {
+                    PSendSysMessage("Partybots %s paused for %u seconds.", option.c_str(), (duration / IN_MILLISECONDS));
+                }
+                else
+                    SendSysMessage("All party bots unpaused.");
+            }
+            else
+            {
+                SendSysMessage("No party bots in group.");
+            }                
+        }
+        else
         {
             SendSysMessage("Incorrect option. Acceptable value: all, tank, dps, healer.");
             SetSentErrorMessage(true);
             return false;
-        }
-
-        bool success = false;
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            if (Player* pMember = itr->getSource())
-            {
-                if (pMember == pPlayer)
-                    continue;
-
-                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
-                {
-                    // Only the owner can.     
-                    if (pAI->m_personalControls)
-                    {
-                        Player* pLeader = pAI->GetPartyLeader();
-                        if (pPlayer != pLeader)
-                            continue;
-                    }
-
-                    if (option == "tank" && pAI->m_role != ROLE_TANK)
-                        continue;
-                    if (option == "dps" && (pAI->m_role == ROLE_TANK || pAI->m_role == ROLE_HEALER))
-                        continue;
-                    if (option == "healer" && pAI->m_role != ROLE_HEALER)
-                        continue;
-                }                
-
-                if (HandlePartyBotPauseApplyHelper(pMember, duration))
-                    success = true;
-            }
-        }
-
-        if (success)
-        {
-            if (pause)
-            {
-                PSendSysMessage("Partybots %s paused for %u seconds.", option.c_str(), (duration / IN_MILLISECONDS));
-            }  
-            else
-                SendSysMessage("All party bots unpaused.");
-        }
-        else
-            SendSysMessage("No party bots in group.");
+        }       
     }
 
     return true;
