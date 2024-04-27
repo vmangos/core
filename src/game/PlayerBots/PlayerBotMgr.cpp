@@ -1574,30 +1574,8 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     Player* pPlayer = GetSession()->GetPlayer();
     Player* pTarget = GetSelectedPlayer();
 
-    if (!pTarget && (option != "all" || option != "tank" || option != "dps" || option != "healer"))
-    {
-        SendSysMessage("Incorrect option. Acceptable value: all, tank, dps, healer.");
-        SetSentErrorMessage(true);
-        return false;
-    }
-
     if (pTarget && pTarget != pPlayer)
     {
-        // Only the owner can.
-        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
-        {
-            if (pAI->m_personalControls)
-            {
-                Player* pLeader = pAI->GetPartyLeader();
-
-                if (pPlayer != pLeader)
-                {
-                    PSendSysMessage("%s is not your bot or it cannot pause.", pTarget->GetName());
-                    return false;
-                }
-            }
-        }
-
         if (HandlePartyBotPauseApplyHelper(pTarget, duration))
         {
             if (pause)
@@ -1611,48 +1589,51 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     }
     else if (Group* pGroup = pPlayer->GetGroup())
     {
-        bool success = false;
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        if (option == "all" || option == "tank" || option == "dps" || option == "healer")
         {
-            if (Player* pMember = itr->getSource())
+            bool success = false;
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
-                if (pMember == pPlayer)
-                    continue;
-
-                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                if (Player* pMember = itr->getSource())
                 {
-                    // Only the owner can.     
-                    if (pAI->m_personalControls)
+                    if (pMember == pPlayer)
+                        continue;
+
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
                     {
-                        Player* pLeader = pAI->GetPartyLeader();
-                        if (pPlayer != pLeader)
+                        if (option == "tank" && pAI->m_role != ROLE_TANK)
+                            continue;
+                        if (option == "dps" && (pAI->m_role == ROLE_TANK || pAI->m_role == ROLE_HEALER))
+                            continue;
+                        if (option == "healer" && pAI->m_role != ROLE_HEALER)
                             continue;
                     }
 
-                    if (option == "tank" && pAI->m_role != ROLE_TANK)
-                        continue;
-                    if (option == "dps" && (pAI->m_role == ROLE_TANK || pAI->m_role == ROLE_HEALER))
-                        continue;
-                    if (option == "healer" && pAI->m_role != ROLE_HEALER)
-                        continue;
+                    if (HandlePartyBotPauseApplyHelper(pMember, duration))
+                        success = true;
                 }
-
-                if (HandlePartyBotPauseApplyHelper(pMember, duration))
-                    success = true;
             }
-        }
 
-        if (success)
-        {
-            if (pause)
+            if (success)
             {
-                PSendSysMessage("Partybots %s paused for %u seconds.", option.c_str(), (duration / IN_MILLISECONDS));
+                if (pause)
+                {
+                    PSendSysMessage("Partybots %s paused for %u seconds.", option.c_str(), (duration / IN_MILLISECONDS));
+                }
+                else
+                    SendSysMessage("All party bots unpaused.");
             }
             else
-                SendSysMessage("All party bots unpaused.");
+            {
+                SendSysMessage("No party bots in group.");
+            }
         }
         else
-            SendSysMessage("No party bots in group.");
+        {
+            SendSysMessage("Incorrect option. Acceptable value: all, tank, dps, healer.");
+            SetSentErrorMessage(true);
+            return false;
+        }
     }
 
     return true;
