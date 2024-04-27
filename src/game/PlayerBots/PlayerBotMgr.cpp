@@ -1550,67 +1550,52 @@ bool HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
 
 bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
 {
-    bool all = false;
-    uint32 duration = 0;
-    if (char* arg1 = ExtractArg(&args))
+    std::string option = "all"; // all, tank, dps, healer
+    uint32 duration = 5 * MINUTE * IN_MILLISECONDS; // in sec
+
+    while (char* arg = ExtractArg(&args))
     {
-        if (!(all = (strcmp(arg1, "all") == 0)) && pause)
-            duration = atoi(arg1);
+        if (!arg)
+            continue;
 
-        if (char* arg2 = ExtractArg(&args))
-        {
-            if (!duration && pause)
-                duration = atoi(arg2);
-            else if (!all)
-                all = strcmp(arg2, "all") == 0;
-        }
-    }
-
-    if (pause && !duration)
-        duration = 5 * MINUTE * IN_MILLISECONDS;
-
-    if (all)
-    {
-        Player* pPlayer = GetSession()->GetPlayer();
-        Group* pGroup = pPlayer->GetGroup();
-        if (!pGroup)
-        {
-            SendSysMessage("You are not in a group.");
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        bool success = false;
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            if (Player* pMember = itr->getSource())
-            {
-                if (pMember == pPlayer)
-                    continue;
-
-                if (HandlePartyBotPauseApplyHelper(pMember, duration))
-                    success = true;
-            }
-        }
-
-        if (success)
-        {
-            if (pause)
-                PSendSysMessage("All party bots paused for %u seconds.", (duration / IN_MILLISECONDS));
-            else
-                SendSysMessage("All party bots unpaused.");
-        }
+        if (pause && isNumeric(arg))
+            duration = atoi(arg) * IN_MILLISECONDS;
         else
-            SendSysMessage("No party bots in group.");
+            option = arg;
     }
-    else
+
+    if (duration > 5 * HOUR * IN_MILLISECONDS)
     {
-        Player* pTarget = GetSelectedPlayer();
-        if (!pTarget)
+        SendSysMessage("The duration is too long, no more than 5 hours.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (!pTarget && (option != "all" || option != "tank" || option != "dps" || option != "healer"))
+    {
+        SendSysMessage("Incorrect option. Acceptable value: all, tank, dps, healer.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget && pTarget != pPlayer)
+    {
+        // Only the owner can.
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
         {
-            SendSysMessage(LANG_NO_CHAR_SELECTED);
-            SetSentErrorMessage(true);
-            return false;
+            if (pAI->m_personalControls)
+            {
+                Player* pLeader = pAI->GetPartyLeader();
+
+                if (pPlayer != pLeader)
+                {
+                    PSendSysMessage("%s is not your bot or it cannot pause.", pTarget->GetName());
+                    return false;
+                }
+            }
         }
 
         if (HandlePartyBotPauseApplyHelper(pTarget, duration))
@@ -1623,6 +1608,51 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
 
         else
             SendSysMessage("Target is not a party bot.");
+    }
+    else if (Group* pGroup = pPlayer->GetGroup())
+    {
+        bool success = false;
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* pMember = itr->getSource())
+            {
+                if (pMember == pPlayer)
+                    continue;
+
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    // Only the owner can.     
+                    if (pAI->m_personalControls)
+                    {
+                        Player* pLeader = pAI->GetPartyLeader();
+                        if (pPlayer != pLeader)
+                            continue;
+                    }
+
+                    if (option == "tank" && pAI->m_role != ROLE_TANK)
+                        continue;
+                    if (option == "dps" && (pAI->m_role == ROLE_TANK || pAI->m_role == ROLE_HEALER))
+                        continue;
+                    if (option == "healer" && pAI->m_role != ROLE_HEALER)
+                        continue;
+                }
+
+                if (HandlePartyBotPauseApplyHelper(pMember, duration))
+                    success = true;
+            }
+        }
+
+        if (success)
+        {
+            if (pause)
+            {
+                PSendSysMessage("Partybots %s paused for %u seconds.", option.c_str(), (duration / IN_MILLISECONDS));
+            }
+            else
+                SendSysMessage("All party bots unpaused.");
+        }
+        else
+            SendSysMessage("No party bots in group.");
     }
 
     return true;
