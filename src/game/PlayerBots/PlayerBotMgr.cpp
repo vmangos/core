@@ -1766,6 +1766,14 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
     Player* pPlayer = GetSession()->GetPlayer();
     Player* pTarget = GetSelectedPlayer();
 
+    //TODO: LANG
+    if (pPlayer->IsHardcore())
+    {
+        SendSysMessage("It is forbidden in HC mode.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     if (Group* pGroup = pPlayer->GetGroup())
     {
         if (pTarget && pTarget != pPlayer)
