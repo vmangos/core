@@ -2235,14 +2235,7 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
         {
             if (pause)
             {
-                if (option == "all")
-                    PSendSysMessage("All party bots paused for %u seconds.", (duration / IN_MILLISECONDS));
-                if (option == "tank")
-                    PSendSysMessage("Tank party bots paused for %u seconds.", (duration / IN_MILLISECONDS));
-                if (option == "dps")
-                    PSendSysMessage("DPS party bots paused for %u seconds.", (duration / IN_MILLISECONDS));
-                if (option == "healer")
-                    PSendSysMessage("Healer party bots paused for %u seconds.", (duration / IN_MILLISECONDS));
+                PSendSysMessage("Partybots %s paused for %u seconds.", option.c_str(), (duration / IN_MILLISECONDS));
             }  
             else
                 SendSysMessage("All party bots unpaused.");
