@@ -2161,14 +2161,7 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     }
 
     Player* pPlayer = GetSession()->GetPlayer();
-    Player* pTarget = GetSelectedPlayer();
-
-    if (!pTarget && (option != "all" || option != "tank" || option != "dps" || option != "healer"))
-    {
-        SendSysMessage("Incorrect option. Acceptable value: all, tank, dps, healer.");
-        SetSentErrorMessage(true);
-        return false;
-    }
+    Player* pTarget = GetSelectedPlayer();    
 
     if (pTarget && pTarget != pPlayer)
     { 
@@ -2199,7 +2192,14 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
             SendSysMessage("Target is not a party bot.");
     }
     else if (Group* pGroup = pPlayer->GetGroup())
-    {        
+    {
+        if (option != "all" || option != "tank" || option != "dps" || option != "healer")
+        {
+            SendSysMessage("Incorrect option. Acceptable value: all, tank, dps, healer.");
+            SetSentErrorMessage(true);
+            return false;
+        }
+
         bool success = false;
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
