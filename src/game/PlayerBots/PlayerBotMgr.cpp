@@ -2148,7 +2148,7 @@ bool HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
 bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
 {
     std::string option = "all"; // all, tank, dps, healer
-    uint32 duration = 5 * MINUTE * IN_MILLISECONDS; // in sec
+    uint32 duration = 0;
 
     while (char* arg = ExtractArg(&args))
     {
@@ -2159,6 +2159,11 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
             duration = atoi(arg) * IN_MILLISECONDS;
         else 
             option = arg;
+    }
+
+    if (pause && !duration)
+    {
+        duration = 5 * MINUTE * IN_MILLISECONDS;
     }
 
     if (duration > 5 * HOUR * IN_MILLISECONDS)
