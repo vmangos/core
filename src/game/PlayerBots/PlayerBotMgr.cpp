@@ -1622,16 +1622,12 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
             if (success)
             {
                 if (pause)
-                {
                     PSendSysMessage("Partybots %s paused for %u seconds.", option.c_str(), (duration / IN_MILLISECONDS));
-                }
                 else
-                    SendSysMessage("All party bots unpaused.");
+                    PSendSysMessage("Partybots %s unpaused.", option.c_str());
             }
             else
-            {
                 SendSysMessage("No party bots in group.");
-            }
         }
         else
         {
