@@ -259,14 +259,19 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
         m_combatTimer = UNIT_COMBAT_CHECK_TIMER_MAX - std::min(update_diff - m_combatTimer, UNIT_COMBAT_CHECK_TIMER_MAX);
 
         // update combat timer only for players and pets
-        if (IsInCombat() && (IsPlayer() || (IsPet() && GetOwnerGuid().IsPlayer()) || GetCharmerGuid().IsPlayer()))
+        if (IsInCombat() && UsesPvPCombatTimer() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
         {
             // Pet in combat ?
             Pet* myPet = GetPet();
             if (HasUnitState(UNIT_STAT_FEIGN_DEATH) || !myPet || myPet->GetHostileRefManager().isEmpty())
             {
-                if (m_HostileRefManager.isEmpty() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
-                    ClearInCombat();
+                if (m_HostileRefManager.isEmpty())
+                {
+                    if (!IsCharmerOrOwnerPlayerOrPlayerItself() && static_cast<Creature const*>(this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET))
+                        OnLeaveCombat();
+                    else
+                        ClearInCombat();
+                }
             }
         }
     }
@@ -328,6 +333,23 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
     m_lastDamageTaken += p_time;
     if (m_lastDamageTaken > 60000)
         m_damageTakenHistory.clear();
+}
+
+bool Unit::UsesPvPCombatTimer() const
+{
+    if (IsPlayer())
+        return true;
+
+    if (IsPet() && GetOwnerGuid().IsPlayer())
+        return true;
+
+    if (GetCharmerGuid().IsPlayer())
+        return true;
+
+    if (static_cast<Creature const*>(this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET))
+        return true;
+
+    return false;
 }
 
 AutoAttackCheckResult Unit::CanAutoAttackTarget(Unit const* pVictim) const
@@ -5980,7 +6002,7 @@ void Unit::SetInCombatWith(Unit* pEnemy)
 {
     ASSERT(pEnemy);
 
-    SetInCombatState(pEnemy->IsCharmerOrOwnerPlayerOrPlayerItself() ? UNIT_PVP_COMBAT_TIMER : 0, pEnemy);
+    SetInCombatState(pEnemy->UsesPvPCombatTimer() ? UNIT_PVP_COMBAT_TIMER : 0, pEnemy);
 }
 
 void Unit::SetInCombatState(uint32 combatTimer, Unit* pEnemy)
@@ -6148,7 +6170,7 @@ void Unit::SetInCombatWithVictim(Unit* pVictim, bool touchOnly/* = false*/, uint
 
     if (!touchOnly)
     {
-        SetInCombatState(pVictim->IsCharmerOrOwnerPlayerOrPlayerItself() && (combatTimer < UNIT_PVP_COMBAT_TIMER) ? UNIT_PVP_COMBAT_TIMER : combatTimer, pVictim);
+        SetInCombatState(pVictim->UsesPvPCombatTimer() && (combatTimer < UNIT_PVP_COMBAT_TIMER) ? UNIT_PVP_COMBAT_TIMER : combatTimer, pVictim);
 
         // pet owner should not enter combat on spell missile launching
         if (!combatTimer)
@@ -7432,9 +7454,6 @@ bool Unit::CanHaveThreatList() const
     if (pCreature->GetCharmerGuid().IsPlayer())
         return false;
 
-    if (pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
-        return false;
-
     return true;
 }
 
@@ -7610,6 +7629,10 @@ bool Unit::SelectHostileTarget()
         }
         return true;
     }
+
+    // mobs that dont acquire targets use 5 second combat timer like players
+    if (((Creature*)this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET))
+        return false;
 
     // no target but something prevent go to evade mode // Nostalrius - fix evade quand CM.
     if (!IsInCombat() || HasAuraType(SPELL_AURA_MOD_TAUNT) || GetCharmerGuid())

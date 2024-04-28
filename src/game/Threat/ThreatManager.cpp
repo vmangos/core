@@ -406,14 +406,21 @@ void ThreatManager::addThreat(Unit* pVictim, float threat, bool crit, SpellSchoo
 
     MANGOS_ASSERT(getOwner()->GetTypeId() == TYPEID_UNIT);
 
-    // don't add assist threat to targets under hard CC
-    // check for fear, blind, freezing trap, reckless charge, banish, etc.
-    if (isAssistThreat)
+    if (threat)
     {
-        if (getOwner()->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED) ||
-           (getOwner()->HasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
+        // mob does not count threat, just keeps list of enemies
+        if (static_cast<Creature*>(getOwner())->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
+            threat = 0;
+
+        // don't add assist threat to targets under hard CC
+        // check for fear, blind, freezing trap, reckless charge, banish, etc.
+        else if (isAssistThreat)
         {
-            threat = 0.0f;
+            if (getOwner()->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED) ||
+                (getOwner()->HasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
+            {
+                threat = 0.0f;
+            }
         }
     }
 

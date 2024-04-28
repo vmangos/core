@@ -756,6 +756,7 @@ class ChatHandler
         bool HandleUnitShowSheathStateCommand(char* args);
         bool HandleUnitShowMoveFlagsCommand(char* args);
         bool HandleUnitShowCreateSpellCommand(char* args);
+        bool HandleUnitShowCombatTimerCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);
