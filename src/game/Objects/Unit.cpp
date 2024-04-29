@@ -267,7 +267,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
             {
                 if (m_HostileRefManager.isEmpty())
                 {
-                    if (!IsCharmerOrOwnerPlayerOrPlayerItself() && static_cast<Creature const*>(this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET))
+                    if (!IsCharmerOrOwnerPlayerOrPlayerItself() && static_cast<Creature const*>(this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
                         OnLeaveCombat();
                     else
                         ClearInCombat();
@@ -346,7 +346,7 @@ bool Unit::UsesPvPCombatTimer() const
     if (GetCharmerGuid().IsPlayer())
         return true;
 
-    if (static_cast<Creature const*>(this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET))
+    if (static_cast<Creature const*>(this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
         return true;
 
     return false;
@@ -7454,6 +7454,9 @@ bool Unit::CanHaveThreatList() const
     if (pCreature->GetCharmerGuid().IsPlayer())
         return false;
 
+    if (pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
+        return false;
+
     return true;
 }
 
@@ -7619,6 +7622,10 @@ bool Unit::SelectHostileTarget()
     if (!target && !m_ThreatManager.isThreatListEmpty())
         target = m_ThreatManager.getHostileTarget();
 
+    // stick to current target if no threat list
+    if (!target && ((Creature*)this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
+        target = GetVictim();
+
     if (target)
     {
         // Nostalrius : Correction bug sheep/fear
@@ -7630,8 +7637,8 @@ bool Unit::SelectHostileTarget()
         return true;
     }
 
-    // mobs that dont acquire targets use 5 second combat timer like players
-    if (((Creature*)this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET))
+    // mobs that dont have threat list use 5 second combat timer like players
+    if (((Creature*)this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
         return false;
 
     // no target but something prevent go to evade mode // Nostalrius - fix evade quand CM.
