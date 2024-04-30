@@ -169,7 +169,7 @@ REPLACE INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `pos
 (42815, 17256, 0, -9075.87, 839.089, 108.423, 5.09636, 0, 0, -0.559193, 0.829038, 180, 180, 100, 1, 0, 10); -- Stormwind City
 
 -- Wooden Chair
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`, `patch_max`) VALUES
+REPLACE INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`, `patch_max`) VALUES
 (42816, 17257, 0, -9084.21, 822.607, 115.678, 1.90241, 0, 0, 0.814115, 0.580704, 180, 180, 100, 1, 0, 10); -- Stormwind City
 
 -- Wooden Chair
