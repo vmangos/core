@@ -167,7 +167,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_GIGANTIC_AOI                 = 0x00000100, // 256      CREATURE_DIFFICULTYFLAGS_3_GIGANTIC_AOI (400 yards)
     CREATURE_FLAG_EXTRA_INFINITE_AOI                 = 0x00000200, // 512      CREATURE_DIFFICULTYFLAGS_3_INFINITE_AOI
     CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400, // 1024     Creature is a guard
-    CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800, // 2048     Creature does not select targets based on threat
+    CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800, // 2048     Creature does not keep track of enemies in threat list, uses 5 second combat timer like players
     CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000, // 4096     Creature keeps positive auras at reset
     CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000, // 8192     Creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
     CREATURE_FLAG_EXTRA_APPEAR_DEAD                  = 0x00004000, // 16384    Creature will have UNIT_DYNFLAG_DEAD applied

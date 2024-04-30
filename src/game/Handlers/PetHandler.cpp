@@ -166,11 +166,20 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             }
 
             pCharmedUnit->ClearUnitState(UNIT_STAT_MOVING);
-            auto result = pCharmedUnit->CastSpell(pUnitTarget, spellInfo, false);
-            if (result != SPELL_CAST_OK)
+            SpellCastResult result = pCharmedUnit->CastSpell(pUnitTarget, spellInfo, false);
+
+            if (result == SPELL_CAST_OK)
+            {
+                if (pCharmedUnit->IsPet())
+                    ((Pet*)pCharmedUnit)->CheckLearning(spellid);
+
+                if (pCharmedUnit->IsMoving() && pCharmedUnit->IsNoMovementSpellCasted())
+                    pCharmedUnit->StopMoving();
+            }
+            else
                 pCharmedUnit->SendPetCastFail(spellid, result);
-            else if (((Creature*)pCharmedUnit)->IsPet())
-                ((Pet*)pCharmedUnit)->CheckLearning(spellid);
+
+
             break;
         }
         default:

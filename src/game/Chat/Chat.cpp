@@ -719,6 +719,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "npcflags",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowNPCFlagsCommand,    "", nullptr },
         { "moveflags",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowMoveFlagsCommand,   "", nullptr },
         { "createspell",    SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowCreateSpellCommand, "", nullptr },
+        { "combattimer",    SEC_MODERATOR,      false, &ChatHandler::HandleUnitShowCombatTimerCommand, "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 

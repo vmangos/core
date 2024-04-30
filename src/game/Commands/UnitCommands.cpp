@@ -859,6 +859,23 @@ bool ChatHandler::HandleUnitShowCreateSpellCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleUnitShowCombatTimerCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Combat timer for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%u", pTarget->GetCombatTimer());
+
+    return true;
+}
+
 bool ChatHandler::HandlePvPCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();
