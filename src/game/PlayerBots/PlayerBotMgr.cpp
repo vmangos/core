@@ -2290,8 +2290,13 @@ bool ChatHandler::HandlePartyBotPullCommand(char* args)
     }
 
     uint32 duration;
-    if (!ExtractUInt32(&args, duration))
+    char* arg = ExtractArg(&args);
+
+    if (isNumeric(arg))
+        duration = atoi(arg) * IN_MILLISECONDS; // in sec
+    else
         duration = 10 * IN_MILLISECONDS;
+        
 
     for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
