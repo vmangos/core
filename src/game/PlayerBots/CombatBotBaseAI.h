@@ -97,8 +97,8 @@ public:
     void LearnTrainerHelper(TrainerSpellData const* tSpells);
     void LearnPremadeSpecForClass();
     void EquipPremadeGearTemplate();
-    void EquipRandomGearInEmptySlots(uint8 pLeaderItl);
-    void AutoEquipGear(uint32 option, uint8 pLeaderItl = 0);
+    void EquipRandomGearInEmptySlots();
+    void AutoEquipGear(uint32 option);
     void LearnRandomTalents();
     
     uint8 GetAttackersInRangeCount(float range) const;

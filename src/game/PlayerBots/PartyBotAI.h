@@ -108,6 +108,8 @@ public:
     void RaidStratsInMKBosses();
     void RaidStratsInOnyxiaBosses();
 
+    void PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer);
+
     std::vector<RaidTargetIcon> m_marksToCC;
     std::vector<RaidTargetIcon> m_marksToFocus;
     ShortTimeTracker m_updateTimer;

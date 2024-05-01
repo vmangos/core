@@ -2632,7 +2632,7 @@ inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
     return ITEM_MOD_STAMINA;
 }
 
-void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
+void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 {
     LearnArmorProficiencies();
     LearnAllTrainer();    
@@ -2827,7 +2827,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots(uint8 pLeaderItl)
     }
 }
 
-void CombatBotBaseAI::AutoEquipGear(uint32 option, uint8 pLeaderItl)
+void CombatBotBaseAI::AutoEquipGear(uint32 option)
 {
     switch (option)
     {
@@ -2835,7 +2835,7 @@ void CombatBotBaseAI::AutoEquipGear(uint32 option, uint8 pLeaderItl)
             me->AddStartingItems();
             break;
         case PLAYER_BOT_AUTO_EQUIP_RANDOM_GEAR:
-            EquipRandomGearInEmptySlots(pLeaderItl);
+            EquipRandomGearInEmptySlots();
             break;
         case PLAYER_BOT_AUTO_EQUIP_PREMADE_GEAR:
             EquipPremadeGearTemplate();
