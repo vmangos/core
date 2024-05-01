@@ -384,6 +384,13 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         return;
 #endif
 
+    if (spellInfo->Attributes & SPELL_ATTR_DO_NOT_DISPLAY)
+        return;
+    
+    if (spellInfo->AttributesEx & SPELL_ATTR_EX_NO_AURA_ICON)
+        return;
+    
+
     if (spellInfo->IsPassiveSpell())
         return;
 
