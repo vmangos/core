@@ -84,15 +84,9 @@ void startDaemon(uint32_t timeout)
         exit(EXIT_FAILURE);
     }
 
-    if ((chdir("/")) < 0)
-    {
-        exit(EXIT_FAILURE);
-    }
-
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
-
 }
 
 void stopDaemon()

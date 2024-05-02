@@ -123,6 +123,7 @@ void CliRunnable::operator()()
                 s_canReadLine = false;
                 sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, nullptr, command.c_str(), &utf8print, &commandFinished));
             }
+            free(command_str);
         }
     }
 }

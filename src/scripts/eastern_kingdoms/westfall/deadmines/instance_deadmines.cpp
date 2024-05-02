@@ -139,7 +139,7 @@ struct instance_deadmines : public ScriptedInstance
             m_uiDoor1GUID = pGo->GetGUID();
         if (pGo->GetEntry() == GO_DOOR2 && pGo->GetPositionX() > -291.0f && pGo->GetPositionX() < -290.0f)
             m_uiDoor2GUID = pGo->GetGUID();
-        if (pGo->GetEntry() == GO_DOOR2 && pGo->GetPositionX() > -169.0f && pGo->GetPositionX() < -168.0f)
+        if (pGo->GetEntry() == GO_DOOR3 && pGo->GetPositionX() > -169.0f && pGo->GetPositionX() < -168.0f)
             m_uiDoor3GUID = pGo->GetGUID();
 
         if (pGo->GetEntry() == GO_DMF_CHEST)
