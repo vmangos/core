@@ -43,6 +43,7 @@
 #include <memory>
 #include <unordered_map>
 #include <thread>
+#include <BattleGroundDefines.h>
 
 class Object;
 class WorldSession;
@@ -807,6 +808,7 @@ class World
         void LoadConfigSettings(bool reload = false);
 
         void SendWorldText(int32 string_id, ...);
+        void SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel, BattleGroundQueueTypeId queueType, ...);
         void SendBroadcastTextToWorld(uint32 textId);
 
         // Only for GMs with ticket notification ON
