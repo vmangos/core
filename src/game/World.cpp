@@ -2259,6 +2259,13 @@ void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel,
             Player* player = session->GetPlayer();
             if (player && player->IsInWorld())
             {
+                // Always announce it to all GMs.
+                if (player->IsGameMaster())
+                {
+                    wt_do(player);
+                    continue;
+                }
+
                 BattleGroundTypeId bgTypeId = BattleGroundMgr::BgTemplateId(queueType);
                 // If player is queued or already inside a BG matching the BG type.
                 if ((player->InBattleGroundQueue() && player->GetQueuedBattleground() == queueType) ||
