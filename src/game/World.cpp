@@ -2260,7 +2260,7 @@ void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel,
             if (player && player->IsInWorld())
             {
                 // Always announce it to all GMs.
-                if (player->IsGameMaster())
+                if (player->GetSession()->GetSecurity() > SEC_PLAYER)
                 {
                     wt_do(player);
                     continue;
