@@ -117,6 +117,15 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 	}
 }
 
+void PartyBotEquipItems(Player* pPlayer, std::vector<PlayerPremadeItem const*> equip)
+{
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->SatisfyItemRequirements(sObjectMgr.GetItemPrototype(equip[i]->itemId));
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
 void PartyBotEquipWarriorTankPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -138,10 +147,7 @@ void PartyBotEquipWarriorTankPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(12602, 929, 0));
 	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12651 : 18323, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipWarriorTankTwo(Player* pPlayer)
@@ -165,10 +171,7 @@ void PartyBotEquipWarriorTankTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(17066, 20017, 0));
 	equip.push_back(new PlayerPremadeItem(18323, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipWarriorMddPreOne(Player* pPlayer)
@@ -192,10 +195,7 @@ void PartyBotEquipWarriorMddPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(12939, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(12651, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipWarriorMddTwo(Player* pPlayer)
@@ -219,10 +219,7 @@ void PartyBotEquipWarriorMddTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(18832, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(17069, 1900, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipWarlockPreOne(Player* pPlayer)
@@ -246,10 +243,7 @@ void PartyBotEquipWarlockPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
 	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13396 : 18467, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipWarlockTwo(Player* pPlayer)
@@ -273,10 +267,7 @@ void PartyBotEquipWarlockTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
 	equip.push_back(new PlayerPremadeItem(13396, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipShamanMddPreOne(Player* pPlayer)
@@ -298,10 +289,7 @@ void PartyBotEquipShamanMddPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(12784, 1900, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipShamanMddTwo(Player* pPlayer)
@@ -323,10 +311,7 @@ void PartyBotEquipShamanMddTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(17104, 1900, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipShamanRddPreOne(Player* pPlayer)
@@ -355,10 +340,7 @@ void PartyBotEquipShamanRddPreOne(Player* pPlayer)
 	else
 		equip.push_back(new PlayerPremadeItem(18534, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipShamanRddTwo(Player* pPlayer)
@@ -380,10 +362,7 @@ void PartyBotEquipShamanRddTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
 	equip.push_back(new PlayerPremadeItem(18842, 2504, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipShamanHealPreOne(Player* pPlayer)
@@ -406,10 +385,7 @@ void PartyBotEquipShamanHealPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11923, 0, 0));
 	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipShamanHealTwo(Player* pPlayer)
@@ -432,10 +408,7 @@ void PartyBotEquipShamanHealTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(17105, 22750, 0));
 	equip.push_back(new PlayerPremadeItem(18523, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipRoguePreOne(Player* pPlayer)
@@ -459,10 +432,7 @@ void PartyBotEquipRoguePreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(12939, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12651 : 18323, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipRogueTwo(Player* pPlayer)
@@ -486,10 +456,7 @@ void PartyBotEquipRogueTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(18832, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(17069, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPriestRddPreOne(Player* pPlayer)
@@ -513,10 +480,7 @@ void PartyBotEquipPriestRddPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
 	equip.push_back(new PlayerPremadeItem(13396, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPriestRddTwo(Player* pPlayer)
@@ -539,10 +503,7 @@ void PartyBotEquipPriestRddTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(18609, 2504, 0));
 	equip.push_back(new PlayerPremadeItem(13396, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPriestHealPreOne(Player* pPlayer)
@@ -566,10 +527,7 @@ void PartyBotEquipPriestHealPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
 	equip.push_back(new PlayerPremadeItem(16997, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPriestHealTwo(Player* pPlayer)
@@ -592,10 +550,7 @@ void PartyBotEquipPriestHealTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(18608, 2505, 0));
 	equip.push_back(new PlayerPremadeItem(18483, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPaladinTankPreOne(Player* pPlayer)
@@ -618,36 +573,30 @@ void PartyBotEquipPaladinTankPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(15806, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(12602, 929, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPaladinTankTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipPaladinProtOnePre;
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(12952, 0, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(13091, 0, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(14552, 2488, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(18413, 1889, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(14624, 1892, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(12550, 923, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(13072, 1887, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(14620, 0, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(11927, 0, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(14621, 911, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(11669, 0, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(22331, 0, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(11810, 0, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(10779, 0, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(15806, 1900, 0));
-	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(12602, 929, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(12952, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13091, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14552, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18413, 1889, 0));
+	equip.push_back(new PlayerPremadeItem(14624, 1892, 0));
+	equip.push_back(new PlayerPremadeItem(12550, 923, 0));
+	equip.push_back(new PlayerPremadeItem(13072, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(14620, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11927, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14621, 911, 0));
+	equip.push_back(new PlayerPremadeItem(11669, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22331, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11810, 0, 0));
+	equip.push_back(new PlayerPremadeItem(10779, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15806, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(12602, 929, 0));
 
-	for (uint32 i = 0; i < EquipPaladinProtOnePre.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(EquipPaladinProtOnePre[i]->itemId, 1, EquipPaladinProtOnePre[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPaladinMddPreOne(Player* pPlayer)
@@ -669,10 +618,7 @@ void PartyBotEquipPaladinMddPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(12784, 1900, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPaladinMddTwo(Player* pPlayer)
@@ -695,10 +641,7 @@ void PartyBotEquipPaladinMddTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(18348, 2504, 0));
 	equip.push_back(new PlayerPremadeItem(17066, 929, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPaladinHealPreOne(Player* pPlayer)
@@ -721,10 +664,7 @@ void PartyBotEquipPaladinHealPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11923, 0, 0));
 	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipPaladinHealTwo(Player* pPlayer)
@@ -747,10 +687,7 @@ void PartyBotEquipPaladinHealTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(17103, 2505, 0));
 	equip.push_back(new PlayerPremadeItem(18523, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipMagePreOne(Player* pPlayer)
@@ -774,10 +711,7 @@ void PartyBotEquipMagePreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
 	equip.push_back(new PlayerPremadeItem(13938, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipMageTwo(Player* pPlayer)
@@ -801,10 +735,7 @@ void PartyBotEquipMageTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
 	equip.push_back(new PlayerPremadeItem(13938, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipHunterPreOne(Player* pPlayer)
@@ -828,10 +759,7 @@ void PartyBotEquipHunterPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(12939, 2564, 0));
 	equip.push_back(new PlayerPremadeItem(2099, 664, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipHunterTwo(Player* pPlayer)
@@ -855,10 +783,7 @@ void PartyBotEquipHunterTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(18805, 2564, 0));
 	equip.push_back(new PlayerPremadeItem(18713, 2523, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipDruidTankPreOne(Player* pPlayer)
@@ -881,10 +806,7 @@ void PartyBotEquipDruidTankPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11811, 0, 0));
 	equip.push_back(new PlayerPremadeItem(943, 1904, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipDruidTankTwo(Player* pPlayer)
@@ -906,10 +828,7 @@ void PartyBotEquipDruidTankTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11811, 0, 0));
 	equip.push_back(new PlayerPremadeItem(943, 1904, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipDruidMddPreOne(Player* pPlayer)
@@ -931,10 +850,7 @@ void PartyBotEquipDruidMddPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13167 : 18420, 1904, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipDruidMddTwo(Player* pPlayer)
@@ -956,10 +872,7 @@ void PartyBotEquipDruidMddTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(18420, 1904, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipDruidRddPreOne(Player* pPlayer)
@@ -989,10 +902,7 @@ void PartyBotEquipDruidRddPreOne(Player* pPlayer)
 		equip.push_back(new PlayerPremadeItem(18534, 0, 0));
 
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipDruidRddTwo(Player* pPlayer)
@@ -1015,10 +925,7 @@ void PartyBotEquipDruidRddTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
 	equip.push_back(new PlayerPremadeItem(18842, 2504, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipDruidHealPreOne(Player* pPlayer)
@@ -1041,10 +948,7 @@ void PartyBotEquipDruidHealPreOne(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11923, 0, 0));
 	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }
 
 void PartyBotEquipDruidHealTwo(Player* pPlayer)
@@ -1068,8 +972,5 @@ void PartyBotEquipDruidHealTwo(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(17105, 2505, 0));
 	equip.push_back(new PlayerPremadeItem(18523, 0, 0));
 
-	for (uint32 i = 0; i < equip.size(); i++)
-	{
-		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
-	}
+	PartyBotEquipItems(pPlayer, equip);
 }

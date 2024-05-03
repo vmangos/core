@@ -1,3 +1,5 @@
+void PartyBotEquipItems(Player* pPlayer, std::vector<PlayerPremadeItem const*> equip);
+
 void PartyBotEquipWarriorTankPreOne(Player* pPlayer);
 void PartyBotEquipWarriorMddPreOne(Player* pPlayer);
 void PartyBotEquipWarriorTankTwo(Player* pPlayer);
