@@ -463,7 +463,7 @@ void PartyBotEquipDruidTankPre(Player* pPlayer)
 	EquipHunterOnePre.push_back(new PlayerPremadeItem(13258, 1887, 0));
 	EquipHunterOnePre.push_back(new PlayerPremadeItem(13258, 1887, 0));
 	EquipHunterOnePre.push_back(new PlayerPremadeItem(14502, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(11821, urand(0, 1) ? 0 : 2545, 0, 0));
+	EquipHunterOnePre.push_back(new PlayerPremadeItem(11821, urand(0, 1) ? 0 : 2545, 0));
 	EquipHunterOnePre.push_back(new PlayerPremadeItem(14641, 911, 0));
 	EquipHunterOnePre.push_back(new PlayerPremadeItem(15855, 0, 0));
 	EquipHunterOnePre.push_back(new PlayerPremadeItem(11669, 0, 0));

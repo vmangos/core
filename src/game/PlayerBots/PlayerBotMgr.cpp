@@ -1346,6 +1346,9 @@ bool ChatHandler::HandlePartyBotAoECommand(char* args)
                            !pSpell->IsPositiveSpell() &&
                             pSpell->IsTargetInRange(pMember, pTarget))
                         {
+                            if (pSpell->Mechanic == MECHANIC_FEAR)
+                                continue;                                
+
                             if (pMember->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
                                !pMember->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->IsAreaOfEffectSpell())
                                 pMember->InterruptSpell(CURRENT_GENERIC_SPELL);
