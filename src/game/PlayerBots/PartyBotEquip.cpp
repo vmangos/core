@@ -6,321 +6,625 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 	LearnArmorProficiencies();
 	LearnAllTrainer();
 
-	if (pPlayer->GetClass() == CLASS_WARRIOR)
+	if (pLeaderItl < 65)
 	{
 		if (m_role == ROLE_TANK)
-			PartyBotEquipWarriorTankPre(pPlayer);
+		{
+			if (pPlayer->GetClass() == CLASS_WARRIOR)
+				PartyBotEquipWarriorTankPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinTankPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidTankPreOne(pPlayer);
+		}
+
 		if (m_role == ROLE_MELEE_DPS)
-			PartyBotEquipWarriorMddPre(pPlayer);		
-	}
+		{
+			if (pPlayer->GetClass() == CLASS_WARRIOR)
+				PartyBotEquipWarriorMddPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanMddPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_ROGUE)
+				PartyBotEquipRoguePreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinMddPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidMddPreOne(pPlayer);
+		}
 
-	if (pPlayer->GetClass() == CLASS_WARLOCK)
-	{
-		PartyBotEquipWarlockPre(pPlayer);
-	}
-
-	if (pPlayer->GetClass() == CLASS_SHAMAN)
-	{
 		if (m_role == ROLE_RANGE_DPS)
-			PartyBotEquipShamanRddPre(pPlayer);		
-		if (m_role == ROLE_MELEE_DPS)
-			PartyBotEquipShamanMddPre(pPlayer);
+		{
+			if (pPlayer->GetClass() == CLASS_WARLOCK)
+				PartyBotEquipWarlockPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanRddPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PRIEST)
+				PartyBotEquipPriestRddPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_MAGE)
+				PartyBotEquipMagePreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_HUNTER)
+				PartyBotEquipHunterPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidRddPreOne(pPlayer);
+		}
+
 		if (m_role == ROLE_HEALER)
-			PartyBotEquipShamanHealPre(pPlayer);
+		{
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanHealPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PRIEST)
+				PartyBotEquipPriestHealPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinHealPreOne(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidHealPreOne(pPlayer);
+		}
 	}
 
-	if (pPlayer->GetClass() == CLASS_ROGUE)
-	{
-		PartyBotEquipRoguePre(pPlayer);
-	}
-
-	if (pPlayer->GetClass() == CLASS_PRIEST)
-	{		
-		if (m_role == ROLE_RANGE_DPS)
-			PartyBotEquipPriestRddPre(pPlayer);
-		if (m_role == ROLE_HEALER)
-			PartyBotEquipPriestHealPre(pPlayer);
-	}
-
-	if (pPlayer->GetClass() == CLASS_PALADIN)
+	if (pLeaderItl >= 65 && pLeaderItl < 70)
 	{
 		if (m_role == ROLE_TANK)
-			PartyBotEquipPaladinTankPre(pPlayer);
+		{
+			if (pPlayer->GetClass() == CLASS_WARRIOR)
+				PartyBotEquipWarriorTankTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinTankTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidTankTwo(pPlayer);
+		}
+
 		if (m_role == ROLE_MELEE_DPS)
-			PartyBotEquipPaladinMddPre(pPlayer);		
-		if (m_role == ROLE_HEALER)
-			PartyBotEquipPaladinHealPre(pPlayer);
-	}
+		{
+			if (pPlayer->GetClass() == CLASS_WARRIOR)
+				PartyBotEquipWarriorMddTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanMddTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_ROGUE)
+				PartyBotEquipRogueTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinMddTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidMddTwo(pPlayer);
+		}
 
-	if (pPlayer->GetClass() == CLASS_MAGE)
-	{
-		PartyBotEquipMagePre(pPlayer);
-	}
-
-	if (pPlayer->GetClass() == CLASS_HUNTER)
-	{
-		PartyBotEquipHunterPre(pPlayer);
-	}
-
-	if (pPlayer->GetClass() == CLASS_DRUID)
-	{
-		if (m_role == ROLE_TANK)
-			PartyBotEquipDruidTankPre(pPlayer);
-		if (m_role == ROLE_MELEE_DPS)
-			PartyBotEquipDruidMddPre(pPlayer);
 		if (m_role == ROLE_RANGE_DPS)
-			PartyBotEquipDruidRddPre(pPlayer);
+		{
+			if (pPlayer->GetClass() == CLASS_WARLOCK)
+				PartyBotEquipWarlockTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanRddTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PRIEST)
+				PartyBotEquipPriestRddTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_MAGE)
+				PartyBotEquipMageTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_HUNTER)
+				PartyBotEquipHunterTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidRddTwo(pPlayer);
+		}
+
 		if (m_role == ROLE_HEALER)
-			PartyBotEquipDruidHealPre(pPlayer);
+		{
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanHealTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PRIEST)
+				PartyBotEquipPriestHealTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinHealTwo(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidHealTwo(pPlayer);
+		}
 	}
 }
 
-void PartyBotEquipWarriorTankPre(Player* pPlayer)
+void PartyBotEquipWarriorTankPreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipWarriorTankOnePre;
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(12952, 0, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(13091, 0, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(14552, 2488, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 18413 : 18495, 1889, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(14624, 1892, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(12550, urand(0, 1) ? 923 : 1886, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(13072, 1887, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(14620, 0, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(11927, 0, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(14621, 911, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(11669, 0, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(22331, 0, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(11810, 0, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(10779, 0, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(15806, 1900, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(12602, 929, 0));
-	EquipWarriorTankOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 12651 : 18323, 0, 0));	
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(12952, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13091, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14552, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 18413 : 18495, 1889, 0));
+	equip.push_back(new PlayerPremadeItem(14624, 1892, 0));
+	equip.push_back(new PlayerPremadeItem(12550, urand(0, 1) ? 923 : 1886, 0));
+	equip.push_back(new PlayerPremadeItem(13072, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(14620, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11927, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14621, 911, 0));
+	equip.push_back(new PlayerPremadeItem(11669, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22331, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11810, 0, 0));
+	equip.push_back(new PlayerPremadeItem(10779, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15806, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(12602, 929, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12651 : 18323, 0, 0));
 
-	for (uint32 i = 0; i < EquipWarriorTankOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipWarriorTankOnePre[i]->itemId, 1, EquipWarriorTankOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipWarriorMddPre(Player* pPlayer)
+void PartyBotEquipWarriorTankTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipWarriorDPSOnePre;
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(13404, 0, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(15411, 0, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(12927, 2488, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(13340, 849, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(11726, 1891, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(12936, 1885, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(15063, 927, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(13959, 0, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(15062, 0, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(12555, 911, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(17713, 0, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(13098, 0, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(13965, 0, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(11815, 0, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(12940, 1900, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(12939, 1900, 0));
-	EquipWarriorDPSOnePre.push_back(new PlayerPremadeItem(12651, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16963, 1503, 0));
+	equip.push_back(new PlayerPremadeItem(17065, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16868, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18495, 1889, 0));
+	equip.push_back(new PlayerPremadeItem(14624, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(16861, 923, 0));
+	equip.push_back(new PlayerPremadeItem(13072, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(16864, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16962, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(16862, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(22331, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18879, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11810, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18406, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18348, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(17066, 20017, 0));
+	equip.push_back(new PlayerPremadeItem(18323, 0, 0));
 
-	for (uint32 i = 0; i < EquipWarriorDPSOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipWarriorDPSOnePre[i]->itemId, 1, EquipWarriorDPSOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipWarlockPre(Player* pPlayer)
+void PartyBotEquipWarriorMddPreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipWarlockDPSOnePre;
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(10504, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(18691, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(14112, 2488, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(13386, 1888, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(14153, 1891, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(13107, 1883, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(13253, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(13956, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(13170, 2544, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(18735, 911, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(12545, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(13001, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(12930, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(13968, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13964 : 18372, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(10796, 0, 0));
-	EquipWarlockDPSOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13396 : 18467, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(13404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15411, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(12936, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(15063, 927, 0));
+	equip.push_back(new PlayerPremadeItem(13959, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15062, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12555, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17713, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13098, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12940, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(12939, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(12651, 0, 0));
 
-	for (uint32 i = 0; i < EquipWarlockDPSOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipWarlockDPSOnePre[i]->itemId, 1, EquipWarlockDPSOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipShamanMddPre(Player* pPlayer)
+void PartyBotEquipWarriorMddTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipChamanEnhOnePre;
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(12587, 0, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(15411, 0, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(12927, 2488, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(13340, 849, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(11726, 1891, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(13211, 1885, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(13957, 1887, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(22232, 0, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(15062, 0, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(14616, 911, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(13098, 0, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(17713, 0, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(13965, 0, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(11815, 0, 0));
-	EquipChamanEnhOnePre.push_back(new PlayerPremadeItem(12784, 1900, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(13404, 1506, 0));
+	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(19146, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(14551, 927, 0));
+	equip.push_back(new PlayerPremadeItem(19137, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14554, 1506, 0));
+	equip.push_back(new PlayerPremadeItem(14616, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18821, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17075, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(18832, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(17069, 1900, 0));
 
-	for (uint32 i = 0; i < EquipChamanEnhOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipChamanEnhOnePre[i]->itemId, 1, EquipChamanEnhOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipShamanRddPre(Player* pPlayer)
+void PartyBotEquipWarlockPreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipChamanElemOnePre;
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(10504, urand(0, 1) ? 2544 : 0, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13141, 0, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13013 : 18494, 2488, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 15421 : 18496, 1888, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(11924, 1891, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13107, 1883, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13253, 0, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13956, 0, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13170, 0, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13954, 911, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(12545, 0, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13001, 0, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(12930, 0, 0));
-	EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13968, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(10504, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18691, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14112, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13386, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(14153, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13107, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(13253, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13956, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13170, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18735, 911, 0));
+	equip.push_back(new PlayerPremadeItem(12545, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13001, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13968, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13964 : 18372, 0, 0));
+	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13396 : 18467, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipWarlockTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16929, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18814, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14112, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(17078, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(19145, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(18497, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(18407, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18809, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13170, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18735, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17103, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13396, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipShamanMddPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(12587, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15411, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13211, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(13957, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(22232, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15062, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14616, 911, 0));
+	equip.push_back(new PlayerPremadeItem(13098, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17713, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12784, 1900, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipShamanMddTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(18817, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(22232, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(13957, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(18393, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15062, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(14616, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18821, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17104, 1900, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipShamanRddPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(10504, urand(0, 1) ? 2544 : 0, 0));
+	equip.push_back(new PlayerPremadeItem(13141, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13013 : 18494, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 15421 : 18496, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(11924, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13107, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(13253, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13956, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13170, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13954, 911, 0));
+	equip.push_back(new PlayerPremadeItem(12545, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13001, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13968, 0, 0));
 
 	if (urand(0, 1))
 	{
-		EquipChamanElemOnePre.push_back(new PlayerPremadeItem(13964, 0, 0));
-		EquipChamanElemOnePre.push_back(new PlayerPremadeItem(11904, 0, 0));
+		equip.push_back(new PlayerPremadeItem(13964, 0, 0));
+		equip.push_back(new PlayerPremadeItem(11904, 0, 0));
 	}
 	else
-		EquipChamanElemOnePre.push_back(new PlayerPremadeItem(18534, 0, 0));	
+		equip.push_back(new PlayerPremadeItem(18534, 0, 0));
 
-	for (uint32 i = 0; i < EquipChamanElemOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipChamanElemOnePre[i]->itemId, 1, EquipChamanElemOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipShamanHealPre(Player* pPlayer)
+void PartyBotEquipShamanRddTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipChamanHealOnePre;
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(13216, urand(0, 1) ? 0 : 2544, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13141 : 18723, 0, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 15061 : 18757, 2488, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(13386, 1888, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(13346, 1891, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(13969, 1883, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(12554, 0, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(14553, 0, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13170 : 18386, urand(0, 1) ? 0 : 2544, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(13954, 911, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(16058, 0, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(13178, 0, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 12930 : 18371, 0, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11819 : 18371, 0, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(11923, 0, 0));
-	EquipChamanHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(10504, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18814, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18829, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18496, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(19145, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(18497, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(16839, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19136, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16946, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18322, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18842, 2504, 0));
 
-	for (uint32 i = 0; i < EquipChamanHealOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipChamanHealOnePre[i]->itemId, 1, EquipChamanHealOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipRoguePre(Player* pPlayer)
+void PartyBotEquipShamanHealPreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipRogueOnePre;
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(13404, 0, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(15411, 0, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(12927, 2488, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(13340, 849, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(14637, 1891, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(13120, 1885, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(15063, 1887, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(13252, 0, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(15062, urand(0, 1) ? 0 : 1508, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(12553, 911, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13098 : 18500, 0, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 17713 : 18500, 0, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(13965, 0, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(11815, 0, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(12940, 1900, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(12939, 1900, 0));
-	EquipRogueOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 12651 : 18323, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(13216, urand(0, 1) ? 0 : 2544, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13141 : 18723, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 15061 : 18757, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13386, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(13346, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13969, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(12554, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14553, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13170 : 18386, urand(0, 1) ? 0 : 2544, 0));
+	equip.push_back(new PlayerPremadeItem(13954, 911, 0));
+	equip.push_back(new PlayerPremadeItem(16058, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13178, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12930 : 18371, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11819 : 18371, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11923, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
 
-	for (uint32 i = 0; i < EquipRogueOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipRogueOnePre[i]->itemId, 1, EquipRogueOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipPriestRddPre(Player* pPlayer)
+void PartyBotEquipShamanHealTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipPriestShadowOnePre;
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(10504, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(18691, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(14112, 2488, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(13386, 1888, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(14136, 1891, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(13107, 1884, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13253 : 18407, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(13956, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(13170, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(18735, 911, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(12545, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(13001, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(12930, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11819 : 18371, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(13349, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(10796, 0, 0));
-	EquipPriestShadowOnePre.push_back(new PlayerPremadeItem(13396, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16842, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18723, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18810, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13386, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(13346, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13969, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(12554, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19162, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18875, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(13954, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19140, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19140, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18371, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17105, 22750, 0));
+	equip.push_back(new PlayerPremadeItem(18523, 0, 0));
 
-	for (uint32 i = 0; i < EquipPriestShadowOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipPriestShadowOnePre[i]->itemId, 1, EquipPriestShadowOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipPriestHealPre(Player* pPlayer)
+void PartyBotEquipRoguePreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipPriestHealOnePre;
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(13102, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(13141, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(13013, 2488, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13386 : 18510, 1888, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(14154, 1891, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(13107, 1884, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(12554, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 14143 : 18327, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(11841, urand(0, 1) ? 0 : 2544, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(11822, 911, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(16058, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(13178, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11819 : 18469, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 12930 : 18371, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(11923, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
-	EquipPriestHealOnePre.push_back(new PlayerPremadeItem(16997, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(13404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15411, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(14637, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13120, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(15063, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(13252, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15062, urand(0, 1) ? 0 : 1508, 0));
+	equip.push_back(new PlayerPremadeItem(12553, 911, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13098 : 18500, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 17713 : 18500, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12940, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(12939, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12651 : 18323, 0, 0));
 
-	for (uint32 i = 0; i < EquipPriestHealOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipPriestHealOnePre[i]->itemId, 1, EquipPriestHealOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipPaladinTankPre(Player* pPlayer)
+void PartyBotEquipRogueTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16908, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16823, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(16820, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(18375, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(16826, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(16827, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16909, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(16824, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18500, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17075, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(18832, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(17069, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipPriestRddPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(10504, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18691, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14112, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13386, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(14136, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13107, 1884, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13253 : 18407, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13956, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13170, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18735, 911, 0));
+	equip.push_back(new PlayerPremadeItem(12545, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13001, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11819 : 18371, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13349, 0, 0));
+	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13396, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipPriestRddTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(10504, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18814, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14112, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13386, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(14136, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(18497, 1884, 0));
+	equip.push_back(new PlayerPremadeItem(18407, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18809, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19133, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(19131, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18609, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(13396, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipPriestHealPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(13102, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13141, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13013, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13386 : 18510, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(14154, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13107, 1884, 0));
+	equip.push_back(new PlayerPremadeItem(12554, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 14143 : 18327, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11841, urand(0, 1) ? 0 : 2544, 0));
+	equip.push_back(new PlayerPremadeItem(11822, 911, 0));
+	equip.push_back(new PlayerPremadeItem(16058, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13178, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11819 : 18469, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12930 : 18371, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11923, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16997, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipPriestHealTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16921, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(17109, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16816, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18510, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(14154, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(16819, 1884, 0));
+	equip.push_back(new PlayerPremadeItem(16812, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16817, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16922, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(16811, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19140, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19140, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18469, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18608, 2505, 0));
+	equip.push_back(new PlayerPremadeItem(18483, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipPaladinTankPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(12952, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13091, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14552, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18413, 1889, 0));
+	equip.push_back(new PlayerPremadeItem(14624, 1892, 0));
+	equip.push_back(new PlayerPremadeItem(12550, 923, 0));
+	equip.push_back(new PlayerPremadeItem(13072, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(14620, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11927, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14621, 911, 0));
+	equip.push_back(new PlayerPremadeItem(11669, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22331, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11810, 0, 0));
+	equip.push_back(new PlayerPremadeItem(10779, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15806, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(12602, 929, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipPaladinTankTwo(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> EquipPaladinProtOnePre;
 	EquipPaladinProtOnePre.push_back(new PlayerPremadeItem(12952, 0, 0));
@@ -346,217 +650,426 @@ void PartyBotEquipPaladinTankPre(Player* pPlayer)
 	}
 }
 
-void PartyBotEquipPaladinMddPre(Player* pPlayer)
+void PartyBotEquipPaladinMddPreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipPaladinRetOnePre;
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(13404, urand(0, 1) ? 0 : 1508, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(15411, 0, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(12927, 2488, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(13340, 849, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(11726, 1891, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(12936, 1885, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(13957, 1887, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(13959, 0, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(14554, urand(0, 1) ? 0 : 1508, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(14616, 1887, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(13098, 0, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(12548, 0, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(13965, 0, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(11815, 0, 0));
-	EquipPaladinRetOnePre.push_back(new PlayerPremadeItem(12784, 1900, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(13404, urand(0, 1) ? 0 : 1508, 0));
+	equip.push_back(new PlayerPremadeItem(15411, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(12936, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(13957, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(13959, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14554, urand(0, 1) ? 0 : 1508, 0));
+	equip.push_back(new PlayerPremadeItem(14616, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(13098, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12548, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12784, 1900, 0));
 
-	for (uint32 i = 0; i < EquipPaladinRetOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipPaladinRetOnePre[i]->itemId, 1, EquipPaladinRetOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipPaladinHealPre(Player* pPlayer)
+void PartyBotEquipPaladinMddTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipPaladinHealOnePre;
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 12633 : 18490, urand(0, 1) ? 0 : 1509, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13141 : 18723, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(18720, 2488, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13386 : 18510, 1888, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(13346, 1891, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(13969, 1883, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 12554 : 18527, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(18702, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13170 : 18386, urand(0, 1) ? 0 : 1509, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13954 : 18507, 911, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(16058, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(18103, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(11819, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(12930, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(11923, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(12952, 1483, 0));
+	equip.push_back(new PlayerPremadeItem(17065, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14552, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18495, 1889, 0));
+	equip.push_back(new PlayerPremadeItem(14624, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(18754, 923, 0));
+	equip.push_back(new PlayerPremadeItem(13072, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(14620, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11927, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(18806, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(19138, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18879, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11810, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18406, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18348, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(17066, 929, 0));
 
-	for (uint32 i = 0; i < EquipPaladinHealOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipPaladinHealOnePre[i]->itemId, 1, EquipPaladinHealOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipMagePre(Player* pPlayer)
+void PartyBotEquipPaladinHealPreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipPaladinHealOnePre;
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(10504, urand(0, 1) ? 0 : 2544, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(12103, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(11782, 2488, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(13386, 1888, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(14152, 1891, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(13107, 1883, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13253 : 23290, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(11662, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(13170, urand(0, 1) ? 0 : 2544, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(11822, 911, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(942, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(942, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(12930, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(13968, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(13964, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(10796, 0, 0));
-	EquipPaladinHealOnePre.push_back(new PlayerPremadeItem(13938, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12633 : 18490, urand(0, 1) ? 0 : 1509, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13141 : 18723, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18720, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13386 : 18510, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(13346, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13969, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12554 : 18527, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18702, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13170 : 18386, urand(0, 1) ? 0 : 1509, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13954 : 18507, 911, 0));
+	equip.push_back(new PlayerPremadeItem(16058, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18103, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11819, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11923, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
 
-	for (uint32 i = 0; i < EquipPaladinHealOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipPaladinHealOnePre[i]->itemId, 1, EquipPaladinHealOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipHunterPre(Player* pPlayer)
+void PartyBotEquipPaladinHealTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipHunterOnePre;
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13404 : 18421, urand(0, 1) ? 0 : 1508, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(15411, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(12927, 2488, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(13340, 849, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(11726, 1891, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(13211, 1883, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(15063, 1887, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 14502 : 18393, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(15062, urand(0, 1) ? 0 : 1508, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(13967, 911, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13098 : 18500, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 17713 : 18500, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(13965, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11815 : 18473, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(12940, 2564, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(12939, 2564, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(2099, 664, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(18490, 1509, 0));
+	equip.push_back(new PlayerPremadeItem(18723, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18810, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18510, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(19145, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13969, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(18527, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19162, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18875, 1509, 0));
+	equip.push_back(new PlayerPremadeItem(18507, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19140, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19140, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17103, 2505, 0));
+	equip.push_back(new PlayerPremadeItem(18523, 0, 0));
 
-	for (uint32 i = 0; i < EquipHunterOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipHunterOnePre[i]->itemId, 1, EquipHunterOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipDruidTankPre(Player* pPlayer)
+void PartyBotEquipMagePreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipHunterOnePre;
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(14539, urand(0, 1) ? 0 : 2545, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(13091, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(15058, 2488, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(18413, 1889, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(15064, 1892, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(18700, 923, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(13258, 1887, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(13258, 1887, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(14502, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(11821, urand(0, 1) ? 0 : 2545, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(14641, 911, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(15855, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(11669, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(13966, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(11811, 0, 0));
-	EquipHunterOnePre.push_back(new PlayerPremadeItem(943, 1904, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(10504, urand(0, 1) ? 0 : 2544, 0));
+	equip.push_back(new PlayerPremadeItem(12103, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11782, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13386, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(14152, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13107, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13253 : 23290, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11662, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13170, urand(0, 1) ? 0 : 2544, 0));
+	equip.push_back(new PlayerPremadeItem(11822, 911, 0));
+	equip.push_back(new PlayerPremadeItem(942, 0, 0));
+	equip.push_back(new PlayerPremadeItem(942, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13968, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13964, 0, 0));
+	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13938, 0, 0));
 
-	for (uint32 i = 0; i < EquipHunterOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipHunterOnePre[i]->itemId, 1, EquipHunterOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipDruidMddPre(Player* pPlayer)
+void PartyBotEquipMageTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipDruidMddOnePre;
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(8345, urand(0, 1) ? 0 : 1508, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(15411, 0, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(12927, 2488, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(13340, 849, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(14637, 1891, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(16710, 1885, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(15063, 1887, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(13252, 0, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(15062, urand(0, 1) ? 0 : 1508, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(12553, 911, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(17713, 0, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 2246 : 18500, 0, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(13965, 0, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(11815, 0, 0));
-	EquipDruidMddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13167 : 18420, 1904, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16914, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18814, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11782, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(17078, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(14152, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(18497, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(23290, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19136, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16915, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(23291, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17103, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(10796, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13938, 0, 0));
 
-	for (uint32 i = 0; i < EquipDruidMddOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipDruidMddOnePre[i]->itemId, 1, EquipDruidMddOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipDruidRddPre(Player* pPlayer)
+void PartyBotEquipHunterPreOne(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipDruidRddOnePre;
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(10504, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(12103, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13013, 2488, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13386, 1888, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 22409 : 18385, 1891, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(11766, 1883, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13258, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(11662, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13170, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(11822, 911, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(12545, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13001, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(12930, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13968, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13404 : 18421, urand(0, 1) ? 0 : 1508, 0));
+	equip.push_back(new PlayerPremadeItem(15411, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(13211, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(15063, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 14502 : 18393, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15062, urand(0, 1) ? 0 : 1508, 0));
+	equip.push_back(new PlayerPremadeItem(13967, 911, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13098 : 18500, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 17713 : 18500, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11815 : 18473, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12940, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(12939, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(2099, 664, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipHunterTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16846, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16848, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(16845, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(16850, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(16852, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(16851, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16847, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(16849, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18500, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18473, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18832, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(18805, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(18713, 2523, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipDruidTankPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(14539, urand(0, 1) ? 0 : 2545, 0));
+	equip.push_back(new PlayerPremadeItem(13091, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15058, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18413, 1889, 0));
+	equip.push_back(new PlayerPremadeItem(15064, 1892, 0));
+	equip.push_back(new PlayerPremadeItem(18700, 923, 0));
+	equip.push_back(new PlayerPremadeItem(13258, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(13258, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(14502, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11821, urand(0, 1) ? 0 : 2545, 0));
+	equip.push_back(new PlayerPremadeItem(14641, 911, 0));
+	equip.push_back(new PlayerPremadeItem(15855, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11669, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13966, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11811, 0, 0));
+	equip.push_back(new PlayerPremadeItem(943, 1904, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipDruidTankTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(14539, 2545, 0));
+	equip.push_back(new PlayerPremadeItem(17065, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19139, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(17107, 1889, 0));
+	equip.push_back(new PlayerPremadeItem(15064, 1892, 0));
+	equip.push_back(new PlayerPremadeItem(18700, 923, 0));
+	equip.push_back(new PlayerPremadeItem(13258, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(19149, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11821, 2545, 0));
+	equip.push_back(new PlayerPremadeItem(14641, 911, 0));
+	equip.push_back(new PlayerPremadeItem(15855, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18879, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13966, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11811, 0, 0));
+	equip.push_back(new PlayerPremadeItem(943, 1904, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipDruidMddPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(8345, urand(0, 1) ? 0 : 1508, 0));
+	equip.push_back(new PlayerPremadeItem(15411, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(14637, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(16710, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(15063, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(13252, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15062, urand(0, 1) ? 0 : 1508, 0));
+	equip.push_back(new PlayerPremadeItem(12553, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17713, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 2246 : 18500, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13167 : 18420, 1904, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipDruidMddTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(8345, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(14637, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(19146, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(18823, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(13252, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15062, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(12553, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18500, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18420, 1904, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipDruidRddPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(10504, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12103, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13013, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13386, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 22409 : 18385, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(11766, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(13258, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11662, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13170, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11822, 911, 0));
+	equip.push_back(new PlayerPremadeItem(12545, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13001, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13968, 0, 0));
 
 	if (urand(0, 1))
 	{
-		EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13964, 0, 0));
-		EquipDruidRddOnePre.push_back(new PlayerPremadeItem(10796, 0, 0));
+		equip.push_back(new PlayerPremadeItem(13964, 0, 0));
+		equip.push_back(new PlayerPremadeItem(10796, 0, 0));
 	}
 	else
-		EquipDruidRddOnePre.push_back(new PlayerPremadeItem(18534, 0, 0));
-	
+		equip.push_back(new PlayerPremadeItem(18534, 0, 0));
 
-	for (uint32 i = 0; i < EquipDruidRddOnePre.size(); i++)
+
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipDruidRddOnePre[i]->itemId, 1, EquipDruidRddOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }
 
-void PartyBotEquipDruidHealPre(Player* pPlayer)
+void PartyBotEquipDruidRddTwo(Player* pPlayer)
 {
-	std::vector<PlayerPremadeItem const*> EquipDruidRddOnePre;
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13102, urand(0, 1) ? 0 : 2544, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13141 : 18723, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(15061, 2488, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13386 : 18510, 1888, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13346, 1891, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 13208 : 18525, 1884, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(12554, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(14553, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 15060 : 18386, urand(0, 1) ? 0 : 2544, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13954, 911, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(13178, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(16058, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 12930 : 18470, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11819 : 18371, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(11923, 0, 0));
-	EquipDruidRddOnePre.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(10504, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18814, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16836, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(13386, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(19145, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(19145, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(11766, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(16831, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19136, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13170, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(16829, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19147, 0, 0));
+	equip.push_back(new PlayerPremadeItem(12930, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18842, 2504, 0));
 
-	for (uint32 i = 0; i < EquipDruidRddOnePre.size(); i++)
+	for (uint32 i = 0; i < equip.size(); i++)
 	{
-		pPlayer->StoreNewItemInBestSlots(EquipDruidRddOnePre[i]->itemId, 1, EquipDruidRddOnePre[i]->enchantId);
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipDruidHealPreOne(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(13102, urand(0, 1) ? 0 : 2544, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13141 : 18723, 0, 0));
+	equip.push_back(new PlayerPremadeItem(15061, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13386 : 18510, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(13346, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 13208 : 18525, 1884, 0));
+	equip.push_back(new PlayerPremadeItem(12554, 0, 0));
+	equip.push_back(new PlayerPremadeItem(14553, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 15060 : 18386, urand(0, 1) ? 0 : 2544, 0));
+	equip.push_back(new PlayerPremadeItem(13954, 911, 0));
+	equip.push_back(new PlayerPremadeItem(13178, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16058, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 12930 : 18470, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11819 : 18371, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11923, 0, 0));
+	equip.push_back(new PlayerPremadeItem(urand(0, 1) ? 11928 : 18523, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
+	}
+}
+
+void PartyBotEquipDruidHealTwo(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16900, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18723, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18810, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18510, 1888, 0));
+	equip.push_back(new PlayerPremadeItem(13346, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(18263, 1884, 0));
+	equip.push_back(new PlayerPremadeItem(12554, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19162, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18875, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(16829, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19140, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19140, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18470, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17105, 2505, 0));
+	equip.push_back(new PlayerPremadeItem(17105, 2505, 0));
+	equip.push_back(new PlayerPremadeItem(18523, 0, 0));
+
+	for (uint32 i = 0; i < equip.size(); i++)
+	{
+		pPlayer->StoreNewItemInBestSlots(equip[i]->itemId, 1, equip[i]->enchantId);
 	}
 }

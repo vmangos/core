@@ -1,26 +1,44 @@
-void PartyBotEquipWarriorTankPre(Player* pPlayer);
-void PartyBotEquipWarriorMddPre(Player* pPlayer);
+void PartyBotEquipWarriorTankPreOne(Player* pPlayer);
+void PartyBotEquipWarriorMddPreOne(Player* pPlayer);
+void PartyBotEquipWarriorTankTwo(Player* pPlayer);
+void PartyBotEquipWarriorMddTwo(Player* pPlayer);
 
-void PartyBotEquipWarlockPre(Player* pPlayer);
+void PartyBotEquipWarlockPreOne(Player* pPlayer);
+void PartyBotEquipWarlockTwo(Player* pPlayer);
 
-void PartyBotEquipShamanMddPre(Player* pPlayer);
-void PartyBotEquipShamanRddPre(Player* pPlayer);
-void PartyBotEquipShamanHealPre(Player* pPlayer);
+void PartyBotEquipShamanMddPreOne(Player* pPlayer);
+void PartyBotEquipShamanRddPreOne(Player* pPlayer);
+void PartyBotEquipShamanHealPreOne(Player* pPlayer);
+void PartyBotEquipShamanMddTwo(Player* pPlayer);
+void PartyBotEquipShamanRddTwo(Player* pPlayer);
+void PartyBotEquipShamanHealTwo(Player* pPlayer);
 
-void PartyBotEquipRoguePre(Player* pPlayer);
+void PartyBotEquipRoguePreOne(Player* pPlayer);
+void PartyBotEquipRogueTwo(Player* pPlayer);
 
-void PartyBotEquipPriestRddPre(Player* pPlayer);
-void PartyBotEquipPriestHealPre(Player* pPlayer);
+void PartyBotEquipPriestRddPreOne(Player* pPlayer);
+void PartyBotEquipPriestHealPreOne(Player* pPlayer);
+void PartyBotEquipPriestRddTwo(Player* pPlayer);
+void PartyBotEquipPriestHealTwo(Player* pPlayer);
 
-void PartyBotEquipPaladinTankPre(Player* pPlayer);
-void PartyBotEquipPaladinMddPre(Player* pPlayer);
-void PartyBotEquipPaladinHealPre(Player* pPlayer);
+void PartyBotEquipPaladinTankPreOne(Player* pPlayer);
+void PartyBotEquipPaladinMddPreOne(Player* pPlayer);
+void PartyBotEquipPaladinHealPreOne(Player* pPlayer);
+void PartyBotEquipPaladinTankTwo(Player* pPlayer);
+void PartyBotEquipPaladinMddTwo(Player* pPlayer);
+void PartyBotEquipPaladinHealTwo(Player* pPlayer);
 
-void PartyBotEquipMagePre(Player* pPlayer);
+void PartyBotEquipMagePreOne(Player* pPlayer);
+void PartyBotEquipMageTwo(Player* pPlayer);
 
-void PartyBotEquipHunterPre(Player* pPlayer);
+void PartyBotEquipHunterPreOne(Player* pPlayer);
+void PartyBotEquipHunterTwo(Player* pPlayer);
 
-void PartyBotEquipDruidTankPre(Player* pPlayer);
-void PartyBotEquipDruidMddPre(Player* pPlayer);
-void PartyBotEquipDruidRddPre(Player* pPlayer);
-void PartyBotEquipDruidHealPre(Player* pPlayer);
+void PartyBotEquipDruidTankPreOne(Player* pPlayer);
+void PartyBotEquipDruidTankTwo(Player* pPlayer);
+void PartyBotEquipDruidMddPreOne(Player* pPlayer);
+void PartyBotEquipDruidMddTwo(Player* pPlayer);
+void PartyBotEquipDruidRddPreOne(Player* pPlayer);
+void PartyBotEquipDruidRddTwo(Player* pPlayer);
+void PartyBotEquipDruidHealPreOne(Player* pPlayer);
+void PartyBotEquipDruidHealTwo(Player* pPlayer);
