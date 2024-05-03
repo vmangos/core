@@ -2245,8 +2245,11 @@ void World::SendWorldText(int32 string_id, ...)
 }
 
 // Send a System Message to all players in the same battleground or queue (except self if mentioned)
-void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel, BattleGroundQueueTypeId queueType, ...)
+void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel, uint32 queueType, ...)
 {
+    BattleGroundTypeId bgTypeId = BattleGroundMgr::BgTemplateId(static_cast<BattleGroundQueueTypeId>(queueType));
+    BattleGroundBracketId queuedPlayerBracket = Player::GetBattleGroundBracketIdFromLevel(bgTypeId, queuedPlayerLevel);
+
     va_list ap;
     va_start(ap, string_id);
 
@@ -2260,19 +2263,18 @@ void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel,
             if (player && player->IsInWorld())
             {
                 // Always announce it to all GMs.
-                if (player->GetSession()->GetSecurity() > SEC_PLAYER)
+                if (session->GetSecurity() > SEC_PLAYER)
                 {
                     wt_do(player);
                     continue;
                 }
 
-                BattleGroundTypeId bgTypeId = BattleGroundMgr::BgTemplateId(queueType);
                 // If player is queued or already inside a BG matching the BG type.
                 if ((player->InBattleGroundQueue() && player->GetQueuedBattleground() == queueType) ||
                     (player->InBattleGround() && player->GetBattleGroundTypeId() == bgTypeId))
                 {
                     // If player bracket matches the queued player bracket.
-                    if (player->GetBattleGroundBracketIdFromLevel(bgTypeId) == Player::GetBattleGroundBracketIdFromLevel(bgTypeId, queuedPlayerLevel))
+                    if (player->GetBattleGroundBracketIdFromLevel(bgTypeId) == queuedPlayerBracket)
                         wt_do(player);
                 }
 
