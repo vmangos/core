@@ -654,6 +654,11 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.hunter.pVolley))
                         m_spells.hunter.pVolley = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Tranquilizing Shot") != std::string::npos)
+                {
+                    if (IsHigherRankSpell(m_spells.hunter.pTranquilizingShot))
+                        m_spells.hunter.pTranquilizingShot = pSpellEntry;
+                }
                 break;
             }
             case CLASS_MAGE:
@@ -2231,6 +2236,7 @@ bool CombatBotBaseAI::IsValidBuffTarget(Unit const* pTarget, SpellEntry const* p
 
 Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
 {
+    std::vector<Player*> pMembersNeedBuff;
     Group* pGroup = me->GetGroup();
     if (pGroup)
     {
@@ -2239,13 +2245,18 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
             if (Player* pMember = itr->getSource())
             {
                 if (me->IsValidHelpfulTarget(pMember) &&
-                   !pMember->IsGameMaster() &&
+                    !pMember->IsGameMaster() &&
                     IsValidBuffTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
                     me->IsWithinDist(pMember, 30.0f))
-                    return pMember;
+                    pMembersNeedBuff.push_back(pMember);
             }
         }
+    }
+
+    if (!pMembersNeedBuff.empty())
+    {
+        return pMembersNeedBuff[rand() % pMembersNeedBuff.size()];
     }
 
     return nullptr;
@@ -2253,7 +2264,14 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
 
 Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
 {
+    if (IsValidDispelTarget(me, pSpellEntry))
+    {
+        return me;
+    }
+
+    std::vector<Player*> pMembersHaveDebuff;
     Group* pGroup = me->GetGroup();
+    
     if (pGroup)
     {
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -2265,9 +2283,14 @@ Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
                     IsValidDispelTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
                     me->IsWithinDist(pMember, 30.0f))
-                    return pMember;
+                    pMembersHaveDebuff.push_back(pMember);
             }
         }
+    }
+
+    if (!pMembersHaveDebuff.empty())
+    {
+        return pMembersHaveDebuff[rand() % pMembersHaveDebuff.size()];
     }
 
     return nullptr;
@@ -2345,6 +2368,82 @@ void CombatBotBaseAI::LearnArmorProficiencies()
             break;
         }
     }
+}
+
+void CombatBotBaseAI::LearnAllTrainer()
+{
+    uint32 trainerId;
+    std::set<uint32> checkedTrainerTemplates;
+    for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
+    {
+        CreatureInfo const* cInfo = itr.second.get();
+        if (!cInfo)
+            continue;
+
+        if (!(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
+            continue;
+
+        switch (cInfo->trainer_type)
+        {
+        case TRAINER_TYPE_CLASS:
+        {
+            if (cInfo->trainer_class != me->GetClass())
+                continue;
+            break;
+        }
+        case TRAINER_TYPE_PETS:
+        {
+            if (me->GetClass() != CLASS_HUNTER)
+                continue;
+            break;
+        }
+        }
+
+        if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
+            LearnTrainerHelper(cSpells);
+
+        if (trainerId = cInfo->trainer_id) // assignment
+        {
+            if (checkedTrainerTemplates.find(trainerId) != checkedTrainerTemplates.end())
+                continue;
+
+            checkedTrainerTemplates.insert(trainerId);
+            if (TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId))
+                LearnTrainerHelper(tSpells);
+        }
+    }
+}
+
+void CombatBotBaseAI::LearnTrainerHelper(TrainerSpellData const* tSpells)
+{
+    bool learnedAnything;
+    do
+    {
+        learnedAnything = false;
+        for (const auto& itr : tSpells->spellList)
+        {
+            TrainerSpell const* tSpell = &itr.second;
+
+            TrainerSpellState state = me->GetTrainerSpellState(tSpell);
+            if (state != TRAINER_SPELL_GREEN)
+                continue;
+
+            for (auto const& spellId : sSpellMgr.GetSpellEntry(tSpell->spell)->EffectTriggerSpell)
+            {
+                if (!spellId)
+                    continue;
+
+                if (sSpellMgr.IsPrimaryProfessionFirstRankSpell(spellId))
+                    continue;
+
+                if (!me->IsSpellFitByClassAndRace(spellId))
+                    continue;
+
+                me->LearnSpell(spellId, false);
+                learnedAnything = true;
+            }
+        }
+    } while (learnedAnything);
 }
 
 void CombatBotBaseAI::LearnPremadeSpecForClass()
@@ -2536,6 +2635,7 @@ inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
 void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 {
     LearnArmorProficiencies();
+    LearnAllTrainer();    
 
     bool const onlyPvE = urand(0, 1) != 0;
     uint8 const honorRank = onlyPvE ? 0 : urand(5, 18);
@@ -2647,7 +2747,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
     for (auto& itr : itemsPerSlot)
     {
         bool hasPrimaryStatItem = false;
-        
+
         for (auto const& pItem : itr.second)
         {
             for (auto const& stat : pItem->ItemStat)
@@ -2666,20 +2766,20 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if (hasPrimaryStatItem)
         {
             itr.second.erase(std::remove_if(itr.second.begin(), itr.second.end(),
-            [primaryStat](ItemPrototype const* & pItem)
-            {
-                bool itemHasPrimaryStat = false;
-                for (auto const& stat : pItem->ItemStat)
+                [primaryStat](ItemPrototype const*& pItem)
                 {
-                    if (stat.ItemStatType == primaryStat && stat.ItemStatValue > 0)
+                    bool itemHasPrimaryStat = false;
+                    for (auto const& stat : pItem->ItemStat)
                     {
-                        itemHasPrimaryStat = true;
-                        break;
+                        if (stat.ItemStatType == primaryStat && stat.ItemStatValue > 0)
+                        {
+                            itemHasPrimaryStat = true;
+                            break;
+                        }
                     }
-                }
 
-                return !itemHasPrimaryStat;
-            }),
+                    return !itemHasPrimaryStat;
+                }),
                 itr.second.end());
         }
 
@@ -2697,10 +2797,10 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if (hasPvpItem)
         {
             itr.second.erase(std::remove_if(itr.second.begin(), itr.second.end(),
-                [](ItemPrototype const* & pItem)
-            {
-                return pItem->RequiredHonorRank == 0;
-            }),
+                [](ItemPrototype const*& pItem)
+                {
+                    return pItem->RequiredHonorRank == 0;
+                }),
                 itr.second.end());
         }
     }

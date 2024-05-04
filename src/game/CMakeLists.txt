@@ -194,6 +194,8 @@ set (game_SRCS
     PlayerBots/BattleBotWaypoints.cpp
     PlayerBots/PlayerBotAI.cpp
     PlayerBots/PlayerBotMgr.cpp
+    PlayerBots/PartyBotRaidStrats.cpp
+    PlayerBots/PartyBotEquip.cpp
     Protocol/Opcodes.cpp
     Protocol/WorldSocket.cpp
     Protocol/WorldSocketMgr.cpp
@@ -392,6 +394,8 @@ set (game_SRCS
     PlayerBots/BattleBotWaypoints.h
     PlayerBots/PlayerBotAI.h
     PlayerBots/PlayerBotMgr.h
+    PlayerBots/PartyBotRaidStrats.h
+    PlayerBots/PartyBotEquip.h    
     Protocol/Opcodes.h
     Protocol/WorldSocket.h
     Protocol/WorldSocketMgr.h
