@@ -49,15 +49,15 @@ jobs:
     steps:
 
     #git checkout
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     #before install dependencies
     - name: ubuntu dependencies
       #ubuntu dependencies
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get -qq install libmysql++-dev libace-dev libtbb-dev
-        sudo apt-get -qq install cmake build-essential cppcheck git make libiberty-dev openssl libssl-dev
+        sudo apt-get -qq update
+        sudo apt-get -qq install build-essential cmake cppcheck git libace-dev libiberty-dev libmysql++-dev libssl-dev libtbb-dev make openssl libreadline-dev
       #windows dependencies
     - name: windows dependencies
       if: matrix.os == 'windows-2019'
@@ -71,20 +71,16 @@ jobs:
         #directory variables
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
         export TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb
-        #wget
-        choco install -y wget --version 1.20
         #ACE package download
-        wget http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
+        curl -LOJ http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
         unzip ACE-$ACE_VERSION.zip
         rm ACE-$ACE_VERSION.zip
         #configuration of ACE header
         echo "#include \"ace/config-win32.h\"" >> $ACE_ROOT/ace/config.h
         #TBB package download
-        wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
+        curl -LOJ https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
         unzip tbb-$TBB_VERSION-win.zip
         rm tbb-$TBB_VERSION-win.zip
-        #openssl
-        choco install -y openssl --version=1.1.1.500
       #git bash shell
       shell: bash
 

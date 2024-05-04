@@ -15,10 +15,10 @@
  */
 
 /*
- * 
+ *
  * This code was written by namreeb (legal@namreeb.org) and is released with
  * permission as part of vmangos (https://github.com/vmangos/core)
- * 
+ *
  */
 
 #include "WardenModule.hpp"
@@ -62,7 +62,7 @@ void Log::OutWarden(Warden const* warden, LogLevel logLevel, char const* format,
         SetColor(stdout, g_logColors[logLevel]);
 
         if (m_includeTime)
-            outTime(stdout);
+            OutTime(stdout);
 
         // Append tag to console warden messages.
         printf("[Warden] (Name %s, Id %u, IP %s) ", warden->GetAccountName(), warden->GetAccountId(), warden->GetSessionIP());
@@ -80,7 +80,7 @@ void Log::OutWarden(Warden const* warden, LogLevel logLevel, char const* format,
 
     if (logFiles[LOG_ANTICHEAT] && m_fileLevel >= logLevel)
     {
-        outTimestamp(logFiles[LOG_ANTICHEAT]);
+        OutTimestamp(logFiles[LOG_ANTICHEAT]);
         fprintf(logFiles[LOG_ANTICHEAT], "[Warden] (Name %s, Id %u, IP %s) ", warden->GetAccountName(), warden->GetAccountId(), warden->GetSessionIP());
 
         va_list ap;
@@ -341,7 +341,7 @@ void Warden::ReadScanResults(ByteBuffer& buff)
     {
         sLog.OutWarden(this, LOG_LVL_DEBUG, "Checking result for %s", s->comment.c_str());
 
-        // checks return true when they have discovered a hack 
+        // checks return true when they have discovered a hack
         if (s->Check(this, buff))
         {
             // if this scan requires being in the world and they are not in the world (meaning they left
@@ -652,7 +652,7 @@ void Warden::Update()
 {
     {
         std::vector<WorldPacket> packetQueue;
-    
+
         {
             std::lock_guard<std::mutex> lock(m_packetQueueMutex);
             std::swap(packetQueue, m_packetQueue);

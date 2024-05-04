@@ -198,7 +198,7 @@ struct npc_attack_masterAI : public ScriptedAI
         float positionX = ME->GetPositionX() + (cos(circleAng) * INVOC_DIST_PORTAL);
         float positionY = ME->GetPositionY() + (sin(circleAng) * INVOC_DIST_PORTAL);
 #ifdef DEBUG_ON
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Invocateur %u (ang %f) [%f,%f]", num, circleAng, positionX, positionY);
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Invocateur %u (ang %f) [%f,%f]", num, circleAng, positionX, positionY);
 #endif
         Creature* summoner = ME->SummonCreature(
                                  NPC_SUMMONER_ENTRY,
@@ -460,7 +460,7 @@ struct npc_attack_masterAI : public ScriptedAI
                                      );
                 if (!cityBoss)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Impossible d'invoquer le maitre de la ville !");
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Impossible d'invoquer le maitre de la ville !");
                     uiCD = CD_INFINY;
                     return;
                 }
@@ -532,7 +532,7 @@ struct npc_attack_masterAI : public ScriptedAI
             uint32 oldPhase = uiPhase;
             uiCurrentPhaseStep++;
 #ifdef DEBUG_ON
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Updating phase %u, step %u", uiPhase, uiCurrentPhaseStep);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Updating phase %u, step %u", uiPhase, uiCurrentPhaseStep);
 #endif
             switch (uiPhase)
             {
@@ -641,7 +641,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
                                0.0f, 0.0f, 0.0f, 0.0f, timeSpawned
                            );
         if (!gobj)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Impossible de spawner le gobj [Entry:%u]", uiGobjEntry);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Impossible de spawner le gobj [Entry:%u]", uiGobjEntry);
     }
     void DoSayRandom()
     {
@@ -774,7 +774,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
                 AttackStart(newTarget);
             else
             {
-                //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Impossible de trouver une cible.");
+                //sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Impossible de trouver une cible.");
                 return;
             }
         }
@@ -910,7 +910,7 @@ struct npc_guard_masterAI : public ScriptedAI
         float positionX = ME->GetPositionX() + x_coef * dist + x_range_add;
         float positionY = ME->GetPositionY() + y_coef * dist + y_range_add;
 #ifdef DEBUG_ON
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%u] Summon : coef [%f:%f] / dist [coef%f:%f] / pos [%f:%f] / o[%f]",
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[%u] Summon : coef [%f:%f] / dist [coef%f:%f] / pos [%f:%f] / o[%f]",
                       ME->GetEntry(), x_coef, y_coef, dist_coef, dist, positionX, positionY, orientation);
 #endif
         uint32 creatureEntry;
@@ -1002,7 +1002,7 @@ struct npc_guard_masterAI : public ScriptedAI
             uint32 oldPhase = uiPhase;
             uiCurrentPhaseStep++;
 #ifdef DEBUG_ON
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%u]Updating phase %u, step %u", ME->GetEntry(), uiPhase, uiCurrentPhaseStep);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[%u]Updating phase %u, step %u", ME->GetEntry(), uiPhase, uiCurrentPhaseStep);
 #endif
             switch (uiPhase)
             {

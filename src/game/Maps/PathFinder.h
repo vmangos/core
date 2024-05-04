@@ -133,7 +133,7 @@ class PathInfo
         void BuildPointPath(float const* startPoint, float const* endPoint, float distToStartPoly, float distToEndPoly);
         void BuildShortcut();
         void BuildUnderwaterPath();
-        bool BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest); // build path using only maps following terrain (no vmap or mmap)
+        void BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest); // build path using only maps following terrain (no vmap or mmap)
 
         void createFilter();
         void updateFilter();

@@ -821,9 +821,12 @@ inline void Map::UpdateCells(uint32 map_diff)
 {
     uint32 now = WorldTimer::getMSTime();
     uint32 diff = WorldTimer::getMSTimeDiff(_lastCellsUpdate, now);
+
     if (diff < sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_UPDATE_CELLS_DIFF))
         return;
+
     _lastCellsUpdate = now;
+    m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
 
     // update active cells around players and active objects
     if (IsContinent() && m_cellThreads->status() == ThreadPool::Status::READY)
@@ -846,22 +849,27 @@ inline void Map::UpdateCells(uint32 map_diff)
 
 void Map::ProcessSessionPackets(PacketProcessing type)
 {
-    uint32 beginTime = WorldTimer::getMSTime();
+    TimePoint beginTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
+
     // update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
         Player* plr = m_mapRefIter->getSource();
         if (plr && plr->IsInWorld())
         {
+            if (type == PACKET_PROCESS_SPELLS)
+                plr->UpdateCooldowns(beginTime);
+
             WorldSession* pSession = plr->GetSession();
             MapSessionFilter updater(pSession);
             updater.SetProcessType(type);
             pSession->ProcessPackets(updater);
         }
     }
-    beginTime = WorldTimer::getMSTimeDiffToNow(beginTime);
-    if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS) && beginTime > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS))
-        sLog.Out(LOG_PERFORMANCE, LOG_LVL_BASIC, "Map %u inst %u: %3ums to update packets type %u", GetId(), GetInstanceId(), beginTime, type);
+
+    auto elapsedTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now()) - beginTime;
+    if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS) && elapsedTime.count() > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS))
+        sLog.Out(LOG_PERFORMANCE, LOG_LVL_BASIC, "Map %u inst %u: %3ums to update packets type %u", GetId(), GetInstanceId(), elapsedTime.count(), type);
 }
 
 void Map::UpdateSessionsMovementAndSpellsIfNeeded()
@@ -884,6 +892,8 @@ void Map::UpdatePlayers()
 
     if (diff < sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_UPDATE_PLAYERS_DIFF))
         return;
+
+    m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
 
     ++_inactivePlayersSkippedUpdates;
     bool updateInactivePlayers = _inactivePlayersSkippedUpdates > sWorld.getConfig(CONFIG_UINT32_INACTIVE_PLAYERS_SKIP_UPDATES);
@@ -923,6 +933,7 @@ void Map::DoUpdate(uint32 maxDiff)
 void Map::Update(uint32 t_diff)
 {
     uint32 updateMapTime = WorldTimer::getMSTime();
+    m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
     _dynamicTree.update(t_diff);
 
     UpdateSessionsMovementAndSpellsIfNeeded();
@@ -2522,12 +2533,14 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid 
     sScriptMgr.IncreaseScheduledScriptsCount();
 }
 
-void Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+bool Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
     if ((script.command != SCRIPT_COMMAND_DISABLED) && 
         FindScriptFinalTargets(source, target, script) && 
         (!script.condition || IsConditionSatisfied(script.condition, target, this, source, CONDITION_FROM_DBSCRIPTS)))
-        (this->*(m_ScriptCommands[script.command]))(script, source, target);
+        return (this->*(m_ScriptCommands[script.command]))(script, source, target);
+
+    return (script.raw.data[4] & SF_GENERAL_ABORT_ON_FAILURE) != 0;
 }
 
 bool Map::FindScriptInitialTargets(WorldObject*& source, WorldObject*& target, ScriptAction const& step)

@@ -502,7 +502,7 @@ void GameEventMgr::LoadFromDB()
                 newData.equipment_id = 0;
             }
 
-            if (newData.entry_id && !ObjectMgr::GetCreatureTemplate(newData.entry_id))
+            if (newData.entry_id && !sObjectMgr.GetCreatureTemplate(newData.entry_id))
             {
                 if (!sObjectMgr.IsExistingCreatureId(newData.entry_id))
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_creature_data` have creature (Guid: %u) with event time entry %u not found in table `creature_template`, set to no 0.", guid, newData.entry_id);
@@ -657,7 +657,7 @@ void GameEventMgr::LoadFromDB()
                 continue;
             }
 
-            if (!ObjectMgr::GetCreatureTemplate(mail.senderEntry))
+            if (!sObjectMgr.GetCreatureTemplate(mail.senderEntry))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `game_event_mail` have nonexistent sender creature entry (%u) for game event %i that invalid not include any player races, ignoring.", mail.senderEntry, event_id);
                 continue;

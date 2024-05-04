@@ -93,6 +93,8 @@ public:
     void AddAllSpellReagents();
     void SummonPetIfNeeded();
     void LearnArmorProficiencies();
+    void LearnAllTrainer();
+    void LearnTrainerHelper(TrainerSpellData const* tSpells);
     void LearnPremadeSpecForClass();
     void EquipPremadeGearTemplate();
     void EquipRandomGearInEmptySlots();
@@ -349,6 +351,7 @@ public:
             SpellEntry const* pFeignDeath;
             SpellEntry const* pScareBeast;
             SpellEntry const* pVolley;
+            SpellEntry const* pTranquilizingShot;
         } hunter;
         struct
         {
@@ -383,6 +386,7 @@ public:
             SpellEntry const* pDivineSpirit;
             SpellEntry const* pPrayerofSpirit;
             SpellEntry const* pPrayerofFortitude;
+            SpellEntry const* pPrayerofShadowProtection;
             SpellEntry const* pInnerFire;
             SpellEntry const* pShadowProtection;
             SpellEntry const* pPowerWordShield;

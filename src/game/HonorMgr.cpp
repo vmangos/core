@@ -584,11 +584,11 @@ void HonorMaintenancer::CheckMaintenanceDay()
 {
     if (sWorld.GetGameDay() >= m_nextMaintenanceDay && !m_markerToStart)
     {
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
+
         // Restart 15 minutes after honor weekend by server time
         if (sWorld.getConfig(CONFIG_BOOL_AUTO_HONOR_RESTART))
             sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
-        else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
 
         ToggleMaintenanceMarker();
     }
@@ -752,14 +752,14 @@ void HonorMgr::Load(QueryResult* result)
     }
 }
 
-bool HonorMgr::Add(float cp, uint8 type, Unit* source)
+bool HonorMgr::Add(float cp, uint8 type, Unit const* source)
 {
     // Prevent give fake records to db with 0 honor
     if (!cp || !m_owner)
         return false;
 
     // If not source, then give yourself
-    Unit* realSource = source;
+    Unit const* realSource = source;
     if (!source)
         source = m_owner;
 
@@ -775,7 +775,7 @@ bool HonorMgr::Add(float cp, uint8 type, Unit* source)
 
     // get IP if source is player
     std::string ip;
-    if (Player* victim = source->ToPlayer())
+    if (Player const* victim = source->ToPlayer())
         ip = victim->GetSession()->GetRemoteAddress();
 
     bool plr = source->GetTypeId() == TYPEID_PLAYER;
@@ -1025,7 +1025,7 @@ float HonorMgr::HonorableKillPoints(Player* killer, Player* victim, uint32 group
     return MaNGOS::Honor::GetHonorGain(killerLevel, victimLevel, victimRank, totalKills, groupSize);
 }
 
-void HonorMgr::SendPVPCredit(Unit* victim, float honor)
+void HonorMgr::SendPVPCredit(Unit const* victim, float honor)
 {
     if (!m_owner)
         return;
@@ -1056,7 +1056,7 @@ void HonorMgr::SendPVPCredit(Unit* victim, float honor)
             // we need to send first rank instead.
             // https://youtu.be/hef06Cs6Q34?t=191
             // New classic client does this on its own.
-            int32 rank = ((Player*)victim)->GetHonorMgr().GetRank().rank;
+            int32 rank = ((Player const*)victim)->GetHonorMgr().GetRank().rank;
             if (!rank)
                 rank = (HONOR_RANK_COUNT - POSITIVE_HONOR_RANK_COUNT) + 1;
             data << uint32(rank);

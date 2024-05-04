@@ -600,7 +600,14 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     if (procSpell && procSpell->Id == 1680)
                         radius = 8.0f;
 
-                    target = SelectRandomUnfriendlyTarget(pVictim, radius, false, true);
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // - Sweeping Strikes will now ignore dead targets, and will ignore PvP
+                    //   enabled targets if you are not PvP enabled.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+                    target = SelectRandomUnfriendlyTarget(pVictim, radius, false, true, true);
+#else
+                    target = SelectRandomUnfriendlyTarget(pVictim, radius, false, true, false);
+#endif
                     if (!target)
                         return SPELL_AURA_PROC_FAILED;
 
@@ -643,6 +650,15 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     // check attack comes not from behind
                     if (!HasInArc(pVictim))
                         return SPELL_AURA_PROC_FAILED;
+
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // - Retaliation - Will now cause a maximum of 30 retaliatory strikes in
+                    //  15 seconds.In addition, retaliatory strikes will not be possible
+                    //  while stunned.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+                    if (HasUnitState(UNIT_STAT_CAN_NOT_REACT))
+                        return SPELL_AURA_PROC_FAILED;
+#endif
 
                     triggered_spell_id = 22858;
                     break;
@@ -937,27 +953,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
             break;
         }
         case SPELLFAMILY_WARRIOR:
-        {
-            // Attaques circulaires
-            if (dummySpell->Id == 12292)
-            {
-                target = SelectRandomUnfriendlyTarget(nullptr, 5.0f, false, true);
-                if (!target)
-                    return SPELL_AURA_PROC_FAILED;
-                triggered_spell_id = 26654;
-            }
-            // Retaliation
-            if (dummySpell->IsFitToFamilyMask<CF_WARRIOR_RETALIATION>())
-            {
-                // check attack comes not from behind
-                if (!HasInArc(pVictim))
-                    return SPELL_AURA_PROC_FAILED;
-
-                triggered_spell_id = 22858;
-                break;
-            }
             break;
-        }
         case SPELLFAMILY_WARLOCK:
             break;
         case SPELLFAMILY_PRIEST:
@@ -976,6 +972,11 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
 
                     // heal amount
                     basepoints[0] = dither(triggerAmount * amount / 100);
+
+                    // don't heal for 0
+                    if (basepoints[0] < 1)
+                        basepoints[0] = 1;
+
                     pVictim->CastCustomSpell(pVictim, 15290, basepoints[0], {}, {}, true, castItem, triggeredByAura);
                     return SPELL_AURA_PROC_OK;                                // no hidden cooldown
                 }
@@ -1291,7 +1292,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 a
                 }
                 case 28200:                                 // Talisman of Ascendance
                 {
-                    if (procSpell && procSpell->IsAreaOfEffectSpell())
+                    if (procSpell && (procSpell->IsAreaOfEffectSpell() || procSpell->Effect[0] == SPELL_EFFECT_SCRIPT_EFFECT))
                         return SPELL_AURA_PROC_FAILED;
                     break;
                 }

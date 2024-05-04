@@ -91,6 +91,32 @@ bool ChatHandler::HandleModifyXpRateCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleCheatFlyCommand(char* args)
+{
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* target = GetSelectedPlayer();
+    if (!target)
+        target = m_session->GetPlayer();
+
+    target->SetCheatFly(value, true);
+
+    PSendSysMessage(LANG_YOU_SET_FLY, value ? "on" : "off", GetNameLink(target).c_str());
+    if (needReportToTarget(target))
+        ChatHandler(target).PSendSysMessage(LANG_YOUR_FLY_SET, value ? "on" : "off", GetNameLink().c_str());
+
+    if (value)
+        ChatHandler(target).SendSysMessage("WARNING: Do not jump or flying mode will be removed.");
+
+    return true;
+}
+
 bool ChatHandler::HandleCheatGodCommand(char* args)
 {
     if (*args)
@@ -537,15 +563,11 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
     Player* target;
     if (!ExtractPlayerTarget(&args, &target))
         return false;
-    
-    if (!target->GetCheatOptions())
-    {
-        PSendSysMessage("No cheats enabled on %s.", target->GetName());
-        return true;
-    }
 
     PSendSysMessage("Cheats active on %s:", target->GetName());
-    if (target->HasCheatOption(PLAYER_CHEAT_GOD))
+    if (target->HasCheatOption(PLAYER_CHEAT_FLY))
+        SendSysMessage("- Fly");
+    if (target->GetInvincibilityHpThreshold())
         SendSysMessage("- God");
     if (target->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
         SendSysMessage("- No cooldowns");
@@ -1245,6 +1267,34 @@ bool ChatHandler::HandleWhisperRestrictionCommand(char* args)
 
     GetSession()->GetPlayer()->SetWhisperRestriction(value);
     PSendSysMessage("Whisper restriction is %s", value ? "ON" : "OFF");
+    return false;
+}
+
+//hardcore
+bool ChatHandler::HandleHCAnnounceRestrictionCommand(char* args)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_HARDCORE_ENABLED))
+    {
+        SendSysMessage("Hardcore is NOT enabled on this server.");
+        return true;
+    }
+
+    if (!*args)
+    {
+        PSendSysMessage("Recieve Hardcore announcements is %s", GetSession()->GetPlayer()->IsEnabledHardcoreAnnouncements() ? "ON" : "OFF");
+        return true;
+    }
+
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    GetSession()->GetPlayer()->SetHardcoreAnnouncements(value);
+    PSendSysMessage("Recieve Hardcore announcements is %s", GetSession()->GetPlayer()->IsEnabledHardcoreAnnouncements() ? "ON" : "OFF");
     return false;
 }
 
@@ -2784,9 +2834,9 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
     else
     {
         std::set<uint32> checkedTrainerTemplates;
-        for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
+        for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
         {
-            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i);
+            CreatureInfo const* cInfo = itr.second.get();
             if (!cInfo)
                 continue;
 
@@ -2809,7 +2859,7 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
                 }
             }
 
-            if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(i))
+            if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
                 HandleLearnTrainerHelper(pPlayer, cSpells);
 
             if (trainerId = cInfo->trainer_id) // assignment
@@ -2917,9 +2967,9 @@ bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
 {
     Player* player = m_session->GetPlayer();
 
-    for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
+    for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
     {
-        if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
+        if (CreatureInfo const* cInfo = itr.second.get())
             if (cInfo->npc_flags & UNIT_NPC_FLAG_FLIGHTMASTER)
             {
                 FindCreatureData worker(cInfo->entry, player);
@@ -5261,6 +5311,48 @@ bool ChatHandler::HandleQuestCompleteCommand(char* args)
     player->FullQuestComplete(entry);
 
     PSendSysMessage("Quest %u completed for %s.", entry, player->GetName());
+    return true;
+}
+
+bool ChatHandler::HandlePetLearnSpellCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Pet* pet = GetSelectedPet();
+    if (!pet)
+        return false;
+
+    int32 spellId;
+    if (!ExtractOptInt32(&args, spellId, 1))
+        return false;
+
+    if (pet->LearnSpell(spellId))
+        PSendSysMessage("Added spell %u to pet %s.", spellId, pet->GetName());
+    else
+        PSendSysMessage("Failed to add spell %u to pet %s.", spellId, pet->GetName());
+
+    return true;
+}
+
+bool ChatHandler::HandlePetUnlearnSpellCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Pet* pet = GetSelectedPet();
+    if (!pet)
+        return false;
+
+    int32 spellId;
+    if (!ExtractOptInt32(&args, spellId, 1))
+        return false;
+
+    if (pet->unlearnSpell(spellId, false, true))
+        PSendSysMessage("Removed spell %u from pet %s.", spellId, pet->GetName());
+    else
+        PSendSysMessage("Failed to remove spell %u from pet %s.", spellId, pet->GetName());
+
     return true;
 }
 

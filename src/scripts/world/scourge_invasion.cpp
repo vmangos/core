@@ -1264,7 +1264,7 @@ struct PallidHorrorAI : public ScriptedAI
         time_t timeToNextAttack = next_attack - now;
         uint32 index = m_creature->GetZoneId() == ZONEID_UNDERCITY ? VARIABLE_SI_UNDERCITY_TIME : VARIABLE_SI_STORMWIND_TIME;
         sObjectMgr.SetSavedVariable(index, now + CITY_ATTACK_TIMER, true);
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] The Scourge has been defeated in %s, next attack starting in %d minutes", m_creature->GetZoneId() == ZONEID_UNDERCITY ? "Undercity" : "Stormwind", uint32(timeToNextAttack / 60));
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "[Scourge Invasion Event] The Scourge has been defeated in %s, next attack starting in %d minutes", m_creature->GetZoneId() == ZONEID_UNDERCITY ? "Undercity" : "Stormwind", uint32(timeToNextAttack / 60));
     }
 
     void SummonedCreatureJustDied(Creature* unit) override

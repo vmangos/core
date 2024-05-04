@@ -217,8 +217,8 @@ WorldSession* World::FindSession(uint32 id) const
 
     if (itr != m_sessions.end())
         return itr->second;                                 // also can return nullptr for kicked session
-    else
-        return nullptr;
+
+    return nullptr;
 }
 
 // Remove a given session
@@ -345,7 +345,7 @@ void World::AddSession_(WorldSession* s)
     }
 }
 
-int32 World::GetQueuedSessionPos(WorldSession* sess)
+uint32 World::GetQueuedSessionPos(WorldSession* sess)
 {
     uint32 position = 1;
 
@@ -561,7 +561,9 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_LOGIN_QUEUE_GRACE_PERIOD_SECS, "LoginQueue.GracePeriodSecs", 0);
     setConfig(CONFIG_UINT32_CHARACTER_SCREEN_MAX_IDLE_TIME, "CharacterScreenMaxIdleTime", 0);
     setConfig(CONFIG_UINT32_ASYNC_QUERIES_TICK_TIMEOUT, "AsyncQueriesTickTimeout", 0);
-    setConfigMinMax(CONFIG_UINT32_COMPRESSION, "Compression", 1, 1, 9);
+    setConfigMinMax(CONFIG_UINT32_COMPRESSION_LEVEL, "Compression.Level", 1, 1, 9);
+    setConfig(CONFIG_UINT32_COMPRESSION_UPDATE_SIZE, "Compression.Update.Size", 128);
+    setConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT, "Compression.Movement.Count", 300);
     setConfig(CONFIG_BOOL_ADDON_CHANNEL, "AddonChannel", true);
     setConfig(CONFIG_BOOL_CLEAN_CHARACTER_DB, "CleanCharacterDB", true);
     setConfig(CONFIG_BOOL_GRID_UNLOAD, "GridUnload", true);
@@ -663,7 +665,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_GM_LOWER_SECURITY,      "GM.LowerSecurity", false);
     setConfig(CONFIG_BOOL_GM_ALLOW_TRADES,        "GM.AllowTrades", true);
     setConfig(CONFIG_BOOL_GMS_ALLOW_PUBLIC_CHANNELS,         "GM.AllowPublicChannels", false);
-    setConfig(CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS, "GM.JoinOppositeFactionChannels", 0);
+    setConfig(CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS, "GM.JoinOppositeFactionChannels", false);
     if (getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT))
         setConfig(CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS, false);
     setConfig(CONFIG_BOOL_GMTICKETS_ENABLE,           "GMTickets.Enable", true);
@@ -961,8 +963,8 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_MAPUPDATE_MIN_VISIBILITY_DISTANCE, "MapUpdate.MinVisibilityDistance", 0);
     setConfig(CONFIG_BOOL_CONTINENTS_INSTANCIATE, "Continents.Instanciate", false);
     setConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS, "Continents.MotionUpdate.Threads", 0);
-    setConfig(CONFIG_BOOL_TERRAIN_PRELOAD_CONTINENTS, "Terrain.Preload.Continents", 1);
-    setConfig(CONFIG_BOOL_TERRAIN_PRELOAD_INSTANCES, "Terrain.Preload.Instances", 1);
+    setConfig(CONFIG_BOOL_TERRAIN_PRELOAD_CONTINENTS, "Terrain.Preload.Continents", true);
+    setConfig(CONFIG_BOOL_TERRAIN_PRELOAD_INSTANCES, "Terrain.Preload.Instances", true);
 
     setConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_CHARGE, "Movement.ExtrapolateChargePosition", true);
     setConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET, "Movement.ExtrapolatePetPosition", true);
@@ -990,6 +992,9 @@ void World::LoadConfigSettings(bool reload)
         else
             setConfig(CONFIG_UINT32_DEBUFF_LIMIT, 8);
     }
+
+    // hardcore
+    setConfig(CONFIG_BOOL_HARDCORE_ENABLED, "Hardcore.Enable", 0);
 
     setConfig(CONFIG_UINT32_ANTICRASH_OPTIONS, "Anticrash.Options", 0);
     setConfig(CONFIG_UINT32_ANTICRASH_REARM_TIMER, "Anticrash.Rearm.Timer", 0);
@@ -2242,6 +2247,47 @@ void World::SendWorldText(int32 string_id, ...)
     va_end(ap);
 }
 
+// Send a System Message to all players in the same battleground or queue (except self if mentioned)
+void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel, uint32 queueType, ...)
+{
+    BattleGroundTypeId bgTypeId = BattleGroundMgr::BgTemplateId(static_cast<BattleGroundQueueTypeId>(queueType));
+    BattleGroundBracketId queuedPlayerBracket = Player::GetBattleGroundBracketIdFromLevel(bgTypeId, queuedPlayerLevel);
+
+    va_list ap;
+    va_start(ap, string_id);
+
+    MaNGOS::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    MaNGOS::LocalizedPacketListDo<MaNGOS::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (const auto& itr : m_sessions)
+    {
+        if (WorldSession* session = itr.second)
+        {
+            Player* player = session->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                // Always announce it to all GMs.
+                if (session->GetSecurity() > SEC_PLAYER)
+                {
+                    wt_do(player);
+                    continue;
+                }
+
+                // If player is queued or already inside a BG matching the BG type.
+                if ((player->InBattleGroundQueue() && player->GetQueuedBattleground() == queueType) ||
+                    (player->InBattleGround() && player->GetBattleGroundTypeId() == bgTypeId))
+                {
+                    // If player bracket matches the queued player bracket.
+                    if (player->GetBattleGroundBracketIdFromLevel(bgTypeId) == queuedPlayerBracket)
+                        wt_do(player);
+                }
+
+            }
+        }
+    }
+
+    va_end(ap);
+}
+
 void World::SendBroadcastTextToWorld(uint32 textId)
 {
     MaNGOS::WorldBroadcastTextBuilder wt_builder(textId);
@@ -2255,6 +2301,27 @@ void World::SendBroadcastTextToWorld(uint32 textId)
                 wt_do(player);
         }
     }
+}
+
+/// Send a System Message to all players (except players that have opted out of hardcore announcements)
+void World::SendHardcoreWorldText(int32 string_id, ...)
+{
+    va_list ap;
+    va_start(ap, string_id);
+
+    MaNGOS::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    MaNGOS::LocalizedPacketListDo<MaNGOS::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (const auto& itr : m_sessions)
+    {
+        if (WorldSession* session = itr.second)
+        {
+            Player* player = session->GetPlayer();
+            if (player && player->IsInWorld() && player->IsEnabledHardcoreAnnouncements())
+                wt_do(player);
+        }
+    }
+
+    va_end(ap);
 }
 
 void World::SendGMTicketText(char const* text)
@@ -2561,6 +2628,8 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
             break;
         }
         default:
+            delete holder;
+
             return BAN_SYNTAX_ERROR;
     }
 

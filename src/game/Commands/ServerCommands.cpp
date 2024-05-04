@@ -1067,6 +1067,23 @@ bool ChatHandler::HandleReloadCreatureQuestInvRelationsCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleReloadCreatureTemplatesCommand(char* args)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `creature_template` Table!");
+    uint32 entry;
+    if (ExtractUInt32(&args, entry))
+    {
+        sObjectMgr.LoadCreatureTemplate(entry);
+        PSendSysMessage("Creature template %u reloaded.", entry);
+    }
+    else
+    {
+        sObjectMgr.LoadCreatureTemplates();
+        SendSysMessage("DB table `creature_template` reloaded.");
+    }
+    return true;
+}
+
 bool ChatHandler::HandleReloadGossipMenuCommand(char* /*args*/)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `gossip_menu` Table!");

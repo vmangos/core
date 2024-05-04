@@ -481,7 +481,7 @@ class Map : public GridRefManager<NGridType>
         // Adds the provided command to the queue. Will be handled by ScriptsProcess.
         void ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid sourceGuid, ObjectGuid targetGuid);
         // Immediately executes the provided command.
-        void ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         // Removes all parts of script from the queue.
         void TerminateScript(ScriptAction const& step);
 
@@ -575,6 +575,7 @@ class Map : public GridRefManager<NGridType>
         void MarkNotUpdated() { m_updateFinished = false; }
         void SetUpdateDiffMod(int32 d) { m_updateDiffMod = d; }
         uint32 GetUpdateDiffMod() const { return m_updateDiffMod; }
+        TimePoint GetCurrentClockTime() const { return m_currentTime; }
         void BindToInstanceOrRaid(Player* player, time_t objectResetTime, bool permBindToRaid);
 
         // WeatherSystem
@@ -697,6 +698,7 @@ class Map : public GridRefManager<NGridType>
         bool m_crashed = false;
         bool m_updateFinished = false;
         uint32 m_updateDiffMod;
+        TimePoint m_currentTime;
         uint32 m_lastMvtSpellsUpdate = 0;
     private:
         time_t i_gridExpiry;

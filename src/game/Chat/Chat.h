@@ -195,6 +195,7 @@ class ChatHandler
 
         //Cheats
         bool HandleCheatStatusCommand(char *);
+        bool HandleCheatFlyCommand(char* args);
         bool HandleCheatGodCommand(char *);
         bool HandleCheatCooldownCommand(char *);
         bool HandleCheatCastTimeCommand(char *);
@@ -272,12 +273,17 @@ class ChatHandler
         bool HandlePartyBotSetRoleCommand(char * args);
         bool HandlePartyBotAttackStartCommand(char * args);
         bool HandlePartyBotAttackStopCommand(char * args);
+        bool HandlePartyBotPullCommand(char * args);
         bool HandlePartyBotAoECommand(char * args);
         bool HandlePartyBotControlMarkCommand(char * args);
         bool HandlePartyBotFocusMarkCommand(char * args);
         bool HandlePartyBotClearMarksCommand(char * args);
         bool HandlePartyBotComeToMeCommand(char * args);
+        bool HandlePartyBotControls(char* args);
+        bool HandlePartyBotChleader(char* args);
         bool HandlePartyBotUseGObjectCommand(char * args);
+        bool HandlePartyBotStayCommand(char * args);
+        bool HandlePartyBotMoveCommand(char * args);
         bool HandlePartyBotPauseCommand(char * args);
         bool HandlePartyBotUnpauseCommand(char * args);
         bool HandlePartyBotUnequipCommand(char * args);
@@ -379,6 +385,7 @@ class ChatHandler
         bool HandleSpellIconFixCommand(char *args);
         bool HandleUnitStatCommand(char *args);
         bool HandleDebugControlCommand(char *args);
+        bool HandlePvPCommand(char *args);
         // Reload
         bool HandleReloadCreatureTemplate(char* args);
         bool HandleReloadItemTemplate(char* args);
@@ -534,7 +541,6 @@ class ChatHandler
 
         bool HandleGMCommand(char* args);
         bool HandleGMChatCommand(char* args);
-        bool HandleGMFlyCommand(char* args);
         bool HandleGMListFullCommand(char* args);
         bool HandleGMListIngameCommand(char* args);
         bool HandleGMVisibleCommand(char* args);
@@ -754,6 +760,7 @@ class ChatHandler
         bool HandleUnitShowSheathStateCommand(char* args);
         bool HandleUnitShowMoveFlagsCommand(char* args);
         bool HandleUnitShowCreateSpellCommand(char* args);
+        bool HandleUnitShowCombatTimerCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);
@@ -768,6 +775,8 @@ class ChatHandler
         bool HandleQuestCompleteCommand(char* args);
         bool HandleQuestStatusCommand(char* args);
 
+        bool HandlePetLearnSpellCommand(char* args);
+        bool HandlePetUnlearnSpellCommand(char* args);
         bool HandlePetListCommand(char* args);
         bool HandlePetRenameCommand(char* args);
         bool HandlePetDeleteCommand(char* args);
@@ -797,6 +806,7 @@ class ChatHandler
         bool HandleReloadConditionsCommand(char* args);
         bool HandleReloadCreatureSpellsCommand(char* args);
         bool HandleReloadCreatureSpellScriptsCommand(char* args);
+        bool HandleReloadCreatureTemplatesCommand(char* args);
         bool HandleReloadCreatureQuestRelationsCommand(char* args);
         bool HandleReloadCreatureQuestInvRelationsCommand(char* args);
         bool HandleReloadGameGraveyardZoneCommand(char* args);
@@ -1016,6 +1026,10 @@ class ChatHandler
         bool HandleRepairitemsCommand(char* args);
         bool HandleStableCommand(char* args);
         bool HandleQuitCommand(char* args);
+
+        //hardcore
+        bool HandleHardcoreONCommand(char* args);
+        bool HandleHCAnnounceRestrictionCommand(char* args);
 
         //! Development Commands
         bool HandleSaveAllCommand(char* args);

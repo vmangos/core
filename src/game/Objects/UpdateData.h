@@ -92,20 +92,20 @@ class UpdateData
         std::list<UpdatePacket> m_datas;
 };
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
 class MovementData
 {
     public:
-        MovementData(WorldObject* owner = nullptr) : _buffer(100), _owner(owner) {}
+        MovementData() : _buffer(1024) {}
         ~MovementData() {}
-        void AddPacket(WorldPacket& data);
-        void SetUnitSpeed(uint32 opcode, ObjectGuid const& unit, float value);
-        void SetSplineOpcode(uint32 opcode, ObjectGuid const& unit);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        bool CanAddPacket(WorldPacket const& data);
+        void AddPacket(WorldPacket const& data);
         bool BuildPacket(WorldPacket& data);
-#endif
+        bool HasData() const { return _buffer.wpos() != 0; }
+        void ClearBuffer() { _buffer.clear(); }
     protected:
         ByteBuffer _buffer;
-        WorldObject* _owner; // If not null, we dont compress data
 };
+#endif
 
 #endif

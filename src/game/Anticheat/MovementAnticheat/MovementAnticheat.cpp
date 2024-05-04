@@ -766,7 +766,7 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
 
     // This flag is only for creatures.
     if ((currentMoveFlags & MOVEFLAG_LEVITATING) &&
-        !me->HasUnitState(UNIT_STAT_FLYING_ALLOWED))
+        !me->HasCheatOption(PLAYER_CHEAT_FLY))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
         removeMoveFlags |= MOVEFLAG_LEVITATING;
@@ -775,7 +775,7 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
     if ((currentMoveFlags & MOVEFLAG_SWIMMING) &&
         (currentMoveFlags & MOVEFLAG_FLYING) &&
         !me->IsTaxiFlying() &&
-        !me->HasUnitState(UNIT_STAT_FLYING_ALLOWED))
+        !me->HasCheatOption(PLAYER_CHEAT_FLY))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
         removeMoveFlags |= MOVEFLAG_SWIMMING | MOVEFLAG_FLYING;

@@ -90,6 +90,7 @@ class AuthSocket: public BufferedSocket
         };
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
+        std::string GetRealmAddress(Realm const& realm) const;
 
         SRP6 srp;
         BigNumber m_reconnectProof;

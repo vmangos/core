@@ -346,7 +346,7 @@ struct boss_nothAI : public ScriptedAI
                 // if you don't kill him during the 3rd ground phase. We'll just repeat previous phase logic
                 // after this. It's highly unlikely that any guild get to this stage without killing him or wiping.
                 m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(180));
-                //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_nothAI::OnRemoveVulnerability() called with phaseCounter: %d", phaseCounter);
+                //sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_nothAI::OnRemoveVulnerability() called with phaseCounter: %d", phaseCounter);
         }
     }
 

@@ -203,6 +203,7 @@ typedef std::unordered_map<uint32, FactionEntry> FactionsMap;
 typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
 typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
 typedef std::unordered_map<uint32, ItemPrototype> ItemPrototypeMap;
+typedef std::unordered_map<uint32, std::unique_ptr<CreatureInfo>> CreatureInfoMap;
 
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
@@ -436,6 +437,7 @@ struct PlayerCacheData
     float fPosZ;
     float fOrientation;
     bool bInFlight;
+    bool bCharIsLocked; //hardcore
 };
 typedef std::map<uint32 /*guid*/, PlayerCacheData> PlayerCacheDataMap;
 
@@ -627,7 +629,6 @@ class ObjectMgr
         GroupMap::iterator GetGroupMapBegin() { return m_GroupMap.begin(); }
         GroupMap::iterator GetGroupMapEnd() { return m_GroupMap.end(); }
 
-        static CreatureInfo const* GetCreatureTemplate(uint32 id);
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoAddon(uint32 display_id);
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoRandomGender(uint32 display_id);
 
@@ -839,7 +840,20 @@ class ObjectMgr
         void LoadPetSpellData();
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
-        void CheckCreatureTemplates();
+        void LoadCreatureTemplate(uint32 entry);
+        void CheckCreatureTemplate(CreatureInfo* cInfo);
+        CreatureInfo const* GetCreatureTemplate(uint32 id) const
+        {
+            auto itr = m_creatureInfoMap.find(id);
+            if (itr != m_creatureInfoMap.end())
+                return itr->second.get();
+
+            return nullptr;
+        }
+        CreatureInfoMap const& GetCreatureInfoMap() const
+        {
+            return m_creatureInfoMap;
+        }
         void CorrectCreatureDisplayIds(uint32, uint32&);
 
         void LoadCreatures(bool reload = false);
@@ -1283,14 +1297,14 @@ class ObjectMgr
         PlayerCacheData const* GetPlayerDataByName(std::string const& name) const;
         void GetPlayerDataForAccount(uint32 accountId, std::vector<PlayerCacheData const*>& data) const;
         PlayerCacheData* InsertPlayerInCache(Player* pPlayer);
-        PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, std::string const& name, uint32 level, uint32 zoneId);
+        PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, std::string const& name, uint32 level, uint32 zoneId, bool isLocked = false); //hardcore
         void DeletePlayerFromCache(uint32 lowGuid);
         void ChangePlayerNameInCache(uint32 lowGuid, std::string const& oldName, std::string const& newName);
         void UpdatePlayerCachedPosition(Player* pPlayer);
         void UpdatePlayerCachedPosition(uint32 lowGuid, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight);
         void UpdatePlayerCachedPosition(PlayerCacheData* data, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight);
         void UpdatePlayerCache(Player* pPlayer);
-        void UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, std::string const& name, uint32 level, uint32 zoneId);
+        void UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, std::string const& name, uint32 level, uint32 zoneId, bool isLocked); //hardcore
 
         PlayerCacheDataMap m_playerCacheData;
         std::map<std::string, uint32> m_playerNameToGuid;
@@ -1482,6 +1496,7 @@ class ObjectMgr
         uint32 m_OldMailCounter;
 
     private:
+        void LoadCreatureInfo(Field* result);
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
         void LoadVendors(char const* tableName, bool isTemplates);
@@ -1549,6 +1564,7 @@ class ObjectMgr
         FactionTemplatesMap m_FactionTemplatesMap;
 
         SoundEntryMap m_SoundEntriesMap;
+        CreatureInfoMap m_creatureInfoMap;
         ItemPrototypeMap m_itemPrototypesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;

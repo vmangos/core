@@ -85,11 +85,8 @@ bool PathInfo::calculate(Vector3 const& start, Vector3 dest, bool forceDest, boo
     }
     else if (!(m_navMeshQuery = mmap->GetNavMeshQuery(m_sourceUnit->GetMapId())))
     {
-        if (BuildPathWithoutMMaps(start, dest))
-        {
-            m_type = PathType(PATHFIND_NORMAL);
-            return true;
-        }
+        BuildPathWithoutMMaps(start, dest);
+        return true;
     }
 
     if (m_navMeshQuery)
@@ -525,7 +522,7 @@ void PathInfo::BuildUnderwaterPath()
     m_type |= PATHFIND_UNDERWATER;
 }
 
-static constexpr float orientationOffsets[] =
+static constexpr float ORIENTATION_OFFSETS[] =
 {
     0,
     (M_PI_F / 6.0f) * 1,
@@ -541,10 +538,12 @@ static constexpr float orientationOffsets[] =
     (M_PI_F / 6.0f) * 6,
 };
 
-bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map const* pMap, std::vector<Vector3>& fullPath, std::vector<Vector3>& checkedPositions, float stepSize, uint32& stepsRemaining, float angle)
+static constexpr float STEP_SIZE = 3.0f;
+
+bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map const* pMap, std::vector<Vector3>& fullPath, std::vector<Vector3>& checkedPositions, uint32& stepsRemaining, float angle)
 {
     float const currentDistance = Geometry::GetDistance3D(targetPos, currentPos);
-    if (currentDistance < (stepSize + 1))
+    if (currentDistance < (STEP_SIZE + 1))
         return true;
 
     if (!stepsRemaining)
@@ -555,17 +554,17 @@ bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map cons
     for (int i = 0; i < 12; i++)
     {
         Vector3 newPos;
-        Geometry::GetNearPoint2DAroundPosition(currentPos.x, currentPos.y, newPos.x, newPos.y, stepSize, Geometry::ClampOrientation(angle + orientationOffsets[i]));
+        Geometry::GetNearPoint2DAroundPosition(currentPos.x, currentPos.y, newPos.x, newPos.y, STEP_SIZE, Geometry::ClampOrientation(angle + ORIENTATION_OFFSETS[i]));
         newPos.z = pMap->GetHeight(newPos.x, newPos.y, currentPos.z + 0.1f, true);
 
         float const zdiff = newPos.z - currentPos.z;
-        if (((zdiff < -0.0f) ? (-zdiff > stepSize) : (zdiff > stepSize * 0.9f)))
+        if (((zdiff < -0.0f) ? (-zdiff > STEP_SIZE) : (zdiff > STEP_SIZE * 0.9f)))
             continue;
 
         bool skip = false;
         for (auto const& checkedPos : checkedPositions)
         {
-            if (Geometry::GetDistance3D(checkedPos, newPos) < stepSize * 0.5f)
+            if (Geometry::GetDistance3D(checkedPos, newPos) < STEP_SIZE * 0.5f)
             {
                 skip = true;
                 break;
@@ -576,7 +575,7 @@ bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map cons
             continue;
 
         checkedPositions.push_back(newPos);
-        if (BuildPathStep(newPos, targetPos, pMap, fullPath, checkedPositions, stepSize, stepsRemaining, Geometry::GetAngle(targetPos, newPos)))
+        if (BuildPathStep(newPos, targetPos, pMap, fullPath, checkedPositions, stepsRemaining, Geometry::GetAngle(targetPos, newPos)))
         {
             fullPath.push_back(newPos);
             return true;
@@ -587,33 +586,59 @@ bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map cons
     return false;
 }
 
-bool PathInfo::BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest)
+void PathInfo::BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest)
 {
-    clear();
-    float stepSize = 5.0f;
-    float totalDistance = Geometry::GetDistance3D(start, dest);
-    if (totalDistance <= stepSize || m_sourceUnit->CanFly() || 
-        (m_sourceUnit->CanSwim() &&
-         m_sourceUnit->CanSwimAtPosition(start) &&
-         m_sourceUnit->CanSwimAtPosition(dest)))
-    {
-        m_pathPoints.resize(2);
-        m_pathPoints[0] = start;
-        m_pathPoints[1] = dest;
-        return true;
-    }
-    uint32 maxSteps = (totalDistance / stepSize) + 3;
+    bool const destInWater = m_sourceUnit->CanSwimAtPosition(dest);
 
+    if (!m_sourceUnit->CanSwim() && destInWater)
+    {
+        BuildShortcut();
+        m_type = PathType(PATHFIND_NOPATH);
+        return;
+    }
+
+    if (m_sourceUnit->CanFly())
+    {
+        BuildShortcut();
+        return;
+    }
+
+    if (!m_sourceUnit->CanWalk() && !destInWater)
+    {
+        BuildShortcut();
+        m_type = PathType(PATHFIND_NOPATH);
+        return;
+    }
+
+    float totalDistance = Geometry::GetDistance3D(start, dest);
+    if (totalDistance <= STEP_SIZE ||
+        (m_sourceUnit->CanSwim() && destInWater && m_sourceUnit->CanSwimAtPosition(start)))
+    {
+        BuildShortcut();
+        m_type |= PATHFIND_NORMAL;
+        return;
+    }
+
+    uint32 maxSteps = (totalDistance / STEP_SIZE) + 3;
     std::vector<Vector3> checkedPositions; // positions we've already been to
     checkedPositions.reserve(maxSteps);
+    
+    clear();
     m_pathPoints.reserve(maxSteps);
     m_pathPoints.push_back(start);
-    
+
     maxSteps *= 2;
 
-    bool ok = BuildPathStep(dest, start, m_sourceUnit->FindMap(), m_pathPoints, checkedPositions, stepSize, maxSteps, m_sourceUnit->GetAngle(dest.x, dest.y));
-    m_pathPoints.push_back(dest);
-    return ok;
+    if (BuildPathStep(dest, start, m_sourceUnit->FindMap(), m_pathPoints, checkedPositions, maxSteps, Geometry::GetAngle(start, dest)))
+    {
+        m_pathPoints.push_back(dest);
+        m_type = PathType(PATHFIND_NORMAL);
+    }
+    else
+    {
+        BuildShortcut();
+        m_type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
+    }
 }
 
 void PathInfo::createFilter()
@@ -1033,8 +1058,8 @@ bool PathInfo::UpdateForCaster(Unit* pTarget, float castRange)
 
 bool PathInfo::UpdateForMelee(Unit* pTarget, float meleeReach)
 {
-    // Si deja en ligne de vision, et a distance, c'est bon.
-    if (pTarget->IsWithinDist3d(m_sourceUnit->GetPositionX(), m_sourceUnit->GetPositionY(), m_sourceUnit->GetPositionZ(), meleeReach))
+    // If already within melee range, all good.
+    if (m_sourceUnit->CanReachWithMeleeAutoAttack(pTarget))
     {
         clear();
         m_type = PathType(PATHFIND_SHORTCUT | PATHFIND_NORMAL | PATHFIND_CASTER);
@@ -1048,12 +1073,13 @@ bool PathInfo::UpdateForMelee(Unit* pTarget, float meleeReach)
     // We have always keep at least 2 points (else, there is no mvt !)
     for (uint32 i = 1; i <= maxIndex; ++i)
     {
-        if (pTarget->IsWithinDist3d(m_pathPoints[i].x, m_pathPoints[i].y, m_pathPoints[i].z, meleeReach))
+        if (pTarget->IsWithinDist3d(m_pathPoints[i].x, m_pathPoints[i].y, m_pathPoints[i].z, meleeReach, SizeFactor::None))
         {
             Vector3 dirVect;
             pTarget->GetPosition(dirVect.x, dirVect.y, dirVect.z);
             dirVect -= m_pathPoints[i - 1];
-            float targetDist = pTarget->GetDistance(m_pathPoints[i - 1].x, m_pathPoints[i - 1].y, m_pathPoints[i - 1].z) - meleeReach;
+            float targetDist = pTarget->GetDistance(m_pathPoints[i - 1].x, m_pathPoints[i - 1].y, m_pathPoints[i - 1].z, SizeFactor::None);
+            targetDist -= meleeReach;
             float directionLength = sqrt(dirVect.squaredLength());
             m_pathPoints[i] = m_pathPoints[i - 1] + dirVect * targetDist / directionLength;
             m_pathPoints.resize(i + 1);

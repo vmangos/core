@@ -26,6 +26,9 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include "Bag.h"
+#include "Guild.h"
+#include "GuildMgr.h"
 
 bool ChatHandler::HandleGUIDCommand(char* /*args*/)
 {
@@ -446,8 +449,8 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Frost spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_FROST));
     PSendSysMessage("Shadow spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Arcane spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_ARCANE));
-    PSendSysMessage("Melee hit chance: %g", pPlayer->GetBonusHitChanceFromAuras(BASE_ATTACK));
-    PSendSysMessage("Ranged hit chance: %g", pPlayer->GetBonusHitChanceFromAuras(RANGED_ATTACK));
+    PSendSysMessage("Melee hit chance: %g", pPlayer->GetWeaponBasedAuraModifier(BASE_ATTACK, SPELL_AURA_MOD_HIT_CHANCE));
+    PSendSysMessage("Ranged hit chance: %g", pPlayer->GetWeaponBasedAuraModifier(RANGED_ATTACK, SPELL_AURA_MOD_HIT_CHANCE));
     PSendSysMessage("Spell hit chance: %g", pPlayer->m_modSpellHitChance);
     PSendSysMessage("Positive strength: %g", pPlayer->GetPosStat(STAT_STRENGTH));
     PSendSysMessage("Positive agility: %g", pPlayer->GetPosStat(STAT_AGILITY));
@@ -855,6 +858,45 @@ bool ChatHandler::HandleUnitShowCreateSpellCommand(char* args)
 
     PSendSysMessage("Create spell for %s:", pTarget->GetObjectGuid().GetString().c_str());
     PSendSysMessage("%s (%u)", pSpellEntry ? pSpellEntry->SpellName[0].c_str() : "Unknown", createdBySpell);
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitShowCombatTimerCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Combat timer for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%u", pTarget->GetCombatTimer());
+
+    return true;
+}
+
+bool ChatHandler::HandlePvPCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget)
+        return false;
+    
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (Player* pPlayer = pTarget->ToPlayer())
+        pPlayer->UpdatePvP(value, true);
+    else
+        pTarget->SetPvP(value);
 
     return true;
 }
@@ -2594,7 +2636,7 @@ bool ChatHandler::HandleDieHelper(Unit* target)
         if (HasLowerSecurity((Player*)target, ObjectGuid(), false))
             return false;
 
-        if (player->IsGod())
+        if (player->GetInvincibilityHpThreshold())
             player->SetCheatGod(false);
     }
 
@@ -2671,6 +2713,116 @@ bool ChatHandler::HandleKnockBackCommand(char* args)
     ExtractFloat(&args, verticalSpeed);
 
     target->KnockBackFrom(player, horizontalSpeed, verticalSpeed);
+
+    return true;
+}
+
+bool ChatHandler::HandleHardcoreONCommand(char* args)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_HARDCORE_ENABLED))
+    {
+        SendSysMessage("Hardcore is NOT enabled on this server.");
+        return false;
+    }
+
+    Player* pPlayer = m_session->GetPlayer();
+
+    if (pPlayer->IsHardcore())
+    {
+        SendSysMessage("You are already Hardcore!");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pPlayer->GetLevel() != 1)
+    {
+        SendSysMessage("You can only enable Hardcore at level 1!");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::vector<uint16> startItem = { 25, 35, 36, 37, 38, 39, 40, 43, 44, 45, 47, 48, 49, 51, 52, 53, 55, 56, 57, 59, 117, 120, 121, 127, 129, 139, 140, 147, 148, 153, 154, 159, 1395, 1396, 2070, 2092, 2101, 2102, 2105, 2361, 2362, 2504, 2508, 2512, 2516, 2947, 3111, 3661, 4536, 4540, 4604, 6096, 6097, 6098, 6116, 6117, 6118, 6119, 6120, 6121, 6122, 6123, 6124, 6125, 6126, 6127, 6129, 6134, 6135, 6136, 6137, 6138, 6139, 6140, 6144, 6948, 12282 };
+
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
+                continue;
+                
+            pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+        }
+    }
+    for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
+                continue;
+            pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+        }
+    }
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (Item* pItem = pBag->GetItemByPos(j))
+                {
+                    if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
+                        continue;
+
+                    pPlayer->DestroyItem(i, j, true);
+                }
+            }
+        }
+    }
+    for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
+                continue;
+
+            pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+        }
+    }
+    for (int i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (Item* pItem = pBag->GetItemByPos(j))
+                {
+                    if (std::find(startItem.begin(), startItem.end(), pItem->GetEntry()) != startItem.end())
+                        continue;
+
+                    pPlayer->DestroyItem(i, j, true);
+                }
+            }
+        }
+    }
+
+    pPlayer->SetMoney(0);
+
+    pPlayer->SetHardcore(true);
+    pPlayer->SetHardcoreAnnouncements(true);
+    pPlayer->RemoveFromGroup();
+    SendSysMessage("Hardcore activated!");
+
+    //inv in guild
+    if (pPlayer->GetTeam() == ALLIANCE)
+    {
+        if (Guild* targetGuild = sGuildMgr.GetGuildByName("HardCore"))
+            auto status = targetGuild->AddMember(pPlayer->GetObjectGuid(), targetGuild->GetLowestRank());        
+    }
+    if (pPlayer->GetTeam() == HORDE)
+    {
+        if (Guild* targetGuild = sGuildMgr.GetGuildByName("Hard Core"))
+            auto status = targetGuild->AddMember(pPlayer->GetObjectGuid(), targetGuild->GetLowestRank());
+    }
 
     return true;
 }

@@ -17,7 +17,7 @@ if( UNIX )
     "preferred path to MySQL (mysql_config)"
   )
 
-  find_program(MYSQL_CONFIG mysql_config
+  find_program(MYSQL_CONFIG NAMES mysql_config mariadb_config
     ${MYSQL_CONFIG_PREFER_PATH}
     /usr/local/mysql/bin/
     /usr/local/bin/

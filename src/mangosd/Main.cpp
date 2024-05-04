@@ -85,8 +85,6 @@ extern int main(int argc, char **argv)
 {
     // Command line parsing
     char const* cfg_file = _MANGOSD_CONFIG;
-
-
     char const *options = ":c:s:";
 
     ACE_Get_Opt cmd_opts(argc, argv, options);
@@ -166,6 +164,9 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
+    // Reads config for file names so needs to be after we set the config.
+    sLog.OpenWorldLogFiles();
+
 #ifndef WIN32                                               // posix daemon commands need apply after config read
     switch (serviceDaemonMode)
     {
@@ -215,7 +216,7 @@ extern int main(int argc, char **argv)
 
     // and run the 'Master'
     // TODO: Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?
-    return sMaster.Run();
+    return sMaster.Run(serviceDaemonMode);
 
     // at sMaster return function exist with codes
     // 0 - normal shutdown

@@ -35,7 +35,7 @@ class Master
     public:
         Master();
         ~Master();
-        int Run();
+        int Run(char serviceDaemonMode);
         static volatile uint32  m_masterLoopCounter;
         static volatile bool    m_handleSigvSignals;
         static void SigvSignalHandler();

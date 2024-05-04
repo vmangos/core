@@ -97,6 +97,8 @@ inline uint32 GetLoveIsInTheAirGossipForCreature(uint32 creatureId, uint32 gende
         case 7936: // Lyon Mountainheart (Gender: Male) (Faction: Ironforge)
         case 14363: // Thief Catcher Shadowdelve (Gender: Male) (Faction: Ironforge)
             return 6990;
+        case 11028: // Jemma Quikswitch <Journeyman Engineer> (Gender: Female) (Faction: Gnomeregan Exiles)
+            return 6991;
         case 14723: // Mistina Steelshield <Alliance Cloth Quartermaster> (Gender: Female) (Faction: Ironforge)
             return 6993;
         case 9099: // Sraaz <Pie Vendor> (Gender: Male) (Faction: Gnomeregan Exiles)
@@ -107,6 +109,8 @@ inline uint32 GetLoveIsInTheAirGossipForCreature(uint32 creatureId, uint32 gende
             return 6996;
         case 5173: // Alexander Calder <Warlock Trainer> (Gender: Male) (Faction: Ironforge)
             return 6997;
+        case 2489: // Milstaff Stormeye <Portal Trainer> (Gender: Male) (Faction: Ironforge)
+            return 6998;
         case 4262: // Darnassus Sentinel (Gender: Female) (Faction: Darnassus)
             return 6999;
         case 2796: // Faelyssa (Gender: Female) (Faction: Darnassus)
@@ -140,6 +144,10 @@ inline uint32 GetLoveIsInTheAirGossipForCreature(uint32 creatureId, uint32 gende
             return 7012;
         case 3048: // Ursyn Ghull <Mage Trainer> (Gender: Female) (Faction: Undercity)
             return 7013;
+        case 12198: // Martin Lindsey <Arathi Basin Battlemaster> (Gender: Male) (Faction: The Defilers)
+            return 7014;
+        case 3040: // Urek Thunderhorn <Hunter Trainer> (Gender: Male) (Faction: Thunder Bluff)
+            return 7015;
         case 2802: // Susan Tillinghast (Gender: Female) (Faction: Undercity)
         case 5732: // Apothecary Katrina <Royal Apothecary Society> (Gender: Female) (Faction: Undercity)
             return 7016;
@@ -176,6 +184,8 @@ inline uint32 GetLoveIsInTheAirGossipForCreature(uint32 creatureId, uint32 gende
             return 7029;
         case 10880: // Warcaller Gorlach (Gender: Male) (Faction: Orgrimmar)
             return 7030;
+        case 13417: // Sagorne Creststrider <Shaman Trainer> (Gender: Male) (Faction: Thunder Bluff)
+            return 7031;
         case 3408: // Zel'mak <Warrior Trainer> (Gender: Male) (Faction: Orgrimmar)
             return 7032;
         case 5624: // Undercity Guardian (Gender: None) (Faction: Undercity)
@@ -185,6 +195,7 @@ inline uint32 GetLoveIsInTheAirGossipForCreature(uint32 creatureId, uint32 gende
         case 7087: // Killian Hagey <Skinning Trainer> (Gender: Male) (Faction: Undercity)
             return 7059;
         case 4600: // Geoffrey Hartwell <Weapon Merchant> (Gender: Male) (Faction: Undercity)
+        case 4603: // Nicholas Atwood <Gun Merchant> (Gender: Male) (Faction: Undercity)
             return 7060;
         case 4554: // Tawny Grisette <Mushroom Vendor> (Gender: Female) (Faction: Undercity)
             return 7063;
@@ -194,6 +205,7 @@ inline uint32 GetLoveIsInTheAirGossipForCreature(uint32 creatureId, uint32 gende
         case 3346: // Kithas <Enchanting Supplies> (Gender: Female) (Faction: Orgrimmar)
         case 3367: // Felika <General Trade Goods Merchant> (Gender: Female) (Faction: Orgrimmar)
         case 5188: // Garyl <Tabard Vendor> (Gender: Female) (Faction: Orgrimmar)
+        case 5816: // Katis <Wand Merchant> (Gender: Female) (Faction: Orgrimmar)
             return 7068;
         case 8404: // Xan'tish <Snake Vendor> (Gender: Male) (Faction: Orgrimmar)
             return 7069;
@@ -226,14 +238,6 @@ inline uint32 GetLoveIsInTheAirGossipForCreature(uint32 creatureId, uint32 gende
         case 1328: // Elly Langston <Barmaid> (Gender: Female) (Faction: Stormwind)
         case 12805: // Officer Areyn <Accessories Quartermaster> (Gender: Female) (Faction: Stormwind)
             return 7081;
-        case 2489: // Milstaff Stormeye <Portal Trainer> (Gender: Male) (Faction: Ironforge)
-        case 3040: // Urek Thunderhorn <Hunter Trainer> (Gender: Male) (Faction: Thunder Bluff)
-        case 4603: // Nicholas Atwood <Gun Merchant> (Gender: Male) (Faction: Undercity)
-        case 5816: // Katis <Wand Merchant> (Gender: Female) (Faction: Orgrimmar)
-        case 11028: // Jemma Quikswitch <Journeyman Engineer> (Gender: Female) (Faction: Gnomeregan Exiles)
-        case 12198: // Martin Lindsey <Arathi Basin Battlemaster> (Gender: Male) (Faction: The Defilers)
-        case 13417: // Sagorne Creststrider <Shaman Trainer> (Gender: Male) (Faction: Thunder Bluff)
-            return 0; // menu not sniffed
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unexpected creature id %u tried to get Love is in the Air gossip menu.", creatureId);
