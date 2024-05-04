@@ -807,6 +807,7 @@ class World
         void LoadConfigSettings(bool reload = false);
 
         void SendWorldText(int32 string_id, ...);
+        void SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel, uint32 queueType, ...);
         void SendBroadcastTextToWorld(uint32 textId);
 
         // Only for GMs with ticket notification ON
