@@ -225,6 +225,61 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 				PartyBotEquipDruidHealFour(pPlayer);
 		}
 	}
+
+	if (pLeaderItl > 75 && pLeaderItl <= 80)
+	{
+		if (m_role == ROLE_TANK)
+		{
+			if (pPlayer->GetClass() == CLASS_WARRIOR)
+				PartyBotEquipWarriorTankFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinTankFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidTankFour(pPlayer);
+		}
+
+		if (m_role == ROLE_MELEE_DPS)
+		{
+			if (pPlayer->GetClass() == CLASS_WARRIOR)
+				PartyBotEquipWarriorMddFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanMddFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_ROGUE)
+				PartyBotEquipRogueFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinMddFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidMddFive(pPlayer);
+		}
+
+		if (m_role == ROLE_RANGE_DPS)
+		{
+			if (pPlayer->GetClass() == CLASS_WARLOCK)
+				PartyBotEquipWarlockFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanRddFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PRIEST)
+				PartyBotEquipPriestRddFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_MAGE)
+				PartyBotEquipMageFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_HUNTER)
+				PartyBotEquipHunterFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidRddFive(pPlayer);
+		}
+
+		if (m_role == ROLE_HEALER)
+		{
+			if (pPlayer->GetClass() == CLASS_SHAMAN)
+				PartyBotEquipShamanHealFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PRIEST)
+				PartyBotEquipPriestHealFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_PALADIN)
+				PartyBotEquipPaladinHealFive(pPlayer);
+			if (pPlayer->GetClass() == CLASS_DRUID)
+				PartyBotEquipDruidHealFive(pPlayer);
+		}
+	}
 }
 
 void PartyBotEquipItems(Player* pPlayer, std::vector<PlayerPremadeItem const*> equip)
@@ -332,6 +387,30 @@ void PartyBotEquipWarriorTankFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipWarriorTankFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16963, 2583, 0));
+	equip.push_back(new PlayerPremadeItem(22732, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21639, 2606, 0));
+	equip.push_back(new PlayerPremadeItem(19888, 2622, 0));
+	equip.push_back(new PlayerPremadeItem(16966, 1892, 0));
+	equip.push_back(new PlayerPremadeItem(16959, 1886, 0));
+	equip.push_back(new PlayerPremadeItem(21674, 2613, 0));
+	equip.push_back(new PlayerPremadeItem(21598, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16962, 2583, 0));
+	equip.push_back(new PlayerPremadeItem(16965, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21601, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18879, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19431, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18406, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19363, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(21269, 929, 0));
+	equip.push_back(new PlayerPremadeItem(19368, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipWarriorMddPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -423,6 +502,30 @@ void PartyBotEquipWarriorMddFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19352, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(19351, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(17069, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipWarriorMddFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(12640, 1506, 0));
+	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21330, 2606, 0));
+	equip.push_back(new PlayerPremadeItem(21701, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21814, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21618, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(21581, 927, 0));
+	equip.push_back(new PlayerPremadeItem(19137, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22385, 1506, 0));
+	equip.push_back(new PlayerPremadeItem(19381, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19384, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19406, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21670, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21650, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(21650, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(17069, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
@@ -522,6 +625,30 @@ void PartyBotEquipWarlockFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipWarlockFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21337, 2589, 0));
+	equip.push_back(new PlayerPremadeItem(21608, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21335, 2605, 0));
+	equip.push_back(new PlayerPremadeItem(22731, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(19682, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21186, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(21585, 2614, 0));
+	equip.push_back(new PlayerPremadeItem(22730, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19683, 2589, 0));
+	equip.push_back(new PlayerPremadeItem(19684, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21417, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21709, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19379, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21622, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(21597, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21603, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipShamanMddPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -606,6 +733,29 @@ void PartyBotEquipShamanMddFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(17104, 1900, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipShamanMddFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(18817, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21684, 2606, 0));
+	equip.push_back(new PlayerPremadeItem(21701, 849, 0));
+	equip.push_back(new PlayerPremadeItem(21374, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21602, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(21624, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(21586, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21651, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(21705, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18821, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22321, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19289, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21134, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(22395, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
 }
@@ -707,6 +857,30 @@ void PartyBotEquipShamanRddFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipShamanRddFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(19375, 2587, 0));
+	equip.push_back(new PlayerPremadeItem(21608, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21376, 2605, 0));
+	equip.push_back(new PlayerPremadeItem(22731, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21671, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21464, 2565, 0));
+	equip.push_back(new PlayerPremadeItem(21585, 2617, 0));
+	equip.push_back(new PlayerPremadeItem(22730, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21375, 2587, 0));
+	equip.push_back(new PlayerPremadeItem(21373, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21707, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21709, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19379, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19344, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19360, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(19366, 0, 0));
+	equip.push_back(new PlayerPremadeItem(23199, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipShamanHealPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -795,6 +969,30 @@ void PartyBotEquipShamanHealFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(19395, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19347, 2505, 0));
 	equip.push_back(new PlayerPremadeItem(19312, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipShamanHealFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21372, 2587, 0));
+	equip.push_back(new PlayerPremadeItem(21712, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21376, 2604, 0));
+	equip.push_back(new PlayerPremadeItem(21583, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21374, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(16943, 2565, 0));
+	equip.push_back(new PlayerPremadeItem(16948, 2617, 0));
+	equip.push_back(new PlayerPremadeItem(16944, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21375, 2587, 0));
+	equip.push_back(new PlayerPremadeItem(21373, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21620, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21681, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19395, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21839, 2505, 0));
+	equip.push_back(new PlayerPremadeItem(21610, 929, 0));
+	equip.push_back(new PlayerPremadeItem(22396, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
 }
@@ -889,6 +1087,30 @@ void PartyBotEquipRogueFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(19406, 0, 0));
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19352, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(19351, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(17069, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipRogueFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21360, 2585, 0));
+	equip.push_back(new PlayerPremadeItem(19377, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21361, 2606, 0));
+	equip.push_back(new PlayerPremadeItem(21701, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21364, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21602, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(21672, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(21586, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21362, 2585, 0));
+	equip.push_back(new PlayerPremadeItem(21359, 911, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19384, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19406, 0, 0));
+	equip.push_back(new PlayerPremadeItem(23570, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21650, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(19351, 1900, 0));
 	equip.push_back(new PlayerPremadeItem(17069, 0, 0));
 
@@ -990,6 +1212,30 @@ void PartyBotEquipPriestRddFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipPriestRddFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21348, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(18814, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19370, 2605, 0));
+	equip.push_back(new PlayerPremadeItem(22731, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21351, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21611, 2565, 0));
+	equip.push_back(new PlayerPremadeItem(21585, 2614, 0));
+	equip.push_back(new PlayerPremadeItem(19400, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19133, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(19131, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21709, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21210, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19379, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19360, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(19366, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21603, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipPriestHealPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -1079,6 +1325,30 @@ void PartyBotEquipPriestHealFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
 	equip.push_back(new PlayerPremadeItem(18608, 2505, 0));
 	equip.push_back(new PlayerPremadeItem(19435, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipPriestHealFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21615, 2590, 0));
+	equip.push_back(new PlayerPremadeItem(21712, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16924, 2604, 0));
+	equip.push_back(new PlayerPremadeItem(21583, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21663, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(16926, 1884, 0));
+	equip.push_back(new PlayerPremadeItem(21619, 2617, 0));
+	equip.push_back(new PlayerPremadeItem(21582, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16922, 2590, 0));
+	equip.push_back(new PlayerPremadeItem(19437, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19382, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21620, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19395, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21839, 2505, 0));
+	equip.push_back(new PlayerPremadeItem(21666, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21801, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
 }
@@ -1175,6 +1445,30 @@ void PartyBotEquipPaladinTankFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipPaladinTankFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21387, 2584, 0));
+	equip.push_back(new PlayerPremadeItem(22732, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21639, 2605, 0));
+	equip.push_back(new PlayerPremadeItem(19888, 1889, 0));
+	equip.push_back(new PlayerPremadeItem(21389, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(16951, 923, 0));
+	equip.push_back(new PlayerPremadeItem(21674, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(21598, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19855, 2584, 0));
+	equip.push_back(new PlayerPremadeItem(21706, 2503, 0));
+	equip.push_back(new PlayerPremadeItem(21200, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21601, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19431, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18406, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19335, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(21269, 929, 0));
+	equip.push_back(new PlayerPremadeItem(22401, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipPaladinMddPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -1261,6 +1555,29 @@ void PartyBotEquipPaladinMddFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19334, 1900, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipPaladinMddFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21387, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21391, 2606, 0));
+	equip.push_back(new PlayerPremadeItem(21701, 849, 0));
+	equip.push_back(new PlayerPremadeItem(21389, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21618, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(21623, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(21463, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21390, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(21388, 1887, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21205, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22321, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19289, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21134, 1900, 0));
+	equip.push_back(new PlayerPremadeItem(23203, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
 }
@@ -1358,6 +1675,30 @@ void PartyBotEquipPaladinHealFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipPaladinHealFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(19375, 2584, 0));
+	equip.push_back(new PlayerPremadeItem(21712, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18810, 2604, 0));
+	equip.push_back(new PlayerPremadeItem(21583, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21663, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21604, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(20264, 2617, 0));
+	equip.push_back(new PlayerPremadeItem(21582, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21667, 2584, 0));
+	equip.push_back(new PlayerPremadeItem(19437, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19382, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21620, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19395, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21839, 2505, 0));
+	equip.push_back(new PlayerPremadeItem(21666, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22402, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipMagePreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -1447,6 +1788,30 @@ void PartyBotEquipMageFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(19379, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19339, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19356, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(19861, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipMageFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(19375, 2588, 0));
+	equip.push_back(new PlayerPremadeItem(21608, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19370, 2605, 0));
+	equip.push_back(new PlayerPremadeItem(22731, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(19145, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21186, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(21585, 2616, 0));
+	equip.push_back(new PlayerPremadeItem(22730, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21461, 2588, 0));
+	equip.push_back(new PlayerPremadeItem(21344, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21836, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21709, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19379, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19339, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21622, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(21597, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19861, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
@@ -1548,6 +1913,30 @@ void PartyBotEquipHunterFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipHunterFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(16939, 2586, 0));
+	equip.push_back(new PlayerPremadeItem(19377, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16937, 2606, 0));
+	equip.push_back(new PlayerPremadeItem(21710, 849, 0));
+	equip.push_back(new PlayerPremadeItem(16942, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(16935, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(16940, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(16936, 0, 0));
+	equip.push_back(new PlayerPremadeItem(16938, 2586, 0));
+	equip.push_back(new PlayerPremadeItem(16941, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19325, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21670, 0, 0));
+	equip.push_back(new PlayerPremadeItem(23570, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21673, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(19859, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(19361, 2523, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipDruidTankPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -1637,6 +2026,29 @@ void PartyBotEquipDruidTankFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipDruidTankFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21693, 2545, 0));
+	equip.push_back(new PlayerPremadeItem(22732, 0, 0));
+	equip.push_back(new PlayerPremadeItem(20194, 2606, 0));
+	equip.push_back(new PlayerPremadeItem(19386, 2622, 0));
+	equip.push_back(new PlayerPremadeItem(19405, 1892, 0));
+	equip.push_back(new PlayerPremadeItem(21602, 923, 0));
+	equip.push_back(new PlayerPremadeItem(21605, 2613, 0));
+	equip.push_back(new PlayerPremadeItem(21675, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22740, 2545, 0));
+	equip.push_back(new PlayerPremadeItem(19381, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21601, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18879, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13966, 0, 0));
+	equip.push_back(new PlayerPremadeItem(11811, 0, 0));
+	equip.push_back(new PlayerPremadeItem(943, 2646, 0));
+	equip.push_back(new PlayerPremadeItem(23198, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipDruidMddPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -1721,6 +2133,30 @@ void PartyBotEquipDruidMddFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(19406, 0, 0));
 	equip.push_back(new PlayerPremadeItem(11815, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19358, 2563, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipDruidMddFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(8345, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(19377, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21665, 2606, 0));
+	equip.push_back(new PlayerPremadeItem(21701, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21680, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21602, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(21672, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(21586, 0, 0));
+	equip.push_back(new PlayerPremadeItem(20665, 1508, 0));
+	equip.push_back(new PlayerPremadeItem(21493, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21205, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19406, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13965, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21268, 2563, 0));
+	equip.push_back(new PlayerPremadeItem(13385, 0, 0));
+	equip.push_back(new PlayerPremadeItem(23198, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
 }
@@ -1824,6 +2260,30 @@ void PartyBotEquipDruidRddFour(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
+void PartyBotEquipDruidRddFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(19375, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(21608, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19370, 2605, 0));
+	equip.push_back(new PlayerPremadeItem(22731, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(19682, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21186, 1883, 0));
+	equip.push_back(new PlayerPremadeItem(21585, 2617, 0));
+	equip.push_back(new PlayerPremadeItem(22730, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19683, 2544, 0));
+	equip.push_back(new PlayerPremadeItem(19684, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19403, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21709, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19379, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18820, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19360, 2504, 0));
+	equip.push_back(new PlayerPremadeItem(21597, 0, 0));
+	equip.push_back(new PlayerPremadeItem(23197, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
 void PartyBotEquipDruidHealPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
@@ -1913,6 +2373,30 @@ void PartyBotEquipDruidHealFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19360, 2505, 0));
 	equip.push_back(new PlayerPremadeItem(19312, 0, 0));
+
+	PartyBotEquipItems(pPlayer, equip);
+}
+
+void PartyBotEquipDruidHealFive(Player* pPlayer)
+{
+	std::vector<PlayerPremadeItem const*> equip;
+	equip.push_back(new PlayerPremadeItem(21615, 2591, 0));
+	equip.push_back(new PlayerPremadeItem(21712, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18810, 2604, 0));
+	equip.push_back(new PlayerPremadeItem(21583, 2621, 0));
+	equip.push_back(new PlayerPremadeItem(21663, 1891, 0));
+	equip.push_back(new PlayerPremadeItem(21604, 2566, 0));
+	equip.push_back(new PlayerPremadeItem(21617, 2617, 0));
+	equip.push_back(new PlayerPremadeItem(21582, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19385, 2591, 0));
+	equip.push_back(new PlayerPremadeItem(19437, 911, 0));
+	equip.push_back(new PlayerPremadeItem(21620, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19382, 0, 0));
+	equip.push_back(new PlayerPremadeItem(19395, 0, 0));
+	equip.push_back(new PlayerPremadeItem(17064, 0, 0));
+	equip.push_back(new PlayerPremadeItem(21839, 2505, 0));
+	equip.push_back(new PlayerPremadeItem(21666, 0, 0));
+	equip.push_back(new PlayerPremadeItem(22399, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
 }
