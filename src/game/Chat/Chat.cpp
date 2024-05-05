@@ -94,7 +94,7 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand partyBotCommandTable[] =
     {
         { "add",        SEC_PLAYER,      false, &ChatHandler::HandlePartyBotAddCommand,         "", nullptr },
-        { "clone",      SEC_PLAYER,      false, &ChatHandler::HandlePartyBotCloneCommand,       "", nullptr },
+        { "clone",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotCloneCommand,       "", nullptr },
         { "load",       SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotLoadCommand,        "", nullptr },
         { "setrole",    SEC_PLAYER,      false, &ChatHandler::HandlePartyBotSetRoleCommand,     "", nullptr },
         { "attackstart",SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAttackStartCommand, "", nullptr },
