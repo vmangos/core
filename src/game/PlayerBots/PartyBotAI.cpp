@@ -196,6 +196,22 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
             me->StoreNewItemInBestSlots(pItem->GetEntry(), 1, pItem->GetEnchantmentId(EnchantmentSlot(0)));
         }   
     }
+
+    // Set equip level
+    uint8 itl = me->GetITL();
+
+    if (itl <= 60)
+        m_equip = 1;
+    if (itl > 60 && itl <= 65)
+        m_equip = 2;
+    if (itl > 65 && itl <= 70)
+        m_equip = 3;
+    if (itl > 70 && itl <= 75)
+        m_equip = 4;
+    if (itl > 75 && itl <= 80)
+        m_equip = 5;
+    if (itl > 80)
+        m_equip = 6;
 }
 
 Player* PartyBotAI::GetPartyLeader() const
