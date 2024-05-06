@@ -8913,7 +8913,7 @@ void Player::SendPetSkillWipeConfirm() const
 
 uint8 Player::GetITL()
 {
-    uint8 itl = 0;
+    uint32 itl = 0;
     uint32 count = 0;
 
     for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
