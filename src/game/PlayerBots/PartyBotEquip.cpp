@@ -2316,7 +2316,7 @@ void PartyBotEquipHunterFive(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
-void PartyBotEquipHunterFive(Player* pPlayer)
+void PartyBotEquipHunterSix(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
 	equip.push_back(new PlayerPremadeItem(22438, 2586, 0));
@@ -2875,7 +2875,7 @@ void PartyBotEquipDruidHealFive(Player* pPlayer)
 	PartyBotEquipItems(pPlayer, equip);
 }
 
-void PartyBotEquipDruidHealFive(Player* pPlayer)
+void PartyBotEquipDruidHealSix(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
 	equip.push_back(new PlayerPremadeItem(21615, 2591, 0));
