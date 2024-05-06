@@ -2250,7 +2250,8 @@ void World::SendWorldText(int32 string_id, ...)
 // Send a System Message to all players in the same battleground or queue (except self if mentioned)
 void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel, uint32 queueType, ...)
 {
-    BattleGroundTypeId bgTypeId = BattleGroundMgr::BgTemplateId(static_cast<BattleGroundQueueTypeId>(queueType));
+    auto queueTypeId = static_cast<BattleGroundQueueTypeId>(queueType);
+    BattleGroundTypeId bgTypeId = BattleGroundMgr::BgTemplateId(queueTypeId);
     BattleGroundBracketId queuedPlayerBracket = Player::GetBattleGroundBracketIdFromLevel(bgTypeId, queuedPlayerLevel);
 
     va_list ap;
@@ -2273,7 +2274,7 @@ void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel,
                 }
 
                 // If player is queued or already inside a BG matching the BG type.
-                if ((player->InBattleGroundQueue() && player->GetQueuedBattleground() == queueType) ||
+                if (player->InBattleGroundQueueForBattleGroundQueueType(queueTypeId) ||
                     (player->InBattleGround() && player->GetBattleGroundTypeId() == bgTypeId))
                 {
                     // If player bracket matches the queued player bracket.
