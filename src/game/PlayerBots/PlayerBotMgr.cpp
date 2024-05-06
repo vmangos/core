@@ -1102,9 +1102,10 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     {
         if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
         {
-            if (EquipLevelHelper(pPlayer) != pAI->m_equip)
+            // No clone for too high itl
+            if (EquipLevelHelper(pPlayer) <= pAI->m_equip)
             {
-                PSendSysMessage("Your ITL does not match the PartyBot: %s.", pTarget->GetName());
+                SendSysMessage("Your ITL too low.");
                 SetSentErrorMessage(true);
                 return false;
             }
@@ -1112,6 +1113,7 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     }
     else
     {
+
         if (pPlayer->GetGuildId() != pTarget->GetGuildId())
         {
             SendSysMessage("You can only clone a member of your guild.");
@@ -1853,10 +1855,10 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                     }
                 }
 
-                // No chleader for to high or low it;
-                if (EquipLevelHelper(pPlayer) != pAI->m_equip)
+                // No chleader for too high itl
+                if (EquipLevelHelper(pPlayer) <= pAI->m_equip)
                 {
-                    PSendSysMessage("Your ITL does not match the PartyBot: %s.", pTarget->GetName());
+                    PSendSysMessage("Your ITL too low for: %s.", pTarget->GetName());
                     SetSentErrorMessage(true);
                     return false;
                 }
@@ -1894,10 +1896,10 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                             }
                         }
 
-                        // No chleader for to high or low it;
-                        if (EquipLevelHelper(pPlayer) != pAI->m_equip)
+                        // No chleader for too high itl
+                        if (EquipLevelHelper(pPlayer) <= pAI->m_equip)
                         {
-                            PSendSysMessage("Your ITL does not match the PartyBot: %s.", pMember->GetName());
+                            PSendSysMessage("Your ITL too low for: %s.", pMember->GetName());
                             continue;
                         }
 
@@ -1913,7 +1915,6 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                 }
             }
 
-            SendSysMessage("The leader has been changed for bots.");
             return true;
         }
     } 
