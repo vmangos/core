@@ -62,7 +62,7 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 				PartyBotEquipDruidHealPreOne(pPlayer);
 		}
 
-		pAI->equip = 1;
+		pAI->m_equip = 1;
 	}
 
 	if (pLeaderItl > 60 && pLeaderItl <= 65)
@@ -119,7 +119,7 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 				PartyBotEquipDruidHealTwo(pPlayer);
 		}
 
-		pAI->equip = 2;
+		pAI->m_equip = 2;
 	}
 
 	if (pLeaderItl > 65 && pLeaderItl <= 70)
@@ -176,7 +176,7 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 				PartyBotEquipDruidHealThree(pPlayer);
 		}
 
-		pAI->equip = 3;
+		pAI->m_equip = 3;
 	}
 
 	if (pLeaderItl > 70 && pLeaderItl <= 75)
@@ -233,7 +233,7 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 				PartyBotEquipDruidHealFour(pPlayer);
 		}
 
-		pAI->equip = 4;
+		pAI->m_equip = 4;
 	}
 
 	if (pLeaderItl > 75 && pLeaderItl <= 80)
@@ -290,7 +290,7 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 				PartyBotEquipDruidHealFive(pPlayer);
 		}
 
-		pAI->equip = 5;
+		pAI->m_equip = 5;
 	}
 
 	if (pLeaderItl > 80)
@@ -347,7 +347,7 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 				PartyBotEquipDruidHealSix(pPlayer);
 		}
 
-		pAI->equip = 6;
+		pAI->m_equip = 6;
 	}
 }
 

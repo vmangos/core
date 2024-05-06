@@ -1032,6 +1032,23 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     return true;
 }
 
+uint8 EquipLevelHelper(Player* pPlayer) {
+    uint8 itl = pPlayer->GetITL();
+
+    if (itl <= 60)
+        return 1;
+    if (itl > 60 && itl <= 65)
+        return 2;
+    if (itl > 65 && itl <= 70)
+        return 3;
+    if (itl > 70 && itl <= 75)
+        return 4;
+    if (itl > 75 && itl <= 80)
+        return 5;
+    if (itl > 80)
+        return 6;
+}
+
 bool ChatHandler::HandlePartyBotCloneCommand(char* args)
 {
     Player* pPlayer = m_session->GetPlayer();
@@ -1054,7 +1071,7 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
 
         //todo: remove hardcode
         strToLower(name);
-        if (name == "sana" || name == "dedzima")
+        if (name == "sana" || name == "dedzima") //gm name
         {
             SendSysMessage(LANG_NO_CHAR_SELECTED);
             SetSentErrorMessage(true);
@@ -1079,7 +1096,29 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
             SetSentErrorMessage(true);
             return false;
         }
-    }    
+    }
+
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            if (EquipLevelHelper(pPlayer) != pAI->m_equip)
+            {
+                PSendSysMessage("Your ITL does not match the PartyBot: %s.", pTarget->GetName());
+                SetSentErrorMessage(true);
+                return false;
+            }
+        }
+    }
+    else
+    {
+        if (pPlayer->GetGuildId() != pTarget->GetGuildId())
+        {
+            SendSysMessage("You can only clone a member of your guild.");
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
 
     if (!PartyBotAddRequirementCheck(pPlayer, pTarget))
     {
@@ -1799,9 +1838,10 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                 return false;
             }
 
-            // Only the owner can.
+            
             if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
             {
+                // Only the owner can.
                 if (pAI->m_personalControls)
                 {
                     Player* pLeader = pAI->GetPartyLeader();
@@ -1811,6 +1851,14 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                         PSendSysMessage("%s this bot does not own you.", pTarget->GetName());
                         return false;
                     }
+                }
+
+                // No chleader for to high or low it;
+                if (EquipLevelHelper(pPlayer) != pAI->m_equip)
+                {
+                    PSendSysMessage("Your ITL does not match the PartyBot: %s.", pTarget->GetName());
+                    SetSentErrorMessage(true);
+                    return false;
                 }
 
                 pAI->ChangePartyLeader(pPlayer->GetObjectGuid());
@@ -1832,10 +1880,10 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                 {
                     if (pMember == pPlayer)
                         continue;
-
-                    // Only the owner can.
+                   
                     if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
                     {
+                        // Only the owner can.
                         if (pAI->m_personalControls)
                         {
                             Player* pLeader = pAI->GetPartyLeader();
@@ -1846,7 +1894,15 @@ bool ChatHandler::HandlePartyBotChleader(char* args)
                             }
                         }
 
+                        // No chleader for to high or low it;
+                        if (EquipLevelHelper(pPlayer) != pAI->m_equip)
+                        {
+                            PSendSysMessage("Your ITL does not match the PartyBot: %s.", pMember->GetName());
+                            continue;
+                        }
+
                         pAI->ChangePartyLeader(pPlayer->GetObjectGuid());
+                        PSendSysMessage("PartyBot %s changed the leader.", pMember->GetName());
 
                         if (!pMember->IsDead())
                         {
