@@ -792,7 +792,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     }
 
     Player* pLeader = GetPartyLeader();
-    if (!pLeader)
+    if (!pLeader || pLeader->IsHardcore()) // hardcore
     {
         if (me->IsDead() && me->GetDeathState() == CORPSE)
         {
