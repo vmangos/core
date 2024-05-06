@@ -1105,6 +1105,7 @@ class Player final: public Unit
     public:
         Item* AddItem(uint32 itemId, uint32 count = 1);
         void InterruptSpellsWithCastItem(Item const* item);
+        uint8 GetITL(); //equip
         uint8 FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const;
         uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item const* skipItem = nullptr) const;
         Item* GetItemByGuid(ObjectGuid guid) const;

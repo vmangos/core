@@ -68,6 +68,7 @@ void PartyBotEquipPaladinTankSix(Player* pPlayer);
 void PartyBotEquipPaladinMddPreOne(Player* pPlayer);
 void PartyBotEquipPaladinMddTwo(Player* pPlayer);
 void PartyBotEquipPaladinMddThree(Player* pPlayer);
+void PartyBotEquipPaladinMddFour(Player* pPlayer);
 void PartyBotEquipPaladinMddFive(Player* pPlayer);
 void PartyBotEquipPaladinMddSix(Player* pPlayer);
 void PartyBotEquipPaladinHealPreOne(Player* pPlayer);

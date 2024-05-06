@@ -8911,6 +8911,29 @@ void Player::SendPetSkillWipeConfirm() const
 /***                    STORAGE SYSTEM                 ***/
 /*********************************************************/
 
+uint8 Player::GetITL()
+{
+    uint8 itl = 0;
+    uint32 count = 0;
+
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
+    {
+        if (i == EQUIPMENT_SLOT_BODY || i == EQUIPMENT_SLOT_TABARD)
+        {
+            continue;
+        }
+
+        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            ItemPrototype const* pProto = pItem->GetProto();
+            itl += pProto->ItemLevel;
+            count += 1;
+        }
+    }
+
+    return itl / count;
+}
+
 uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const
 {
     uint8 slots[4];

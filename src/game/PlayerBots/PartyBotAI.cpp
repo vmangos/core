@@ -741,31 +741,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 {
                     if (pLeader->GetLevel() == 60)
                     {
-                        uint8 pLeaderItl = 0;
-                        uint32 countItems = 0;
-                        uint32 pLeaderAverageItle = 0;
-
-                        for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; i++)
-                        {
-                            if (i == EQUIPMENT_SLOT_BODY || i == EQUIPMENT_SLOT_TABARD)
-                            {
-                                continue;
-                            }
-
-                            if (Item* pItem = pLeader->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                            {
-                                ItemPrototype const* pProto = pItem->GetProto();
-                                pLeaderAverageItle += pProto->ItemLevel;
-                                countItems += 1;
-                            }
-                        }
-
-                        if (countItems && countItems >= 15) //prevent overestimation of the parameter.
-                        {
-                            pLeaderItl = pLeaderAverageItle / countItems;
-                        }
-
-                        PartyBotEquipPremadeGear(pLeaderItl, me);
+                        PartyBotEquipPremadeGear(pLeader->GetITL(), me);
                     }
                     else
                         AutoEquipGear(sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP));

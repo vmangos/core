@@ -3,6 +3,8 @@
 
 void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 {
+	PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pPlayer->AI());
+
 	LearnArmorProficiencies();
 	LearnAllTrainer();
 
@@ -59,6 +61,8 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 			if (pPlayer->GetClass() == CLASS_DRUID)
 				PartyBotEquipDruidHealPreOne(pPlayer);
 		}
+
+		pAI->equip = 1;
 	}
 
 	if (pLeaderItl > 60 && pLeaderItl <= 65)
@@ -114,6 +118,8 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 			if (pPlayer->GetClass() == CLASS_DRUID)
 				PartyBotEquipDruidHealTwo(pPlayer);
 		}
+
+		pAI->equip = 2;
 	}
 
 	if (pLeaderItl > 65 && pLeaderItl <= 70)
@@ -169,6 +175,8 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 			if (pPlayer->GetClass() == CLASS_DRUID)
 				PartyBotEquipDruidHealThree(pPlayer);
 		}
+
+		pAI->equip = 3;
 	}
 
 	if (pLeaderItl > 70 && pLeaderItl <= 75)
@@ -224,6 +232,8 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 			if (pPlayer->GetClass() == CLASS_DRUID)
 				PartyBotEquipDruidHealFour(pPlayer);
 		}
+
+		pAI->equip = 4;
 	}
 
 	if (pLeaderItl > 75 && pLeaderItl <= 80)
@@ -279,6 +289,8 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 			if (pPlayer->GetClass() == CLASS_DRUID)
 				PartyBotEquipDruidHealFive(pPlayer);
 		}
+
+		pAI->equip = 5;
 	}
 
 	if (pLeaderItl > 80)
@@ -334,6 +346,8 @@ void PartyBotAI::PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer)
 			if (pPlayer->GetClass() == CLASS_DRUID)
 				PartyBotEquipDruidHealSix(pPlayer);
 		}
+
+		pAI->equip = 6;
 	}
 }
 

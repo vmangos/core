@@ -127,6 +127,7 @@ public:
     bool m_resetSpellData = false;
     bool m_personalControls = false;
     bool m_stay = false;
+    uint8 equip = 0;
 };
 
 #endif
