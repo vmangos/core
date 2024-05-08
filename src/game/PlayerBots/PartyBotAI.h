@@ -113,6 +113,7 @@ public:
     std::vector<RaidTargetIcon> m_marksToCC;
     std::vector<RaidTargetIcon> m_marksToFocus;
     ShortTimeTracker m_updateTimer;
+    ShortTimeTracker m_updateGearCheckTimer;
     ObjectGuid m_leaderGuid;
     ObjectGuid m_cloneGuid;
     uint8 m_race = 0;

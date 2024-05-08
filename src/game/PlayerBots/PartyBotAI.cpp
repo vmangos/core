@@ -39,6 +39,7 @@ enum PartyBotSpells
 };
 
 #define PB_UPDATE_INTERVAL 1000
+#define PB_UPDATE_RECHECK_GEAR_INTERVAL 1000 * 60 * 10
 #define PB_MIN_FOLLOW_DIST 3.0f
 #define PB_MAX_FOLLOW_DIST 6.0f
 #define PB_MIN_FOLLOW_ANGLE 0.0f
@@ -723,7 +724,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     if (m_updateTimer.Passed())
         m_updateTimer.Reset(PB_UPDATE_INTERVAL);
     else
-        return;
+        return;    
 
     if (!me->IsInWorld() || me->IsBeingTeleported())
         return;
@@ -797,6 +798,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         me->UpdateZone(newzone, newarea);
 
         m_initialized = true;
+        m_updateGearCheckTimer.Reset(PB_UPDATE_RECHECK_GEAR_INTERVAL);
         return;
     }
 
@@ -808,6 +810,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     }
 
     Player* pLeader = GetPartyLeader();
+
     if (!pLeader || pLeader->IsHardcore()) // hardcore
     {
         if (me->IsDead() && me->GetDeathState() == CORPSE)
@@ -822,6 +825,36 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
     if (!pLeader->IsInWorld())
         return;
+
+    // Recheck if leader change gear
+    m_updateGearCheckTimer.Update(diff);
+    if (m_updateGearCheckTimer.Passed())
+    {
+        uint8 itl = pLeader->GetITL();
+        uint8 leaderEquip = 0;
+
+        if (itl <= 60)
+            leaderEquip = 1;
+        if (itl > 60 && itl <= 65)
+            leaderEquip = 2;
+        if (itl > 65 && itl <= 70)
+            leaderEquip = 3;
+        if (itl > 70 && itl <= 75)
+            leaderEquip = 4;
+        if (itl > 75 && itl <= 80)
+            leaderEquip = 5;
+        if (itl > 80)
+            leaderEquip = 6;
+
+        if (leaderEquip < m_equip)
+        {
+            me->Say("The leader's itl has changed, I'm leaving.", 0);
+            botEntry->requestRemoval = true;
+            return;
+        }
+        
+        m_updateGearCheckTimer.Reset(PB_UPDATE_RECHECK_GEAR_INTERVAL);
+    }
 
     // NO PvP whith partybot
     if (!me->GetMap()->Instanceable())
