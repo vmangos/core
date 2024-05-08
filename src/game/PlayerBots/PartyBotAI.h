@@ -49,6 +49,8 @@ public:
     uint16 SelectManaPotionForLevel();
     // POTS end
 
+    uint8 GetEquipLevel(Player* pPlayer);
+
     bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) final;
     void OnPlayerLogin() final;
     void UpdateAI(uint32 const diff) final;

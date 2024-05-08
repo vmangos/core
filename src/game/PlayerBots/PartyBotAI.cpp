@@ -140,6 +140,24 @@ uint16 PartyBotAI::SelectManaPotionForLevel()
 }
 // Use potions end
 
+uint8 PartyBotAI::GetEquipLevel(Player* pPlayer) {
+    // Set equip level
+    uint8 itl = pPlayer->GetITL();
+
+    if (itl <= 60)
+        return 1;
+    if (itl > 60 && itl <= 65)
+        return 2;
+    if (itl > 65 && itl <= 70)
+        return 3;
+    if (itl > 70 && itl <= 75)
+        return 4;
+    if (itl > 75 && itl <= 80)
+        return 5;
+    if (itl > 80)
+        return 6;
+}
+
 bool PartyBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
 {
     if (!m_race && !m_class)
@@ -201,18 +219,7 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
     // Set equip level
     uint8 itl = me->GetITL();
 
-    if (itl <= 60)
-        m_equip = 1;
-    if (itl > 60 && itl <= 65)
-        m_equip = 2;
-    if (itl > 65 && itl <= 70)
-        m_equip = 3;
-    if (itl > 70 && itl <= 75)
-        m_equip = 4;
-    if (itl > 75 && itl <= 80)
-        m_equip = 5;
-    if (itl > 80)
-        m_equip = 6;
+    m_equip = GetEquipLevel(me);
 }
 
 Player* PartyBotAI::GetPartyLeader() const
@@ -830,21 +837,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     m_updateGearCheckTimer.Update(diff);
     if (m_updateGearCheckTimer.Passed())
     {
-        uint8 itl = pLeader->GetITL();
-        uint8 leaderEquip = 0;
-
-        if (itl <= 60)
-            leaderEquip = 1;
-        if (itl > 60 && itl <= 65)
-            leaderEquip = 2;
-        if (itl > 65 && itl <= 70)
-            leaderEquip = 3;
-        if (itl > 70 && itl <= 75)
-            leaderEquip = 4;
-        if (itl > 75 && itl <= 80)
-            leaderEquip = 5;
-        if (itl > 80)
-            leaderEquip = 6;
+        uint8 leaderEquip = GetEquipLevel(pLeader);
 
         if (leaderEquip < m_equip)
         {
