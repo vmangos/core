@@ -2874,7 +2874,7 @@ CharDelete.KeepDays = 30
 AHBot.Enable = 1
 AHBot.ah.id = 1
 AHBot.ah.fid = 120
-AHBot.itemcount = 3610
+AHBot.itemcount = 3630
 AHBot.bot.guid = 697196
 AHBot.bot.account = 2125
 
