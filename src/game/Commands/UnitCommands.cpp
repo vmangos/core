@@ -2826,3 +2826,38 @@ bool ChatHandler::HandleHardcoreONCommand(char* args)
 
     return true;
 }
+
+
+bool ChatHandler::HandleGetItlCommand(char* args)
+{    
+    Player* pTarget;
+    if (char* arg = ExtractArg(&args))
+    {
+        std::string name = arg;
+
+        pTarget = ObjectAccessor::FindPlayerByName(name.c_str());
+
+        if (!pTarget)
+        {
+            SendSysMessage(LANG_NO_CHAR_SELECTED);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+    else
+    {
+        pTarget = GetSelectedPlayer();
+        if (!pTarget)
+        {
+            SendSysMessage(LANG_NO_CHAR_SELECTED);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
+
+    if (pTarget)
+    {
+        PSendSysMessage("%s has an itl %u.", pTarget->GetName(), pTarget->GetITL());
+    }
+}
