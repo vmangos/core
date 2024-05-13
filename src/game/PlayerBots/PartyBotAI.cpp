@@ -805,7 +805,6 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         me->UpdateZone(newzone, newarea);
 
         m_initialized = true;
-        m_updateGearCheckTimer.Reset(PB_UPDATE_RECHECK_GEAR_INTERVAL);
         return;
     }
 
@@ -832,22 +831,6 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
     if (!pLeader->IsInWorld())
         return;
-
-    // Recheck if leader change gear
-    m_updateGearCheckTimer.Update(diff);
-    if (m_updateGearCheckTimer.Passed())
-    {
-        uint8 leaderEquip = GetEquipLevel(pLeader);
-
-        if (leaderEquip < m_equip)
-        {
-            me->Say("The leader's itl has changed, I'm leaving.", 0);
-            botEntry->requestRemoval = true;
-            return;
-        }
-        
-        m_updateGearCheckTimer.Reset(PB_UPDATE_RECHECK_GEAR_INTERVAL);
-    }
 
     // NO PvP whith partybot
     if (!me->GetMap()->Instanceable())
