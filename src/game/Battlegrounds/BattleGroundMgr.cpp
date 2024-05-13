@@ -639,19 +639,53 @@ should be called from BattleGround::RemovePlayer function in some cases
 void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId)
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_lock);
-    // First, remove old offline players
+
+    // First, remove players who shouldn't be in queue anymore
     QueuedPlayersMap::iterator itrOffline = m_queuedPlayers.begin();
     while (itrOffline != m_queuedPlayers.end())
     {
+        // remove offline players
         if (!itrOffline->second.online && WorldTimer::getMSTimeDiffToNow(itrOffline->second.lastOnlineTime) > OFFLINE_BG_QUEUE_TIME)
         {
             RemovePlayer(itrOffline->first, true);
             itrOffline = m_queuedPlayers.begin();
+            continue;
         }
-        else
-            ++itrOffline;
+
+        // remove players who are in queue for bg that has ended
+        GroupQueueInfo* group = itrOffline->second.groupInfo;
+        if (group->isInvitedToBgInstanceGuid)
+        {
+            BattleGround* bg;
+            if ((bg = sBattleGroundMgr.GetBattleGround(group->isInvitedToBgInstanceGuid, group->bgTypeId)) && bg->GetStatus() == STATUS_WAIT_LEAVE)
+            {
+                if (itrOffline->second.online)
+                {
+                    if (Player* player = ObjectAccessor::FindPlayerNotInWorld(itrOffline->first))
+                    {
+                        BattleGroundQueueTypeId queueTypeId = BattleGroundMgr::BgQueueTypeId(group->bgTypeId);
+                        uint32 queueSlot = player->GetBattleGroundQueueIndex(queueTypeId);
+                        if (queueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES)
+                        {
+                            player->RemoveBattleGroundQueueId(queueTypeId);
+
+                            WorldPacket data;
+                            sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0);
+                            player->GetSession()->SendPacket(&data);
+                        }
+                    }
+                }
+
+                RemovePlayer(itrOffline->first, true);
+                itrOffline = m_queuedPlayers.begin();
+                continue;
+            }
+        }
+
+        ++itrOffline;
     }
-    //if no players in queue - do nothing
+
+    // if no players in queue - do nothing
     if (m_queuedGroups[bracketId][BG_QUEUE_PREMADE_ALLIANCE].empty() &&
             m_queuedGroups[bracketId][BG_QUEUE_PREMADE_HORDE].empty() &&
             m_queuedGroups[bracketId][BG_QUEUE_NORMAL_ALLIANCE].empty() &&
@@ -669,7 +703,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             std::default_random_engine(seed));
     }
 
-    //battleground with free slot for player should be always in the beginning of the queue
+    // battleground with free slot for player should be always in the beginning of the queue
     // maybe it would be better to create bgfreeslotqueue for each bracketId
     BgFreeSlotQueueType::iterator itr, next;
     for (itr = sBattleGroundMgr.m_bgFreeSlotQueue[bgTypeId].begin(); itr != sBattleGroundMgr.m_bgFreeSlotQueue[bgTypeId].end(); itr = next)

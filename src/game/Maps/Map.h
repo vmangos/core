@@ -403,6 +403,7 @@ class Map : public GridRefManager<NGridType>
         }
 
         time_t GetGridExpiry(void) const { return i_gridExpiry; }
+        time_t GetCreateTime() const { return m_createTime; }
         uint32 GetId(void) const { return i_id; }
 
         // some calls like isInWater should not use vmaps due to processor power
@@ -701,6 +702,7 @@ class Map : public GridRefManager<NGridType>
         TimePoint m_currentTime;
         uint32 m_lastMvtSpellsUpdate = 0;
     private:
+        time_t m_createTime; // time when map was created
         time_t i_gridExpiry;
 
         NGridType* i_grids[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
