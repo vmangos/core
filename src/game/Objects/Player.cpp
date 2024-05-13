@@ -8527,6 +8527,13 @@ void Player::SendNotifyLootMoneyRemoved() const
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendLootMoneyNotify(uint32 amount) const
+{
+    WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
+    data << uint32(amount);
+    GetSession()->SendPacket(&data);
+}
+
 void Player::SendNotifyLootItemRemoved(uint8 lootSlot) const
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
