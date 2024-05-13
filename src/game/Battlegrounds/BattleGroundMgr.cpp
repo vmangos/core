@@ -1663,6 +1663,7 @@ void BattleGroundMgr::LoadBattleEventIndexes()
 void BattleGroundMgr::PlayerLoggedIn(Player* player)
 {
     for (int i = 1; i <= PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+    {
         if (m_battleGroundQueues[i].PlayerLoggedIn(player))
         {
             GroupQueueInfo groupInfo;
@@ -1677,8 +1678,16 @@ void BattleGroundMgr::PlayerLoggedIn(Player* player)
             player->GetSession()->SendPacket(&data);
 
             if (groupInfo.isInvitedToBgInstanceGuid)
+            {
                 player->SetInviteForBattleGroundQueueType(BattleGroundQueueTypeId(i), groupInfo.isInvitedToBgInstanceGuid);
+
+                // create automatic remove events
+                BGQueueRemoveEvent* removeEvent = new BGQueueRemoveEvent(player->GetObjectGuid(), groupInfo.isInvitedToBgInstanceGuid, bg->GetTypeID(), BattleGroundQueueTypeId(i), groupInfo.removeInviteTime);
+                uint32 offset = (WorldTimer::getMSTime() > groupInfo.removeInviteTime) ? 1 : WorldTimer::getMSTimeDiff(WorldTimer::getMSTime(), groupInfo.removeInviteTime);
+                player->m_Events.AddEvent(removeEvent, player->m_Events.CalculateTime(offset));
+            }
         }
+    }
 }
 
 void BattleGroundMgr::PlayerLoggedOut(Player* player)
