@@ -1098,28 +1098,20 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
         }
     }
 
-    if (pTarget->AI())
+    // No clone for too high itl
+    if (EquipLevelHelper(pPlayer) <= EquipLevelHelper(pTarget))
     {
-        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
-        {
-            // No clone for too high itl
-            if (EquipLevelHelper(pPlayer) <= pAI->m_equip)
-            {
-                SendSysMessage("Your ITL too low.");
-                SetSentErrorMessage(true);
-                return false;
-            }
-        }
+        SendSysMessage("Your ITL too low.");
+        SetSentErrorMessage(true);
+        return false;
     }
-    else
-    {
 
-        if (pPlayer->GetGuildId() != pTarget->GetGuildId())
-        {
-            SendSysMessage("You can only clone a member of your guild.");
-            SetSentErrorMessage(true);
-            return false;
-        }
+    // Clone only guild member
+    if (!pTarget->IsBot() && pPlayer->GetGuildId() != pTarget->GetGuildId())
+    {
+        SendSysMessage("You can only clone a member of your guild.");
+        SetSentErrorMessage(true);
+        return false;
     }
 
     if (!PartyBotAddRequirementCheck(pPlayer, pTarget))
