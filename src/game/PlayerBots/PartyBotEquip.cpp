@@ -487,18 +487,18 @@ void PartyBotEquipWarriorTankSix(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(22732, 0, 0));
 	equip.push_back(new PlayerPremadeItem(22419, 2716, 0));
 	equip.push_back(new PlayerPremadeItem(22938, 2622, 0));
-	equip.push_back(new PlayerPremadeItem(22416, 1892, 0));
+	equip.push_back(new PlayerPremadeItem(22416, 1891, 0));
 	equip.push_back(new PlayerPremadeItem(22423, 1886, 0));
-	equip.push_back(new PlayerPremadeItem(22421, 2613, 0));
+	equip.push_back(new PlayerPremadeItem(22421, 2564, 0));
 	equip.push_back(new PlayerPremadeItem(22422, 0, 0));
 	equip.push_back(new PlayerPremadeItem(22417, 2583, 0));
-	equip.push_back(new PlayerPremadeItem(22420, 911, 0));
+	equip.push_back(new PlayerPremadeItem(22420, 1887, 0));
 	equip.push_back(new PlayerPremadeItem(23059, 0, 0));
 	equip.push_back(new PlayerPremadeItem(21601, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19431, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19406, 0, 0));
-	equip.push_back(new PlayerPremadeItem(23577, 1900, 0));
-	equip.push_back(new PlayerPremadeItem(23043, 929, 0));
+	equip.push_back(new PlayerPremadeItem(23577, 2564, 0));
+	equip.push_back(new PlayerPremadeItem(23043, 1704, 0));
 	equip.push_back(new PlayerPremadeItem(19368, 0, 0));
 
 	PartyBotEquipItems(pPlayer, equip);
