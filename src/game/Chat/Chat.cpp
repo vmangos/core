@@ -1317,7 +1317,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "wareffort",      SEC_DEVELOPER,      true, nullptr,                                         "", warEffortCommandTable },
         //hardcore
         { "hardcore",       SEC_PLAYER,         true,  nullptr,                                        "", hardcoreCommandTable },
-        { "itl",            SEC_PLAYER,         true,  &ChatHandler::HandleGetItlCommand,              "", nullptr },
+        //{ "itl",            SEC_PLAYER,         true,  &ChatHandler::HandleGetItlCommand,              "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
