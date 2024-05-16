@@ -1099,7 +1099,7 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     }
 
     // No clone for too high itl
-    if (EquipLevelHelper(pPlayer) <= EquipLevelHelper(pTarget))
+    if (EquipLevelHelper(pTarget) > EquipLevelHelper(pPlayer))
     {
         SendSysMessage("Your ITL too low.");
         SetSentErrorMessage(true);
