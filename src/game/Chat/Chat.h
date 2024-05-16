@@ -1032,7 +1032,7 @@ class ChatHandler
         bool HandleHardcoreONCommand(char* args);
         bool HandleHCAnnounceRestrictionCommand(char* args);
 
-        //bool HandleGetItlCommand(char* args);
+        bool HandleGetItlCommand(char* args);
 
         //! Development Commands
         bool HandleSaveAllCommand(char* args);

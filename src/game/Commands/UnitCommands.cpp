@@ -2827,7 +2827,6 @@ bool ChatHandler::HandleHardcoreONCommand(char* args)
     return true;
 }
 
-/*
 bool ChatHandler::HandleGetItlCommand(char* args)
 {    
     Player* pTarget;
@@ -2859,6 +2858,7 @@ bool ChatHandler::HandleGetItlCommand(char* args)
     if (pTarget)
     {
         PSendSysMessage("%s has an itl %u.", pTarget->GetName(), pTarget->GetITL());
+        return true;
     }
+    return false;
 }
-*/
