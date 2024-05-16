@@ -1179,8 +1179,8 @@ ChatCommand * ChatHandler::getCommandTable()
     //hardcore
     static ChatCommand hardcoreCommandTable[] =
     {
-        { "on",       SEC_PLAYER, true,  &ChatHandler::HandleHardcoreONCommand,            "", nullptr },
-        { "messages", SEC_PLAYER, true,  &ChatHandler::HandleHCAnnounceRestrictionCommand, "", nullptr },
+        { "on",       SEC_PLAYER, false,  &ChatHandler::HandleHardcoreONCommand,            "", nullptr },
+        { "messages", SEC_PLAYER, false,  &ChatHandler::HandleHCAnnounceRestrictionCommand, "", nullptr },
         { nullptr,    0,          false, nullptr,                                          "", nullptr }
     };
 
@@ -1316,8 +1316,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "gold",           SEC_BASIC_ADMIN,    true, nullptr,                                         "", goldCommandTable },
         { "wareffort",      SEC_DEVELOPER,      true, nullptr,                                         "", warEffortCommandTable },
         //hardcore
-        { "hardcore",       SEC_PLAYER,         true,  nullptr,                                        "", hardcoreCommandTable },
-        //{ "itl",            SEC_PLAYER,         true,  &ChatHandler::HandleGetItlCommand,              "", nullptr },
+        { "hardcore",       SEC_PLAYER,         false,  nullptr,                                        "", hardcoreCommandTable },
+        //{ "itl",            SEC_PLAYER,         false,  &ChatHandler::HandleGetItlCommand,              "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
