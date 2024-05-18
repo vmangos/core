@@ -1168,6 +1168,63 @@ uint32 BattleGround::GetFreeSlotsForTeam(Team team) const
     return 0;
 }
 
+void BattleGround::DecreaseInvitedCount(Team team)
+{
+    switch (team)
+    {
+        case ALLIANCE:
+        {
+            MANGOS_ASSERT(m_invitedAlliance-- > 0);
+            break;
+        }
+        case HORDE:
+        {
+            MANGOS_ASSERT(m_invitedHorde-- > 0);
+            break;
+        }
+        default:
+        {
+            sLog.Out(LOG_BG, LOG_LVL_ERROR, "BattleGround::DecreaseInvitedCount - Unknown player team %u.", team);
+            break;
+        }
+    }
+}
+void BattleGround::IncreaseInvitedCount(Team team)
+{ 
+    switch (team)
+    {
+        case ALLIANCE:
+        {
+            ++m_invitedAlliance;
+            break;
+        }
+        case HORDE:
+        {
+            ++m_invitedHorde;
+            break;
+        }
+        default:
+        {
+            sLog.Out(LOG_BG, LOG_LVL_ERROR, "BattleGround::IncreaseInvitedCount - Unknown player team %u.", team);
+            break;
+        }
+    }
+}
+
+uint32 BattleGround::GetInvitedCount(Team team) const
+{
+    switch (team)
+    {
+        case ALLIANCE:
+            return m_invitedAlliance;
+        case HORDE:
+            return m_invitedHorde;
+    }
+
+    sLog.Out(LOG_BG, LOG_LVL_ERROR, "BattleGround::GetInvitedCount - Unknown player team %u.", team);
+    return 0;
+}
+
 bool BattleGround::HasFreeSlots() const
 {
     return GetPlayersSize() < GetMaxPlayers();
