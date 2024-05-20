@@ -159,6 +159,8 @@ if(UNIX)
 endif()
 
 if(APPLE)
+  include_directories(/usr/local/opt/readline/include)
+  link_directories(/usr/local/opt/readline/lib)
   set(EXECUTABLE_LINK_FLAGS "-framework Carbon ${EXECUTABLE_LINK_FLAGS}")
 endif()
 
