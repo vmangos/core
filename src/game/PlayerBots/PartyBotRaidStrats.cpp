@@ -450,6 +450,7 @@ void PartyBotAI::RaidStratsInZGBosses() {
         me->AttackStop();
         me->StopMoving();
         me->ClearTarget();
+        return;
     }
 
     //Jin'do the Hexxer
