@@ -453,7 +453,7 @@ void PartyBotAI::RaidStratsInZGBosses() {
     }
 
     //Jin'do the Hexxer
-    if (me->GetAreaId() == 3383)
+    if (me->FindNearestCreature(11380, 30, true))
     {
         if (!m_has_tactics)
         {
