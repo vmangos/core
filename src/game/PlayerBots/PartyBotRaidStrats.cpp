@@ -451,6 +451,57 @@ void PartyBotAI::RaidStratsInZGBosses() {
         me->StopMoving();
         me->ClearTarget();
     }
+
+    //Jin'do the Hexxer
+    if (me->GetAreaId() == 3383)
+    {
+        if (!m_has_tactics)
+        {
+            m_has_tactics = 1;
+        }
+
+        const uint16 DELUSIONS_OF_JINDO = 24306;
+        if (me->HasAura(DELUSIONS_OF_JINDO))
+        {
+            std::list<Unit*> targets;
+            me->GetEnemyListInRadiusAround(me, 50, targets);
+
+            for (auto const& pEnemy : targets)
+            {
+                if (pEnemy->GetEntry() == 14986) //Shade of Jin'do
+                {
+                    me->AttackStop(true);
+                    AttackStart(pEnemy);
+                    return;
+                }
+            }
+        }
+        
+        if (Unit* pTarget = me->GetVictim())
+        {
+            if (pTarget->GetEntry() == 11380 && (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS))
+            {
+                std::list<Unit*> targets;
+                me->GetEnemyListInRadiusAround(me, 50, targets);
+                for (auto const& pEnemy : targets)
+                {
+                    if (pEnemy->GetEntry() == 14987) //Powerful Healing Ward
+                    {
+                        me->AttackStop(true);
+                        AttackStart(pEnemy);
+                        return;
+                    }
+
+                    if (pEnemy->GetEntry() == 15112) //Brain Wash Totem
+                    {
+                        me->AttackStop(true);
+                        AttackStart(pEnemy);
+                        return;
+                    }
+                }
+            }
+        }           
+    }    
 }
 
 void PartyBotAI::RaidStratsInMKBosses()

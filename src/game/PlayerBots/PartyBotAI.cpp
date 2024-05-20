@@ -1124,6 +1124,11 @@ void PartyBotAI::UpdateOutOfCombatAI()
             return;
     }
 
+    if (m_has_tactics)
+    {
+        m_has_tactics = 0;
+    }
+
     switch (me->GetClass())
     {
         case CLASS_PALADIN:
@@ -1160,13 +1165,6 @@ void PartyBotAI::UpdateInCombatAI()
 {
     if (!IsInDuel())
     {
-        if (me->GetLevel() == 60 && RaidStratsIsInRaid())
-        {
-            RaidStratsInZGBosses();
-            RaidStratsInMKBosses();
-            RaidStratsInOnyxiaBosses();
-        }
-
         Player* pLeader = GetPartyLeader();
         Unit* pVictim = me->GetVictim();
 
@@ -1205,7 +1203,7 @@ void PartyBotAI::UpdateInCombatAI()
         }
 
         // Swap DPS to marked target or party leader's target
-        if (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS)
+        if (!m_has_tactics && (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS))
         {
             Unit* newVictim = SelectAttackTarget(pLeader);
 
@@ -1274,7 +1272,14 @@ void PartyBotAI::UpdateInCombatAI()
             }
         }
         // Use potions stop
-    }    
+    }
+
+    if (me->GetLevel() == 60 && RaidStratsIsInRaid())
+    {
+        RaidStratsInZGBosses();
+        RaidStratsInMKBosses();
+        RaidStratsInOnyxiaBosses();
+    }
 
     switch (me->GetClass())
     {
