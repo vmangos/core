@@ -17215,6 +17215,17 @@ bool Player::SaveAura(SpellAuraHolder const* holder, AuraSaveStruct& saveStruct)
 
         for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
+            // don't save some types of auras
+            switch (holder->GetSpellProto()->EffectApplyAuraName[i])
+            {
+                case SPELL_AURA_BIND_SIGHT:
+                case SPELL_AURA_MOD_POSSESS:
+                case SPELL_AURA_MOD_CHARM:
+                case SPELL_AURA_FAR_SIGHT:
+                case SPELL_AURA_AOE_CHARM:
+                    return false;
+            }
+
             saveStruct.damage[i] = 0;
             saveStruct.periodicTime[i] = 0;
 
@@ -17242,8 +17253,10 @@ bool Player::SaveAura(SpellAuraHolder const* holder, AuraSaveStruct& saveStruct)
         saveStruct.maxDuration = holder->GetAuraMaxDuration();
         for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             saveStruct.charges = holder->GetAuraCharges();
+
         return true;
     }
+
     return false;
 }
 
