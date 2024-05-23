@@ -1520,8 +1520,8 @@ Antiflood.Sanction = 8
 #
 ###################################################################################################
 
-Warden.WinEnabled            = 1
-Warden.OSXEnabled            = 1
+Warden.WinEnabled            = 0
+Warden.OSXEnabled            = 0
 Warden.PlayersOnly           = 0
 Warden.NumScans              = 10
 Warden.ClientResponseDelay   = 30
