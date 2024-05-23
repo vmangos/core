@@ -2027,3 +2027,12 @@ bool ChatHandler::HandleWarEffortSetStageCommand(char* args)
 
     return true;
 }
+
+bool ChatHandler::HandleListMapsCommand(char* /*args*/)
+{
+    SendSysMessage("Listing all currently created maps:");
+    for (auto const& itr : sMapMgr.Maps())
+        PSendSysMessage("%u-%u - %s - Players %u - Created %s ago", itr.first.nMapId, itr.first.nInstanceId, playerLink(itr.second->GetMapName()).c_str(), itr.second->GetPlayersCountExceptGMs(), secsToTimeString(time(nullptr) - itr.second->GetCreateTime(), true).c_str());
+
+    return true;
+}

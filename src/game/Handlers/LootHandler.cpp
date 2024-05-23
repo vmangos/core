@@ -277,14 +277,16 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
             for (const auto i : playersNear)
             {
                 i->LootMoney(moneyPerPlayer, pLoot);
-                
-                WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
-                data << uint32(moneyPerPlayer);
-                i->GetSession()->SendPacket(&data);
+                i->SendLootMoneyNotify(moneyPerPlayer);
             }
         }
         else
+        {
             player->LootMoney(pLoot->gold, pLoot);
+
+            // in wotlk and after this should be sent for solo looting too
+            //player->SendLootMoneyNotify(pLoot->gold);
+        }
 
         pLoot->gold = 0;
 
