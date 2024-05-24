@@ -8938,7 +8938,7 @@ uint8 Player::GetITL()
         }
     }
 
-    if (count < 15)
+    if (count < 16)
     {
         return 0;
     }
