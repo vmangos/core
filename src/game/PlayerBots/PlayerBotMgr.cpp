@@ -1372,6 +1372,16 @@ bool ChatHandler::HandlePartyBotAoECommand(char* args)
             {
                 if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
                 {
+                    if (pAI->m_personalControls)
+                    {
+                        Player* pLeader = pAI->GetPartyLeader();
+
+                        if (pPlayer != pLeader)
+                        {
+                            continue;
+                        }
+                    }
+
                     for (auto const& pSpell : pAI->m_spells.raw.spells)
                     {
                         if (pSpell && pSpell->IsAreaOfEffectSpell() &&
