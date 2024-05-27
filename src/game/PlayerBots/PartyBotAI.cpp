@@ -1105,7 +1105,7 @@ void PartyBotAI::UpdateOutOfCombatAI()
 {
     if (!IsInDuel())
     {
-        if (me->GetLevel() == 60 && RaidStratsIsInRaid())
+        if (me->GetLevel() == 60 && me->GetMap()->IsRaid())
         {
             RaidStratsDefaultPotionsInRaid();
             RaidStratsInZGProtectionPotions();
@@ -1274,7 +1274,7 @@ void PartyBotAI::UpdateInCombatAI()
         // Use potions stop
     }
 
-    if (me->GetLevel() == 60 && RaidStratsIsInRaid())
+    if (me->GetLevel() == 60 && me->GetMap()->IsRaid())
     {
         RaidStratsInZGBosses();
         RaidStratsInMKBosses();

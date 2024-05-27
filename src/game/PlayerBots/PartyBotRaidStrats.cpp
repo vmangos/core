@@ -1,15 +1,6 @@
 #include "PartyBotAI.h"
 #include "PartyBotRaidStrats.h"
 
-bool PartyBotAI::RaidStratsIsInRaid()
-{
-    if (me->GetMap()->IsRaid())
-    {
-        return true;
-    }
-        return false;
-}
-
 void PartyBotAI::RaidStratsDefaultPotionsInRaid()
 {
     // Elixir of Fortitude
@@ -478,30 +469,33 @@ void PartyBotAI::RaidStratsInZGBosses() {
             }
         }
         
-        if (Unit* pTarget = me->GetVictim())
-        {
-            if (pTarget->GetEntry() == 11380 && (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS))
-            {
-                std::list<Unit*> targets;
-                me->GetEnemyListInRadiusAround(me, 50, targets);
-                for (auto const& pEnemy : targets)
-                {
-                    if (pEnemy->GetEntry() == 14987) //Powerful Healing Ward
-                    {
-                        me->AttackStop(true);
-                        AttackStart(pEnemy);
-                        return;
-                    }
+        // Disable auto attack totems
+        //if (Unit* pTarget = me->GetVictim())
+        //{
+        //    if (pTarget->GetEntry() == 11380 && (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS))
+        //    {
+        //        std::list<Unit*> targets;
+        //        me->GetEnemyListInRadiusAround(me, 50, targets);
+        //        for (auto const& pEnemy : targets)
+        //        {
+        //            if (pEnemy->GetEntry() == 14987) //Powerful Healing Ward
+        //            {
+        //                me->AttackStop(true);
+        //                AttackStart(pEnemy);
+        //                return;
+        //            }
 
-                    if (pEnemy->GetEntry() == 15112) //Brain Wash Totem
-                    {
-                        me->AttackStop(true);
-                        AttackStart(pEnemy);
-                        return;
-                    }
-                }
-            }
-        }           
+        //            if (pEnemy->GetEntry() == 15112) //Brain Wash Totem
+        //            {
+        //                me->AttackStop(true);
+        //                AttackStart(pEnemy);
+        //                return;
+        //            }
+        //        }
+        //    }
+        //}  
+
+        //Jin'do the Hexxer
     }    
 }
 
