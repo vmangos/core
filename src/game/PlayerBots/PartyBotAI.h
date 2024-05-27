@@ -100,7 +100,6 @@ public:
     void UpdateInCombatAI_Druid() final;
     void UpdateOutOfCombatAI_Druid() final;
 
-    bool RaidStratsIsInRaid();
     void RaidStratsDefaultPotionsInRaid();
     void RaidStratsInZGProtectionPotions();
     void RaidStratsInMKProtectionPotions();

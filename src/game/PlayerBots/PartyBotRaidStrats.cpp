@@ -484,7 +484,6 @@ void PartyBotAI::RaidStratsInZGBosses() {
         //                AttackStart(pEnemy);
         //                return;
         //            }
-
         //            if (pEnemy->GetEntry() == 15112) //Brain Wash Totem
         //            {
         //                me->AttackStop(true);
@@ -493,10 +492,21 @@ void PartyBotAI::RaidStratsInZGBosses() {
         //            }
         //        }
         //    }
-        //}  
-
-        //Jin'do the Hexxer
+        //}    
     }    
+
+    // go to leader after tp
+    if (me->GetDistance3dToCenter(-11582.900391, -1251.150024, 90) < 5)
+    {
+        me->SetPosition(-11582.900391, -1251.150024, 77.546959, 5.894388);
+    }
+    if (me->GetDistance2dToCenter(-11582.900391, -1251.150024) < 30)
+    {
+        me->GetMotionMaster()->MoveChase(GetPartyLeader());
+        return;
+    }
+
+    //Jin'do the Hexxer
 }
 
 void PartyBotAI::RaidStratsInMKBosses()
