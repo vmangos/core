@@ -104,7 +104,7 @@ struct instance_scarlet_monastery : ScriptedInstance
     uint64 m_uiVorrelGUID;
     uint64 m_uiDoorHighInquisitorGUID;
     uint64 m_uiChapelDoorGUID;
-    Player* m_uiAshbringerWielderGUID;
+    uint64 m_uiAshbringerWielderGUID;
     bool m_ashbringerActive;
     uint32 m_ashbringerCheckTimer;
     std::set<ObjectGuid> m_ashbringerReactedNpcs;
@@ -312,7 +312,7 @@ struct instance_scarlet_monastery : ScriptedInstance
         if (receiver->IsDead())
             return;
 
-        m_uiAshbringerWielderGUID = pCaster->ToPlayer();
+        m_uiAshbringerWielderGUID = pCaster->GetGUID();
         switch (receiver->GetEntry())
         {
             case NPC_COMMANDER_MOGRAINE:
@@ -350,7 +350,8 @@ struct instance_scarlet_monastery : ScriptedInstance
                         break;
                     case EVENT_TALK1:
                         if (m_uiAshbringerWielderGUID)
-                            DoScriptText(SAY_COMMANDER1, pMograine, m_uiAshbringerWielderGUID);
+                            if (Player* pPlayer = instance->GetPlayer(m_uiAshbringerWielderGUID))
+                                DoScriptText(SAY_COMMANDER1, pMograine, pPlayer);
                         break;
                     case EVENT_SUMMON:
                         if (Creature* pC = pMograine->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1034.9252f, 1399.0653f, 27.393204f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 400000))
