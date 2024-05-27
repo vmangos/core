@@ -281,6 +281,10 @@ struct instance_scarlet_monastery : ScriptedInstance
                     go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
                 }
 
+                if (Creature* whitemane = instance->GetCreature(m_uiWhitemaneGUID))
+                            if (whitemane->IsAlive() && !whitemane->IsInCombat())
+                                whitemane->DespawnOrUnsummon();
+
                 for (const auto& scarletCathedralNpcGuid : m_ashbringerReactedNpcs)
                     if (Creature* scarletNpc = instance->GetCreature(scarletCathedralNpcGuid))
                         if (scarletNpc->IsAlive() && !scarletNpc->IsInCombat())
