@@ -502,6 +502,7 @@ void PartyBotAI::RaidStratsInZGBosses() {
     }
     if (me->GetDistance2dToCenter(-11582.900391, -1251.150024) < 30)
     {
+        me->AttackStop(true);
         me->GetMotionMaster()->MoveChase(GetPartyLeader());
         return;
     }
