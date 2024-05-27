@@ -106,7 +106,6 @@ struct instance_scarlet_monastery : ScriptedInstance
     uint64 m_uiChapelDoorGUID;
     uint64 m_uiAshbringerWielderGUID;
     bool m_ashbringerActive;
-    uint32 m_ashbringerCheckTimer;
     std::set<ObjectGuid> m_ashbringerReactedNpcs;
     EventMap m_events;
 
@@ -120,7 +119,6 @@ struct instance_scarlet_monastery : ScriptedInstance
         m_uiDoorHighInquisitorGUID = 0;
         m_uiChapelDoorGUID = 0;
         m_uiAshbringerWielderGUID = 0;
-        m_ashbringerCheckTimer = 5000;
         m_ashbringerReactedNpcs.clear();
         m_events.Reset();
     }
