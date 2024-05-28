@@ -1174,32 +1174,35 @@ void PartyBotAI::UpdateInCombatAI()
             if (!m_marksToFocus.empty())
             {
                 pVictim = SelectAttackTarget(pLeader);
-                AttackStart(pVictim);
-                return;              
-            }       
-
-            // Defend party members.
-            if (!pVictim || pVictim->GetVictim() == me)
-            {
-                if (pVictim = SelectPartyAttackTarget())
-                {
-                    me->AttackStop(true);
-                    AttackStart(pVictim);
-                }
+                AttackStart(pVictim);         
             }
-
-            // Taunt target if its attacking someone else.
-            if (pVictim && pVictim->GetVictim() != me)
+            else 
             {
-                for (const auto& pSpellEntry : m_spellListTaunt)
+                // Defend party members.
+                if (!pVictim || pVictim->GetVictim() == me)
                 {
-                    if (CanTryToCastSpell(pVictim, pSpellEntry))
+                    if (pVictim = SelectPartyAttackTarget())
                     {
-                        if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
-                            return;
+                        me->AttackStop(true);
+                        AttackStart(pVictim);
+                    }
+                }
+
+                // Taunt target if its attacking someone else.
+                if (pVictim && pVictim->GetVictim() != me)
+                {
+                    for (const auto& pSpellEntry : m_spellListTaunt)
+                    {
+                        if (CanTryToCastSpell(pVictim, pSpellEntry))
+                        {
+                            if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
+                                return;
+                        }
                     }
                 }
             }
+
+            
         }
 
         // Swap DPS to marked target or party leader's target
