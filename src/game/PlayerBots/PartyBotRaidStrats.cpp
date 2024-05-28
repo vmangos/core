@@ -105,7 +105,7 @@ void PartyBotAI::RaidStratsDefaultPotionsInRaid()
             }
         }
 
-        if (m_class != CLASS_SHAMAN)
+        if (m_class != CLASS_SHAMAN || m_class != CLASS_DRUID || m_class != CLASS_PALADIN)
         {
             //Flask of the Titans
             if (!me->HasAura((int)RaidStratsPotionAuraId::FLASK_OF_THE_TITANS))
