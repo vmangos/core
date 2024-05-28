@@ -47,8 +47,7 @@ void PartyBotAI::RaidStratsDefaultPotionsInRaid()
                     return;
                 }
             }
-        }
-        
+        }        
     }
     
     if (m_role == ROLE_TANK || m_role == ROLE_MELEE_DPS || me->GetClass() == CLASS_HUNTER)
@@ -101,6 +100,19 @@ void PartyBotAI::RaidStratsDefaultPotionsInRaid()
                 if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::GIFT_OF_ARTHAS))
                 {
                     UsePotionsOrRune((int)RaidStratsPotionItemId::GIFT_OF_ARTHAS);
+                    return;
+                }
+            }
+        }
+
+        if (m_class != CLASS_SHAMAN)
+        {
+            //Flask of the Titans
+            if (!me->HasAura((int)RaidStratsPotionAuraId::FLASK_OF_THE_TITANS))
+            {
+                if (CanUsePotionsOrRune((int)RaidStratsPotionItemId::FLASK_OF_THE_TITANS))
+                {
+                    UsePotionsOrRune((int)RaidStratsPotionItemId::FLASK_OF_THE_TITANS);
                     return;
                 }
             }
