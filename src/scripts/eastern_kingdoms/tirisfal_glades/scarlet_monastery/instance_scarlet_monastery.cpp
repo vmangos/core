@@ -46,8 +46,6 @@ enum AshbringerEventMisc
     GO_CHAPEL_DOOR   = 104591,
     GO_HIGH_INQUISITOR_DOOR = 104600,
 
-    ITEM_CORRUPTED_ASHBRINGER = 22691,
-
     SAY_COMMANDER1  = 12390,
     SAY_COMMANDER2  = 12470,
     SAY_COMMANDER3  = 12472,
@@ -57,9 +55,12 @@ enum AshbringerEventMisc
     YELL_COMMANDER  = 12389,
     YELL_WHITEMANE  = 2973,
 
-    SPELL_AB_EFFECT_000   = 28441,
-    SPELL_FORGIVENESS     = 28697,
-    SPELL_MOGRAINE_COMETH = 28688,
+    SPELL_AB_EFFECT_000 = 28441,
+    SPELL_FORGIVENESS = 28697,
+    SPELL_MOGRAINE_COMETH_DND = 28688,
+    SPELL_ASHBRINGER = 28282,
+
+    MODEL_HIGHLORD_MOGRAINE = 16180,
 
     STAGE_MOGRAINE_NOT_STARTED = 0,
     STAGE_MOGRAINE_IN_PROGRESS = 1,
@@ -67,7 +68,6 @@ enum AshbringerEventMisc
     STAGE_MOGRAINE_REVIVED     = 3,
     STAGE_MOGRAINE_DONE        = 4,
 
-    AURA_OF_ASHBRINGER = 28282
 };
 
 enum eEvents
@@ -328,7 +328,6 @@ struct instance_scarlet_monastery : ScriptedInstance
 
     void Update(uint32 diff) override
     {
-        // not bothering to check if player has unequipped weapon, dont know if its a thing
         if (m_ashbringerActive)
         {
             m_events.Update(diff);
@@ -355,16 +354,15 @@ struct instance_scarlet_monastery : ScriptedInstance
                         if (Creature* pC = pMograine->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1034.9252f, 1399.0653f, 27.393204f, 6.257956981658935546f, TEMPSUMMON_TIMED_DESPAWN, 400000))
                         {
                             pC->SetFactionTemporary(35, TEMPFACTION_RESTORE_RESPAWN);
-                            pC->SetDisplayId(16180);
-pC->SetVirtualItem(BASE_ATTACK, EQUIP_UNEQUIP);
-pC->SetObjectScale(2.0);
-pC->CastSpell(pC, SPELL_MOGRAINE_COMETH, false);                           pC->GetMotionMaster()->MovePoint(0, 1150.3911f, 1398.723f, 32.54613f);
+                            pC->SetDisplayId(MODEL_HIGHLORD_MOGRAINE);
+                            pC->SetVirtualItem(BASE_ATTACK, EQUIP_UNEQUIP);
+                            pC->SetObjectScale(2.0);
+                            pC->CastSpell(pC, SPELL_MOGRAINE_COMETH_DND, false);
+                            pC->GetMotionMaster()->MovePoint(0, 1150.3911f, 1398.723f, 32.54613f);
                         }
                         m_events.ScheduleEvent(EVENT_TALK2, Milliseconds(48500));
                         break;
                     case EVENT_TALK2:
-                        //FaceDirection: 6.188851833343505859
-                        //FacingGUID: Full: 0x2044A017A003E200002196000023BAC7 Creature/0 R4392/S8598 Map: 189 Entry: 3976 Low: 2341575
                         pHighlord->StopMoving();
                         if (pHighlord)
                         {
@@ -410,6 +408,7 @@ pC->CastSpell(pC, SPELL_MOGRAINE_COMETH, false);                           pC->G
                         break;
                     case EVENT_SPELL:
                         if (pHighlord)
+                            //TODO:This spell hits the target and the target has no lightning effect
                             pHighlord->CastSpell(pMograine, SPELL_FORGIVENESS, false);
                         m_events.ScheduleEvent(EVENT_FORGIVEN, Seconds(4));
                         break;
@@ -439,7 +438,7 @@ bool AreaTrigger_at_cathedral_entrance(Player* player, AreaTriggerEntry const* a
 {
     if (areaTrigger->id == 4089)
     {
-        if (!player->HasAura(AURA_OF_ASHBRINGER))
+        if (!player->HasAura(SPELL_ASHBRINGER))
             return false;
 
         ScriptedInstance* pInstance = (ScriptedInstance*)player->GetInstanceData();
