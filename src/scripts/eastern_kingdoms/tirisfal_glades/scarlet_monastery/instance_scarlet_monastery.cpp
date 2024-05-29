@@ -356,11 +356,9 @@ struct instance_scarlet_monastery : ScriptedInstance
                         {
                             pC->SetFactionTemporary(35, TEMPFACTION_RESTORE_RESPAWN);
                             pC->SetDisplayId(16180);
-                            pC->SetVirtualItem(BASE_ATTACK, EQUIP_UNEQUIP);
-                            pC->SetObjectScale(2.0);
-                            pC->CastSpell(pC, SPELL_MOGRAINE_COMETH, false);
-                            // TODO: The coordinates below appear to be guessed, set the correct ones once we have them.
-                            pC->GetMotionMaster()->MovePoint(0, 1150.3911f, 1398.723f, 32.54613f);
+pC->SetVirtualItem(BASE_ATTACK, EQUIP_UNEQUIP);
+pC->SetObjectScale(2.0);
+pC->CastSpell(pC, SPELL_MOGRAINE_COMETH, false);                           pC->GetMotionMaster()->MovePoint(0, 1150.3911f, 1398.723f, 32.54613f);
                         }
                         m_events.ScheduleEvent(EVENT_TALK2, Milliseconds(48500));
                         break;
