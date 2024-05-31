@@ -1748,6 +1748,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             && me->GetDistance(pVictim) > 30.0f && !m_stay)
         {
             me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            return;
         }
 
         if (m_spells.hunter.pVolley &&
@@ -1810,7 +1811,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
                 return;
         }
 
-        if (GetAttackersInRangeCount(8.0f))
+        if (GetAttackersInRangeCount(10.0f))
         {
             Unit* pAttacker = *me->GetAttackers().begin();
 
