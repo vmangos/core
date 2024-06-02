@@ -1124,11 +1124,6 @@ void PartyBotAI::UpdateOutOfCombatAI()
             return;
     }
 
-    if (m_has_tactics)
-    {
-        m_has_tactics = 0;
-    }
-
     switch (me->GetClass())
     {
         case CLASS_PALADIN:
@@ -1206,7 +1201,7 @@ void PartyBotAI::UpdateInCombatAI()
         }
 
         // Swap DPS to marked target or party leader's target
-        if (!m_has_tactics && (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS))
+        if (m_role == ROLE_MELEE_DPS || m_role == ROLE_RANGE_DPS)
         {
             Unit* newVictim = SelectAttackTarget(pLeader);
 

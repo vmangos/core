@@ -129,7 +129,6 @@ public:
     bool m_personalControls = true;
     bool m_stay = false;
     uint8 m_equip = 0;
-    uint8 m_has_tactics = 0;
 };
 
 #endif

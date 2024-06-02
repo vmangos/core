@@ -459,11 +459,6 @@ void PartyBotAI::RaidStratsInZGBosses() {
     //Jin'do the Hexxer
     if (me->FindNearestCreature(11380, 30, true))
     {
-        if (!m_has_tactics)
-        {
-            m_has_tactics = 1;
-        }
-
         const uint16 DELUSIONS_OF_JINDO = 24306;
         if (me->HasAura(DELUSIONS_OF_JINDO))
         {
