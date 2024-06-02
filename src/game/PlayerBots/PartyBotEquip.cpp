@@ -531,13 +531,13 @@ void PartyBotEquipWarriorMddPreOne(Player* pPlayer)
 void PartyBotEquipWarriorMddTwo(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
-	equip.push_back(new PlayerPremadeItem(13404, 1506, 0));
+	equip.push_back(new PlayerPremadeItem(12640, 1506, 0));
 	equip.push_back(new PlayerPremadeItem(18404, 0, 0));
-	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
-	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
+	equip.push_back(new PlayerPremadeItem(22001, 2488, 0));
+	equip.push_back(new PlayerPremadeItem(18541, 849, 0));
 	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
-	equip.push_back(new PlayerPremadeItem(19146, 1885, 0));
-	equip.push_back(new PlayerPremadeItem(14551, 927, 0));
+	equip.push_back(new PlayerPremadeItem(12936, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(19143, 1887, 0));
 	equip.push_back(new PlayerPremadeItem(19137, 0, 0));
 	equip.push_back(new PlayerPremadeItem(14554, 1506, 0));
 	equip.push_back(new PlayerPremadeItem(14616, 911, 0));
