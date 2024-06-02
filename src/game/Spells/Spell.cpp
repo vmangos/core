@@ -1467,7 +1467,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             // Restauration d'energie sur miss/dodge des sorts rapportant un CP.
             // Source : http://roguecrap.blogspot.co.uk/2006/03/energy-regeneration-oddities.html, + verifiable en video
             // Source for Parry: https://youtu.be/aDXXr3ad3is?t=3m07s
-            if ((missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_DODGE || missInfo == SPELL_MISS_PARRY) && m_spellInfo->powerType == POWER_ENERGY)
+            if ((missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_DODGE || missInfo == SPELL_MISS_PARRY || missInfo == SPELL_MISS_IMMUNE || missInfo == SPELL_MISS_IMMUNE2) && m_spellInfo->powerType == POWER_ENERGY)
             {
                 int32 regen = lroundf(m_powerCost * 0.82f);
                 pRealUnitCaster->ModifyPower(POWER_ENERGY, regen);
