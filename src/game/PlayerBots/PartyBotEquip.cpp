@@ -584,11 +584,11 @@ void PartyBotEquipWarriorMddFour(Player* pPlayer)
 	equip.push_back(new PlayerPremadeItem(19394, 2488, 0));
 	equip.push_back(new PlayerPremadeItem(19436, 849, 0));
 	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
-	equip.push_back(new PlayerPremadeItem(19146, 1885, 0));
-	equip.push_back(new PlayerPremadeItem(14551, 927, 0));
+	equip.push_back(new PlayerPremadeItem(12936, 1885, 0));
+	equip.push_back(new PlayerPremadeItem(14551, 1887, 0));
 	equip.push_back(new PlayerPremadeItem(19137, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19402, 1506, 0));
-	equip.push_back(new PlayerPremadeItem(19381, 911, 0));
+	equip.push_back(new PlayerPremadeItem(19387, 911, 0));
 	equip.push_back(new PlayerPremadeItem(17063, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19384, 0, 0));
 	equip.push_back(new PlayerPremadeItem(19406, 0, 0));
