@@ -507,15 +507,15 @@ void PartyBotEquipWarriorTankSix(Player* pPlayer)
 void PartyBotEquipWarriorMddPreOne(Player* pPlayer)
 {
 	std::vector<PlayerPremadeItem const*> equip;
-	equip.push_back(new PlayerPremadeItem(13404, 0, 0));
+	equip.push_back(new PlayerPremadeItem(13404, 1506, 0));
 	equip.push_back(new PlayerPremadeItem(15411, 0, 0));
 	equip.push_back(new PlayerPremadeItem(12927, 2488, 0));
 	equip.push_back(new PlayerPremadeItem(13340, 849, 0));
 	equip.push_back(new PlayerPremadeItem(11726, 1891, 0));
 	equip.push_back(new PlayerPremadeItem(12936, 1885, 0));
-	equip.push_back(new PlayerPremadeItem(15063, 927, 0));
+	equip.push_back(new PlayerPremadeItem(19057, 1887, 0));
 	equip.push_back(new PlayerPremadeItem(13959, 0, 0));
-	equip.push_back(new PlayerPremadeItem(15062, 0, 0));
+	equip.push_back(new PlayerPremadeItem(18380, 1506, 0));
 	equip.push_back(new PlayerPremadeItem(12555, 911, 0));
 	equip.push_back(new PlayerPremadeItem(17713, 0, 0));
 	equip.push_back(new PlayerPremadeItem(13098, 0, 0));
