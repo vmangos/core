@@ -1559,6 +1559,11 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #
+#    Anticheat.LogFile
+#        Description: Creates a package dump file.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
 #    Anticheat.PacketLogSize
 #        Description: How many previous movement packets to dump to file upon detection resulting in kick or ban.
 #                     File is saved in pkt format that can be parsed with WowPacketParser.
