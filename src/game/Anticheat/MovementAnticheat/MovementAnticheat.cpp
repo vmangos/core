@@ -141,7 +141,7 @@ uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
             m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
     }
 
-    if ((result & (CHEAT_ACTION_KICK | CHEAT_ACTION_BAN_ACCOUNT | CHEAT_ACTION_BAN_IP_ACCOUNT)) && !m_packetLog.empty())
+    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_FILE) && (result & (CHEAT_ACTION_KICK | CHEAT_ACTION_BAN_ACCOUNT | CHEAT_ACTION_BAN_IP_ACCOUNT)) && !m_packetLog.empty())
     {
         AddMessageToPacketLog("End of packet log. Penalty: " + std::to_string(result) + ", Detected cheats: " + reason.str());
         std::string fileName = "movement_log_" +  m_session->GetUsername() + "_" + std::to_string(time(nullptr)) + ".pkt";

@@ -2069,6 +2069,7 @@ Anticheat.PlayersOnly = 1
 Anticheat.NotifyCheaters = 0
 Anticheat.BanDuration = 86400
 Anticheat.LogData = 0
+Anticheat.LogFile = 0
 Anticheat.PacketLogSize = 100
 Anticheat.MaxAllowedDesync = 0
 Anticheat.ReverseTime.Enable = 1

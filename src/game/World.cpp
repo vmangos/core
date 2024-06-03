@@ -1099,6 +1099,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_AC_MOVEMENT_NOTIFY_CHEATERS, "Anticheat.NotifyCheaters", false);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION, "Anticheat.BanDuration", 86400);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_DATA, "Anticheat.LogData", false);
+    setConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_FILE, "Anticheat.LogFile", false);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE, "Anticheat.PacketLogSize", 100);
     setConfig(CONFIG_INT32_AC_ANTICHEAT_MAX_ALLOWED_DESYNC, "Anticheat.MaxAllowedDesync", 0);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_REVERSE_TIME_ENABLED, "Anticheat.ReverseTime.Enable", true);
