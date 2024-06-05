@@ -97,10 +97,28 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 
             bool ok_loot = pCreature && pCreature->IsAlive() == (player->GetClass() == CLASS_ROGUE && pCreature->lootForPickPocketed);
 
-            if (!ok_loot || !pCreature->IsWithinDistInMap(_player, _player->GetMaxLootDistance(pCreature), true, SizeFactor::None))
+            if (!ok_loot)
             {
-                player->SendLootRelease(lguid);
+                player->SendLootError(lguid, LOOT_ERROR_DIDNT_KILL);
                 return;
+            }
+
+            // skinning uses the spell range which is 5 yards
+            if (pCreature->lootForSkin)
+            {
+                if (!pCreature->IsWithinCombatDistInMap(player, INTERACTION_DISTANCE + 1.25f))
+                {
+                    player->SendLootError(lguid, LOOT_ERROR_TOO_FAR);
+                    return;
+                }
+            }
+            else
+            {
+                if (!pCreature->IsWithinDistInMap(_player, _player->GetMaxLootDistance(pCreature), true, SizeFactor::None))
+                {
+                    player->SendLootError(lguid, LOOT_ERROR_TOO_FAR);
+                    return;
+                }
             }
 
             loot = &pCreature->loot;
