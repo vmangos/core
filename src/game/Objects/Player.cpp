@@ -10912,14 +10912,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
     // Modification - trading in loot for two hours.
     if (pItem->GetLootingTime())
-    {        
-        static SqlStatementID updateInventory;
-        SqlStatement stmt = CharacterDatabase.CreateStatement(updateInventory, "UPDATE `character_inventory` SET `looting_date` = ?, `raid_group` = ? WHERE `item_guid` = ?");
-        stmt.addUInt64(0);
-        stmt.addNull();
-        stmt.addUInt32(pItem->GetGUIDLow());
-        stmt.Execute();
-
+    {
         pItem->SetLootingTime(0);
         pItem->SetRaidGroup("");
         pItem->SetBinding(true);        
@@ -17267,6 +17260,14 @@ void Player::_SaveInventory()
         Bag* container = item->GetContainer();
         uint32 bag_guid = container ? container->GetGUIDLow() : 0;
 
+        // Modification - trading in loot for two hours.
+        if (item->GetLootingTime() && item->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) < time(nullptr))
+        {
+            item->SetLootingTime(0);
+            item->SetRaidGroup("");
+        }
+        // Modification - trading in loot for two hours.
+
         switch (item->GetState())
         {
             case ITEM_NEW:
@@ -17277,20 +17278,8 @@ void Player::_SaveInventory()
                 stmt.addUInt8(item->GetSlot());
                 stmt.addUInt32(item->GetGUIDLow());
                 stmt.addUInt32(item->GetEntry());
-
-                // Modification - trading in loot for two hours.
-                if (item->GetLootingTime() && item->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) >= time(nullptr))
-                {
-                    stmt.addUInt64(item->GetLootingTime());
-                    stmt.addString(item->GetRaidGroup());
-                }
-                else
-                {
-                    stmt.addUInt64(0);
-                    stmt.addNull();
-                }
-                // Modification - trading in loot for two hours.
-
+                stmt.addUInt64(item->GetLootingTime());
+                stmt.addString(item->GetRaidGroup());
                 stmt.Execute();
             }
             break;
@@ -17302,20 +17291,8 @@ void Player::_SaveInventory()
                 stmt.addUInt8(item->GetSlot());
                 stmt.addUInt32(item->GetEntry());
                 stmt.addUInt32(item->GetGUIDLow());
-
-                // Modification - trading in loot for two hours.
-                if (item->GetLootingTime() && item->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) >= time(nullptr))
-                {
-                    stmt.addUInt64(item->GetLootingTime());
-                    stmt.addString(item->GetRaidGroup());
-                }
-                else
-                {
-                    stmt.addUInt64(0);
-                    stmt.addNull();
-                }
-                // Modification - trading in loot for two hours.
-
+                stmt.addUInt64(item->GetLootingTime());
+                stmt.addString(item->GetRaidGroup());
                 stmt.Execute();
             }
             break;

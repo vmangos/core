@@ -227,6 +227,24 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
         return;
     }
 
+    // Modification - trading in loot for two hours.
+    if (!req->itemGuid.IsEmpty())
+    {
+        if (Player* pPlayer = GetPlayer())
+        {
+            if (Item* it = pPlayer->GetItemByGuid(req->itemGuid))
+            {
+                if (it->GetLootingTime())
+                {
+                    SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR);
+                    delete req;
+                    return;
+                }
+            }
+        }        
+    }
+    // Modification - trading in loot for two hours.
+
     req->receiverPtr = sObjectMgr.GetPlayer(req->receiver);
 
     if (req->receiverPtr)
