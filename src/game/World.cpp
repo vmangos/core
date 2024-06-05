@@ -1018,6 +1018,9 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_THRESHOLD, "DynamicRespawn.PlayersThreshold", 0);
     setConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_LEVELDIFF, "DynamicRespawn.PlayersMaxLevelDiff", 0);
 
+    //Modification - trading in loot for two hours.
+    setConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME, "TradingRaidLoot.Time", 7200);
+
     setConfig(CONFIG_UINT32_CHANNEL_INVITE_MIN_LEVEL, "ChannelInvite.MinLevel", 10);
     setConfig(CONFIG_BOOL_WHISPER_RESTRICTION, "WhisperRestriction", false);
     setConfig(CONFIG_UINT32_WORLD_CHAN_MIN_LEVEL, "WorldChan.MinLevel", 0);

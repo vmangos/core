@@ -10721,7 +10721,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
             return nullptr;
 
         // Modification - trading in loot for two hours.
-        if (pItem->GetLootingTime() && pItem->GetLootingTime() + 2 * HOUR >= time(nullptr))
+        if (pItem->GetLootingTime() && pItem->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) >= time(nullptr))
             pItem->SetBinding(false);
         else if (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM || (pItem->GetProto()->Bonding == BIND_WHEN_EQUIPPED && IsBagPos(pos)))
             pItem->SetBinding(true);
@@ -10981,7 +10981,7 @@ void Player::VisualizeItem(uint8 slot, Item* pItem)
 
     // check also  BIND_WHEN_PICKED_UP and BIND_QUEST_ITEM for .additem or .additemset case by GM (not binded at adding to inventory)
     // Modification - trading in loot for two hours.
-    if (pItem->GetLootingTime() && pItem->GetLootingTime() + 2 * HOUR >= time(nullptr))
+    if (pItem->GetLootingTime() && pItem->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) >= time(nullptr))
         pItem->SetBinding(false);
     else if (pItem->GetProto()->Bonding == BIND_WHEN_EQUIPPED || pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM)
         pItem->SetBinding(true);

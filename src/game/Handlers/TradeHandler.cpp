@@ -750,7 +750,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     }
 
     // Modification - trading in loot for two hours.
-    if (item->GetLootingTime() && item->GetLootingTime() + 2 * HOUR >= time(nullptr))
+    if (item->GetLootingTime() && item->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) >= time(nullptr))
     {
         std::string raid_group = item->GetRaidGroup();
         if (raid_group.size())
