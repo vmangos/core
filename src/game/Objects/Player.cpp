@@ -16130,6 +16130,8 @@ bool Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& hasEpicM
                 }
                 if (looting_time && looting_time + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) < time(nullptr))
                 {
+                    item->SetRaidGroup("");
+                    item->SetLootingTime(0);
                     item->SetBinding(true);
                 }
                 // Modification - trading in loot for two hours.
