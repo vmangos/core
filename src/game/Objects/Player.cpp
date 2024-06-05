@@ -12142,6 +12142,8 @@ void Player::UpdateItemsInBags()
             if (pItem->GetLootingTime() && pItem->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) < time(nullptr))
             {
                 pItem->SetBinding(true);
+                pItem->SetLootingTime(0);
+                pItem->SetRaidGroup("");
             }
         }
     }
@@ -17302,15 +17304,15 @@ void Player::_SaveInventory()
                 stmt.addUInt32(item->GetGUIDLow());
 
                 // Modification - trading in loot for two hours.
-                if (item->GetLootingTime() && item->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) < time(nullptr))
-                {
-                    stmt.addUInt64(0);
-                    stmt.addNull();                    
-                }
-                else
+                if (item->GetLootingTime() && item->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) >= time(nullptr))
                 {
                     stmt.addUInt64(item->GetLootingTime());
                     stmt.addString(item->GetRaidGroup());
+                }
+                else
+                {
+                    stmt.addUInt64(0);
+                    stmt.addNull();
                 }
                 // Modification - trading in loot for two hours.
 
