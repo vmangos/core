@@ -1562,6 +1562,10 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     if (now > m_lastTick)
         UpdateItemDuration(uint32(now - m_lastTick));
 
+    // Modification - trading in loot for two hours.
+    UpdateItemsInBags();
+    // Modification - trading in loot for two hours.
+
     if (m_cameraUpdateTimer)
     {
         if (m_cameraUpdateTimer <= update_diff)
@@ -12128,6 +12132,22 @@ void Player::UpdateItemDuration(uint32 time, bool realtimeonly)
     }
 }
 
+// Modification - trading in loot for two hours.
+void Player::UpdateItemsInBags()
+{
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pItem->GetLootingTime() && pItem->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) < time(nullptr))
+            {
+                pItem->SetBinding(true);
+            }
+        }
+    }
+}
+// Modification - trading in loot for two hours.
+
 void Player::UpdateEnchantTime(uint32 time)
 {
     for (EnchantDurationList::iterator itr = m_enchantDuration.begin(), next; itr != m_enchantDuration.end(); itr = next)
@@ -17274,12 +17294,26 @@ void Player::_SaveInventory()
             break;
             case ITEM_CHANGED:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(updateInventory, "UPDATE `character_inventory` SET `guid` = ?, `bag` = ?, `slot` = ?, `item_id` = ? WHERE `item_guid` = ?");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(updateInventory, "UPDATE `character_inventory` SET `guid` = ?, `bag` = ?, `slot` = ?, `item_id` = ?, `looting_date` = ?, `raid_group` = ? WHERE `item_guid` = ?");
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(bag_guid);
                 stmt.addUInt8(item->GetSlot());
                 stmt.addUInt32(item->GetEntry());
                 stmt.addUInt32(item->GetGUIDLow());
+
+                // Modification - trading in loot for two hours.
+                if (item->GetLootingTime() && item->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) < time(nullptr))
+                {
+                    stmt.addUInt64(0);
+                    stmt.addNull();                    
+                }
+                else
+                {
+                    stmt.addUInt64(item->GetLootingTime());
+                    stmt.addString(item->GetRaidGroup());
+                }
+                // Modification - trading in loot for two hours.
+
                 stmt.Execute();
             }
             break;

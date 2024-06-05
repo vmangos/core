@@ -1085,6 +1085,7 @@ class Player final: public Unit
         void RemoveItemDependentAurasAndCasts(Item const* pItem);
         void UpdateEnchantTime(uint32 time);
         void UpdateItemDuration(uint32 time, bool realtimeonly = false);
+        void UpdateItemsInBags();
         void AddEnchantmentDurations(Item* item);
         void RemoveEnchantmentDurations(Item* item);
         void RemoveAllEnchantments(EnchantmentSlot slot);
