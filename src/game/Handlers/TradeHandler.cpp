@@ -771,6 +771,11 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
             return;
         }
     }
+    if (item->GetLootingTime() && item->GetLootingTime() + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) < time(nullptr))
+    {
+        SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
+        return;
+    }
     // Modification - trading in loot for two hours.
 
     his_trade->SetAccepted(false);
