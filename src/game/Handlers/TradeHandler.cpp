@@ -32,6 +32,8 @@
 #include "Language.h"
 #include "Map.h"
 
+#include <regex>
+
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
     WorldPacket data;
@@ -746,6 +748,30 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;
     }
+
+    // Modification - trading in loot for two hours.
+    if (item->GetLootingTime() && item->GetLootingTime() + 2 * HOUR >= time(nullptr))
+    {
+        std::string raid_group = item->GetRaidGroup();
+        if (raid_group.size())
+        {
+            std::stringstream pattern;
+            pattern << ":" << my_trade->GetTrader()->GetGUIDLow() << ":";
+
+            std::regex rx(pattern.str().c_str());
+            if (!std::regex_search(raid_group, rx))
+            {
+                SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
+                return;
+            }
+        }
+        else
+        {
+            SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
+            return;
+        }
+    }
+    // Modification - trading in loot for two hours.
 
     his_trade->SetAccepted(false);
     his_trade->SetLastModificationTime(time(nullptr));

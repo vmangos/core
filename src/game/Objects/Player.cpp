@@ -10640,6 +10640,29 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
     Item* pItem = Item::CreateItem(item, count, GetObjectGuid());
     if (pItem)
     {
+        // Modification - trading in loot for two hours.
+        if (GetMap()->IsRaid() && (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM))
+        {
+            pItem->SetLootingTime(time(nullptr));
+
+            std::ostringstream ss;
+            if (Group* pGroup = GetGroup())
+            {
+                ss << ":";
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    if (Player* pMember = itr->getSource())
+                    {
+                        if (pMember->IsBot())
+                            continue;
+                        ss << pMember->GetGUIDLow() << ":";
+                    }
+                }
+            }
+            pItem->SetRaidGroup(ss.str().c_str());
+        }
+        // Modification - trading in loot for two hours.
+
         ItemAddedQuestCheck(item, count);
         if (randomPropertyId)
             pItem->SetItemRandomProperties(randomPropertyId);
@@ -10697,9 +10720,9 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         if (!pItem)
             return nullptr;
 
-        if (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP ||
-                pItem->GetProto()->Bonding == BIND_QUEST_ITEM ||
-                (pItem->GetProto()->Bonding == BIND_WHEN_EQUIPPED && IsBagPos(pos)))
+        if (pItem->GetLootingTime() && pItem->GetLootingTime() + 2 * HOUR >= time(nullptr))
+            pItem->SetBinding(false);
+        else if (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM || (pItem->GetProto()->Bonding == BIND_WHEN_EQUIPPED && IsBagPos(pos)))
             pItem->SetBinding(true);
 
         if (bag == INVENTORY_SLOT_BAG_0)
@@ -10742,9 +10765,9 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
     }
     else
     {
-        if (pItem2->GetProto()->Bonding == BIND_WHEN_PICKED_UP ||
-                pItem2->GetProto()->Bonding == BIND_QUEST_ITEM ||
-                (pItem2->GetProto()->Bonding == BIND_WHEN_EQUIPPED && IsBagPos(pos)))
+        if (pItem2->GetLootingTime() && pItem2->GetLootingTime() + 2 * HOUR >= time(nullptr))
+            pItem2->SetBinding(false);
+        else if (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM || (pItem->GetProto()->Bonding == BIND_WHEN_EQUIPPED && IsBagPos(pos)))
             pItem2->SetBinding(true);
 
         pItem2->SetCount(pItem2->GetCount() + count);
@@ -10879,6 +10902,22 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         return pItem2;
     }
 
+    // Modification - trading in loot for two hours.
+    if (pItem->GetLootingTime())
+    {        
+        static SqlStatementID updateInventory;
+        SqlStatement stmt = CharacterDatabase.CreateStatement(updateInventory, "UPDATE `character_inventory` SET `looting_date` = ?, `raid_group` = ? WHERE `item_guid` = ?");
+        stmt.addUInt64(0);
+        stmt.addNull();
+        stmt.addUInt32(pItem->GetGUIDLow());
+        stmt.Execute();
+
+        pItem->SetLootingTime(0);
+        pItem->SetRaidGroup("");
+        pItem->SetBinding(true);        
+    }
+    // Modification - trading in loot for two hours.
+
     return pItem;
 }
 
@@ -10937,7 +10976,9 @@ void Player::VisualizeItem(uint8 slot, Item* pItem)
         return;
 
     // check also  BIND_WHEN_PICKED_UP and BIND_QUEST_ITEM for .additem or .additemset case by GM (not binded at adding to inventory)
-    if (pItem->GetProto()->Bonding == BIND_WHEN_EQUIPPED || pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM)
+    if (pItem->GetLootingTime() && pItem->GetLootingTime() + 2 * HOUR >= time(nullptr))
+        pItem->SetBinding(false);
+    else if (pItem->GetProto()->Bonding == BIND_WHEN_EQUIPPED || pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM)
         pItem->SetBinding(true);
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "STORAGE: EquipItem slot = %u, item = %u", slot, pItem->GetEntry());
@@ -15878,8 +15919,8 @@ void Player::LoadCorpse()
 
 bool Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& hasEpicMount)
 {
-    //       0             1                  2      3         4        5      6             7                   8           9     10   11    12         13              14
-    //SELECT creator_guid, gift_creator_guid, count, duration, charges, flags, enchantments, random_property_id, durability, text, bag, slot, item_guid, item_id, generated_loot
+    //       0             1                  2      3         4        5      6             7                   8           9     10   11    12         13              14       15            16
+    //SELECT creator_guid, gift_creator_guid, count, duration, charges, flags, enchantments, random_property_id, durability, text, bag, slot, item_guid, item_id, generated_loot, looting_date, raid_group
 
     if (result)
     {
@@ -15903,6 +15944,8 @@ bool Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& hasEpicM
             uint8  slot         = fields[11].GetUInt8();
             uint32 item_lowguid = fields[12].GetUInt32();
             uint32 item_id      = fields[13].GetUInt32();
+            uint64 looting_time = fields[15].GetUInt64(); // Modification - trading in loot for two hours.
+            std::string raid_group = fields[16].GetCppString(); // Modification - trading in loot for two hours.
 
             ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item_id);
 
@@ -16056,6 +16099,19 @@ bool Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& hasEpicM
                 // restore container unchanged state also
                 if (item->GetContainer())
                     item->GetContainer()->SetState(ITEM_UNCHANGED, this);
+
+                // Modification - trading in loot for two hours.
+                if (looting_time && 2 * HOUR + looting_time >= time(nullptr) && (item->GetState() == ITEM_NEW || item->GetState() == ITEM_UNCHANGED))
+                {
+                    item->SetBinding(false);
+                    item->SetRaidGroup(raid_group);
+                    item->SetLootingTime(looting_time);
+                }
+                if (looting_time && 2 * HOUR + looting_time < time(nullptr))
+                {
+                    item->SetBinding(true);
+                }
+                // Modification - trading in loot for two hours.
             }
             else
             {
@@ -17187,12 +17243,26 @@ void Player::_SaveInventory()
         {
             case ITEM_NEW:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(insertInventory, "INSERT INTO `character_inventory` (`guid`, `bag`, `slot`, `item_guid`, `item_id`) VALUES (?, ?, ?, ?, ?)");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(insertInventory, "INSERT INTO `character_inventory` (`guid`, `bag`, `slot`, `item_guid`, `item_id`, `looting_date`, `raid_group`) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(bag_guid);
                 stmt.addUInt8(item->GetSlot());
                 stmt.addUInt32(item->GetGUIDLow());
                 stmt.addUInt32(item->GetEntry());
+
+                // Modification - trading in loot for two hours.
+                if (item->GetLootingTime() && 2 * HOUR + item->GetLootingTime() >= time(nullptr))
+                {
+                    stmt.addUInt64(item->GetLootingTime());
+                    stmt.addString(item->GetRaidGroup());
+                }
+                else
+                {
+                    stmt.addUInt64(0);
+                    stmt.addNull();
+                }
+                // Modification - trading in loot for two hours.
+
                 stmt.Execute();
             }
             break;
