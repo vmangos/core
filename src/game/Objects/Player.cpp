@@ -8431,11 +8431,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player const* pVictim
             // must be in range and creature must be alive for pickpocket and must be dead for another loot
             if (!creature || creature->IsAlive() != (loot_type == LOOT_PICKPOCKETING))
             {
-                SendLootRelease(guid);
+                SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
                 return;
             }
 
-            if (!creature->IsWithinDistInMap(this, GetMaxLootDistance(creature), true, SizeFactor::None))
+            // skinning range already checked during spell cast
+            if (loot_type != LOOT_SKINNING && !creature->IsWithinDistInMap(this, GetMaxLootDistance(creature), true, SizeFactor::None))
             {
                 SendLootError(guid, LOOT_ERROR_TOO_FAR);
                 return;
