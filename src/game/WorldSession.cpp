@@ -272,7 +272,6 @@ uint32 GetChatPacketProcessingType(uint32 chatType)
 // Add an incoming packet to the queue
 void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
 {
-    printf("%s\n", LookupOpcodeName(newPacket->GetOpcode()));
     if (m_sniffFile)
         m_sniffFile->WritePacket(*newPacket, true, time(nullptr));
 
