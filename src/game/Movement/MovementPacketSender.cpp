@@ -398,6 +398,7 @@ void MovementPacketSender::SendMovementFlagChangeToAll(Unit* unit, MovementFlags
                 data << unit->GetPackGUID();
                 data << unit->m_movementInfo;
                 unit->SendMovementMessageToSet(std::move(data), true);
+                return;
             }
             else
                 opcode = SMSG_SPLINE_MOVE_UNROOT;
