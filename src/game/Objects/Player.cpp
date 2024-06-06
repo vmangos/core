@@ -17280,8 +17280,8 @@ void Player::_SaveInventory()
                 stmt.addUInt8(item->GetSlot());
                 stmt.addUInt32(item->GetGUIDLow());
                 stmt.addUInt32(item->GetEntry());
-                stmt.addUInt64(item->GetLootingTime());
-                stmt.addString(item->GetRaidGroup());
+                stmt.addUInt64(item->GetLootingTime()); // Modification - trading in loot for two hours.
+                stmt.addString(item->GetRaidGroup()); // Modification - trading in loot for two hours.
                 stmt.Execute();
             }
             break;
@@ -17292,8 +17292,8 @@ void Player::_SaveInventory()
                 stmt.addUInt32(bag_guid);
                 stmt.addUInt8(item->GetSlot());
                 stmt.addUInt32(item->GetEntry());
-                stmt.addUInt64(item->GetLootingTime());
-                stmt.addString(item->GetRaidGroup());
+                stmt.addUInt64(item->GetLootingTime()); // Modification - trading in loot for two hours.
+                stmt.addString(item->GetRaidGroup()); // Modification - trading in loot for two hours.
                 stmt.addUInt32(item->GetGUIDLow());
                 stmt.Execute();
             }
