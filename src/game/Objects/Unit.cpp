@@ -9058,7 +9058,7 @@ void Unit::SendPetActionFeedback(uint8 msg)
 
 void Unit::SendPetTalk(uint32 pettalk)
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     if (Player* pOwner = ::ToPlayer(GetOwner()))
     {
         WorldPacket data(SMSG_PET_ACTION_SOUND, 8 + 4);

@@ -815,17 +815,5 @@ enum OpcodesList
     CMSG_IGNORE_KNOCKBACK_CHEAT            = 812,
     SMSG_CHAT_PLAYER_AMBIGUOUS             = 813,
     MSG_DELAY_GHOST_TELEPORT               = 814,
-    SMSG_SPELLINSTAKILLLOG                 = 815,
-    SMSG_SPELL_UPDATE_CHAIN_TARGETS        = 816,
-    CMSG_CHAT_FILTERED                     = 817,
-    SMSG_EXPECTED_SPAM_RECORDS             = 818,
-    SMSG_SPELLSTEALLOG                     = 819,
-    CMSG_LOTTERY_QUERY_OBSOLETE            = 820,
-    SMSG_LOTTERY_QUERY_RESULT_OBSOLETE     = 821,
-    CMSG_BUY_LOTTERY_TICKET_OBSOLETE       = 822,
-    SMSG_LOTTERY_RESULT_OBSOLETE           = 823,
-    SMSG_CHARACTER_PROFILE                 = 824,
-    SMSG_CHARACTER_PROFILE_REALM_CONNECTED = 825,
-    SMSG_DEFENSE_MESSAGE                   = 827,
-    NUM_MSG_TYPES                          = 828
+    NUM_MSG_TYPES                          = 815
 };

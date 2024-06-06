@@ -1117,6 +1117,7 @@ void BattleGroundMgr::BuildPlaySoundPacket(WorldPacket* data, uint32 soundid)
     *data << uint32(soundid);
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
 void BattleGroundMgr::BuildPlayerLeftBattleGroundPacket(WorldPacket* data, ObjectGuid guid)
 {
     data->Initialize(SMSG_BATTLEGROUND_PLAYER_LEFT, 8);
@@ -1128,6 +1129,7 @@ void BattleGroundMgr::BuildPlayerJoinedBattleGroundPacket(WorldPacket* data, Pla
     data->Initialize(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
     *data << player->GetObjectGuid();
 }
+#endif
 
 BattleGround* BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 instanceId, BattleGroundTypeId bgTypeId)
 {

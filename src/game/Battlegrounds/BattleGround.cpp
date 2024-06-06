@@ -960,9 +960,11 @@ void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool transport, bool sen
             sBattleGroundMgr.ScheduleQueueUpdate(bgQueueTypeId, bgTypeId, GetBracketId());
 
             // Let others know
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             WorldPacket data;
             sBattleGroundMgr.BuildPlayerLeftBattleGroundPacket(&data, guid);
             SendPacketToTeam(team, &data, pPlayer, false);
+#endif
         }
     }
 
@@ -1037,9 +1039,11 @@ void BattleGround::AddPlayer(Player* pPlayer)
 
     UpdatePlayersCountByTeam(team, false);                  // +1 player
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     WorldPacket data;
     sBattleGroundMgr.BuildPlayerJoinedBattleGroundPacket(&data, pPlayer);
     SendPacketToTeam(team, &data, pPlayer, false);
+#endif
 
     // setup BG group membership
     PlayerAddedToBGCheckIfBGIsRunning(pPlayer);

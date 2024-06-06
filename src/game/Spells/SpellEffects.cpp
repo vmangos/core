@@ -303,7 +303,7 @@ void Spell::EffectInstaKill(SpellEffectIndex /*effIdx*/)
     if (m_caster == unitTarget)                             // prevent interrupt message
         finish();
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     WorldPacket data(SMSG_SPELLINSTAKILLLOG, (8 + 4));
     data << unitTarget->GetObjectGuid();                    // Victim GUID
     data << uint32(m_spellInfo->Id);

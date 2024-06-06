@@ -92,7 +92,7 @@ class UpdateData
         std::list<UpdatePacket> m_datas;
 };
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
 class MovementData
 {
     public:

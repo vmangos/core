@@ -209,7 +209,7 @@ void UpdateData::Clear()
     m_outOfRangeGUIDs.clear();
 }
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
 bool MovementData::CanAddPacket(WorldPacket const& data)
 {
     // Since packet size is stored with an uint8, packet size is limited for compressed packets

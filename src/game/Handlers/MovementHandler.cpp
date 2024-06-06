@@ -285,7 +285,7 @@ void Player::ExecuteTeleportNear()
 
 void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 {
-    uint32 const opcode = recvData.GetOpcode();
+    uint32 opcode = recvData.GetOpcode();
 
     // Do not accept packets sent before this time.
     if (recvData.GetPacketTime() <= m_moveRejectTime)
@@ -377,6 +377,25 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (opcode == CMSG_MOVE_FALL_RESET)
         return;
 
+    // This opcode has no handler in this client build.
+#if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_9_4
+    if (opcode == MSG_MOVE_FALL_LAND)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+            opcode = MSG_MOVE_STOP;
+        else if (movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
+            opcode = MSG_MOVE_START_BACKWARD;
+        else if (movementInfo.HasMovementFlag(MOVEFLAG_FORWARD))
+            opcode = MSG_MOVE_START_FORWARD;
+        else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_LEFT))
+            opcode = MSG_MOVE_START_STRAFE_LEFT;
+        else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_RIGHT))
+            opcode = MSG_MOVE_START_STRAFE_RIGHT;
+        else
+            opcode = MSG_MOVE_HEARTBEAT;
+    }
+#endif
+
     WorldPacket data(opcode, recvData.size());
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -387,36 +406,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     movementInfo.Write(data);
 
     pMover->SendMovementMessageToSet(std::move(data), true, _player);
-
-    // Fix movement issue on older clients where if the player jumps while running,
-    // and then lets go of the key while in the air, he appears to continue moving
-    // forward on other people's screen. Once he moves for real, they will see him
-    // teleport back to where he was standing after he jumped.
-#if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_9_4
-    if (opcode == MSG_MOVE_FALL_LAND)
-    {
-        uint16 opcode2 = 0;
-        if (!movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
-            opcode2 = MSG_MOVE_STOP;
-        else if (movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
-            opcode2 = MSG_MOVE_START_BACKWARD;
-        else if (movementInfo.HasMovementFlag(MOVEFLAG_FORWARD))
-            opcode2 = MSG_MOVE_START_FORWARD;
-        else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_LEFT))
-            opcode2 = MSG_MOVE_START_STRAFE_LEFT;
-        else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_RIGHT))
-            opcode2 = MSG_MOVE_START_STRAFE_RIGHT;
-
-        if (opcode2)
-        {
-            WorldPacket data(opcode2, recvData.size());
-            data << m_clientMoverGuid.WriteAsPacked();             // write guid
-            movementInfo.Write(data);                             // write data
-
-            pMover->SendMovementMessageToSet(std::move(data), true, _player);
-        }
-    }
-#endif
 }
 
 /*
@@ -1055,7 +1044,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
             pTransport->SendCreateUpdateToPlayer(_player);
         }
     }
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     else
     {
         WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);

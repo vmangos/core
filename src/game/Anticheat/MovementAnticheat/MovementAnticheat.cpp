@@ -379,7 +379,7 @@ bool MovementAnticheat::IsLoggedOpcode(uint16 opcode)
         case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
         case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
         case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         case MSG_MOVE_TIME_SKIPPED:
 #endif
             return true;

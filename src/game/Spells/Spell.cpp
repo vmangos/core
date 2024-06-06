@@ -5392,7 +5392,7 @@ void Spell::SendChannelStart(uint32 duration)
 
     m_timer = duration;
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_CHANNELED))
     {
         WorldPacket data(SMSG_SPELL_UPDATE_CHAIN_TARGETS);

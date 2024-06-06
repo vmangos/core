@@ -911,7 +911,7 @@ class WorldSession
         TutorialDataState m_tutorialState;
 
         // compressed moves packet does not exist in early clients
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         MovementData m_movementPacketCompressor;
         void SendCompressedMovementPackets();
         // dynamically decide when to enable or disable compression

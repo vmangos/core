@@ -270,7 +270,7 @@ struct instance_scarlet_monastery : ScriptedInstance
         {
             if (uiData == IN_PROGRESS)
             {
-                Cell c(MaNGOS::ComputeCellPair(1069.949951f, 1399.140015));
+                Cell c(MaNGOS::ComputeCellPair(1069.949951f, 1399.140015f));
                 instance->LoadGrid(c, true);
                 if (GameObject* go = instance->GetGameObject(m_uiChapelDoorGUID))
                 {

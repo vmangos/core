@@ -622,7 +622,7 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recv_data)
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     if (recv_data.empty())                                  // request
     {
         Group* group = GetPlayer()->GetGroup();
