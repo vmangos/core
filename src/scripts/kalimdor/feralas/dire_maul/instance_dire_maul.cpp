@@ -926,6 +926,7 @@ enum
     GOSSIP_MENU_1               = 6795,
     GOSSIP_MENU_2               = 6883,
 
+    GO_KNOTS_CACHE = 179501,
     GO_KNOTS_BALL_AND_CHAIN     = 179511,
 };
 
@@ -1001,7 +1002,7 @@ bool GossipHello_npc_knot_thimblejack(Player* pPlayer, Creature* pCreature)
     if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Why should I bother fixing the trap? Why not just eliminate the guard the old fashioned way?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, 9368, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
     if (pPlayer->GetQuestRewardStatus(QUEST_GORDOK_OGRE_SUIT) && pPlayer->GetQuestStatus(QUEST_GORDOK_OGRE_SUIT) == QUEST_STATUS_COMPLETE)
     {
@@ -1040,6 +1041,13 @@ bool QuestRewarded_npc_knot_thimblejack(Player* pPlayer, Creature* pCreature, Qu
             {
                 if (GameObject* pGo = pCreature->FindNearestGameObject(GO_KNOTS_BALL_AND_CHAIN, 20.0f))
                     pGo->Delete();
+                
+                if (GameObject* pGo_2 = pCreature->FindNearestGameObject(GO_KNOTS_CACHE, 20.0f))
+                {
+                    pPlayer->SummonGameObject(GO_KNOTS_CACHE, pGo_2->GetPositionX(), pGo_2->GetPositionY(), pGo_2->GetPositionZ(), 0.0f, 0, 0, 0, 0, 43200);
+                    pGo_2->Delete();
+                }
+
                 pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 //pCreature->SetActiveObjectState(true);
                 pCreature->GetMotionMaster()->MovePoint(1, 518.325f, 542.00f, -23.901f);

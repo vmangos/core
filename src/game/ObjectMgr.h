@@ -437,6 +437,7 @@ struct PlayerCacheData
     float fPosZ;
     float fOrientation;
     bool bInFlight;
+    bool bCharIsLocked; //hardcore
 };
 typedef std::map<uint32 /*guid*/, PlayerCacheData> PlayerCacheDataMap;
 
@@ -1296,14 +1297,14 @@ class ObjectMgr
         PlayerCacheData const* GetPlayerDataByName(std::string const& name) const;
         void GetPlayerDataForAccount(uint32 accountId, std::vector<PlayerCacheData const*>& data) const;
         PlayerCacheData* InsertPlayerInCache(Player* pPlayer);
-        PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, std::string const& name, uint32 level, uint32 zoneId);
+        PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, std::string const& name, uint32 level, uint32 zoneId, bool isLocked = false); //hardcore
         void DeletePlayerFromCache(uint32 lowGuid);
         void ChangePlayerNameInCache(uint32 lowGuid, std::string const& oldName, std::string const& newName);
         void UpdatePlayerCachedPosition(Player* pPlayer);
         void UpdatePlayerCachedPosition(uint32 lowGuid, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight);
         void UpdatePlayerCachedPosition(PlayerCacheData* data, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight);
         void UpdatePlayerCache(Player* pPlayer);
-        void UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, std::string const& name, uint32 level, uint32 zoneId);
+        void UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, std::string const& name, uint32 level, uint32 zoneId, bool isLocked); //hardcore
 
         PlayerCacheDataMap m_playerCacheData;
         std::map<std::string, uint32> m_playerNameToGuid;

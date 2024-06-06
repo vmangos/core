@@ -555,6 +555,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY,
     CONFIG_BOOL_AC_MOVEMENT_NOTIFY_CHEATERS,
     CONFIG_BOOL_AC_MOVEMENT_LOG_DATA,
+    CONFIG_BOOL_AC_MOVEMENT_LOG_FILE,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_REVERSE_TIME_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_NULL_TIME_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_SKIPPED_HEARTBEATS_ENABLED,
@@ -610,6 +611,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_GM_CHEAT_GOD,
     CONFIG_BOOL_LFG_MATCHMAKING,
     CONFIG_BOOL_LIMIT_PLAY_TIME,
+    CONFIG_BOOL_HARDCORE_ENABLED,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -812,6 +814,7 @@ class World
         void SendBroadcastTextToWorld(uint32 textId);
 
         // Only for GMs with ticket notification ON
+        void SendHardcoreWorldText(int32 string_id, ...);
         void SendGMTicketText(int32 string_id, ...);
         void SendGMTicketText(char const* text);
         void SendGMText(int32 string_id, ...);

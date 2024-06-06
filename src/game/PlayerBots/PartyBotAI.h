@@ -41,6 +41,16 @@ public:
         m_updateTimer.Reset(2000);
     }
 
+    // POTS start
+    void UsePotionsOrRune(uint16 potion);
+    bool CanUsePotionsOrRune(uint16 itemId);
+    bool CreateAndUseItemFromId(uint16 itemId);
+    uint16 SelectHealingPotionForLevel();
+    uint16 SelectManaPotionForLevel();
+    // POTS end
+
+    uint8 GetEquipLevel(Player* pPlayer);
+
     bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) final;
     void OnPlayerLogin() final;
     void UpdateAI(uint32 const diff) final;
@@ -51,6 +61,7 @@ public:
 
     bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const final;
     Player* GetPartyLeader() const;
+    void ChangePartyLeader(ObjectGuid newLeader) { m_leaderGuid = newLeader; };
     bool AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget(Player* pLeader) const;
     Unit* SelectPartyAttackTarget() const;
@@ -89,6 +100,17 @@ public:
     void UpdateInCombatAI_Druid() final;
     void UpdateOutOfCombatAI_Druid() final;
 
+    void RaidStratsDefaultPotionsInRaid();
+    void RaidStratsInZGProtectionPotions();
+    void RaidStratsInMKProtectionPotions();
+    void RaidStratsInOnyxiaProtectionPotions();
+    void RaidStratsInBWLProtectionPotions();
+    void RaidStratsInZGBosses();
+    void RaidStratsInMKBosses();
+    void RaidStratsInOnyxiaBosses();
+
+    void PartyBotEquipPremadeGear(uint8 pLeaderItl, Player* pPlayer);
+
     std::vector<RaidTargetIcon> m_marksToCC;
     std::vector<RaidTargetIcon> m_marksToFocus;
     ShortTimeTracker m_updateTimer;
@@ -104,6 +126,9 @@ public:
     float m_z = 0.0f;
     float m_o = 0.0f;
     bool m_resetSpellData = false;
+    bool m_personalControls = true;
+    bool m_stay = false;
+    uint8 m_equip = 0;
 };
 
 #endif
