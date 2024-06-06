@@ -85,8 +85,8 @@ class MySQLConnection : public SqlConnection
         bool Reconnect();
         bool HandleMySQLError(uint32 errNo);
 
-        QueryResult* Query(char const* sql) override;
-        QueryNamedResult* QueryNamed(char const* sql) override;
+        std::unique_ptr<QueryResult> Query(char const* sql) override;
+        std::unique_ptr<QueryNamedResult> QueryNamed(char const* sql) override;
         bool Execute(char const* sql) override;
 
         unsigned long escape_string(char* to, char const* from, unsigned long length) override;

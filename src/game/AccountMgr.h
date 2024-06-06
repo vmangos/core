@@ -100,7 +100,7 @@ class AccountMgr
         static bool normalizeString(std::string& utf8str);
         // Nostalrius
         void Update(uint32 diff);
-        void LoadIPBanList(QueryResult* result, bool silent=false);
+        void LoadIPBanList(std::unique_ptr<QueryResult> result, bool silent=false);
         void LoadAccountBanList(bool silent=false);
         void BanIP(std::string const& ip, uint32 unbandate) { m_ipBanned[ip] = unbandate; }
         void UnbanIP(std::string const& ip) { m_ipBanned.erase(ip); }

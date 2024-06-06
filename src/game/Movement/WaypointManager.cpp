@@ -48,7 +48,7 @@ void WaypointManager::Load()
     // creature_movement
     // /////////////////////////////////////////////////////
 
-    QueryResult* result = WorldDatabase.Query("SELECT `id`, COUNT(`point`) FROM `creature_movement` GROUP BY `id`");
+    std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT `id`, COUNT(`point`) FROM `creature_movement` GROUP BY `id`");
 
     if (!result)
     {
@@ -76,8 +76,6 @@ void WaypointManager::Load()
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Paths loaded");
-
-        delete result;
 
         //                                    0     1        2             3             4             5           6                  7            8              9
         result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation`, `path_id` FROM `creature_movement`");
@@ -134,7 +132,7 @@ void WaypointManager::Load()
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
             {
-                QueryResult* result1 = WorldDatabase.PQuery("SELECT `id`, `map` FROM `creature` WHERE `guid` = '%u'", id);
+                std::unique_ptr<QueryResult> result1 = WorldDatabase.PQuery("SELECT `id`, `map` FROM `creature` WHERE `guid` = '%u'", id);
                 if (result1)
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (guidlow %d, entry %d) have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
                                     id, result1->Fetch()[0].GetUInt32(), point, node.x, node.y);
@@ -148,7 +146,6 @@ void WaypointManager::Load()
                 if (result1)
                 {
                     node.z = sTerrainMgr.LoadTerrain(result1->Fetch()[1].GetUInt32())->GetHeightStatic(node.x, node.y, node.z);
-                    delete result1;
                 }
 
                 WorldDatabase.PExecute("UPDATE `creature_movement` SET `position_x` = '%f', `position_y` = '%f', `position_z` = '%f' WHERE `id` = '%u' AND `point` = '%u'", node.x, node.y, node.z, id, point);
@@ -160,8 +157,6 @@ void WaypointManager::Load()
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Waypoints and behaviors loaded");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">>> Loaded %u paths, %u nodes and %u behaviors", total_paths, total_nodes, total_behaviors);
-
-        delete result;
     }
 
     // /////////////////////////////////////////////////////
@@ -195,8 +190,6 @@ void WaypointManager::Load()
             total_nodes += count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Path templates loaded");
@@ -271,8 +264,6 @@ void WaypointManager::Load()
         }
         while (result->NextRow());
 
-        delete result;
-
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Waypoint templates loaded");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -313,8 +304,6 @@ void WaypointManager::Load()
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Paths loaded");
-
-        delete result;
 
         //                                    0     1        2             3             4             5           6                  7            8              9
         result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation`, `path_id` FROM `creature_movement_special`");
@@ -380,8 +369,6 @@ void WaypointManager::Load()
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Special waypoints loaded");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">>> Loaded %u paths, %u nodes and %u behaviors", total_paths, total_nodes, total_behaviors);
-
-        delete result;
     }
 
     for (auto const& id : specialPathSet)
@@ -397,9 +384,8 @@ void WaypointManager::Load()
 void WaypointManager::Cleanup()
 {
     // check if points need to be renumbered and do it
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from `creature_movement` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1"))
+    if (std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT 1 from `creature_movement` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1"))
     {
-        delete result;
         WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement`");
         WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement`");
         WorldDatabase.DirectExecute("ALTER TABLE `creature_movement` DROP PRIMARY KEY");
@@ -412,9 +398,8 @@ void WaypointManager::Cleanup()
         MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from `creature_movement` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1")));
     }
 
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from `creature_movement_template` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_template` WHERE `entry` = T.`entry` AND `point` <= T.`point`) LIMIT 1"))
+    if (std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT 1 from `creature_movement_template` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_template` WHERE `entry` = T.`entry` AND `point` <= T.`point`) LIMIT 1"))
     {
-        delete result;
         WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement_template`");
         WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement_template`");
         WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_template` DROP PRIMARY KEY");
@@ -427,9 +412,8 @@ void WaypointManager::Cleanup()
         MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from `creature_movement_template` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_template` WHERE `entry` = T.`entry` AND `point` <= T.`point`) LIMIT 1")));
     }
 
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from `creature_movement_special` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_special` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1"))
+    if (std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT 1 from `creature_movement_special` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_special` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1"))
     {
-        delete result;
         WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement_special`");
         WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement_special`");
         WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_special` DROP PRIMARY KEY");

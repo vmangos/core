@@ -43,8 +43,8 @@ class PostgreSQLConnection : public SqlConnection
 
         bool OpenConnection(bool reconnect);
 
-        QueryResult* Query(char const* sql);
-        QueryNamedResult* QueryNamed(char const* sql);
+        std::unique_ptr<QueryResult> Query(char const* sql);
+        std::unique_ptr<QueryNamedResult> QueryNamed(char const* sql);
         bool Execute(char const* sql);
 
         unsigned long escape_string(char* to, char const* from, unsigned long length);

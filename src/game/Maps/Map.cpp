@@ -1973,7 +1973,7 @@ void Map::CreateInstanceData(bool load)
     if (load)
     {
         // TODO: make a global storage for this
-        QueryResult* result;
+        std::unique_ptr<QueryResult> result;
 
         if (Instanceable())
             result = CharacterDatabase.PQuery("SELECT data FROM instance WHERE id = '%u'", i_InstanceId);
@@ -1991,8 +1991,6 @@ void Map::CreateInstanceData(bool load)
             }
             else
                 i_data->Create();
-
-            delete result;
         }
         else
         {

@@ -262,11 +262,9 @@ public:
 
     void SendTicket(WorldSession* session, GmTicket* ticket) const;
     void ReloadTicket(uint32 ticketId);
-    void ReloadTicketCallback(QueryResult* holder);
+    void ReloadTicketCallback(std::unique_ptr<QueryResult> result);
 
 protected:
-    void _RemoveTicket(uint32 ticketId, int64 source = -1, bool permanently = false);
-
     GmTicketList _ticketList;
 
     bool   _status;

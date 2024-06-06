@@ -39,8 +39,6 @@
 #include <map>
 #include <limits>
 
-extern SQLStorage sCreatureDataLinkGroupStorage;
-
 class Group;
 class Item;
 

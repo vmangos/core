@@ -973,7 +973,7 @@ class Player final: public Unit
         // Initializes a new Player object that was not loaded from the database.
         bool Create(uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
         void Update(uint32 update_diff, uint32 time) override;
-        static bool BuildEnumData(QueryResult const* result,  WorldPacket* pData);
+        static bool BuildEnumData(const std::unique_ptr<QueryResult>& result,  WorldPacket* pData);
 
         /**
          * @brief Can only be called from Master server (or ASSERT will fail)
@@ -1410,22 +1410,22 @@ class Player final: public Unit
     private:
         void LoadAura(AuraSaveStruct& saveStruct, uint32 timediff);
         bool SaveAura(SpellAuraHolder const* holder, AuraSaveStruct& saveStruct);
-        void _LoadAuras(QueryResult* result, uint32 timediff);
-        void _LoadBoundInstances(QueryResult* result);
-        bool _LoadInventory(QueryResult* result, uint32 timediff, bool& hasEpicMount);
-        void _LoadItemLoot(QueryResult* result);
-        void _LoadQuestStatus(QueryResult* result);
-        void _LoadGroup(QueryResult* result);
-        void _LoadSkills(QueryResult* result);
+        void _LoadAuras(std::unique_ptr<QueryResult> result, uint32 timediff);
+        void _LoadBoundInstances(std::unique_ptr<QueryResult> result);
+        bool _LoadInventory(std::unique_ptr<QueryResult> result, uint32 timediff, bool& hasEpicMount);
+        void _LoadItemLoot(std::unique_ptr<QueryResult> result);
+        void _LoadQuestStatus(std::unique_ptr<QueryResult> result);
+        void _LoadGroup(std::unique_ptr<QueryResult> result);
+        void _LoadSkills(std::unique_ptr<QueryResult> result);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        void _LoadForgottenSkills(QueryResult* result);
+        void _LoadForgottenSkills(std::unique_ptr<QueryResult> result);
 #endif
         void LoadSkillsFromFields();
-        void _LoadSpells(QueryResult* result);
-        bool _LoadHomeBind(QueryResult* result);
-        void _LoadBGData(QueryResult* result);
+        void _LoadSpells(std::unique_ptr<QueryResult> result);
+        bool _LoadHomeBind(std::unique_ptr<QueryResult> result);
+        void _LoadBGData(std::unique_ptr<QueryResult> result);
         void _LoadIntoDataField(char const* data, uint32 startOffset, uint32 count);
-        void _LoadGuild(QueryResult* result);
+        void _LoadGuild(std::unique_ptr<QueryResult> result);
         uint32 m_atLoginFlags;
     public:
         bool LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder);
@@ -1577,7 +1577,7 @@ class Player final: public Unit
         void SendClearCooldown(uint32 spellId, Unit const* target) const;
         void SendClearAllCooldowns(Unit const* target) const;
         void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
-        void _LoadSpellCooldowns(QueryResult* result);
+        void _LoadSpellCooldowns(std::unique_ptr<QueryResult> result);
         void _SaveSpellCooldowns();
 
         template <typename F>
