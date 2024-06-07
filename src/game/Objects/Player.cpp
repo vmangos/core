@@ -1560,7 +1560,12 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     // Update items that have just a limited lifetime
     if (now > m_lastTick)
+    {
         UpdateItemDuration(uint32(now - m_lastTick));
+        // Modification - trading in loot for two hours.
+        UpdateItemsInBags(uint32(now - m_lastTick));
+    }
+        
 
     // Modification - trading in loot for two hours.
     UpdateItemsInBags();
@@ -10647,6 +10652,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         if (GetMap()->IsRaid() && (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM))
         {
             pItem->SetLootingTime(time(nullptr));
+            pItem->SetDurationRaidLooting(this);
 
             std::ostringstream ss;
             if (Group* pGroup = GetGroup())
@@ -12120,7 +12126,7 @@ void Player::UpdateItemDuration(uint32 time, bool realtimeonly)
 }
 
 // Modification - trading in loot for two hours.
-void Player::UpdateItemsInBags()
+void Player::UpdateItemsInBags(uint32 diff)
 {
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     {
@@ -12131,6 +12137,10 @@ void Player::UpdateItemsInBags()
                 pItem->SetBinding(true);
                 pItem->SetLootingTime(0);
                 pItem->SetRaidGroup("");
+            }
+            else
+            {
+                pItem->UpdateDurationRaidLooting(this, diff);
             }
         }
     }

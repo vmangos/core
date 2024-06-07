@@ -250,6 +250,16 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
     SetState(ITEM_CHANGED, owner);                          // save new time in database
 }
 
+// Modification - trading in loot for two hours.
+void Item::UpdateDurationRaidLooting(Player* owner, uint32 diff)
+{
+    if (!GetUInt32Value(ITEM_FIELD_DURATION))
+        return;
+
+    SetUInt32Value(ITEM_FIELD_DURATION, GetUInt32Value(ITEM_FIELD_DURATION) - diff);
+}
+
+
 void Item::SaveToDB()
 {
     uint32 guid = GetGUIDLow();
@@ -850,6 +860,12 @@ void Item::SetState(ItemUpdateState state, Player* forplayer)
         uQueuePos = -1;
         uState = ITEM_UNCHANGED;
     }
+}
+
+// Modification - trading in loot for two hours.
+void Item::SetDurationRaidLooting(Player* owner)
+{
+    SetUInt32Value(ITEM_FIELD_DURATION, sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME));
 }
 
 void Item::AddToUpdateQueueOf(Player* player)
