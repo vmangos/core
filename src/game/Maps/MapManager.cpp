@@ -450,11 +450,10 @@ void MapManager::InitMaxInstanceId()
 {
     i_MaxInstanceId = RESERVED_INSTANCES_LAST;
 
-    QueryResult* result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `instance`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `instance`");
     if (result)
     {
         i_MaxInstanceId = result->Fetch()[0].GetUInt32();
-        delete result;
     }
     if (i_MaxInstanceId < RESERVED_INSTANCES_LAST)
         i_MaxInstanceId = RESERVED_INSTANCES_LAST;

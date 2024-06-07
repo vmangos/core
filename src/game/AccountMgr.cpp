@@ -77,10 +77,9 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
 
 AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
 {
-    QueryResult* result = LoginDatabase.PQuery("SELECT 1 FROM `account` WHERE `id`='%u'", accid);
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT 1 FROM `account` WHERE `id`='%u'", accid);
     if (!result)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
-    delete result;
 
     // existing characters list
     result = CharacterDatabase.PQuery("SELECT `guid` FROM `characters` WHERE `account`='%u'", accid);
@@ -97,8 +96,6 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
             Player::DeleteFromDB(guid, accid, false);       // no need to update realm characters
         }
         while (result->NextRow());
-
-        delete result;
     }
 
     // table realm specific but common for all characters of account for realm
@@ -121,10 +118,9 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
 //#DEPRECATED: Not used anywhere, should we delete?
 AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, std::string new_passwd)
 {
-    QueryResult* result = LoginDatabase.PQuery("SELECT 1 FROM `account` WHERE `id`='%u'", accid);
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT 1 FROM `account` WHERE `id`='%u'", accid);
     if (!result)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
-    delete result;
 
     if (utf8length(new_uname) > MAX_ACCOUNT_STR)
         return AOR_NAME_TOO_LONG;
@@ -197,13 +193,12 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd,
 uint32 AccountMgr::GetId(std::string username)
 {
     LoginDatabase.escape_string(username);
-    QueryResult* result = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` = '%s'", username.c_str());
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` = '%s'", username.c_str());
     if (!result)
         return 0;
     else
     {
         uint32 id = (*result)[0].GetUInt32();
-        delete result;
         return id;
     }
 }
@@ -254,7 +249,7 @@ void AccountMgr::Load()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> %u GM ranks loaded for realm %u", m_accountSecurity.size(), realmID);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     LoadAccountBanList();
-    LoadIPBanList(LoginDatabase.Query(LOAD_IP_BANS_QUERY));
+    LoadIPBanList(std::move(LoginDatabase.Query(LOAD_IP_BANS_QUERY)));
     LoadAccountWarnings();
 }
 
@@ -275,11 +270,10 @@ void AccountMgr::SetSecurity(uint32 accId, AccountTypes sec)
 
 bool AccountMgr::GetName(uint32 acc_id, std::string &name)
 {
-    QueryResult* result = LoginDatabase.PQuery("SELECT `username` FROM `account` WHERE `id` = '%u'", acc_id);
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `username` FROM `account` WHERE `id` = '%u'", acc_id);
     if (result)
     {
         name = (*result)[0].GetCppString();
-        delete result;
         if (normalizeString(name))
             return true;
     }
@@ -290,12 +284,11 @@ bool AccountMgr::GetName(uint32 acc_id, std::string &name)
 uint32 AccountMgr::GetCharactersCount(uint32 acc_id)
 {
     // check character count
-    QueryResult* result = CharacterDatabase.PQuery("SELECT COUNT(`guid`) FROM `characters` WHERE `account` = '%u'", acc_id);
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT COUNT(`guid`) FROM `characters` WHERE `account` = '%u'", acc_id);
     if (result)
     {
         Field* fields = result->Fetch();
         uint32 charcount = fields[0].GetUInt32();
-        delete result;
         return charcount;
     }
     else
@@ -314,22 +307,18 @@ bool AccountMgr::CheckPassword(uint32 accid, std::string passwd, std::string use
 
     normalizeString(passwd);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT `s`, `v` FROM `account` WHERE `id`='%u'", accid);
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `s`, `v` FROM `account` WHERE `id`='%u'", accid);
     if (result)
     {
         Field* fields = result->Fetch();
         SRP6 srp;
 
-        bool calcv = srp.CalculateVerifier(
-            CalculateShaPassHash(username, passwd), fields[0].GetCppString().c_str());
+        bool calcv = srp.CalculateVerifier(CalculateShaPassHash(username, passwd), fields[0].GetCppString().c_str());
 
         if (calcv && srp.ProofVerifier(fields[1].GetCppString()))
         {
-            delete result;
             return true;
         }
-
-        delete result;
     }
 
     return false;
@@ -376,7 +365,7 @@ void AccountMgr::Update(uint32 diff)
         m_banlistUpdateTimer -= diff;
 }
 
-void AccountMgr::LoadIPBanList(QueryResult* result, bool silent)
+void AccountMgr::LoadIPBanList(std::unique_ptr<QueryResult> result, bool silent)
 {
     if (!silent)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading ip_banned ...");
@@ -407,7 +396,6 @@ void AccountMgr::LoadIPBanList(QueryResult* result, bool silent)
             unbandate = 0xFFFFFFFF;
         ipBanned.emplace(std::make_pair(fields[0].GetString(), unbandate));
     } while (result->NextRow());
-    delete result;
 
     std::lock_guard<std::shared_timed_mutex> lock(m_ipBannedMutex);
     std::swap(ipBanned, m_ipBanned);

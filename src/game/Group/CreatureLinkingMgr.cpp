@@ -116,7 +116,7 @@ void CreatureLinkingMgr::LoadFromDB()
     // Load `creature_linking`
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "> Loading table `creature_linking`");
     count = 0;
-    result.reset(WorldDatabase.Query("SELECT `guid`, `master_guid`, `flag` FROM `creature_linking`"));
+    result = WorldDatabase.Query("SELECT `guid`, `master_guid`, `flag` FROM `creature_linking`");
     if (!result)
     {
         BarGoLink bar(1);
@@ -234,7 +234,7 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
         // Check for uniqueness of mob whom is followed, on whom spawning is dependend
         if (pTmp->searchRange == 0 && pTmp->linkingFlag & (FLAG_FOLLOW | FLAG_CANT_SPAWN_IF_BOSS_DEAD | FLAG_CANT_SPAWN_IF_BOSS_ALIVE))
         {
-            QueryResult* result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id=%u AND map=%u LIMIT 2", pTmp->masterId, pTmp->mapId);
+            std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id=%u AND map=%u LIMIT 2", pTmp->masterId, pTmp->mapId);
             if (!result)
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking_template` has FLAG_FOLLOW, but no master, (entry: %u, map: %u, master: %u)", slaveEntry, pTmp->mapId, pTmp->masterId);
@@ -244,12 +244,10 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
             if (result->GetRowCount() > 1)
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`creature_linking_template` has FLAG_FOLLOW, but non unique master, (entry: %u, map: %u, master: %u)", slaveEntry, pTmp->mapId, pTmp->masterId);
-                delete result;
                 return false;
             }
             Field* fields = result->Fetch();
             pTmp->masterDBGuid = fields[0].GetUInt32();
-            delete result;
         }
     }
 

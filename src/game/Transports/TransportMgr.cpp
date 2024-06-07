@@ -390,7 +390,7 @@ void TransportMgr::SpawnContinentTransports()
 
     uint32 oldMSTime = WorldTimer::getMSTime();
 
-    QueryResult* result = WorldDatabase.Query("SELECT `entry`, `period` FROM `transports`");
+    std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT `entry`, `period` FROM `transports`");
 
     uint32 count = 0;
     if (result)
@@ -416,7 +416,6 @@ void TransportMgr::SpawnContinentTransports()
             }
 
         } while (result->NextRow());
-        delete result;
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Spawned %u continent transports in %u ms", count, WorldTimer::getMSTimeDiffToNow(oldMSTime));

@@ -73,7 +73,7 @@ void PlayerBotMgr::Load()
     LoadConfig();
 
     // 3- Load usable account ID
-    QueryResult* result = LoginDatabase.PQuery(
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery(
                               "SELECT MAX(`id`)"
                               " FROM `account`");
     if (!result)
@@ -83,7 +83,6 @@ void PlayerBotMgr::Load()
     }
     Field* fields = result->Fetch();
     m_maxAccountId = fields[0].GetUInt32() + 10000;
-    delete result;
 
     // 4- LoadFromDB
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> [PlayerBotMgr] Loading Bots ...");
@@ -111,7 +110,6 @@ void PlayerBotMgr::Load()
             m_totalChance += chance;
         }
         while (result->NextRow());
-        delete result;
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%u bots loaded", m_bots.size());
     }
 

@@ -159,7 +159,7 @@ class HonorMgr
 
         void Save();
         void SaveStoredData();
-        void Load(QueryResult* result);
+        void Load(std::unique_ptr<QueryResult> result);
 
         bool Add(float CP, uint8 type, Unit const* source = nullptr);
         void Update();

@@ -462,7 +462,7 @@ class WorldSession
         void SetAccountData(NewAccountData::AccountDataType type, const std::string& data);
         void SendAccountDataTimes();
         void LoadGlobalAccountData();
-        void LoadAccountData(QueryResult* result, uint32 mask);
+        void LoadAccountData(std::unique_ptr<QueryResult> result, uint32 mask);
 
         void LoadTutorialsData();
         void SendTutorialsData();
@@ -529,8 +529,8 @@ class WorldSession
         void HandleCharDeleteOpcode(WorldPacket& recvPacket);
         void HandleCharCreateOpcode(WorldPacket& recvPacket);
         void HandlePlayerLoginOpcode(WorldPacket& recvPacket);
-        void HandleCharEnum(QueryResult* result);
-        void HandlePlayerLogin(LoginQueryHolder * holder);
+        void HandleCharEnum(std::unique_ptr<QueryResult> result);
+        void HandlePlayerLogin(LoginQueryHolder* holder);
         void HandlePlayedTime(WorldPacket& recvPacket);
 
         // Movement
@@ -828,7 +828,7 @@ class WorldSession
         void HandleRequestPetInfoOpcode(WorldPacket& recv_data);
 
         void HandleCharRenameOpcode(WorldPacket& recv_data);
-        static void HandleChangePlayerNameOpcodeCallBack(QueryResult* result, uint32 accountId, std::string newname);
+        static void HandleChangePlayerNameOpcodeCallBack(std::unique_ptr<QueryResult> result, uint32 accountId, std::string newname);
 
         //BattleGround
         void HandleBattlefieldJoinOpcode(WorldPacket& recv_data);

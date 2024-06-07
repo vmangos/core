@@ -469,7 +469,7 @@ void CreatureGroupsManager::Load()
     }
     while (result->NextRow());
 
-    result.reset(WorldDatabase.Query("SELECT `leader_guid`, `creature_id`, `min_count`, `max_count` FROM `creature_groups_entry_limit` ORDER BY `leader_guid`"));
+    result = WorldDatabase.Query("SELECT `leader_guid`, `creature_id`, `min_count`, `max_count` FROM `creature_groups_entry_limit` ORDER BY `leader_guid`");
 
     if (result)
     {
