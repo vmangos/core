@@ -346,7 +346,7 @@ class Item : public Object
         uint64 GetLootingTime() { return m_looting_time; } // Modification - trading in loot for two hours.
         std::string GetRaidGroup() { return m_raid_group; } // Modification - trading in loot for two hours.
         void SetState(ItemUpdateState state, Player* forplayer = nullptr);
-        void SetDurationRaidLooting(Player* owner); // Modification - trading in loot for two hours.
+        void SetDurationRaidLooting(Player* owner, uint32 duration); // Modification - trading in loot for two hours.
         void SetLootingTime(uint64 looting_time) { m_looting_time = looting_time; }; // Modification - trading in loot for two hours.
         void SetRaidGroup(std::string raid_group) { m_raid_group = raid_group; }; // Modification - trading in loot for two hours.
         void AddToUpdateQueueOf(Player* player);

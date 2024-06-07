@@ -863,9 +863,9 @@ void Item::SetState(ItemUpdateState state, Player* forplayer)
 }
 
 // Modification - trading in loot for two hours.
-void Item::SetDurationRaidLooting(Player* owner)
+void Item::SetDurationRaidLooting(Player* owner, uint32 duration)
 {
-    SetUInt32Value(ITEM_FIELD_DURATION, sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME));
+    SetUInt32Value(ITEM_FIELD_DURATION, duration);
 }
 
 void Item::AddToUpdateQueueOf(Player* player)

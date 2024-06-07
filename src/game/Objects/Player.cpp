@@ -1565,10 +1565,6 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         // Modification - trading in loot for two hours.
         UpdateItemsInBags(uint32(now - m_lastTick));
     }
-        
-
-    // Modification - trading in loot for two hours.
-    UpdateItemsInBags();
 
     if (m_cameraUpdateTimer)
     {
@@ -10652,7 +10648,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         if (GetMap()->IsRaid() && (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM))
         {
             pItem->SetLootingTime(time(nullptr));
-            pItem->SetDurationRaidLooting(this);
+            pItem->SetDurationRaidLooting(this, sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME));
 
             std::ostringstream ss;
             if (Group* pGroup = GetGroup())
@@ -10915,6 +10911,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     // Modification - trading in loot for two hours.
     if (pItem->GetLootingTime())
     {
+        pItem->SetDurationRaidLooting(this, 0);
         pItem->SetLootingTime(0);
         pItem->SetRaidGroup("");
         pItem->SetBinding(true);
