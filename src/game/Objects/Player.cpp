@@ -10658,7 +10658,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
                 {
                     if (Player* pMember = itr->getSource())
                     {
-                        if (pMember->IsBot())
+                        if (pMember->IsBot() || !pMember->GetMap()->IsRaid() || pMember->GetMap()->GetInstanceId() != GetMap()->GetInstanceId())
                             continue;
                         ss << pMember->GetGUIDLow() << ":";
                     }
