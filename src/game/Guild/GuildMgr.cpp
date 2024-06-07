@@ -105,7 +105,7 @@ void GuildMgr::LoadGuilds()
 {
     uint32 count = 0;
 
-    //                                                     0           1       2              3               4               5               6
+    //                                                                     0           1       2              3               4               5               6
     std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `guild_id`, `name`, `leader_guid`, `emblem_style`, `emblem_color`, `border_style`, `border_color`,"
                           //   7                8       9       10
                           "`background_Color`, `info`, `motd`, `create_date` FROM `guild` ORDER BY `guild_id` ASC");
@@ -122,11 +122,11 @@ void GuildMgr::LoadGuilds()
     }
 
     // load guild ranks
-    //                                                                 0           1     2       3
+    //                                                                                 0           1     2       3
     std::unique_ptr<QueryResult> guildRanksResult   = CharacterDatabase.Query("SELECT `guild_id`, `id`, `name`, `rights` FROM `guild_rank` ORDER BY `guild_id` ASC, `id` ASC");
 
     // load guild members
-    //                                                                 0                          1       2       3              4
+    //                                                                                 0                          1       2       3              4
     std::unique_ptr<QueryResult> guildMembersResult = CharacterDatabase.Query("SELECT `guild_id`, `guild_member`.`guid`, `rank`, `player_note`, `officer_note`,"
                                       //             5                    6                     7                     8                    9                           10
                                       "`characters`.`name`, `characters`.`level`, `characters`.`class`, `characters`.`zone`, `characters`.`logout_time`, `characters`.`account` "
@@ -170,7 +170,7 @@ void GuildMgr::LoadPetitions()
     CleanUpPetitions(); // for reload
     uint32 count = 0;
 
-    //                                                      0            1                2               3
+    //                                                                     0            1                2               3
     std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `owner_guid`, `petition_guid`, `charter_guid`, `name` FROM `petition`");
 
     if (!result)
@@ -185,7 +185,7 @@ void GuildMgr::LoadPetitions()
     }
 
     // load signatures
-    //                                                                 0             1                2              3
+    //                                                                                         0             1                2              3
     std::unique_ptr<QueryResult> petitionSignaturesDbResult = CharacterDatabase.Query("SELECT `owner_guid`, `petition_guid`, `player_guid`, `player_account` FROM `petition_sign`");
 
     BarGoLink bar(result->GetRowCount());

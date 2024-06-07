@@ -2089,7 +2089,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
             } while (result->NextRow());
         }
 
-        //                                         0        1               2                3               4                      5         6              7       8            9           10         11         12           13        14
+        //                                     0        1               2                3               4                      5         6              7       8            9           10         11         12           13        14
         result = WorldDatabase.PQuery("SELECT `level`, `melee_damage`, `ranged_damage`, `attack_power`, `ranged_attack_power`, `health`, `base_health`, `mana`, `base_mana`, `strength`, `agility`, `stamina`, `intellect`, `spirit`, `armor` FROM `creature_classlevelstats` WHERE `class`=%u ORDER BY `level`", unitClass);
 
         if (result)
@@ -5187,7 +5187,7 @@ void ObjectMgr::LoadGroups()
 
     // -- loading members --
     count = 0;
-    //                                            0              1            2           3
+    //                                        0              1            2           3
     result = CharacterDatabase.Query("SELECT `member_guid`, `assistant`, `subgroup`, `group_id` FROM `group_member` ORDER BY `group_id`");
     if (!result)
     {
@@ -8275,7 +8275,7 @@ void ObjectMgr::LoadFactions()
 
 #if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
         // Load localized texts (currently we only have 1.12 locales).
-        //                                        0        1            2            3            4            5            6            7                   8                   9                   10                  11                  12
+        //                                    0        1            2            3            4            5            6            7                   8                   9                   10                  11                  12
         result = WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `description_loc1`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc5`, `description_loc6` FROM `locales_faction`");
         if (result)
         {
@@ -8880,7 +8880,7 @@ void ObjectMgr::LoadTaxiNodes()
 
 #if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
     // Load localized texts (currently we only have 1.12 locales).
-    //                                        0        1            2            3            4            5            6
+    //                                    0        1            2            3            4            5            6
     result = WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6` FROM `locales_taxi_node`");
     if (result)
     {

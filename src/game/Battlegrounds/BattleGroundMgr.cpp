@@ -1591,7 +1591,7 @@ void BattleGroundMgr::LoadBattleEventIndexes()
     uint32 count = 0;
 
     std::unique_ptr<QueryResult> result =
-        //                           0         1           2                3                4              5           6
+        //                               0         1           2                3                4              5           6
         WorldDatabase.Query("SELECT data.typ, data.guid1, data.ev1 AS ev1, data.ev2 AS ev2, data.map AS m, data.guid2, description.map, "
                             //                              7                  8                   9
                             "description.event1, description.event2, description.description "

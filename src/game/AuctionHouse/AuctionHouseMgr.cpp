@@ -345,7 +345,7 @@ void AuctionHouseMgr::LoadAuctionHouses()
 
 void AuctionHouseMgr::LoadAuctionItems()
 {
-    //                                                     0               1                    2        3           4          5        6               7                     8             9       10                           11
+    //                                                                     0               1                    2        3           4          5        6               7                     8             9       10                           11
     std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `item_guid`, `item_instance`.`item_id` FROM `auction` JOIN `item_instance` ON `item_guid` = `guid`");
 
     if (!result)

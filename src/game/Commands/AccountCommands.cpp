@@ -324,7 +324,7 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
         return false;
 
     // Get the list of accounts ID logged to the realm
-    //                                                  0     1           2          3          4
+    //                                                                  0     1           2          3          4
     std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id`, `username`, `last_ip`, `gmlevel`, `expansion` FROM `account` WHERE `current_realm` = %u LIMIT %u", realmID, limit);
     if (!result)
     {

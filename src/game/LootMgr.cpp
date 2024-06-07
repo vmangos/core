@@ -101,7 +101,7 @@ void LootStore::LoadLootTable()
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s :", GetName());
 
-    //                                                 0      1     2                    3        4              5         6
+    //                                                                 0      1     2                    3        4              5         6
     std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT entry, item, ChanceOrQuestChance, groupid, mincountOrRef, maxcount, condition_id FROM %s WHERE ((%u >= patch_min) && (%u <= patch_max)) && ((mincountOrRef < 0) || (item NOT IN (SELECT entry FROM forbidden_items WHERE (after_or_before = 0 && patch <= %u) || (after_or_before = 1 && patch >= %u))))", GetName(), sWorld.GetWowPatch(), sWorld.GetWowPatch(), sWorld.GetWowPatch(), sWorld.GetWowPatch());
 
     if (result)

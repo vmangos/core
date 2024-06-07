@@ -2244,7 +2244,7 @@ bool ChatHandler::HandleCharacterCopySkinCommand(char* args)
         std::string plName(args);
         CharacterDatabase.escape_string(plName); // No SQL injection
 
-        //                                                      0       1       2             3             4              5
+        //                                                                      0       1       2             3             4              5
         std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `gender` FROM `characters` WHERE `name`='%s'", plName.c_str());
         if (!result)
         {

@@ -4817,7 +4817,7 @@ void Player::DeleteFromDB(ObjectGuid playerGuid, uint32 accountId, bool updateRe
         // completely remove from the database
         case 0:
         {
-            // return back all mails with COD and Item                 0      1               2                   3              4          5               6        7
+            // return back all mails with COD and Item                                  0      1               2                   3              4          5               6        7
             std::unique_ptr<QueryResult> resultMail = CharacterDatabase.PQuery("SELECT `id`, `message_type`, `mail_template_id`, `sender_guid`, `subject`, `item_text_id`, `money`, `has_items` FROM `mail` WHERE `receiver_guid`='%u' AND `has_items`<>0 AND `cod`<>0", lowguid);
             if (resultMail)
             {
@@ -16136,7 +16136,7 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
 
     uint32 slot = 0;
 
-    ////                                                     0      1       2         3         4      5           6           7           8           9            10           11           12           13
+    ////                                                                     0      1       2         3         4      5           6           7           8           9            10           11           12           13
     //std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mob_count1, mob_count2, mob_count3, mob_count4, item_count1, item_count2, item_count3, item_count4, reward_choice FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
 
     if (result)
