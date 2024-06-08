@@ -10648,7 +10648,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         if (GetMap()->IsRaid() && (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM))
         {
             pItem->SetLootingTime(time(nullptr));
-            pItem->SetDurationRaidLooting(this, sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME));
+            pItem->SetDurationRaidLooting(sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME));
 
             std::ostringstream ss;
             if (Group* pGroup = GetGroup())
@@ -10911,7 +10911,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     // Modification - trading in loot for two hours.
     if (pItem->GetLootingTime())
     {
-        pItem->SetDurationRaidLooting(this, 0);
+        pItem->SetDurationRaidLooting(0);
         pItem->SetLootingTime(0);
         pItem->SetRaidGroup("");
         pItem->SetBinding(true);
@@ -12137,7 +12137,7 @@ void Player::UpdateItemsInBags(uint32 diff)
             }
             else
             {
-                pItem->UpdateDurationRaidLooting(this, diff);
+                pItem->UpdateDurationRaidLooting(diff);
             }
         }
     }
@@ -16124,6 +16124,7 @@ bool Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& hasEpicM
                 // Modification - trading in loot for two hours.
                 if (looting_time && looting_time + sWorld.getConfig(CONFIG_UINT32_TRADINGRAIDLOOT_TIME) >= time(nullptr) && (item->GetState() == ITEM_NEW || item->GetState() == ITEM_UNCHANGED))
                 {
+                    item->SetDurationRaidLooting(time(nullptr) - looting_time);
                     item->SetBinding(false);
                     item->SetRaidGroup(raid_group);
                     item->SetLootingTime(looting_time);

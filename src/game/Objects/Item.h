@@ -327,7 +327,7 @@ class Item : public Object
 
         void SendTimeUpdate(Player const* owner) const;
         void UpdateDuration(Player* owner, uint32 diff);
-        void UpdateDurationRaidLooting(Player* owner, uint32 diff); // Modification - trading in loot for two hours.
+        void UpdateDurationRaidLooting(uint32 diff); // Modification - trading in loot for two hours.
 
         // spell charges (negative means that once charges are consumed the item should be deleted)
         int32 GetSpellCharges(uint8 index/*0..5*/ = 0) const { return GetInt32Value(ITEM_FIELD_SPELL_CHARGES + index); }
@@ -346,7 +346,7 @@ class Item : public Object
         uint64 GetLootingTime() { return m_looting_time; } // Modification - trading in loot for two hours.
         std::string GetRaidGroup() { return m_raid_group; } // Modification - trading in loot for two hours.
         void SetState(ItemUpdateState state, Player* forplayer = nullptr);
-        void SetDurationRaidLooting(Player* owner, uint32 duration); // Modification - trading in loot for two hours.
+        void SetDurationRaidLooting(uint32 duration); // Modification - trading in loot for two hours.
         void SetLootingTime(uint64 looting_time) { m_looting_time = looting_time; }; // Modification - trading in loot for two hours.
         void SetRaidGroup(std::string raid_group) { m_raid_group = raid_group; }; // Modification - trading in loot for two hours.
         void AddToUpdateQueueOf(Player* player);

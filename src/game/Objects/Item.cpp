@@ -251,7 +251,7 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
 }
 
 // Modification - trading in loot for two hours.
-void Item::UpdateDurationRaidLooting(Player* owner, uint32 diff)
+void Item::UpdateDurationRaidLooting(uint32 diff)
 {
     if (!GetUInt32Value(ITEM_FIELD_DURATION))
         return;
@@ -863,7 +863,7 @@ void Item::SetState(ItemUpdateState state, Player* forplayer)
 }
 
 // Modification - trading in loot for two hours.
-void Item::SetDurationRaidLooting(Player* owner, uint32 duration)
+void Item::SetDurationRaidLooting(uint32 duration)
 {
     SetUInt32Value(ITEM_FIELD_DURATION, duration);
 }
