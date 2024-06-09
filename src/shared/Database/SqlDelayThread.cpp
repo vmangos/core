@@ -68,8 +68,7 @@ void SqlDelayThread::run()
         {
             loopCounter = 0;
             m_dbEngine->Ping();
-            if (QueryResult* res = m_dbConnection->Query("SELECT 1"))
-                delete res;
+            /* ignore result */ m_dbConnection->Query("SELECT 1"); // TODO: Why is this here, when its already check in m_dbEngine->Ping(); ???
         }
     }
 

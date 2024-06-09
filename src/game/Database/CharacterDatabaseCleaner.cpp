@@ -35,11 +35,10 @@ void CharacterDatabaseCleaner::CleanDatabase()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Cleaning character database...");
 
     // check flags which clean ups are necessary
-    QueryResult* result = CharacterDatabase.PQuery("SELECT cleaning_flags FROM saved_variables");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT cleaning_flags FROM saved_variables");
     if (!result)
         return;
     uint32 flags = (*result)[0].GetUInt32();
-    delete result;
 
     // clean up
     if (flags & CLEANING_FLAG_SKILLS)
@@ -51,7 +50,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
 
 void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table, bool (*check)(uint32))
 {
-    QueryResult* result = CharacterDatabase.PQuery("SELECT DISTINCT %s FROM %s", column, table);
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT DISTINCT %s FROM %s", column, table);
     if (!result)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Table %s is empty.", table);
@@ -82,7 +81,6 @@ void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table
         }
     }
     while (result->NextRow());
-    delete result;
 
     if (found)
     {

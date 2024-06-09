@@ -116,7 +116,7 @@ bool PostgreSQLConnection::_Query(char const* sql, PGresult** pResult, uint64* p
     return true;
 }
 
-QueryResult* PostgreSQLConnection::Query(char const* sql)
+std::unique_ptr<QueryResult> PostgreSQLConnection::Query(char const* sql)
 {
     if (!mPGconn)
         return nullptr;
@@ -128,13 +128,13 @@ QueryResult* PostgreSQLConnection::Query(char const* sql)
     if(!_Query(sql,&result,&rowCount,&fieldCount))
         return nullptr;
 
-    QueryResultPostgre * queryResult = new QueryResultPostgre(result, rowCount, fieldCount);
+    std::unique_ptr<QueryResultPostgre> queryResult(new QueryResultPostgre(result, rowCount, fieldCount));
 
     queryResult->NextRow();
     return queryResult;
 }
 
-QueryNamedResult* PostgreSQLConnection::QueryNamed(char const* sql)
+std::unique_ptr<QueryNamedResult> PostgreSQLConnection::QueryNamed(char const* sql)
 {
     if (!mPGconn)
         return nullptr;
@@ -150,10 +150,10 @@ QueryNamedResult* PostgreSQLConnection::QueryNamed(char const* sql)
     for (uint32 i = 0; i < fieldCount; i++)
         names[i] = PQfname(result, i);
 
-    QueryResultPostgre * queryResult = new QueryResultPostgre(result, rowCount, fieldCount);
+    std::unique_ptr<QueryResultPostgre> queryResult(new QueryResultPostgre(result, rowCount, fieldCount));
 
     queryResult->NextRow();
-    return new QueryNamedResult(queryResult,names);
+    return std::make_unique<QueryNamedResult>(std::move(queryResult), names);
 }
 
 bool PostgreSQLConnection::Execute(char const* sql)

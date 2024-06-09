@@ -292,7 +292,7 @@ void Guild::SetGINFO(std::string ginfo)
     CharacterDatabase.PExecute("UPDATE `guild` SET `info`='%s' WHERE `guild_id`='%u'", ginfo.c_str(), m_Id);
 }
 
-bool Guild::LoadGuildFromDB(QueryResult* guildDataResult)
+bool Guild::LoadGuildFromDB(const std::unique_ptr<QueryResult>& guildDataResult)
 {
     if (!guildDataResult)
         return false;
@@ -347,7 +347,7 @@ bool Guild::CheckGuildStructure()
     return true;
 }
 
-bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
+bool Guild::LoadRanksFromDB(const std::unique_ptr<QueryResult>& guildRanksResult)
 {
     if (!guildRanksResult)
     {
@@ -424,7 +424,7 @@ bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
     return true;
 }
 
-bool Guild::LoadMembersFromDB(QueryResult* guildMembersResult)
+bool Guild::LoadMembersFromDB(const std::unique_ptr<QueryResult>& guildMembersResult)
 {
     if (!guildMembersResult)
         return false;
@@ -898,7 +898,7 @@ void Guild::DisplayGuildEventLog(WorldSession* session)
 void Guild::LoadGuildEventLogFromDB()
 {
     //                                                      0           1             2               3               4           5
-    QueryResult* result = CharacterDatabase.PQuery("SELECT `log_guid`, `event_type`, `player_guid1`, `player_guid2`, `new_rank`, `timestamp` FROM `guild_eventlog` WHERE `guild_id`=%u ORDER BY `timestamp` DESC,`log_guid` DESC LIMIT %u", m_Id, GUILD_EVENTLOG_MAX_RECORDS);
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `log_guid`, `event_type`, `player_guid1`, `player_guid2`, `new_rank`, `timestamp` FROM `guild_eventlog` WHERE `guild_id`=%u ORDER BY `timestamp` DESC,`log_guid` DESC LIMIT %u", m_Id, GUILD_EVENTLOG_MAX_RECORDS);
     if (!result)
         return;
     bool isNextLogGuidSet = false;
@@ -929,7 +929,6 @@ void Guild::LoadGuildEventLogFromDB()
 
     }
     while (result->NextRow());
-    delete result;
 }
 
 // Add entry to guild eventlog

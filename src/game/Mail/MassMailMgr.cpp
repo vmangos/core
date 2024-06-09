@@ -58,7 +58,7 @@ void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender const& sender
 
 struct MassMailerQueryHandler
 {
-    void HandleQueryCallback(QueryResult* result, MailDraft* mailProto, MailSender sender)
+    void HandleQueryCallback(std::unique_ptr<QueryResult> result, MailDraft* mailProto, MailSender sender)
     {
         if (!result)
             return;
@@ -69,10 +69,8 @@ struct MassMailerQueryHandler
         {
             Field* fields = result->Fetch();
             recievers.insert(fields[0].GetUInt32());
-
         }
         while (result->NextRow());
-        delete result;
     }
 } massMailerQueryHandler;
 
