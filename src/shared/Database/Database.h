@@ -49,15 +49,15 @@ class SqlConnection
         virtual ~SqlConnection() = default;
 
         //method for initializing DB connection
-        bool Initialize(char const* infoString);
+        bool Initialize(std::string const& infoString);
         virtual bool OpenConnection(bool reconnect) = 0;
 
         //public methods for making queries
-        virtual std::unique_ptr<QueryResult> Query(char const* sql) = 0;
-        virtual std::unique_ptr<QueryNamedResult> QueryNamed(char const* sql) = 0;
+        virtual std::unique_ptr<QueryResult> Query(std::string const& sql) = 0;
+        virtual std::unique_ptr<QueryNamedResult> QueryNamed(std::string const& sql) = 0;
 
         //public methods for making requests
-        virtual bool Execute(char const* sql) = 0;
+        virtual bool Execute(std::string const& sql) = 0;
 
         //escape string generation
         virtual unsigned long escape_string(char* to, char const* from, unsigned long length) { strncpy(to,from,length); return length; }
@@ -128,13 +128,13 @@ class Database
         virtual void HaltDelayThread();
 
         // Synchronous DB queries
-        inline std::unique_ptr<QueryResult> Query(char const* sql)
+        inline std::unique_ptr<QueryResult> Query(std::string const& sql)
         {
             SqlConnection::Lock guard(getQueryConnection());
             return guard->Query(sql);
         }
 
-        inline std::unique_ptr<QueryNamedResult> QueryNamed(char const* sql)
+        inline std::unique_ptr<QueryNamedResult> QueryNamed(std::string const& sql)
         {
             SqlConnection::Lock guard(getQueryConnection());
             return guard->QueryNamed(sql);
@@ -143,7 +143,7 @@ class Database
         std::unique_ptr<QueryResult> PQuery(char const* format,...) ATTR_PRINTF(2,3);
         std::unique_ptr<QueryNamedResult> PQueryNamed(char const* format,...) ATTR_PRINTF(2,3);
 
-        inline bool DirectExecute(char const* sql)
+        inline bool DirectExecute(std::string const& sql)
         {
             if(!m_pAsyncConn)
                 return false;

@@ -86,7 +86,7 @@ SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
     return pStmt;
 }
 
-bool SqlConnection::Initialize(char const* infoString)
+bool SqlConnection::Initialize(std::string const& infoString)
 {
     Tokens tokens = StrSplit(infoString, ";");
 
@@ -295,7 +295,7 @@ SqlConnection* Database::getQueryConnection()
 
 void Database::Ping()
 {
-    char const* sql = "SELECT 1";
+    std::string const sql = "SELECT 1";
 
     {
         SqlConnection::Lock guard(m_pAsyncConn);
