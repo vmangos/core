@@ -613,7 +613,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     target = SelectRandomUnfriendlyTarget(pVictim, radius, false, true, false);
 #endif
                     if (!target)
-                        return SPELL_AURA_PROC_FAILED;
+                        return SPELL_AURA_PROC_OK; //Burn charges when solo target
 
                     // World of Warcraft Client Patch 1.10.0 (2006-03-28)
                     // - Execute - This ability will now work with Sweeping Strikes again. If
