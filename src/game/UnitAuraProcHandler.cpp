@@ -640,13 +640,6 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                             triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                     }
-                    else if (procSpell && procSpell->Id == 1680 && stacks_left > 1) // If procced by Whirlwind
-                    {   
-                        basepoints[0] = ditheru(amount * 100 / CalcArmorReducedDamage(pVictim, 100)); 
-                        triggered_spell_id = 12723;                                                   
-                        CastSpell(pVictim, 26654, true);                                              
-                        triggeredByAura->GetHolder()->DropAuraCharge();
-                    }
                     else // Full damage on anything else
 #endif
                     {
