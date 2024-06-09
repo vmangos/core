@@ -371,7 +371,11 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
                 return SPELL_PROC_TRIGGER_OK;
         }
 #endif
-
+        //  Never proc for Rend.	
+        if (spellProto->Id == 12292) 
+        {
+            if (procSpell->SpellIconID == 245)      
+                return SPELL_PROC_TRIGGER_FAILED;
         // SHAMAN
         // Elemental Mastery
         // Do not consume aura if spell did not benefit from crit chance bonus.
