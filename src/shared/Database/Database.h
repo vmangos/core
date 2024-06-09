@@ -253,7 +253,7 @@ class Database
         void ProcessResultQueue(uint32 maxTime = 0);
 
         bool CheckRequiredMigrations(char const** migrations);
-        uint32 GetPingIntervall() { return m_pingIntervallms; }
+        uint32 GetPingIntervalMs() { return m_pingIntervalMs; }
 
         //function to ping database connections
         void Ping();
@@ -277,7 +277,7 @@ class Database
     protected:
         Database() : m_nQueryConnPoolSize(1), m_delayQueue(new SqlQueue()), m_pAsyncConn(nullptr),
                      m_pResultQueue(nullptr), m_numAsyncWorkers(0),
-                     m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_logSQL(false), m_pingIntervallms(0)
+                     m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_logSQL(false), m_pingIntervalMs(0)
         {
             m_nQueryCounter = -1;
         }
@@ -357,6 +357,6 @@ class Database
 
         bool m_logSQL;
         std::string m_logsDir;
-        uint32 m_pingIntervallms;
+        uint32 m_pingIntervalMs;
 };
 #endif

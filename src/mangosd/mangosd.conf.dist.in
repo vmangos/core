@@ -55,8 +55,9 @@ ConfVersion=2010100901
 #        Amount of async threads (with dedicated connection) which will be used for async SELECT, executes, and transactions.
 #        Default: 1 async worker
 #
-#    MaxPingTime
-#        Settings for maximum database-ping interval (minutes between pings)
+#    Database.AliveCheckInternal - in seconds
+#        The interval in seconds to check the reachability of the database
+#        Default: 600 (10 min)
 #
 #    WorldServerPort
 #        Port on which the server will listen
@@ -85,7 +86,7 @@ CharacterDatabase.WorkerThreads = 1
 LogsDatabase.Info               = "127.0.0.1;3306;mangos;mangos;logs"
 LogsDatabase.Connections        = 1
 LogsDatabase.WorkerThreads      = 1
-MaxPingTime = 30
+Database.AliveCheckInternal     = 600
 WorldServerPort = 8085
 BindIP = "0.0.0.0"
 

@@ -153,7 +153,7 @@ bool Database::Initialize(char const* infoString, int nConns /*= 1*/, int nWorke
             m_logsDir.append("/");
     }
 
-    m_pingIntervallms = sConfig.GetIntDefault ("MaxPingTime", 30) * (MINUTE * 1000);
+    m_pingIntervalMs = sConfig.GetIntDefault("Database.AliveCheckInternal", 600) * IN_MILLISECONDS;
 
     //create DB connections
 
