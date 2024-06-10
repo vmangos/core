@@ -232,6 +232,9 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank, uint32 petitio
         PlayerCacheData const* data = sObjectMgr.GetPlayerDataByGUID(lowguid);
         if (!data)
             return GuildAddStatus::UNKNOWN_PLAYER;
+        if (data->sName.empty())
+            return GuildAddStatus::UNKNOWN_PLAYER;
+
         newmember.Name   = data->sName;
         newmember.Level  = data->uiLevel;
         newmember.Class  = data->uiClass;
@@ -239,7 +242,7 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank, uint32 petitio
         newmember.accountId = data->uiAccount;
 
         if (newmember.Level < 1 || newmember.Level > PLAYER_STRONG_MAX_LEVEL ||
-                !((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE))
+          !((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE))
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters` table, cannot add him to guild.", plGuid.GetString().c_str());
             return GuildAddStatus::PLAYER_DATA_ERROR;
@@ -483,6 +486,12 @@ bool Guild::LoadMembersFromDB(const std::unique_ptr<QueryResult>& guildMembersRe
         if (!((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE)) // can be at broken `class` field
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters`.`class`, deleting him from guild!", newmember.guid.GetString().c_str());
+            CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guid` = '%u'", lowguid);
+            continue;
+        }
+        if (newmember.Name.empty()) // no deleted characters
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has no name, deleting him from guild!", newmember.guid.GetString().c_str());
             CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guid` = '%u'", lowguid);
             continue;
         }
