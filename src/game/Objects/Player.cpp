@@ -687,8 +687,7 @@ Player::Player(WorldSession* session) : Unit(),
     m_summon_y = 0.0f;
     m_summon_z = 0.0f;
 
-    m_lastFallTime = 0;
-    m_lastFallZ = 0;
+    m_fallStartZ = 0.0f;
 
     m_currentCinematicEntry = 0;
 
@@ -2345,7 +2344,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         // this will be used instead of the current location in SaveToDB
         m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
         DisableSpline();
-        SetFallInformation(0, z);
+        SetFallInformation(0);
 
         // code for finish transfer called in WorldSession::HandleMovementOpcodes()
         // at client packet MSG_MOVE_TELEPORT_ACK
@@ -2498,7 +2497,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
 
         m_teleport_dest = WorldLocation(mapid, data->x, data->y, data->z, data->orientation);
         DisableSpline();
-        SetFallInformation(0, data->z);
+        SetFallInformation(0);
         ScheduleDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
 
         // Clear hostile refs so that we have no cross-map (and thread) references being maintained
@@ -15476,7 +15475,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     }
 
     // has to be called after last Relocate() in Player::LoadFromDB
-    SetFallInformation(0, GetPositionZ());
+    SetFallInformation(0);
 
     _LoadSpellCooldowns(std::move(holder->TakeResult(PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS)));
 
@@ -20993,47 +20992,6 @@ InventoryResult Player::CanEquipUniqueItem(ItemPrototype const* itemProto, uint8
     return EQUIP_ERR_OK;
 }
 
-void Player::HandleFall(MovementInfo const& movementInfo)
-{
-    // calculate total z distance of the fall
-    float z_diff = m_lastFallZ - movementInfo.GetPos().z;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "zDiff = %f", z_diff);
-
-    //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
-    // 14.57 can be calculated by resolving damageperc formula below to 0
-    if (z_diff >= 14.57f && !IsDead() && !IsGameMaster() &&
-        !HasAuraType(SPELL_AURA_HOVER) && !HasAuraType(SPELL_AURA_FEATHER_FALL))
-    {
-        //Safe fall, fall height reduction
-        int32 safe_fall = GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
-
-        float damageperc = 0.018f * (z_diff - safe_fall) - 0.2426f;
-
-        if (damageperc > 0)
-        {
-            float TakenTotalMod = 1.0f;
-            TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, SPELL_SCHOOL_MASK_NORMAL);
-
-            uint32 damage = (uint32)(damageperc * GetMaxHealth() * sWorld.getConfig(CONFIG_FLOAT_RATE_DAMAGE_FALL) * TakenTotalMod);
-
-            float height = movementInfo.GetPos().z;
-            UpdateAllowedPositionZ(movementInfo.GetPos().x, movementInfo.GetPos().y, height);
-
-            if (damage > 0)
-            {
-                //Prevent fall damage from being more than the player maximum health
-                if (damage > GetMaxHealth())
-                    damage = GetMaxHealth();
-
-                EnvironmentalDamage(DAMAGE_FALL, damage);
-            }
-
-            //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d" , movementInfo.GetPos().z, height, GetPositionZ(), movementInfo.GetFallTime(), height, damage, safe_fall);
-        }
-    }
-}
-
 bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
 {
     uint32 CurTalentPoints = GetFreeTalentPoints();
@@ -21151,8 +21109,80 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
 void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode)
 {
-    if (m_lastFallTime >= minfo.GetFallTime() || m_lastFallZ <= minfo.GetPos().z || opcode == MSG_MOVE_FALL_LAND)
-        SetFallInformation(minfo.GetFallTime(), minfo.GetPos().z);
+    if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM ||
+        minfo.HasMovementFlag(MOVEFLAG_HOVER | MOVEFLAG_SAFE_FALL) ||
+       !minfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+    {
+        if (IsFalling())
+            SetFallInformation(0);
+        return;
+    }
+
+    float currentZ = minfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ? minfo.t_pos.z : minfo.pos.z;
+
+    if (!m_fallStartZ || m_fallStartZ < currentZ || m_movementInfo.t_guid != minfo.t_guid)
+        SetFallInformation(currentZ);
+}
+
+void Player::HandleFall(MovementInfo const& movementInfo)
+{
+    if (!m_fallStartZ)
+        return;
+
+    if (!m_movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR))
+        return;
+
+    if (m_movementInfo.t_guid != movementInfo.t_guid)
+        return;
+
+    if (m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) != movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+        return;
+
+    // the normal fall time from height of 14.57 yards
+    if (movementInfo.fallTime < 1229)
+        return;
+
+    Position const& currentPos = (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ? movementInfo.GetTransportPos() : movementInfo.GetPos());
+
+    if (m_fallStartZ < currentPos.z)
+        return;
+
+    // calculate total z distance of the fall
+    float z_diff = m_fallStartZ - currentPos.z;
+    //printf("zDiff = %f\n", z_diff);
+
+    // Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
+    // 14.57 can be calculated by resolving dmgPct formula below to 0
+    if (z_diff >= 14.57f && !IsDead() && !IsGameMaster() &&
+        !HasAuraType(SPELL_AURA_HOVER) && !HasAuraType(SPELL_AURA_FEATHER_FALL))
+    {
+        // Safe fall, fall height reduction
+        int32 safeFall = GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
+
+        float dmgPct = 0.018f * (z_diff - safeFall) - 0.2426f;
+        if (dmgPct > 0)
+        {
+            float TakenTotalMod = 1.0f;
+            TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, SPELL_SCHOOL_MASK_NORMAL);
+
+            uint32 damage = (uint32)(dmgPct * GetMaxHealth() * sWorld.getConfig(CONFIG_FLOAT_RATE_DAMAGE_FALL) * TakenTotalMod);
+
+            float height = movementInfo.GetPos().z;
+            UpdateAllowedPositionZ(movementInfo.GetPos().x, movementInfo.GetPos().y, height);
+
+            if (damage > 0)
+            {
+                // Prevent fall damage from being more than the player maximum health
+                if (damage > GetMaxHealth())
+                    damage = GetMaxHealth();
+
+                EnvironmentalDamage(DAMAGE_FALL, damage);
+            }
+
+            // Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d" , movementInfo.GetPos().z, height, GetPositionZ(), movementInfo.GetFallTime(), height, damage, safeFall);
+        }
+    }
 }
 
 /**
