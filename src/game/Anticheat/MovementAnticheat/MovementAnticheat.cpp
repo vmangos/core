@@ -48,6 +48,10 @@ const char* GetMovementCheatName(CheatType flagId)
             return "NoFallTime";
         case CHEAT_TYPE_BAD_FALL_RESET:
             return "BadFallReset";
+        case CHEAT_TYPE_BAD_FALL_STOP:
+            return "BadFallStop";
+        case CHEAT_TYPE_BAD_MOVE_START:
+            return "BadMoveStart";
         case CHEAT_TYPE_TELEPORT:
             return "TeleportHack";
         case CHEAT_TYPE_TELEPORT_TRANSPORT:
@@ -242,6 +246,8 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     AddPenaltyForCheat(false, CHEAT_TYPE_FLY_HACK_SWIM, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_NO_FALL_TIME, CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_BAD_FALL_RESET, CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_BAD_FALL_STOP, CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_BAD_MOVE_START, CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_MOVE_START_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_MOVE_START_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_MOVE_START_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FAKE_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_PENALTY);
@@ -450,6 +456,8 @@ void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz
         InitNewPlayer(pPlayer);
 
     m_knockBack = true;
+    m_jumpFlagCount = 0;
+    m_jumpFlagTime = 0;
 }
 
 void MovementAnticheat::OnUnreachable(Unit* attacker)
@@ -540,10 +548,6 @@ bool ShouldRejectMovement(uint32 cheatFlags)
 
     if ((cheatFlags & (1 << CHEAT_TYPE_FLY_HACK_SWIM)) &&
         sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_REJECT))
-        return true;
-
-    if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
-        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
         return true;
 
     if ((cheatFlags & (1 << CHEAT_TYPE_TELEPORT)) &&
@@ -655,6 +659,12 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
         CheckFallReset(movementInfo))
         APPEND_CHEAT(CHEAT_TYPE_BAD_FALL_RESET);
 
+    if (CheckFallStop(movementInfo, opcode))
+        APPEND_CHEAT(CHEAT_TYPE_BAD_FALL_STOP);
+
+    if (CheckMoveStart(movementInfo, opcode))
+        APPEND_CHEAT(CHEAT_TYPE_BAD_MOVE_START);
+
     // Distance computation related. No need to do it if teleport detected.
     if (!teleportDetected)
     {
@@ -685,18 +695,6 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
             UnitMoveType moveType = GetMoveTypeForMovementInfo(GetLastMovementInfo());
             float speedRate = me->GetSpeed(moveType) / baseMoveSpeed[moveType];
             MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
-        }
-
-        if (HAS_CHEAT(CHEAT_TYPE_NO_FALL_TIME) &&
-            sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
-        {
-            // Teleport to ground height in this case.
-            float const x = GetLastMovementInfo().pos.x;
-            float const y = GetLastMovementInfo().pos.y;
-            float const z = me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + 5;
-            GetLastMovementInfo().RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
-            GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses extrapolation.
-            me->TeleportPositionRelocation(x, y, z, 0);
         }
 
         me->ResolvePendingMovementChanges(true, true);
@@ -758,7 +756,8 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
     }
 
     // This flag is only for creatures.
-    if (currentMoveFlags & MOVEFLAG_FIXED_Z)
+    if ((currentMoveFlags & MOVEFLAG_FIXED_Z) &&
+        !me->HasCheatOption(PLAYER_CHEAT_FIXED_Z))
     {
         APPEND_CHEAT(CHEAT_TYPE_FIXED_Z);
         removeMoveFlags |= MOVEFLAG_FIXED_Z;
@@ -860,54 +859,52 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
     return true;
 }
 
-#define JUMP_FLAG_THRESHOLD 5
-#define FAR_FALL_FLAG_TIME 3000u
-#define HEIGHT_LEEWAY 5.0f
-
-bool ShouldResetNoFallTimeCheck(MovementInfo const& movementInfo, uint16 opcode)
-{
-    if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR | MOVEFLAG_ROOT | MOVEFLAG_FLYING | MOVEFLAG_SWIMMING | MOVEFLAG_SAFE_FALL | MOVEFLAG_ONTRANSPORT))
-        return true;
-
-    switch (opcode)
-    {
-        case MSG_MOVE_JUMP:
-        case MSG_MOVE_FALL_LAND:
-        case MSG_MOVE_START_SWIM:
-        case CMSG_MOVE_KNOCK_BACK_ACK:
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
+#define JUMP_FLAG_THRESHOLD 3
+#define MIN_FALLING_TIME 1000u
 
 bool MovementAnticheat::CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED))
         return false;
 
-    if (ShouldResetNoFallTimeCheck(movementInfo, opcode))
+    if (opcode == CMSG_MOVE_FALL_RESET || movementInfo.HasMovementFlag(MOVEFLAG_FIXED_Z))
     {
         m_jumpFlagCount = 0;
         m_jumpFlagTime = 0;
         return false;
     }
-    
-    if (movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))
+
+    if (!GetLastMovementInfo().ctime ||
+        !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+    {
+        m_jumpFlagCount = 0;
+        m_jumpFlagTime = 0;
+    }
+
+    if (movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
     {
         m_jumpFlagCount++;
 
         if (!m_jumpFlagTime)
-            m_jumpFlagTime = movementInfo.stime;
+            m_jumpFlagTime = movementInfo.ctime;
     }
-    
-    return m_jumpFlagTime &&
-       (m_jumpFlagCount > JUMP_FLAG_THRESHOLD) &&
-       (movementInfo.stime - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
-       (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
-       (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY);
+
+    if (!movementInfo.fallTime &&
+        m_jumpFlagCount >= JUMP_FLAG_THRESHOLD &&
+       (m_jumpFlagTime + MIN_FALLING_TIME) < movementInfo.ctime)
+    {
+        m_jumpFlagCount = 0;
+        m_jumpFlagTime = 0;
+        return true;
+    }
+
+    if (!movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+    {
+        m_jumpFlagCount = 0;
+        m_jumpFlagTime = 0;
+    }
+
+    return false;
 }
 
 bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
@@ -922,6 +919,152 @@ bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
     }
     
     return movementInfo.fallTime != 0 || movementInfo.jump.zspeed != 0.0f;
+}
+
+bool MovementAnticheat::CheckFallStop(MovementInfo const& movementInfo, uint16 opcode)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_MOVE_START_ENABLED))
+        return false;
+
+    if (!GetLastMovementInfo().ctime)
+        return false;
+
+    if (IsFallEndOpcode(opcode))
+        return false;
+
+    if (movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
+        return false;
+
+    if (!movementInfo.HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR) &&
+        GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
+        return true;
+
+    return false;
+}
+
+bool MovementAnticheat::CheckMoveStart(MovementInfo const& movementInfo, uint16 opcode)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_MOVE_START_ENABLED))
+        return false;
+
+    if (!GetLastMovementInfo().ctime)
+        return false;
+
+    if (IsFallEndOpcode(opcode))
+        return false;
+
+    if (IsAnyMoveAckOpcode(opcode))
+        return false;
+
+    if (opcode == MSG_MOVE_START_FORWARD)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_FORWARD))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_FORWARD) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_FORWARD))
+            return true;
+    }
+    
+    if (opcode == MSG_MOVE_START_BACKWARD)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_BACKWARD))
+            return true;
+    }
+
+    if (opcode == MSG_MOVE_START_PITCH_DOWN)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_PITCH_DOWN))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_PITCH_DOWN) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_PITCH_DOWN))
+            return true;
+    }
+
+    if (opcode == MSG_MOVE_START_PITCH_UP)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_PITCH_UP))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_PITCH_UP) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_PITCH_UP))
+            return true;
+    }
+
+    if (opcode == MSG_MOVE_START_STRAFE_LEFT)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_LEFT))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_LEFT) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_STRAFE_LEFT))
+            return true;
+    }
+
+    if (opcode == MSG_MOVE_START_STRAFE_RIGHT)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_RIGHT))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_RIGHT) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_STRAFE_RIGHT))
+            return true;
+    }
+
+    if (opcode == MSG_MOVE_START_SWIM)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_SWIMMING))
+            return true;
+    }
+
+    if (opcode == MSG_MOVE_START_TURN_LEFT)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_TURN_LEFT))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_TURN_LEFT) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_TURN_LEFT))
+            return true;
+    }
+
+    if (opcode == MSG_MOVE_START_TURN_RIGHT)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_TURN_RIGHT))
+            return true;
+    }
+    else
+    {
+        if (movementInfo.HasMovementFlag(MOVEFLAG_TURN_RIGHT) &&
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_TURN_RIGHT))
+            return true;
+    }
+
+    return false;
 }
 
 uint32 MovementAnticheat::CheckTimeDesync(MovementInfo const& movementInfo)

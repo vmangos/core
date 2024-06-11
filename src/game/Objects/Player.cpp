@@ -3208,6 +3208,23 @@ void Player::SetCheatFly(bool on, bool notify)
     }
 }
 
+void Player::SetCheatFixedZ(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_FIXED_Z, on);
+    
+    if (on)
+        m_movementInfo.AddMovementFlag(MOVEFLAG_FIXED_Z);
+    else
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_FIXED_Z);
+
+    SendHeartBeat(true);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_FIXED_Z_ON : LANG_CHEAT_FIXED_Z_OFF);
+    }
+}
+
 void Player::SetCheatGod(bool on, bool notify)
 {
     SetInvincibilityHpThreshold(on ? 1 : 0);

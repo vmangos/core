@@ -196,6 +196,7 @@ class ChatHandler
         //Cheats
         bool HandleCheatStatusCommand(char *);
         bool HandleCheatFlyCommand(char* args);
+        bool HandleCheatFixedZCommand(char* args);
         bool HandleCheatGodCommand(char *);
         bool HandleCheatCooldownCommand(char *);
         bool HandleCheatCastTimeCommand(char *);

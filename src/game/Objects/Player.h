@@ -507,6 +507,7 @@ enum PlayerCheatOptions : uint16
     PLAYER_CHEAT_TRIGGER_PASS      = 0x100,
     PLAYER_CHEAT_IGNORE_TRIGGERS   = 0x200,
     PLAYER_CHEAT_DEBUG_TARGET_INFO = 0x400,
+    PLAYER_CHEAT_FIXED_Z           = 0x800,
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -1020,6 +1021,7 @@ class Player final: public Unit
         void SetGMVisible(bool on, bool notify = false);
         
         void SetCheatFly(bool on, bool notify = false);
+        void SetCheatFixedZ(bool on, bool notify = false);
         void SetCheatGod(bool on, bool notify = false);
         void SetCheatNoCooldown(bool on, bool notify = false);
         void SetCheatInstantCast(bool on, bool notify = false);
