@@ -97,25 +97,28 @@ enum MovementFlags
     MOVEFLAG_TURN_RIGHT         = 0x00000020,
     MOVEFLAG_PITCH_UP           = 0x00000040,
     MOVEFLAG_PITCH_DOWN         = 0x00000080,
-    MOVEFLAG_WALK_MODE          = 0x00000100,               // Walking
-    //MOVEFLAG_ONTRANSPORT        = 0x00000200, // ??
-    MOVEFLAG_LEVITATING         = 0x00000400, // ?? Semble ne pas fonctionner
-    MOVEFLAG_FIXED_Z            = 0x00000800, // Hauteur fixee. Sauter => Defiler sur toute la map
+    MOVEFLAG_WALK_MODE          = 0x00000100, // Walking
+    MOVEFLAG_UNUSED1            = 0x00000200, // ??
+    MOVEFLAG_LEVITATING         = 0x00000400, // ?? Seems not to work
+    MOVEFLAG_FIXED_Z            = 0x00000800, // Fixed height. Jump => Glide across the entire map
     MOVEFLAG_ROOT               = 0x00001000, // Fix Nostalrius
     MOVEFLAG_JUMPING            = 0x00002000,
     MOVEFLAG_FALLINGFAR         = 0x00004000,
-    // Fin TC
+    MOVEFLAG_PENDING_STOP       = 0x00008000, // Only used in older client versions
+    MOVEFLAG_PENDING_UNSTRAFE   = 0x00010000, // Only used in older client versions
+    MOVEFLAG_PENDING_FORWARD    = 0x00020000, // Only used in older client versions
+    MOVEFLAG_PENDING_BACKWARD   = 0x00040000, // Only used in older client versions
+    MOVEFLAG_PENDING_STR_LEFT   = 0x00080000, // Only used in older client versions
+    MOVEFLAG_PENDING_STR_RGHT   = 0x00100000, // Only used in older client versions
     MOVEFLAG_SWIMMING           = 0x00200000, // Ok
     MOVEFLAG_SPLINE_ENABLED     = 0x00400000, // Ok
-    // 0x00800000 = 'MOVEMENTFLAG_DESCENDING' pour TrinityCore
-    MOVEFLAG_CAN_FLY            = 0x00800000,               // [-ZERO] is it really need and correct value
-    MOVEFLAG_FLYING             = 0x01000000,               // [-ZERO] is it really need and correct value
-
-    MOVEFLAG_ONTRANSPORT        = 0x02000000,               // Used for flying on some creatures
-    MOVEFLAG_SPLINE_ELEVATION   = 0x04000000,               // used for flight paths
-
-    MOVEFLAG_WATERWALKING       = 0x10000000,               // prevent unit from falling through water
-    MOVEFLAG_SAFE_FALL          = 0x20000000,               // active rogue safe fall spell (passive)
+    MOVEFLAG_MOVED              = 0x00800000, // Only used in older client versions
+    MOVEFLAG_FLYING             = 0x01000000, // [-ZERO] is it really need and correct value
+    MOVEFLAG_ONTRANSPORT        = 0x02000000, // Used for flying on some creatures
+    MOVEFLAG_SPLINE_ELEVATION   = 0x04000000, // Used for flight paths
+    MOVEFLAG_UNUSED8            = 0x08000000,
+    MOVEFLAG_WATERWALKING       = 0x10000000, // Prevent unit from falling through water
+    MOVEFLAG_SAFE_FALL          = 0x20000000, // Active rogue safe fall spell (passive)
     MOVEFLAG_HOVER              = 0x40000000,
     MOVEFLAG_INTERNAL           = 0x80000000,
 
@@ -155,6 +158,8 @@ static char const* MoveFlagToString(uint32 flag)
             return "Pitch Down";
         case MOVEFLAG_WALK_MODE:
             return "Walk Mode";
+        case MOVEFLAG_UNUSED1:
+            return "Unused1";
         case MOVEFLAG_LEVITATING:
             return "Levitating";
         case MOVEFLAG_FIXED_Z:
@@ -165,18 +170,32 @@ static char const* MoveFlagToString(uint32 flag)
             return "Jumping";
         case MOVEFLAG_FALLINGFAR:
             return "Falling Far";
+        case MOVEFLAG_PENDING_STOP:
+            return "Pending Stop";
+        case MOVEFLAG_PENDING_UNSTRAFE:
+            return "Pending Unstrafe";
+        case MOVEFLAG_PENDING_FORWARD:
+            return "Pending Forward";
+        case MOVEFLAG_PENDING_BACKWARD:
+            return "Pending Backward";
+        case MOVEFLAG_PENDING_STR_LEFT:
+            return "Pending Strafe Left";
+        case MOVEFLAG_PENDING_STR_RGHT:
+            return "Pending Strafe Right";
         case MOVEFLAG_SWIMMING:
             return "Swimming";
         case MOVEFLAG_SPLINE_ENABLED:
             return "Spline Enabled";
-        case MOVEFLAG_CAN_FLY:
-            return "Can Fly";
+        case MOVEFLAG_MOVED:
+            return "Moved";
         case MOVEFLAG_FLYING:
             return "Flying";
         case MOVEFLAG_ONTRANSPORT:
             return "On Transport";
         case MOVEFLAG_SPLINE_ELEVATION:
             return "Spline Elevation";
+        case MOVEFLAG_UNUSED8:
+            return "Unused8";
         case MOVEFLAG_WATERWALKING:
             return "Water Walking";
         case MOVEFLAG_SAFE_FALL:

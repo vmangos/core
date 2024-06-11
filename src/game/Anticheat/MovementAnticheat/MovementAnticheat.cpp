@@ -912,6 +912,10 @@ bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED))
         return false;
 
+    // older clients spam fall reset opcode with fixed z flag
+    if (movementInfo.HasMovementFlag(MOVEFLAG_FIXED_Z))
+        return false;
+
     if (GetLastMovementInfo().ctime)
     {
         if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
@@ -930,6 +934,9 @@ bool MovementAnticheat::CheckFallStop(MovementInfo const& movementInfo, uint16 o
         return false;
 
     if (IsFallEndOpcode(opcode))
+        return false;
+
+    if (opcode == CMSG_FORCE_MOVE_ROOT_ACK)
         return false;
 
     if (movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
@@ -1115,7 +1122,7 @@ bool MovementAnticheat::CheckMultiJump(uint16 opcode)
     return false;
 }
 
-#define NO_WALL_CLIMB_CHECK_MOVE_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT | MOVEFLAG_SPLINE_ELEVATION)
+#define NO_WALL_CLIMB_CHECK_MOVE_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT | MOVEFLAG_SPLINE_ELEVATION)
 #define NO_WALL_CLIMB_CHECK_UNIT_FLAGS (UNIT_FLAG_UNK_0 | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED)
 
 bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const
