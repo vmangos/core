@@ -49,15 +49,15 @@ class SqlConnection
         virtual ~SqlConnection() = default;
 
         //method for initializing DB connection
-        bool Initialize(char const* infoString);
+        bool Initialize(std::string const& infoString);
         virtual bool OpenConnection(bool reconnect) = 0;
 
         //public methods for making queries
-        virtual std::unique_ptr<QueryResult> Query(char const* sql) = 0;
-        virtual std::unique_ptr<QueryNamedResult> QueryNamed(char const* sql) = 0;
+        virtual std::unique_ptr<QueryResult> Query(std::string const& sql) = 0;
+        virtual std::unique_ptr<QueryNamedResult> QueryNamed(std::string const& sql) = 0;
 
         //public methods for making requests
-        virtual bool Execute(char const* sql) = 0;
+        virtual bool Execute(std::string const& sql) = 0;
 
         //escape string generation
         virtual unsigned long escape_string(char* to, char const* from, unsigned long length) { strncpy(to,from,length); return length; }
@@ -128,13 +128,13 @@ class Database
         virtual void HaltDelayThread();
 
         // Synchronous DB queries
-        inline std::unique_ptr<QueryResult> Query(char const* sql)
+        inline std::unique_ptr<QueryResult> Query(std::string const& sql)
         {
             SqlConnection::Lock guard(getQueryConnection());
             return guard->Query(sql);
         }
 
-        inline std::unique_ptr<QueryNamedResult> QueryNamed(char const* sql)
+        inline std::unique_ptr<QueryNamedResult> QueryNamed(std::string const& sql)
         {
             SqlConnection::Lock guard(getQueryConnection());
             return guard->QueryNamed(sql);
@@ -143,7 +143,7 @@ class Database
         std::unique_ptr<QueryResult> PQuery(char const* format,...) ATTR_PRINTF(2,3);
         std::unique_ptr<QueryNamedResult> PQueryNamed(char const* format,...) ATTR_PRINTF(2,3);
 
-        inline bool DirectExecute(char const* sql)
+        inline bool DirectExecute(std::string const& sql)
         {
             if(!m_pAsyncConn)
                 return false;
@@ -253,7 +253,7 @@ class Database
         void ProcessResultQueue(uint32 maxTime = 0);
 
         bool CheckRequiredMigrations(char const** migrations);
-        uint32 GetPingIntervall() { return m_pingIntervallms; }
+        uint32 GetPingIntervalMs() { return m_pingIntervalMs; }
 
         //function to ping database connections
         void Ping();
@@ -277,7 +277,7 @@ class Database
     protected:
         Database() : m_nQueryConnPoolSize(1), m_delayQueue(new SqlQueue()), m_pAsyncConn(nullptr),
                      m_pResultQueue(nullptr), m_numAsyncWorkers(0),
-                     m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_logSQL(false), m_pingIntervallms(0)
+                     m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_logSQL(false), m_pingIntervalMs(0)
         {
             m_nQueryCounter = -1;
         }
@@ -357,6 +357,6 @@ class Database
 
         bool m_logSQL;
         std::string m_logsDir;
-        uint32 m_pingIntervallms;
+        uint32 m_pingIntervalMs;
 };
 #endif

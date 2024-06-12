@@ -86,7 +86,7 @@ SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
     return pStmt;
 }
 
-bool SqlConnection::Initialize(char const* infoString)
+bool SqlConnection::Initialize(std::string const& infoString)
 {
     Tokens tokens = StrSplit(infoString, ";");
 
@@ -153,7 +153,7 @@ bool Database::Initialize(char const* infoString, int nConns /*= 1*/, int nWorke
             m_logsDir.append("/");
     }
 
-    m_pingIntervallms = sConfig.GetIntDefault ("MaxPingTime", 30) * (MINUTE * 1000);
+    m_pingIntervalMs = sConfig.GetIntDefault("Database.AliveCheckInternal", 600) * IN_MILLISECONDS;
 
     //create DB connections
 
@@ -295,7 +295,7 @@ SqlConnection* Database::getQueryConnection()
 
 void Database::Ping()
 {
-    char const* sql = "SELECT 1";
+    std::string const sql = "SELECT 1";
 
     {
         SqlConnection::Lock guard(m_pAsyncConn);
