@@ -913,6 +913,7 @@ class WorldSession
         // compressed moves packet does not exist in early clients
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         MovementData m_movementPacketCompressor;
+        std::mutex m_movementPacketCompressorMutex;
         void SendCompressedMovementPackets();
         // dynamically decide when to enable or disable compression
         uint32 m_movePacketsSentLastInterval = 0;

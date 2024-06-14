@@ -208,8 +208,13 @@ void WorldSession::SendMovementPacket(WorldPacket const* packet)
 
     if (++m_movePacketsSentThisInterval < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT) &&
         m_movePacketsSentLastInterval < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT))
+    {
         SendPacketImpl(packet);
-    else if (m_movementPacketCompressor.CanAddPacket(*packet))
+        return;
+    }
+        
+    std::lock_guard<std::mutex> guard(m_movementPacketCompressorMutex);
+    if (m_movementPacketCompressor.CanAddPacket(*packet))
         m_movementPacketCompressor.AddPacket(*packet);
     else
     {
