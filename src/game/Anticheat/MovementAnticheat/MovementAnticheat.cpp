@@ -927,7 +927,7 @@ bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
 
 bool MovementAnticheat::CheckFallStop(MovementInfo const& movementInfo, uint16 opcode)
 {
-    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_MOVE_START_ENABLED))
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_ENABLED))
         return false;
 
     if (!GetLastMovementInfo().ctime)
