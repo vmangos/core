@@ -546,6 +546,7 @@ CreatureAI* GetAI_npc_doctor(Creature* pCreature)
     return new npc_doctorAI(pCreature);
 }
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
 /*######
 ## npc_tonk_mine
 ######*/
@@ -685,6 +686,7 @@ CreatureAI* GetAI_npc_steam_tonk(Creature* pCreature)
 {
     return new npc_steam_tonkAI(pCreature);
 }
+#endif
 
 /*
  * Rat of the depths
@@ -1130,6 +1132,7 @@ CreatureAI* GetAI_npc_the_cleaner(Creature* pCreature)
     return new npc_the_cleanerAI(pCreature);
 }
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
 /*
  * Fireworks
  */
@@ -1350,6 +1353,7 @@ CreatureAI* GetAI_npc_pats_firework_guy(Creature* creature)
 {
     return new npc_pats_firework_guyAI(creature);
 }
+#endif
 
 /*
  * Summon possessed mobs
@@ -1387,6 +1391,7 @@ CreatureAI* GetAI_npc_summon_possessed(Creature* pCreature)
     return new npc_summon_possessedAI(pCreature);
 }
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_7_1
 /*
  * Riggle Bassbait (Stranglethorn Vale Fishing Extravaganza)
  */
@@ -1491,6 +1496,7 @@ bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, Que
 
     return true;
 }
+#endif
 
 /*
  * Target Dummy
@@ -2091,6 +2097,7 @@ CreatureAI* GetAI_npc_explosive_sheep(Creature* pCreature)
     return new npc_explosive_sheepAI(pCreature);
 }
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
 enum
 {
     EVENT_LOVE_IS_IN_THE_AIR                                    = 8,
@@ -2317,6 +2324,7 @@ bool QuestRewarded_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature, Que
 
     return true;
 }
+#endif
 
 enum
 {
@@ -2432,6 +2440,7 @@ void AddSC_npcs_special()
     newscript->pQuestAcceptNPC = &QuestAccept_npc_doctor;
     newscript->RegisterSelf();
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     newscript = new Script;
     newscript->Name = "npc_tonk_mine";
     newscript->GetAI = &GetAI_npc_tonk_mine;
@@ -2446,6 +2455,7 @@ void AddSC_npcs_special()
     newscript->Name = "npc_steam_tonk";
     newscript->GetAI = &GetAI_npc_steam_tonk;
     newscript->RegisterSelf();
+#endif
 
     newscript = new Script;
     newscript->Name = "rat_des_profondeurs";
@@ -2482,10 +2492,12 @@ void AddSC_npcs_special()
     newscript->GetAI = &GetAI_npc_the_cleaner;
     newscript->RegisterSelf();
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     newscript = new Script;
     newscript->Name = "npc_pats_firework_guy";
     newscript->GetAI = &GetAI_npc_pats_firework_guy;
     newscript->RegisterSelf();
+#endif
     /*
     newscript = new Script;
     newscript->Name = "npc_firestarter_regular";
@@ -2498,11 +2510,13 @@ void AddSC_npcs_special()
     newscript->GetAI = &GetAI_npc_summon_possessed;
     newscript->RegisterSelf();
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_7_1
     newscript = new Script;
     newscript->Name = "npc_riggle_bassbait";
     newscript->GetAI = &GetAI_npc_riggle_bassbait;
     newscript->pQuestRewardedNPC = &QuestRewarded_npc_riggle_bassbait;
     newscript->RegisterSelf();
+#endif
 
     newscript = new Script;
     newscript->Name = "npc_target_dummy";
@@ -2534,12 +2548,14 @@ void AddSC_npcs_special()
     newscript->GetAI = &GetAI_npc_explosive_sheep;
     newscript->RegisterSelf();
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     newscript = new Script;
     newscript->Name = "npc_kwee_peddlefeet";
     newscript->GetAI = &GetAI_npc_kwee_peddlefeet;
     newscript->pGossipHello = &GossipHello_npc_kwee_peddlefeet;
     newscript->pQuestRewardedNPC = &QuestRewarded_npc_kwee_peddlefeet;
     newscript->RegisterSelf();
+#endif
 
     newscript = new Script;
     newscript->Name = "npc_oozeling_jubjub";

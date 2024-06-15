@@ -32,12 +32,16 @@ void AddSC_npc_king_gordok();
 
 //world
 void AddSC_areatrigger_scripts();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_8_4
 void AddSC_dragons_of_nightmare();
+#endif
 void AddSC_go_scripts();
 void AddSC_event_fireworks();
 void AddSC_npcs_special();
 void AddSC_Totems();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
 void AddSC_scourge_invasion();
+#endif
 
 //eastern kingdoms
 void AddSC_instance_blackrock_spire();
@@ -59,6 +63,7 @@ void AddSC_boss_overlordwyrmthalak();
 void AddSC_boss_shadowvosh();
 void AddSC_boss_thebeast();
 void AddSC_boss_warmastervoone();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
 void AddSC_boss_razorgore();                         //blackwing_lair
 void AddSC_boss_vael();
 void AddSC_boss_broodlord();
@@ -69,6 +74,7 @@ void AddSC_boss_chromaggus();
 void AddSC_boss_nefarian();
 void AddSC_boss_victor_nefarius();
 void AddSC_instance_blackwing_lair();
+#endif
 
 void AddSC_deadmines();                              //deadmines
 void AddSC_instance_deadmines();
@@ -90,6 +96,7 @@ void AddSC_boss_majordomo();
 void AddSC_boss_ragnaros();
 void AddSC_instance_molten_core();
 void AddSC_molten_core();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
 void AddSC_boss_anubrekhan();                        //naxxramas
 void AddSC_boss_four_horsemen();
 void AddSC_boss_faerlina();
@@ -106,6 +113,7 @@ void AddSC_boss_thaddius();
 void AddSC_boss_razuvious();
 void AddSC_boss_sapphiron();
 void AddSC_instance_naxxramas();
+#endif
 void AddSC_boss_arcanist_doan();                     //scarlet_monastery
 //void AddSC_boss_azshir_the_sleepless();
 void AddSC_boss_herod();
@@ -143,6 +151,7 @@ void AddSC_boss_ironaya();                           //uldaman
 void AddSC_instance_uldaman();                       //uldaman
 void AddSC_uldaman();                                //uldaman
 void AddSC_boss_archaedas();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_7_1
 void AddSC_boss_arlokk();                            //zulgurub
 void AddSC_boss_gahzranka();
 //void AddSC_boss_grilek();
@@ -152,13 +161,12 @@ void AddSC_boss_jeklik();
 void AddSC_boss_jindo();
 void AddSC_boss_mandokir();
 void AddSC_boss_marli();
-void AddSC_boss_ouro();
 void AddSC_boss_renataki();
 void AddSC_boss_venoxis();
 //void AddSC_boss_wushoolay();
 void AddSC_instance_zulgurub();
 void AddSC_zg_trash();
-void AddSC_boss_omen();
+#endif
 
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
@@ -194,6 +202,7 @@ void AddSC_razorfen_downs();
 void AddSC_razorfen_kraul();                         //razorfen_kraul
 void AddSC_instance_razorfen_kraul();
 void AddSC_instance_razorfen_downs();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
 void AddSC_boss_ayamiss();                           //ruins_of_ahnqiraj
 void AddSC_boss_buru();
 void AddSC_boss_kurinnaxx();
@@ -206,11 +215,14 @@ void AddSC_boss_viscidus();
 void AddSC_boss_fankriss();
 void AddSC_boss_huhuran();
 void AddSC_bug_trio();
+void AddSC_boss_ouro();
 void AddSC_boss_sartura();
 void AddSC_boss_skeram();
 void AddSC_boss_twinemperors();
 void AddSC_mob_anubisath_sentinel();
 void AddSC_instance_temple_of_ahnqiraj();
+void AddSC_boss_omen();
+#endif
 void AddSC_instance_wailing_caverns();               //Wailing caverns
 void AddSC_wailing_caverns();
 void AddSC_zulfarrak();                              //zulfarrak
@@ -235,7 +247,9 @@ void AddSC_the_barrens();
 void AddSC_thousand_needles();
 void AddSC_ungoro_crater();
 void AddSC_winterspring();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
 void AddSC_war_effort();
+#endif
 
 void AddSC_npc_j_eevee();                            // J'Eevee, the Imp in a Jar
 
@@ -268,14 +282,20 @@ void AddScripts()
 
     //world
     AddSC_areatrigger_scripts();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_8_4
     AddSC_dragons_of_nightmare();
+#endif
     AddSC_go_scripts();
     AddSC_event_fireworks();
     AddSC_npcs_special();
     AddSC_Totems();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
     AddSC_scourge_invasion();
+#endif
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     AddSC_war_effort();
+#endif
 
     //eastern kingdoms
     AddSC_blackrock_depths();                               //blackrock_depths
@@ -298,6 +318,7 @@ void AddScripts()
     AddSC_boss_warmastervoone();
 
     AddSC_instance_blackrock_spire();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     AddSC_boss_razorgore();                                 //blackwing_lair
     AddSC_boss_vael();
     AddSC_boss_broodlord();
@@ -308,6 +329,7 @@ void AddScripts()
     AddSC_boss_nefarian();
     AddSC_boss_victor_nefarius();
     AddSC_instance_blackwing_lair();
+#endif
     AddSC_deadmines();                                      //deadmines
     AddSC_instance_deadmines();
     AddSC_boss_mr_smite();
@@ -326,6 +348,7 @@ void AddScripts()
     AddSC_boss_ragnaros();
     AddSC_instance_molten_core();
     AddSC_molten_core();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
     AddSC_boss_anubrekhan();                                //naxxramas
     AddSC_boss_four_horsemen();
     AddSC_boss_faerlina();
@@ -342,6 +365,7 @@ void AddScripts()
     AddSC_boss_razuvious();
     AddSC_boss_sapphiron();
     AddSC_instance_naxxramas();
+#endif
     AddSC_boss_arcanist_doan();                             //scarlet_monastery
     //AddSC_boss_azshir_the_sleepless();
     AddSC_boss_herod();
@@ -379,6 +403,7 @@ void AddScripts()
     AddSC_boss_ironaya();                                   //uldaman
     AddSC_uldaman();
     AddSC_boss_archaedas();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_7_1
     AddSC_boss_arlokk();                                    //zulgurub
     AddSC_boss_gahzranka();
     //AddSC_boss_grilek();
@@ -388,13 +413,12 @@ void AddScripts()
     AddSC_boss_jindo();
     AddSC_boss_mandokir();
     AddSC_boss_marli();
-    AddSC_boss_ouro();
     AddSC_boss_renataki();
     AddSC_boss_venoxis();
     //AddSC_boss_wushoolay();
     AddSC_instance_zulgurub();
     AddSC_zg_trash();
-    AddSC_boss_omen();
+#endif
 
     //AddSC_alterac_mountains();
     AddSC_arathi_highlands();
@@ -430,6 +454,7 @@ void AddScripts()
     AddSC_razorfen_kraul();                                 //razorfen_kraul
     AddSC_instance_razorfen_downs();
     AddSC_instance_razorfen_kraul();
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     AddSC_boss_ayamiss();                                   //ruins_of_ahnqiraj
     AddSC_boss_buru();
     AddSC_boss_kurinnaxx();
@@ -442,11 +467,14 @@ void AddScripts()
     AddSC_boss_fankriss();
     AddSC_boss_huhuran();
     AddSC_bug_trio();
+    AddSC_boss_ouro();
     AddSC_boss_sartura();
     AddSC_boss_skeram();
     AddSC_boss_twinemperors();
     AddSC_mob_anubisath_sentinel();
     AddSC_instance_temple_of_ahnqiraj();
+    AddSC_boss_omen();
+#endif
     AddSC_wailing_caverns();                               //Wailing caverns
     AddSC_instance_wailing_caverns();
     AddSC_zulfarrak();                                      //zulfarrak
