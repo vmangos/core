@@ -327,7 +327,6 @@ class Item : public Object
 
         void SendTimeUpdate(Player const* owner) const;
         void UpdateDuration(Player* owner, uint32 diff);
-        void UpdateDurationRaidLooting(uint32 diff); // Modification - trading in loot for two hours.
 
         // spell charges (negative means that once charges are consumed the item should be deleted)
         int32 GetSpellCharges(uint8 index/*0..5*/ = 0) const { return GetInt32Value(ITEM_FIELD_SPELL_CHARGES + index); }
