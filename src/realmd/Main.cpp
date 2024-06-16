@@ -30,6 +30,7 @@
 #include "Config/Config.h"
 #include "Log.h"
 #include "AuthSocket.h"
+#include "BufferedSocketImpl.h"
 #include "SystemConfig.h"
 #include "revision.h"
 #include "Util.h"
@@ -38,11 +39,6 @@
 #include <openssl/crypto.h>
 
 #include <ace/Get_Opt.h>
-#include <ace/Dev_Poll_Reactor.h>
-#include <ace/TP_Reactor.h>
-#include <ace/ACE.h>
-#include <ace/Acceptor.h>
-#include <ace/SOCK_Acceptor.h>
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -72,6 +68,10 @@ void HookSignals();
 bool stopEvent = false;                                     // Setting it to true stops the server
 
 DatabaseType LoginDatabase;                                 // Accessor to the realm server database
+
+// make sure template functions are instantiated
+template bool BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>::send(const char *buf, size_t len);
+template void BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>::close_connection();
 
 // Print out the usage string for this program on the console.
 void usage(const char *prog)
@@ -225,14 +225,6 @@ extern int main(int argc, char **argv)
     MailerService::set_global_mailer(&mailer);
 #endif
 
-#if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-    ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
-#else
-    ACE_Reactor::instance(new ACE_Reactor(new ACE_TP_Reactor(), true), true);
-#endif
-
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Max allowed open files is %d", ACE::max_handles());
-
     // realmd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
     if(!pidfile.empty())
@@ -290,16 +282,14 @@ extern int main(int argc, char **argv)
     LoginDatabase.CommitTransaction();
 
     // Launch the listening network socket
-    ACE_Acceptor<AuthSocket, ACE_SOCK_Acceptor> acceptor;
+    BufferedSocketAcceptor<AuthSocket> acceptor;
 
-    uint16 rmport = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
-    std::string bind_ip = sConfig.GetStringDefault("BindIP", "0.0.0.0");
+    uint16 bindPort = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
+    std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
 
-    ACE_INET_Addr bind_addr(rmport, bind_ip.c_str());
-
-    if(acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
+    if (!acceptor.StartNetwork(bindIp.c_str(), bindPort))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d", bind_ip.c_str(), rmport);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d", bindIp.c_str(), bindPort);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
@@ -363,11 +353,8 @@ extern int main(int argc, char **argv)
     // Wait for termination signal
     while (!stopEvent)
     {
-        // dont move this outside the loop, the reactor will modify it
-        ACE_Time_Value interval(0, 100000);
-
-        if (ACE_Reactor::instance()->run_reactor_event_loop(interval) == -1)
-            break;
+        acceptor.AcceptConnections();
+        acceptor.ReceiveData();
 
         if( (++loopCounter) == numLoops )
         {
@@ -375,6 +362,9 @@ extern int main(int argc, char **argv)
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Ping MySQL to keep connection alive");
             LoginDatabase.Ping();
         }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
 #ifdef WIN32
         if (m_ServiceStatus == 0) stopEvent = true;
         while (m_ServiceStatus == 2) Sleep(1000);

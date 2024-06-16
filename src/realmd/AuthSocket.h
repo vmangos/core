@@ -52,7 +52,7 @@ enum LockFlag
 };
 
 // Handle login commands
-class AuthSocket: public BufferedSocket
+class AuthSocket: public BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>
 {
     public:
         const static int s_BYTE_SIZE = 32;
@@ -60,8 +60,8 @@ class AuthSocket: public BufferedSocket
         AuthSocket() = default;
         ~AuthSocket();
 
-        void OnAccept();
-        void OnRead();
+        void OnAccept() final;
+        void OnRead() final;
         void SendProof(Sha1Hash sha);
         void LoadRealmlist(ByteBuffer &pkt);
         bool VerifyPinData(uint32 pin, const PINData& clientData);
@@ -138,5 +138,6 @@ class AuthSocket: public BufferedSocket
 
         void InitPatch();
 };
+
 #endif
 // @}

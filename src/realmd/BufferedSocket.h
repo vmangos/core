@@ -26,58 +26,92 @@
 #ifndef _BUFFEREDSOCKET_H_
 #define _BUFFEREDSOCKET_H_
 
-#include <ace/Basic_Types.h>
-#include <ace/Synch_Traits.h>
-#include <ace/Svc_Handler.h>
-#include <ace/SOCK_Stream.h>
-#include <ace/Message_Block.h>
-#include <ace/Basic_Types.h>
-
+#include "Common.h"
 #include <string>
 
-class BufferedSocket: public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
+#define BUFFERED_SOCKET_BUFFER_SIZE 256
+
+template <typename DerivedType, class Acceptor>
+struct BufferedSocket
 {
-    protected:
-        typedef ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH> Base;
+    virtual void OnRead(void) { }
+    virtual void OnAccept(void) { }
+    virtual void OnClose(void) { }
 
-        virtual void OnRead(void) { }
-        virtual void OnAccept(void) { }
-        virtual void OnClose(void) { }
+    std::string const& get_remote_address() const
+    {
+        return remoteAddress;
+    }
+    size_t recv_len() const
+    {
+        return recvPosition;
+    }
+    bool recv_soft(char* buf, size_t len)
+    {
+        if (len > recvPosition)
+            return false;
 
-    public:
-        BufferedSocket(void);
-        virtual ~BufferedSocket(void);
+        memcpy(buf, recvBuffer, len);
+        return true;
+    }
+    bool recv(char* buf, size_t len)
+    {
+        if (len > recvPosition)
+            return false;
 
-        size_t recv_len(void) const;
-        bool recv_soft(char *buf, size_t len);
-        bool recv(char *buf, size_t len);
-        void recv_skip(size_t len);
+        memcpy(buf, recvBuffer, len);
+        memcpy(recvBuffer, recvBuffer + len, BUFFERED_SOCKET_BUFFER_SIZE - len);
+        recvPosition -= len;
+        return true;
+    }
+    void recv_skip(size_t len)
+    {
+        if (len > recvPosition)
+            len = recvPosition;
 
-        bool send(const char *buf, size_t len);
+        if (!len)
+            return;
 
-        const std::string& get_remote_address(void) const;
+        memcpy(recvBuffer, recvBuffer + len, BUFFERED_SOCKET_BUFFER_SIZE - len);
+        recvPosition -= len;
+    }
+    bool send(const char *buf, size_t len);
+    void close_connection();
 
-        virtual int open(void *) override;
+    int         index = 0;
+    bool		connected = false;
+    SOCKADDR_IN	address;
+    SOCKET		socket = INVALID_SOCKET;
+    fd_set		socketData;
+    int			dataLength = 0;
+    char        recvBuffer[BUFFERED_SOCKET_BUFFER_SIZE] = {};
+    int         recvPosition = 0;
+    std::string remoteAddress;
+    Acceptor* acceptor = nullptr;
+};
 
-        void close_connection(void);
+#define BUFFERED_SOCKET_ACCEPTOR_MAX_CLIENTS 1024
 
-        virtual int handle_input(ACE_HANDLE = ACE_INVALID_HANDLE) override;
-        virtual int handle_output(ACE_HANDLE = ACE_INVALID_HANDLE) override;
+template<class SocketType>
+class BufferedSocketAcceptor
+{
+public:
+    bool AcceptClient(SocketType* pClient);
+    void AcceptConnections();
+    bool DisconnectClient(SocketType* pClient);
+    void StopNetwork();
+    int ReceiveClient(SocketType* pClient, char * buffer, int size);
+    void ReceiveData();
+    bool SendData(SocketType* pClient, char const* buffer, int size);
+    bool StartNetwork(char const* bindIp, uint16 port);
+    int GetConnectionsCount() const { return m_connectionsCount; }
 
-        virtual int handle_close(ACE_HANDLE = ACE_INVALID_HANDLE,
-                ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK) override;
-        virtual int handle_timeout(ACE_Time_Value const& current_time,
-            void const* act = 0) override;
-
-    private:
-        ssize_t noblk_send(ACE_Message_Block &message_block);
-
-    private:
-        ACE_Message_Block input_buffer_;
-
-    protected:
-        std::string remote_address_;
-
+private:
+    SOCKADDR_IN	   m_serverAddress;
+    SOCKADDR	   m_serverSocketAddress;
+    SOCKET		   m_serverSocket = INVALID_SOCKET;
+    std::unique_ptr<SocketType> m_clients[BUFFERED_SOCKET_ACCEPTOR_MAX_CLIENTS];
+    int			   m_connectionsCount = 0;
 };
 
 #endif /* _BUFFEREDSOCKET_H_ */

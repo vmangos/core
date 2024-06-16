@@ -186,7 +186,7 @@ std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B,
 // Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
 {
-    if(m_patch != ACE_INVALID_HANDLE)
+    if (m_patch != ACE_INVALID_HANDLE)
         ACE_OS::close(m_patch);
 }
 
@@ -1001,15 +1001,12 @@ bool AuthSocket::_HandleRealmList()
 
 std::string AuthSocket::GetRealmAddress(Realm const& realm) const
 {
-    ACE_INET_Addr addr;
-    if (peer().get_remote_addr(addr) == 0)
+    ACE_INET_Addr addr(address.sin_port, remoteAddress.c_str(), PF_INET);
+    ACE_INET_Addr localAddress;
+    if (localAddress.set(realm.localAddress.c_str()) == 0)
     {
-        ACE_INET_Addr localAddress;
-        if (localAddress.set(realm.localAddress.c_str()) == 0)
-        {
-            if ((addr.get_ip_address() & realm.localSubnetMask) == (localAddress.get_ip_address() & realm.localSubnetMask))
-                return realm.localAddress;
-        }
+        if ((addr.get_ip_address() & realm.localSubnetMask) == (localAddress.get_ip_address() & realm.localSubnetMask))
+            return realm.localAddress;
     }
 
     return realm.address;
@@ -1295,6 +1292,7 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
 
 void AuthSocket::InitPatch()
 {
+    /*
     PatchHandler* handler = new PatchHandler(ACE_OS::dup(get_handle()), m_patch);
 
     m_patch = ACE_INVALID_HANDLE;
@@ -1304,6 +1302,7 @@ void AuthSocket::InitPatch()
         handler->close();
         close_connection();
     }
+    */
 }
 
 void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
