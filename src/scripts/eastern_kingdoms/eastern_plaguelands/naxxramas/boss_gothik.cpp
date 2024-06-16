@@ -356,7 +356,7 @@ struct boss_gothikAI : public ScriptedAI
                         continue;
 
                     // Do not count players stacked inside the gate.
-                    if (std::abs(p->GetPositionY() - pCombatGate->GetPositionY()) < 2.0f)
+                    if (std::abs(p->GetPositionY() - pCombatGate->GetPositionY()) < 0.5f)
                         continue;
 
                     if (pCombatGate->GetPositionY() >= p->GetPositionY())
