@@ -32,8 +32,4 @@
 #include "Weather.h"
 #include "TotemAI.h"
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #endif

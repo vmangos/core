@@ -57,9 +57,6 @@
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
 
-#include <math.h>
-#include <stdarg.h>
-
 //#define DEBUG_DEBUFF_LIMIT
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =

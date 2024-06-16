@@ -64,14 +64,14 @@
 
 #include "Platform/CompilerDefs.h"
 #include "Platform/Define.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
-#include <errno.h>
-#include <signal.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <cmath>
+#include <cerrno>
+#include <csignal>
+#include <cassert>
 
 #if defined(__sun__)
 #include <ieeefp.h> // finite() on Solaris

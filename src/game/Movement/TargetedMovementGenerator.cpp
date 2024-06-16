@@ -18,7 +18,6 @@
 
 #include "ByteBuffer.h"
 #include "TargetedMovementGenerator.h"
-#include "Errors.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Player.h"
