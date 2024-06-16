@@ -379,16 +379,15 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         return;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    if (spellInfo->Attributes & SPELL_ATTR_NO_AURA_CANCEL)
+    if (spellInfo->HasAttribute(SPELL_ATTR_NO_AURA_CANCEL))
         return;
 #endif
 
-    if (spellInfo->Attributes & SPELL_ATTR_DO_NOT_DISPLAY)
+    if (spellInfo->HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY))
         return;
     
-    if (spellInfo->AttributesEx & SPELL_ATTR_EX_NO_AURA_ICON)
+    if (spellInfo->HasAttribute(SPELL_ATTR_EX_NO_AURA_ICON) && !spellInfo->activeIconID)
         return;
-    
 
     if (spellInfo->IsPassiveSpell())
         return;
