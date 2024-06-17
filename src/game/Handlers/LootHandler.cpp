@@ -145,15 +145,28 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 
     if (!item->AllowedForPlayer(player, loot->GetLootTarget()))
     {
-        player->SendLootRelease(lguid);
+        player->SendLootError(lguid, LOOT_ERROR_DIDNT_KILL);
         return;
     }
 
     // questitems use the blocked field for other purposes
     if (!qitem && item->is_blocked)
     {
-        player->SendLootRelease(lguid);
+        player->SendLootError(lguid, LOOT_ERROR_DIDNT_KILL);
         return;
+    }
+
+    // prevent stealing items if using master loot
+    if (lguid.IsCreature() && !item->is_underthreshold)
+    {
+        if (Group* pGroup = player->GetGroup())
+        {
+            if (pGroup->GetLootMethod() == MASTER_LOOT)
+            {
+                player->SendLootError(lguid, LOOT_ERROR_DIDNT_KILL);
+                return;
+            }
+        }
     }
 
     if (pItem)
