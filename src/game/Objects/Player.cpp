@@ -68,7 +68,6 @@
 #include "GMTicketMgr.h"
 #include "MasterPlayer.h"
 #include "MovementPacketSender.h"
-#include "Config/Config.h"
 #include "ZoneScript.h"
 #include "ZoneScriptMgr.h"
 #include "PlayerBotMgr.h"

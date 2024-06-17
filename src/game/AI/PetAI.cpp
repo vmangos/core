@@ -20,7 +20,6 @@
  */
 
 #include "PetAI.h"
-#include "Errors.h"
 #include "Pet.h"
 #include "Player.h"
 #include "Spell.h"

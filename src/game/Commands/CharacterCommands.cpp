@@ -28,7 +28,6 @@
 #include "Language.h"
 #include "AccountMgr.h"
 #include "ObjectMgr.h"
-#include "SystemConfig.h"
 #include "Util.h"
 #include "AsyncCommandHandlers.h"
 #include "WaypointMovementGenerator.h"
