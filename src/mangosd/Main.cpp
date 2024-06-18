@@ -47,7 +47,7 @@ char serviceDescription[] = "Massive Network Game Object Server";
  *  1 - running
  *  2 - paused
  */
-int m_ServiceStatus = -1;
+volatile int m_ServiceStatus = -1;
 #else
 #include "PosixDaemon.h"
 #endif
