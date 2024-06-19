@@ -99,6 +99,8 @@ set (shared_SRCS
     Database/SQLStorage.cpp
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
+    Network/AsyncServerListener.h
+    Network/AsyncSocket.h
 )
 
 if(USE_LIBCURL)

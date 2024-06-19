@@ -62,11 +62,16 @@ enum AccountFlags
 #pragma pack(push,1)
 #endif
 
-typedef struct AUTH_LOGON_CHALLENGE_C
+# define AUTH_LOGON_MAX_NAME 16
+
+struct sAuthLogonChallengeHeader
 {
-    uint8   cmd;
     uint8   error;
     uint16  size;
+};
+
+struct sAuthLogonChallengeBody
+{
     uint8   gamename[4];
     uint8   version1;
     uint8   version2;
@@ -77,9 +82,9 @@ typedef struct AUTH_LOGON_CHALLENGE_C
     uint8   country[4];
     uint32  timezone_bias;
     uint32  ip;
-    uint8   I_len;
-    uint8   I[1];
-} sAuthLogonChallenge_C;
+    uint8   username_len;
+    uint8   username[AUTH_LOGON_MAX_NAME + 1];
+};
 
 //typedef sAuthLogonChallenge_C sAuthReconnectChallenge_C;
 /*
@@ -169,7 +174,7 @@ typedef struct AuthHandler
 {
     eAuthCmd cmd;
     uint32 status;
-    bool (AuthSocket::*handler)(void);
+    void (AuthSocket::*asyncHandler)();
 }AuthHandler;
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
@@ -182,6 +187,12 @@ typedef struct AuthHandler
 #define AUTH_TOTAL_COMMANDS sizeof(table)/sizeof(AuthHandler)
 
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
+
+// Accept the connection and set the s random value for SRP6 // TODO where is this SRP6 done?
+AuthSocket::AuthSocket(SocketDescriptor const& socketDescriptor) : MaNGOS::AsyncSocket<AuthSocket>(socketDescriptor)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", socketDescriptor.peerAddress.c_str());
+}
 
 // Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
@@ -198,72 +209,79 @@ AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
     return it->second;
 }
 
-// Accept the connection and set the s random value for SRP6
-void AuthSocket::OnAccept()
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", get_remote_address().c_str());
-}
-
 // Read the packet from the client
-void AuthSocket::OnRead()
+void AuthSocket::ProcessIncomingData()
 {
     // benchmarking has demonstrated that this lookup method is faster than std::map
-    const static AuthHandler table[] =
+    constexpr AuthHandler table[] =
     {
         { CMD_AUTH_LOGON_CHALLENGE,     STATUS_CHALLENGE,   &AuthSocket::_HandleLogonChallenge },
-        { CMD_AUTH_LOGON_PROOF,         STATUS_LOGON_PROOF, &AuthSocket::_HandleLogonProof },
-        { CMD_AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge },
-        { CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
-        { CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
-        { CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
-        { CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
-        { CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
+        //{ CMD_AUTH_LOGON_PROOF,         STATUS_LOGON_PROOF, &AuthSocket::_HandleLogonProof },
+        //{ CMD_AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge },
+        //{ CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
+        //{ CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
+        //{ CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
+        //{ CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
+        //{ CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
     };
 
-    uint8 _cmd;
-    while (1)
+    constexpr size_t tableLength = sizeof(table) / sizeof(AuthHandler);
+
+    std::shared_ptr<eAuthCmd> cmd = std::make_shared<eAuthCmd>();
+
+    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd, table, tableLength](MaNGOS::NetworkError const& error) -> void
     {
-        if(!recv_soft((char *)&_cmd, 1))
+        if (error)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] ProcessIncomingData Read() error");
+            self->CloseSocket();
             return;
+        }
 
         size_t i;
-
         // Circle through known commands and call the correct command handler
-        for (i = 0; i < AUTH_TOTAL_COMMANDS; ++i)
+        for (i = 0; i < tableLength; ++i)
         {
-            if (table[i].cmd != _cmd)
+            if (table[i].cmd != *cmd)
                 continue;
 
             // unauthorized
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Status %u, table status %u", m_status, table[i].status);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Status %u, table status %u", self->m_status, table[i].status);
 
-            if (table[i].status != m_status)
+            if (table[i].status != self->m_status)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Received unauthorized command %u length %u", _cmd, (uint32)recv_len());
+                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Received unauthorized command %u", *cmd);
+                self->CloseSocket();
                 return;
             }
 
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Got data for cmd %u recv length %u", _cmd, (uint32)recv_len());
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Got data for cmd %u", *cmd);
 
-            if (!(*this.*table[i].handler)())
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Command handler failed for cmd %u recv length %u", _cmd, (uint32)recv_len());
-                close_connection();
-                return;
-            }
+            // this handler will async call Read and Write, and hopefully will call ProcessIncomingData or CloseSocket when done.
+            ((*self).*table[i].asyncHandler)();
 
             break;
         }
 
         // Report unknown commands in the debug log
-        if (i == AUTH_TOTAL_COMMANDS)
+        if (i == tableLength)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] got unknown packet %u", (uint32)_cmd);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] got unknown packet %u", *cmd);
+            self->CloseSocket();
             return;
         }
-    }
+
+        // if we reach here, it means that a valid opcode was found and the handler completed successfully
+        // TODO: self->m_timeoutTimer.reset();
+    });
 }
 
+void AuthSocket::Start()
+{
+    ProcessIncomingData();
+}
+
+/*
 void AuthSocket::SendProof(Sha1Hash sha)
 {
     if (m_build < 6299)  // before version 2.0.3 (exclusive)
@@ -300,248 +318,278 @@ void AuthSocket::SendProof(Sha1Hash sha)
         send((char *)&proof, sizeof(proof));
     }
 }
-
+*/
 // Logon Challenge command handler
-bool AuthSocket::_HandleLogonChallenge()
+void AuthSocket::_HandleLogonChallenge()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleLogonChallenge");
-    if (recv_len() < sizeof(sAuthLogonChallenge_C))
-        return false;
+    std::shared_ptr<sAuthLogonChallengeHeader> header = std::make_shared<sAuthLogonChallengeHeader>();
 
-    // Read the first 4 bytes (header) to get the length of the remaining of the packet
-    std::vector<uint8> buf;
-    buf.resize(4);
-
-    recv((char *)&buf[0], 4);
-
-    EndianConvert(*((uint16*)(&buf[0])));
-    uint16 remaining = ((sAuthLogonChallenge_C *)&buf[0])->size;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] got header, body is %#04x bytes", remaining);
-
-    if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (recv_len() < remaining))
-        return false;
-
-    // Session is closed unless overriden
-    m_status = STATUS_CLOSED;
-
-    // No big fear of memory outage (size is int16, i.e. < 65536)
-    buf.resize(remaining + buf.size() + 1);
-    buf[buf.size() - 1] = 0;
-    sAuthLogonChallenge_C *ch = (sAuthLogonChallenge_C*)&buf[0];
-
-    // Read the remaining of the packet
-    recv((char *)&buf[4], remaining);
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] got full packet, %#04x bytes", ch->size);
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] name(%d): '%s'", ch->I_len, ch->I);
-
-    // BigEndian code, nop in little endian case
-    // size already converted
-    EndianConvert(*((uint32*)(&ch->gamename[0])));
-    EndianConvert(ch->build);
-    EndianConvert(*((uint32*)(&ch->os[0])));
-    EndianConvert(*((uint32*)(&ch->country[0])));
-    EndianConvert(ch->timezone_bias);
-    EndianConvert(ch->ip);
-
-    ByteBuffer pkt;
-
-    m_login = (const char*)ch->I;
-    m_build = ch->build;
-
-    ch->os[3] = '\0';
-    std::reverse(ch->os, ch->os + 3);
-    memcpy(&m_os, ch->os, sizeof(m_os));
-
-    ch->platform[3] = '\0';
-    std::reverse(ch->platform, ch->platform + 3);
-    memcpy(&m_platform, ch->platform, sizeof(m_platform));
-
-    // Normalize account name
-    // utf8ToUpperOnlyLatin(m_login); -- client already send account in expected form
-
-    // Escape the user login to avoid further SQL injection
-    // Memory will be freed on AuthSocket object destruction
-    m_safelogin = m_login;
-    LoginDatabase.escape_string(m_safelogin);
-
-    pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
-    pkt << (uint8) 0x00;
-
-    // Verify that this IP is not in the ip_banned table
-    // No SQL injection possible (paste the IP address as passed by the socket)
-    std::string address = get_remote_address();
-    LoginDatabase.escape_string(address);
-    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` WHERE "
-    //    permanent                    still banned
-        "(`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP()) AND `ip` = '%s'", address.c_str());
-    if (result)
+    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](MaNGOS::NetworkError const& error) -> void
     {
-        pkt << (uint8)WOW_FAIL_DB_BUSY;
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", get_remote_address().c_str(), m_login.c_str());
-    }
-    else
-    {
-        // Get the account details from the account table
-        // No SQL injection (escaped user name)
-        //                                     0     1         2          3    4    5           6              7              8       9
-        result = LoginDatabase.PQuery("SELECT `id`, `locked`, `last_ip`, `v`, `s`, `security`, `email_verif`, `geolock_pin`, `email`, UNIX_TIMESTAMP(`joindate`) FROM `account` WHERE `username` = '%s'",m_safelogin.c_str ());
-        if (result)
+        if (error)
         {
-            Field* fields = result->Fetch();
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] HandleLogonChallenge Read() error");
+            self->CloseSocket();
+            return;
+        }
 
-            // Prevent login if the user's email address has not been verified
-            bool requireVerification = sConfig.GetBoolDefault("ReqEmailVerification", false);
-            int32 requireEmailSince = sConfig.GetIntDefault("ReqEmailSince", 0);
-            bool verified = (*result)[6].GetBool();
-            
-            // Prevent login if the user's join date is bigger than the timestamp in configuration
-            if (requireEmailSince > 0)
+        uint16* pUint16 = reinterpret_cast<uint16*>(header.get());
+        EndianConvert(*pUint16);
+        uint16 actualBodySize = header->size;
+
+        if ((actualBodySize < sizeof(sAuthLogonChallengeBody) - AUTH_LOGON_MAX_NAME))
+        { // The paket is too small and has no username???
+            return;
+        }
+
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] got header, body is %#04x bytes", actualBodySize);
+
+        // Session is closed unless overridden
+        self->m_status = STATUS_CLOSED;
+
+        // Read the remaining of the packet
+        std::shared_ptr<sAuthLogonChallengeBody> body = std::make_shared<sAuthLogonChallengeBody>();
+        self->Read((char*)body.get(), actualBodySize, [self, header, body](MaNGOS::NetworkError const& error)
+        {
+            if (error)
             {
-                uint32 t = (*result)[9].GetUInt32();
-                requireVerification = requireVerification && (t >= uint32(requireEmailSince));
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonChallenge self->Read(): ERROR");
+                self->CloseSocket();
+                return;
             }
 
-            if (requireVerification && !verified)
+            if (body->username_len > AUTH_LOGON_MAX_NAME)
+                return;
+
+            body->username[body->username_len] = '\0'; // TODO: What happens if AUTH_LOGON_MAX_NAME? Shouldn't this then be writing out of bounds by one byte?
+
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] got full packet, %#04x bytes", header->size);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] name(%d): '%s'", body->username_len, body->username);
+
+            // BigEndian code, nop in little endian case
+            // size already converted
+            EndianConvert(*((uint32*)(&body->gamename[0])));
+            EndianConvert(body->build);
+            EndianConvert(*((uint32*)(&body->platform[0])));
+            EndianConvert(*((uint32*)(&body->os[0])));
+            EndianConvert(*((uint32*)(&body->country[0])));
+            EndianConvert(body->timezone_bias);
+            EndianConvert(body->ip);
+
+            std::shared_ptr<ByteBuffer> pkt = std::make_shared<ByteBuffer>();
+
+            self->m_login = (const char*)body->username;
+            self->m_build = body->build;
+
+            // Convert uint8[4] to string, restore string order as its byte order is reversed
+            // To it for os
+            body->os[3] = '\0';
+            self->m_os = (char*)body->os;
+            std::reverse(self->m_os.begin(), self->m_os.end());
+            // To it for platform
+            body->platform[3] = '\0';
+            self->m_platform = (char*)body->platform;
+            std::reverse(self->m_platform.begin(), self->m_platform.end());
+            // Do it for locale
+            self->m_localizationName.resize(sizeof(body->country));
+            self->m_localizationName.assign(body->country, (body->country + sizeof(body->country)));
+            std::reverse(self->m_localizationName.begin(), self->m_localizationName.end());
+
+            // Normalize account name
+            // utf8ToUpperOnlyLatin(m_login); -- client already send account in expected form
+
+            // Escape the user input used in DB to avoid further SQL injection
+            // Memory will be freed on AuthSocket object destruction
+            self->m_safelogin = self->m_login;
+            LoginDatabase.escape_string(self->m_safelogin);
+            LoginDatabase.escape_string(self->m_os);
+
+            *pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
+            *pkt << (uint8) 0x00;
+
+            // Verify that this IP is not in the ip_banned table
+            // No SQL injection possible (paste the IP address as passed by the socket)
+            //                                                                                                              permanent ban          OR  still banned
+            std::unique_ptr<QueryResult> sqlIpBanResult = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` WHERE (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP()) AND `ip` = '%s'", self->get_remote_address().c_str());
+            if (sqlIpBanResult)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", m_login.c_str(), get_remote_address().c_str());
-                pkt << (uint8)WOW_FAIL_UNKNOWN_ACCOUNT;
-                send((char const*)pkt.contents(), pkt.size());
-                return true;
-            }
-
-            // If the IP is 'locked', check that the player comes indeed from the correct IP address
-            bool locked = false;
-            m_lockFlags = (LockFlag)(*result)[1].GetUInt32();
-            m_securityInfo = (*result)[5].GetCppString();
-            m_lastIP = fields[2].GetString();
-            m_geoUnlockPIN = fields[7].GetUInt32();
-            m_email = fields[8].GetCppString();
-
-            if (m_lockFlags & IP_LOCK)
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account '%s' is locked to IP - '%s'", m_login.c_str(), m_lastIP.c_str());
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Player address is '%s'", get_remote_address().c_str());
-
-                if (m_lastIP != get_remote_address())
-                {
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account IP differs");
-
-                    // account is IP locked and the player does not have 2FA enabled
-                    if (((m_lockFlags & TOTP) != TOTP && (m_lockFlags & FIXED_PIN) != FIXED_PIN))
-                        pkt << (uint8) WOW_FAIL_SUSPENDED;
-
-                    locked = true;
-                }
-                else
-                {
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account IP matches");
-                }
+                *pkt << uint8(WOW_FAIL_FAIL_NOACCESS);
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", self->get_remote_address().c_str(), self->m_login.c_str());
             }
             else
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account '%s' is not locked to ip", m_login.c_str());
-            }
-
-            std::string databaseV = fields[3].GetCppString();
-            std::string databaseS = fields[4].GetCppString();
-            bool broken = false;
-
-            if (!srp.SetVerifier(databaseV.c_str()) || !srp.SetSalt(databaseS.c_str()))
-            {
-                pkt << (uint8)WOW_FAIL_FAIL_NOACCESS;
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Broken v/s values in database for account %s!", m_login.c_str());
-                broken = true;
-            }
-
-            if ((!locked || (locked && (m_lockFlags & FIXED_PIN || m_lockFlags & TOTP))) && !broken)
-            {
-                uint32 account_id = fields[0].GetUInt32();
-                // If the account is banned, reject the logon attempt
-                std::unique_ptr<QueryResult> banResult = LoginDatabase.PQuery("SELECT `bandate`, `unbandate` FROM `account_banned` WHERE "
-                    "`id` = %u AND `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `unbandate` = `bandate`) LIMIT 1", account_id);
-                if (banResult)
+                // Get the account details from the account table
+                // No SQL injection (escaped username)
+                //                                                                            0     1         2          3    4    5           6              7              8       9
+                std::unique_ptr<QueryResult> sqlAccountResult = LoginDatabase.PQuery("SELECT `id`, `locked`, `last_ip`, `v`, `s`, `security`, `email_verif`, `geolock_pin`, `email`, UNIX_TIMESTAMP(`joindate`) FROM `account` WHERE `username` = '%s'", self->m_safelogin.c_str());
+                if (sqlAccountResult)
                 {
-                    if((*banResult)[0].GetUInt64() == (*banResult)[1].GetUInt64())
+                    Field* fields = sqlAccountResult->Fetch();
+
+                    // Prevent login if the user's email address has not been verified
+                    bool requireVerification = sConfig.GetBoolDefault("ReqEmailVerification", false);
+                    int32 requireEmailSince = sConfig.GetIntDefault("ReqEmailSince", 0);
+                    bool isVerified = fields[6].GetBool();
+
+                    // Prevent login if the user's join date is bigger than the timestamp in configuration
+                    if (requireEmailSince > 0)
                     {
-                        pkt << (uint8) WOW_FAIL_BANNED;
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!",m_login.c_str (), get_remote_address().c_str());
+                        uint32 t = fields[9].GetUInt32();
+                        requireVerification = requireVerification && (t >= uint32(requireEmailSince));
+                    }
+
+                    if (requireVerification && !isVerified)
+                    {
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", self->m_login.c_str(), self->get_remote_address().c_str());
+                        *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
+
+                        self->Write(pkt, [self](MaNGOS::NetworkError const& error) {
+                            if (error)
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonChallenge self->Write(): ERROR");
+                            else
+                                self->ProcessIncomingData();
+                        });
+                        return; // TODO refactor?
+                    }
+
+                    // If the IP is 'locked', check that the player comes indeed from the correct IP address
+                    bool locked = false;
+                    self->m_lockFlags = (LockFlag)fields[1].GetUInt32();
+                    self->m_securityInfo = fields[5].GetCppString();
+                    self->m_lastIP = fields[2].GetString();
+                    self->m_geoUnlockPIN = fields[7].GetUInt32();
+                    self->m_email = fields[8].GetCppString();
+
+                    if (self->m_lockFlags & IP_LOCK)
+                    {
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account '%s' is locked to IP - '%s'", self->m_login.c_str(), self->m_lastIP.c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Player address is '%s'", self->get_remote_address().c_str());
+
+                        if (self->m_lastIP != self->get_remote_address())
+                        {
+                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account IP differs");
+
+                            // account is IP locked and the player does not have 2FA enabled
+                            if (((self->m_lockFlags & TOTP) != TOTP && (self->m_lockFlags & FIXED_PIN) != FIXED_PIN))
+                                *pkt << (uint8) WOW_FAIL_SUSPENDED;
+
+                            locked = true;
+                        }
+                        else
+                        {
+                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account IP matches");
+                        }
                     }
                     else
                     {
-                        pkt << (uint8) WOW_FAIL_SUSPENDED;
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!",m_login.c_str (), get_remote_address().c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account '%s' is not locked to ip", self->m_login.c_str());
+                    }
+
+                    std::string databaseV = fields[3].GetCppString();
+                    std::string databaseS = fields[4].GetCppString();
+                    bool broken = false;
+
+                    if (!self->srp.SetVerifier(databaseV.c_str()) || !self->srp.SetSalt(databaseS.c_str()))
+                    {
+                        *pkt << uint8(WOW_FAIL_FAIL_NOACCESS);
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Broken v/s values in database for account %s!", self->m_login.c_str());
+                        broken = true;
+                    }
+
+                    if ((!locked || (locked && (self->m_lockFlags & FIXED_PIN || self->m_lockFlags & TOTP))) && !broken)
+                    {
+                        uint32 pendingAccountId = fields[0].GetUInt32();
+
+                        // If the account is banned, reject the logon attempt
+                        std::unique_ptr<QueryResult> sqlAccountBanResult = LoginDatabase.PQuery("SELECT `bandate`, `unbandate` FROM `account_banned` WHERE `id` = %u AND `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `unbandate` = `bandate`) LIMIT 1", pendingAccountId);
+                        if (sqlAccountBanResult)
+                        {
+                            uint64_t banTimestamp = (*sqlAccountBanResult)[0].GetUInt64();
+                            uint64_t unbanTimestamp = (*sqlAccountBanResult)[1].GetUInt64();
+                            if (banTimestamp == unbanTimestamp)
+                            {
+                                *pkt << (uint8) WOW_FAIL_BANNED;
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->get_remote_address().c_str());
+                            }
+                            else
+                            {
+                                *pkt << (uint8) WOW_FAIL_SUSPENDED;
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->get_remote_address().c_str());
+                            }
+                        }
+                        else
+                        {
+                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
+
+                            BigNumber s;
+                            s.SetHexStr(databaseS.c_str());
+
+                            self->srp.CalculateHostPublicEphemeral();
+
+                            // Fill the response packet with the result
+                            *pkt << uint8(WOW_SUCCESS);
+
+                            // B may be calculated < 32B so we force minimal length to 32B
+                            pkt->append(self->srp.GetHostPublicEphemeral().AsByteArray(32)); // 32 bytes
+                            *pkt << uint8(1);
+                            pkt->append(self->srp.GetGeneratorModulo().AsByteArray());
+                            *pkt << uint8(32);
+                            pkt->append(self->srp.GetPrime().AsByteArray(32));
+                            pkt->append(s.AsByteArray());// 32 bytes
+                            pkt->append(VersionChallenge.data(), VersionChallenge.size());
+
+                            // figure out whether we need to display the PIN grid
+                            self->m_promptPin = locked; // always prompt if the account is IP locked & 2FA is enabled
+
+                            if ((!locked && ((self->m_lockFlags & ALWAYS_ENFORCE) == ALWAYS_ENFORCE)) || self->m_geoUnlockPIN)
+                            {
+                                self->m_promptPin = true; // prompt if the lock hasn't been triggered but ALWAYS_ENFORCE is set
+                            }
+
+                            if (self->m_promptPin)
+                            {
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", self->m_login.c_str(), self->get_remote_address().c_str());
+
+                                uint32 gridSeedPkt = self->m_gridSeed = static_cast<uint32>(rand32());
+                                EndianConvert(gridSeedPkt);
+                                self->m_serverSecuritySalt.SetRand(16 * 8); // 16 bytes random
+
+                                *pkt << uint8(1); // securityFlags, only '1' is available in classic (PIN input)
+                                *pkt << gridSeedPkt;
+                                pkt->append(self->m_serverSecuritySalt.AsByteArray(16).data(), 16);
+                            }
+                            else
+                            {
+                                if (self->m_build >= 5428)        // version 1.11.0 or later
+                                    *pkt << uint8(0);
+                            }
+
+                            self->LoadAccountSecurityLevels(pendingAccountId);
+                            self->m_accountId = pendingAccountId;
+
+                            // All good, await client's proof
+                            self->m_status = STATUS_LOGON_PROOF;
+                        }
                     }
                 }
                 else
-                {
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
-
-                    BigNumber s;
-                    s.SetHexStr(databaseS.c_str());
-
-                    srp.CalculateHostPublicEphemeral();
-
-                    // Fill the response packet with the result
-                    pkt << uint8(WOW_SUCCESS);
-
-                    // B may be calculated < 32B so we force minimal length to 32B
-                    pkt.append(srp.GetHostPublicEphemeral().AsByteArray(32).data(), 32); // 32 bytes
-                    pkt << uint8(1);
-                    pkt.append(srp.GetGeneratorModulo().AsByteArray().data(), 1);
-                    pkt << uint8(32);
-                    pkt.append(srp.GetPrime().AsByteArray(32).data(), 32);
-                    pkt.append(s.AsByteArray());        // 32 bytes
-                    pkt.append(VersionChallenge.data(), VersionChallenge.size());
-
-                    // figure out whether we need to display the PIN grid
-                    m_promptPin = locked; // always prompt if the account is IP locked & 2FA is enabled
-
-                    if ((!locked && ((m_lockFlags & ALWAYS_ENFORCE) == ALWAYS_ENFORCE)) || m_geoUnlockPIN)
-                    {
-                        m_promptPin = true; // prompt if the lock hasn't been triggered but ALWAYS_ENFORCE is set
-                    }
-
-                    if (m_promptPin)
-                    {
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", m_login.c_str(), get_remote_address().c_str());
-
-                        uint32 gridSeedPkt = m_gridSeed = static_cast<uint32>(rand32());
-                        EndianConvert(gridSeedPkt);
-                        m_serverSecuritySalt.SetRand(16 * 8); // 16 bytes random
-
-                        pkt << uint8(1); // securityFlags, only '1' is available in classic (PIN input)
-                        pkt << gridSeedPkt;
-                        pkt.append(m_serverSecuritySalt.AsByteArray(16).data(), 16);
-                    }
-                    else
-                    {
-                        if (m_build >= 5428)        // version 1.11.0 or later
-                            pkt << uint8(0);
-                    }
-
-                    m_localizationName.resize(4);
-                    for(int i = 0; i < 4; ++i)
-                        m_localizationName[i] = ch->country[4-i-1];
-
-                    LoadAccountSecurityLevels(account_id);
-                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' is using '%c%c%c%c' locale (%u)", m_login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(m_localizationName));
-
-                    m_accountId = account_id;
-
-                    // All good, await client's proof
-                    m_status = STATUS_LOGON_PROOF;
+                { // no account
+                    *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
                 }
             }
-        }
-        else                                                // no account
-        {
-            pkt<< (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
-        }
-    }
-    send((char const*)pkt.contents(), pkt.size());
-    return true;
+
+            self->Write(pkt, [self](MaNGOS::NetworkError const& error) {
+                if (error)
+                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonChallenge self->Write(): ERROR");
+                else
+                    self->ProcessIncomingData();
+            });
+        });
+    });
 }
 
+/*
 // Logon Proof command handler
 bool AuthSocket::_HandleLogonProof()
 {
@@ -1292,7 +1340,6 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
 
 void AuthSocket::InitPatch()
 {
-    /*
     PatchHandler* handler = new PatchHandler(ACE_OS::dup(get_handle()), m_patch);
 
     m_patch = ACE_INVALID_HANDLE;
@@ -1302,15 +1349,13 @@ void AuthSocket::InitPatch()
         handler->close();
         close_connection();
     }
-    */
 }
-
+*/
 void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
 {
-    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `gmlevel`, `RealmID` FROM `account_access` WHERE `id` = %u",
-        accountId);
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `gmlevel`, `RealmID` FROM `account_access` WHERE `id` = %u", accountId);
     if (!result)
-        return;
+        return; // The account has no special permissions (most likely a normal user)
 
     do
     {
@@ -1373,12 +1418,11 @@ bool AuthSocket::GeographicalLockCheck()
     uint32_t ip = result->Fetch()[0].GetUInt32();
     uint32_t ip_prev = result_prev->Fetch()[0].GetUInt32();
 
-    /* The optimised query will return the next highest range in the event
-     * of the address not being found in the database. Therefore, we need
-     * to perform a second check to ensure our address falls within
-     * the returned range.
-     * See: https://blog.jcole.us/2007/11/24/on-efficiently-geo-referencing-ips-with-maxmind-geoip-and-mysql-gis/
-     */
+    // The optimised query will return the next highest range in the event
+    // of the address not being found in the database. Therefore, we need
+    // to perform a second check to ensure our address falls within
+    // the returned range.
+    // See: https://blog.jcole.us/2007/11/24/on-efficiently-geo-referencing-ips-with-maxmind-geoip-and-mysql-gis/
     if (net_start > ip || net_start_prev > ip_prev)
     {
         return false;
@@ -1436,3 +1480,4 @@ bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versi
 
     return false;
 }
+

@@ -36,13 +36,13 @@ struct RealmBuildInfo
     uint8 bugfixVersion = 0;
     char hotfixVersion = 0;
     uint16 build = 0;
-    uint32 os = 0;
-    uint32 platform = 0;
+    std::string os;
+    std::string platform;
     std::array<uint8, 20> integrityHash = { };
 };
 
 RealmBuildInfo const* FindBuildInfo(uint16 build);
-std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, uint32 os, uint32 platform);
+std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, std::string const& os, std::string const& platform);
 
 extern std::vector<RealmBuildInfo> ExpectedRealmdClientBuilds;
 

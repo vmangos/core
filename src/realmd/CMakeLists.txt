@@ -19,8 +19,6 @@ set(EXECUTABLE_NAME realmd)
 set(EXECUTABLE_SRCS 
   AuthCodes.h
   AuthSocket.h
-  BufferedSocket.h
-  BufferedSocketImpl.h
   PatchHandler.h
   RealmList.h
   AuthSocket.cpp

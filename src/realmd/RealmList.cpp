@@ -37,7 +37,7 @@ INSTANTIATE_SINGLETON_1( RealmList );
 // list sorted from high to low build and first build used as low bound for accepted by default range (any > it will accepted by realmd at least)
 std::vector<RealmBuildInfo> ExpectedRealmdClientBuilds;
 
-std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, uint32 os, uint32 platform)
+std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, std::string const& os, std::string const& platform)
 {
     std::vector<RealmBuildInfo const*> matchingBuilds;
     for (auto const& itr : ExpectedRealmdClientBuilds)
@@ -224,14 +224,8 @@ void RealmList::LoadAllowedClients()
             std::string hotfixVersion = fields[3].GetCppString();
             buildInfo.hotfixVersion = hotfixVersion.empty() ? 0 : hotfixVersion[0];
             buildInfo.build = fields[4].GetUInt16();
-            
-            std::string os = fields[5].GetCppString();
-            MANGOS_ASSERT(os.size() == 3);
-            memcpy(&buildInfo.os, os.data(), 4);
-
-            std::string platform = fields[6].GetCppString();
-            MANGOS_ASSERT(platform.size() == 3);
-            memcpy(&buildInfo.platform, platform.data(), 4);
+            buildInfo.os = fields[5].GetCppString();
+            buildInfo.platform = fields[6].GetCppString();
 
             std::string integrityHash = fields[7].GetCppString();
             if (!integrityHash.empty())

@@ -32,7 +32,7 @@
 #include "SRP6/SRP6.h"
 #include "ByteBuffer.h"
 
-#include "BufferedSocket.h"
+#include "Network/AsyncSocket.h"
 
 struct PINData
 {
@@ -52,22 +52,23 @@ enum LockFlag
 };
 
 // Handle login commands
-class AuthSocket: public BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>
+class AuthSocket : public MaNGOS::AsyncSocket<AuthSocket>, public std::enable_shared_from_this<AuthSocket>
 {
     public:
         const static int s_BYTE_SIZE = 32;
 
-        AuthSocket() = default;
+        explicit AuthSocket(SocketDescriptor const& clientAddress);
         ~AuthSocket();
 
-        void OnAccept() final;
-        void OnRead() final;
+        void Start() final;
+
+        void ProcessIncomingData();
         void SendProof(Sha1Hash sha);
         void LoadRealmlist(ByteBuffer &pkt);
         bool VerifyPinData(uint32 pin, const PINData& clientData);
         uint32 GenerateTotpPin(const std::string& secret, int interval);
 
-        bool _HandleLogonChallenge();
+        void _HandleLogonChallenge();
         bool _HandleLogonProof();
         bool _HandleReconnectChallenge();
         bool _HandleReconnectProof();
@@ -116,8 +117,8 @@ class AuthSocket: public BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthS
         static constexpr uint32 X86 = 'x86';
         static constexpr uint32 PPC = 'PPC';
 
-        uint32 m_os = 0;
-        uint32 m_platform = 0;
+        std::string m_os;
+        std::string m_platform;
         uint32 m_accountId = 0;
         uint32 m_lastRealmListRequest = 0;
 
