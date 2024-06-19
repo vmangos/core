@@ -157,7 +157,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
     }
 
     // prevent stealing items if using master loot
-    if (lguid.IsCreature() && !item->is_underthreshold)
+    if (lguid.IsCreature() && !item->is_underthreshold && !qitem && !ffaitem)
     {
         if (Group* pGroup = player->GetGroup())
         {
