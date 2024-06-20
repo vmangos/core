@@ -939,6 +939,9 @@ bool MovementAnticheat::CheckFallStop(MovementInfo const& movementInfo, uint16 o
     if (opcode == CMSG_FORCE_MOVE_ROOT_ACK)
         return false;
 
+    if (opcode == CMSG_MOVE_NOT_ACTIVE_MOVER)
+        return false;
+
     if (movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
         return false;
 
