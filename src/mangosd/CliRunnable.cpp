@@ -82,11 +82,11 @@ int checkStopped()
 void CliRunnable::operator()()
 {
     // Init new SQL thread for the world database (one connection call enough)
-    WorldDatabase.ThreadStart(); // let thread do safe mySQL requests
+    WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests
 
     // Display the list of available CLI functions then beep
     if (sConfig.GetBoolDefault("BeepAtStart", true))
-        printf("\a"); // \a = Alert
+        printf("\a");                                       // \a = Alert
 
     rl_event_hook = &checkStopped;
     // TODO: tab completion
