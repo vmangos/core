@@ -29,8 +29,10 @@
 #include "Util.h"
 #include "CliRunnable.h"
 #include "Database/DatabaseEnv.h"
+#ifdef linux
 #include "readline/readline.h"
 #include "readline/history.h"
+#endif
 
 void utf8print(void* /*arg*/, const char* str)
 {
@@ -55,17 +57,20 @@ void utf8print(void* /*arg*/, const char* str)
 #endif
 }
 
-static bool s_canReadLine = true;
-
 void commandFinished(void*, bool /*sucess*/)
 {
+#ifdef WIN32
+    printf("mangos>");
+#endif
     fflush(stdout);
+    #ifdef linux
     rl_on_new_line();
-    s_canReadLine = true;
+    #endif
 }
 
 // @}
 
+#ifdef linux
 int checkStopped()
 {
     if (World::IsStopped())
@@ -77,6 +82,7 @@ int checkStopped()
     }
     return 0;
 }
+#endif
 
 // %Thread start
 void CliRunnable::operator()()
@@ -84,45 +90,60 @@ void CliRunnable::operator()()
     // Init new SQL thread for the world database (one connection call enough)
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests
 
+    char commandbuf[256];
+
     // Display the list of available CLI functions then beep
     if (sConfig.GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
-    rl_event_hook = &checkStopped;
-    // TODO: tab completion
-    rl_bind_key('\t', rl_insert);
+    // print this here the first time
+    // later it will be printed after command queue updates
+    #ifdef WIN32
+    printf("\nmangos>");
+    #endif
 
     // As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
     {
         fflush(stdout);
 
-        if (s_canReadLine)
+        #ifdef WIN32
+        char *command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
+        #else
+        rl_event_hook = &checkStopped;
+        //TDO: tab completion
+        rl_bind_key ('\t', rl_insert);
+        char *command_str = readline("vmangos>");
+        // don't save empty commands
+        if (command_str && *command_str)
+            add_history(command_str);
+        #endif
+        if (command_str != nullptr)
         {
-            char *command_str = readline("vmangos>");
-            // don't save empty commands
-            if (command_str && *command_str)
-                add_history(command_str);
+            for(int x=0;command_str[x];x++)
+                if(command_str[x]=='\r'||command_str[x]=='\n')
+                {
+                    command_str[x]=0;
+                    break;
+                }
 
-            if (command_str != nullptr)
+            if(!*command_str)
             {
-                for (int x = 0;command_str[x];x++)
-                    if (command_str[x] == '\r' || command_str[x] == '\n')
-                    {
-                        command_str[x] = 0;
-                        break;
-                    }
-
-                if (!*command_str)
-                    continue;
-
-                std::string command;
-                if (!consoleToUtf8(command_str, command))         // convert from console encoding to utf8
-                    continue;
-
-                s_canReadLine = false;
-                sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, nullptr, command.c_str(), &utf8print, &commandFinished));
+                #ifdef WIN32
+                printf("mangos>");
+                #endif
+                continue;
             }
+
+            std::string command;
+            if(!consoleToUtf8(command_str,command))         // convert from console encoding to utf8
+            {
+                #ifdef WIN32
+                printf("mangos>");
+                #endif
+                continue;
+            }
+            sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, nullptr, command.c_str(), &utf8print, &commandFinished));
         }
     }
 }
