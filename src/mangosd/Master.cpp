@@ -153,7 +153,7 @@ Master::~Master()
 }
 
 // Main function
-int Master::Run(char serviceDaemonMode = '\0')
+int Master::Run()
 {
     // worldd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
@@ -210,7 +210,7 @@ int Master::Run(char serviceDaemonMode = '\0')
 #ifdef WIN32
     if (sConfig.GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
 #else
-    if (sConfig.GetBoolDefault("Console.Enable", true) && !serviceDaemonMode)
+    if (sConfig.GetBoolDefault("Console.Enable", true))
 #endif
     {
         // Launch CliRunnable thread
