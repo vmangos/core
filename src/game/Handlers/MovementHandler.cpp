@@ -1097,6 +1097,7 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
 {
     Player* const pPlayerMover = pMover->ToPlayer();
 
+    movementInfo.sourceSessionGuid = GetGUID();
     movementInfo.CorrectData(pMover);
 
     // Prevent client from removing root flag.

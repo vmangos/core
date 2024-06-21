@@ -15241,7 +15241,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         if (GenericTransport* transport = GetMap()->GetTransport(guid))
         {
             float x = fields[30].GetFloat(), y = fields[31].GetFloat(), z = fields[32].GetFloat(), o = fields[33].GetFloat();
-            m_movementInfo.SetTransportData(guid, x, y, z, o, 0);
+            m_movementInfo.SetTransportData(guid, x, y, z, o);
             transport->CalculatePassengerPosition(x, y, z, &o);
 
             if (!MaNGOS::IsValidMapCoord(x, y, z, o) ||
