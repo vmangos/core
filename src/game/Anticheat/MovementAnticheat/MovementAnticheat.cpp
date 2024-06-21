@@ -686,7 +686,7 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
         if (IsFlagAckOpcode(opcode))
         {
             me->m_movementInfo.moveFlags = movementInfo.moveFlags;
-            me->m_movementInfo.CorrectData(me);
+            me->m_movementInfo.CorrectData();
         }     
         
         if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&

@@ -520,7 +520,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
         {
             // Can only change flags and speed for not current active mover.
             pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
-            pMover->m_movementInfo.CorrectData(pMover);
+            pMover->m_movementInfo.CorrectData();
         }
     }
 
@@ -629,7 +629,7 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
         {
             // Can only change flags and speed for not current active mover.
             pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
-            pMover->m_movementInfo.CorrectData(pMover);
+            pMover->m_movementInfo.CorrectData();
         }
     } while (false);
 
@@ -730,7 +730,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         {
             // Can only change flags and speed for not current active mover.
             pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
-            pMover->m_movementInfo.CorrectData(pMover);
+            pMover->m_movementInfo.CorrectData();
         }
     } while (false);
 
@@ -1098,7 +1098,7 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
     Player* const pPlayerMover = pMover->ToPlayer();
 
     movementInfo.sourceSessionGuid = GetGUID();
-    movementInfo.CorrectData(pMover);
+    movementInfo.CorrectData();
 
     // Prevent client from removing root flag.
     if (pMover->HasUnitMovementFlag(MOVEFLAG_ROOT) && !movementInfo.HasMovementFlag(MOVEFLAG_ROOT))

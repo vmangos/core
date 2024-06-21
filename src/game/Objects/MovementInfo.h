@@ -22,10 +22,8 @@
 #include "ObjectGuid.h"
 #include "Timer.h"
 
-class Unit;
-
 // [-ZERO] Need check and update
-// used in most movement packets (send and received)
+// used in most movement packets (sent and received)
 enum MovementFlags
 {
     MOVEFLAG_NONE               = 0x00000000, // 0
@@ -168,7 +166,7 @@ class MovementInfo
         // Read/Write methods
         void Read(ByteBuffer &data);
         void Write(ByteBuffer &data) const;
-        void CorrectData(Unit* mover = nullptr);
+        void CorrectData();
 
         // Movement flags manipulations
         void AddMovementFlag(int f) { moveFlags |= f; }
@@ -260,6 +258,5 @@ inline ByteBuffer& operator>> (ByteBuffer& buf, MovementInfo& mi)
     mi.Read(buf);
     return buf;
 }
-
 
 #endif
