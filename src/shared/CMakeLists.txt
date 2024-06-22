@@ -101,6 +101,7 @@ set (shared_SRCS
     SRP6/SRP6.cpp
     Network/AsyncServerListener.h
     Network/AsyncSocket.h
+    Network/Internal/IocpOperationTask.h
 )
 
 if(USE_LIBCURL)

@@ -6,6 +6,7 @@
 #include <string>
 #include <chrono>
 #include <WinSock2.h>
+#include "Network/Internal/IocpOperationTask.h"
 
 /*
  * What to expect form TClientSocket
@@ -19,26 +20,97 @@
 template<typename TClientSocket>
 class AsyncServerListener {
 public:
+private:
+    void StartAcceptOperation()
+    {
+        SOCKET peerSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (peerSocket == INVALID_SOCKET)
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::socket(accept, ...) Error: %u", WSAGetLastError());
+            return;
+        }
+
+        // Attach our acceptor socket to our completion port
+        HANDLE tmpCompletionPort = CreateIoCompletionPort((HANDLE) peerSocket, m_completionPort, (u_long) 0, 0);
+        if (tmpCompletionPort != m_completionPort) {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(accept, ...) Error: %u", WSAGetLastError());
+            return;
+        }
+
+        struct Addresses {
+            sockaddr_in localAddress;
+            uint8_t __pad1[16];
+            sockaddr_in peerAddress;
+            uint8_t __pad2[16];
+        };
+
+        Addresses* addrBuffer = new Addresses();
+        IocpOperationTask* task = new IocpOperationTask([peerSocket, this, addrBuffer](IocpOperationTask* task, DWORD errorCode) {
+            std::string peerAddress(inet_ntoa(addrBuffer->peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
+            delete addrBuffer;
+
+            SocketDescriptor socketDescriptor { peerAddress, peerSocket };
+
+            std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
+            HandleAccept(client);
+
+            this->StartAcceptOperation();
+        });
+
+        DWORD bytesWritten = 0;
+
+        bool booleanOkay = ::AcceptEx(m_acceptorNativeSocket, peerSocket,
+                                            addrBuffer,
+                                            0,
+                                            sizeof(addrBuffer->localAddress) + sizeof(addrBuffer->__pad1), sizeof(addrBuffer->peerAddress) + sizeof(addrBuffer->__pad2),
+                                            &bytesWritten, task
+        );
+        if (!booleanOkay)
+        {
+            int lastError = WSAGetLastError();
+            if (lastError != WSA_IO_PENDING)
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::AcceptEx(...) Error: %u", lastError);
+                return;
+            }
+        }
+    }
+public:
     static std::unique_ptr<AsyncServerListener<TClientSocket>> CreateAndBindServer(std::string const& bindIp, uint16_t port)
     {
-        int res;
+        int errorCode;
 
         // TODO <static> check if WSA was already initialized
-        WSADATA wsaData;
-        res = WSAStartup(MAKEWORD(1, 1), &wsaData);
+        // TODO if fatal error, close socket and CleanupWSA (if reference counter == 0)
 
-        if (res != 0)
+        WSADATA wsaData;
+        errorCode = ::WSAStartup(MAKEWORD(2, 2), &wsaData);
+        if (errorCode != 0)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to initialize winsock.");
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSAStartup(...) Error: %u", errorCode);
             return nullptr;
         }
 
-
-        SOCKET nativeSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-        if (nativeSocket == INVALID_SOCKET || nativeSocket == SOCKET_ERROR)
+        int const numberOfConcurrentThreads = 0; // If this parameter is zero, the system allows as many concurrently running threads as there are processors in the system.
+        HANDLE completionPort = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, (ULONG_PTR) 0, numberOfConcurrentThreads);
+        if (completionPort == nullptr)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to create a black socket");
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::CreateIoCompletionPort(root, ...) Error: %u", GetLastError());
+            return nullptr;
+        }
+
+        // Create an IPv4 TCP server where other clients can connect to
+        SOCKET listenNativeSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (listenNativeSocket == INVALID_SOCKET)
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::socket(listen, ...) Error: %u", WSAGetLastError());
+            return nullptr;
+        }
+
+        // Attach our listener socket to our completion port
+        HANDLE tmpCompletionPort = ::CreateIoCompletionPort((HANDLE) listenNativeSocket, completionPort, (u_long) 0, 0);
+        if (tmpCompletionPort != completionPort) {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(listen, ...) Error: %u", WSAGetLastError());
             return nullptr;
         }
 
@@ -46,150 +118,63 @@ public:
         m_serverAddress.sin_family = AF_INET;
         m_serverAddress.sin_addr.s_addr = ::inet_addr(bindIp.c_str());
         m_serverAddress.sin_port = ::htons(port);
-
-        res = ::bind(nativeSocket, (SOCKADDR*)(&m_serverAddress), sizeof(m_serverAddress));
-        if (res != 0)
+        errorCode = ::bind(listenNativeSocket, (SOCKADDR*)(&m_serverAddress), sizeof(m_serverAddress));
+        if (errorCode != 0)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to bind socket.");
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::bind(...) Error: %u", WSAGetLastError());
             return nullptr;
         }
 
-        res = listen(nativeSocket, 8);
-        if (res != 0)
+        int const acceptBacklogCount = 50; // the number of connection requests that are queued in the kernel until this process calls "accept"
+        errorCode = ::listen(listenNativeSocket, acceptBacklogCount);
+        if (errorCode != 0)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to listen on socket.");
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::listen(...) Error: %u", WSAGetLastError());
             return nullptr;
         }
 
-        // Make it server socket BLOCKING
-        u_long nonBlockingMode = 0;
-        ioctlsocket(nativeSocket, FIONBIO, &nonBlockingMode);
-
-        return std::make_unique<AsyncServerListener<TClientSocket>>(nativeSocket);
+        auto server = std::make_unique<AsyncServerListener<TClientSocket>>(listenNativeSocket, completionPort);
+        server->StartAcceptOperation();
+        return server;
     }
 
 
     //StopAcceptingNewConnections();
     //CloseAllClient();
 
-    //template <class Rep, class Period>
     void RunEventLoop(std::chrono::milliseconds maxBlockingDuration)
     {
-        timeval timeout {0};
-        timeout.tv_sec = std::chrono::duration_cast<std::chrono::seconds>(maxBlockingDuration).count();
-        timeout.tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(maxBlockingDuration).count() % 1000000;
+        ULONG_PTR completionKey = 0;
+        IocpOperationTask* task = nullptr;
 
-        // TODO Make accept a separate threat that checks if the client is event valid before adding it to the main list (m_clients)
-        // TODO -- Must be impl specific (e.g. WorldSocket is a different check than AuthSocket)
-
-        // This (acceptOrReadSet) FileDescriptorSet holds the server acceptor socket and all client
-        // It will trigger whenever a new client connects or if a client in m_clients has data for us
-        // the select() function does all the internal syscall magic. It will wait until maxBlockingDuration or _at least one_ event takes place
-        // This way its much more performant than iterating over all sockets and force sleeping
-        fd_set acceptOrReadSet;
-        FD_ZERO(&acceptOrReadSet);
-
-        FD_SET(m_acceptorNativeSocket, &acceptOrReadSet);
-
-        { // Fill up acceptOrReadSet
-            auto iter = m_clients.begin();
-            while (iter != m_clients.end())
-            {
-                std::shared_ptr<TClientSocket>& client = *iter;
-
-                SOCKET nativeSocket = client->m_socket.nativeSocket;
-                if (client->m_disconnectRequest)
-                { // client has disconnect intend, and since we are in the mainloop, we will disconnect it properly
-                    sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Close socket");
-                    ::closesocket(nativeSocket);
-                    iter = m_clients.erase(iter);
-                }
-                else
-                {
-                    // TODO!!! Important, we are currently limited to 64 clients (see FD_SETSIZE). Use pollfd / IOCP instead
-                    // TODO: Dont recreate the fd_set from scratch, use the last one, and keep it in sync with m_clients
-                    FD_SET(nativeSocket, &acceptOrReadSet);
-                    ++iter;
-                }
-            }
+        DWORD bytesWritten = 0;
+        bool booleanOkay = ::GetQueuedCompletionStatus(m_completionPort, &bytesWritten, &completionKey, reinterpret_cast<LPOVERLAPPED*>(&task), maxBlockingDuration.count());
+        DWORD errorCode = ::GetLastError();
+        if (task)
+        {
+            task->OnComplete(errorCode);
         }
 
-        // Select will check and fill the FDSet for us. It will set a flag for each SOCKET that has an event for us
-        int result = ::select(0, &acceptOrReadSet, NULL, NULL, &timeout);
-
-        if (result == SOCKET_ERROR)
+        if (!booleanOkay)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] Socket select() error: WSAGetLastError() = %d", WSAGetLastError());
-            MANGOS_ASSERT(0);
+            if (errorCode != WAIT_TIMEOUT)
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Error: %u", errorCode);
             return;
-        }
-
-        if (result == 0)
-        {
-            sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "select: No event");
-            return;
-        }
-
-        if (FD_ISSET(m_acceptorNativeSocket, &acceptOrReadSet)) // Check if the main socket itself has some event for us
-        { // Handle new incoming connections
-            sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "select: accept");
-
-            sockaddr_in nativeClientAddr;
-            int sizeofAddr = sizeof(nativeClientAddr);
-            SOCKET nativeSocket = ::accept(m_acceptorNativeSocket, (SOCKADDR*)&nativeClientAddr, &sizeofAddr);
-
-            if (nativeSocket == 0 || nativeSocket == SOCKET_ERROR)
-            {
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] select: accept() error: WSAGetLastError() = %d", WSAGetLastError());
-                return;
-            }
-
-            std::string peerAddress(inet_ntoa(nativeClientAddr.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
-
-            SocketDescriptor socketDescriptor { peerAddress, nativeSocket };
-
-            std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
-            m_clients.emplace_back(client);
-
-            HandleAccept(client);
-        }
-
-        for (auto const& client : m_clients) // Check if any of the clients has an event for us
-        {
-            if (!FD_ISSET(client->m_socket.nativeSocket, &acceptOrReadSet))
-                continue; // Socket has no event for us
-
-            char buf[1];
-            result = ::recv(client->m_socket.nativeSocket, buf, 1, MSG_PEEK);
-            if (result == 0) // Disconnected
-            {
-                sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "client has disconnected");
-                ::closesocket(client->m_socket.nativeSocket);
-                m_clients.erase(std::remove(m_clients.begin(), m_clients.end(), client), m_clients.end());
-            }
-            else if (result > 0) // Has data
-            {
-                sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "client has data");
-                client->PerformNonBlockingRead();
-            }
-            else // Error? But how, the ::select should catch all errors
-            {
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] select: recv() error: WSAGetLastError() = %d", WSAGetLastError());
-                // TODO: Should I disconnect the socket?
-                client->CloseSocket();
-            }
         }
     }
 
-    explicit AsyncServerListener(SOCKET nativeSocket) : m_acceptorNativeSocket(nativeSocket) {}
+    explicit AsyncServerListener(SOCKET acceptorNativeSocket, HANDLE completionPort) : m_acceptorNativeSocket(acceptorNativeSocket), m_completionPort(completionPort) {}
 
 private:
     void HandleAccept(std::shared_ptr<TClientSocket> newClient)
     {
         newClient->Start();
     }
+
     SOCKET m_acceptorNativeSocket;
-    std::vector<std::shared_ptr<TClientSocket>> m_clients; // <-- This list might only be touched by the main thread / event loop
+    HANDLE m_completionPort;
+
+    // std::vector<std::shared_ptr<TClientSocket>> m_clients; // <-- This list might only be touched by the main thread / event loop
 };
 
 #endif //MANGOS_ASYNCSERVERLISTENER_H

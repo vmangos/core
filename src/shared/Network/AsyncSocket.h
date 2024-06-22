@@ -8,22 +8,27 @@
 #include <functional>
 #include "ByteBuffer.h"
 #include "Network/Internal/SocketDescriptor.h"
-
-#define READ_BLOCK_SIZE 4096
+#include "Network/Internal/IocpOperationTask.h"
 
 namespace MaNGOS {
 
     struct NetworkError {
         enum class ErrorType {
             NoError,
+            InternalError,
+            SocketClosed,
             OnlyOneTransferPerDirectionAllowed,
         };
 
-        ErrorType Error; // TODO somehow handle real errors
+        ErrorType Error;
 
         explicit operator bool() const {
             return Error != ErrorType::NoError;
         };
+
+        std::string toString() const {
+            return "TODO, Error to String";
+        }
     };
 
     template<typename SocketType>
@@ -31,7 +36,7 @@ namespace MaNGOS {
 
     // this socket is different in that it does not block on reads
     template<typename SocketType>
-    class AsyncSocket {
+    class AsyncSocket : public std::enable_shared_from_this<SocketType> {
         friend class AsyncSocketListener<SocketType>;
 
         public:
@@ -39,6 +44,8 @@ namespace MaNGOS {
             ~AsyncSocket()
             {
                 sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "~AsyncSocket");
+                if (!m_disconnectRequest)
+                    CloseSocket();
             }
             AsyncSocket(const AsyncSocket&) = delete;
             AsyncSocket& operator=(const AsyncSocket&) = delete;
@@ -53,169 +60,305 @@ namespace MaNGOS {
             void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(MaNGOS::NetworkError const&)> const& callback);
             void Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(MaNGOS::NetworkError const&)> const& callback);
 
-            bool HasPendingIo();
             void CloseSocket();
         public://private:
             SocketDescriptor m_socket;
-            bool m_disconnectRequest;
+            bool m_disconnectRequest = false;
 
             // Read = the target buffer to write the network stream to
-            std::function<void(MaNGOS::NetworkError)> m_readCallback;
-            char* m_readDstBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_readDstBufferBytesLeft for space
-            std::size_t m_readDstBufferBytesLeft = 0;
+            std::function<void(MaNGOS::NetworkError)> m_readCallback = nullptr;
 
             // Write = the source buffer from where to read to be able to write to the network stream
-            std::function<void(MaNGOS::NetworkError)> m_writeCallback;
-            char* m_writeSrcBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_writeSrcBufferBytesLeft for space
-            std::size_t m_writeSrcBufferBytesLeft = 0;
-            std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer; // Optional. To keep the shared_ptr for the lifetime of the transfer
-            std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector; // Optional. To keep the shared_ptr for the lifetime of the transfer
+            std::function<void(MaNGOS::NetworkError)> m_writeCallback = nullptr;
+            std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
+            std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
 
-            std::string get_remote_address()
+            std::string get_remote_address() const
             {
                 return m_socket.peerAddress;
             }
-
-            void PerformNonBlockingRead();
-            void PerformNonBlockingWrite();
     };
-
-    template<typename SocketType>
-    void AsyncSocket<SocketType>::PerformNonBlockingRead() {
-        if (m_readDstBuffer == nullptr || m_readDstBufferBytesLeft == 0)
-        {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[Error] PerformNonBlockingRead was called without destination buffer");
-            return;
-        }
-
-        int newWrittenBytes = ::recv(m_socket.nativeSocket, m_readDstBuffer, m_readDstBufferBytesLeft, 0);
-        if (newWrittenBytes == 0)
-        {
-            // TODO: Why were we called in the first place, when the buffer is empty?
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] Unnecessary call to PerformNonBlockingRead()");
-            return;
-        }
-        if (newWrittenBytes < 0)
-        {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::recv on client failed: WSAGetLastError() = %d", WSAGetLastError());
-            return;
-        }
-
-        MANGOS_ASSERT(newWrittenBytes <= m_readDstBufferBytesLeft);
-        m_readDstBufferBytesLeft -= newWrittenBytes;
-        m_readDstBuffer += newWrittenBytes;
-
-        if (m_readDstBufferBytesLeft == 0)
-        { // we are done with this buffer
-            m_readDstBuffer = nullptr;
-
-            MANGOS_ASSERT(m_readCallback);
-            auto callback = std::move(m_readCallback); // this will set m_readCallback to nullptr (to prevent race condition when resetting it after the invocation)
-            callback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::NoError});
-        }
-    }
-
-    template<typename SocketType>
-    void AsyncSocket<SocketType>::PerformNonBlockingWrite() {
-        if (m_writeSrcBuffer == nullptr || m_writeSrcBufferBytesLeft == 0)
-        {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[Error] PerformNonBlockingWrite was called without source buffer");
-            return;
-        }
-
-        int newWrittenBytes = ::send(m_socket.nativeSocket, m_writeSrcBuffer, m_writeSrcBufferBytesLeft, 0);
-        if (newWrittenBytes == 0)
-        {
-            // TODO: Why were we called in the first place, when the buffer is empty?
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] Unnecessary call to PerformNonBlockingWrite()");
-            return;
-        }
-        if (newWrittenBytes < 0)
-        {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::send on client failed: WSAGetLastError() = %d", WSAGetLastError());
-            return;
-        }
-
-        MANGOS_ASSERT(newWrittenBytes <= m_writeSrcBufferBytesLeft);
-        m_writeSrcBufferBytesLeft -= newWrittenBytes;
-        m_writeSrcBuffer += newWrittenBytes;
-
-        if (m_writeSrcBufferBytesLeft == 0)
-        { // we are done with this buffer
-            m_writeSrcBuffer = nullptr;
-            m_writeSrcBufferDummyHolder_ByteBuffer.reset();
-            m_writeSrcBufferDummyHolder_u8Vector.reset();
-
-            MANGOS_ASSERT(m_writeCallback);
-            auto callback = std::move(m_writeCallback); // this will set m_writeCallback to nullptr (to prevent race condition when resetting it after the invocation)
-            callback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::NoError});
-        }
-    }
 
     template<typename SocketType>
     void AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(MaNGOS::NetworkError const&)> const& callback)
     {
-        if (m_readDstBuffer != nullptr)
+        if (m_disconnectRequest)
+        {
+            callback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::SocketClosed});
+            return;
+        }
+        if (m_readCallback != nullptr)
         { // We already have a buffer. Just like ASIO, only one Read can be queued at the same time
             callback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed});
             return;
         }
-
         m_readCallback = callback;
-        m_readDstBuffer = target;
-        m_readDstBufferBytesLeft = size;
+
+        int const bufferCount = 1;
+        struct BufferCtx
+        {
+            WSABUF buffers[bufferCount];
+        };
+
+        std::shared_ptr<BufferCtx> bufferCtx(new BufferCtx{0});
+        bufferCtx->buffers[0].len = size;
+        bufferCtx->buffers[0].buf = target;
+
+        IocpOperationTask* task = new IocpOperationTask([self = this->shared_from_this(), bufferCtx](IocpOperationTask* task, DWORD errorCode) {
+            uint64_t bytesProcessed = task->InternalHigh;
+            if (bytesProcessed == 0)
+            { // 0 means the socket is already closed on the other side
+                sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Empty response -> Going to disconnect.");
+                self->CloseSocket();
+                auto tmpCallback = std::move(self->m_readCallback);
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::SocketClosed});
+                return;
+            }
+
+            if (bytesProcessed < bufferCtx->buffers[0].len)
+            { // We are not done yet. We need to requeue our task
+                bufferCtx->buffers[0].buf += bytesProcessed;
+                bufferCtx->buffers[0].len -= bytesProcessed;
+
+                int const bufferCount = 1;
+                DWORD flags = 0;
+                int errorCode = ::WSARecv(self->m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, task, nullptr);
+                if (errorCode)
+                {
+                    int err = WSAGetLastError();
+                    if (err != WSA_IO_PENDING)
+                    {
+                        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
+                        auto tmpCallback = std::move(self->m_readCallback);
+                        delete task;
+                        tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::InternalError});
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                auto tmpCallback = std::move(self->m_readCallback);
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::NoError});
+            }
+        });
+
+        DWORD flags = 0;
+        int errorCode = ::WSARecv(m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, task, nullptr);
+        if (errorCode)
+        {
+            int err = WSAGetLastError();
+            if (err != WSA_IO_PENDING)
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
+                auto tmpCallback = std::move(this->m_readCallback);
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::InternalError});
+                return;
+            }
+        }
     }
 
     template<typename SocketType>
     void AsyncSocket<SocketType>::ReadSkip(std::size_t skipSize, std::function<void(MaNGOS::NetworkError const&)> const& callback)
     {
-        // TODO
+        std::shared_ptr<std::vector<uint8_t>> skipBuffer(new std::vector<uint8_t>());
+        skipBuffer->resize(skipSize);
+        Read((char*)skipBuffer->data(), skipSize, [skipBuffer, callback](MaNGOS::NetworkError const& error)
+        {
+            // KEEP skipBuffer in scope!
+            // Do not remove skipBuffer before Read() is done, since we are transferring into it via async IO
+            // and since we are using a raw pointer, the Task has no knowledge about the lifetime of the std::vector
+            skipBuffer->clear();
+            callback(error);
+        });
     }
 
     /// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
     template<typename SocketType>
     void AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(MaNGOS::NetworkError const&)> const& callback)
     {
-        if (m_writeSrcBuffer != nullptr)
-        { // We already have a buffer. Just like ASIO, only one Read can be queued at the same time
+        if (m_disconnectRequest)
+        {
+            callback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::SocketClosed});
+            return;
+        }
+        if (m_writeCallback != nullptr)
+        { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
             callback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed});
             return;
         }
-
         m_writeCallback = callback;
         m_writeSrcBufferDummyHolder_u8Vector = source;
-        m_writeSrcBuffer = (char*) source->data();
-        m_writeSrcBufferBytesLeft = source->size();
-        PerformNonBlockingWrite();
+
+        int const bufferCount = 1;
+        struct BufferCtx
+        {
+            WSABUF buffers[bufferCount];
+        };
+
+        std::shared_ptr<BufferCtx> bufferCtx(new BufferCtx{0});
+        bufferCtx->buffers[0].len = source->size();
+        bufferCtx->buffers[0].buf = (char*)(source->data());
+
+        IocpOperationTask* task = new IocpOperationTask([self = this->shared_from_this(), bufferCtx](IocpOperationTask* task, DWORD errorCode) {
+            uint64_t bytesProcessed = task->InternalHigh;
+            if (bytesProcessed == 0)
+            { // 0 means the socket is already closed on the other side
+                self->CloseSocket();
+                auto tmpCallback = std::move(self->m_writeCallback);
+                self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::SocketClosed});
+                return;
+            }
+
+            if (bytesProcessed < bufferCtx->buffers[0].len)
+            { // We are not done yet. We need to requeue our task
+                bufferCtx->buffers[0].buf += bytesProcessed;
+                bufferCtx->buffers[0].len -= bytesProcessed;
+
+                int const bufferCount = 1;
+                DWORD flags = 0;
+                int errorCode = ::WSASend(self->m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, task, nullptr);
+                if (errorCode)
+                {
+                    int err = WSAGetLastError();
+                    if (err != WSA_IO_PENDING)
+                    {
+                        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
+                        auto tmpCallback = std::move(self->m_writeCallback);
+                        self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
+                        delete task;
+                        tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::InternalError});
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                auto tmpCallback = std::move(self->m_writeCallback);
+                self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::NoError});
+            }
+        });
+
+        DWORD flags = 0;
+        int errorCode = ::WSASend(m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, task, nullptr);
+        if (errorCode)
+        {
+            int err = WSAGetLastError();
+            if (err != WSA_IO_PENDING)
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
+                auto tmpCallback = std::move(this->m_writeCallback);
+                this->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::InternalError});
+                return;
+            }
+        }
     }
 
     /// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
     template<typename SocketType>
     void AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(MaNGOS::NetworkError const&)> const& callback)
     {
-        if (m_writeSrcBuffer != nullptr)
-        { // We already have a buffer. Just like ASIO, only one Read can be queued at the same time
+        if (m_disconnectRequest)
+        {
+            callback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::SocketClosed});
+            return;
+        }
+        if (m_writeCallback != nullptr)
+        { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
             callback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed});
             return;
         }
-
         m_writeCallback = callback;
         m_writeSrcBufferDummyHolder_ByteBuffer = source;
-        m_writeSrcBuffer = (char*) source->contents();
-        m_writeSrcBufferBytesLeft = source->size();
-        PerformNonBlockingWrite();
+
+        int const bufferCount = 1;
+        struct BufferCtx
+        {
+            WSABUF buffers[bufferCount];
+        };
+
+        std::shared_ptr<BufferCtx> bufferCtx(new BufferCtx{0});
+        bufferCtx->buffers[0].len = source->size();
+        bufferCtx->buffers[0].buf = (char*)(source->contents());
+
+        IocpOperationTask* task = new IocpOperationTask([self = this->shared_from_this(), bufferCtx](IocpOperationTask* task, DWORD errorCode) {
+            uint64_t bytesProcessed = task->InternalHigh;
+            if (bytesProcessed == 0)
+            { // 0 means the socket is already closed on the other side
+                self->CloseSocket();
+                auto tmpCallback = std::move(self->m_writeCallback);
+                self->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::SocketClosed});
+                return;
+            }
+
+            if (bytesProcessed < bufferCtx->buffers[0].len)
+            { // We are not done yet. We need to requeue our task
+                bufferCtx->buffers[0].buf += bytesProcessed;
+                bufferCtx->buffers[0].len -= bytesProcessed;
+
+                int const bufferCount = 1;
+                DWORD flags = 0;
+                int errorCode = ::WSASend(self->m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, task, nullptr);
+                if (errorCode)
+                {
+                    int err = WSAGetLastError();
+                    if (err != WSA_IO_PENDING)
+                    {
+                        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
+                        auto tmpCallback = std::move(self->m_writeCallback);
+                        self->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
+                        delete task;
+                        tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::InternalError});
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                auto tmpCallback = std::move(self->m_writeCallback);
+                self->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::NoError});
+            }
+        });
+
+        DWORD flags = 0;
+        int errorCode = ::WSASend(m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, task, nullptr);
+        if (errorCode)
+        {
+            int err = WSAGetLastError();
+            if (err != WSA_IO_PENDING)
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
+                auto tmpCallback = std::move(this->m_writeCallback);
+                this->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
+                delete task;
+                tmpCallback(MaNGOS::NetworkError{MaNGOS::NetworkError::ErrorType::InternalError});
+                return;
+            }
+        }
     }
 
     template<typename SocketType>
     void AsyncSocket<SocketType>::CloseSocket()
     {
         if (m_disconnectRequest)
-        {
-            sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Multiple calls to CloseSocket?");
             return;
-        }
         m_disconnectRequest = true;
+
         sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "CloseSocket(): Disconnect request");
+        ::closesocket(m_socket.nativeSocket);
     }
 
 }
