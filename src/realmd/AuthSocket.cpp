@@ -235,7 +235,7 @@ void AuthSocket::ProcessIncomingData()
     std::shared_ptr<eAuthCmd> cmd = std::make_shared<eAuthCmd>();
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ProcessIncomingData() Reading... Ready for next opcode");
-    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd, table, tableLength](MaNGOS::IO::NetworkError const& error) -> void
+    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd, &table, tableLength](MaNGOS::IO::NetworkError const& error) -> void
     {
         if (error)
         {
