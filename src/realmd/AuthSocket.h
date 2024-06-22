@@ -31,8 +31,7 @@
 #include "Auth/Sha1.h"
 #include "SRP6/SRP6.h"
 #include "ByteBuffer.h"
-
-#include "BufferedSocket.h"
+#include "IO/Networking/AsyncSocket.h"
 
 struct PINData
 {
@@ -51,27 +50,32 @@ enum LockFlag
     GEO_CITY        = 0x20
 };
 
+struct sAuthLogonProof_C;
+
 // Handle login commands
-class AuthSocket: public BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>
+class AuthSocket : public MaNGOS::AsyncSocket<AuthSocket>
 {
     public:
         const static int s_BYTE_SIZE = 32;
 
-        AuthSocket() = default;
+        explicit AuthSocket(SocketDescriptor const& clientAddress);
         ~AuthSocket();
 
-        void OnAccept() final;
-        void OnRead() final;
-        void SendProof(Sha1Hash sha);
-        void LoadRealmlist(ByteBuffer &pkt);
-        bool VerifyPinData(uint32 pin, const PINData& clientData);
+        void Start() final;
+
+        void ProcessIncomingData();
+        std::shared_ptr<ByteBuffer> GenerateLogonProofResponse(Sha1Hash sha);
+        void LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt);
+        bool VerifyPinData(uint32 pin, PINData const& clientData);
         uint32 GenerateTotpPin(const std::string& secret, int interval);
 
-        bool _HandleLogonChallenge();
-        bool _HandleLogonProof();
-        bool _HandleReconnectChallenge();
-        bool _HandleReconnectProof();
-        bool _HandleRealmList();
+        void _HandleLogonChallenge();
+        void _HandleLogonProof();
+        void _HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C const> const& lp, std::shared_ptr<PINData const> const& pinData);
+        void _HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_ptr<sAuthLogonProof_C const> const& lp);
+        void _HandleReconnectChallenge();
+        void _HandleReconnectProof();
+        void _HandleRealmList();
         //data transfer handle for patch
 
         bool _HandleXferResume();
@@ -84,9 +88,9 @@ class AuthSocket: public BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthS
             STATUS_CHALLENGE,
             STATUS_LOGON_PROOF,
             STATUS_RECON_PROOF,
-            STATUS_PATCH,      // unused in CMaNGOS
+            STATUS_PATCH,
             STATUS_AUTHED,
-            STATUS_CLOSED
+            STATUS_INVALID,
         };
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
@@ -116,8 +120,8 @@ class AuthSocket: public BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthS
         static constexpr uint32 X86 = 'x86';
         static constexpr uint32 PPC = 'PPC';
 
-        uint32 m_os = 0;
-        uint32 m_platform = 0;
+        std::string m_os;
+        std::string m_platform;
         uint32 m_accountId = 0;
         uint32 m_lastRealmListRequest = 0;
 

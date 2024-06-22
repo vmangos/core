@@ -30,7 +30,6 @@
 #include "Config/Config.h"
 #include "Log.h"
 #include "AuthSocket.h"
-#include "BufferedSocketImpl.h"
 #include "SystemConfig.h"
 #include "revision.h"
 #include "Util.h"
@@ -39,6 +38,7 @@
 #include <openssl/crypto.h>
 
 #include <ace/Get_Opt.h>
+#include "IO/Networking/AsyncServerListener.h"
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -56,7 +56,7 @@ char serviceDescription[] = "Massive Network Game Object Server";
  *  1 - running
  *  2 - paused
  */
-int m_ServiceStatus = -1;
+volatile int m_ServiceStatus = -1;
 #else
 #include "PosixDaemon.h"
 #endif
@@ -70,8 +70,8 @@ bool stopEvent = false;                                     // Setting it to tru
 DatabaseType LoginDatabase;                                 // Accessor to the realm server database
 
 // make sure template functions are instantiated
-template bool BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>::send(const char *buf, size_t len);
-template void BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>::close_connection();
+//template std::unique_ptr<AsyncServerListener<AuthSocket>> AsyncServerListener<AuthSocket>::CreateAndBindServer(std::string const&, uint16_t);
+//template void BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>::close_connection();
 
 // Print out the usage string for this program on the console.
 void usage(const char *prog)
@@ -281,15 +281,14 @@ extern int main(int argc, char **argv)
     LoginDatabase.Execute("DELETE FROM `ip_banned` WHERE `unbandate`<=UNIX_TIMESTAMP() AND `unbandate`<>`bandate`");
     LoginDatabase.CommitTransaction();
 
-    // Launch the listening network socket
-    BufferedSocketAcceptor<AuthSocket> acceptor;
-
-    uint16 bindPort = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
     std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
+    uint16 bindPort = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
 
-    if (!acceptor.StartNetwork(bindIp.c_str(), bindPort))
+    // Launch the listening network socket
+    std::unique_ptr<AsyncServerListener<AuthSocket>> listener = AsyncServerListener<AuthSocket>::CreateAndBindServer(bindIp, bindPort);
+    if (listener == nullptr)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d", bindIp.c_str(), bindPort);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d  -  Is the port already in use?", bindIp.c_str(), bindPort);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
@@ -344,7 +343,7 @@ extern int main(int argc, char **argv)
     LoginDatabase.AllowAsyncTransactions();
 
     // maximum counter for next ping
-    uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / 100000));
+    uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / 100000)); // TODO make this loop like mangosd
     uint32 loopCounter = 0;
 
     #ifndef WIN32
@@ -353,17 +352,14 @@ extern int main(int argc, char **argv)
     // Wait for termination signal
     while (!stopEvent)
     {
-        acceptor.AcceptConnections();
-        acceptor.ReceiveData();
+        listener->RunEventLoop(std::chrono::milliseconds(1000));
 
-        if( (++loopCounter) == numLoops )
+        if( (++loopCounter) == numLoops ) // TODO make this loop like mangosd
         {
             loopCounter = 0;
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Ping MySQL to keep connection alive");
             LoginDatabase.Ping();
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
 #ifdef WIN32
         if (m_ServiceStatus == 0) stopEvent = true;

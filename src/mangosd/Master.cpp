@@ -55,7 +55,7 @@
 
 #ifdef WIN32
 #include "ServiceWin32.h"
-extern int m_ServiceStatus;
+extern volatile int m_ServiceStatus;
 #endif
 
 INSTANTIATE_SINGLETON_1( Master );
