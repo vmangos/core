@@ -116,6 +116,12 @@ class SqlConnection
         StmtHolder m_holder;
 };
 
+enum class DbExecMode
+{
+    CanBeAsync,
+    MustBeSync,
+};
+
 class Database
 {
     public:
@@ -218,7 +224,10 @@ class Database
         template<typename ParamType1>
             bool DelayQueryHolderUnsafe(void (*method)(std::unique_ptr<QueryResult>, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1);
 
+        /// Unless in Sync mode, the return value just gives you a hint whenever or not the statement was added to be async queue
         bool Execute(char const* sql);
+        bool Execute(DbExecMode executionMode, char const* sql);
+        bool PExecute(DbExecMode executionMode, char const* format,...) ATTR_PRINTF(2,3);
         bool PExecute(char const* format,...) ATTR_PRINTF(2,3);
 
         // Writes SQL commands to a LOG file (see mangosd.conf "LogSQL")

@@ -393,6 +393,11 @@ std::unique_ptr<QueryNamedResult> Database::PQueryNamed(char const* format,...)
 
 bool Database::Execute(char const* sql)
 {
+    return Execute(DbExecMode::CanBeAsync, sql);
+}
+
+bool Database::Execute(DbExecMode mode, char const* sql)
+{
     if (!m_pAsyncConn)
         return false;
 
@@ -405,7 +410,7 @@ bool Database::Execute(char const* sql)
     else
     {
         //if async execution is not available
-        if(!m_bAllowAsyncTransactions)
+        if(!m_bAllowAsyncTransactions || mode == DbExecMode::MustBeSync)
             return DirectExecute(sql);
 
         // Simple sql statement
@@ -413,6 +418,26 @@ bool Database::Execute(char const* sql)
     }
 
     return true;
+}
+
+bool Database::PExecute(DbExecMode mode, char const* format,...)
+{
+    if (!format)
+        return false;
+
+    va_list ap;
+    char szQuery [MAX_QUERY_LEN];
+            va_start(ap, format);
+    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
+            va_end(ap);
+
+    if(res==-1)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format);
+        return false;
+    }
+
+    return Execute(mode, szQuery);
 }
 
 bool Database::PExecute(char const* format,...)
