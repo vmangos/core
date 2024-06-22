@@ -148,10 +148,6 @@ if(UNIX)
   )
 endif()
 
-target_link_libraries(${EXECUTABLE_NAME}
-    readline
-)
-
 set(EXECUTABLE_LINK_FLAGS "")
 
 if(UNIX)
@@ -159,8 +155,6 @@ if(UNIX)
 endif()
 
 if(APPLE)
-  include_directories(/usr/local/opt/readline/include)
-  link_directories(/usr/local/opt/readline/lib)
   set(EXECUTABLE_LINK_FLAGS "-framework Carbon ${EXECUTABLE_LINK_FLAGS}")
 endif()
 

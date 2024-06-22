@@ -1752,6 +1752,11 @@ struct Position
     float y = 0.0f;
     float z = 0.0f;
     float o = 0.0f;
+
+    bool IsEmpty() const
+    {
+        return !x && !y && !z && !o;
+    }
 };
 
 struct WorldLocation
@@ -1765,6 +1770,11 @@ struct WorldLocation
         : mapId(_mapid), x(_x), y(_y), z(_z), o(_o) {}
     WorldLocation(WorldLocation const& loc)
         : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
+
+    bool IsEmpty() const
+    {
+        return !mapId && !x && !y && !z && !o;
+    }
 };
 
 #endif

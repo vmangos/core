@@ -18,7 +18,7 @@
 
 #include "Auth/Sha1.h"
 #include "Auth/BigNumber.h"
-#include <stdarg.h>
+#include <cstdarg>
 
 Sha1Hash::Sha1Hash()
 {

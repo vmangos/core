@@ -686,7 +686,7 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
         if (IsFlagAckOpcode(opcode))
         {
             me->m_movementInfo.moveFlags = movementInfo.moveFlags;
-            me->m_movementInfo.CorrectData(me);
+            me->m_movementInfo.CorrectData();
         }     
         
         if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&
@@ -874,7 +874,7 @@ bool MovementAnticheat::CheckNoFallTime(MovementInfo const& movementInfo, uint16
         return false;
     }
 
-    if (!GetLastMovementInfo().ctime ||
+    if (!GetLastMovementInfo().WasSentBySession(m_session->GetGUID()) ||
         !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
     {
         m_jumpFlagCount = 0;
@@ -916,7 +916,7 @@ bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
     if (movementInfo.HasMovementFlag(MOVEFLAG_FIXED_Z))
         return false;
 
-    if (GetLastMovementInfo().ctime)
+    if (GetLastMovementInfo().WasSentBySession(m_session->GetGUID()))
     {
         if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
             return true;
@@ -930,13 +930,16 @@ bool MovementAnticheat::CheckFallStop(MovementInfo const& movementInfo, uint16 o
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_ENABLED))
         return false;
 
-    if (!GetLastMovementInfo().ctime)
+    if (!GetLastMovementInfo().WasSentBySession(m_session->GetGUID()))
         return false;
 
     if (IsFallEndOpcode(opcode))
         return false;
 
     if (opcode == CMSG_FORCE_MOVE_ROOT_ACK)
+        return false;
+
+    if (opcode == CMSG_MOVE_NOT_ACTIVE_MOVER)
         return false;
 
     if (movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
@@ -954,7 +957,7 @@ bool MovementAnticheat::CheckMoveStart(MovementInfo const& movementInfo, uint16 
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_MOVE_START_ENABLED))
         return false;
 
-    if (!GetLastMovementInfo().ctime)
+    if (!GetLastMovementInfo().WasSentBySession(m_session->GetGUID()))
         return false;
 
     if (IsFallEndOpcode(opcode))
@@ -1079,7 +1082,7 @@ uint32 MovementAnticheat::CheckTimeDesync(MovementInfo const& movementInfo)
     uint32 cheatFlags = 0x0;
 #define APPEND_CHEAT(t) cheatFlags |= (1 << t)
 
-    if (GetLastMovementInfo().ctime)
+    if (GetLastMovementInfo().WasSentBySession(m_session->GetGUID()))
     {
         if (GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING)
         {
