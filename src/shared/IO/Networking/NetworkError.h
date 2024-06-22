@@ -1,9 +1,9 @@
-#ifndef MANGOS_NETWORKERROR_H
-#define MANGOS_NETWORKERROR_H
+#ifndef MANGOS_IO_NETWORKING_NETWORKERROR_H
+#define MANGOS_IO_NETWORKING_NETWORKERROR_H
 
 #include <string>
 
-namespace MaNGOS
+namespace MaNGOS { namespace IO
 {
     struct NetworkError {
         enum class ErrorType {
@@ -23,6 +23,6 @@ namespace MaNGOS
             return "TODO, Error to String";
         }
     };
-}
+}} // namespace MaNGOS::IO
 
-#endif //MANGOS_NETWORKERROR_H
+#endif //MANGOS_IO_NETWORKING_NETWORKERROR_H

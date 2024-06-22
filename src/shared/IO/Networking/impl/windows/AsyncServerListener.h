@@ -1,12 +1,12 @@
-#ifndef MANGOS_ASYNCSERVERLISTENER_H
-#define MANGOS_ASYNCSERVERLISTENER_H
+#ifndef MANGOS_IO_NETWORKING_WIN32_ASYNCSERVERLISTENER_H
+#define MANGOS_IO_NETWORKING_WIN32_ASYNCSERVERLISTENER_H
 
 #include <vector>
 #include <memory>
 #include <string>
 #include <chrono>
 #include <WinSock2.h>
-#include "Network/Internal/IocpOperationTask.h"
+#include "./IocpOperationTask.h"
 
 template<typename TClientSocket>
 class AsyncServerListener {
@@ -178,4 +178,4 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
     }
 }
 
-#endif //MANGOS_ASYNCSERVERLISTENER_H
+#endif //MANGOS_IO_NETWORKING_WIN32_ASYNCSERVERLISTENER_H

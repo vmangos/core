@@ -31,8 +31,7 @@
 #include "Auth/Sha1.h"
 #include "SRP6/SRP6.h"
 #include "ByteBuffer.h"
-
-#include "Network/AsyncSocket.h"
+#include "IO/Networking/AsyncSocket.h"
 
 struct PINData
 {

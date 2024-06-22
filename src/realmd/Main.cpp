@@ -38,6 +38,7 @@
 #include <openssl/crypto.h>
 
 #include <ace/Get_Opt.h>
+#include "IO/Networking/AsyncServerListener.h"
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -46,8 +47,6 @@
 
 #ifdef WIN32
 #include "ServiceWin32.h"
-#include "Network/AsyncServerListener.h"
-
 char serviceName[] = "realmd";
 char serviceLongName[] = "MaNGOS realmd service";
 char serviceDescription[] = "Massive Network Game Object Server";
