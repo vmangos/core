@@ -103,6 +103,8 @@ set (shared_SRCS
     IO/Networking/AsyncSocket.h
     IO/Networking/NetworkError.h
     IO/Networking/SocketDescriptor.h
+    IO/Multithreading/CreateThread.h
+    IO/Multithreading/CreateThread.cpp
 )
 
 if(USE_LIBCURL)
