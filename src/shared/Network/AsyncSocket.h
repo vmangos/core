@@ -7,30 +7,11 @@
 #include <cstdint>
 #include <functional>
 #include "ByteBuffer.h"
+#include "Network/NetworkError.h"
 #include "Network/Internal/SocketDescriptor.h"
 #include "Network/Internal/IocpOperationTask.h"
 
 namespace MaNGOS {
-
-    struct NetworkError {
-        enum class ErrorType {
-            NoError,
-            InternalError,
-            SocketClosed,
-            OnlyOneTransferPerDirectionAllowed,
-        };
-
-        ErrorType Error;
-
-        explicit operator bool() const {
-            return Error != ErrorType::NoError;
-        };
-
-        std::string toString() const {
-            return "TODO, Error to String";
-        }
-    };
-
     template<typename SocketType>
     class AsyncSocketListener;
 
@@ -41,12 +22,7 @@ namespace MaNGOS {
 
         public:
             explicit AsyncSocket(SocketDescriptor const& socketDescriptor) : m_socket(socketDescriptor) {}
-            ~AsyncSocket()
-            {
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "~AsyncSocket");
-                if (!m_disconnectRequest)
-                    CloseSocket();
-            }
+            ~AsyncSocket();
             AsyncSocket(const AsyncSocket&) = delete;
             AsyncSocket& operator=(const AsyncSocket&) = delete;
             AsyncSocket(AsyncSocket&&) = delete;
@@ -61,7 +37,10 @@ namespace MaNGOS {
             void Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(MaNGOS::NetworkError const&)> const& callback);
 
             void CloseSocket();
-        public://private:
+
+            std::string get_remote_address() const;
+
+        private:
             SocketDescriptor m_socket;
             bool m_disconnectRequest = false;
 
@@ -72,12 +51,21 @@ namespace MaNGOS {
             std::function<void(MaNGOS::NetworkError)> m_writeCallback = nullptr;
             std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
-
-            std::string get_remote_address() const
-            {
-                return m_socket.peerAddress;
-            }
     };
+
+    template<typename SocketType>
+    AsyncSocket<SocketType>::~AsyncSocket()
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "~AsyncSocket");
+        if (!m_disconnectRequest)
+            CloseSocket();
+    }
+
+    template<typename SocketType>
+    std::string AsyncSocket<SocketType>::get_remote_address() const
+    {
+        return m_socket.peerAddress;
+    }
 
     template<typename SocketType>
     void AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(MaNGOS::NetworkError const&)> const& callback)
