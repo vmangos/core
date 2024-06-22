@@ -1117,6 +1117,7 @@ void BattleGroundMgr::BuildPlaySoundPacket(WorldPacket* data, uint32 soundid)
     *data << uint32(soundid);
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
 void BattleGroundMgr::BuildPlayerLeftBattleGroundPacket(WorldPacket* data, ObjectGuid guid)
 {
     data->Initialize(SMSG_BATTLEGROUND_PLAYER_LEFT, 8);
@@ -1128,6 +1129,7 @@ void BattleGroundMgr::BuildPlayerJoinedBattleGroundPacket(WorldPacket* data, Pla
     data->Initialize(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
     *data << player->GetObjectGuid();
 }
+#endif
 
 BattleGround* BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 instanceId, BattleGroundTypeId bgTypeId)
 {
@@ -1501,7 +1503,7 @@ void BattleGroundMgr::LoadBattleMastersEntry()
 {
     m_battleMastersMap.clear();                              // need for reload case
 
-    QueryResult* result = WorldDatabase.Query("SELECT `entry`, `bg_template` FROM `battlemaster_entry`");
+    std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT `entry`, `bg_template` FROM `battlemaster_entry`");
 
     uint32 count = 0;
 
@@ -1536,8 +1538,6 @@ void BattleGroundMgr::LoadBattleMastersEntry()
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u battlemaster entries", count);
@@ -1590,8 +1590,8 @@ void BattleGroundMgr::LoadBattleEventIndexes()
 
     uint32 count = 0;
 
-    QueryResult* result =
-        //                           0         1           2                3                4              5           6
+    std::unique_ptr<QueryResult> result =
+        //                               0         1           2                3                4              5           6
         WorldDatabase.Query("SELECT data.typ, data.guid1, data.ev1 AS ev1, data.ev2 AS ev2, data.map AS m, data.guid2, description.map, "
                             //                              7                  8                   9
                             "description.event1, description.event2, description.description "
@@ -1690,7 +1690,6 @@ void BattleGroundMgr::LoadBattleEventIndexes()
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u battleground eventindexes", count);
-    delete result;
 }
 
 // Offline BG queue system

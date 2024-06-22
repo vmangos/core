@@ -181,7 +181,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
     
     m_QuestIdSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `quest_template`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `quest_template`");
 
     if (result)
     {
@@ -194,7 +194,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
 
     m_CreatureIdSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_template`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_template`");
 
     if (result)
     {
@@ -207,7 +207,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
 
     m_GameObjectIdSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `gameobject_template`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `gameobject_template`");
 
     if (result)
     {
@@ -220,7 +220,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
 
     m_CreatureGuidSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `guid` FROM `creature`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `guid` FROM `creature`");
 
     if (result)
     {
@@ -233,7 +233,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
 
     m_GameObjectGuidSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `guid` FROM `gameobject`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `guid` FROM `gameobject`");
 
     if (result)
     {
@@ -246,7 +246,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
 
     m_AreaTriggerIdSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `id` FROM `areatrigger_template`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `id` FROM `areatrigger_template`");
 
     if (result)
     {
@@ -259,7 +259,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
 
     m_CreatureSpellsIdSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_spells`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_spells`");
 
     if (result)
     {
@@ -272,7 +272,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
 
     m_VendorTemplateIdSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `npc_vendor_template`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `npc_vendor_template`");
 
     if (result)
     {
@@ -285,7 +285,7 @@ void ObjectMgr::LoadAllIdentifiers()
     }
 
     m_GossipMenuIdSet.clear();
-    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `gossip_menu`"));
+    result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `gossip_menu`");
 
     if (result)
     {
@@ -654,16 +654,16 @@ void ObjectMgr::LoadPlayerCacheData(uint32 lowGuid)
         m_playerCacheData.clear();
         m_playerNameToGuid.clear();
 
-        result.reset(CharacterDatabase.Query(
+        result = CharacterDatabase.Query(
             //       0       1       2        3         4          5       6        7          8      9             10            11            12             13
-            "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters`;"));
+            "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters`;");
     }
     else
     {
         // load a single character (likely just restored)
-        result.reset(CharacterDatabase.PQuery(
+        result = CharacterDatabase.PQuery(
             //       0       1       2        3         4          5       6        7          8      9             10            11            12             13
-            "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters` WHERE `guid`=%u;", lowGuid));
+            "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters` WHERE `guid`=%u;", lowGuid);
     }
 
     uint32 totalCount = 0;
@@ -1913,7 +1913,7 @@ void ObjectMgr::LoadCreatureSpells()
     m_CreatureSpellsMap.clear(); // for reload case
 
                                      //       0        1            2                3               4                 5                 6              7                    8                    9                   10                  11
-    result.reset(WorldDatabase.Query("SELECT `entry`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, "
+    result = WorldDatabase.Query("SELECT `entry`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, "
                                       //               12           13               14              15                16                17             18                   19                   20                  21                  22
                                                      "`spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, "
                                      //                23           24               25              26                27                28             29                   30                   31                  32                  33
@@ -1927,7 +1927,7 @@ void ObjectMgr::LoadCreatureSpells()
                                      //                67           68               69              70                71                72             73                   74                   75                  76                  77
                                                      "`spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, "
                                      //                78           79               80              81                82                83             84                   85                   86                  87                  88
-                                                     "`spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8` FROM `creature_spells`"));
+                                                     "`spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8` FROM `creature_spells`");
     if (!result)
     {
         BarGoLink bar(1);
@@ -2055,7 +2055,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
     for (auto unitClass : creatureClasses)
     {
-        result.reset(WorldDatabase.PQuery("SELECT MAX(`level_max`) FROM `creature_template` WHERE `unit_class`=%u", unitClass));
+        result = WorldDatabase.PQuery("SELECT MAX(`level_max`) FROM `creature_template` WHERE `unit_class`=%u", unitClass);
 
         uint32 requiredMaxLevel = MAX_LEVEL;
         if (result)
@@ -2069,7 +2069,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
             } while (result->NextRow());
         }
 
-        result.reset(WorldDatabase.PQuery("SELECT MAX(`level`) FROM `creature_classlevelstats` WHERE `class`=%u", unitClass));
+        result = WorldDatabase.PQuery("SELECT MAX(`level`) FROM `creature_classlevelstats` WHERE `class`=%u", unitClass);
 
         uint32 currentMaxLevel = CREATURE_MAX_LEVEL;
         if (result)
@@ -2089,8 +2089,8 @@ void ObjectMgr::LoadCreatureClassLevelStats()
             } while (result->NextRow());
         }
 
-        //                                         0        1               2                3               4                      5         6              7       8            9           10         11         12           13        14
-        result.reset(WorldDatabase.PQuery("SELECT `level`, `melee_damage`, `ranged_damage`, `attack_power`, `ranged_attack_power`, `health`, `base_health`, `mana`, `base_mana`, `strength`, `agility`, `stamina`, `intellect`, `spirit`, `armor` FROM `creature_classlevelstats` WHERE `class`=%u ORDER BY `level`", unitClass));
+        //                                     0        1               2                3               4                      5         6              7       8            9           10         11         12           13        14
+        result = WorldDatabase.PQuery("SELECT `level`, `melee_damage`, `ranged_damage`, `attack_power`, `ranged_attack_power`, `health`, `base_health`, `mana`, `base_mana`, `strength`, `agility`, `stamina`, `intellect`, `spirit`, `armor` FROM `creature_classlevelstats` WHERE `class`=%u ORDER BY `level`", unitClass);
 
         if (result)
         {
@@ -5187,8 +5187,8 @@ void ObjectMgr::LoadGroups()
 
     // -- loading members --
     count = 0;
-    //                                            0              1            2           3
-    result.reset(CharacterDatabase.Query("SELECT `member_guid`, `assistant`, `subgroup`, `group_id` FROM `group_member` ORDER BY `group_id`"));
+    //                                        0              1            2           3
+    result = CharacterDatabase.Query("SELECT `member_guid`, `assistant`, `subgroup`, `group_id` FROM `group_member` ORDER BY `group_id`");
     if (!result)
     {
         BarGoLink bar2(1);
@@ -5251,7 +5251,7 @@ void ObjectMgr::LoadGroups()
 
     // -- loading instances --
     count = 0;
-    result.reset(CharacterDatabase.Query(
+    result = CharacterDatabase.Query(
                  //                        0              1      2           3            4
                  "SELECT `group_instance`.`leader_guid`, `map`, `instance`, `permanent`, `reset_time`, "
                  // 5
@@ -5259,7 +5259,7 @@ void ObjectMgr::LoadGroups()
                  // 6
                  " `groups`.`group_id` "
                  "FROM `group_instance` LEFT JOIN `instance` ON `instance` = `id` LEFT JOIN `groups` ON `groups`.`leader_guid` = `group_instance`.`leader_guid` ORDER BY `leader_guid`"
-             ));
+             );
 
     if (!result)
     {
@@ -6606,7 +6606,7 @@ public:
     ObjectGuid receiverGuid;
     uint32 itemTextId;
 
-    void Callback(QueryResult* result)
+    void Callback(std::unique_ptr<QueryResult> result)
     {
         uint32 item_guid = 0;
         if (result)
@@ -6614,8 +6614,8 @@ public:
             Field* fields2 = result->Fetch();
 
             item_guid = fields2[0].GetUInt32();
-            delete result;
         }
+
         if (!sObjectAccessor.FindPlayerNotInWorld(receiverGuid)) // Do not process online players!
         {
             if (!returnToLowGuid) // Delete mail and items
@@ -6654,7 +6654,7 @@ public:
     OldMailsReturner() : serverUp(false), basetime(0) {}
     bool serverUp;
     time_t basetime;
-    void Callback(QueryResult* result)
+    void Callback(std::unique_ptr<QueryResult> result)
     {
         if (!result)
         {
@@ -6724,7 +6724,7 @@ public:
         }
         while (result->NextRow());
         sObjectMgr.IncrementOldMailCounter(skippedCount);
-        delete result;
+
         delete this;
     }
 };
@@ -7578,11 +7578,11 @@ void ObjectMgr::SetHighestGuids()
     if (result)
         m_CharGuids.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(WorldDatabase.Query("SELECT MAX(`guid`) FROM `creature`"));
+    result = WorldDatabase.Query("SELECT MAX(`guid`) FROM `creature`");
     if (result)
         m_FirstTemporaryCreatureGuid = (*result)[0].GetUInt32() + 1;
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `item_instance`"));
+    result = CharacterDatabase.Query("SELECT MAX(`guid`) FROM `item_instance`");
     if (result)
         m_ItemGuids.Set((*result)[0].GetUInt32() + 1);
 
@@ -7593,11 +7593,11 @@ void ObjectMgr::SetHighestGuids()
     CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.CommitTransaction();
 
-    result.reset(WorldDatabase.Query("SELECT MAX(`guid`) FROM `gameobject`"));
+    result = WorldDatabase.Query("SELECT MAX(`guid`) FROM `gameobject`");
     if (result)
         m_FirstTemporaryGameObjectGuid = (*result)[0].GetUInt32() + 1;
 
-    result.reset(CharacterDatabase.Query("SELECT `id` FROM `auction`"));
+    result = CharacterDatabase.Query("SELECT `id` FROM `auction`");
     if (result)
     {
         do
@@ -7608,27 +7608,27 @@ void ObjectMgr::SetHighestGuids()
     }
     m_NextAuctionId = 1;
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`id`) FROM `mail`"));
+    result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `mail`");
     if (result)
         m_MailIds.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`id`) FROM `item_text`"));
+    result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `item_text`");
     if (result)
         m_ItemTextIds.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `corpse`"));
+    result = CharacterDatabase.Query("SELECT MAX(`guid`) FROM `corpse`");
     if (result)
         m_CorpseGuids.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`guild_id`) FROM `guild`"));
+    result = CharacterDatabase.Query("SELECT MAX(`guild_id`) FROM `guild`");
     if (result)
         m_GuildIds.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`group_id`) FROM `groups`"));
+    result = CharacterDatabase.Query("SELECT MAX(`group_id`) FROM `groups`");
     if (result)
         m_GroupIds.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`petition_guid`) FROM `petition`"));
+    result = CharacterDatabase.Query("SELECT MAX(`petition_guid`) FROM `petition`");
     if (result)
         m_PetitionIds.Set((*result)[0].GetUInt32() + 1);
 
@@ -8275,8 +8275,8 @@ void ObjectMgr::LoadFactions()
 
 #if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
         // Load localized texts (currently we only have 1.12 locales).
-        //                                        0        1            2            3            4            5            6            7                   8                   9                   10                  11                  12
-        result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `description_loc1`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc5`, `description_loc6` FROM `locales_faction`"));
+        //                                    0        1            2            3            4            5            6            7                   8                   9                   10                  11                  12
+        result = WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `description_loc1`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc5`, `description_loc6` FROM `locales_faction`");
         if (result)
         {
             do
@@ -8841,7 +8841,7 @@ void ObjectMgr::LoadTaxiNodes()
     uint32 maxTaxiNodeEntry = fields[0].GetUInt32() + 1;
 
     // Actually loading the taxi nodes.
-    result.reset(WorldDatabase.PQuery("SELECT * FROM `taxi_nodes` t1 WHERE `build`=(SELECT max(`build`) FROM `taxi_nodes` t2 WHERE t1.`id`=t2.`id` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
+    result = WorldDatabase.PQuery("SELECT * FROM `taxi_nodes` t1 WHERE `build`=(SELECT max(`build`) FROM `taxi_nodes` t2 WHERE t1.`id`=t2.`id` && `build` <= %u)", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -8880,8 +8880,8 @@ void ObjectMgr::LoadTaxiNodes()
 
 #if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
     // Load localized texts (currently we only have 1.12 locales).
-    //                                        0        1            2            3            4            5            6
-    result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6` FROM `locales_taxi_node`"));
+    //                                    0        1            2            3            4            5            6
+    result = WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6` FROM `locales_taxi_node`");
     if (result)
     {
         do
@@ -9327,7 +9327,7 @@ void ObjectMgr::LoadSkillLineAbility()
     uint32 maxSkillLineAbilityId = fields[0].GetUInt32() + 1;
 
     // Actually loading the skills.
-    result.reset(WorldDatabase.PQuery("SELECT * FROM `skill_line_ability` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+    result = WorldDatabase.PQuery("SELECT * FROM `skill_line_ability` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -10156,7 +10156,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         } while (result->NextRow());
     }
 
-    result.reset(WorldDatabase.PQuery("SELECT `entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel` FROM %s WHERE %u BETWEEN `build_min` AND `build_max`", tableName, SUPPORTED_CLIENT_BUILD));
+    result = WorldDatabase.PQuery("SELECT `entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel` FROM %s WHERE %u BETWEEN `build_min` AND `build_max`", tableName, SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {

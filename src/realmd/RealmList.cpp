@@ -158,7 +158,7 @@ void RealmList::UpdateRealms(bool init)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Updating realm list...");
 
-    QueryResult *result = LoginDatabase.Query(
+    std::unique_ptr<QueryResult> result = LoginDatabase.Query(
         //       0     1       2          3               4                  5       6
         "SELECT `id`, `name`, `address`, `localAddress`, `localSubnetMask`, `port`, `icon`, "
         // 7            8           9                       10            11
@@ -199,7 +199,6 @@ void RealmList::UpdateRealms(bool init)
             if(init)
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Added realm \"%s\"", fields[1].GetString());
         } while( result->NextRow() );
-        delete result;
     }
 }
 
@@ -207,7 +206,7 @@ void RealmList::LoadAllowedClients()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Loading allowed clients...");
 
-    QueryResult *result = LoginDatabase.Query(
+    std::unique_ptr<QueryResult> result = LoginDatabase.Query(
         //       0                 1               2                 3                 4        5     6           7
         "SELECT `major_version`, `minor_version`, `bugfix_version`, `hotfix_version`, `build`, `os`, `platform`, `integrity_hash` "
         "FROM `allowed_clients`");
@@ -244,6 +243,5 @@ void RealmList::LoadAllowedClients()
             ExpectedRealmdClientBuilds.push_back(buildInfo);
 
         } while (result->NextRow());
-        delete result;
     }
 }

@@ -64,7 +64,7 @@ class ReputationMgr
         ~ReputationMgr() {}
 
         void SaveToDB();
-        void LoadFromDB(QueryResult* result);
+        void LoadFromDB(std::unique_ptr<QueryResult> result);
     public:                                                 // statics
         static int32 const PointsInRank[MAX_REPUTATION_RANK];
         static int32 const Reputation_Cap    =  42999;

@@ -92,19 +92,19 @@ class UpdateData
         std::list<UpdatePacket> m_datas;
 };
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
 class MovementData
 {
     public:
-        MovementData() : _buffer(1024) {}
+        MovementData() : m_buffer(1024) {}
         ~MovementData() {}
         bool CanAddPacket(WorldPacket const& data);
         void AddPacket(WorldPacket const& data);
         bool BuildPacket(WorldPacket& data);
-        bool HasData() const { return _buffer.wpos() != 0; }
-        void ClearBuffer() { _buffer.clear(); }
+        bool HasData() const { return m_buffer.wpos() != 0; }
+        void ClearBuffer() { m_buffer.clear(); }
     protected:
-        ByteBuffer _buffer;
+        ByteBuffer m_buffer;
 };
 #endif
 

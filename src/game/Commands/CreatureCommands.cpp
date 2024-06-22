@@ -1865,10 +1865,9 @@ bool ChatHandler::HandleWpAddCommand(char* args)
                 wpDestination = PATH_FROM_ENTRY;                // Default place to store paths
                 if (wpOwner->HasStaticDBSpawnData())
                 {
-                    QueryResult* result = WorldDatabase.PQuery("SELECT COUNT(id) FROM creature WHERE id = %u", wpOwner->GetEntry());
+                    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT COUNT(id) FROM creature WHERE id = %u", wpOwner->GetEntry());
                     if (result && result->Fetch()[0].GetUInt32() != 1)
                         wpDestination = PATH_FROM_GUID;
-                    delete result;
                 }
             }
         }
@@ -2639,8 +2638,9 @@ bool ChatHandler::HandleEscortAddWpCommand(char *args)
         SetSentErrorMessage(true);
         return false;
     }
-    QueryResult* pResult = nullptr;
-    Field* pFields       = nullptr;
+
+    std::unique_ptr<QueryResult> pResult = nullptr;
+    Field* pFields = nullptr;
     if (waypointId == 0)
     {
         pResult = WorldDatabase.PQuery("SELECT MAX(pointid) FROM script_waypoint WHERE entry=%u", creatureEntry);

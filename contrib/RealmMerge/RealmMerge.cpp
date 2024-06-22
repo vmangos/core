@@ -139,7 +139,7 @@ bool UpdateCharacterGuids()
     } while (result->NextRow());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.characters...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `guid`, `name` FROM `characters`"));
+    result = CharacterDatabase2.Query("SELECT `guid`, `name` FROM `characters`");
 
     if (!result)
     {
@@ -296,7 +296,7 @@ bool UpdateCharacterGuids()
 
     // This table has auto increment primary key so update that too.
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.character_deleted_items...", g_db1Name.c_str());
-    result.reset(CharacterDatabase1.Query("SELECT MAX(`id`) FROM `character_deleted_items`"));
+    result = CharacterDatabase1.Query("SELECT MAX(`id`) FROM `character_deleted_items`");
     if (result)
     {
         uint32 maxId = 0;
@@ -335,7 +335,7 @@ bool UpdateItemGuids()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.item_instance...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `guid` FROM `item_instance`"));
+    result = CharacterDatabase2.Query("SELECT `guid` FROM `item_instance`");
 
     if (result)
     {
@@ -422,7 +422,7 @@ bool UpdatePetitionGuids()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.petition...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `petition_guid` FROM `petition`"));
+    result = CharacterDatabase2.Query("SELECT `petition_guid` FROM `petition`");
 
     if (result)
     {
@@ -493,7 +493,7 @@ bool UpdatePetGuids()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.character_pet...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `id` FROM `character_pet`"));
+    result = CharacterDatabase2.Query("SELECT `id` FROM `character_pet`");
 
     if (result)
     {
@@ -568,7 +568,7 @@ bool UpdateCorpseGuids()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.corpse...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `guid` FROM `corpse`"));
+    result = CharacterDatabase2.Query("SELECT `guid` FROM `corpse`");
 
     if (result)
     {
@@ -637,7 +637,7 @@ bool UpdateGroupIds()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.groups...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `group_id` FROM `groups`"));
+    result = CharacterDatabase2.Query("SELECT `group_id` FROM `groups`");
 
     if (result)
     {
@@ -708,7 +708,7 @@ bool UpdateGuildIds()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.guild...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `guild_id` FROM `guild`"));
+    result = CharacterDatabase2.Query("SELECT `guild_id` FROM `guild`");
 
     if (result)
     {
@@ -783,7 +783,7 @@ bool UpdateInstanceIds()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.instance...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `id` FROM `instance`"));
+    result = CharacterDatabase2.Query("SELECT `id` FROM `instance`");
 
     if (result)
     {
@@ -864,7 +864,7 @@ bool UpdateMailIds()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.mail...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `id` FROM `mail`"));
+    result = CharacterDatabase2.Query("SELECT `id` FROM `mail`");
 
     if (result)
     {
@@ -935,7 +935,7 @@ bool UpdateItemTextIds()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.mail...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `id` FROM `item_text`"));
+    result = CharacterDatabase2.Query("SELECT `id` FROM `item_text`");
 
     if (result)
     {
@@ -1008,7 +1008,7 @@ bool UpdateAuctionIds()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.auction...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `id` FROM `auction`"));
+    result = CharacterDatabase2.Query("SELECT `id` FROM `auction`");
 
     if (result)
     {
@@ -1077,7 +1077,7 @@ bool UpdateTicketIds()
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading %s.gm_tickets...", g_db2Name.c_str());
-    result.reset(CharacterDatabase2.Query("SELECT `ticket_id` FROM `gm_tickets`"));
+    result = CharacterDatabase2.Query("SELECT `ticket_id` FROM `gm_tickets`");
 
     if (result)
     {

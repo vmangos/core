@@ -55,13 +55,8 @@ void startDaemon(uint32_t timeout)
     signal(SIGTERM, daemonSignal);
     signal(SIGALRM, daemonSignal);
 
-    // Fork the process
     sid = pid = fork();
 
-    // An error occurred
-    // pid > 0 == parent
-    // pid == 0 == child
-    // do the real termination of the parent via a call in master.cpp Master::run()
     if (pid < 0)
     {
         exit(EXIT_FAILURE);
@@ -76,7 +71,6 @@ void startDaemon(uint32_t timeout)
 
     umask(0);
 
-    // child process becomes the session leader
     sid = setsid();
 
     if (sid < 0)
@@ -84,9 +78,17 @@ void startDaemon(uint32_t timeout)
         exit(EXIT_FAILURE);
     }
 
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
+    if ((chdir("/")) < 0)
+    {
+        exit(EXIT_FAILURE);
+    }
+
+    if (!freopen("/dev/null", "rt", stdin))
+        exit(EXIT_FAILURE);
+    if (!freopen("/dev/null", "wt", stdout))
+        exit(EXIT_FAILURE);
+    if (!freopen("/dev/null", "wt", stderr))
+        exit(EXIT_FAILURE);
 }
 
 void stopDaemon()

@@ -209,14 +209,14 @@ void UpdateData::Clear()
     m_outOfRangeGUIDs.clear();
 }
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
 bool MovementData::CanAddPacket(WorldPacket const& data)
 {
     // Since packet size is stored with an uint8, packet size is limited for compressed packets
     if ((data.wpos() + 2) > 0xFF)
         return false;
 
-    if ((_buffer.wpos() + (data.wpos() + 2)) >= 900000)
+    if ((m_buffer.wpos() + (data.wpos() + 2)) >= 900000)
         return false;
 
     return true;
@@ -225,16 +225,16 @@ bool MovementData::CanAddPacket(WorldPacket const& data)
 void MovementData::AddPacket(WorldPacket const& data)
 {
     ASSERT(data.wpos() + 2 <= 0xFF); // Max packet size to be stored on uint8. Client crash else.
-    _buffer << uint8(data.wpos() + 2); // Packet + opcode size
-    _buffer << uint16(data.GetOpcode());
-    _buffer.append(data.contents(), data.wpos());
+    m_buffer << uint8(data.wpos() + 2); // Packet + opcode size
+    m_buffer << uint16(data.GetOpcode());
+    m_buffer.append(data.contents(), data.wpos());
 }
 
 bool MovementData::BuildPacket(WorldPacket& packet)
 {
     MANGOS_ASSERT(packet.empty()); // We want a clean packet !
 
-    size_t pSize = _buffer.wpos();                              // use real used data size
+    size_t pSize = m_buffer.wpos();                              // use real used data size
 
     if (pSize >= 900000)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH-CLIENT] Too large packet size %u (SMSG_COMPRESSED_MOVES)", pSize);
@@ -242,7 +242,7 @@ bool MovementData::BuildPacket(WorldPacket& packet)
     uint32 destsize = compressBound(pSize);
     packet.resize(destsize + sizeof(uint32));
     packet.put<uint32>(0, pSize);
-    PacketCompressor::Compress(const_cast<uint8*>(packet.contents()) + sizeof(uint32), &destsize, (void*)_buffer.contents(), pSize);
+    PacketCompressor::Compress(const_cast<uint8*>(packet.contents()) + sizeof(uint32), &destsize, (void*)m_buffer.contents(), pSize);
     if (destsize == 0)
         return false;
 

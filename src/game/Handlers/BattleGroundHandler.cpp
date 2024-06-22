@@ -83,7 +83,7 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket& recv_data)
     uint32 mapId;
     recv_data >> mapId;
 
-    WorldPacket data(CMSG_BATTLEMASTER_JOIN);
+    WorldPacket data(recv_data.GetOpcode());
     data << uint64(0);
     data << uint32(mapId);
     data << uint32(0);

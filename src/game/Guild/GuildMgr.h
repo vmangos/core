@@ -96,7 +96,7 @@ public:
 
     ~Petition();
 
-    bool LoadFromDB(QueryResult* result);
+    bool LoadFromDB(const std::unique_ptr<QueryResult>& result);
     void Delete();
     void SaveToDB();
 

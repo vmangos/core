@@ -55,8 +55,9 @@ ConfVersion=2010100901
 #        Amount of async threads (with dedicated connection) which will be used for async SELECT, executes, and transactions.
 #        Default: 1 async worker
 #
-#    MaxPingTime
-#        Settings for maximum database-ping interval (minutes between pings)
+#    Database.AliveCheckInternal - in seconds
+#        The interval in seconds to check the reachability of the database
+#        Default: 600 (10 min)
 #
 #    WorldServerPort
 #        Port on which the server will listen
@@ -85,7 +86,7 @@ CharacterDatabase.WorkerThreads = 1
 LogsDatabase.Info               = "127.0.0.1;3306;mangos;mangos;logs"
 LogsDatabase.Connections        = 1
 LogsDatabase.WorkerThreads      = 1
-MaxPingTime = 30
+Database.AliveCheckInternal     = 600
 WorldServerPort = 8085
 BindIP = "0.0.0.0"
 
@@ -1772,18 +1773,13 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.NoFallTime.Enable
-#        Description: Check for players that walking in the air.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.NoFallTime.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Description: Check for consecutive movements with falling flag but no fall time.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.NoFallTime.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     5
+#        Default:     1
 #
 #    Anticheat.NoFallTime.Penalty
 #        Description: Action to take upon failing this check.
@@ -1799,6 +1795,32 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     1
 #
 #    Anticheat.BadFallReset.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Kick
+#
+#    Anticheat.BadFallStop.Enable
+#        Description: Check for falling flag being removed without sending land opcode.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.BadFallStop.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.BadFallStop.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Kick
+#
+#    Anticheat.BadMoveStart.Enable
+#        Description: Check for starting movement with wrong opcode.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.BadMoveStart.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.BadMoveStart.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
@@ -2118,12 +2140,17 @@ Anticheat.FlyHack.Reject = 1
 Anticheat.FlyHack.Threshold = 3
 Anticheat.FlyHack.Penalty = 11
 Anticheat.NoFallTime.Enable = 1
-Anticheat.NoFallTime.Reject = 1
-Anticheat.NoFallTime.Threshold = 5
+Anticheat.NoFallTime.Threshold = 1
 Anticheat.NoFallTime.Penalty = 11
 Anticheat.BadFallReset.Enable = 1
 Anticheat.BadFallReset.Threshold = 1
 Anticheat.BadFallReset.Penalty = 11
+Anticheat.BadFallStop.Enable = 1
+Anticheat.BadFallStop.Threshold = 1
+Anticheat.BadFallStop.Penalty = 11
+Anticheat.BadMoveStart.Enable = 1
+Anticheat.BadMoveStart.Threshold = 1
+Anticheat.BadMoveStart.Penalty = 11
 Anticheat.Teleport.Enable = 1
 Anticheat.Teleport.Reject = 1
 Anticheat.Teleport.Distance = 40.0

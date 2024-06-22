@@ -335,30 +335,42 @@ struct boss_gothikAI : public ScriptedAI
         }
     }
 
-    bool IsAllPlayersOneSide()
+    bool HasLessPlayersPerSide(uint32 count)
     {
-        MapRefManager const&  lPlayers = m_pInstance->GetMap()->GetPlayers();
-        uint32 num_left = 0;
-        uint32 num_right = 0;
+        MapRefManager const& lPlayers = m_pInstance->GetMap()->GetPlayers();
+        uint32 numLeft = 0;
+        uint32 numRight = 0;
         for (auto& playerRef : lPlayers)
         {
             if (Player const* p = playerRef.getSource())
             {
-                // Don't count dead players, except those feigned
-                if (p->IsDead() && !p->HasAura(SPELL_AURA_FEIGN_DEATH))
+                // Don't count dead players, including those that are feigned
+                // Otherwise we could have a bunch of feigned players sitting on one side
+                if (p->IsDead() || p->IsFeigningDeathSuccessfully())
                     continue;
 
-                if(m_pInstance->IsInRightSideGothArea(p))
-                    ++num_right;
-                else
-                    ++num_left;
+                if (GameObject* pCombatGate = m_pInstance->GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
+                {
+                    // Do not count players outside the room.
+                    if (!pCombatGate->IsWithinDist(p, 100))
+                        continue;
+
+                    // Do not count players stacked inside the gate.
+                    if (std::abs(p->GetPositionY() - pCombatGate->GetPositionY()) < 0.5f)
+                        continue;
+
+                    if (pCombatGate->GetPositionY() >= p->GetPositionY())
+                        ++numRight;
+                    else
+                        ++numLeft;
+                }
             }
         }
         // if there are less than 10 people on one of the sides we consider it as
         // "everyone is on the same side". That to avoid the whole raid afking on spectral
         // side, waiting for gothik to TP down, in which case they have 40 sec to kill him
         // before the gates would ordinarily open.
-        return (num_left < 1 || num_right < 1);
+        return (numLeft < count || numRight < count);
     }
 
     void UpdateAI(uint32 const uiDiff) override
@@ -384,7 +396,7 @@ struct boss_gothikAI : public ScriptedAI
             {
                 if (m_uiSpeechTimer < uiDiff)
                 {
-                    if (IsAllPlayersOneSide())
+                    if (HasLessPlayersPerSide(10))
                     {
                         EnterEvadeMode();
                         return;
@@ -428,7 +440,7 @@ struct boss_gothikAI : public ScriptedAI
                         m_creature->SetTempPacified(TELEPORT_PACIFY_TIMER);
 
                         // opening the gates when TPing down if all players are considered on the same side
-                        if (!gatesOpened && IsAllPlayersOneSide())
+                        if (!gatesOpened && HasLessPlayersPerSide(1))
                             OpenTheGate();
 
                         if (m_creature->HasAura(SPELL_IMMUNE_ALL))
@@ -508,7 +520,7 @@ struct boss_gothikAI : public ScriptedAI
                 // We check if a side has wiped every 1 sec. If it's the case, we open the gates
                 if (!gatesOpened && m_checkAllPlayersOneSideTimer < uiDiff)
                 {
-                    if(IsAllPlayersOneSide())
+                    if(HasLessPlayersPerSide(1))
                         OpenTheGate();
                     m_checkAllPlayersOneSideTimer = 1000;
                 }

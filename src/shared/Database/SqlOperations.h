@@ -26,7 +26,7 @@
 
 #include "LockedQueue.h"
 #include <queue>
-#include "Utilities/Callback.h"
+#include "DatabaseCallback.h"
 #include <memory>
 
 // ---- BASE ---
@@ -129,20 +129,21 @@ class SqlQueryHolder
 {
     friend class SqlQueryHolderEx;
     private:
-        typedef std::pair<char const*, QueryResult*> SqlResultPair;
+        typedef std::pair<std::string, std::unique_ptr<QueryResult>> SqlResultPair;
         std::vector<SqlResultPair> m_queries;
 
         uint32 serialId;
     public:
         SqlQueryHolder(uint32 id) : serialId(id) {}
         SqlQueryHolder() : serialId(0) {}
-        virtual ~SqlQueryHolder();
-        bool SetQuery(size_t index, char const* sql);
-        bool SetPQuery(size_t index, char const* format, ...) ATTR_PRINTF(3,4);
+        virtual ~SqlQueryHolder() = default;
+        bool SetQuery(size_t index, std::string const& sql);
+        bool SetPQuery(size_t index, char const* format, ...) ATTR_PRINTF(3,4); // <-- the format is copied
         void SetSize(size_t size);
         size_t GetSize() const { return m_queries.size(); }
-        QueryResult* GetResult(size_t index);
-        void SetResult(size_t index, QueryResult* result);
+        /// When you are using this function, you are the new owner of the ptr. The query will be removed from the QueryHolder
+        std::unique_ptr<QueryResult> TakeResult(size_t index);
+        void SetResult(size_t index, std::unique_ptr<QueryResult> result);
         bool Execute(MaNGOS::IQueryCallback* callback, Database* db, SqlResultQueue* queue);
         void DeleteAllResults();
         uint32 GetSerialId() const { return serialId; }

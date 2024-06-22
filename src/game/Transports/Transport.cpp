@@ -210,7 +210,6 @@ void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
         passenger->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
         bool changedTransports = passenger->m_movementInfo.t_guid != GetObjectGuid();
         passenger->m_movementInfo.t_guid = GetObjectGuid();
-        passenger->m_movementInfo.t_time = GetPathProgress();
         if (changedTransports && adjustCoords)
         {
             passenger->m_movementInfo.t_pos.x = passenger->GetPositionX();
@@ -253,7 +252,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
 void GenericTransport::AddFollowerToTransport(Unit* passenger, Unit* follower)
 {
     AddPassenger(follower);
-    follower->m_movementInfo.SetTransportData(GetObjectGuid(), passenger->m_movementInfo.t_pos.x, passenger->m_movementInfo.t_pos.y, passenger->m_movementInfo.t_pos.z, passenger->m_movementInfo.t_pos.o, GetPathProgress());
+    follower->m_movementInfo.SetTransportData(GetObjectGuid(), passenger->m_movementInfo.t_pos.x, passenger->m_movementInfo.t_pos.y, passenger->m_movementInfo.t_pos.z, passenger->m_movementInfo.t_pos.o);
     if (follower->IsCreature())
         follower->NearTeleportTo(passenger->m_movementInfo.pos.x, passenger->m_movementInfo.pos.y, passenger->m_movementInfo.pos.z, passenger->m_movementInfo.pos.o);
     else
@@ -470,7 +469,6 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
                 GetMap()->CreatureRelocation(creature, x, y, z, o);
             else
                 passenger->Relocate(x, y, z, o);
-            creature->m_movementInfo.t_time = GetPathProgress();
             passenger->m_movementInfo.ctime = 0;
             break;
         }
@@ -483,7 +481,6 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
                 passenger->Relocate(x, y, z, o);
                 static_cast<Player*>(passenger)->m_movementInfo.t_guid = GetObjectGuid();
             }
-            static_cast<Player*>(passenger)->m_movementInfo.t_time = GetPathProgress();
             passenger->m_movementInfo.ctime = 0;
             break;
         default:

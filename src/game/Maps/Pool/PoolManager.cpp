@@ -666,7 +666,7 @@ bool CheckPoolAndChance(char const* table, uint16 pool_id, float chance)
 
 void PoolManager::LoadFromDB()
 {
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(`entry`) FROM `pool_template` WHERE %u BETWEEN `patch_min` AND `patch_max`", sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT MAX(`entry`) FROM `pool_template` WHERE %u BETWEEN `patch_min` AND `patch_max`", sWorld.GetWowPatch());
     if (!result)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Table pool_template is empty.");
@@ -677,7 +677,6 @@ void PoolManager::LoadFromDB()
     {
         Field* fields = result->Fetch();
         max_pool_id = fields[0].GetUInt16();
-        delete result;
     }
 
     mPoolTemplate.resize(max_pool_id + 1);
@@ -716,7 +715,6 @@ void PoolManager::LoadFromDB()
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u objects pools", count);
-    delete result;
 
     PoolMapChecker mapChecker(mPoolTemplate);
 
@@ -798,7 +796,6 @@ void PoolManager::LoadFromDB()
         while (result->NextRow());
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creatures in pools from `pool_creature` and `pool_creature_template`", count);
-        delete result;
     }
 
     // Gameobjects (guids and entries)
@@ -886,7 +883,6 @@ void PoolManager::LoadFromDB()
         while (result->NextRow());
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobject in pools from `pool_gameobject` and `pool_gameobject_template`", count);
-        delete result;
     }
 
     // Pool of pools
@@ -986,7 +982,6 @@ void PoolManager::LoadFromDB()
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u pools in mother pools", count);
-        delete result;
     }
 
     // check chances integrity

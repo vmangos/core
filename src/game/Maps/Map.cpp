@@ -156,14 +156,14 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState->SetUsedByMapState(this);
     m_weatherSystem = new WeatherSystem(this);
 
-    int numObjThreads = (int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
-    if (numObjThreads > 1)
-    {
-        m_objectThreads.reset(new ThreadPool(numObjThreads -1));
-        m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
-    }
     if (IsContinent())
     {
+        int numObjThreads = (int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
+        if (numObjThreads > 1)
+        {
+            m_objectThreads.reset(new ThreadPool(numObjThreads -1));
+            m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
+        }
         m_motionThreads.reset(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS)));
         m_visibilityThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1,0)));
         m_cellThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) - 1, 0)));
@@ -1840,7 +1840,7 @@ bool Map::SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const
 
 void Map::SendDefenseMessage(int32 textId, uint32 zoneId) const
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     for (const auto& itr : m_mapRefManager)
     {
         Player* pPlayer = itr.getSource();
@@ -1973,7 +1973,7 @@ void Map::CreateInstanceData(bool load)
     if (load)
     {
         // TODO: make a global storage for this
-        QueryResult* result;
+        std::unique_ptr<QueryResult> result;
 
         if (Instanceable())
             result = CharacterDatabase.PQuery("SELECT data FROM instance WHERE id = '%u'", i_InstanceId);
@@ -1991,8 +1991,6 @@ void Map::CreateInstanceData(bool load)
             }
             else
                 i_data->Create();
-
-            delete result;
         }
         else
         {

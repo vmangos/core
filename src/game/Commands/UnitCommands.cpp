@@ -318,6 +318,50 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleUnitMoveInfoCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Move info for %s", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("Server Time: %u", pTarget->m_movementInfo.stime);
+    PSendSysMessage("Client Time: %u", pTarget->m_movementInfo.ctime);
+    PSendSysMessage("Move Flags: %u (%s)", pTarget->m_movementInfo.moveFlags, FlagsToString(pTarget->m_movementInfo.moveFlags, MoveFlagToString).c_str());
+    PSendSysMessage("Position: %g %g %g %g", pTarget->m_movementInfo.pos.x, pTarget->m_movementInfo.pos.y, pTarget->m_movementInfo.pos.z, pTarget->m_movementInfo.pos.o);
+    if (!pTarget->m_movementInfo.t_guid.IsEmpty() || !pTarget->m_movementInfo.t_pos.IsEmpty())
+    {
+        PSendSysMessage("Transport Guid: %s", pTarget->m_movementInfo.t_guid.GetString().c_str());
+        PSendSysMessage("Transport Position: %g %g %g %g", pTarget->m_movementInfo.t_pos.x, pTarget->m_movementInfo.t_pos.y, pTarget->m_movementInfo.t_pos.z, pTarget->m_movementInfo.t_pos.o);
+    }
+    if (pTarget->m_movementInfo.s_pitch)
+        PSendSysMessage("Swim Pitch: %g", pTarget->m_movementInfo.s_pitch);
+    if (pTarget->m_movementInfo.fallTime)
+        PSendSysMessage("Fall Time: %u", pTarget->m_movementInfo.fallTime);
+    if (pTarget->m_movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))
+    {
+        PSendSysMessage("Jump Z Speed: %g", pTarget->m_movementInfo.jump.zspeed);
+        PSendSysMessage("Jump Cos Angle: %g", pTarget->m_movementInfo.jump.cosAngle);
+        PSendSysMessage("Jump Sin Angle: %g", pTarget->m_movementInfo.jump.sinAngle);
+        PSendSysMessage("Jump XY Speed: %g", pTarget->m_movementInfo.jump.xyspeed);
+        PSendSysMessage("Jump Start Time: %g", pTarget->m_movementInfo.jump.startClientTime);
+
+    }
+    if (pTarget->m_movementInfo.splineElevation)
+        PSendSysMessage("Spline Elevation: %g", pTarget->m_movementInfo.splineElevation);
+    if (pTarget->m_movementInfo.sourceSessionGuid)
+        PSendSysMessage("Source: Session %u", pTarget->m_movementInfo.sourceSessionGuid);
+    else
+        SendSysMessage("Source: Server");
+
+    return true;
+}
+
 bool ChatHandler::HandleUnitSpeedInfoCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();

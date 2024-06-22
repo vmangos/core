@@ -188,7 +188,7 @@ void WorldSession::SendPacketImpl(WorldPacket const* packet)
         m_socket->CloseSocket();
 }
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
 void WorldSession::SendMovementPacket(WorldPacket const* packet)
 {
     // There is a maximum size packet.
@@ -208,8 +208,13 @@ void WorldSession::SendMovementPacket(WorldPacket const* packet)
 
     if (++m_movePacketsSentThisInterval < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT) &&
         m_movePacketsSentLastInterval < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT))
+    {
         SendPacketImpl(packet);
-    else if (m_movementPacketCompressor.CanAddPacket(*packet))
+        return;
+    }
+        
+    std::lock_guard<std::mutex> guard(m_movementPacketCompressorMutex);
+    if (m_movementPacketCompressor.CanAddPacket(*packet))
         m_movementPacketCompressor.AddPacket(*packet);
     else
     {
@@ -442,7 +447,7 @@ bool WorldSession::Update(PacketFilter& updater)
 
         time_t const currTime = time(nullptr);
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         // send these out every world update
         SendCompressedMovementPackets();
 
@@ -795,7 +800,7 @@ void WorldSession::LogoutPlayer(bool Save)
             Map::DeleteFromWorld(_player);
         }
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         m_movementPacketCompressor.ClearBuffer();
 #endif
 
@@ -945,16 +950,14 @@ void WorldSession::SendAuthWaitQue(uint32 position)
 
 void WorldSession::LoadGlobalAccountData()
 {
-    QueryResult* result = CharacterDatabase.PQuery("SELECT `type`, `time`, `data` FROM `account_data` WHERE `account`=%u", GetAccountId());
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `type`, `time`, `data` FROM `account_data` WHERE `account`=%u", GetAccountId());
     LoadAccountData(
-        result,
+        std::move(result),
         NewAccountData::GLOBAL_CACHE_MASK
     );
-    if (result)
-        delete result;
 }
 
-void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
+void WorldSession::LoadAccountData(std::unique_ptr<QueryResult> result, uint32 mask)
 {
     for (uint32 i = 0; i < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++i)
         if (mask & (1 << i))
@@ -1065,7 +1068,7 @@ void WorldSession::LoadTutorialsData()
     for (uint32 & tutorial : m_tutorials)
         tutorial = 0;
 
-    QueryResult* result = CharacterDatabase.PQuery("SELECT `tut0`, `tut1`, `tut2`, `tut3`, `tut4`, `tut5`, `tut6`, `tut7` FROM `character_tutorial` WHERE `account` = '%u'", GetAccountId());
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `tut0`, `tut1`, `tut2`, `tut3`, `tut4`, `tut5`, `tut6`, `tut7` FROM `character_tutorial` WHERE `account` = '%u'", GetAccountId());
 
     if (!result)
     {
@@ -1081,8 +1084,6 @@ void WorldSession::LoadTutorialsData()
             m_tutorials[iI] = fields[iI].GetUInt32();
     }
     while (result->NextRow());
-
-    delete result;
 
     m_tutorialState = TUTORIALDATA_UNCHANGED;
 }

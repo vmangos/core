@@ -196,6 +196,7 @@ class ChatHandler
         //Cheats
         bool HandleCheatStatusCommand(char *);
         bool HandleCheatFlyCommand(char* args);
+        bool HandleCheatFixedZCommand(char* args);
         bool HandleCheatGodCommand(char *);
         bool HandleCheatCooldownCommand(char *);
         bool HandleCheatCastTimeCommand(char *);
@@ -738,6 +739,7 @@ class ChatHandler
 
         bool HandleUnitAIInfoCommand(char* args);
         bool HandleUnitInfoCommand(char* args);
+        bool HandleUnitMoveInfoCommand(char* args);
         bool HandleUnitSpeedInfoCommand(char* args);
         bool HandleUnitStatInfoCommand(char* args);
         bool HandleUnitUpdateFieldsInfoCommand(char* args);
@@ -1079,8 +1081,8 @@ class ChatHandler
         void ShowAllUpdateFieldsHelper(Object const* pTarget);
         void ShowUpdateFieldHelper(Object const* pTarget, uint16 index);
         SkillLineEntry const* FindSkillLineEntryFromProfessionName(char* args, std::string& nameOut);
-        bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = nullptr);
-        bool HandleBanListHelper(QueryResult* result);
+        bool LookupPlayerSearchCommand(std::unique_ptr<QueryResult> result, uint32* limit = nullptr);
+        bool HandleBanListHelper(std::unique_ptr<QueryResult> result);
         bool HandleBanHelper(BanMode mode, char* args);
         bool HandleBanInfoHelper(uint32 accountid, char const* accountname);
         bool HandleUnBanHelper(BanMode mode, char* args);

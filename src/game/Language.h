@@ -641,6 +641,10 @@ enum MangosStrings
     LANG_COMMAND_SOUND_LIST             = 602,
 
     // cheat commands
+    LANG_YOU_SET_FIXED_Z                = 611,
+    LANG_YOUR_FIXED_Z_SET               = 612,
+    LANG_CHEAT_FIXED_Z_ON               = 613,
+    LANG_CHEAT_FIXED_Z_OFF              = 614,
     LANG_YOU_SET_FLY                    = 615,
     LANG_YOUR_FLY_SET                   = 616,
     LANG_CHEAT_FLY_ON                   = 617,
