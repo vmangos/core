@@ -44,7 +44,7 @@ extern char serviceLongName[];
 extern char serviceName[];
 extern char serviceDescription[];
 
-extern int m_ServiceStatus;
+extern volatile int m_ServiceStatus;
 
 SERVICE_STATUS serviceStatus;
 
