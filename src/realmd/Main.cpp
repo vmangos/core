@@ -69,10 +69,6 @@ bool stopEvent = false;                                     // Setting it to tru
 
 DatabaseType LoginDatabase;                                 // Accessor to the realm server database
 
-// make sure template functions are instantiated
-//template std::unique_ptr<AsyncServerListener<AuthSocket>> AsyncServerListener<AuthSocket>::CreateAndBindServer(std::string const&, uint16_t);
-//template void BufferedSocket<AuthSocket, BufferedSocketAcceptor<AuthSocket>>::close_connection();
-
 // Print out the usage string for this program on the console.
 void usage(const char *prog)
 {
