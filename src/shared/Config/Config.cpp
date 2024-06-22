@@ -54,7 +54,7 @@ enum LineReadStage
     STAGE_READ_VALUE
 };
 
-bool IsLineEndChar(char chr)
+static bool IsLineEndChar(char chr)
 {
     switch (chr)
     {
