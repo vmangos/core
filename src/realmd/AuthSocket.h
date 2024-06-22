@@ -51,8 +51,10 @@ enum LockFlag
     GEO_CITY        = 0x20
 };
 
+struct sAuthLogonProof_C;
+
 // Handle login commands
-class AuthSocket : public MaNGOS::AsyncSocket<AuthSocket>, public std::enable_shared_from_this<AuthSocket>
+class AuthSocket : public MaNGOS::AsyncSocket<AuthSocket>
 {
     public:
         const static int s_BYTE_SIZE = 32;
@@ -63,16 +65,18 @@ class AuthSocket : public MaNGOS::AsyncSocket<AuthSocket>, public std::enable_sh
         void Start() final;
 
         void ProcessIncomingData();
-        void SendProof(Sha1Hash sha);
-        void LoadRealmlist(ByteBuffer &pkt);
-        bool VerifyPinData(uint32 pin, const PINData& clientData);
+        std::shared_ptr<ByteBuffer> GenerateLogonProofResponse(Sha1Hash sha);
+        void LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt);
+        bool VerifyPinData(uint32 pin, PINData const& clientData);
         uint32 GenerateTotpPin(const std::string& secret, int interval);
 
         void _HandleLogonChallenge();
-        bool _HandleLogonProof();
-        bool _HandleReconnectChallenge();
-        bool _HandleReconnectProof();
-        bool _HandleRealmList();
+        void _HandleLogonProof();
+        void _HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C const> const& lp, std::shared_ptr<PINData const> const& pinData);
+        void _HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_ptr<sAuthLogonProof_C const> const& lp);
+        void _HandleReconnectChallenge();
+        void _HandleReconnectProof();
+        void _HandleRealmList();
         //data transfer handle for patch
 
         bool _HandleXferResume();
@@ -85,9 +89,9 @@ class AuthSocket : public MaNGOS::AsyncSocket<AuthSocket>, public std::enable_sh
             STATUS_CHALLENGE,
             STATUS_LOGON_PROOF,
             STATUS_RECON_PROOF,
-            STATUS_PATCH,      // unused in CMaNGOS
+            STATUS_PATCH,
             STATUS_AUTHED,
-            STATUS_CLOSED
+            STATUS_INVALID,
         };
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);

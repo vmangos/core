@@ -55,6 +55,14 @@ enum AccountFlags
     ACCOUNT_FLAG_PROPASS    = 0x00800000,
 };
 
+enum SecurityFlags : uint8_t
+{
+    SECURITY_FLAG_NONE          = 0x00,
+    SECURITY_FLAG_PIN           = 0x01, // pin was added in 1.11.0
+    SECURITY_FLAG_UNK           = 0x02,
+    SECURITY_FLAG_AUTHENTICATOR = 0x04, // authenticator was added in 2.4.3
+};
+
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some paltform
 #if defined( __GNUC__ )
 #pragma pack(1)
@@ -103,18 +111,17 @@ typedef struct
 } sAuthLogonChallenge_S;
 */
 
-struct sAuthLogonProof_C_Base
+struct sAuthLogonProof_C_Pre_1_11_0
 {
-    uint8   cmd;
     uint8   A[32];
     uint8   M1[20];
     uint8   crc_hash[20];
     uint8   number_of_keys;
 };
 
-struct sAuthLogonProof_C_1_11 : public sAuthLogonProof_C_Base
+struct sAuthLogonProof_C : public sAuthLogonProof_C_Pre_1_11_0
 {
-    uint8   securityFlags;                                  // 0x00-0x04
+    uint8   securityFlags; // 0x00-0x04 // See enum SecurityFlags
 };
 /*
 typedef struct
@@ -184,8 +191,6 @@ typedef struct AuthHandler
 #pragma pack(pop)
 #endif
 
-#define AUTH_TOTAL_COMMANDS sizeof(table)/sizeof(AuthHandler)
-
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 // Accept the connection and set the s random value for SRP6 // TODO where is this SRP6 done?
@@ -216,10 +221,10 @@ void AuthSocket::ProcessIncomingData()
     constexpr AuthHandler table[] =
     {
         { CMD_AUTH_LOGON_CHALLENGE,     STATUS_CHALLENGE,   &AuthSocket::_HandleLogonChallenge },
-        //{ CMD_AUTH_LOGON_PROOF,         STATUS_LOGON_PROOF, &AuthSocket::_HandleLogonProof },
-        //{ CMD_AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge },
-        //{ CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
-        //{ CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
+        { CMD_AUTH_LOGON_PROOF,         STATUS_LOGON_PROOF, &AuthSocket::_HandleLogonProof },
+        { CMD_AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge },
+        { CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
+        { CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
         //{ CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
         //{ CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
         //{ CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
@@ -229,12 +234,13 @@ void AuthSocket::ProcessIncomingData()
 
     std::shared_ptr<eAuthCmd> cmd = std::make_shared<eAuthCmd>();
 
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ProcessIncomingData() Reading... Ready for next opcode");
     Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd, table, tableLength](MaNGOS::NetworkError const& error) -> void
     {
         if (error)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] ProcessIncomingData Read() error");
-            self->CloseSocket();
+            if (error.Error != MaNGOS::NetworkError::ErrorType::SocketClosed)
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] ProcessIncomingData Read(cmd) error");
             return;
         }
 
@@ -245,13 +251,11 @@ void AuthSocket::ProcessIncomingData()
             if (table[i].cmd != *cmd)
                 continue;
 
-            // unauthorized
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Status %u, table status %u", self->m_status, table[i].status);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] CMD: %u requires status %u, user has %u", *cmd, table[i].status, self->m_status);
 
             if (table[i].status != self->m_status)
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Received unauthorized command %u", *cmd);
-                self->CloseSocket();
+            { // unauthorized
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] Received unauthorized command %u", *cmd);
                 return;
             }
 
@@ -266,8 +270,7 @@ void AuthSocket::ProcessIncomingData()
         // Report unknown commands in the debug log
         if (i == tableLength)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] got unknown packet %u", *cmd);
-            self->CloseSocket();
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] got unknown packet cmd %u", *cmd);
             return;
         }
 
@@ -281,9 +284,10 @@ void AuthSocket::Start()
     ProcessIncomingData();
 }
 
-/*
-void AuthSocket::SendProof(Sha1Hash sha)
+std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)
 {
+    std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+
     if (m_build < 6299)  // before version 2.0.3 (exclusive)
     {
         sAuthLogonProof_S proof;
@@ -292,7 +296,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
         proof.error = 0;
         proof.surveyId = 0x00000000;
 
-        send((char *)&proof, sizeof(proof));
+        pkt->append(&proof, 1);
     }
     else if (m_build < 8089) // before version 2.4.0 (exclusive)
     {
@@ -303,7 +307,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
         proof.surveyId = 0x00000000;
         proof.loginFlags = 0x0000;
 
-        send((char *)&proof, sizeof(proof));
+        pkt->append(&proof, 1);
     }
     else
     {
@@ -315,22 +319,27 @@ void AuthSocket::SendProof(Sha1Hash sha)
         proof.surveyId = 0x00000000;
         proof.loginFlags = 0x0000;
 
-        send((char *)&proof, sizeof(proof));
+        pkt->append(&proof, 1);
     }
+
+    return pkt;
 }
-*/
+
 // Logon Challenge command handler
 void AuthSocket::_HandleLogonChallenge()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleLogonChallenge");
+    m_status = STATUS_INVALID;
+
     std::shared_ptr<sAuthLogonChallengeHeader> header = std::make_shared<sAuthLogonChallengeHeader>();
 
+    // Read the header first, to get the length of the remaining packet
     Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](MaNGOS::NetworkError const& error) -> void
     {
         if (error)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] HandleLogonChallenge Read() error");
-            self->CloseSocket();
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] HandleLogonChallenge Read(header) error");
+            self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
             return;
         }
 
@@ -345,24 +354,20 @@ void AuthSocket::_HandleLogonChallenge()
 
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] got header, body is %#04x bytes", actualBodySize);
 
-        // Session is closed unless overridden
-        self->m_status = STATUS_CLOSED;
-
         // Read the remaining of the packet
         std::shared_ptr<sAuthLogonChallengeBody> body = std::make_shared<sAuthLogonChallengeBody>();
         self->Read((char*)body.get(), actualBodySize, [self, header, body](MaNGOS::NetworkError const& error)
         {
             if (error)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonChallenge self->Read(): ERROR");
-                self->CloseSocket();
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Read(body): ERROR");
+                self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
                 return;
             }
 
             if (body->username_len > AUTH_LOGON_MAX_NAME)
                 return;
-
-            body->username[body->username_len] = '\0'; // TODO: What happens if AUTH_LOGON_MAX_NAME? Shouldn't this then be writing out of bounds by one byte?
+            body->username[body->username_len] = '\0';
 
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] got full packet, %#04x bytes", header->size);
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] name(%d): '%s'", body->username_len, body->username);
@@ -379,7 +384,6 @@ void AuthSocket::_HandleLogonChallenge()
 
             std::shared_ptr<ByteBuffer> pkt = std::make_shared<ByteBuffer>();
 
-            self->m_login = (const char*)body->username;
             self->m_build = body->build;
 
             // Convert uint8[4] to string, restore string order as its byte order is reversed
@@ -396,14 +400,11 @@ void AuthSocket::_HandleLogonChallenge()
             self->m_localizationName.assign(body->country, (body->country + sizeof(body->country)));
             std::reverse(self->m_localizationName.begin(), self->m_localizationName.end());
 
-            // Normalize account name
-            // utf8ToUpperOnlyLatin(m_login); -- client already send account in expected form
-
             // Escape the user input used in DB to avoid further SQL injection
             // Memory will be freed on AuthSocket object destruction
+            self->m_login = (const char*)body->username;
             self->m_safelogin = self->m_login;
             LoginDatabase.escape_string(self->m_safelogin);
-            LoginDatabase.escape_string(self->m_os);
 
             *pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
             *pkt << (uint8) 0x00;
@@ -446,7 +447,7 @@ void AuthSocket::_HandleLogonChallenge()
 
                         self->Write(pkt, [self](MaNGOS::NetworkError const& error) {
                             if (error)
-                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonChallenge self->Write(): ERROR");
+                                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write(): ERROR");
                             else
                                 self->ProcessIncomingData();
                         });
@@ -493,7 +494,7 @@ void AuthSocket::_HandleLogonChallenge()
                     if (!self->srp.SetVerifier(databaseV.c_str()) || !self->srp.SetSalt(databaseS.c_str()))
                     {
                         *pkt << uint8(WOW_FAIL_FAIL_NOACCESS);
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Broken v/s values in database for account %s!", self->m_login.c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[AuthChallenge] Broken v/s values in database for account %s!", self->m_login.c_str());
                         broken = true;
                     }
 
@@ -579,9 +580,10 @@ void AuthSocket::_HandleLogonChallenge()
                 }
             }
 
-            self->Write(pkt, [self](MaNGOS::NetworkError const& error) {
+            self->Write(pkt, [self](MaNGOS::NetworkError const& error)
+            {
                 if (error)
-                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonChallenge self->Write(): ERROR");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write(): ERROR");
                 else
                     self->ProcessIncomingData();
             });
@@ -589,123 +591,167 @@ void AuthSocket::_HandleLogonChallenge()
     });
 }
 
-/*
 // Logon Proof command handler
-bool AuthSocket::_HandleLogonProof()
+void AuthSocket::_HandleLogonProof()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleLogonProof");
+    m_status = STATUS_INVALID;
 
-    sAuthLogonProof_C_1_11 lp;
-    
     // Read the packet
-    if (m_build < 5428)        // before version 1.11.0 (exclusive)
-    {
-        if (!recv((char *)&lp, sizeof(sAuthLogonProof_C_Base)))
-            return false;
-        lp.securityFlags = 0;
-    }
-    else
-    {
-        if (!recv((char *)&lp, sizeof(sAuthLogonProof_C_1_11)))
-            return false;  
+    std::shared_ptr<sAuthLogonProof_C> lp = std::make_shared<sAuthLogonProof_C>();
+    size_t expectedSize = sizeof(sAuthLogonProof_C);
+    if (m_build < 5428) { // Pin support was added in 1.11.0, so if an older client connects, we need to skip those fields
+        lp->securityFlags = 0;
+        expectedSize = sizeof(sAuthLogonProof_C_Pre_1_11_0);
     }
 
-    PINData pinData;
-
-    if (lp.securityFlags)
+    Read((char*) lp.get(), expectedSize, [self = shared_from_this(), lp](MaNGOS::NetworkError const& error)
     {
-        if (!recv((char*)&pinData, sizeof(pinData)))
-            return false;
+        if (error)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Read(): ERROR");
+            self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+            return;
+        }
+
+        if (lp->securityFlags)
+        {
+            if (!(lp->securityFlags & SECURITY_FLAG_PIN))
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonChallenge Invalid/Unsupported securityFlags: %u", lp->securityFlags);
+                self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+                return;
+            }
+
+            std::shared_ptr<PINData> pinData(new PINData());
+            self->Read((char*) pinData.get(), sizeof(PINData), [self, lp, pinData](MaNGOS::NetworkError const& error)
+            {
+                self->_HandleLogonProof__PostRecv(lp, pinData);
+            });
+            return;
+        }
+
+        self->_HandleLogonProof__PostRecv(lp, nullptr);
+    });
+}
+
+void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_ptr<sAuthLogonProof_C const> const& lp)
+{
+    if (this->m_patch != ACE_INVALID_HANDLE)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonProof__PostRecv m_patch is already set??");
+        this->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+        return;
     }
+
+    // Check if we have the apropriate patch on the disk
+    // file looks like: 65535enGB.mpq
+    char tmp[256];
+
+    snprintf(tmp, 256, "%s/%d%s.mpq", sConfig.GetStringDefault("PatchesDir","./patches").c_str(), m_build, m_localizationName.c_str());
+
+    char filename[PATH_MAX];
+    if (ACE_OS::realpath(tmp, filename) != nullptr)
+    {
+        m_patch = ACE_OS::open(filename, GENERIC_READ | FILE_FLAG_SEQUENTIAL_SCAN);
+    }
+
+    if (m_patch == ACE_INVALID_HANDLE)
+    {
+        // no patch found
+        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+        *pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
+        *pkt << (uint8) 0x00;
+        *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] %u is not a valid client version!", m_build);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Patch %s not found", tmp);
+        Write(pkt, [self = shared_from_this(), pkt](MaNGOS::NetworkError const& error)
+        {
+            if (error)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonProof__PostRecv Write(...) failed");
+                self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+                return;
+            }
+            self->ProcessIncomingData();
+        });
+        return;
+    }
+
+    XFER_INIT xferh;
+
+    ACE_OFF_T file_size = ACE_OS::filesize(this->m_patch);
+
+    if (file_size == -1)
+    {
+        this->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+        return;
+    }
+
+    if (!PatchCache::instance()->GetHash(tmp, (uint8*)&xferh.md5))
+    {
+        // calculate patch md5, happens if patch was added while realmd was running
+        PatchCache::instance()->LoadPatchMD5(tmp);
+        PatchCache::instance()->GetHash(tmp, (uint8*)&xferh.md5);
+    }
+
+    std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+
+    // packet 1
+    *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
+    *pkt << (uint8) WOW_FAIL_VERSION_UPDATE;
+
+    // packet 2
+    xferh.cmd = CMD_XFER_INITIATE;
+    memcpy(&xferh.fileName, "Patch", 5);
+    xferh.fileNameLen = 5;
+    xferh.file_size = file_size;
+    pkt->append(&xferh, 1);
+
+    // Set right status
+    m_status = STATUS_PATCH;
+
+    Write(pkt, [self = shared_from_this()](MaNGOS::NetworkError const& error)
+    {
+        self->ProcessIncomingData();
+    });
+}
+
+void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C const> const& lp, std::shared_ptr<PINData const> const& pinData)
+{
+    MANGOS_ASSERT(!lp->securityFlags || pinData.get() != nullptr); // PinData must be present, when securityFlags is set
 
     // Check if the client has one of the expected version numbers
     bool valid_version = FindBuildInfo(m_build) != nullptr;
 
-    // Session is closed unless overriden
-    m_status = STATUS_CLOSED;
-
-    // <ul><li> If the client has no valid version
+    // If the client has no valid version
     if(!valid_version)
     {
-        if (this->m_patch != ACE_INVALID_HANDLE)
-            return false;
-
-        // Check if we have the apropriate patch on the disk
-        // file looks like: 65535enGB.mpq
-        char tmp[256];
-
-        snprintf(tmp, 256, "%s/%d%s.mpq", sConfig.GetStringDefault("PatchesDir","./patches").c_str(), m_build, m_localizationName.c_str());
-
-        char filename[PATH_MAX];
-        if (ACE_OS::realpath(tmp, filename) != nullptr)
-        {
-            m_patch = ACE_OS::open(filename, GENERIC_READ | FILE_FLAG_SEQUENTIAL_SCAN);
-        }
-
-        if (m_patch == ACE_INVALID_HANDLE)
-        {
-            // no patch found
-            ByteBuffer pkt;
-            pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
-            pkt << (uint8) 0x00;
-            pkt << (uint8) WOW_FAIL_VERSION_INVALID;
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] %u is not a valid client version!", m_build);
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Patch %s not found", tmp);
-            send((char const*)pkt.contents(), pkt.size());
-            return true;
-        }
-
-        XFER_INIT xferh;
-
-        ACE_OFF_T file_size = ACE_OS::filesize(this->m_patch);
-
-        if (file_size == -1)
-        {
-            close_connection();
-            return false;
-        }
-
-        if (!PatchCache::instance()->GetHash(tmp, (uint8*)&xferh.md5))
-        {
-            // calculate patch md5, happens if patch was added while realmd was running
-            PatchCache::instance()->LoadPatchMD5(tmp);
-            PatchCache::instance()->GetHash(tmp, (uint8*)&xferh.md5);
-        }
-
-        uint8 data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_VERSION_UPDATE};
-        send((const char*)data, sizeof(data));
-
-        memcpy(&xferh, "0\x05Patch", 7);
-        xferh.cmd = CMD_XFER_INITIATE;
-        xferh.file_size = file_size;
-
-        send((const char*)&xferh, sizeof(xferh));
-
-        // Set right status
-        m_status = STATUS_PATCH;
-
-        return true;
+        _HandleLogonProof__PostRecv_HandleInvalidVersion(lp);
+        return;
     }
-    // </ul>
 
     // Continue the SRP6 calculation based on data received from the client
-    if (!srp.CalculateSessionKey(lp.A, 32))
-        return false;
+    if (!srp.CalculateSessionKey(lp->A, 32))
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Session calculation failed for account %s!", this->m_login.c_str());
+        return;
+    }
 
     srp.HashSessionKey();
-    srp.CalculateProof(m_login);
+    srp.CalculateProof(this->m_login);
 
     // Check PIN data is correct
     bool pinResult = true;
 
-    if (m_promptPin && !lp.securityFlags)
+    if (m_promptPin && !lp->securityFlags)
         pinResult = false; // expected PIN data but did not receive it
 
-    if (m_promptPin && lp.securityFlags)
+    if (m_promptPin && lp->securityFlags)
     {
         if ((m_lockFlags & FIXED_PIN) == FIXED_PIN)
         {
-            pinResult = VerifyPinData(std::stoi(m_securityInfo), pinData);
+            pinResult = VerifyPinData(std::stoi(m_securityInfo), *pinData);
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' PIN result: %u", m_login.c_str(), get_remote_address().c_str(), pinResult);
         }
         else if ((m_lockFlags & TOTP) == TOTP)
@@ -717,13 +763,13 @@ bool AuthSocket::_HandleLogonProof()
                 if (pin == uint32(-1))
                     break;
 
-                if ((pinResult = VerifyPinData(pin, pinData)))
+                if ((pinResult = VerifyPinData(pin, *pinData)))
                     break;
             }
         }
         else if (m_geoUnlockPIN)
         {
-            pinResult = VerifyPinData(m_geoUnlockPIN, pinData);
+            pinResult = VerifyPinData(m_geoUnlockPIN, *pinData);
         }
         else
         {
@@ -733,22 +779,26 @@ bool AuthSocket::_HandleLogonProof()
     }
 
     // Check if SRP6 results match (password is correct), else send an error
-    if (!srp.Proof(lp.M1, 20) && pinResult)
+    if (!srp.Proof(lp->M1, 20) && pinResult)
     {
-        if (!VerifyVersion(lp.A, sizeof(lp.A), lp.crc_hash, false))
+        if (!VerifyVersion(lp->A, sizeof(lp->A), lp->crc_hash, false))
         {
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account %s tried to login with modified client!", m_login.c_str());
-            char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_VERSION_INVALID };
-            send(data, sizeof(data));
-            return true;
+
+            std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+            *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
+            *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
+            Write(pkt, [self = shared_from_this()](MaNGOS::NetworkError const& error)
+            {
+                self->ProcessIncomingData();
+            });
+            return;
         }
 
         // Geolocking checks must be done after an otherwise successful login to prevent lockout attacks
         if (m_geoUnlockPIN) // remove the PIN to unlock the account since login succeeded
         {
-            auto result = LoginDatabase.PExecute("UPDATE `account` SET `geolock_pin` = 0 WHERE `username` = '%s'",
-                m_safelogin.c_str());
-
+            bool result = LoginDatabase.PExecute("UPDATE `account` SET `geolock_pin` = 0 WHERE `username` = '%s'", m_safelogin.c_str());
             if (!result)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to remove geolock PIN for %s - account has not been unlocked", m_safelogin.c_str());
@@ -758,17 +808,20 @@ bool AuthSocket::_HandleLogonProof()
         {
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Account '%s' (%u) using IP '%s' has been geolocked", m_login.c_str(), m_accountId, get_remote_address().c_str()); // todo, add additional logging info
 
-            auto pin = urand(100000, 999999); // check rand32_max
-            auto result = LoginDatabase.PExecute("UPDATE `account` SET `geolock_pin` = %u WHERE `username` = '%s'",
-                pin, m_safelogin.c_str());
-
+            uint32_t pin = urand(100000, 999999); // check rand32_max
+            bool result = LoginDatabase.PExecute("UPDATE `account` SET `geolock_pin` = %u WHERE `username` = '%s'", pin, m_safelogin.c_str());
             if (!result)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to write geolock PIN for %s - account has not been locked", m_safelogin.c_str());
 
-                char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_DB_BUSY };
-                send(data, sizeof(data));
-                return true;
+                std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+                *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
+                *pkt << (uint8) WOW_FAIL_DB_BUSY;
+                Write(pkt, [self = shared_from_this()](MaNGOS::NetworkError const& error)
+                {
+                    self->ProcessIncomingData();
+                });
+                return;
             }
 
 #ifdef USE_SENDGRID
@@ -795,20 +848,29 @@ bool AuthSocket::_HandleLogonProof()
             }
 #endif
 
-            char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_PARENTCONTROL };
-            send(data, sizeof(data));
-            return true;
+            std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+            *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
+            *pkt << (uint8) WOW_FAIL_PARENTCONTROL;
+            Write(pkt, [self = shared_from_this()](MaNGOS::NetworkError const& error)
+            {
+                self->ProcessIncomingData();
+            });
+            return;
         }
 
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' successfully authenticated", m_login.c_str(), get_remote_address().c_str());
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
-        // No SQL injection (escaped user name) and IP address as received by socket
+        // No SQL injection (escaped username) and IP address as received by socket
         const char* K_hex = srp.GetStrongSessionKey().AsHexStr();
-        const char *os = reinterpret_cast<char *>(&m_os); // no injection as there are only two possible values
-        const char *platform = reinterpret_cast<char *>(&m_platform); // no injection as there are only two possible values
-        std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
-            K_hex, get_remote_address().c_str(), GetLocaleByName(m_localizationName), os, platform, m_safelogin.c_str() );
+        // Why it must be sync: The new network implementation is so fast that the async db cant execute the UPDATE statement before the client tries to reach mangosd
+        // If it is async there would be a race condition
+        bool result = LoginDatabase.PExecute(DbExecMode::MustBeSync, "UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
+            K_hex, get_remote_address().c_str(), GetLocaleByName(m_localizationName), m_os.c_str(), m_platform.c_str(), m_safelogin.c_str() );
+        if (!result)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to update login stats for account '%s'", m_safelogin.c_str());
+        }
 
         OPENSSL_free((void*)K_hex);
 
@@ -816,22 +878,17 @@ bool AuthSocket::_HandleLogonProof()
         Sha1Hash sha;
         srp.Finalize(sha);
 
-        SendProof(sha);
+        std::shared_ptr<ByteBuffer> pkt = GenerateLogonProofResponse(sha);
         m_status = STATUS_AUTHED;
+
+        Write(pkt, [self = shared_from_this()](MaNGOS::NetworkError const& error)
+        {
+            self->ProcessIncomingData();
+        });
     }
     else
     {
-        if (m_build > 6005)                                  // > 1.12.2
-        {
-            char data[4] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 0, 0};
-            send(data, sizeof(data));
-        }
-        else
-        {
-            // 1.x not react incorrectly at 4-byte message use 3 as real error
-            char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT};
-            send(data, sizeof(data));
-        }
+        // We are here because the password was incorrect
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", m_login.c_str (), get_remote_address().c_str());
 
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);
@@ -871,196 +928,257 @@ bool AuthSocket::_HandleLogonProof()
                 }
             }
         }
+
+        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+        *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
+        *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
+        if (m_build > 6005) // > 1.12.2
+        {
+            *pkt << (uint8) 0;
+            *pkt << (uint8) 0;
+        }
+        Write(pkt, [self = shared_from_this()](MaNGOS::NetworkError const& error)
+        {
+            self->ProcessIncomingData();
+        });
     }
-    return true;
 }
 
 // Reconnect Challenge command handler
-bool AuthSocket::_HandleReconnectChallenge()
+void AuthSocket::_HandleReconnectChallenge()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleReconnectChallenge");
-    if (recv_len() < sizeof(sAuthLogonChallenge_C))
-        return false;
+    m_status = STATUS_INVALID;
 
-    // Read the first 4 bytes (header) to get the length of the remaining of the packet
-    std::vector<uint8> buf;
-    buf.resize(4);
-
-    recv((char *)&buf[0], 4);
-
-    EndianConvert(*((uint16*)(&buf[0])));
-    uint16 remaining = ((sAuthLogonChallenge_C *)&buf[0])->size;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[ReconnectChallenge] got header, body is %#04x bytes", remaining);
-
-    if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (recv_len() < remaining))
-        return false;
-
-    // Session is closed unless overriden
-    m_status = STATUS_CLOSED;
-
-    //No big fear of memory outage (size is int16, i.e. < 65536)
-    buf.resize(remaining + buf.size() + 1);
-    buf[buf.size() - 1] = 0;
-    sAuthLogonChallenge_C *ch = (sAuthLogonChallenge_C*)&buf[0];
-
-    // Read the remaining of the packet
-    recv((char *)&buf[4], remaining);
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[ReconnectChallenge] got full packet, %#04x bytes", ch->size);
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[ReconnectChallenge] name(%d): '%s'", ch->I_len, ch->I);
-
-    EndianConvert(ch->build);
-    m_build = ch->build;
-
-    ch->os[3] = '\0';
-    std::reverse(ch->os, ch->os + 3);
-    memcpy(&m_os, ch->os, sizeof(m_os));
-
-    ch->platform[3] = '\0';
-    std::reverse(ch->platform, ch->platform + 3);
-    memcpy(&m_platform, ch->platform, sizeof(m_platform));
-
-    m_login = (const char*)ch->I;
-    m_safelogin = m_login;
-    LoginDatabase.escape_string(m_safelogin);
-
-    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `sessionkey`, `id` FROM `account` WHERE `username` = '%s'", m_safelogin.c_str());
-
-    // Stop if the account is not found
-    if (!result)
+    // Read the header first, to get the length of the remaining packet
+    std::shared_ptr<sAuthLogonChallengeHeader> header = std::make_shared<sAuthLogonChallengeHeader>();
+    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](MaNGOS::NetworkError const& error)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s tried to login and we cannot find his session key in the database.", m_login.c_str());
-        close_connection();
-        return false;
-    }
+        if (error)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleReconnectChallenge Read(header): ERROR");
+            self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+            return;
+        }
 
-    Field* fields = result->Fetch ();
-    srp.SetStrongSessionKey(fields[0].GetString());
-    m_accountId = fields[1].GetUInt32();
+        uint16* pUint16 = reinterpret_cast<uint16*>(header.get());
+        EndianConvert(*pUint16);
+        uint16 actualBodySize = header->size;
 
-    // All good, await client's proof
-    m_status = STATUS_RECON_PROOF;
+        if (actualBodySize < sizeof(sAuthLogonChallengeBody) - AUTH_LOGON_MAX_NAME) // TODO: @cMangos: Why is here "-10" and not AUTH_LOGON_MAX_NAME
+        { // The paket is too small and has no username???
+            return;
+        }
 
-    // Sending response
-    ByteBuffer pkt;
-    pkt << (uint8)  CMD_AUTH_RECONNECT_CHALLENGE;
-    pkt << (uint8)  0x00;
-    m_reconnectProof.SetRand(16 * 8);
-    pkt.append(m_reconnectProof.AsByteArray(16));            // 16 bytes random
-    pkt.append(VersionChallenge.data(), VersionChallenge.size());
-    send((char const*)pkt.contents(), pkt.size());
-    return true;
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[ReconnectChallenge] got header, body is %#04x bytes", actualBodySize);
+
+        // Read the remaining of the packet
+        std::shared_ptr<sAuthLogonChallengeBody> body = std::make_shared<sAuthLogonChallengeBody>();
+        self->Read((char*)body.get(), actualBodySize, [self, header, body](MaNGOS::NetworkError const& error)
+        {
+            if (error)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleReconnectChallenge self->Read(body): ERROR");
+                self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+                return;
+            }
+
+            if (body->username_len > AUTH_LOGON_MAX_NAME)
+                return;
+            body->username[body->username_len] = '\0';
+
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[ReconnectChallenge] got full packet, %#04x bytes", header->size);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[ReconnectChallenge] name(%d): '%s'", body->username_len, body->username);
+
+            // BigEndian code, nop in little endian case
+            // size already converted
+            EndianConvert(*((uint32*)(&body->gamename[0])));
+            EndianConvert(body->build);
+            EndianConvert(*((uint32*)(&body->platform[0])));
+            EndianConvert(*((uint32*)(&body->os[0])));
+            EndianConvert(*((uint32*)(&body->country[0])));
+            EndianConvert(body->timezone_bias);
+            EndianConvert(body->ip);
+
+            // Convert uint8[4] to string, restore string order as its byte order is reversed
+            // To it for os
+            body->os[3] = '\0';
+            self->m_os = (char*)body->os;
+            std::reverse(self->m_os.begin(), self->m_os.end());
+            // To it for platform
+            body->platform[3] = '\0';
+            self->m_platform = (char*)body->platform;
+            std::reverse(self->m_platform.begin(), self->m_platform.end());
+            // Do it for locale
+            self->m_localizationName.resize(sizeof(body->country));
+            self->m_localizationName.assign(body->country, (body->country + sizeof(body->country)));
+            std::reverse(self->m_localizationName.begin(), self->m_localizationName.end());
+
+            // Escape the user input used in DB to avoid further SQL injection
+            // Memory will be freed on AuthSocket object destruction
+            self->m_login = (const char*)body->username;
+            self->m_safelogin = self->m_login;
+            LoginDatabase.escape_string(self->m_safelogin);
+
+            std::unique_ptr<QueryResult> queryResult = LoginDatabase.PQuery("SELECT `sessionkey`, `id` FROM `account` WHERE `username` = '%s'", self->m_safelogin.c_str());
+
+            // Stop if the account is not found
+            if (!queryResult)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s tried to login and we cannot find his session key in the database.", self->m_login.c_str());
+                self->CloseSocket();
+                return;
+            }
+
+            Field* fields = queryResult->Fetch();
+            self->srp.SetStrongSessionKey(fields[0].GetString());
+            self->m_accountId = fields[1].GetUInt32();
+
+            // All good, await client's proof
+            self->m_status = STATUS_RECON_PROOF;
+
+            // Sending response
+            std::shared_ptr<ByteBuffer> pkt = std::make_shared<ByteBuffer>();
+            *pkt << (uint8)CMD_AUTH_RECONNECT_CHALLENGE;
+            *pkt << (uint8)0x00;
+            self->m_reconnectProof.SetRand(16 * 8);
+            pkt->append(self->m_reconnectProof.AsByteArray(16));        // 16 bytes random
+            pkt->append(VersionChallenge.data(), VersionChallenge.size());
+            self->Write(pkt, [self](MaNGOS::NetworkError const& error)
+            {
+                self->ProcessIncomingData();
+            });
+        });
+    });
 }
 
 // Reconnect Proof command handler
-bool AuthSocket::_HandleReconnectProof()
+void AuthSocket::_HandleReconnectProof()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleReconnectProof");
+    m_status = STATUS_INVALID;
+
     // Read the packet
-    sAuthReconnectProof_C lp;
-    if(!recv((char *)&lp, sizeof(sAuthReconnectProof_C)))
-        return false;
-
-    // Session is closed unless overriden
-    m_status = STATUS_CLOSED;
-
-    BigNumber K = srp.GetStrongSessionKey();
-    if (m_login.empty() || !m_reconnectProof.GetNumBytes() || !K.GetNumBytes())
-        return false;
-
-    BigNumber t1;
-    t1.SetBinary(lp.R1, 16);
-
-    Sha1Hash sha;
-    sha.Initialize();
-    sha.UpdateData(m_login);
-    sha.UpdateBigNumbers(&t1, &m_reconnectProof, &K, nullptr);
-    sha.Finalize();
-
-    if (!memcmp(sha.GetDigest(), lp.R2, SHA_DIGEST_LENGTH))
+    std::shared_ptr<sAuthReconnectProof_C> lp(new sAuthReconnectProof_C());
+    Read((char*) lp.get(), sizeof(sAuthReconnectProof_C), [self = shared_from_this(), lp](MaNGOS::NetworkError const& error)
     {
-        if (!VerifyVersion(lp.R1, sizeof(lp.R1), lp.R3, true))
+        if (error)
         {
-            ByteBuffer pkt;
-            pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
-            pkt << uint8(WOW_FAIL_VERSION_INVALID);
-            send((char const*)pkt.contents(), pkt.size());
-            return true;
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleReconnectProof self->Read(): ERROR");
+            self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+            return;
         }
 
-        // Sending response
-        ByteBuffer pkt;
-        pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
-        pkt << uint8(WOW_SUCCESS);
-        send((char const*)pkt.contents(), pkt.size());
+        BigNumber K = self->srp.GetStrongSessionKey();
+        if (self->m_login.empty() || !self->m_reconnectProof.GetNumBytes() || !K.GetNumBytes())
+            return;
 
-        m_status = STATUS_AUTHED;
-        return true;
-    }
-    else
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s tried to login, but session invalid.", m_login.c_str());
-        close_connection();
-        return false;
-    }
+        BigNumber t1;
+        t1.SetBinary(lp->R1, 16);
+
+        Sha1Hash sha;
+        sha.Initialize();
+        sha.UpdateData(self->m_login);
+        sha.UpdateBigNumbers(&t1, &self->m_reconnectProof, &K, nullptr);
+        sha.Finalize();
+
+        if (!memcmp(sha.GetDigest(), lp->R2, SHA_DIGEST_LENGTH))
+        {
+            if (!self->VerifyVersion(lp->R1, sizeof(lp->R1), lp->R3, true))
+            {
+                std::shared_ptr<ByteBuffer> pkt = std::make_shared<ByteBuffer>();
+                *pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
+                *pkt << uint8(WOW_FAIL_VERSION_INVALID);
+                return;
+            }
+
+            // Sending response
+            std::shared_ptr<ByteBuffer> pkt = std::make_shared<ByteBuffer>();
+            *pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
+            *pkt << uint8(WOW_SUCCESS);
+            self->Write(pkt, [self](MaNGOS::NetworkError const& error)
+            {
+                self->ProcessIncomingData();
+            });
+
+            self->m_status = STATUS_AUTHED;
+            return;
+        }
+        else
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s tried to login, but session invalid.", self->m_login.c_str());
+            self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+            return;
+        }
+    });
 }
 
 // %Realm List command handler
-bool AuthSocket::_HandleRealmList()
+void AuthSocket::_HandleRealmList()
 {
+    assert(this->m_accountId);
+
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleRealmList");
-    if (recv_len() < 5)
-        return false;
-
-    recv_skip(5);
-
-    // this shouldn't be possible, but just in case
-    if (!m_accountId)
-        return false;
-
-    // check for too frequent requests
-    auto const minDelay = sConfig.GetIntDefault("MinRealmListDelay", 1);
-    auto const now = time(nullptr);
-    auto const delay = now - m_lastRealmListRequest;
-
-    m_lastRealmListRequest = now;
-
-    if (delay < minDelay)
+    ReadSkip(4, [self = shared_from_this()](MaNGOS::NetworkError const& error)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", m_login.c_str(), get_remote_address().c_str(), delay);
-        return false;
-    }
+        if (error)
+        {
+            self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+            return;
+        }
 
-    // Update realm list if need
-    sRealmList.UpdateIfNeed();
+        // check for too frequent requests
+        auto const minDelay = sConfig.GetIntDefault("MinRealmListDelay", 1);
+        auto const now = time(nullptr);
+        auto const delay = now - self->m_lastRealmListRequest;
 
-    // Circle through realms in the RealmList and construct the return packet (including # of user characters in each realm)
-    ByteBuffer pkt;
-    LoadRealmlist(pkt);
+        self->m_lastRealmListRequest = now;
 
-    ByteBuffer hdr;
-    hdr << (uint8) CMD_REALM_LIST;
-    hdr << (uint16)pkt.size();
-    hdr.append(pkt);
+        if (delay < minDelay)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", self->m_login.c_str(), self->get_remote_address().c_str(), delay);
 
-    send((char const*)hdr.contents(), hdr.size());
+            self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+            return;
+        }
 
-    return true;
+        // Update realm list if need
+        sRealmList.UpdateIfNeed();
+
+        // Circle through realms in the RealmList and construct the return packet (including # of user characters in each realm)
+        ByteBuffer realmlistBuffer;
+        self->LoadRealmlistAndWriteIntoBuffer(realmlistBuffer);
+
+        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+        *pkt << (uint8) CMD_REALM_LIST;
+        *pkt << (uint16)realmlistBuffer.size();
+        pkt->append(realmlistBuffer);
+
+        self->Write(pkt, [self](MaNGOS::NetworkError const& error)
+        {
+            self->ProcessIncomingData();
+        });
+    });
 }
 
 std::string AuthSocket::GetRealmAddress(Realm const& realm) const
 {
-    ACE_INET_Addr addr(address.sin_port, remoteAddress.c_str(), PF_INET);
+    ACE_INET_Addr clientAddress;
     ACE_INET_Addr localAddress;
-    if (localAddress.set(realm.localAddress.c_str()) == 0)
+
+    std::string strClientAddressWithPort = this->get_remote_address() + ":0";
+    std::string strServerAddressWithPort = realm.localAddress;
+
+    if (clientAddress.set(strClientAddressWithPort.c_str()) == 0 && localAddress.set(strServerAddressWithPort.c_str()) == 0)
     {
-        if ((addr.get_ip_address() & realm.localSubnetMask) == (localAddress.get_ip_address() & realm.localSubnetMask))
+        if ((clientAddress.get_ip_address() & realm.localSubnetMask) == (localAddress.get_ip_address() & realm.localSubnetMask))
             return realm.localAddress;
     }
 
     return realm.address;
 }
 
-void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
+void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
 {
     if (m_build < 6299)        // before version 2.0.3 (exclusive)
     {
@@ -1173,6 +1291,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
     }
 }
 
+/*
 // Resume patch transfer
 bool AuthSocket::_HandleXferResume()
 {
@@ -1234,8 +1353,9 @@ bool AuthSocket::_HandleXferAccept()
     return true;
 }
 
+ */
 // Verify PIN entry data
-bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
+bool AuthSocket::VerifyPinData(uint32 pin, PINData const& clientData)
 {
     // remap the grid to match the client's layout
     std::vector<uint8> grid { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -1340,6 +1460,7 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
 
 void AuthSocket::InitPatch()
 {
+    /*
     PatchHandler* handler = new PatchHandler(ACE_OS::dup(get_handle()), m_patch);
 
     m_patch = ACE_INVALID_HANDLE;
@@ -1349,8 +1470,9 @@ void AuthSocket::InitPatch()
         handler->close();
         close_connection();
     }
+     */
 }
-*/
+
 void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
 {
     std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `gmlevel`, `RealmID` FROM `account_access` WHERE `id` = %u", accountId);
