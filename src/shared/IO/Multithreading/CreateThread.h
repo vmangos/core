@@ -1,5 +1,5 @@
-#ifndef MANGOS_CREATETHREAD_H
-#define MANGOS_CREATETHREAD_H
+#ifndef MANGOS_IO_MULTITHREADING_CREATETHREAD_H
+#define MANGOS_IO_MULTITHREADING_CREATETHREAD_H
 
 #include <thread>
 #include <functional>
@@ -15,4 +15,4 @@ namespace IO { namespace Multithreading {
     void RenameCurrentThread(std::string const& name);
 }} // namespace IO::Multithreading
 
-#endif //MANGOS_CREATETHREAD_H
+#endif //MANGOS_IO_MULTITHREADING_CREATETHREAD_H

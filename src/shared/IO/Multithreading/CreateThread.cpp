@@ -1,7 +1,9 @@
 #include "CreateThread.h"
 
 #if defined(WIN32)
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#undef WIN32_LEAN_AND_MEAN
 #elif defined(__linux__)
 #include <pthread.h>
 #endif
