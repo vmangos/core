@@ -19,7 +19,7 @@ void IO::Multithreading::RenameCurrentThread(std::string const& name)
 {
 #if defined(WIN32)
     // Windows part taken from https://stackoverflow.com/a/23899379
-    // SetThreadDescription is only supported on >= Win10
+    // SetThreadDescription is only supported on >= Win10, that's why we are using this approach
 
     const DWORD MS_VC_EXCEPTION=0x406D1388;
 #pragma pack(push,8)
