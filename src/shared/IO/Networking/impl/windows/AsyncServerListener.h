@@ -47,16 +47,9 @@ void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds 
     bool booleanOkay = ::GetQueuedCompletionStatus(m_completionPort, &bytesWritten, &completionKey, reinterpret_cast<LPOVERLAPPED*>(&task), maxBlockingDuration.count());
     DWORD errorCode = ::GetLastError();
     if (task)
-    {
-        task->OnComplete(errorCode);
-    }
-
-    if (!booleanOkay)
-    {
-        if (errorCode != WAIT_TIMEOUT)
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Error: %u", errorCode);
-        return;
-    }
+        task->OnComplete(booleanOkay ? 0 : errorCode);
+    else if (errorCode != WAIT_TIMEOUT)
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Has no TASK!!! Error: %u", errorCode);
 }
 
 template<typename TClientSocket>
