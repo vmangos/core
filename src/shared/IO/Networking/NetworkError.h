@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace MaNGOS { namespace IO
+namespace IO
 {
     struct NetworkError {
         enum class ErrorType {
@@ -23,6 +23,6 @@ namespace MaNGOS { namespace IO
             return "TODO, Error to String";
         }
     };
-}} // namespace MaNGOS::IO
+} // namespace IO
 
 #endif //MANGOS_IO_NETWORKING_NETWORKERROR_H

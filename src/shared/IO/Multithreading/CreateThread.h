@@ -13,6 +13,6 @@ namespace IO { namespace Multithreading {
     /// Will rename your current thread.
     /// Names are super useful when monitoring the utilization of each thread.
     void RenameCurrentThread(std::string const& name);
-}} // IO::Multithreading
+}} // namespace IO::Multithreading
 
 #endif //MANGOS_CREATETHREAD_H

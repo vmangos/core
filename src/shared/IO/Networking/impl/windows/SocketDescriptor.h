@@ -5,6 +5,8 @@
 
 #include "WinSock2.h"
 
+namespace IO { namespace Networking {
+
 struct SocketDescriptor {
 public:
     /// IP address without port.
@@ -14,5 +16,7 @@ public:
 //private:
     SOCKET nativeSocket;
 };
+
+}} // namespace IO::Networking
 
 #endif //MANGOS_IO_NETWORKING_WIN32_SOCKETDESCIRPTOR_H

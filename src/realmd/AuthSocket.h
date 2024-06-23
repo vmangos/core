@@ -54,12 +54,12 @@ enum LockFlag
 struct sAuthLogonProof_C;
 
 // Handle login commands
-class AuthSocket : public MaNGOS::AsyncSocket<AuthSocket>
+class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
 {
     public:
         const static int s_BYTE_SIZE = 32;
 
-        explicit AuthSocket(SocketDescriptor const& clientAddress);
+        explicit AuthSocket(IO::Networking::SocketDescriptor const& clientAddress);
         ~AuthSocket();
 
         void Start() final;

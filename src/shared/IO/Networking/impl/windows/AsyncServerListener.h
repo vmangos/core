@@ -144,7 +144,7 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
         std::string peerAddress(inet_ntoa(addrBuffer->peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
         delete addrBuffer;
 
-        SocketDescriptor socketDescriptor { peerAddress, peerSocket };
+        IO::Networking::SocketDescriptor socketDescriptor { peerAddress, peerSocket };
 
         std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
         HandleAccept(client);
