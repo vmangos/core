@@ -162,7 +162,6 @@ typedef struct AUTH_LOGON_PROOF_S
 
 typedef struct AUTH_RECONNECT_PROOF_C
 {
-    uint8   cmd;
     uint8   R1[16];
     uint8   R2[20];
     uint8   R3[20];
@@ -235,25 +234,10 @@ AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
 // Read the packet from the client
 void AuthSocket::ProcessIncomingData()
 {
-    // benchmarking has demonstrated that this lookup method is faster than std::map
-    constexpr AuthHandler table[] =
-    {
-        { CMD_AUTH_LOGON_CHALLENGE,     STATUS_CHALLENGE,   &AuthSocket::_HandleLogonChallenge },
-        { CMD_AUTH_LOGON_PROOF,         STATUS_LOGON_PROOF, &AuthSocket::_HandleLogonProof },
-        { CMD_AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge },
-        { CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
-        { CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
-        //{ CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
-        //{ CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
-        //{ CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
-    };
-
-    constexpr size_t tableLength = sizeof(table) / sizeof(AuthHandler);
-
     std::shared_ptr<eAuthCmd> cmd = std::make_shared<eAuthCmd>();
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ProcessIncomingData() Reading... Ready for next opcode");
-    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd, table, tableLength](MaNGOS::IO::NetworkError const& error) -> void
+    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd](MaNGOS::IO::NetworkError const& error) -> void
     {
         if (error)
         {
@@ -261,6 +245,21 @@ void AuthSocket::ProcessIncomingData()
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] ProcessIncomingData Read(cmd) error");
             return;
         }
+
+        // benchmarking has demonstrated that this lookup method is faster than std::map
+        constexpr AuthHandler table[] =
+        {
+            { CMD_AUTH_LOGON_CHALLENGE,     STATUS_CHALLENGE,   &AuthSocket::_HandleLogonChallenge },
+            { CMD_AUTH_LOGON_PROOF,         STATUS_LOGON_PROOF, &AuthSocket::_HandleLogonProof },
+            { CMD_AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge },
+            { CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
+            { CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
+            //{ CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
+            //{ CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
+            //{ CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
+        };
+
+        constexpr size_t tableLength = sizeof(table) / sizeof(AuthHandler);
 
         size_t i;
         // Circle through known commands and call the correct command handler
@@ -1012,6 +1011,8 @@ void AuthSocket::_HandleReconnectChallenge()
             EndianConvert(*((uint32*)(&body->country[0])));
             EndianConvert(body->timezone_bias);
             EndianConvert(body->ip);
+
+            self->m_build = body->build;
 
             // Convert uint8[4] to string, restore string order as its byte order is reversed
             // To it for os
