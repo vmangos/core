@@ -20,6 +20,7 @@ set (shared_SRCS
     ByteBuffer.h
     Common.h
     DelayExecutor.h
+    EnumFlag.h
     Errors.h
     LockedQueue.h
     Log.h
