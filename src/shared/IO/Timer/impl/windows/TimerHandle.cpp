@@ -8,10 +8,7 @@ void IO::Timer::TimerHandle::Cancel()
     bool wasRemoved = m_asyncSystemTimer->m_pendingTimers.erase(shared_from_this());
     m_asyncSystemTimer->m_pendingTimers_mutex.unlock();
     if (!wasRemoved)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] TimerHandle->Cancel(): Timer was already removed?");
-        return;
-    }
+        return; // The timer was already removed, so we don't want to re-execute it again.
 
     // To avoid race conditions:
     // MSDN: If this parameter (last one) is INVALID_HANDLE_VALUE, the function waits for any running timer callback functions to complete before returning.

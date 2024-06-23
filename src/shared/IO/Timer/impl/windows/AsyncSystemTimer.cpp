@@ -47,10 +47,7 @@ void IO::Timer::impl::windows::AsyncSystemTimer::_timerQueueTimeoutCallback(PVOI
     bool wasRemoved = timerHandle->m_asyncSystemTimer->m_pendingTimers.erase(timerHandle);
     timerHandle->m_asyncSystemTimer->m_pendingTimers_mutex.unlock();
     if (!wasRemoved)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] AsyncSystemTimer::_timerQueueTimeoutCallback: Timer was already removed?");
-        return;
-    }
+        return; // The timer was already removed, so we don't want to re-execute it again.
 
     timerHandle->m_callback();
 }
