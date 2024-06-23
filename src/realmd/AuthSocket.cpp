@@ -34,6 +34,7 @@
 #include "AuthCodes.h"
 #include "PatchHandler.h"
 #include "Util.h"
+#include "IO/Timer/AsyncSystemTimer.h"
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -161,7 +162,6 @@ typedef struct AUTH_LOGON_PROOF_S
 
 typedef struct AUTH_RECONNECT_PROOF_C
 {
-    //uint8   cmd;
     uint8   R1[16];
     uint8   R2[20];
     uint8   R3[20];
@@ -194,9 +194,23 @@ typedef struct AuthHandler
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 // Accept the connection and set the s random value for SRP6 // TODO where is this SRP6 done?
-AuthSocket::AuthSocket(SocketDescriptor const& socketDescriptor) : MaNGOS::AsyncSocket<AuthSocket>(socketDescriptor)
+AuthSocket::AuthSocket(IO::Networking::SocketDescriptor const& socketDescriptor) : IO::Networking::AsyncSocket<AuthSocket>(socketDescriptor)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", socketDescriptor.peerAddress.c_str());
+}
+
+void AuthSocket::Start()
+{
+    if (int secs = sConfig.GetIntDefault("MaxSessionDuration", 300))
+    {
+        this->m_sessionDurationTimeout = sAsyncSystemTimer.ScheduleFunctionOnce(std::chrono::seconds(secs), [this]()
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Connection has reached MaxSessionDuration. Closing socket...");
+            // It's correct that we capture _this_, since the timer will be canceled in destructor
+            this->CloseSocket();
+        });
+    }
+    ProcessIncomingData();
 }
 
 // Close patch file descriptor before leaving
@@ -204,6 +218,9 @@ AuthSocket::~AuthSocket()
 {
     if (m_patch != ACE_INVALID_HANDLE)
         ACE_OS::close(m_patch);
+
+    if (m_sessionDurationTimeout)
+        m_sessionDurationTimeout->Cancel();
 }
 
 AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
@@ -220,11 +237,11 @@ void AuthSocket::ProcessIncomingData()
     std::shared_ptr<eAuthCmd> cmd = std::make_shared<eAuthCmd>();
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ProcessIncomingData() Reading... Ready for next opcode");
-    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd](MaNGOS::IO::NetworkError const& error) -> void
+    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd](IO::NetworkError const& error) -> void
     {
         if (error)
         {
-            if (error.Error != MaNGOS::IO::NetworkError::ErrorType::SocketClosed)
+            if (error.Error != IO::NetworkError::ErrorType::SocketClosed)
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] ProcessIncomingData Read(cmd) error");
             return;
         }
@@ -279,11 +296,6 @@ void AuthSocket::ProcessIncomingData()
     });
 }
 
-void AuthSocket::Start()
-{
-    ProcessIncomingData();
-}
-
 std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)
 {
     std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
@@ -334,7 +346,7 @@ void AuthSocket::_HandleLogonChallenge()
     std::shared_ptr<sAuthLogonChallengeHeader> header = std::make_shared<sAuthLogonChallengeHeader>();
 
     // Read the header first, to get the length of the remaining packet
-    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](MaNGOS::IO::NetworkError const& error) -> void
+    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](IO::NetworkError const& error) -> void
     {
         if (error)
         {
@@ -356,7 +368,7 @@ void AuthSocket::_HandleLogonChallenge()
 
         // Read the remaining of the packet
         std::shared_ptr<sAuthLogonChallengeBody> body = std::make_shared<sAuthLogonChallengeBody>();
-        self->Read((char*)body.get(), actualBodySize, [self, header, body](MaNGOS::IO::NetworkError const& error)
+        self->Read((char*)body.get(), actualBodySize, [self, header, body](IO::NetworkError const& error)
         {
             if (error)
             {
@@ -445,7 +457,7 @@ void AuthSocket::_HandleLogonChallenge()
                         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", self->m_login.c_str(), self->get_remote_address().c_str());
                         *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
 
-                        self->Write(pkt, [self](MaNGOS::IO::NetworkError const& error) {
+                        self->Write(pkt, [self](IO::NetworkError const& error) {
                             if (error)
                                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write(): ERROR");
                             else
@@ -580,7 +592,7 @@ void AuthSocket::_HandleLogonChallenge()
                 }
             }
 
-            self->Write(pkt, [self](MaNGOS::IO::NetworkError const& error)
+            self->Write(pkt, [self](IO::NetworkError const& error)
             {
                 if (error)
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write(): ERROR");
@@ -605,7 +617,7 @@ void AuthSocket::_HandleLogonProof()
         expectedSize = sizeof(sAuthLogonProof_C_Pre_1_11_0);
     }
 
-    Read((char*) lp.get(), expectedSize, [self = shared_from_this(), lp](MaNGOS::IO::NetworkError const& error)
+    Read((char*) lp.get(), expectedSize, [self = shared_from_this(), lp](IO::NetworkError const& error)
     {
         if (error)
         {
@@ -624,7 +636,7 @@ void AuthSocket::_HandleLogonProof()
             }
 
             std::shared_ptr<PINData> pinData(new PINData());
-            self->Read((char*) pinData.get(), sizeof(PINData), [self, lp, pinData](MaNGOS::IO::NetworkError const& error)
+            self->Read((char*) pinData.get(), sizeof(PINData), [self, lp, pinData](IO::NetworkError const& error)
             {
                 self->_HandleLogonProof__PostRecv(lp, pinData);
             });
@@ -665,7 +677,7 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
         *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] %u is not a valid client version!", m_build);
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Patch %s not found", tmp);
-        Write(pkt, [self = shared_from_this(), pkt](MaNGOS::IO::NetworkError const& error)
+        Write(pkt, [self = shared_from_this(), pkt](IO::NetworkError const& error)
         {
             if (error)
             {
@@ -711,7 +723,7 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
     // Set right status
     m_status = STATUS_PATCH;
 
-    Write(pkt, [self = shared_from_this()](MaNGOS::IO::NetworkError const& error)
+    Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
     {
         self->ProcessIncomingData();
     });
@@ -788,7 +800,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
             *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
             *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
-            Write(pkt, [self = shared_from_this()](MaNGOS::IO::NetworkError const& error)
+            Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
             {
                 self->ProcessIncomingData();
             });
@@ -817,7 +829,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
                 std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
                 *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
                 *pkt << (uint8) WOW_FAIL_DB_BUSY;
-                Write(pkt, [self = shared_from_this()](MaNGOS::IO::NetworkError const& error)
+                Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
                 {
                     self->ProcessIncomingData();
                 });
@@ -851,7 +863,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
             *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
             *pkt << (uint8) WOW_FAIL_PARENTCONTROL;
-            Write(pkt, [self = shared_from_this()](MaNGOS::IO::NetworkError const& error)
+            Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
             {
                 self->ProcessIncomingData();
             });
@@ -881,7 +893,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         std::shared_ptr<ByteBuffer> pkt = GenerateLogonProofResponse(sha);
         m_status = STATUS_AUTHED;
 
-        Write(pkt, [self = shared_from_this()](MaNGOS::IO::NetworkError const& error)
+        Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
         {
             self->ProcessIncomingData();
         });
@@ -937,7 +949,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             *pkt << (uint8) 0;
             *pkt << (uint8) 0;
         }
-        Write(pkt, [self = shared_from_this()](MaNGOS::IO::NetworkError const& error)
+        Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
         {
             self->ProcessIncomingData();
         });
@@ -952,7 +964,7 @@ void AuthSocket::_HandleReconnectChallenge()
 
     // Read the header first, to get the length of the remaining packet
     std::shared_ptr<sAuthLogonChallengeHeader> header = std::make_shared<sAuthLogonChallengeHeader>();
-    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](MaNGOS::IO::NetworkError const& error)
+    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](IO::NetworkError const& error)
     {
         if (error)
         {
@@ -974,7 +986,7 @@ void AuthSocket::_HandleReconnectChallenge()
 
         // Read the remaining of the packet
         std::shared_ptr<sAuthLogonChallengeBody> body = std::make_shared<sAuthLogonChallengeBody>();
-        self->Read((char*)body.get(), actualBodySize, [self, header, body](MaNGOS::IO::NetworkError const& error)
+        self->Read((char*)body.get(), actualBodySize, [self, header, body](IO::NetworkError const& error)
         {
             if (error)
             {
@@ -1046,7 +1058,7 @@ void AuthSocket::_HandleReconnectChallenge()
             self->m_reconnectProof.SetRand(16 * 8);
             pkt->append(self->m_reconnectProof.AsByteArray(16));        // 16 bytes random
             pkt->append(VersionChallenge.data(), VersionChallenge.size());
-            self->Write(pkt, [self](MaNGOS::IO::NetworkError const& error)
+            self->Write(pkt, [self](IO::NetworkError const& error)
             {
                 self->ProcessIncomingData();
             });
@@ -1062,7 +1074,7 @@ void AuthSocket::_HandleReconnectProof()
 
     // Read the packet
     std::shared_ptr<sAuthReconnectProof_C> lp(new sAuthReconnectProof_C());
-    Read((char*) lp.get(), sizeof(sAuthReconnectProof_C), [self = shared_from_this(), lp](MaNGOS::IO::NetworkError const& error)
+    Read((char*) lp.get(), sizeof(sAuthReconnectProof_C), [self = shared_from_this(), lp](IO::NetworkError const& error)
     {
         if (error)
         {
@@ -1098,7 +1110,7 @@ void AuthSocket::_HandleReconnectProof()
             std::shared_ptr<ByteBuffer> pkt = std::make_shared<ByteBuffer>();
             *pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
             *pkt << uint8(WOW_SUCCESS);
-            self->Write(pkt, [self](MaNGOS::IO::NetworkError const& error)
+            self->Write(pkt, [self](IO::NetworkError const& error)
             {
                 self->ProcessIncomingData();
             });
@@ -1121,7 +1133,7 @@ void AuthSocket::_HandleRealmList()
     assert(this->m_accountId);
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleRealmList");
-    ReadSkip(4, [self = shared_from_this()](MaNGOS::IO::NetworkError const& error)
+    ReadSkip(4, [self = shared_from_this()](IO::NetworkError const& error)
     {
         if (error)
         {
@@ -1156,7 +1168,7 @@ void AuthSocket::_HandleRealmList()
         *pkt << (uint16)realmlistBuffer.size();
         pkt->append(realmlistBuffer);
 
-        self->Write(pkt, [self](MaNGOS::IO::NetworkError const& error)
+        self->Write(pkt, [self](IO::NetworkError const& error)
         {
             self->ProcessIncomingData();
         });

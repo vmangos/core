@@ -4,7 +4,7 @@
 #ifdef WIN32
 #include "./impl/windows/AsyncSocket.h"
 #else
-#error "Mangos::IO::Networking not supported on your platform"
+#error "IO::Networking not supported on your platform"
 #endif
 
 #endif //MANGOS_IO_NETWORKING_ASYNCSOCKET_H
