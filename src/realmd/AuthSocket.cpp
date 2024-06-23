@@ -34,6 +34,7 @@
 #include "AuthCodes.h"
 #include "PatchHandler.h"
 #include "Util.h"
+#include "IO/Timer/AsyncSystemTimer.h"
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -199,11 +200,28 @@ AuthSocket::AuthSocket(SocketDescriptor const& socketDescriptor) : MaNGOS::Async
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", socketDescriptor.peerAddress.c_str());
 }
 
+void AuthSocket::Start()
+{
+    if (int secs = sConfig.GetIntDefault("MaxSessionDuration", 300))
+    {
+        this->m_sessionDurationTimeout = sAsyncSystemTimer.ScheduleFunctionOnce(std::chrono::seconds(secs), [this]()
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Connection has reached MaxSessionDuration. Closing socket...");
+            // It's correct that we capture _this_, since the timer will be canceled in destructor
+            this->CloseSocket();
+        });
+    }
+    ProcessIncomingData();
+}
+
 // Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
 {
     if (m_patch != ACE_INVALID_HANDLE)
         ACE_OS::close(m_patch);
+
+    if (m_sessionDurationTimeout)
+        m_sessionDurationTimeout->Cancel();
 }
 
 AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
@@ -277,11 +295,6 @@ void AuthSocket::ProcessIncomingData()
         // if we reach here, it means that a valid opcode was found and the handler completed successfully
         // TODO: self->m_timeoutTimer.reset();
     });
-}
-
-void AuthSocket::Start()
-{
-    ProcessIncomingData();
 }
 
 std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)

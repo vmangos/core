@@ -32,6 +32,7 @@
 #include "SRP6/SRP6.h"
 #include "ByteBuffer.h"
 #include "IO/Networking/AsyncSocket.h"
+#include "IO/Timer/TimerHandle.h"
 
 struct PINData
 {
@@ -141,6 +142,8 @@ class AuthSocket : public MaNGOS::AsyncSocket<AuthSocket>
         ACE_HANDLE m_patch = ACE_INVALID_HANDLE;
 
         void InitPatch();
+
+        std::shared_ptr<IO::Timer::TimerHandle> m_sessionDurationTimeout;
 };
 
 #endif

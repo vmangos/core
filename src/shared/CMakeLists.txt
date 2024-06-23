@@ -105,6 +105,11 @@ set (shared_SRCS
     IO/Networking/SocketDescriptor.h
     IO/Multithreading/CreateThread.h
     IO/Multithreading/CreateThread.cpp
+    IO/Timer/impl/windows/AsyncSystemTimer.h
+    IO/Timer/impl/windows/AsyncSystemTimer.cpp
+    IO/Timer/impl/windows/TimerHandle.h
+    IO/Timer/impl/windows/TimerHandle.cpp
+    IO/Timer/AsyncSystemTimer.h
 )
 
 if(USE_LIBCURL)
