@@ -161,7 +161,7 @@ typedef struct AUTH_LOGON_PROOF_S
 
 typedef struct AUTH_RECONNECT_PROOF_C
 {
-    uint8   cmd;
+    //uint8   cmd;
     uint8   R1[16];
     uint8   R2[20];
     uint8   R3[20];
@@ -999,6 +999,9 @@ void AuthSocket::_HandleReconnectChallenge()
             EndianConvert(*((uint32*)(&body->country[0])));
             EndianConvert(body->timezone_bias);
             EndianConvert(body->ip);
+
+            EndianConvert(body->build);
+            self->m_build = body->build;
 
             // Convert uint8[4] to string, restore string order as its byte order is reversed
             // To it for os
