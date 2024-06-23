@@ -1000,7 +1000,6 @@ void AuthSocket::_HandleReconnectChallenge()
             EndianConvert(body->timezone_bias);
             EndianConvert(body->ip);
 
-            EndianConvert(body->build);
             self->m_build = body->build;
 
             // Convert uint8[4] to string, restore string order as its byte order is reversed
