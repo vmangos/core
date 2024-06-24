@@ -5373,7 +5373,7 @@ void Aura::HandleAuraModAttackPower(bool apply, bool /*Real*/)
                 modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, m_modifier.m_amount);
     }
 
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, m_modifier.m_amount, apply);
+    GetTarget()->HandleAttackPowerModifier(MELEE_AP_MODS, IsPositive() ? AP_MOD_POSITIVE_FLAT : AP_MOD_NEGATIVE_FLAT, m_modifier.m_amount, apply);
 
 #if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1) && (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4)
     // Blood Fury- Add aura to decrease attack power on remove
@@ -5403,7 +5403,7 @@ void Aura::HandleAuraModRangedAttackPower(bool apply, bool /*Real*/)
                 modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, m_modifier.m_amount);
     }
 
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, m_modifier.m_amount, apply);
+    GetTarget()->HandleAttackPowerModifier(RANGED_AP_MODS, IsPositive() ? AP_MOD_POSITIVE_FLAT : AP_MOD_NEGATIVE_FLAT, m_modifier.m_amount, apply);
 }
 
 void Aura::HandleAuraModAttackPowerPercent(bool apply, bool /*Real*/)
@@ -5416,7 +5416,7 @@ void Aura::HandleAuraModAttackPowerPercent(bool apply, bool /*Real*/)
     }
 
     // UNIT_FIELD_ATTACK_POWER_MULTIPLIER = multiplier - 1
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, m_modifier.m_amount, apply);
+    GetTarget()->HandleAttackPowerModifier(MELEE_AP_MODS, AP_MOD_PCT, m_modifier.m_amount, apply);
 }
 
 void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool /*Real*/)
@@ -5433,7 +5433,7 @@ void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool /*Real*/)
     }
 
     // UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_PCT, m_modifier.m_amount, apply);
+    GetTarget()->HandleAttackPowerModifier(RANGED_AP_MODS, AP_MOD_PCT, m_modifier.m_amount, apply);
 #endif
 }
 

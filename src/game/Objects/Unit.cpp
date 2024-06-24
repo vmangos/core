@@ -7772,6 +7772,55 @@ uint32 Unit::GetCreatureType() const
 ########                         ########
 #######################################*/
 
+// attack power needs special handling because positive and negative mods are set in separate update fields
+bool Unit::HandleAttackPowerModifier(AttackPowerModIndex index, AttackPowerModType modifierType, float amount, bool apply)
+{
+    if (index >= AP_MODS_COUNT || modifierType >= AP_MOD_TYPE_COUNT)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ERROR in HandleAttackPowerModifier(): nonexistent index %u or type %u!", index, modifierType);
+        return false;
+    }
+
+    switch (modifierType)
+    {
+        case AP_MOD_POSITIVE_FLAT:
+            m_attackPowerMods[index].positiveMods += apply ? amount : -amount;
+            break;
+        case AP_MOD_NEGATIVE_FLAT:
+            m_attackPowerMods[index].negativeMods += apply ? amount : -amount;
+            break;
+        case AP_MOD_PCT:
+            ApplyPercentModFloatVar(m_attackPowerMods[index].multiplier, amount, apply);
+            break;
+    }
+
+    if (!CanModifyStats())
+        return false;
+
+    UpdateAttackPowerAndDamage(index == RANGED_AP_MODS);
+}
+
+float Unit::GetAttackPowerModifierValue(AttackPowerModIndex index, AttackPowerModType modifierType) const
+{
+    if (index >= AP_MODS_COUNT || modifierType >= AP_MOD_TYPE_COUNT)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "attempt to access nonexistent modifier value from m_attackPowerMods!");
+        return 0.0f;
+    }
+
+    switch (modifierType)
+    {
+        case AP_MOD_POSITIVE_FLAT:
+            return m_attackPowerMods[index].positiveMods;
+        case AP_MOD_NEGATIVE_FLAT:
+            return m_attackPowerMods[index].negativeMods;
+        case AP_MOD_PCT:
+            return std::max(0.0f, m_attackPowerMods[index].multiplier);
+    }
+
+    return 0;
+}
+
 bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply)
 {
     if (unitMod >= UNIT_MOD_END || modifierType >= MODIFIER_TYPE_END)
@@ -7830,13 +7879,6 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         case UNIT_MOD_RESISTANCE_SHADOW:
         case UNIT_MOD_RESISTANCE_ARCANE:
             UpdateResistances(GetSpellSchoolByAuraGroup(unitMod));
-            break;
-
-        case UNIT_MOD_ATTACK_POWER:
-            UpdateAttackPowerAndDamage();
-            break;
-        case UNIT_MOD_ATTACK_POWER_RANGED:
-            UpdateAttackPowerAndDamage(true);
             break;
 
         case UNIT_MOD_DAMAGE_MAINHAND:
@@ -8026,7 +8068,7 @@ float Unit::GetTotalAttackPowerValue(WeaponAttackType attType) const
 {
     if (attType == RANGED_ATTACK)
     {
-        int32 ap = GetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER) + GetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS);
+        int32 ap = GetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER) + GetInt16Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 0) + GetInt16Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 1);
         if (ap < 0)
             return 0.0f;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -8037,7 +8079,7 @@ float Unit::GetTotalAttackPowerValue(WeaponAttackType attType) const
     }
     else
     {
-        int32 ap = GetInt32Value(UNIT_FIELD_ATTACK_POWER) + GetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS);
+        int32 ap = GetInt32Value(UNIT_FIELD_ATTACK_POWER) + GetInt16Value(UNIT_FIELD_ATTACK_POWER_MODS, 0) + GetInt16Value(UNIT_FIELD_ATTACK_POWER_MODS, 1);
         if (ap < 0)
             return 0.0f;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

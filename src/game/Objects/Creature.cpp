@@ -1763,9 +1763,6 @@ void Creature::InitStatsForLevel(float percentHealth, float percentMana)
     SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, rangedDamageAverage - rangedDamageVariance);
     SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, rangedDamageAverage + rangedDamageVariance);
 
-    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, pCLS->attack_power);
-    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, pCLS->ranged_attack_power);
-
     // armor
     SetCreateResistance(SPELL_SCHOOL_NORMAL, pCLS->armor * cinfo->armor_multiplier);
 
