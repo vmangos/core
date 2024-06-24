@@ -168,6 +168,9 @@ namespace IO { namespace Networking {
     template<typename SocketType>
     void AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
     {
+        if (source->size() > 8*1024*1024)
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source->size());
+
         if (m_disconnectRequest)
         {
             callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
@@ -255,6 +258,9 @@ namespace IO { namespace Networking {
     template<typename SocketType>
     void AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
     {
+        if (source->size() > 8*1024*1024)
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source->size());
+
         if (m_disconnectRequest)
         {
             callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
