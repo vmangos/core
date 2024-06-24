@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <functional>
+#include <string>
 
 namespace IO { namespace Multithreading {
     /// Creates a new system thread that has a name attached to it.
