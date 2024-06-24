@@ -1123,6 +1123,8 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
 
     DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamageHealth1");
 
+    // remember victim PvP death for corpse type and corpse reclaim delay
+    // at original death (not at SpiritOfRedemptionTalent timeout)
     if (pPlayerVictim && !damageFromSpiritOfRedemptionTalent)
         pPlayerVictim->SetPvPDeath(pPlayerTap != nullptr);
 
