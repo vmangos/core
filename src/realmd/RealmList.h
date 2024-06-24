@@ -52,8 +52,8 @@ typedef std::set<uint32> RealmBuilds;
 struct Realm
 {
     uint32 id = 0;
-    std::string address;
-    std::string localAddress;
+    std::string address;                                    // format: <ip>:<port>
+    std::string localAddress;                               // format: <ip>:<port>
     uint32 localSubnetMask = 0;
     uint8 icon = 0;
     RealmFlags realmFlags = REALM_FLAG_NONE;

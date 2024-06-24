@@ -36,6 +36,7 @@
 #include "IO/Timer/AsyncSystemTimer.h"
 #include "IO/Filesystem/FileSystem.h"
 #include "ClientPatchCache.h"
+#include "IO/Networking/Utils.h"
 
 #include <ace/INET_Addr.h>
 
@@ -202,7 +203,7 @@ std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B,
 // Accept the connection and set the s random value for SRP6 // TODO where is this SRP6 done?
 AuthSocket::AuthSocket(IO::Networking::SocketDescriptor const& socketDescriptor) : IO::Networking::AsyncSocket<AuthSocket>(socketDescriptor)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", socketDescriptor.peerAddress.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpAddress().c_str());
 }
 
 void AuthSocket::Start()
@@ -427,11 +428,11 @@ void AuthSocket::_HandleLogonChallenge()
             // Verify that this IP is not in the ip_banned table
             // No SQL injection possible (paste the IP address as passed by the socket)
             //                                                                                                              permanent ban          OR  still banned
-            std::unique_ptr<QueryResult> sqlIpBanResult = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` WHERE (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP()) AND `ip` = '%s'", self->get_remote_address().c_str());
+            std::unique_ptr<QueryResult> sqlIpBanResult = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` WHERE (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP()) AND `ip` = '%s'", self->GetRemoteIpAddress().c_str());
             if (sqlIpBanResult)
             {
                 *pkt << uint8(WOW_FAIL_FAIL_NOACCESS);
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", self->get_remote_address().c_str(), self->m_login.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", self->GetRemoteIpAddress().c_str(), self->m_login.c_str());
             }
             else
             {
@@ -457,7 +458,7 @@ void AuthSocket::_HandleLogonChallenge()
 
                     if (requireVerification && !isVerified)
                     {
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", self->m_login.c_str(), self->get_remote_address().c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", self->m_login.c_str(), self->GetRemoteIpAddress().c_str());
                         *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
 
                         self->Write(pkt, [self](IO::NetworkError const& error) {
@@ -480,9 +481,9 @@ void AuthSocket::_HandleLogonChallenge()
                     if (self->m_lockFlags & IP_LOCK)
                     {
                         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account '%s' is locked to IP - '%s'", self->m_login.c_str(), self->m_lastIP.c_str());
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Player address is '%s'", self->get_remote_address().c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Player address is '%s'", self->GetRemoteIpAddress().c_str());
 
-                        if (self->m_lastIP != self->get_remote_address())
+                        if (self->m_lastIP != self->GetRemoteIpAddress())
                         {
                             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account IP differs");
 
@@ -526,12 +527,12 @@ void AuthSocket::_HandleLogonChallenge()
                             if (banTimestamp == unbanTimestamp)
                             {
                                 *pkt << (uint8) WOW_FAIL_BANNED;
-                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->get_remote_address().c_str());
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->GetRemoteIpAddress().c_str());
                             }
                             else
                             {
                                 *pkt << (uint8) WOW_FAIL_SUSPENDED;
-                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->get_remote_address().c_str());
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->GetRemoteIpAddress().c_str());
                             }
                         }
                         else
@@ -565,7 +566,7 @@ void AuthSocket::_HandleLogonChallenge()
 
                             if (self->m_promptPin)
                             {
-                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", self->m_login.c_str(), self->get_remote_address().c_str());
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", self->m_login.c_str(), self->GetRemoteIpAddress().c_str());
 
                                 uint32 gridSeedPkt = self->m_gridSeed = static_cast<uint32>(rand32());
                                 EndianConvert(gridSeedPkt);
@@ -751,7 +752,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         if ((m_lockFlags & FIXED_PIN) == FIXED_PIN)
         {
             pinResult = VerifyPinData(std::stoi(m_securityInfo), *pinData);
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' PIN result: %u", m_login.c_str(), get_remote_address().c_str(), pinResult);
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' PIN result: %u", m_login.c_str(), GetRemoteIpAddress().c_str(), pinResult);
         }
         else if ((m_lockFlags & TOTP) == TOTP)
         {
@@ -805,7 +806,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         }
         else if (GeographicalLockCheck())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Account '%s' (%u) using IP '%s' has been geolocked", m_login.c_str(), m_accountId, get_remote_address().c_str()); // todo, add additional logging info
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Account '%s' (%u) using IP '%s' has been geolocked", m_login.c_str(), m_accountId, GetRemoteIpAddress().c_str()); // todo, add additional logging info
 
             uint32_t pin = urand(100000, 999999); // check rand32_max
             bool result = LoginDatabase.PExecute("UPDATE `account` SET `geolock_pin` = %u WHERE `username` = '%s'", pin, m_safelogin.c_str());
@@ -836,7 +837,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
                 mail->from(sConfig.GetStringDefault("MailFrom", ""));
                 mail->substitution("%username%", m_login);
                 mail->substitution("%unlock_pin%", std::to_string(pin));
-                mail->substitution("%originating_ip%", get_remote_address());
+                mail->substitution("%originating_ip%", GetRemoteIpAddress());
 
                 MailerService::get_global_mailer()->send(std::move(mail),
                     [](SendgridMail::Result res)
@@ -857,7 +858,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             return;
         }
 
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' successfully authenticated", m_login.c_str(), get_remote_address().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' successfully authenticated", m_login.c_str(), GetRemoteIpAddress().c_str());
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped username) and IP address as received by socket
@@ -865,7 +866,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         // Why it must be sync: The new network implementation is so fast that the async db cant execute the UPDATE statement before the client tries to reach mangosd
         // If it is async there would be a race condition
         bool result = LoginDatabase.PExecute(DbExecMode::MustBeSync, "UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
-            K_hex, get_remote_address().c_str(), GetLocaleByName(m_localizationName), m_os.c_str(), m_platform.c_str(), m_safelogin.c_str() );
+                                             K_hex, GetRemoteIpAddress().c_str(), GetLocaleByName(m_localizationName), m_os.c_str(), m_platform.c_str(), m_safelogin.c_str() );
         if (!result)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to update login stats for account '%s'", m_safelogin.c_str());
@@ -888,7 +889,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
     else
     {
         // We are here because the password was incorrect
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", m_login.c_str (), get_remote_address().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", m_login.c_str (), GetRemoteIpAddress().c_str());
 
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);
         if(MaxWrongPassCount > 0)
@@ -913,11 +914,11 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
                             "VALUES ('%u',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','MaNGOS realmd','Failed login autoban',1,1)",
                             acc_id, WrongPassBanTime);
                         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using  IP '%s' got banned for '%u' seconds because it failed to authenticate '%u' times",
-                            m_login.c_str(), get_remote_address().c_str(), WrongPassBanTime, failed_logins);
+                                 m_login.c_str(), GetRemoteIpAddress().c_str(), WrongPassBanTime, failed_logins);
                     }
                     else
                     {
-                        std::string current_ip = get_remote_address();
+                        std::string current_ip = GetRemoteIpAddress();
                         LoginDatabase.escape_string(current_ip);
                         LoginDatabase.PExecute("INSERT INTO `ip_banned` VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','MaNGOS realmd','Failed login autoban')",
                             current_ip.c_str(), WrongPassBanTime);
@@ -1137,7 +1138,7 @@ void AuthSocket::_HandleRealmList()
 
         if (delay < minDelay)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", self->m_login.c_str(), self->get_remote_address().c_str(), delay);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", self->m_login.c_str(), self->GetRemoteIpAddress().c_str(), delay);
 
             self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
             return;
@@ -1162,12 +1163,12 @@ void AuthSocket::_HandleRealmList()
     });
 }
 
-std::string AuthSocket::GetRealmAddress(Realm const& realm) const
+std::string AuthSocket::GetRealmAddressForClient(Realm const& realm) const
 {
     ACE_INET_Addr clientAddress;
     ACE_INET_Addr localAddress;
 
-    std::string strClientAddressWithPort = this->get_remote_address() + ":0";
+    std::string strClientAddressWithPort = this->GetRemoteIpAddress() + ":0";
     std::string strServerAddressWithPort = realm.localAddress;
 
     if (clientAddress.set(strClientAddressWithPort.c_str()) == 0 && localAddress.set(strServerAddressWithPort.c_str()) == 0)
@@ -1224,7 +1225,7 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
             pkt << uint32(i->second.icon);              // realm type
             pkt << uint8(realmflags);                   // realmflags
             pkt << name;                                // name
-            pkt << GetRealmAddress(i->second);          // address
+            pkt << GetRealmAddressForClient(i->second); // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(i->second.timeZone);           // realm category
@@ -1273,7 +1274,7 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
             pkt << uint8(lock);                         // flags, if 0x01, then realm locked
             pkt << uint8(realmFlags);                   // see enum RealmFlags
             pkt << i->first;                            // name
-            pkt << GetRealmAddress(i->second);          // address
+            pkt << GetRealmAddressForClient(i->second);// address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(i->second.timeZone);           // realm category (Cfg_Categories.dbc)
@@ -1512,7 +1513,7 @@ bool AuthSocket::GeographicalLockCheck()
         return false;
     }
 
-    if (m_lastIP.empty() || m_lastIP == get_remote_address())
+    if (m_lastIP.empty() || m_lastIP == GetRemoteIpAddress())
     {
         return false;
     }
@@ -1527,7 +1528,7 @@ bool AuthSocket::GeographicalLockCheck()
         "FROM geoip "
         "WHERE network_last_integer >= INET_ATON('%s') "
         "ORDER BY network_last_integer ASC LIMIT 1",
-        get_remote_address().c_str(), get_remote_address().c_str())
+        GetRemoteIpAddress().c_str(), GetRemoteIpAddress().c_str())
         );
 
     auto result_prev = std::unique_ptr<QueryResult>(LoginDatabase.PQuery(

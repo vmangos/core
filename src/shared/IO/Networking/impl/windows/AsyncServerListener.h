@@ -141,10 +141,14 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
 
     Addresses* addrBuffer = new Addresses();
     IocpOperationTask* task = new IocpOperationTask([nativePeerSocket, this, addrBuffer](IocpOperationTask* task, DWORD errorCode) {
-        std::string peerAddress(inet_ntoa(addrBuffer->peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
+        std::string peerIpAddressStr(inet_ntoa(addrBuffer->peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
         delete addrBuffer;
+        auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(peerIpAddressStr);
+        MANGOS_ASSERT(peerIpAddress.has_value());
 
-        IO::Networking::SocketDescriptor socketDescriptor{peerAddress, nativePeerSocket};
+        uint16_t peerPort = ntohs(addrBuffer->peerAddress.sin_port);
+        IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
+        IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
 
         std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
         HandleAccept(client);
