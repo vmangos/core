@@ -7804,7 +7804,7 @@ float Unit::GetAttackPowerModifierValue(AttackPowerModIndex index, AttackPowerMo
 {
     if (index >= AP_MODS_COUNT || modifierType >= AP_MOD_TYPE_COUNT)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "attempt to access nonexistent modifier value from m_attackPowerMods!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to access nonexistent modifier value from m_attackPowerMods!");
         return 0.0f;
     }
 
