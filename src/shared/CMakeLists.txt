@@ -111,6 +111,10 @@ set (shared_SRCS
     IO/Timer/impl/windows/TimerHandle.h
     IO/Timer/impl/windows/TimerHandle.cpp
     IO/Timer/AsyncSystemTimer.h
+    IO/Filesystem/FileSystem.h
+    IO/Filesystem/FileSystem.cpp
+    IO/Filesystem/FileHandle.h
+    IO/Filesystem/FileHandle.cpp
 )
 
 if(USE_LIBCURL)
