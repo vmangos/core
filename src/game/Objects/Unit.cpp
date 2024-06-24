@@ -7798,6 +7798,7 @@ bool Unit::HandleAttackPowerModifier(AttackPowerModIndex index, AttackPowerModTy
         return false;
 
     UpdateAttackPowerAndDamage(index == RANGED_AP_MODS);
+    return true;
 }
 
 float Unit::GetAttackPowerModifierValue(AttackPowerModIndex index, AttackPowerModType modifierType) const
