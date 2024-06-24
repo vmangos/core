@@ -169,12 +169,19 @@ typedef struct AUTH_RECONNECT_PROOF_C
 
 typedef struct XFER_INIT
 {
-    uint8 cmd;                                              // XFER_INITIATE
-    uint8 fileNameLen;                                      // strlen(fileName);
-    uint8 fileName[5];                                      // fileName[fileNameLen]
-    uint64 file_size;                                       // file size (bytes)
-    uint8 md5[MD5_DIGEST_LENGTH];                           // MD5
-}XFER_INIT;
+    uint8 cmd;                    // XFER_INITIATE
+    uint8 fileNameLen;            // strlen(fileName);
+    uint8 fileName[5];            // fileName[fileNameLen]
+    uint64 file_size;             // file size (bytes)
+    uint8 md5[MD5_DIGEST_LENGTH]; // MD5
+} XFER_INIT;
+
+typedef struct XFER_DATA_CHUNK
+{
+    uint8  cmd;        // this must be CMD_XFER_DATA
+    uint16 data_size;
+    uint8  data[4096]; // 4096 - page size on most arch // TODO: Is this a client limitation?
+} XferChunk;
 
 typedef struct AuthHandler
 {
@@ -182,13 +189,6 @@ typedef struct AuthHandler
     uint32 status;
     void (AuthSocket::*asyncHandler)();
 } AuthHandler;
-
-typedef struct XferChunk
-{
-    ACE_UINT8 cmd;        // this must be CMD_XFER_DATA
-    ACE_UINT16 data_size;
-    ACE_UINT8 data[4096]; // 4096 - page size on most arch // TODO: Is this a client limitation?
-} XferChunk;
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
 #if defined( __GNUC__ )
@@ -1452,7 +1452,7 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
 
 void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t[]> rawChunk)
 {
-    XferChunk* chunk = (XferChunk*)(rawChunk.get());
+    XFER_DATA_CHUNK* chunk = (XFER_DATA_CHUNK*)(rawChunk.get());
 
     uint64_t actualReadAmount = m_pendingPatchFile->ReadSync((uint8_t*)&(chunk->data), sizeof(chunk->data));
     if (actualReadAmount == 0)
@@ -1481,8 +1481,8 @@ void AuthSocket::InitAndHandOverControlToPatchHandler()
         return;
     }
 
-    std::shared_ptr<uint8_t[]> rawChunk = std::shared_ptr<uint8_t[]>(new uint8_t[sizeof(XferChunk)]);
-    ((XferChunk*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
+    std::shared_ptr<uint8_t[]> rawChunk = std::shared_ptr<uint8_t[]>(new uint8_t[sizeof(XFER_DATA_CHUNK)]);
+    ((XFER_DATA_CHUNK*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
 
     RepeatInternalXferLoop(std::move(rawChunk));
 }
