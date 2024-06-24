@@ -118,15 +118,15 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
 template<typename TClientSocket>
 void AsyncServerListener<TClientSocket>::StartAcceptOperation()
 {
-    SOCKET peerSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (peerSocket == INVALID_SOCKET)
+    SOCKET nativePeerSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (nativePeerSocket == INVALID_SOCKET)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::socket(accept, ...) Error: %u", WSAGetLastError());
         return;
     }
 
     // Attach our acceptor socket to our completion port
-    HANDLE tmpCompletionPort = CreateIoCompletionPort((HANDLE) peerSocket, m_completionPort, (u_long) 0, 0);
+    HANDLE tmpCompletionPort = CreateIoCompletionPort((HANDLE) nativePeerSocket, m_completionPort, (u_long) 0, 0);
     if (tmpCompletionPort != m_completionPort) {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(accept, ...) Error: %u", WSAGetLastError());
         return;
@@ -140,11 +140,11 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
     };
 
     Addresses* addrBuffer = new Addresses();
-    IocpOperationTask* task = new IocpOperationTask([peerSocket, this, addrBuffer](IocpOperationTask* task, DWORD errorCode) {
+    IocpOperationTask* task = new IocpOperationTask([nativePeerSocket, this, addrBuffer](IocpOperationTask* task, DWORD errorCode) {
         std::string peerAddress(inet_ntoa(addrBuffer->peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
         delete addrBuffer;
 
-        IO::Networking::SocketDescriptor socketDescriptor { peerAddress, peerSocket };
+        IO::Networking::SocketDescriptor socketDescriptor{peerAddress, nativePeerSocket};
 
         std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
         HandleAccept(client);
@@ -154,7 +154,7 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
 
     DWORD bytesWritten = 0;
 
-    bool booleanOkay = ::AcceptEx(m_acceptorNativeSocket, peerSocket,
+    bool booleanOkay = ::AcceptEx(m_acceptorNativeSocket, nativePeerSocket,
                                   addrBuffer,
                                   0,
                                   sizeof(addrBuffer->localAddress) + sizeof(addrBuffer->__pad1), sizeof(addrBuffer->peerAddress) + sizeof(addrBuffer->__pad2),
