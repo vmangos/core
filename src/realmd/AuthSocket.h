@@ -33,6 +33,7 @@
 #include "ByteBuffer.h"
 #include "IO/Networking/AsyncSocket.h"
 #include "IO/Timer/TimerHandle.h"
+#include "IO/Filesystem/FileHandle.h"
 
 struct PINData
 {
@@ -77,11 +78,11 @@ class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
         void _HandleReconnectChallenge();
         void _HandleReconnectProof();
         void _HandleRealmList();
-        //data transfer handle for patch
 
-        bool _HandleXferResume();
-        bool _HandleXferCancel();
-        bool _HandleXferAccept();
+        //data transfer handle for patch
+        void _HandleXferAccept();
+        void _HandleXferResume();
+        void _HandleXferCancel();
 
     private:
         enum eStatus
@@ -139,11 +140,14 @@ class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
         typedef std::map<uint32, AccountTypes> AccountSecurityMap;
         AccountSecurityMap m_accountSecurityOnRealm;
 
-        ACE_HANDLE m_patch = ACE_INVALID_HANDLE;
-
-        void InitPatch();
-
+        // Auto kick realmd client connection after some time
         std::shared_ptr<IO::Timer::TimerHandle> m_sessionDurationTimeout;
+
+        // Patching stuff
+        void InitAndHandOverControlToPatchHandler();
+        std::unique_ptr<IO::Filesystem::FileHandleReadonly> m_pendingPatchFile = nullptr;
+
+        void RepeatInternalXferLoop(std::shared_ptr<uint8_t[]> rawChunk);
 };
 
 #endif

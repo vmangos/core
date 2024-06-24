@@ -34,7 +34,10 @@
 #include "AuthCodes.h"
 #include "Util.h"
 #include "IO/Timer/AsyncSystemTimer.h"
+#include "IO/Filesystem/FileSystem.h"
 #include "ClientPatchCache.h"
+
+#include <ace/INET_Addr.h>
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -44,10 +47,6 @@
 #include <openssl/md5.h>
 #include <ctime>
 //#include "Util.h" -- for commented utf8ToUpperOnlyLatin
-
-#include <ace/OS_NS_unistd.h>
-#include <ace/OS_NS_fcntl.h>
-#include <ace/OS_NS_sys_stat.h>
 
 enum AccountFlags
 {
@@ -182,7 +181,14 @@ typedef struct AuthHandler
     eAuthCmd cmd;
     uint32 status;
     void (AuthSocket::*asyncHandler)();
-}AuthHandler;
+} AuthHandler;
+
+typedef struct XferChunk
+{
+    ACE_UINT8 cmd;        // this must be CMD_XFER_DATA
+    ACE_UINT16 data_size;
+    ACE_UINT8 data[4096]; // 4096 - page size on most arch // TODO: Is this a client limitation?
+} XferChunk;
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
 #if defined( __GNUC__ )
@@ -216,9 +222,6 @@ void AuthSocket::Start()
 // Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
 {
-    if (m_patch != ACE_INVALID_HANDLE)
-        ACE_OS::close(m_patch);
-
     if (m_sessionDurationTimeout)
         m_sessionDurationTimeout->Cancel();
 }
@@ -254,9 +257,9 @@ void AuthSocket::ProcessIncomingData()
             { CMD_AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge },
             { CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
             { CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
-            //{ CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
+            { CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
             //{ CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
-            //{ CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
+            { CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
         };
 
         constexpr size_t tableLength = sizeof(table) / sizeof(AuthHandler);
@@ -649,10 +652,9 @@ void AuthSocket::_HandleLogonProof()
 
 void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_ptr<sAuthLogonProof_C const> const& lp)
 {
-    if (this->m_patch != ACE_INVALID_HANDLE)
+    if (m_pendingPatchFile)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonProof__PostRecv m_patch is already set??");
-        this->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonProof__PostRecv m_patch is already set?? The client should accept the XFER!");
         return;
     }
 
@@ -662,13 +664,10 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
 
     snprintf(tmp, 256, "%s/%d%s.mpq", sConfig.GetStringDefault("PatchesDir","./patches").c_str(), m_build, m_localizationName.c_str());
 
-    char filename[PATH_MAX];
-    if (ACE_OS::realpath(tmp, filename) != nullptr)
-    {
-        m_patch = ACE_OS::open(filename, GENERIC_READ | FILE_FLAG_SEQUENTIAL_SCAN);
-    }
+    std::string pathFilePath = IO::Filesystem::ToAbsolutePath(tmp);
+    m_pendingPatchFile = IO::Filesystem::TryOpenFileReadonly(pathFilePath);
 
-    if (m_patch == ACE_INVALID_HANDLE)
+    if (m_pendingPatchFile == nullptr)
     {
         // no patch found
         std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
@@ -687,46 +686,34 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
             }
             self->ProcessIncomingData();
         });
-        return;
     }
-
-    XFER_INIT xferh;
-
-    ACE_OFF_T file_size = ACE_OS::filesize(this->m_patch);
-
-    if (file_size == -1)
+    else
     {
-        this->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
-        return;
+        Md5HashDigest md5Hash = sRealmdPatchCache.GetOrCalculateHash(m_pendingPatchFile);
+        std::string wowClientPathFileName = "Patch"; // It seems like "Patch" is the only accepted name by the client
+        MANGOS_ASSERT(wowClientPathFileName.size() <= 255); // Filename must fit inside a byte
+
+        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+
+        // packet 1
+        *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
+        *pkt << (uint8) WOW_FAIL_VERSION_UPDATE;
+
+        // packet 2 - XFER_INIT
+        *pkt << (uint8) CMD_XFER_INITIATE;
+        *pkt << (uint8) wowClientPathFileName.size();
+        pkt->append(wowClientPathFileName.c_str(), wowClientPathFileName.size()); // we cant use the std::string overload of ->append(...), because it would +1 the size with null-terminator
+        *pkt << (uint64) m_pendingPatchFile->GetTotalFileSize();
+        pkt->append(md5Hash.digest);
+
+        // Set right status
+        m_status = STATUS_PATCH;
+
+        Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
+        {
+            self->ProcessIncomingData();
+        });
     }
-
-    if (!PatchCache::instance()->GetHash(tmp, (uint8*)&xferh.md5))
-    {
-        // calculate patch md5, happens if patch was added while realmd was running
-        PatchCache::instance()->LoadPatchMD5(tmp);
-        PatchCache::instance()->GetHash(tmp, (uint8*)&xferh.md5);
-    }
-
-    std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
-
-    // packet 1
-    *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
-    *pkt << (uint8) WOW_FAIL_VERSION_UPDATE;
-
-    // packet 2
-    xferh.cmd = CMD_XFER_INITIATE;
-    memcpy(&xferh.fileName, "Patch", 5);
-    xferh.fileNameLen = 5;
-    xferh.file_size = file_size;
-    pkt->append(&xferh, 1);
-
-    // Set right status
-    m_status = STATUS_PATCH;
-
-    Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
-    {
-        self->ProcessIncomingData();
-    });
 }
 
 void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C const> const& lp, std::shared_ptr<PINData const> const& pinData)
@@ -1305,9 +1292,16 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
     }
 }
 
+// Accept patch transfer
+void AuthSocket::_HandleXferAccept()
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferAccept");
+    InitAndHandOverControlToPatchHandler();
+}
+
 /*
 // Resume patch transfer
-bool AuthSocket::_HandleXferResume()
+void AuthSocket::_HandleXferResume()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferResume");
 
@@ -1339,35 +1333,19 @@ bool AuthSocket::_HandleXferResume()
         return false;
     }
 
-    InitPatch();
+    InitAndHandOverControlToPatchHandler();
 
     return true;
 }
+ */
 
 // Cancel patch transfer
-bool AuthSocket::_HandleXferCancel()
+void AuthSocket::_HandleXferCancel()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferCancel");
-
-    recv_skip(1);
-    close_connection();
-
-    return true;
+    // Socket will close implicitly
 }
 
-// Accept patch transfer
-bool AuthSocket::_HandleXferAccept()
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferAccept");
-
-    recv_skip(1);
-
-    InitPatch();
-
-    return true;
-}
-
- */
 // Verify PIN entry data
 bool AuthSocket::VerifyPinData(uint32 pin, PINData const& clientData)
 {
@@ -1472,19 +1450,41 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
     return pin;
 }
 
-void AuthSocket::InitPatch()
+void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t[]> rawChunk)
 {
-    /*
-    PatchHandler* handler = new PatchHandler(ACE_OS::dup(get_handle()), m_patch);
+    XferChunk* chunk = (XferChunk*)(rawChunk.get());
 
-    m_patch = ACE_INVALID_HANDLE;
-
-    if(handler->open() == -1)
+    uint64_t actualReadAmount = m_pendingPatchFile->ReadSync((uint8_t*)&(chunk->data), sizeof(chunk->data));
+    if (actualReadAmount == 0)
     {
-        handler->close();
-        close_connection();
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[XFER]: Done");
+        return;
     }
-     */
+    chunk->data_size = (uint16_t) actualReadAmount;
+
+    Write(rawChunk, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount, [self = shared_from_this(), rawChunk](IO::NetworkError const& error)
+    {
+        if (error)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[XFER]: Write(...) failed: %s", error.toString().c_str());
+            return;
+        }
+        self->RepeatInternalXferLoop(std::move(rawChunk));
+    });
+}
+
+void AuthSocket::InitAndHandOverControlToPatchHandler()
+{
+    if (!m_pendingPatchFile)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?");
+        return;
+    }
+
+    std::shared_ptr<uint8_t[]> rawChunk = std::shared_ptr<uint8_t[]>(new uint8_t[sizeof(XferChunk)]);
+    ((XferChunk*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
+
+    RepeatInternalXferLoop(std::move(rawChunk));
 }
 
 void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
