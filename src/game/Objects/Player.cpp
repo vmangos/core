@@ -3216,6 +3216,7 @@ void Player::SetCheatFixedZ(bool on, bool notify)
     else
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_FIXED_Z);
 
+    GetSession()->RejectMovementPacketsFor(100);
     SendHeartBeat(true);
 
     if (notify)
@@ -5022,6 +5023,7 @@ void Player::SetFly(bool enable)
         m_movementInfo.moveFlags = (MOVEFLAG_NONE);
     }
 
+    GetSession()->RejectMovementPacketsFor(100);
     SendHeartBeat(true);
 }
 

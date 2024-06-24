@@ -374,7 +374,8 @@ class WorldSession
         Unit* GetMoverFromGuid(ObjectGuid const& guid) const;
         ObjectGuid const& GetClientMoverGuid() const { return m_clientMoverGuid; }
         bool HasClientMovementControl() const { return !m_clientMoverGuid.IsEmpty(); }
-        
+        void RejectMovementPacketsFor(uint32 ms);
+
         void SetReceivedWhoRequest(bool v) { m_who_recvd = v; }
         bool ReceivedWhoRequest() const { return m_who_recvd; }
         bool m_who_recvd;

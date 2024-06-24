@@ -1073,6 +1073,13 @@ Unit* WorldSession::GetMoverFromGuid(ObjectGuid const& guid) const
     return nullptr;
 }
 
+void WorldSession::RejectMovementPacketsFor(uint32 ms)
+{
+    uint32 timeout = WorldTimer::getMSTime() + ms;
+    if (m_moveRejectTime < timeout)
+        m_moveRejectTime = timeout;
+}
+
 bool WorldSession::VerifyMovementInfo(MovementInfo const& movementInfo) const
 {
     if (!MaNGOS::IsValidMapCoord(movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o))
