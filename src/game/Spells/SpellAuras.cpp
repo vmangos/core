@@ -5445,11 +5445,18 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
     Unit* target = GetTarget();
 
     // apply item specific bonuses for already equipped weapon
-    if (Real && target->GetTypeId() == TYPEID_PLAYER)
+    if (Real)
     {
-        for (int i = 0; i < MAX_ATTACK; ++i)
-            if (Item* pItem = ((Player*)target)->GetWeaponForAttack(WeaponAttackType(i), true, false))
-                ((Player*)target)->_ApplyWeaponDependentAuraDamageMod(pItem, WeaponAttackType(i), this, apply);
+        if (Player* player = target->ToPlayer())
+        {
+            for (int i = 0; i < MAX_ATTACK; ++i)
+            {
+                if (Item* pItem = player->GetWeaponForAttack(WeaponAttackType(i), true, true))
+                {
+                    player->_ApplyWeaponDependentAuraDamageMod(pItem, WeaponAttackType(i), this, apply);
+                }
+            }
+        }
     }
 
     // m_modifier.m_miscvalue is bitmask of spell schools
@@ -5534,7 +5541,7 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
         {
             for (int i = 0; i < MAX_ATTACK; ++i)
             {
-                if (Item* pItem = player->GetWeaponForAttack(WeaponAttackType(i), true, false))
+                if (Item* pItem = player->GetWeaponForAttack(WeaponAttackType(i), true, true))
                 {
                     player->_ApplyWeaponDependentAuraDamageMod(pItem, WeaponAttackType(i), this, apply);
                 }
