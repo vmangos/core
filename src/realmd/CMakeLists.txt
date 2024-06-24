@@ -23,6 +23,8 @@ set(EXECUTABLE_SRCS
   AuthSocket.cpp
   Main.cpp
   RealmList.cpp
+  ClientPatchCache.h
+  ClientPatchCache.cpp
 )
 
 

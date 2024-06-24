@@ -32,9 +32,9 @@
 #include "RealmList.h"
 #include "AuthSocket.h"
 #include "AuthCodes.h"
-#include "PatchHandler.h"
 #include "Util.h"
 #include "IO/Timer/AsyncSystemTimer.h"
+#include "ClientPatchCache.h"
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
