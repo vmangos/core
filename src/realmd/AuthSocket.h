@@ -146,7 +146,7 @@ class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
         void InitAndHandOverControlToPatchHandler();
         std::unique_ptr<IO::Filesystem::FileHandleReadonly> m_pendingPatchFile = nullptr;
 
-        void RepeatInternalXferLoop(std::shared_ptr<uint8_t[]> rawChunk);
+        void RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk);
 };
 
 #endif

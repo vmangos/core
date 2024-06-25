@@ -1438,7 +1438,7 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
     return pin;
 }
 
-void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t[]> rawChunk)
+void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
 {
     XFER_DATA_CHUNK* chunk = (XFER_DATA_CHUNK*)(rawChunk.get());
 
@@ -1461,6 +1461,15 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t[]> rawChunk)
     });
 }
 
+template< typename T >
+struct array_deleter
+{
+    void operator ()(T const * p)
+    {
+        delete[] p;
+    }
+};
+
 void AuthSocket::InitAndHandOverControlToPatchHandler()
 {
     if (!m_pendingPatchFile)
@@ -1469,7 +1478,7 @@ void AuthSocket::InitAndHandOverControlToPatchHandler()
         return;
     }
 
-    std::shared_ptr<uint8_t[]> rawChunk = std::shared_ptr<uint8_t[]>(new uint8_t[sizeof(XFER_DATA_CHUNK)]);
+    std::shared_ptr<uint8_t> rawChunk = std::shared_ptr<uint8_t>(new uint8_t[sizeof(XFER_DATA_CHUNK)], array_deleter<uint8_t>());
     ((XFER_DATA_CHUNK*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
 
     RepeatInternalXferLoop(std::move(rawChunk));

@@ -37,7 +37,7 @@ namespace IO { namespace Networking {
 
             void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
             void Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
-            void Write(std::shared_ptr<uint8 const[]> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback);
+            void Write(std::shared_ptr<uint8 const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback);
 
             void CloseSocket();
 
@@ -55,7 +55,7 @@ namespace IO { namespace Networking {
             std::function<void(IO::NetworkError)> m_writeCallback = nullptr;
             std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
-            std::shared_ptr<uint8_t const[]> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
+            std::shared_ptr<uint8_t const> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
     };
 
     template<typename SocketType>
@@ -323,7 +323,7 @@ namespace IO { namespace Networking {
 
     /// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
     template<typename SocketType>
-    void AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const[]> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
+    void AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
     {
         if (size > 8*1024*1024)
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", size);
