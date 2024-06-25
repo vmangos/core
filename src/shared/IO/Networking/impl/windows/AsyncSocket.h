@@ -41,7 +41,8 @@ namespace IO { namespace Networking {
 
             void CloseSocket();
 
-            std::string GetRemoteIpAddress() const;
+            IO::Networking::IpEndpoint const& GetRemoteEndpoint() const;
+            std::string GetRemoteIpString() const;;
 
         private:
             SocketDescriptor m_socket;
@@ -66,9 +67,15 @@ namespace IO { namespace Networking {
     }
 
     template<typename SocketType>
-    std::string AsyncSocket<SocketType>::GetRemoteIpAddress() const
+    IO::Networking::IpEndpoint const& AsyncSocket<SocketType>::GetRemoteEndpoint() const
     {
-        return m_socket.peerEndpoint.ip.toString();
+        return m_socket.peerEndpoint;
+    }
+
+    template<typename SocketType>
+    std::string AsyncSocket<SocketType>::GetRemoteIpString() const
+    {
+        return GetRemoteEndpoint().ip.toString();
     }
 
     template<typename SocketType>
