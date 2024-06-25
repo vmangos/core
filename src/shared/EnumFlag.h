@@ -106,7 +106,7 @@ public:
     constexpr bool HasFlag(T flag) const
     {
         using i = std::underlying_type_t<T>;
-        return static_cast<i>(_value & flag) != static_cast<i>(0);
+        return static_cast<i>((i)_value & (i)flag) != static_cast<i>(0);
     }
 
     constexpr bool HasAllFlags(T flags) const
