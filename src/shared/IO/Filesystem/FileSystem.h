@@ -32,8 +32,8 @@ namespace IO { namespace Filesystem {
     std::string ToAbsolutePath(std::string const& partialPath);
 
     /// Returns all files in a folder, non-recursively.
-    /// if OutputFilePath::PartialPath the path will be based on the folderPath e.g. "myCoolFile.txt"
-    /// if OutputFilePath::FullPath the path will be absolute e.g. "/home/user/data/myCoolFile.txt"
+    /// if OutputFilePath::JustFileName the path will be based on the folderPath e.g. "myCoolFile.txt"
+    /// if OutputFilePath::FullFilePath the path will be absolute e.g. "/home/user/data/myCoolFile.txt"
     [[nodiscard]]
     std::vector<std::string> GetAllFilesInFolder(std::string const& folderPath, OutputFilePath filePathOption);
 }} // namespace IO::Filesystem
