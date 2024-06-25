@@ -26,6 +26,7 @@
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "RealmList.h"
+#include "ClientPatchCache.h"
 
 #include "Config/Config.h"
 #include "Log.h"
@@ -269,6 +270,8 @@ extern int main(int argc, char **argv)
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
+
+    (void) sRealmdPatchCache; // <-- This will initialize the singleton. Which will preload all known patches.
 
     // cleanup query
     // set expired bans to inactive

@@ -30,15 +30,19 @@ namespace IO { namespace Networking {
 
             virtual void Start() = 0;
 
+            /// Keep in mind to keep the source buffer in scope of the callback, otherwise random memory might get overwritten
+            /// Most of the time this is not an issue, since you want to process the incoming buffer
             void Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback);
             void ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback);
 
             void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
             void Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
+            void Write(std::shared_ptr<uint8 const[]> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback);
 
             void CloseSocket();
 
-            std::string get_remote_address() const;
+            IO::Networking::IpEndpoint const& GetRemoteEndpoint() const;
+            std::string GetRemoteIpString() const;;
 
         private:
             SocketDescriptor m_socket;
@@ -51,20 +55,27 @@ namespace IO { namespace Networking {
             std::function<void(IO::NetworkError)> m_writeCallback = nullptr;
             std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
+            std::shared_ptr<uint8_t const[]> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
     };
 
     template<typename SocketType>
     AsyncSocket<SocketType>::~AsyncSocket()
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "~AsyncSocket");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
         if (!m_disconnectRequest)
             CloseSocket();
     }
 
     template<typename SocketType>
-    std::string AsyncSocket<SocketType>::get_remote_address() const
+    IO::Networking::IpEndpoint const& AsyncSocket<SocketType>::GetRemoteEndpoint() const
     {
-        return m_socket.peerAddress;
+        return m_socket.peerEndpoint;
+    }
+
+    template<typename SocketType>
+    std::string AsyncSocket<SocketType>::GetRemoteIpString() const
+    {
+        return GetRemoteEndpoint().ip.toString();
     }
 
     template<typename SocketType>
@@ -168,6 +179,9 @@ namespace IO { namespace Networking {
     template<typename SocketType>
     void AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
     {
+        if (source->size() > 8*1024*1024)
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source->size());
+
         if (m_disconnectRequest)
         {
             callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
@@ -193,45 +207,28 @@ namespace IO { namespace Networking {
 
         IocpOperationTask* task = new IocpOperationTask([self = this->shared_from_this(), bufferCtx](IocpOperationTask* task, DWORD errorCode) {
             uint64_t bytesProcessed = task->InternalHigh;
+
+            IO::NetworkError errorResult{IO::NetworkError::ErrorType::InternalError};
+
             if (bytesProcessed == 0)
             { // 0 means the socket is already closed on the other side
                 self->CloseSocket();
-                auto tmpCallback = std::move(self->m_writeCallback);
-                self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
-                delete task;
-                tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
-                return;
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed};
             }
-
-            if (bytesProcessed < bufferCtx->buffers[0].len)
-            { // We are not done yet. We need to requeue our task
-                bufferCtx->buffers[0].buf += bytesProcessed;
-                bufferCtx->buffers[0].len -= bytesProcessed;
-
-                int const bufferCount = 1;
-                DWORD flags = 0;
-                int errorCode = ::WSASend(self->m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, task, nullptr);
-                if (errorCode)
-                {
-                    int err = WSAGetLastError();
-                    if (err != WSA_IO_PENDING)
-                    {
-                        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
-                        auto tmpCallback = std::move(self->m_writeCallback);
-                        self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
-                        delete task;
-                        tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::InternalError});
-                        return;
-                    }
-                }
+            else if (bytesProcessed < bufferCtx->buffers[0].len || errorCode != 0)
+            {
+                self->CloseSocket();
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::InternalError};
             }
             else
             {
-                auto tmpCallback = std::move(self->m_writeCallback);
-                self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
-                delete task;
-                tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::NoError});
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::NoError};
             }
+
+            auto tmpCallback = std::move(self->m_writeCallback);
+            self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
+            delete task;
+            tmpCallback(errorResult);
         });
 
         DWORD flags = 0;
@@ -255,6 +252,9 @@ namespace IO { namespace Networking {
     template<typename SocketType>
     void AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
     {
+        if (source->size() > 8*1024*1024)
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source->size());
+
         if (m_disconnectRequest)
         {
             callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
@@ -280,45 +280,28 @@ namespace IO { namespace Networking {
 
         IocpOperationTask* task = new IocpOperationTask([self = this->shared_from_this(), bufferCtx](IocpOperationTask* task, DWORD errorCode) {
             uint64_t bytesProcessed = task->InternalHigh;
+
+            IO::NetworkError errorResult{IO::NetworkError::ErrorType::InternalError};
+
             if (bytesProcessed == 0)
             { // 0 means the socket is already closed on the other side
                 self->CloseSocket();
-                auto tmpCallback = std::move(self->m_writeCallback);
-                self->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
-                delete task;
-                tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
-                return;
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed};
             }
-
-            if (bytesProcessed < bufferCtx->buffers[0].len)
-            { // We are not done yet. We need to requeue our task
-                bufferCtx->buffers[0].buf += bytesProcessed;
-                bufferCtx->buffers[0].len -= bytesProcessed;
-
-                int const bufferCount = 1;
-                DWORD flags = 0;
-                int errorCode = ::WSASend(self->m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, task, nullptr);
-                if (errorCode)
-                {
-                    int err = WSAGetLastError();
-                    if (err != WSA_IO_PENDING)
-                    {
-                        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
-                        auto tmpCallback = std::move(self->m_writeCallback);
-                        self->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
-                        delete task;
-                        tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::InternalError});
-                        return;
-                    }
-                }
+            else if (bytesProcessed < bufferCtx->buffers[0].len || errorCode != 0)
+            {
+                self->CloseSocket();
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::InternalError};
             }
             else
             {
-                auto tmpCallback = std::move(self->m_writeCallback);
-                self->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
-                delete task;
-                tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::NoError});
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::NoError};
             }
+
+            auto tmpCallback = std::move(self->m_writeCallback);
+            self->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
+            delete task;
+            tmpCallback(errorResult);
         });
 
         DWORD flags = 0;
@@ -330,8 +313,81 @@ namespace IO { namespace Networking {
             {
                 sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
                 auto tmpCallback = std::move(this->m_writeCallback);
-                this->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
+                this->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
                 delete task;
+                tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::InternalError});
+                return;
+            }
+        }
+    }
+
+    /// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+    template<typename SocketType>
+    void AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const[]> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
+    {
+        if (size > 8*1024*1024)
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", size);
+
+        if (m_disconnectRequest)
+        {
+            callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
+            return;
+        }
+        if (m_writeCallback != nullptr)
+        { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
+            callback(IO::NetworkError{IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed});
+            return;
+        }
+        m_writeCallback = callback;
+        m_writeSrcBufferDummyHolder_rawArray = source;
+
+        int const bufferCount = 1;
+        struct BufferCtx
+        {
+            WSABUF buffers[bufferCount];
+        };
+
+        std::shared_ptr<BufferCtx> bufferCtx(new BufferCtx{0});
+        bufferCtx->buffers[0].len = size;
+        bufferCtx->buffers[0].buf = (char*)source.get();
+
+        IocpOperationTask* task = new IocpOperationTask([self = this->shared_from_this(), bufferCtx](IocpOperationTask* task, DWORD errorCode) {
+            uint64_t bytesProcessed = task->InternalHigh;
+
+            IO::NetworkError errorResult{IO::NetworkError::ErrorType::InternalError};
+
+            if (bytesProcessed == 0)
+            { // 0 means the socket is already closed on the other side
+                self->CloseSocket();
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed};
+            }
+            else if (bytesProcessed < bufferCtx->buffers[0].len || errorCode != 0)
+            {
+                self->CloseSocket();
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::InternalError};
+            }
+            else
+            {
+                errorResult = IO::NetworkError{IO::NetworkError::ErrorType::NoError};
+            }
+
+            auto tmpCallback = std::move(self->m_writeCallback);
+            self->m_writeSrcBufferDummyHolder_rawArray = nullptr;
+            delete task;
+            tmpCallback(errorResult);
+        });
+
+        DWORD flags = 0;
+        int errorCode = ::WSASend(m_socket.nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, task, nullptr);
+        if (errorCode)
+        {
+            int err = WSAGetLastError();
+            if (err != WSA_IO_PENDING)
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
+                auto tmpCallback = std::move(this->m_writeCallback);
+                delete task;
+                this->m_writeSrcBufferDummyHolder_rawArray = nullptr;
                 tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::InternalError});
                 return;
             }

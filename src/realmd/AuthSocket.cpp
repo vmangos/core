@@ -32,9 +32,13 @@
 #include "RealmList.h"
 #include "AuthSocket.h"
 #include "AuthCodes.h"
-#include "PatchHandler.h"
 #include "Util.h"
 #include "IO/Timer/AsyncSystemTimer.h"
+#include "IO/Filesystem/FileSystem.h"
+#include "ClientPatchCache.h"
+#include "IO/Networking/Utils.h"
+
+#include <ace/INET_Addr.h>
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -44,10 +48,6 @@
 #include <openssl/md5.h>
 #include <ctime>
 //#include "Util.h" -- for commented utf8ToUpperOnlyLatin
-
-#include <ace/OS_NS_unistd.h>
-#include <ace/OS_NS_fcntl.h>
-#include <ace/OS_NS_sys_stat.h>
 
 enum AccountFlags
 {
@@ -170,19 +170,26 @@ typedef struct AUTH_RECONNECT_PROOF_C
 
 typedef struct XFER_INIT
 {
-    uint8 cmd;                                              // XFER_INITIATE
-    uint8 fileNameLen;                                      // strlen(fileName);
-    uint8 fileName[5];                                      // fileName[fileNameLen]
-    uint64 file_size;                                       // file size (bytes)
-    uint8 md5[MD5_DIGEST_LENGTH];                           // MD5
-}XFER_INIT;
+    uint8 cmd;                    // XFER_INITIATE
+    uint8 fileNameLen;            // strlen(fileName);
+    uint8 fileName[5];            // fileName[fileNameLen]
+    uint64 file_size;             // file size (bytes)
+    uint8 md5[MD5_DIGEST_LENGTH]; // MD5
+} XFER_INIT;
+
+typedef struct XFER_DATA_CHUNK
+{
+    uint8  cmd;        // this must be CMD_XFER_DATA
+    uint16 data_size;
+    uint8  data[4096]; // 4096 - page size on most arch // TODO: Is this a client limitation?
+} XferChunk;
 
 typedef struct AuthHandler
 {
     eAuthCmd cmd;
     uint32 status;
     void (AuthSocket::*asyncHandler)();
-}AuthHandler;
+} AuthHandler;
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
 #if defined( __GNUC__ )
@@ -196,7 +203,7 @@ std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B,
 // Accept the connection and set the s random value for SRP6 // TODO where is this SRP6 done?
 AuthSocket::AuthSocket(IO::Networking::SocketDescriptor const& socketDescriptor) : IO::Networking::AsyncSocket<AuthSocket>(socketDescriptor)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", socketDescriptor.peerAddress.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpString().c_str());
 }
 
 void AuthSocket::Start()
@@ -216,9 +223,6 @@ void AuthSocket::Start()
 // Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
 {
-    if (m_patch != ACE_INVALID_HANDLE)
-        ACE_OS::close(m_patch);
-
     if (m_sessionDurationTimeout)
         m_sessionDurationTimeout->Cancel();
 }
@@ -254,9 +258,9 @@ void AuthSocket::ProcessIncomingData()
             { CMD_AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge },
             { CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
             { CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
-            //{ CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
+            { CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
             //{ CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
-            //{ CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
+            { CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
         };
 
         constexpr size_t tableLength = sizeof(table) / sizeof(AuthHandler);
@@ -424,11 +428,11 @@ void AuthSocket::_HandleLogonChallenge()
             // Verify that this IP is not in the ip_banned table
             // No SQL injection possible (paste the IP address as passed by the socket)
             //                                                                                                              permanent ban          OR  still banned
-            std::unique_ptr<QueryResult> sqlIpBanResult = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` WHERE (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP()) AND `ip` = '%s'", self->get_remote_address().c_str());
+            std::unique_ptr<QueryResult> sqlIpBanResult = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` WHERE (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP()) AND `ip` = '%s'", self->GetRemoteIpString().c_str());
             if (sqlIpBanResult)
             {
                 *pkt << uint8(WOW_FAIL_FAIL_NOACCESS);
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", self->get_remote_address().c_str(), self->m_login.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", self->GetRemoteIpString().c_str(), self->m_login.c_str());
             }
             else
             {
@@ -454,7 +458,7 @@ void AuthSocket::_HandleLogonChallenge()
 
                     if (requireVerification && !isVerified)
                     {
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", self->m_login.c_str(), self->get_remote_address().c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", self->m_login.c_str(), self->GetRemoteIpString().c_str());
                         *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
 
                         self->Write(pkt, [self](IO::NetworkError const& error) {
@@ -477,9 +481,9 @@ void AuthSocket::_HandleLogonChallenge()
                     if (self->m_lockFlags & IP_LOCK)
                     {
                         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account '%s' is locked to IP - '%s'", self->m_login.c_str(), self->m_lastIP.c_str());
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Player address is '%s'", self->get_remote_address().c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Player address is '%s'", self->GetRemoteIpString().c_str());
 
-                        if (self->m_lastIP != self->get_remote_address())
+                        if (self->m_lastIP != self->GetRemoteIpString())
                         {
                             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account IP differs");
 
@@ -523,12 +527,12 @@ void AuthSocket::_HandleLogonChallenge()
                             if (banTimestamp == unbanTimestamp)
                             {
                                 *pkt << (uint8) WOW_FAIL_BANNED;
-                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->get_remote_address().c_str());
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->GetRemoteIpString().c_str());
                             }
                             else
                             {
                                 *pkt << (uint8) WOW_FAIL_SUSPENDED;
-                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->get_remote_address().c_str());
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->GetRemoteIpString().c_str());
                             }
                         }
                         else
@@ -562,7 +566,7 @@ void AuthSocket::_HandleLogonChallenge()
 
                             if (self->m_promptPin)
                             {
-                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", self->m_login.c_str(), self->get_remote_address().c_str());
+                                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", self->m_login.c_str(), self->GetRemoteIpString().c_str());
 
                                 uint32 gridSeedPkt = self->m_gridSeed = static_cast<uint32>(rand32());
                                 EndianConvert(gridSeedPkt);
@@ -649,10 +653,9 @@ void AuthSocket::_HandleLogonProof()
 
 void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_ptr<sAuthLogonProof_C const> const& lp)
 {
-    if (this->m_patch != ACE_INVALID_HANDLE)
+    if (m_pendingPatchFile)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonProof__PostRecv m_patch is already set??");
-        this->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "_HandleLogonProof__PostRecv m_patch is already set?? The client should accept the XFER!");
         return;
     }
 
@@ -662,13 +665,10 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
 
     snprintf(tmp, 256, "%s/%d%s.mpq", sConfig.GetStringDefault("PatchesDir","./patches").c_str(), m_build, m_localizationName.c_str());
 
-    char filename[PATH_MAX];
-    if (ACE_OS::realpath(tmp, filename) != nullptr)
-    {
-        m_patch = ACE_OS::open(filename, GENERIC_READ | FILE_FLAG_SEQUENTIAL_SCAN);
-    }
+    std::string pathFilePath = IO::Filesystem::ToAbsolutePath(tmp);
+    m_pendingPatchFile = IO::Filesystem::TryOpenFileReadonly(pathFilePath);
 
-    if (m_patch == ACE_INVALID_HANDLE)
+    if (m_pendingPatchFile == nullptr)
     {
         // no patch found
         std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
@@ -687,46 +687,34 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
             }
             self->ProcessIncomingData();
         });
-        return;
     }
-
-    XFER_INIT xferh;
-
-    ACE_OFF_T file_size = ACE_OS::filesize(this->m_patch);
-
-    if (file_size == -1)
+    else
     {
-        this->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
-        return;
+        Md5HashDigest md5Hash = sRealmdPatchCache.GetOrCalculateHash(m_pendingPatchFile);
+        std::string wowClientPathFileName = "Patch"; // It seems like "Patch" is the only accepted name by the client
+        MANGOS_ASSERT(wowClientPathFileName.size() <= 255); // Filename must fit inside a byte
+
+        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+
+        // packet 1
+        *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
+        *pkt << (uint8) WOW_FAIL_VERSION_UPDATE;
+
+        // packet 2 - XFER_INIT
+        *pkt << (uint8) CMD_XFER_INITIATE;
+        *pkt << (uint8) wowClientPathFileName.size();
+        pkt->append(wowClientPathFileName.c_str(), wowClientPathFileName.size()); // we cant use the std::string overload of ->append(...), because it would +1 the size with null-terminator
+        *pkt << (uint64) m_pendingPatchFile->GetTotalFileSize();
+        pkt->append(md5Hash.digest);
+
+        // Set right status
+        m_status = STATUS_PATCH;
+
+        Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
+        {
+            self->ProcessIncomingData();
+        });
     }
-
-    if (!PatchCache::instance()->GetHash(tmp, (uint8*)&xferh.md5))
-    {
-        // calculate patch md5, happens if patch was added while realmd was running
-        PatchCache::instance()->LoadPatchMD5(tmp);
-        PatchCache::instance()->GetHash(tmp, (uint8*)&xferh.md5);
-    }
-
-    std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
-
-    // packet 1
-    *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
-    *pkt << (uint8) WOW_FAIL_VERSION_UPDATE;
-
-    // packet 2
-    xferh.cmd = CMD_XFER_INITIATE;
-    memcpy(&xferh.fileName, "Patch", 5);
-    xferh.fileNameLen = 5;
-    xferh.file_size = file_size;
-    pkt->append(&xferh, 1);
-
-    // Set right status
-    m_status = STATUS_PATCH;
-
-    Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
-    {
-        self->ProcessIncomingData();
-    });
 }
 
 void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C const> const& lp, std::shared_ptr<PINData const> const& pinData)
@@ -764,7 +752,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         if ((m_lockFlags & FIXED_PIN) == FIXED_PIN)
         {
             pinResult = VerifyPinData(std::stoi(m_securityInfo), *pinData);
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' PIN result: %u", m_login.c_str(), get_remote_address().c_str(), pinResult);
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' PIN result: %u", m_login.c_str(), GetRemoteIpString().c_str(), pinResult);
         }
         else if ((m_lockFlags & TOTP) == TOTP)
         {
@@ -818,7 +806,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         }
         else if (GeographicalLockCheck())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Account '%s' (%u) using IP '%s' has been geolocked", m_login.c_str(), m_accountId, get_remote_address().c_str()); // todo, add additional logging info
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Account '%s' (%u) using IP '%s' has been geolocked", m_login.c_str(), m_accountId, GetRemoteIpString().c_str()); // todo, add additional logging info
 
             uint32_t pin = urand(100000, 999999); // check rand32_max
             bool result = LoginDatabase.PExecute("UPDATE `account` SET `geolock_pin` = %u WHERE `username` = '%s'", pin, m_safelogin.c_str());
@@ -849,7 +837,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
                 mail->from(sConfig.GetStringDefault("MailFrom", ""));
                 mail->substitution("%username%", m_login);
                 mail->substitution("%unlock_pin%", std::to_string(pin));
-                mail->substitution("%originating_ip%", get_remote_address());
+                mail->substitution("%originating_ip%", GetRemoteIpAddress());
 
                 MailerService::get_global_mailer()->send(std::move(mail),
                     [](SendgridMail::Result res)
@@ -870,7 +858,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             return;
         }
 
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' successfully authenticated", m_login.c_str(), get_remote_address().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' successfully authenticated", m_login.c_str(), GetRemoteIpString().c_str());
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped username) and IP address as received by socket
@@ -878,7 +866,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         // Why it must be sync: The new network implementation is so fast that the async db cant execute the UPDATE statement before the client tries to reach mangosd
         // If it is async there would be a race condition
         bool result = LoginDatabase.PExecute(DbExecMode::MustBeSync, "UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
-            K_hex, get_remote_address().c_str(), GetLocaleByName(m_localizationName), m_os.c_str(), m_platform.c_str(), m_safelogin.c_str() );
+                                             K_hex, GetRemoteIpString().c_str(), GetLocaleByName(m_localizationName), m_os.c_str(), m_platform.c_str(), m_safelogin.c_str() );
         if (!result)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to update login stats for account '%s'", m_safelogin.c_str());
@@ -901,7 +889,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
     else
     {
         // We are here because the password was incorrect
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", m_login.c_str (), get_remote_address().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", m_login.c_str (), GetRemoteIpString().c_str());
 
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);
         if(MaxWrongPassCount > 0)
@@ -926,11 +914,11 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
                             "VALUES ('%u',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','MaNGOS realmd','Failed login autoban',1,1)",
                             acc_id, WrongPassBanTime);
                         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using  IP '%s' got banned for '%u' seconds because it failed to authenticate '%u' times",
-                            m_login.c_str(), get_remote_address().c_str(), WrongPassBanTime, failed_logins);
+                                 m_login.c_str(), GetRemoteIpString().c_str(), WrongPassBanTime, failed_logins);
                     }
                     else
                     {
-                        std::string current_ip = get_remote_address();
+                        std::string current_ip = GetRemoteIpString();
                         LoginDatabase.escape_string(current_ip);
                         LoginDatabase.PExecute("INSERT INTO `ip_banned` VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','MaNGOS realmd','Failed login autoban')",
                             current_ip.c_str(), WrongPassBanTime);
@@ -1150,7 +1138,7 @@ void AuthSocket::_HandleRealmList()
 
         if (delay < minDelay)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", self->m_login.c_str(), self->get_remote_address().c_str(), delay);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", self->m_login.c_str(), self->GetRemoteIpString().c_str(), delay);
 
             self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
             return;
@@ -1173,23 +1161,6 @@ void AuthSocket::_HandleRealmList()
             self->ProcessIncomingData();
         });
     });
-}
-
-std::string AuthSocket::GetRealmAddress(Realm const& realm) const
-{
-    ACE_INET_Addr clientAddress;
-    ACE_INET_Addr localAddress;
-
-    std::string strClientAddressWithPort = this->get_remote_address() + ":0";
-    std::string strServerAddressWithPort = realm.localAddress;
-
-    if (clientAddress.set(strClientAddressWithPort.c_str()) == 0 && localAddress.set(strServerAddressWithPort.c_str()) == 0)
-    {
-        if ((clientAddress.get_ip_address() & realm.localSubnetMask) == (localAddress.get_ip_address() & realm.localSubnetMask))
-            return realm.localAddress;
-    }
-
-    return realm.address;
 }
 
 void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
@@ -1234,10 +1205,12 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
             if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.id)))
                 realmflags = RealmFlags(realmflags | REALM_FLAG_OFFLINE);
 
+            std::string realmIpPortStr = i->second.GetAddressForClient(GetRemoteEndpoint().ip).toString();
+
             pkt << uint32(i->second.icon);              // realm type
             pkt << uint8(realmflags);                   // realmflags
             pkt << name;                                // name
-            pkt << GetRealmAddress(i->second);          // address
+            pkt << realmIpPortStr;                      // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(i->second.timeZone);           // realm category
@@ -1282,11 +1255,13 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
             if (!buildInfo)
                 realmFlags = RealmFlags(realmFlags & ~REALM_FLAG_SPECIFYBUILD);
 
+            std::string realmIpPortStr = i->second.GetAddressForClient(GetRemoteEndpoint().ip).toString();
+
             pkt << uint8(i->second.icon);               // realm type (this is second column in Cfg_Configs.dbc)
             pkt << uint8(lock);                         // flags, if 0x01, then realm locked
             pkt << uint8(realmFlags);                   // see enum RealmFlags
             pkt << i->first;                            // name
-            pkt << GetRealmAddress(i->second);          // address
+            pkt << realmIpPortStr;                      // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(i->second.timeZone);           // realm category (Cfg_Categories.dbc)
@@ -1305,9 +1280,16 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
     }
 }
 
+// Accept patch transfer
+void AuthSocket::_HandleXferAccept()
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferAccept");
+    InitAndHandOverControlToPatchHandler();
+}
+
 /*
 // Resume patch transfer
-bool AuthSocket::_HandleXferResume()
+void AuthSocket::_HandleXferResume()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferResume");
 
@@ -1339,35 +1321,19 @@ bool AuthSocket::_HandleXferResume()
         return false;
     }
 
-    InitPatch();
+    InitAndHandOverControlToPatchHandler();
 
     return true;
 }
+ */
 
 // Cancel patch transfer
-bool AuthSocket::_HandleXferCancel()
+void AuthSocket::_HandleXferCancel()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferCancel");
-
-    recv_skip(1);
-    close_connection();
-
-    return true;
+    // Socket will close implicitly
 }
 
-// Accept patch transfer
-bool AuthSocket::_HandleXferAccept()
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferAccept");
-
-    recv_skip(1);
-
-    InitPatch();
-
-    return true;
-}
-
- */
 // Verify PIN entry data
 bool AuthSocket::VerifyPinData(uint32 pin, PINData const& clientData)
 {
@@ -1472,19 +1438,41 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
     return pin;
 }
 
-void AuthSocket::InitPatch()
+void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t[]> rawChunk)
 {
-    /*
-    PatchHandler* handler = new PatchHandler(ACE_OS::dup(get_handle()), m_patch);
+    XFER_DATA_CHUNK* chunk = (XFER_DATA_CHUNK*)(rawChunk.get());
 
-    m_patch = ACE_INVALID_HANDLE;
-
-    if(handler->open() == -1)
+    uint64_t actualReadAmount = m_pendingPatchFile->ReadSync((uint8_t*)&(chunk->data), sizeof(chunk->data));
+    if (actualReadAmount == 0)
     {
-        handler->close();
-        close_connection();
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[XFER]: Done");
+        return;
     }
-     */
+    chunk->data_size = (uint16_t) actualReadAmount;
+
+    Write(rawChunk, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount, [self = shared_from_this(), rawChunk](IO::NetworkError const& error)
+    {
+        if (error)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[XFER]: Write(...) failed: %s", error.toString().c_str());
+            return;
+        }
+        self->RepeatInternalXferLoop(std::move(rawChunk));
+    });
+}
+
+void AuthSocket::InitAndHandOverControlToPatchHandler()
+{
+    if (!m_pendingPatchFile)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?");
+        return;
+    }
+
+    std::shared_ptr<uint8_t[]> rawChunk = std::shared_ptr<uint8_t[]>(new uint8_t[sizeof(XFER_DATA_CHUNK)]);
+    ((XFER_DATA_CHUNK*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
+
+    RepeatInternalXferLoop(std::move(rawChunk));
 }
 
 void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
@@ -1512,7 +1500,7 @@ bool AuthSocket::GeographicalLockCheck()
         return false;
     }
 
-    if (m_lastIP.empty() || m_lastIP == get_remote_address())
+    if (m_lastIP.empty() || m_lastIP == GetRemoteIpString())
     {
         return false;
     }
@@ -1527,7 +1515,7 @@ bool AuthSocket::GeographicalLockCheck()
         "FROM geoip "
         "WHERE network_last_integer >= INET_ATON('%s') "
         "ORDER BY network_last_integer ASC LIMIT 1",
-        get_remote_address().c_str(), get_remote_address().c_str())
+        GetRemoteIpString().c_str(), GetRemoteIpString().c_str())
         );
 
     auto result_prev = std::unique_ptr<QueryResult>(LoginDatabase.PQuery(

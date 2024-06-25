@@ -20,6 +20,7 @@ set (shared_SRCS
     ByteBuffer.h
     Common.h
     DelayExecutor.h
+    EnumFlag.h
     Errors.h
     LockedQueue.h
     Log.h
@@ -103,6 +104,10 @@ set (shared_SRCS
     IO/Networking/AsyncSocket.h
     IO/Networking/NetworkError.h
     IO/Networking/SocketDescriptor.h
+    IO/Networking/Utils.h
+    IO/Networking/Utils.cpp
+    IO/Networking/IpAddress.h
+    IO/Networking/IpAddress.cpp
     IO/Multithreading/CreateThread.h
     IO/Multithreading/CreateThread.cpp
     IO/Timer/impl/windows/AsyncSystemTimer.h
@@ -110,6 +115,10 @@ set (shared_SRCS
     IO/Timer/impl/windows/TimerHandle.h
     IO/Timer/impl/windows/TimerHandle.cpp
     IO/Timer/AsyncSystemTimer.h
+    IO/Filesystem/FileSystem.h
+    IO/Filesystem/FileSystem.cpp
+    IO/Filesystem/FileHandle.h
+    IO/Filesystem/FileHandle.cpp
 )
 
 if(USE_LIBCURL)

@@ -30,7 +30,7 @@
 #include "Log.h"
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
-#include <ace/INET_Addr.h>
+#include "IO/Networking/Utils.h"
 
 INSTANTIATE_SINGLETON_1( RealmList );
 
@@ -86,7 +86,7 @@ void RealmList::Initialize(uint32 updateInterval)
     UpdateRealms(true);
 }
 
-void RealmList::UpdateRealm(uint32 realmId, std::string const& name, std::string const& address, std::string const& localAddress, std::string const& localSubnetMask, uint32 port, uint8 icon, RealmFlags realmFlags, uint8 timeZone, AccountTypes allowedSecurityLevel, float population, std::string const& builds)
+void RealmList::UpdateRealm(uint32 realmId, std::string const& name, IO::Networking::IpAddress const& externalIpAddress, IO::Networking::IpAddress const& localIpAddress, uint8 localSubnetMaskCidr, uint16 port, uint8 icon, RealmFlags realmFlags, uint8 timeZone, AccountTypes allowedSecurityLevel, float population, std::string const& builds)
 {
     // Create new if not exist or update existed
     Realm& realm = m_realms[name];
@@ -120,23 +120,9 @@ void RealmList::UpdateRealm(uint32 realmId, std::string const& name, std::string
             if (bInfo->build == first_build)
                 realm.realmBuildInfo = *bInfo;
 
-    // Append port to IP address.
-    std::ostringstream ss;
-    ss << address << ":" << port;
-    realm.address = ss.str();
-
-    // Same for the local address.
-    ss.str("");
-    ss.clear();
-    ss << localAddress << ":" << port;
-    realm.localAddress = ss.str();
-
-    // Subnet mask does not need port.
-    ACE_INET_Addr subnetAddress;
-    if (subnetAddress.set("0", localSubnetMask.c_str()) == -1)
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to parse local subnet mask for realm id %u!", realmId);
-    else
-        realm.localSubnetMask = subnetAddress.get_ip_address();
+    realm.externalAddress = IO::Networking::IpEndpoint(externalIpAddress, port);
+    realm.localAddress = IO::Networking::IpEndpoint(localIpAddress, port);
+    realm.localSubnetMaskCidr = localSubnetMaskCidr;
 }
 
 void RealmList::UpdateIfNeed()
@@ -172,11 +158,12 @@ void RealmList::UpdateRealms(bool init)
         {
             Field *fields = result->Fetch();
 
-            uint32 id = fields[0].GetUInt32();
+            uint32 realmId = fields[0].GetUInt32();
             std::string name = fields[1].GetCppString();
-            std::string address = fields[2].GetCppString();
-            std::string localAddress = fields[3].GetCppString();
-            std::string localSubnetMask = fields[4].GetCppString();
+            std::string externalAddressString = fields[2].GetCppString();
+            std::string localAddressString = fields[3].GetCppString();
+            // TODO the db should be changed to a numeric subnet mask, so invalid states cant be represented (instead of "255.255.255.0" it should be "24")
+            std::string localSubnetMaskString = fields[4].GetCppString();
             uint32 port = fields[5].GetUInt32();
             uint8 icon = fields[6].GetUInt8();
             uint8 realmflags = fields[7].GetUInt8();
@@ -191,8 +178,45 @@ void RealmList::UpdateRealms(bool init)
                 realmflags &= (REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD);
             }
 
+            // TODO: maybe dns-resolve it like TrinityCore does
+            auto externalIpAddress = IO::Networking::IpAddress::TryParseFromString(externalAddressString);
+            if (!externalIpAddress)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse externalAddress: %s for realm \"%s\" (id %d) will skip realm update.", externalAddressString.c_str(), name.c_str(), realmId);
+                continue;
+            }
+            auto localIpAddress = IO::Networking::IpAddress::TryParseFromString(localAddressString);
+            if (!localIpAddress)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse localAddress: %s for realm \"%s\" (id %d) will skip realm update.", localAddressString.c_str(), name.c_str(), realmId);
+                continue;
+            }
+
+            auto localSubnetMaskIp = IO::Networking::IpAddress::TryParseFromString(localSubnetMaskString);
+            if (!localSubnetMaskIp)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse localSubnetMask: %s for realm \"%s\" (id %d) will skip realm update.", localSubnetMaskString.c_str(), name.c_str(), realmId);
+                continue;
+            }
+
+            uint8 localSubnetMaskCidr = 0;
+            // Check and convert subnet mask
+            {
+                uint32 localSubnetMaskBinary = localSubnetMaskIp->_getInternalIPv4ReprAsUint32();
+                if (((~localSubnetMaskBinary) & ((~localSubnetMaskBinary) + 1)) != 0) // doing some binary trickery to check if this is really a valid subnet mask without holes
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid localSubnetMask: %s for realm \"%s\" (id %d) will skip realm update.", localSubnetMaskString.c_str(), name.c_str(), realmId);
+                    continue;
+                }
+                while (localSubnetMaskBinary)
+                {
+                    localSubnetMaskCidr += (localSubnetMaskBinary & 0x01);
+                    localSubnetMaskBinary >>= 1;
+                }
+            }
+
             UpdateRealm(
-                id, name, address, localAddress, localSubnetMask, port, icon, RealmFlags(realmflags), timezone, 
+                realmId, name, *externalIpAddress, *localIpAddress, localSubnetMaskCidr, port, icon, RealmFlags(realmflags), timezone,
                 (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR),
                 population, realmBuilds);
 
@@ -238,4 +262,16 @@ void RealmList::LoadAllowedClients()
 
         } while (result->NextRow());
     }
+}
+
+IO::Networking::IpEndpoint Realm::GetAddressForClient(IO::Networking::IpAddress const& clientAddr) const
+{
+    if (clientAddr.getType() != IO::Networking::IpAddress::Type::IPv4)
+        return externalAddress;
+
+    // Check if user connected with an IpAddress that is in the same subnet as the localAddress of the realm
+    bool clientHasAccessToLocalSubnet = IO::Networking::IsInSameSubnet(clientAddr, localAddress.ip, localSubnetMaskCidr);
+    return clientHasAccessToLocalSubnet
+           ? localAddress
+           : externalAddress;
 }
