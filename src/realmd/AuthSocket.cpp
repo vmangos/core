@@ -1163,23 +1163,6 @@ void AuthSocket::_HandleRealmList()
     });
 }
 
-std::string AuthSocket::GetRealmAddressForClient(Realm const& realm) const
-{
-    ACE_INET_Addr clientAddress;
-    ACE_INET_Addr localAddress;
-
-    std::string strClientAddressWithPort = this->GetRemoteIpAddress() + ":0";
-    std::string strServerAddressWithPort = realm.localAddress;
-
-    if (clientAddress.set(strClientAddressWithPort.c_str()) == 0 && localAddress.set(strServerAddressWithPort.c_str()) == 0)
-    {
-        if ((clientAddress.get_ip_address() & realm.localSubnetMask) == (localAddress.get_ip_address() & realm.localSubnetMask))
-            return realm.localAddress;
-    }
-
-    return realm.address;
-}
-
 void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
 {
     if (m_build < 6299)        // before version 2.0.3 (exclusive)
@@ -1222,10 +1205,12 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
             if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.id)))
                 realmflags = RealmFlags(realmflags | REALM_FLAG_OFFLINE);
 
+            std::string realmIpPortStr = i->second.GetAddressForClient(GetRemoteEndpoint().ip).toString();
+
             pkt << uint32(i->second.icon);              // realm type
             pkt << uint8(realmflags);                   // realmflags
             pkt << name;                                // name
-            pkt << GetRealmAddressForClient(i->second); // address
+            pkt << realmIpPortStr;                      // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(i->second.timeZone);           // realm category
@@ -1270,11 +1255,13 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
             if (!buildInfo)
                 realmFlags = RealmFlags(realmFlags & ~REALM_FLAG_SPECIFYBUILD);
 
+            std::string realmIpPortStr = i->second.GetAddressForClient(GetRemoteEndpoint().ip).toString();
+
             pkt << uint8(i->second.icon);               // realm type (this is second column in Cfg_Configs.dbc)
             pkt << uint8(lock);                         // flags, if 0x01, then realm locked
             pkt << uint8(realmFlags);                   // see enum RealmFlags
             pkt << i->first;                            // name
-            pkt << GetRealmAddressForClient(i->second);// address
+            pkt << realmIpPortStr;                      // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(i->second.timeZone);           // realm category (Cfg_Categories.dbc)
