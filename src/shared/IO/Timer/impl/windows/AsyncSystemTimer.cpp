@@ -3,7 +3,7 @@
 #undef WIN32_LEAN_AND_MEAN
 
 #include "./AsyncSystemTimer.h"
-#include "IO/Multithreading/CreateThread.h";
+#include "IO/Multithreading/CreateThread.h"
 #include "Log.h"
 
 INSTANTIATE_SINGLETON_1(IO::Timer::impl::windows::AsyncSystemTimer);
