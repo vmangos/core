@@ -164,6 +164,28 @@ struct SpellPeriodicAuraLogInfo
     float  multiplier;
 };
 
+struct AttackPowerModInfo
+{
+    float positiveMods = 0; // int16 in client
+    float negativeMods = 0; // int16 in client
+    float multiplier = 1.0f;
+};
+
+enum AttackPowerModType
+{
+    AP_MOD_POSITIVE_FLAT,
+    AP_MOD_NEGATIVE_FLAT,
+    AP_MOD_PCT,
+    AP_MOD_TYPE_COUNT,
+};
+
+enum AttackPowerModIndex
+{
+    MELEE_AP_MODS,
+    RANGED_AP_MODS,
+    AP_MODS_COUNT,
+};
+
 uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition);
 
 enum SpellProcEventTriggerCheck
@@ -356,6 +378,7 @@ class Unit : public SpellCaster
         float m_createStats[MAX_STATS];
         int32 m_createResistances[MAX_SPELL_SCHOOL];
         float m_auraModifiersGroup[UNIT_MOD_END][MODIFIER_TYPE_END];
+        AttackPowerModInfo m_attackPowerMods[AP_MODS_COUNT];
         WeaponDamageInfo m_weaponDamage[MAX_ATTACK][MAX_ITEM_PROTO_DAMAGES];
         uint8 m_weaponDamageCount[MAX_ATTACK];
         bool m_canModifyStats;
@@ -446,6 +469,8 @@ class Unit : public SpellCaster
         virtual uint32 GetShieldBlockValue() const = 0;
         float GetPPMProcChance(uint32 WeaponSpeed, float PPM) const;
 
+        bool HandleAttackPowerModifier(AttackPowerModIndex index, AttackPowerModType modifierType, float amount, bool apply);
+        float GetAttackPowerModifierValue(AttackPowerModIndex index, AttackPowerModType modifierType) const;
         bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
         void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
         float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;

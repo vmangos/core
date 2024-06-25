@@ -3216,6 +3216,7 @@ void Player::SetCheatFixedZ(bool on, bool notify)
     else
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_FIXED_Z);
 
+    GetSession()->RejectMovementPacketsFor(100);
     SendHeartBeat(true);
 
     if (notify)
@@ -3767,12 +3768,14 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, 0.0f);
 
     SetInt32Value(UNIT_FIELD_ATTACK_POWER,            0);
-    SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS,       0);
+    SetInt16Value(UNIT_FIELD_ATTACK_POWER_MODS, 0, 0);
+    SetInt16Value(UNIT_FIELD_ATTACK_POWER_MODS, 1, 0);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, 0.0f);
 #endif
     SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER,     0);
-    SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 0);
+    SetInt16Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 0, 0);
+    SetInt16Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 1, 0);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, 0.0f);
 #endif
@@ -5020,6 +5023,7 @@ void Player::SetFly(bool enable)
         m_movementInfo.moveFlags = (MOVEFLAG_NONE);
     }
 
+    GetSession()->RejectMovementPacketsFor(100);
     SendHeartBeat(true);
 }
 
