@@ -69,7 +69,7 @@ class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
         std::shared_ptr<ByteBuffer> GenerateLogonProofResponse(Sha1Hash sha);
         void LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt);
         bool VerifyPinData(uint32 pin, PINData const& clientData);
-        uint32 GenerateTotpPin(const std::string& secret, int interval);
+        uint32 GenerateTotpPin(std::string const& secret, int interval);
 
         void _HandleLogonChallenge();
         void _HandleLogonProof();

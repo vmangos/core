@@ -1018,7 +1018,7 @@ void AuthSocket::_HandleReconnectChallenge()
 
             // Escape the user input used in DB to avoid further SQL injection
             // Memory will be freed on AuthSocket object destruction
-            self->m_login = (const char*)body->username;
+            self->m_login = (char const*)body->username;
             self->m_safelogin = self->m_login;
             LoginDatabase.escape_string(self->m_safelogin);
 
@@ -1406,9 +1406,10 @@ bool AuthSocket::VerifyPinData(uint32 pin, PINData const& clientData)
     return !memcmp(hash.AsDecStr(), clientHash.AsDecStr(), 20);
 }
 
-uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
+uint32 AuthSocket::GenerateTotpPin(std::string const& secret, int interval)
+{
     std::vector<uint8> decoded_key((secret.size() + 7) / 8 * 5);
-    int key_size = base32_decode((const uint8_t*)secret.data(), decoded_key.data(), decoded_key.size());
+    int key_size = base32_decode((uint8_t const*)secret.data(), decoded_key.data(), decoded_key.size());
 
     if (key_size == -1)
     {

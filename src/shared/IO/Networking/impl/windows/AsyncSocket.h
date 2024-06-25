@@ -23,8 +23,8 @@ namespace IO { namespace Networking {
         public:
             explicit AsyncSocket(SocketDescriptor const& socketDescriptor) : m_socket(socketDescriptor) {}
             ~AsyncSocket();
-            AsyncSocket(const AsyncSocket&) = delete;
-            AsyncSocket& operator=(const AsyncSocket&) = delete;
+            AsyncSocket(AsyncSocket const&) = delete;
+            AsyncSocket& operator=(AsyncSocket const&) = delete;
             AsyncSocket(AsyncSocket&&) = delete;
             AsyncSocket& operator=(AsyncSocket&&) = delete;
 

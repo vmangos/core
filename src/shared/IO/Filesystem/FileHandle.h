@@ -16,8 +16,8 @@ namespace IO { namespace Filesystem {
     {
     public:
         ~FileHandle();
-        FileHandle(const FileHandle&) = delete;
-        FileHandle& operator=(const FileHandle&) = delete;
+        FileHandle(FileHandle const&) = delete;
+        FileHandle& operator=(FileHandle const&) = delete;
         FileHandle(FileHandle&&) = delete;
         FileHandle& operator=(FileHandle&&) = delete;
 
@@ -39,8 +39,8 @@ namespace IO { namespace Filesystem {
     {
     public:
         explicit FileHandleReadonly(HANDLE nativeFileHandle) : FileHandle(nativeFileHandle) {};
-        FileHandleReadonly(const FileHandleReadonly&) = delete;
-        FileHandleReadonly& operator=(const FileHandleReadonly&) = delete;
+        FileHandleReadonly(FileHandleReadonly const&) = delete;
+        FileHandleReadonly& operator=(FileHandleReadonly const&) = delete;
         FileHandleReadonly(FileHandleReadonly&&) = delete;
         FileHandleReadonly& operator=(FileHandleReadonly&&) = delete;
 

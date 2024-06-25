@@ -17,8 +17,8 @@ namespace IO { namespace Timer { namespace impl { namespace windows {
     public:
         explicit AsyncSystemTimer();
         ~AsyncSystemTimer() = default;
-        AsyncSystemTimer(const AsyncSystemTimer&) = delete;
-        AsyncSystemTimer& operator=(const AsyncSystemTimer&) = delete;
+        AsyncSystemTimer(AsyncSystemTimer const&) = delete;
+        AsyncSystemTimer& operator=(AsyncSystemTimer const&) = delete;
         AsyncSystemTimer(AsyncSystemTimer&&) = delete;
         AsyncSystemTimer& operator=(AsyncSystemTimer&&) = delete;
 

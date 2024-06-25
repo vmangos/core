@@ -15,8 +15,8 @@ public:
     explicit AsyncServerListener(SOCKET acceptorNativeSocket, HANDLE completionPort)
                 : m_acceptorNativeSocket(acceptorNativeSocket), m_completionPort(completionPort) {}
 
-    AsyncServerListener(const AsyncServerListener&) = delete;
-    AsyncServerListener& operator=(const AsyncServerListener&) = delete;
+    AsyncServerListener(AsyncServerListener const&) = delete;
+    AsyncServerListener& operator=(AsyncServerListener const&) = delete;
     AsyncServerListener(AsyncServerListener&&) = delete;
     AsyncServerListener& operator=(AsyncServerListener&&) = delete;
 
