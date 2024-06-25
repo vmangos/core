@@ -10,9 +10,11 @@ nonstd::optional<IO::Networking::IpAddress> IO::Networking::IpAddress::TryParseF
     if (ipv6Begin == -1)
     {
         result.m_address.type = Type::IPv4;
+
+        // IPv4 expected format: 255.255.255.255
         const char* const fixEndPtr = ipAddressString.c_str() + ipAddressString.size();
 
-        const char* tmpLastEndPtr = ipAddressString.c_str(); // loop variable
+        const char* tmpLastEndPtr = ipAddressString.c_str(); // <- loop variable
         for (int i = 0; i < result.m_address.ipv4.size(); i++)
         {
             const char* tmpStartPtr = tmpLastEndPtr;
@@ -117,5 +119,13 @@ std::string IO::Networking::IpAddress::toString() const
 IO::Networking::IpAddress::Type IO::Networking::IpAddress::getType() const
 {
     return m_address.type;
+}
+
+uint32_t IO::Networking::IpAddress::_getInternalIPv4ReprAsUint32() const
+{
+    return (m_address.ipv4[0] << (3*8))
+         | (m_address.ipv4[1] << (2*8))
+         | (m_address.ipv4[2] << (1*8))
+         | (m_address.ipv4[3] << (0*8));
 }
 

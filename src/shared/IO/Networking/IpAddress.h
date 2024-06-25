@@ -9,9 +9,9 @@ namespace IO { namespace Networking
 {
     class IpAddress
     {
+    public:
         enum class Type { IPv4, IPv6 };
 
-    public:
         static nonstd::optional<IpAddress> TryParseFromString(std::string const& ipAddressString);
 
         /// IPv4 Format: 255.255.255.255
@@ -19,6 +19,8 @@ namespace IO { namespace Networking
         std::string toString() const;
 
         Type getType() const;
+
+        uint32_t _getInternalIPv4ReprAsUint32() const;
 
     private:
         struct
@@ -39,6 +41,7 @@ namespace IO { namespace Networking
         uint16_t port;
 
     public:
+        IpEndpoint() : ip{}, port{0} {}
         IpEndpoint(IO::Networking::IpAddress ip, uint16_t port) : ip{ip}, port{port} {}
         std::string toString() const
         {

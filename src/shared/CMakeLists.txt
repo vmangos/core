@@ -104,6 +104,8 @@ set (shared_SRCS
     IO/Networking/AsyncSocket.h
     IO/Networking/NetworkError.h
     IO/Networking/SocketDescriptor.h
+    IO/Networking/Utils.h
+    IO/Networking/Utils.cpp
     IO/Networking/IpAddress.h
     IO/Networking/IpAddress.cpp
     IO/Multithreading/CreateThread.h
