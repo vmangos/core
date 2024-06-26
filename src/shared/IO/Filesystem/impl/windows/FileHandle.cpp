@@ -1,7 +1,7 @@
-#include "./FileHandle.h"
+#include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 
-IO::Filesystem::FileHandle::FileHandle(HANDLE nativeFileHandle) : m_nativeFileHandle(nativeFileHandle)
+IO::Filesystem::FileHandle::FileHandle(IO::Native::FileHandle nativeFileHandle) : m_nativeFileHandle(nativeFileHandle)
 {
 
 }

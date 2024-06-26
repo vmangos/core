@@ -111,15 +111,17 @@ set (shared_SRCS
     IO/Networking/IpAddress.cpp
     IO/Multithreading/CreateThread.h
     IO/Multithreading/CreateThread.cpp
-    IO/Timer/impl/windows/AsyncSystemTimer.h
     IO/Timer/impl/windows/AsyncSystemTimer.cpp
-    IO/Timer/impl/windows/TimerHandle.h
     IO/Timer/impl/windows/TimerHandle.cpp
+    IO/Timer/impl/unix/AsyncSystemTimer.cpp
+    IO/Timer/impl/unix/TimerHandle.cpp
     IO/Timer/AsyncSystemTimer.h
     IO/Filesystem/FileSystem.h
-    IO/Filesystem/FileSystem.cpp
     IO/Filesystem/FileHandle.h
-    IO/Filesystem/FileHandle.cpp
+    IO/Filesystem/impl/windows/FileSystem.cpp
+    IO/Filesystem/impl/windows/FileHandle.cpp
+    IO/Filesystem/impl/unix/FileSystem.cpp
+    IO/Filesystem/impl/unix/FileHandle.cpp
 )
 
 if(USE_LIBCURL)
@@ -139,6 +141,10 @@ if(WIN32)
     PosixDaemon.cpp
     revision.h
     migrations_list.h
+    IO/Timer/impl/unix/AsyncSystemTimer.cpp
+    IO/Timer/impl/unix/TimerHandle.cpp
+    IO/Filesystem/impl/unix/FileSystem.cpp
+    IO/Filesystem/impl/unix/FileHandle.cpp
   )
   
   if (NOT MSVC)
@@ -157,6 +163,10 @@ else()
     ServiceWin32.h
     revision.h
     migrations_list.h
+    IO/Timer/impl/windows/AsyncSystemTimer.cpp
+    IO/Timer/impl/windows/TimerHandle.cpp
+    IO/Filesystem/impl/windows/FileSystem.cpp
+    IO/Filesystem/impl/windows/FileHandle.cpp
   )
 endif()
 

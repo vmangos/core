@@ -148,12 +148,6 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
 }
 
 template<typename TClientSocket>
-void AsyncServerListener<TClientSocket>::HandleAccept(std::shared_ptr<TClientSocket> newClient)
-{
-    newClient->Start();
-}
-
-template<typename TClientSocket>
 void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds maxBlockingDuration)
 {
     ULONG_PTR completionKey = 0;

@@ -15,19 +15,30 @@ public:
     void RunEventLoop(std::chrono::milliseconds maxBlockingDuration);
 
 private:
+    void HandleAccept(std::shared_ptr<TClientSocket> newClient);
+
+    IO::Native::SocketHandle m_acceptorNativeSocket;
+    void StartAcceptOperation();
+
+#if defined(WIN32)
     explicit AsyncServerListener(SOCKET acceptorNativeSocket, HANDLE completionPort)
             : m_acceptorNativeSocket(acceptorNativeSocket), m_completionPort(completionPort) {}
 
-    void StartAcceptOperation();
-    void HandleAccept(std::shared_ptr<TClientSocket> newClient);
-
-    SOCKET m_acceptorNativeSocket;
     HANDLE m_completionPort;
     IocpOperationTask m_currentAcceptTask;
+#endif
 };
 
-#ifdef WIN32
+template<typename TClientSocket>
+void AsyncServerListener<TClientSocket>::HandleAccept(std::shared_ptr<TClientSocket> newClient)
+{
+    newClient->Start();
+}
+
+#if defined(WIN32)
 #include "./impl/windows/AsyncServerListener_impl.h"
+#elif defined(__linux__)
+#include "./impl/unix/AsyncServerListener_impl.h"
 #else
 #error "IO::Networking not supported on your platform"
 #endif

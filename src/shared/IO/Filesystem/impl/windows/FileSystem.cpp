@@ -1,5 +1,5 @@
-#include "./FileSystem.h"
-#include "./FileHandle.h"
+#include "IO/Filesystem/FileSystem.h"
+#include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 
 #define WIN32_LEAN_AND_MEAN

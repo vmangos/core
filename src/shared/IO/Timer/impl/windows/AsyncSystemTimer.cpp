@@ -55,7 +55,7 @@ void IO::Timer::impl::windows::AsyncSystemTimer::_timerQueueTimeoutCallback(PVOI
     timerHandle->m_callback();
 }
 
-std::shared_ptr<IO::Timer::TimerHandle> IO::Timer::impl::windows::AsyncSystemTimer::_scheduleFunctionOnceMs(uint64_t milliseconds, std::function<void()> const& function)
+std::shared_ptr<IO::Timer::TimerHandle> IO::Timer::impl::windows::AsyncSystemTimer::_ScheduleFunctionOnceMs(uint64_t milliseconds, std::function<void()> const& function)
 {
     MANGOS_ASSERT(this->m_nativeTimerQueueHandle);
 

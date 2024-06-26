@@ -83,21 +83,6 @@ void AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function
     }
 }
 
-template<typename SocketType>
-void AsyncSocket<SocketType>::ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback)
-{
-    std::shared_ptr<std::vector<uint8_t>> skipBuffer(new std::vector<uint8_t>());
-    skipBuffer->resize(skipSize);
-    Read((char*)skipBuffer->data(), skipSize, [skipBuffer, callback](IO::NetworkError const& error)
-    {
-        // KEEP skipBuffer in scope!
-        // Do not remove skipBuffer before Read() is done, since we are transferring into it via async IO
-        // and since we are using a raw pointer, the Task has no knowledge about the lifetime of the std::vector
-        skipBuffer->clear();
-        callback(error);
-    });
-}
-
 /// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 template<typename SocketType>
 void AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)

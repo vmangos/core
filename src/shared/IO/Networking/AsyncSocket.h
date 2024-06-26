@@ -2,6 +2,7 @@
 #define MANGOS_IO_NETWORKING_ASYNCSOCKET_H
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <array>
 #include <cstdint>
@@ -9,7 +10,9 @@
 #include "ByteBuffer.h"
 #include "IO/Networking/NetworkError.h"
 #include "IO/Networking/SocketDescriptor.h"
+#if defined(WIN32)
 #include "IO/Networking/impl/windows/IocpOperationTask.h"
+#endif
 
 namespace IO { namespace Networking {
     template<typename SocketType>
@@ -21,7 +24,7 @@ namespace IO { namespace Networking {
         friend class AsyncSocketListener<SocketType>;
 
         public:
-            explicit AsyncSocket(SocketDescriptor const& socketDescriptor) : m_socket(socketDescriptor) {}
+            explicit AsyncSocket(SocketDescriptor  socketDescriptor) : m_socket(std::move(socketDescriptor)) {}
             ~AsyncSocket() noexcept(false); // this destructor will throw if there is a pending transaction
             AsyncSocket(AsyncSocket const&) = delete;
             AsyncSocket& operator=(AsyncSocket const&) = delete;
@@ -86,8 +89,26 @@ namespace IO { namespace Networking {
     {
         return GetRemoteEndpoint().ip.toString();
     }
+
+    template<typename SocketType>
+    void AsyncSocket<SocketType>::ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback)
+    {
+        std::shared_ptr<std::vector<uint8_t>> skipBuffer(new std::vector<uint8_t>());
+        skipBuffer->resize(skipSize);
+        Read((char*)skipBuffer->data(), skipSize, [skipBuffer, callback](IO::NetworkError const& error)
+        {
+            // KEEP skipBuffer in scope!
+            // Do not remove skipBuffer before Read() is done, since we are transferring into it via async IO
+            // and since we are using a raw pointer, the Task has no knowledge about the lifetime of the std::vector
+            skipBuffer->clear();
+            callback(error);
+        });
+    }
+
 #if defined(WIN32)
 #include "./impl/windows/AsyncSocket_impl.h"
+#elif defined(__linux__)
+#include "./impl/unix/AsyncSocket_impl.h"
 #else
 #error "IO::Networking not supported on your platform"
 #endif

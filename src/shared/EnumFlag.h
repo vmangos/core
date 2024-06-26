@@ -28,7 +28,7 @@ constexpr bool IsEnumFlag(T) { return false; }
 namespace EnumTraits
 {
     template<typename T>
-    using IsFlag = std::conjunction<std::is_enum<T>, std::integral_constant<bool, IsEnumFlag(T{})>>;
+    using IsFlag = std::integral_constant<bool, IsEnumFlag(T{})>;
 }
 
 template<typename T, std::enable_if_t<EnumTraits::IsFlag<T>::value, std::nullptr_t> = nullptr>
@@ -64,7 +64,7 @@ inline constexpr T operator~(T value)
 template<typename T>
 class EnumFlag
 {
-    static_assert(EnumTraits::IsFlag<T>::value, "EnumFlag must be used only with enums that are marked as flags by DEFINE_ENUM_FLAG macro");
+    static_assert(EnumTraits::IsFlag<T>::value, "EnumFlag must be used only with enums that are specify EnumFlag::IsFlag");
 
 public:
     /*implicit*/ constexpr EnumFlag(T value) : _value(value)
@@ -106,7 +106,7 @@ public:
     constexpr bool HasFlag(T flag) const
     {
         using i = std::underlying_type_t<T>;
-        return static_cast<i>((i)_value & (i)flag) != static_cast<i>(0);
+        return static_cast<i>(_value & flag) != static_cast<i>(0);
     }
 
     constexpr bool HasAllFlags(T flags) const
