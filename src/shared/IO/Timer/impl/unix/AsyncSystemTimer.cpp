@@ -7,15 +7,16 @@ INSTANTIATE_SINGLETON_1(IO::Timer::AsyncSystemTimer);
 
 IO::Timer::AsyncSystemTimer::AsyncSystemTimer()
 {
-    throw std::runtime_error("Not implemented: AsyncSystemTimer::AsyncSystemTimer");
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "NotYetImplemented: AsyncSystemTimer::.ctor");
 }
 
 void IO::Timer::AsyncSystemTimer::RemoveAllTimersAndStopThread()
 {
-    throw std::runtime_error("Not implemented: AsyncSystemTimer::RemoveAllTimersAndStopThread");
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "NotYetImplemented: AsyncSystemTimer::RemoveAllTimersAndStopThread");
 }
 
 std::shared_ptr<IO::Timer::TimerHandle> IO::Timer::AsyncSystemTimer::_ScheduleFunctionOnceMs(uint64_t milliseconds, std::function<void()> const& function)
 {
-    throw std::runtime_error("Not implemented: AsyncSystemTimer::_ScheduleFunctionOnceMs");
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "NotYetImplemented: AsyncSystemTimer::_ScheduleFunctionOnceMs");
+    std::shared_ptr<TimerHandle> timerHandle = std::make_shared<IO::Timer::TimerHandle>();
 }

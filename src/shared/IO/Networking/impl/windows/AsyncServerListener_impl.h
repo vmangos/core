@@ -54,20 +54,18 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
         return nullptr;
     }
 
-    SOCKADDR_IN m_serverAddress;
+    sockaddr_in m_serverAddress;
     m_serverAddress.sin_family = AF_INET;
     m_serverAddress.sin_addr.s_addr = ::inet_addr(bindIp.c_str());
     m_serverAddress.sin_port = ::htons(port);
-    errorCode = ::bind(listenNativeSocket, (SOCKADDR*)(&m_serverAddress), sizeof(m_serverAddress));
-    if (errorCode != 0)
+    if (::bind(listenNativeSocket, (struct sockaddr*)(&m_serverAddress), sizeof(m_serverAddress)) != 0)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::bind(...) Error: %u", WSAGetLastError());
         return nullptr;
     }
 
     int const acceptBacklogCount = 50; // the number of connection requests that are queued in the kernel until this process calls "accept"
-    errorCode = ::listen(listenNativeSocket, acceptBacklogCount);
-    if (errorCode != 0)
+    if (::listen(listenNativeSocket, acceptBacklogCount) != 0)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::listen(...) Error: %u", WSAGetLastError());
         return nullptr;
@@ -121,7 +119,7 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
         IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
 
         std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
-        HandleAccept(client);
+        HandlePostAccept(client);
 
         m_currentAcceptTask.Reset();
         this->StartAcceptOperation();

@@ -2,16 +2,22 @@
 #define MANGOS_IO_NETWORKING_WIN32_ASYNCSOCKET_IMPL_H
 
 template<typename SocketType>
-void AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback)
 {
     if (m_disconnectRequest)
     {
-        callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
     if (m_readCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Read can be queued at the same time
-        callback(IO::NetworkError{IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed});
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+    if (size == 0)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
         return;
     }
     m_readCallback = callback;
@@ -34,7 +40,7 @@ void AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function
             self->CloseSocket();
             auto tmpCallback = std::move(self->m_readCallback);
             self->m_currentReadTask.Reset();
-            tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
+            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
             return;
         }
 
@@ -63,7 +69,7 @@ void AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function
         {
             auto tmpCallback = std::move(self->m_readCallback);
             self->m_currentReadTask.Reset();
-            tmpCallback(IO::NetworkError{IO::NetworkError::ErrorType::NoError});
+            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
         }
     });
 
@@ -85,19 +91,19 @@ void AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function
 
 /// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 template<typename SocketType>
-void AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
     if (source->size() > 8*1024*1024)
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source->size());
 
     if (m_disconnectRequest)
     {
-        callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
-        callback(IO::NetworkError{IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed});
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
         return;
     }
     m_writeCallback = callback;
@@ -121,7 +127,7 @@ void AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> 
         if (bytesProcessed == 0)
         { // 0 means the socket is already closed on the other side
             self->CloseSocket();
-            errorResult = IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed};
+            errorResult = IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed);
         }
         else if (bytesProcessed < bufferCtx->buffers[0].len || errorCode != 0)
         {
@@ -158,19 +164,19 @@ void AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> 
 
 /// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 template<typename SocketType>
-void AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
     if (source->size() > 8*1024*1024)
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source->size());
 
     if (m_disconnectRequest)
     {
-        callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
-        callback(IO::NetworkError{IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed});
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
         return;
     }
     m_writeCallback = callback;
@@ -231,19 +237,19 @@ void AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& sou
 
 /// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 template<typename SocketType>
-void AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
 {
     if (size > 8*1024*1024)
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", size);
 
     if (m_disconnectRequest)
     {
-        callback(IO::NetworkError{IO::NetworkError::ErrorType::SocketClosed});
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
-        callback(IO::NetworkError{IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed});
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
         return;
     }
     m_writeCallback = callback;
@@ -303,7 +309,7 @@ void AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const> const& source
 }
 
 template<typename SocketType>
-void AsyncSocket<SocketType>::CloseSocket()
+void IO::Networking::AsyncSocket<SocketType>::CloseSocket()
 {
     if (m_disconnectRequest)
         return;
@@ -314,7 +320,7 @@ void AsyncSocket<SocketType>::CloseSocket()
 }
 
 template<typename SocketType>
-bool AsyncSocket<SocketType>::HasPendingTransfers() const
+bool IO::Networking::AsyncSocket<SocketType>::HasPendingTransfers() const
 {
     return m_currentWriteTask.m_callback || m_currentReadTask.m_callback;
 }

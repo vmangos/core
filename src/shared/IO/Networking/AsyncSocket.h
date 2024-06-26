@@ -65,6 +65,13 @@ namespace IO { namespace Networking {
 #if defined(WIN32)
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
+#elif defined(__linux__)
+
+    public: // TODO: Make me private again. Why does friend not work?
+            void PerformNonBlockingRead();
+    private:
+            char* m_readDstBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_readDstBufferBytesLeft for space
+            std::size_t m_readDstBufferBytesLeft = 0;
 #endif
     };
 
@@ -104,6 +111,8 @@ namespace IO { namespace Networking {
             callback(error);
         });
     }
+}} // namespace IO::Networking
+
 
 #if defined(WIN32)
 #include "./impl/windows/AsyncSocket_impl.h"
@@ -112,7 +121,5 @@ namespace IO { namespace Networking {
 #else
 #error "IO::Networking not supported on your platform"
 #endif
-
-}} // namespace IO::Networking
 
 #endif //MANGOS_IO_NETWORKING_ASYNCSOCKET_H

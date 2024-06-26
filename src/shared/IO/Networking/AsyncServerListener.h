@@ -15,22 +15,32 @@ public:
     void RunEventLoop(std::chrono::milliseconds maxBlockingDuration);
 
 private:
-    void HandleAccept(std::shared_ptr<TClientSocket> newClient);
+    void HandlePostAccept(std::shared_ptr<TClientSocket> newClient);
 
     IO::Native::SocketHandle m_acceptorNativeSocket;
-    void StartAcceptOperation();
 
 #if defined(WIN32)
-    explicit AsyncServerListener(SOCKET acceptorNativeSocket, HANDLE completionPort)
+    void StartAcceptOperation();
+
+    explicit AsyncServerListener(IO::Native::SocketHandle acceptorNativeSocket, HANDLE completionPort)
             : m_acceptorNativeSocket(acceptorNativeSocket), m_completionPort(completionPort) {}
 
     HANDLE m_completionPort;
     IocpOperationTask m_currentAcceptTask;
+#elif defined(__linux__)
+    void OnNewClientToAcceptAvailable();
+
+    explicit AsyncServerListener(IO::Native::SocketHandle acceptorNativeSocket, int epollDescriptor)
+            : m_acceptorNativeSocket(acceptorNativeSocket), m_epollDescriptor(epollDescriptor) {}
+
+    int m_epollDescriptor; // <-- Kept in sync with m_clients
+    std::vector<std::shared_ptr<TClientSocket>> m_clients; // <-- This list might only be touched by the main thread / event loop
 #endif
 };
 
+
 template<typename TClientSocket>
-void AsyncServerListener<TClientSocket>::HandleAccept(std::shared_ptr<TClientSocket> newClient)
+void AsyncServerListener<TClientSocket>::HandlePostAccept(std::shared_ptr<TClientSocket> newClient)
 {
     newClient->Start();
 }

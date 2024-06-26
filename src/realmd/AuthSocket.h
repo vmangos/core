@@ -58,8 +58,6 @@ struct sAuthLogonProof_C;
 class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
 {
     public:
-        const static int s_BYTE_SIZE = 32;
-
         explicit AuthSocket(IO::Networking::SocketDescriptor const& clientAddress);
         ~AuthSocket();
 
