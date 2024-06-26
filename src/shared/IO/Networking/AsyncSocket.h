@@ -22,7 +22,7 @@ namespace IO { namespace Networking {
 
         public:
             explicit AsyncSocket(SocketDescriptor const& socketDescriptor) : m_socket(socketDescriptor) {}
-            ~AsyncSocket();
+            ~AsyncSocket() noexcept(false); // this destructor will throw if there is a pending transaction
             AsyncSocket(AsyncSocket const&) = delete;
             AsyncSocket& operator=(AsyncSocket const&) = delete;
             AsyncSocket(AsyncSocket&&) = delete;
@@ -42,28 +42,37 @@ namespace IO { namespace Networking {
             void CloseSocket();
 
             IO::Networking::IpEndpoint const& GetRemoteEndpoint() const;
-            std::string GetRemoteIpString() const;;
+            std::string GetRemoteIpString() const;
+
+            bool HasPendingTransfers() const;
 
         private:
             SocketDescriptor m_socket;
             bool m_disconnectRequest = false;
 
             // Read = the target buffer to write the network stream to
-            std::function<void(IO::NetworkError)> m_readCallback = nullptr;
+            std::function<void(IO::NetworkError)> m_readCallback = nullptr; // <-- Callback into user code
 
             // Write = the source buffer from where to read to be able to write to the network stream
-            std::function<void(IO::NetworkError)> m_writeCallback = nullptr;
+            std::function<void(IO::NetworkError)> m_writeCallback = nullptr; // <-- Callback into user code
             std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<uint8_t const> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
+
+#if defined(WIN32)
+            IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
+            IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
+#endif
     };
 
     template<typename SocketType>
-    AsyncSocket<SocketType>::~AsyncSocket()
+    AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
         if (!m_disconnectRequest)
             CloseSocket();
+
+        MANGOS_ASSERT(!HasPendingTransfers());
     }
 
     template<typename SocketType>
@@ -77,8 +86,7 @@ namespace IO { namespace Networking {
     {
         return GetRemoteEndpoint().ip.toString();
     }
-
-#ifdef WIN32
+#if defined(WIN32)
 #include "./impl/windows/AsyncSocket_impl.h"
 #else
 #error "IO::Networking not supported on your platform"

@@ -5,6 +5,7 @@ template<typename TClientSocket>
 class AsyncServerListener {
 
 public:
+    ~AsyncServerListener();
     AsyncServerListener(AsyncServerListener const&) = delete;
     AsyncServerListener& operator=(AsyncServerListener const&) = delete;
     AsyncServerListener(AsyncServerListener&&) = delete;
@@ -22,6 +23,7 @@ private:
 
     SOCKET m_acceptorNativeSocket;
     HANDLE m_completionPort;
+    IocpOperationTask m_currentAcceptTask;
 };
 
 #ifdef WIN32

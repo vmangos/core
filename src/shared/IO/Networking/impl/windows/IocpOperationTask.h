@@ -1,41 +1,42 @@
 #ifndef MANGOS_IO_NETWORKING_WIN32_IOCPOPERATIONEVENT_H
 #define MANGOS_IO_NETWORKING_WIN32_IOCPOPERATIONEVENT_H
 
-#include <WinSock2.h>
 #include <string>
 #include <functional>
+#include "../../../../Errors.h"
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#undef WIN32_LEAN_AND_MEAN
 
 class IocpOperationTask : public OVERLAPPED
 {
 public:
-    explicit IocpOperationTask(std::function<void(IocpOperationTask* thisTask, DWORD errorCode)> const& callback): OVERLAPPED()
+    void InitNew(const std::function<void(DWORD errorCode)>& callback)
     {
-        Reset();
-        m_callback = callback;
-    };
-    IocpOperationTask(const IocpOperationTask&) = delete;
-    IocpOperationTask& operator=(const IocpOperationTask&) = delete;
-    IocpOperationTask(IocpOperationTask&&) = delete;
-    IocpOperationTask& operator=(IocpOperationTask&&) = delete;
+        MANGOS_ASSERT(m_callback == nullptr);
 
-private:
-    std::function<void(IocpOperationTask* thisTask, DWORD errorCode)> m_callback;
-
-    void Reset()
-    {
         Internal = 0;
         InternalHigh = 0;
         Offset = 0;
         OffsetHigh = 0;
         hEvent = nullptr;
+        m_callback = callback;
+    }
+
+    void Reset()
+    {
+        MANGOS_ASSERT(m_callback != nullptr);
+
         m_callback = nullptr;
     }
 
-public:
     void OnComplete(DWORD errorCode)
     {
-        m_callback(this, errorCode);
+        m_callback(errorCode);
     }
+
+    std::function<void(DWORD errorCode)> m_callback = nullptr;
 };
 
 #endif //MANGOS_IO_NETWORKING_WIN32_IOCPOPERATIONEVENT_H

@@ -8,27 +8,11 @@
 #include <WinSock2.h>
 #include "./IocpOperationTask.h"
 
-
-
 template<typename TClientSocket>
-void AsyncServerListener<TClientSocket>::HandleAccept(std::shared_ptr<TClientSocket> newClient)
+AsyncServerListener<TClientSocket>::~AsyncServerListener()
 {
-    newClient->Start();
-}
-
-template<typename TClientSocket>
-void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds maxBlockingDuration)
-{
-    ULONG_PTR completionKey = 0;
-    IocpOperationTask* task = nullptr;
-
-    DWORD bytesWritten = 0;
-    bool booleanOkay = ::GetQueuedCompletionStatus(m_completionPort, &bytesWritten, &completionKey, reinterpret_cast<LPOVERLAPPED*>(&task), maxBlockingDuration.count());
-    DWORD errorCode = ::GetLastError();
-    if (task)
-        task->OnComplete(booleanOkay ? 0 : errorCode);
-    else if (errorCode != WAIT_TIMEOUT)
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Has no TASK!!! Error: %u", errorCode);
+    ::closesocket(m_acceptorNativeSocket);
+    ::CloseHandle(m_completionPort);
 }
 
 template<typename TClientSocket>
@@ -97,7 +81,7 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
 template<typename TClientSocket>
 void AsyncServerListener<TClientSocket>::StartAcceptOperation()
 {
-    SOCKET nativePeerSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    SOCKET nativePeerSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); // <-- will be filled when callback is called
     if (nativePeerSocket == INVALID_SOCKET)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::socket(accept, ...) Error: %u", WSAGetLastError());
@@ -119,7 +103,14 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
     };
 
     Addresses* addrBuffer = new Addresses();
-    IocpOperationTask* task = new IocpOperationTask([nativePeerSocket, this, addrBuffer](IocpOperationTask* task, DWORD errorCode) {
+    m_currentAcceptTask.InitNew([nativePeerSocket, this, addrBuffer](DWORD errorCode) {
+        if (errorCode)
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::AcceptEx(...) Task Error: %u", errorCode);
+            m_currentAcceptTask.Reset();
+            return;
+        }
+
         std::string peerIpAddressStr(inet_ntoa(addrBuffer->peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
         delete addrBuffer;
         auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(peerIpAddressStr);
@@ -132,6 +123,7 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
         std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
         HandleAccept(client);
 
+        m_currentAcceptTask.Reset();
         this->StartAcceptOperation();
     });
 
@@ -141,17 +133,39 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
                                   addrBuffer,
                                   0,
                                   sizeof(addrBuffer->localAddress) + sizeof(addrBuffer->__pad1), sizeof(addrBuffer->peerAddress) + sizeof(addrBuffer->__pad2),
-                                  &bytesWritten, task
+                                  &bytesWritten, &m_currentAcceptTask
     );
     if (!booleanOkay)
     {
         int lastError = WSAGetLastError();
         if (lastError != WSA_IO_PENDING)
         {
+            m_currentAcceptTask.Reset();
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::AcceptEx(...) Error: %u", lastError);
             return;
         }
     }
+}
+
+template<typename TClientSocket>
+void AsyncServerListener<TClientSocket>::HandleAccept(std::shared_ptr<TClientSocket> newClient)
+{
+    newClient->Start();
+}
+
+template<typename TClientSocket>
+void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds maxBlockingDuration)
+{
+    ULONG_PTR completionKey = 0;
+    IocpOperationTask* task = nullptr;
+
+    DWORD bytesWritten = 0;
+    bool booleanOkay = ::GetQueuedCompletionStatus(m_completionPort, &bytesWritten, &completionKey, reinterpret_cast<LPOVERLAPPED*>(&task), maxBlockingDuration.count());
+    DWORD errorCode = ::GetLastError();
+    if (task)
+        task->OnComplete(booleanOkay ? 0 : errorCode);
+    else if (errorCode != WAIT_TIMEOUT)
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Has no TASK!!! Error: %u", errorCode);
 }
 
 #endif //MANGOS_IO_NETWORKING_WIN32_ASYNCSERVERLISTENER_H
