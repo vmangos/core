@@ -1,10 +1,89 @@
 #ifndef MANGOS_IO_NETWORKING_ASYNCSOCKET_H
 #define MANGOS_IO_NETWORKING_ASYNCSOCKET_H
 
+#include <memory>
+#include <vector>
+#include <array>
+#include <cstdint>
+#include <functional>
+#include "ByteBuffer.h"
+#include "IO/Networking/NetworkError.h"
+#include "IO/Networking/SocketDescriptor.h"
+#include "IO/Networking/impl/windows/IocpOperationTask.h"
+
+namespace IO { namespace Networking {
+    template<typename SocketType>
+    class AsyncSocketListener;
+
+    // this socket is different in that it does not block on reads
+    template<typename SocketType>
+    class AsyncSocket : public std::enable_shared_from_this<SocketType> {
+        friend class AsyncSocketListener<SocketType>;
+
+        public:
+            explicit AsyncSocket(SocketDescriptor const& socketDescriptor) : m_socket(socketDescriptor) {}
+            ~AsyncSocket();
+            AsyncSocket(AsyncSocket const&) = delete;
+            AsyncSocket& operator=(AsyncSocket const&) = delete;
+            AsyncSocket(AsyncSocket&&) = delete;
+            AsyncSocket& operator=(AsyncSocket&&) = delete;
+
+            virtual void Start() = 0;
+
+            /// Keep in mind to keep the source buffer in scope of the callback, otherwise random memory might get overwritten
+            /// Most of the time this is not an issue, since you want to process the incoming buffer
+            void Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback);
+            void ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback);
+
+            void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
+            void Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
+            void Write(std::shared_ptr<uint8 const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback);
+
+            void CloseSocket();
+
+            IO::Networking::IpEndpoint const& GetRemoteEndpoint() const;
+            std::string GetRemoteIpString() const;;
+
+        private:
+            SocketDescriptor m_socket;
+            bool m_disconnectRequest = false;
+
+            // Read = the target buffer to write the network stream to
+            std::function<void(IO::NetworkError)> m_readCallback = nullptr;
+
+            // Write = the source buffer from where to read to be able to write to the network stream
+            std::function<void(IO::NetworkError)> m_writeCallback = nullptr;
+            std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
+            std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
+            std::shared_ptr<uint8_t const> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
+    };
+
+    template<typename SocketType>
+    AsyncSocket<SocketType>::~AsyncSocket()
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
+        if (!m_disconnectRequest)
+            CloseSocket();
+    }
+
+    template<typename SocketType>
+    IO::Networking::IpEndpoint const& AsyncSocket<SocketType>::GetRemoteEndpoint() const
+    {
+        return m_socket.m_peerEndpoint;
+    }
+
+    template<typename SocketType>
+    std::string AsyncSocket<SocketType>::GetRemoteIpString() const
+    {
+        return GetRemoteEndpoint().ip.toString();
+    }
+
 #ifdef WIN32
-#include "./impl/windows/AsyncSocket.h"
+#include "./impl/windows/AsyncSocket_impl.h"
 #else
 #error "IO::Networking not supported on your platform"
 #endif
+
+}} // namespace IO::Networking
 
 #endif //MANGOS_IO_NETWORKING_ASYNCSOCKET_H

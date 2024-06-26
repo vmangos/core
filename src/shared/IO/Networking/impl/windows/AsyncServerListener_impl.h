@@ -8,28 +8,7 @@
 #include <WinSock2.h>
 #include "./IocpOperationTask.h"
 
-template<typename TClientSocket>
-class AsyncServerListener {
 
-public:
-    explicit AsyncServerListener(SOCKET acceptorNativeSocket, HANDLE completionPort)
-                : m_acceptorNativeSocket(acceptorNativeSocket), m_completionPort(completionPort) {}
-
-    AsyncServerListener(AsyncServerListener const&) = delete;
-    AsyncServerListener& operator=(AsyncServerListener const&) = delete;
-    AsyncServerListener(AsyncServerListener&&) = delete;
-    AsyncServerListener& operator=(AsyncServerListener&&) = delete;
-
-    static std::unique_ptr<AsyncServerListener<TClientSocket>> CreateAndBindServer(std::string const& bindIp, uint16_t port);
-    void RunEventLoop(std::chrono::milliseconds maxBlockingDuration);
-
-private:
-    void StartAcceptOperation();
-    void HandleAccept(std::shared_ptr<TClientSocket> newClient);
-
-    SOCKET m_acceptorNativeSocket;
-    HANDLE m_completionPort;
-};
 
 template<typename TClientSocket>
 void AsyncServerListener<TClientSocket>::HandleAccept(std::shared_ptr<TClientSocket> newClient)
@@ -110,7 +89,7 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
         return nullptr;
     }
 
-    auto server = std::make_unique<AsyncServerListener<TClientSocket>>(listenNativeSocket, completionPort);
+    auto server = std::unique_ptr<AsyncServerListener<TClientSocket>>(new AsyncServerListener<TClientSocket>(listenNativeSocket, completionPort));
     server->StartAcceptOperation();
     return server;
 }

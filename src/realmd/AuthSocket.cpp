@@ -245,8 +245,8 @@ void AuthSocket::ProcessIncomingData()
     {
         if (error)
         {
-            if (error.Error != IO::NetworkError::ErrorType::SocketClosed)
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] ProcessIncomingData Read(cmd) error");
+            if (error.GetErrorType() != IO::NetworkError::ErrorType::SocketClosed)
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] ProcessIncomingData Read(cmd) error: %s", error.ToString().c_str());
             return;
         }
 
@@ -1455,7 +1455,7 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
     {
         if (error)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[XFER]: Write(...) failed: %s", error.toString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[XFER]: Write(...) failed: %s", error.ToString().c_str());
             return;
         }
         self->RepeatInternalXferLoop(std::move(rawChunk));
@@ -1614,4 +1614,3 @@ bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versi
 
     return false;
 }
-

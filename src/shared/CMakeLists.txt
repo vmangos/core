@@ -103,6 +103,7 @@ set (shared_SRCS
     IO/Networking/AsyncServerListener.h
     IO/Networking/AsyncSocket.h
     IO/Networking/NetworkError.h
+    IO/Networking/NetworkError.cpp
     IO/Networking/SocketDescriptor.h
     IO/Networking/Utils.h
     IO/Networking/Utils.cpp
