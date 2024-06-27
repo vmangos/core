@@ -23,6 +23,12 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
         return nullptr;
     }
 
+    int opt = 1; // Linux is a bit weird. When someone else is still connected to our socket, but we restart the server, the server cannot bind again.
+    if (::setsockopt(listenNativeSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0) {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] CreateAndBindServer -> ::setsockopt(reuseaddr) Error: %s", SystemErrorToCString(errno));
+        return nullptr;
+    }
+
     sockaddr_in m_serverAddress;
     m_serverAddress.sin_family = AF_INET;
     m_serverAddress.sin_addr.s_addr = ::inet_addr(bindIp.c_str());
