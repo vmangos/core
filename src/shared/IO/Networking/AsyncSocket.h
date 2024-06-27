@@ -67,11 +67,15 @@ namespace IO { namespace Networking {
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
 #elif defined(__linux__)
 
-    public: // TODO: Make me private again. Why does friend not work?
+        public: // TODO: Make me private again. Why does friend not work?
             void PerformNonBlockingRead();
-    private:
+            void PerformNonBlockingWrite();
+            void StopPendingTransactionsAndForceClose();
+        private:
             char* m_readDstBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_readDstBufferBytesLeft for space
             std::size_t m_readDstBufferBytesLeft = 0;
+            char const* m_writeSrcBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_writeSrcBufferBytesLeft for space
+            std::size_t m_writeSrcBufferBytesLeft = 0;
 #endif
     };
 

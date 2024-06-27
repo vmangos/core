@@ -33,8 +33,7 @@ private:
     explicit AsyncServerListener(IO::Native::SocketHandle acceptorNativeSocket, int epollDescriptor)
             : m_acceptorNativeSocket(acceptorNativeSocket), m_epollDescriptor(epollDescriptor) {}
 
-    int m_epollDescriptor; // <-- Kept in sync with m_clients
-    std::vector<std::shared_ptr<TClientSocket>> m_clients; // <-- This list might only be touched by the main thread / event loop
+    int m_epollDescriptor;
 #endif
 };
 

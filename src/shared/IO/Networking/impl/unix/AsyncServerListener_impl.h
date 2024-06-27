@@ -56,7 +56,7 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
 
     // Add server socket to epoll (needed for ::accept(..))
     struct epoll_event event;
-    event.events = EPOLLIN | EPOLLET; // Edge-triggered mode
+    event.events = EPOLLIN | EPOLLERR; // Don't use EdgeTrigger here, since if multiple ::accepts are in the queue, we one get notified for one
     event.data.fd = listenNativeSocket;
     if (epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, listenNativeSocket, &event) == -1)
     {
@@ -77,7 +77,8 @@ void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds 
     int numEvents = ::epoll_wait(m_epollDescriptor, events, maxEvents, maxBlockingDuration.count());
     if (numEvents == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] RunEventLoop -> ::epoll_wait(...) Error: %s", SystemErrorToCString(errno));
+        if (errno != EINTR) // ignore interrupted system call
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] RunEventLoop -> ::epoll_wait(...) Error: %s", SystemErrorToCString(errno));
         return;
     }
     if (numEvents == 0)
@@ -96,11 +97,24 @@ void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds 
         else
         {
             TClientSocket* client = (TClientSocket*) event.data.ptr;
-            if (event.events & EPOLLIN)
+            if (event.events & EPOLLERR)
             {
-                client->PerformNonBlockingRead();
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Epoll ERR");
+                client->StopPendingTransactionsAndForceClose();
             }
-
+            else
+            {
+                if (event.events & EPOLLIN)
+                {
+                    sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Epoll IN");
+                    client->PerformNonBlockingRead();
+                }
+                if (event.events & EPOLLOUT)
+                {
+                    sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Epoll OUT");
+                    client->PerformNonBlockingWrite();
+                }
+            }
         }
 
     }
@@ -133,10 +147,9 @@ void AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvailable()
     IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
 
     std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
-    m_clients.emplace_back(client);
 
     struct epoll_event event;
-    event.events = EPOLLIN | EPOLLOUT;
+    event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLET;
     event.data.ptr = client.get();
     if (epoll_ctl(m_epollDescriptor, EPOLL_CTL_ADD, nativePeerSocket, &event) == -1)
     {
