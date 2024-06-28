@@ -62,6 +62,24 @@ UPDATE `creature` SET `patch_min`=6 WHERE `guid`=43077;
 -- Bonfire Damage in northeast Silithus shouldn't be spawned in pre 1.8
 UPDATE `gameobject` SET `patch_min`=6 WHERE `guid`=49282;
 
+-- Terrain was changed a bit in Cenarion Hold in 1.9, remove objects that didn't exist prior to 1.9.0:
+-- Forge
+UPDATE `gameobject` SET `patch_min`=7 WHERE `guid`=49393;
+-- Anvil
+UPDATE `gameobject` SET `patch_min`=7 WHERE `guid`=49394;
+-- Cooking Brazier
+UPDATE `gameobject` SET `patch_min`=7 WHERE `guid`=49395;
+
+-- Several Cenarion Hold Infantry NPCs shouldn't be spawned pre 1.9.
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42772;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42784;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42868;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42769;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42773;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42776;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42777;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42768;
+
 
 -- End of migration.
 END IF;
