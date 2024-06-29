@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 
 namespace IO { namespace Timer {
     class AsyncSystemTimer;
@@ -13,9 +14,13 @@ namespace IO { namespace Timer {
     public:
         void Cancel();
     private:
-        void* m_nativeTimerHandle = nullptr;
+        explicit TimerHandle(IO::Timer::AsyncSystemTimer* systemTimer, std::function<void()> callbackFunction);
+
         IO::Timer::AsyncSystemTimer* m_asyncSystemTimer = nullptr;
         std::function<void()> m_callback = nullptr;
+#if defined(WIN32)
+        void* const m_nativeTimerHandle = nullptr;
+#endif
     };
 }} // namespace IO::Timer
 

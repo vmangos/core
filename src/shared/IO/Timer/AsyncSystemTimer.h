@@ -6,6 +6,11 @@
 #include "Policies/Singleton.h"
 #include "./TimerHandle.h"
 
+#if defined(__linux__)
+#include <condition_variable>
+#include <thread>
+#endif
+
 namespace IO { namespace Timer {
     class AsyncSystemTimer : public MaNGOS::Singleton<AsyncSystemTimer, MaNGOS::ClassLevelLockable<AsyncSystemTimer, std::mutex>> {
         friend IO::Timer::TimerHandle;
@@ -29,6 +34,7 @@ namespace IO { namespace Timer {
             uint64_t milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(timeFromNow).count();
             return this->_ScheduleFunctionOnceMs(milliseconds, function);
         }
+
     private:
         std::shared_ptr<IO::Timer::TimerHandle> _ScheduleFunctionOnceMs(uint64_t milliseconds, std::function<void()> const& function);
 
@@ -37,6 +43,21 @@ namespace IO { namespace Timer {
         std::mutex m_pendingTimers_mutex;
         std::unordered_set<std::shared_ptr<IO::Timer::TimerHandle>> m_pendingTimers;
         HANDLE m_nativeTimerQueueHandle;
+#elif defined(__linux__)
+        struct InternalTimerEntry {
+            std::chrono::time_point<std::chrono::system_clock> m_whenToTriggerMe;
+            std::shared_ptr<IO::Timer::TimerHandle> m_timerHandle;
+        };
+
+        void _TimerThreadFunc();
+        void _DeleteTimer(TimerHandle* timerHandle);
+
+        std::mutex m_orderedPendingTimer_mutex;
+        std::deque<InternalTimerEntry> m_orderedPendingTimer;
+
+        std::condition_variable m_sleepSemaphore; // used to wake up the thread, if something changed at the front() of the timer queue
+        volatile bool m_threadRunning = true;
+        std::thread m_thread;
 #endif
     };
 }} // namespace IO::Timer
