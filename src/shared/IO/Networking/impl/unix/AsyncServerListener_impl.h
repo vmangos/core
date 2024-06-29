@@ -58,7 +58,7 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
     struct epoll_event event;
     event.events = EPOLLIN | EPOLLERR; // Don't use EdgeTrigger here, since if multiple ::accepts are in the queue, we one get notified for one
     event.data.fd = listenNativeSocket;
-    if (epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, listenNativeSocket, &event) == -1)
+    if (::epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, listenNativeSocket, &event) == -1)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] CreateAndBindServer -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
         return nullptr;
@@ -105,25 +105,14 @@ void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds 
             else
             {
                 if (event.events & EPOLLIN)
-                {
-                    sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Epoll IN");
                     client->PerformNonBlockingRead();
-                }
+
                 if (event.events & EPOLLOUT)
-                {
-                    sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Epoll OUT");
                     client->PerformNonBlockingWrite();
-                }
             }
         }
 
     }
-    /*
-    for (int i = 0; i < nfds; ++i) {
-        if (events[i].data.fd == server_fd) {
-        }
-    }
-     */
 }
 
 template<typename TClientSocket>
@@ -151,7 +140,7 @@ void AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvailable()
     struct epoll_event event;
     event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLET;
     event.data.ptr = client.get();
-    if (epoll_ctl(m_epollDescriptor, EPOLL_CTL_ADD, nativePeerSocket, &event) == -1)
+    if (::epoll_ctl(m_epollDescriptor, EPOLL_CTL_ADD, nativePeerSocket, &event) == -1)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] OnNewClientToAcceptAvailable -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
         return;

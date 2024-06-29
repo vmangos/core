@@ -40,6 +40,8 @@
 
 #include <ace/Get_Opt.h>
 #include "IO/Networking/AsyncServerListener.h"
+#include "IO/Timer/AsyncSystemTimer.h"
+#include "IO/Multithreading/CreateThread.h"
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -291,6 +293,9 @@ extern int main(int argc, char **argv)
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
+
+    (void) sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
+    IO::Multithreading::RenameCurrentThread("Main/IO");
 
     // Catch termination signals
     HookSignals();
