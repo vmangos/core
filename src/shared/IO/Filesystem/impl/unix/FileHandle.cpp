@@ -17,9 +17,8 @@ uint64_t IO::Filesystem::FileHandle::GetTotalFileSize() const
 {
     struct stat file_stat;
 
-    if (fstat(m_nativeFileHandle, &file_stat) == -1) {
+    if (fstat(m_nativeFileHandle, &file_stat) == -1)
         throw std::runtime_error("GetTotalFileSize -> ::fstat() Failed: " + SystemErrorToString(errno));
-    }
 
     return file_stat.st_size;
 }
