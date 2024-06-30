@@ -40,9 +40,9 @@ std::string IO::Filesystem::FileHandle::GetAbsoluteFilePath() const
 {
     char filePath[PATH_MAX];
 #if defined(__linux__)
-    // I really hate LINUX, there is no way universal way to get a file path
+    // I really hate LINUX, there is no universal way to get a file path
     // Everyone on the internet recommends the following approach.
-    // If we don't have access to the "/proc fs" this method might fail.
+    // (Which can fail if we dont have access to the virtual-"/proc"-fs).
 
     char pathToLink[PATH_MAX];
     snprintf(pathToLink, sizeof(pathToLink), "/proc/self/fd/%d", m_nativeFileHandle);
