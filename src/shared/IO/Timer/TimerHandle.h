@@ -19,7 +19,7 @@ namespace IO { namespace Timer {
         IO::Timer::AsyncSystemTimer* m_asyncSystemTimer = nullptr;
         std::function<void()> m_callback = nullptr;
 #if defined(WIN32)
-        void* const m_nativeTimerHandle = nullptr;
+        void* m_nativeTimerHandle = nullptr;
 #endif
     };
 }} // namespace IO::Timer

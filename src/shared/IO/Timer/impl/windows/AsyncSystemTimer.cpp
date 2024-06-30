@@ -60,7 +60,7 @@ std::shared_ptr<IO::Timer::TimerHandle> IO::Timer::AsyncSystemTimer::_ScheduleFu
 {
     MANGOS_ASSERT(this->m_nativeTimerQueueHandle);
 
-    std::shared_ptr<TimerHandle> timerHandle = std::make_shared<IO::Timer::TimerHandle>();
+    std::shared_ptr<TimerHandle> timerHandle(new IO::Timer::TimerHandle(this, function));
     timerHandle->m_asyncSystemTimer = this;
     timerHandle->m_callback = function;
 
