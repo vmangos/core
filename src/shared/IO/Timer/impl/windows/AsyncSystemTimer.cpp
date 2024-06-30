@@ -2,13 +2,14 @@
 #include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
 
-#include "./AsyncSystemTimer.h"
+#include "../../AsyncSystemTimer.h"
 #include "IO/Multithreading/CreateThread.h"
 #include "Log.h"
+#include "Policies/SingletonImp.h"
 
-INSTANTIATE_SINGLETON_1(IO::Timer::impl::windows::AsyncSystemTimer);
+INSTANTIATE_SINGLETON_1(IO::Timer::AsyncSystemTimer);
 
-IO::Timer::impl::windows::AsyncSystemTimer::AsyncSystemTimer()
+IO::Timer::AsyncSystemTimer::AsyncSystemTimer()
 {
     m_nativeTimerQueueHandle = ::CreateTimerQueue();
     if (!m_nativeTimerQueueHandle)
@@ -21,7 +22,7 @@ IO::Timer::impl::windows::AsyncSystemTimer::AsyncSystemTimer()
     });
 }
 
-void IO::Timer::impl::windows::AsyncSystemTimer::RemoveAllTimersAndStopThread()
+void IO::Timer::AsyncSystemTimer::RemoveAllTimersAndStopThread()
 {
     HANDLE timerQueueHandle = m_nativeTimerQueueHandle;
     m_nativeTimerQueueHandle = nullptr;
@@ -38,7 +39,7 @@ void IO::Timer::impl::windows::AsyncSystemTimer::RemoveAllTimersAndStopThread()
     m_pendingTimers_mutex.unlock();
 }
 
-void IO::Timer::impl::windows::AsyncSystemTimer::_timerQueueTimeoutCallback(PVOID opaquePointer, BOOLEAN _thisVariableIsNotUsedInTimers)
+void IO::Timer::AsyncSystemTimer::_timerQueueTimeoutCallback(PVOID opaquePointer, BOOLEAN _thisVariableIsNotUsedInTimers)
 {
     (void)_thisVariableIsNotUsedInTimers;
 
@@ -55,11 +56,11 @@ void IO::Timer::impl::windows::AsyncSystemTimer::_timerQueueTimeoutCallback(PVOI
     timerHandle->m_callback();
 }
 
-std::shared_ptr<IO::Timer::TimerHandle> IO::Timer::impl::windows::AsyncSystemTimer::_scheduleFunctionOnceMs(uint64_t milliseconds, std::function<void()> const& function)
+std::shared_ptr<IO::Timer::TimerHandle> IO::Timer::AsyncSystemTimer::_ScheduleFunctionOnceMs(uint64_t milliseconds, std::function<void()> const& function)
 {
     MANGOS_ASSERT(this->m_nativeTimerQueueHandle);
 
-    std::shared_ptr<TimerHandle> timerHandle = std::make_shared<IO::Timer::TimerHandle>();
+    std::shared_ptr<TimerHandle> timerHandle(new IO::Timer::TimerHandle(this, function));
     timerHandle->m_asyncSystemTimer = this;
     timerHandle->m_callback = function;
 

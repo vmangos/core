@@ -28,7 +28,7 @@ constexpr bool IsEnumFlag(T) { return false; }
 namespace EnumTraits
 {
     template<typename T>
-    using IsFlag = std::conjunction<std::is_enum<T>, std::integral_constant<bool, IsEnumFlag(T{})>>;
+    using IsFlag = std::integral_constant<bool, IsEnumFlag(T{})>;
 }
 
 template<typename T, std::enable_if_t<EnumTraits::IsFlag<T>::value, std::nullptr_t> = nullptr>

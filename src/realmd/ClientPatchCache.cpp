@@ -1,10 +1,11 @@
 #include "./ClientPatchCache.h"
 #include "Policies/SingletonImp.h"
 #include "Log.h"
-#include "md5.h"
 #include "Config/Config.h"
 #include "IO/Filesystem/FileSystem.h"
 #include "IO/Filesystem/FileHandle.h"
+
+#include <openssl/md5.h>
 
 INSTANTIATE_SINGLETON_1(ClientPatchCache);
 
@@ -41,11 +42,11 @@ Md5HashDigest ClientPatchCache::GetOrCalculateHash(std::unique_ptr<IO::Filesyste
     auto lastModifyDate = fileHandle->GetLastModifyDate();
     auto fileSize = fileHandle->GetTotalFileSize();
 
-    m_knownPatches_mutex.lock_shared();
+    m_knownPatches_mutex.lock();
     auto const& exisingEntry = m_knownPatches.find(filePath);
     if (exisingEntry == m_knownPatches.end() || exisingEntry->second.lastModifyDate != lastModifyDate || exisingEntry->second.fileSize != fileSize)
     { // file does not exist in cache or was changed
-        m_knownPatches_mutex.unlock_shared();
+        m_knownPatches_mutex.unlock();
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[PatchCache] Detected change of file '%s'. Will recalculate hash.", filePath.c_str());
         // It's important to have a duplicate file handle here, since we want to guarantee easy access
         return CalculateAndCacheHash(fileHandle->DuplicateFileHandle());
@@ -53,7 +54,7 @@ Md5HashDigest ClientPatchCache::GetOrCalculateHash(std::unique_ptr<IO::Filesyste
     else
     { // we can use the existent entry
         Md5HashDigest md5Hash = exisingEntry->second.md5Hash;
-        m_knownPatches_mutex.unlock_shared();
+        m_knownPatches_mutex.unlock();
         return md5Hash;
     }
 }

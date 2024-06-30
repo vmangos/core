@@ -58,8 +58,6 @@ struct sAuthLogonProof_C;
 class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
 {
     public:
-        const static int s_BYTE_SIZE = 32;
-
         explicit AuthSocket(IO::Networking::SocketDescriptor const& clientAddress);
         ~AuthSocket();
 
@@ -140,7 +138,7 @@ class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
         AccountSecurityMap m_accountSecurityOnRealm;
 
         // Auto kick realmd client connection after some time
-        std::shared_ptr<IO::Timer::TimerHandle> m_sessionDurationTimeout;
+        std::shared_ptr<IO::Timer::TimerHandle> m_sessionDurationTimeout = nullptr;
 
         // Patching stuff
         void InitAndHandOverControlToPatchHandler();

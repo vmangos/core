@@ -1,7 +1,7 @@
-#include "./FileHandle.h"
+#include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 
-IO::Filesystem::FileHandle::FileHandle(HANDLE nativeFileHandle) : m_nativeFileHandle(nativeFileHandle)
+IO::Filesystem::FileHandle::FileHandle(IO::Native::FileHandle nativeFileHandle) : m_nativeFileHandle(nativeFileHandle)
 {
 
 }
@@ -10,7 +10,6 @@ IO::Filesystem::FileHandle::~FileHandle()
 {
     sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~FileHandle: No references left");
     ::CloseHandle(m_nativeFileHandle);
-    m_nativeFileHandle = nullptr;
 }
 
 uint64_t IO::Filesystem::FileHandle::GetTotalFileSize() const
@@ -18,7 +17,7 @@ uint64_t IO::Filesystem::FileHandle::GetTotalFileSize() const
     LARGE_INTEGER fileSize;
     bool isOkay = ::GetFileSizeEx(m_nativeFileHandle, &fileSize);
     if (!isOkay)
-        throw std::runtime_error("::GetFileSizeEx(...) Failed, ErrorCode = " + std::to_string(GetLastError()));
+        throw std::runtime_error("GetTotalFileSize -> ::GetFileSizeEx() Failed, ErrorCode = " + std::to_string(GetLastError()));
 
     return fileSize.QuadPart;
 }
@@ -28,7 +27,7 @@ std::chrono::system_clock::time_point IO::Filesystem::FileHandle::GetLastModifyD
     FILETIME nativeWinFileTime;
     bool isOkay = ::GetFileTime(m_nativeFileHandle, nullptr, nullptr, &nativeWinFileTime);
     if (!isOkay)
-        throw std::runtime_error("::GetFileTime(...) Failed, ErrorCode = " + std::to_string(GetLastError()));
+        throw std::runtime_error("GetLastModifyDate -> ::GetFileTime() Failed, ErrorCode = " + std::to_string(GetLastError()));
 
     // Convert FILETIME to ULARGE_INTEGER, so we can use it as uint64_t
     ULARGE_INTEGER ulargeInt;
@@ -38,9 +37,9 @@ std::chrono::system_clock::time_point IO::Filesystem::FileHandle::GetLastModifyD
     // Windows epoch time is January 1, 1601 (UTC) in 100-nanosecond intervals -> Convert to UNIX epoch
     uint64_t constexpr FILETIME_to_1970 = 116444736000000000ULL;
     ulargeInt.QuadPart -= FILETIME_to_1970;
-    uint64_t nanos = ulargeInt.QuadPart * 100;
+    uint64_t unixNanos = ulargeInt.QuadPart * 100;
 
-    std::chrono::system_clock::time_point result(std::chrono::duration_cast<std::chrono::system_clock::time_point::duration>(std::chrono::nanoseconds(nanos)));
+    std::chrono::system_clock::time_point result(std::chrono::duration_cast<std::chrono::system_clock::time_point::duration>(std::chrono::nanoseconds(unixNanos)));
     return result;
 }
 
@@ -51,7 +50,7 @@ std::string IO::Filesystem::FileHandle::GetAbsoluteFilePath() const
     // VOLUME_NAME_DOS means that it stars with a Drive Letter like "\\?\C:\"
     bool isOkay = ::GetFinalPathNameByHandleA(m_nativeFileHandle, filePathRaw, MAX_PATH, VOLUME_NAME_DOS);
     if (!isOkay)
-        throw std::runtime_error("::GetFileTime(...) Failed, ErrorCode = " + std::to_string(GetLastError()));
+        throw std::runtime_error("GetAbsoluteFilePath -> ::GetFileTime() Failed, ErrorCode = " + std::to_string(GetLastError()));
 
     std::string filePathStr(filePathRaw);
 
@@ -81,7 +80,7 @@ uint64_t IO::Filesystem::FileHandleReadonly::ReadSync(uint8_t* dest, uint64_t am
         bool isOkay = ::ReadFile(m_nativeFileHandle, dest, amountToReadThisCycle, &actuallyReadThisCycle, nullptr);
         if (!isOkay)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] ::ReadFile(...) Error: %u", GetLastError());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] ReadSync -> ::ReadFile() Error: %u", GetLastError());
             return 0;
         }
         leftToRead -= actuallyReadThisCycle;
@@ -107,7 +106,7 @@ std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::FileHandleRe
             FALSE,
             DUPLICATE_SAME_ACCESS);
     if (!isOkay)
-        throw std::runtime_error("::DuplicateHandle(...) Failed, ErrorCode = " + std::to_string(GetLastError()));
+        throw std::runtime_error("DuplicateFileHandle -> ::DuplicateHandle() Failed, ErrorCode = " + std::to_string(GetLastError()));
 
     return std::make_unique<FileHandleReadonly>(newNativeFileHandle);
 }

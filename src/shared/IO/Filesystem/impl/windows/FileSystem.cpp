@@ -1,5 +1,5 @@
-#include "./FileSystem.h"
-#include "./FileHandle.h"
+#include "IO/Filesystem/FileSystem.h"
+#include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -40,7 +40,7 @@ std::string IO::Filesystem::ToAbsolutePath(std::string const& partialPath)
 {
     char fullPath[MAX_PATH];
     if (::GetFullPathNameA(partialPath.c_str(), MAX_PATH, fullPath, nullptr) == 0)
-        throw std::runtime_error("::GetFullPathNameA() failed " + std::to_string(GetLastError()));
+        throw std::runtime_error("ToAbsolutePath -> ::GetFullPathNameA() failed " + std::to_string(GetLastError()));
 
     return std::string(fullPath);
 }
@@ -63,7 +63,6 @@ std::vector<std::string> IO::Filesystem::GetAllFilesInFolder(std::string const& 
         {
             if (!(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // Somehow Windows detects .MPQ files as FILE_ATTRIBUTE_ARCHIVE? Thus, we can't use FILE_ATTRIBUTE_NORMAL
             {
-                // convert it to a full-path if necessary
                 std::string filePath = filePathOption == OutputFilePath::FullFilePath
                         ? IO::Filesystem::ToAbsolutePath(folderPath + "\\" + fileData.cFileName)
                         : fileData.cFileName;

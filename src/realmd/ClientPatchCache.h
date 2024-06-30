@@ -42,7 +42,7 @@ class ClientPatchCache : public MaNGOS::Singleton<ClientPatchCache, MaNGOS::Clas
 
     private:
         void LoadPatchesInfo();
-        std::shared_mutex m_knownPatches_mutex; // will be read-lock when normal access, will be write-lock when adding a new entry
+        std::mutex m_knownPatches_mutex;
         std::unordered_map<std::string /*filePath*/, PatchCacheEntry> m_knownPatches;
 };
 

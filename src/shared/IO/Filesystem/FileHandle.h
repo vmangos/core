@@ -1,14 +1,11 @@
 #ifndef MANGOS_IO_FILESYSTEM_FILEHANDLE_H
 #define MANGOS_IO_FILESYSTEM_FILEHANDLE_H
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#undef WIN32_LEAN_AND_MEAN
-
 #include <cstdint>
 #include <chrono>
 #include <string>
 #include <memory>
+#include "IO/NativeAliases.h"
 
 namespace IO { namespace Filesystem {
 
@@ -31,14 +28,14 @@ namespace IO { namespace Filesystem {
         std::string GetAbsoluteFilePath() const;
 
     protected:
-        explicit FileHandle(HANDLE nativeFileHandle);
-        HANDLE m_nativeFileHandle;
+        explicit FileHandle(IO::Native::FileHandle nativeFileHandle);
+        IO::Native::FileHandle m_nativeFileHandle;
     };
 
     class FileHandleReadonly : public FileHandle
     {
     public:
-        explicit FileHandleReadonly(HANDLE nativeFileHandle) : FileHandle(nativeFileHandle) {};
+        explicit FileHandleReadonly(IO::Native::FileHandle nativeFileHandle) : FileHandle(nativeFileHandle) {};
         FileHandleReadonly(FileHandleReadonly const&) = delete;
         FileHandleReadonly& operator=(FileHandleReadonly const&) = delete;
         FileHandleReadonly(FileHandleReadonly&&) = delete;
