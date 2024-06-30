@@ -376,6 +376,7 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
         {
             if (procSpell->SpellIconID == 245)      
                 return SPELL_PROC_TRIGGER_FAILED;
+        }
         // SHAMAN
         // Elemental Mastery
         // Do not consume aura if spell did not benefit from crit chance bonus.
