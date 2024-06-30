@@ -102,6 +102,11 @@ void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds 
                 sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Epoll ERR");
                 client->StopPendingTransactionsAndForceClose();
             }
+            else if (event.events & EPOLLRDHUP)
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "EPOLLRDHUP -> Going to disconnect.");
+                client->StopPendingTransactionsAndForceClose();
+            }
             else
             {
                 if (event.events & EPOLLIN)
@@ -138,7 +143,7 @@ void AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvailable()
     std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
 
     struct epoll_event event;
-    event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLET;
+    event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLRDHUP | EPOLLET;
     event.data.ptr = client.get();
     if (::epoll_ctl(m_epollDescriptor, EPOLL_CTL_ADD, nativePeerSocket, &event) == -1)
     {

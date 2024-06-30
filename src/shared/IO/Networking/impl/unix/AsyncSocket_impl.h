@@ -217,7 +217,6 @@ void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingRead()
         return;
     }
 
-    MANGOS_ASSERT(newWrittenBytes <= m_readDstBufferBytesLeft);
     m_readDstBufferBytesLeft -= newWrittenBytes;
     m_readDstBuffer += newWrittenBytes;
 
@@ -254,7 +253,6 @@ void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingWrite()
         return;
     }
 
-    MANGOS_ASSERT(newSentBytes <= m_writeSrcBufferBytesLeft);
     m_writeSrcBufferBytesLeft -= newSentBytes;
     m_writeSrcBuffer += newSentBytes;
 
