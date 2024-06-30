@@ -18,16 +18,14 @@ namespace IO
         explicit NetworkError(ErrorType errorType, int osErrorCode) : m_error{errorType}, m_additionalOsErrorCode{osErrorCode} {};
 
         ErrorType GetErrorType() const { return m_error; };
-        int _GetOsErrorCode() const { return m_additionalOsErrorCode; };
 
         explicit operator bool() const { return GetErrorType() != ErrorType::NoError; };
         std::string ToString() const;
 
     private:
         ErrorType m_error;
-        /// internal variable for toString(), might be os and situation dependent
+        /// internal variable for toString(), might be os and situation dependent (On windows there is ::GetLastError()/errno and ::WSAGetLastError())
         int m_additionalOsErrorCode;
-
     };
 } // namespace IO
 

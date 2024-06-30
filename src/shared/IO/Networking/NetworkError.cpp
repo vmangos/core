@@ -1,6 +1,6 @@
 #include "./NetworkError.h"
 
-std::string const& ErrorBaseString(IO::NetworkError::ErrorType errorType)
+std::string const& GetErrorBaseString(IO::NetworkError::ErrorType errorType)
 {
     switch (errorType) {
         case IO::NetworkError::ErrorType::NoError:
@@ -28,9 +28,9 @@ std::string const& ErrorBaseString(IO::NetworkError::ErrorType errorType)
 
 std::string IO::NetworkError::ToString() const
 {
-    std::string result = ErrorBaseString(GetErrorType());
-    if (_GetOsErrorCode())
-        result += " (Code: " + std::to_string(_GetOsErrorCode()) + ")";
+    std::string result = GetErrorBaseString(this->GetErrorType());
+    if (m_additionalOsErrorCode)
+        result += " (Code: " + std::to_string(m_additionalOsErrorCode) + ")";
 
     return result;
 }

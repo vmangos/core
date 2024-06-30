@@ -81,7 +81,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
         if (err != WSA_IO_PENDING)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
-            auto tmpCallback = std::move(this->m_readCallback);
+            auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
@@ -141,7 +141,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
 
         auto tmpCallback = std::move(self->m_writeCallback);
         self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
-        m_currentWriteTask.Reset();
+        self->m_currentWriteTask.Reset();
         tmpCallback(errorResult);
     });
 
@@ -153,8 +153,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
         if (err != WSA_IO_PENDING)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
-            auto tmpCallback = std::move(this->m_writeCallback);
-            this->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
+            auto tmpCallback = std::move(m_writeCallback);
+            m_writeSrcBufferDummyHolder_u8Vector = nullptr;
             m_currentWriteTask.Reset();
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
@@ -226,8 +226,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
         if (err != WSA_IO_PENDING)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
-            auto tmpCallback = std::move(this->m_writeCallback);
-            this->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
+            auto tmpCallback = std::move(m_writeCallback);
+            m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
             m_currentWriteTask.Reset();
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
@@ -299,9 +299,9 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
         if (err != WSA_IO_PENDING)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
-            auto tmpCallback = std::move(this->m_writeCallback);
+            auto tmpCallback = std::move(m_writeCallback);
+            m_writeSrcBufferDummyHolder_rawArray = nullptr;
             m_currentWriteTask.Reset();
-            this->m_writeSrcBufferDummyHolder_rawArray = nullptr;
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
         }
