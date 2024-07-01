@@ -334,10 +334,16 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                     // Public channels restrictions
                     if (!chn->HasFlag(Channel::CHANNEL_FLAG_CUSTOM))
                     {
+                        if (HasTrialRestrictions())
+                        {
+                            SendNotification(LANG_CANT_USE_PUBLIC_CHANNELS);
+                            return;
+                        }
+
                         // GMs should not be able to use public channels
                         if (GetSecurity() > SEC_PLAYER && !sWorld.getConfig(CONFIG_BOOL_GMS_ALLOW_PUBLIC_CHANNELS))
                         {
-                            ChatHandler(this).SendSysMessage("GMs can't use public channels.");
+                            SendNotification(LANG_CANT_USE_PUBLIC_CHANNELS);
                             return;
                         }
 
@@ -502,8 +508,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             {
                 bool allowIgnoreAntispam = toPlayer->IsAllowedWhisperFrom(masterPlr->GetObjectGuid());
                 bool allowSendWhisper = allowIgnoreAntispam;
-                if (!sWorld.getConfig(CONFIG_BOOL_WHISPER_RESTRICTION) || !toPlayer->IsEnabledWhisperRestriction())
-                    allowSendWhisper = true;
+
+                if (!allowSendWhisper)
+                {
+                    if (pSecurity == SEC_PLAYER && HasTrialRestrictions())
+                        SendNotification(LANG_CAN_ONLY_WHISPER_FRIENDS);
+                    else if (!sWorld.getConfig(CONFIG_BOOL_WHISPER_RESTRICTION) || !toPlayer->IsEnabledWhisperRestriction())
+                        allowSendWhisper = true;
+                }
 
                 if (masterPlr->IsGameMaster() || allowSendWhisper)
                     masterPlr->Whisper(msg, lang, player);

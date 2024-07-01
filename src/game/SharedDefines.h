@@ -1111,6 +1111,9 @@ enum SkillCategory
     SKILL_CATEGORY_GENERIC       = 12
 };
 
+#define MAX_TRIAL_MAIN_PROFESSION_SKILL 100
+#define MAX_TRIAL_SECONDARY_PROFESSION_SKILL 150
+
 // These errors are only printed in client console.
 enum TrainingFailureReason
 {

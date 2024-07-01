@@ -320,7 +320,8 @@ void World::AddSession_(WorldSession* s)
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4);
     packet << uint8(AUTH_OK);
     packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(0);                                     // BillingPlanFlags
+                                                            // BillingPlanFlags
+    packet << uint8(s->HasTrialRestrictions() ? (BILLING_FLAG_TRIAL | BILLING_FLAG_RESTRICTED) : BILLING_FLAG_NONE); 
     packet << uint32(0);                                    // BillingTimeRested
     s->SendPacket(&packet);
 
@@ -366,7 +367,8 @@ void World::AddQueuedSession(WorldSession* sess)
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 4);
     packet << uint8(AUTH_WAIT_QUEUE);
     packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(0);                                     // BillingPlanFlags
+                                                            // BillingPlanFlags
+    packet << uint8(sess->HasTrialRestrictions() ? (BILLING_FLAG_TRIAL | BILLING_FLAG_RESTRICTED) : BILLING_FLAG_NONE); 
     packet << uint32(0);                                    // BillingTimeRested
     packet << uint32(GetQueuedSessionPos(sess));            // position in queue
     sess->SendPacket(&packet);
@@ -617,6 +619,7 @@ void World::LoadConfigSettings(bool reload)
     setConfigMinMax(CONFIG_UINT32_CHARACTERS_PER_REALM, "CharactersPerRealm", 10, 1, 10);
     setConfigMin(CONFIG_UINT32_CHARACTERS_PER_ACCOUNT, "CharactersPerAccount", 50, getConfig(CONFIG_UINT32_CHARACTERS_PER_REALM));
     setConfig(CONFIG_BOOL_LIMIT_PLAY_TIME, "LimitPlayTime", false);
+    setConfig(CONFIG_BOOL_RESTRICT_UNVERIFIED_ACCOUNTS, "RestrictUnverifiedAccounts", false);
 
     setConfig(CONFIG_BOOL_SKIP_CINEMATICS, "SkipCinematics", false);
     setConfig(CONFIG_BOOL_OBJECT_HEALTH_VALUE_SHOW, "ShowHealthValues", false);

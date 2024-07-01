@@ -834,6 +834,19 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 0 (Disabled)
 #                 1 (Enabled)
 #
+#    RestrictUnverifiedAccounts
+#        Treat accounts with an unverified email as trial accounts, which are not allowed to do the following:
+#        - Join a guild
+#        - Whisper someone who has not added you to their friends list
+#        - Trade
+#        - Talk in General, Trade or LocalDefense channels
+#        - Level above level 20
+#        - Receive mail other than from Game Masters
+#        - Have more then 10 gold
+#        - May not level higher than 100 in your two main professions, or 150 in secondary professions
+#        Default: 0 (Disabled)
+#                 1 (Enabled)
+#
 #    SkipCinematics
 #        Disable in-game intro cinematic on first login of character (allows to prevent buggy intro when using custom start location)
 #        Default: 0 - show intro for each new character
@@ -1092,6 +1105,7 @@ CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
 LimitPlayTime = 0
+RestrictUnverifiedAccounts = 0
 SkipCinematics = 0
 ShowHealthValues = 0
 MaxPlayerLevel = 60
