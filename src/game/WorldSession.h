@@ -88,6 +88,19 @@ enum TutorialDataState
     TUTORIALDATA_NEW       = 2
 };
 
+enum BillingPlanFlags
+{
+    BILLING_FLAG_NONE         = 0x00,
+    BILLING_FLAG_UNUSED       = 0x01,
+    BILLING_FLAG_RECURRING    = 0x02,
+    BILLING_FLAG_TRIAL        = 0x04,
+    BILLING_FLAG_IGR          = 0x08,
+    BILLING_FLAG_USAGE        = 0x10,
+    BILLING_FLAG_TIME_MIXTURE = 0x20,
+    BILLING_FLAG_RESTRICTED   = 0x40,
+    BILLING_FLAG_ENABLE_CAIS  = 0x80
+};
+
 enum PlayTimeLimit : uint32
 {
     PLAY_TIME_LIMIT_APPROACHING_PARTIAL = 2 * HOUR + 30 * MINUTE,
@@ -285,6 +298,9 @@ class WorldSession
         uint32 GetAccountMaxLevel() const { return m_characterMaxLevel; }
         void SetAccountFlags(uint32 f) { m_accountFlags = f; }
         uint32 GetAccountFlags() const { return m_accountFlags; }
+        void SetVerifiedEmail(bool verified) { m_verifiedEmail = verified; }
+        bool HasVerifiedEmail() const { return m_verifiedEmail; }
+        bool HasTrialRestrictions() const;
         Player* GetPlayer() const { return _player; }
         char const* GetPlayerName() const;
         void SetSecurity(AccountTypes security) { m_security = security; }
@@ -374,7 +390,8 @@ class WorldSession
         Unit* GetMoverFromGuid(ObjectGuid const& guid) const;
         ObjectGuid const& GetClientMoverGuid() const { return m_clientMoverGuid; }
         bool HasClientMovementControl() const { return !m_clientMoverGuid.IsEmpty(); }
-        
+        void RejectMovementPacketsFor(uint32 ms);
+
         void SetReceivedWhoRequest(bool v) { m_who_recvd = v; }
         bool ReceivedWhoRequest() const { return m_who_recvd; }
         bool m_who_recvd;
@@ -881,9 +898,10 @@ class WorldSession
         uint32 m_accountFlags;
         LocaleConstant m_sessionDbcLocale;
         int m_sessionDbLocaleIndex;
-        ClientOSType    m_clientOS;
+        ClientOSType m_clientOS;
         ClientPlatformType m_clientPlatform;
-        uint32          m_gameBuild;
+        uint32 m_gameBuild;
+        bool m_verifiedEmail;
         std::shared_ptr<PlayerBotEntry> m_bot;
         std::unique_ptr<SniffFile> m_sniffFile;
 

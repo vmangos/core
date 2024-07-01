@@ -136,22 +136,27 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
     
     recv_data >> mailboxGuid;
     if (!CheckMailBox(mailboxGuid))
+    {
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
         return;
+    }
+
+    if (HasTrialRestrictions())
+    {
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_DISABLED_FOR_TRIAL_ACC);
+        return;
+    }
 
     WorldSession::AsyncMailSendRequest* req = new WorldSession::AsyncMailSendRequest();
     req->accountId = GetAccountId();
     req->senderGuid = GetMasterPlayer()->GetObjectGuid();
+
     recv_data >> req->receiverName;
-
     recv_data >> req->subject;
-
     recv_data >> req->body;
-
     recv_data >> unk1;                                      // stationery?
     recv_data >> unk2;                                      // 0x00000000
-
     recv_data >> req->itemGuid;
-
     recv_data >> req->money >> req->COD;                    // money and cod
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
@@ -230,6 +235,14 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
 
     if (req->receiverPtr)
     {
+        // check trial account restrictions for online receiver
+        if (GetSecurity() <= SEC_PLAYER && req->receiverPtr->GetSession()->HasTrialRestrictions())
+        {
+            SendMailResult(0, MAIL_SEND, MAIL_ERR_DISABLED_FOR_TRIAL_ACC);
+            delete req;
+            return;
+        }
+
         MasterPlayer* receiverMasterPlayer = req->receiverPtr->GetSession()->GetMasterPlayer();
         ASSERT(receiverMasterPlayer);
         req->rcTeam = receiverMasterPlayer->GetTeam();
@@ -280,7 +293,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         return;
     }
 
-    uint32 rc_account = sObjectMgr.GetPlayerAccountIdByGUID(req->receiver);
+    uint32 receiverAccount = sObjectMgr.GetPlayerAccountIdByGUID(req->receiver);
 
     Item* item = nullptr;
 
@@ -315,6 +328,13 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         }
     }
 
+    // check trial account restrictions for offline receiver
+    if (!req->receiverPtr && GetSecurity() <= SEC_PLAYER && sAccountMgr.HasTrialRestrictions(receiverAccount))
+    {
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_DISABLED_FOR_TRIAL_ACC);
+        return;
+    }
+
     // Antispam checks
     if (loadedPlayer->GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAILSPAM_LEVEL) &&
         req->money < sWorld.getConfig(CONFIG_UINT32_MAILSPAM_MONEY) &&
@@ -325,7 +345,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
     }
 
     AccountPersistentData& data = sAccountMgr.GetAccountPersistentData(GetAccountId());
-    if (!data.CanMail(rc_account))
+    if (!data.CanMail(receiverAccount))
     {
         std::stringstream details;
         std::string from = ChatHandler(this).playerLink(GetMasterPlayer()->GetName());
@@ -343,7 +363,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         SendMailResult(0, MAIL_SEND, MAIL_OK);
         return;
     }
-    data.JustMailed(rc_account);
+    data.JustMailed(receiverAccount);
 
     SendMailResult(0, MAIL_SEND, MAIL_OK);
 
@@ -376,7 +396,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
                 sLog.Player(GetAccountId(), LOG_GM, LOG_LVL_BASIC,
                     "GM %s (Account: %u) mail item: %s (Entry: %u Count: %u) to player: %s (Account: %u)",
                     GetPlayerName(), GetAccountId(), item->GetProto()->Name1, item->GetEntry(), item->GetCount(),
-                    req->receiver.GetString().c_str(), rc_account);
+                    req->receiver.GetString().c_str(), receiverAccount);
             }
 
             loadedPlayer->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
@@ -394,7 +414,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         {
             sLog.Player(GetAccountId(), LOG_GM, LOG_LVL_BASIC,
                 "GM %s (Account: %u) mail money: %u to player: %s (Account: %u)",
-                GetPlayerName(), GetAccountId(), req->money, req->receiver.GetString().c_str(), rc_account);
+                GetPlayerName(), GetAccountId(), req->money, req->receiver.GetString().c_str(), receiverAccount);
         }
     }
 

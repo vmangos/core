@@ -1045,8 +1045,10 @@ bool MovementAnticheat::CheckMoveStart(MovementInfo const& movementInfo, uint16 
     }
     else
     {
+        
         if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) &&
-           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_SWIMMING))
+           !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_SWIMMING) &&
+           !me->HasCheatOption(PLAYER_CHEAT_FLY))
             return true;
     }
 

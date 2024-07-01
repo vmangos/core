@@ -190,6 +190,9 @@ enum MangosStrings
     LANG_XP_RATE_SET                    = 179,
     LANG_ALLIANCE_BATTLEBOT_ADDED       = 180,
     LANG_HORDE_BATTLEBOT_ADDED          = 181,
+    LANG_CAN_ONLY_WHISPER_FRIENDS       = 182,
+    LANG_CANT_USE_PUBLIC_CHANNELS       = 183,
+    LANG_RESTRICTED_ACCOUNT             = 184,
     // Room for more level 1              182-199 not used
 
     // level 2 chat

@@ -738,8 +738,9 @@ enum ReputationSource
 };
 
 // Player summoning auto-decline time (in secs)
-#define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
-#define MAX_MONEY_AMOUNT                       (0x7FFFFFFF-1)
+#define MAX_PLAYER_SUMMON_DELAY (2*MINUTE)
+#define MAX_MONEY_AMOUNT (0x7FFFFFFF-1)
+#define MAX_TRIAL_MONEY_AMOUNT 100000
 
 struct InstancePlayerBind
 {
@@ -1221,12 +1222,13 @@ class Player final: public Unit
 
         uint32 GetMoney() const { return GetUInt32Value(PLAYER_FIELD_COINAGE); }
         void LogModifyMoney(int32 d, char const* type, ObjectGuid fromGuid = ObjectGuid(), uint32 data = 0);
+        uint32 GetMaxMoney() const;
         void ModifyMoney(int32 d)
         {
             if (d < 0)
                 SetMoney(GetMoney() > uint32(-d) ? GetMoney() + d : 0);
             else
-                SetMoney(GetMoney() < uint32(MAX_MONEY_AMOUNT - d) ? GetMoney() + d : MAX_MONEY_AMOUNT);
+                SetMoney((uint32)std::min<uint64>(uint64(GetMoney()) + uint64(d), GetMaxMoney()));
         }
         void LootMoney(int32 g, Loot* loot);
         std::string GetShortDescription() const; // "player:guid [username:accountId@IP]"
