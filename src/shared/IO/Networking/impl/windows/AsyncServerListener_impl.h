@@ -7,16 +7,17 @@
 #include <chrono>
 #include <WinSock2.h>
 #include "./IocpOperationTask.h"
+#include "IO/Networking/IpAddress.h"
 
 template<typename TClientSocket>
-AsyncServerListener<TClientSocket>::~AsyncServerListener()
+IO::Networking::AsyncServerListener<TClientSocket>::~AsyncServerListener()
 {
     ::closesocket(m_acceptorNativeSocket);
     ::CloseHandle(m_completionPort);
 }
 
 template<typename TClientSocket>
-std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientSocket>::CreateAndBindServer(const std::string &bindIp, uint16_t port)
+std::unique_ptr<IO::Networking::AsyncServerListener<TClientSocket>> IO::Networking::AsyncServerListener<TClientSocket>::CreateAndBindServer(const std::string &bindIp, uint16_t port)
 {
     int errorCode;
 
@@ -77,7 +78,7 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
 }
 
 template<typename TClientSocket>
-void AsyncServerListener<TClientSocket>::StartAcceptOperation()
+void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
 {
     SOCKET nativePeerSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); // <-- will be filled when callback is called
     if (nativePeerSocket == INVALID_SOCKET)
@@ -132,11 +133,11 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
                                   0,
                                   sizeof(addrBuffer->localAddress) + sizeof(addrBuffer->__pad1), sizeof(addrBuffer->peerAddress) + sizeof(addrBuffer->__pad2),
                                   &bytesWritten, &m_currentAcceptTask
-    );
+                        );
     if (!booleanOkay)
     {
         int lastError = WSAGetLastError();
-        if (lastError != WSA_IO_PENDING)
+        if (lastError != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             m_currentAcceptTask.Reset();
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::AcceptEx(...) Error: %u", lastError);
@@ -146,7 +147,7 @@ void AsyncServerListener<TClientSocket>::StartAcceptOperation()
 }
 
 template<typename TClientSocket>
-void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds maxBlockingDuration)
+void IO::Networking::AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds maxBlockingDuration)
 {
     ULONG_PTR completionKey = 0;
     IocpOperationTask* task = nullptr;

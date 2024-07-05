@@ -55,7 +55,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
             if (errorCode)
             {
                 int err = WSAGetLastError();
-                if (err != WSA_IO_PENDING)
+                if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
                 {
                     sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
                     auto tmpCallback = std::move(self->m_readCallback);
@@ -78,7 +78,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     if (errorCode)
     {
         int err = WSAGetLastError();
-        if (err != WSA_IO_PENDING)
+        if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
             auto tmpCallback = std::move(m_readCallback);
@@ -89,7 +89,8 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     }
 }
 
-/// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
@@ -104,6 +105,12 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+    if (source->size() == 0)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
     }
     m_writeCallback = callback;
@@ -150,7 +157,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
     if (errorCode)
     {
         int err = WSAGetLastError();
-        if (err != WSA_IO_PENDING)
+        if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
             auto tmpCallback = std::move(m_writeCallback);
@@ -162,7 +169,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
     }
 }
 
-/// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
@@ -177,6 +185,12 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+    if (source->size() == 0)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
     }
     m_writeCallback = callback;
@@ -223,7 +237,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
     if (errorCode)
     {
         int err = WSAGetLastError();
-        if (err != WSA_IO_PENDING)
+        if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
             auto tmpCallback = std::move(m_writeCallback);
@@ -235,7 +249,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
     }
 }
 
-/// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
 {
@@ -250,6 +265,12 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+    if (size == 0)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
     }
     m_writeCallback = callback;
@@ -296,7 +317,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
     if (errorCode)
     {
         int err = WSAGetLastError();
-        if (err != WSA_IO_PENDING)
+        if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
             auto tmpCallback = std::move(m_writeCallback);

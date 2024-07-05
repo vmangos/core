@@ -41,7 +41,8 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     m_readCallback = callback;
 }
 
-/// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
@@ -87,7 +88,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
     m_writeCallback = callback;
 }
 
-/// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
@@ -133,7 +135,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
     m_writeCallback = callback;
 }
 
-/// Warning using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
+/// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
 {

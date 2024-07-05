@@ -23,7 +23,6 @@
     \ingroup mangosd
 */
 
-#include "WorldSocketMgr.h"
 #include "Common.h"
 #include "World.h"
 #include "WorldRunnable.h"
@@ -118,7 +117,7 @@ void WorldRunnable::operator()()
     sBattleGroundMgr.DeleteAllBattleGrounds();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stopping network threads...");
-    sWorldSocketMgr->StopNetwork();
+    //sWorldSocketMgr->StopNetwork();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Unloading all maps...");
     sMapMgr.UnloadAll();                                    // unload all grids (including locked in memory)

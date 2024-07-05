@@ -210,10 +210,10 @@ void World::Shutdown()
     sAnticheatMgr->StopWardenUpdateThread();
 }
 
-// Find a session by its id
-WorldSession* World::FindSession(uint32 id) const
+/// Find a session by its accountId. Might return nullptr if not found.
+WorldSession* World::FindSession(uint32 accountId) const
 {
-    SessionMap::const_iterator itr = m_sessions.find(id);
+    SessionMap::const_iterator itr = m_sessions.find(accountId);
 
     if (itr != m_sessions.end())
         return itr->second;                                 // also can return nullptr for kicked session
@@ -221,11 +221,11 @@ WorldSession* World::FindSession(uint32 id) const
     return nullptr;
 }
 
-// Remove a given session
-bool World::RemoveSession(uint32 id)
+/// Remove a given session by its accountId
+bool World::RemoveSession(uint32 accountId)
 {
     // Find the session, kick the user, but we can't delete session at this moment to prevent iterator invalidation
-    SessionMap::const_iterator itr = m_sessions.find(id);
+    SessionMap::const_iterator itr = m_sessions.find(accountId);
 
     if (itr != m_sessions.end() && itr->second)
     {

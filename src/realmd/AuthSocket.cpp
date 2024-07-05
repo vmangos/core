@@ -217,10 +217,9 @@ void AuthSocket::Start()
             this->CloseSocket();
         });
     }
-    ProcessIncomingData();
+    DoRecvIncomingData();
 }
 
-// Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
 {
     if (m_sessionDurationTimeout)
@@ -236,17 +235,17 @@ AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
 }
 
 // Read the packet from the client
-void AuthSocket::ProcessIncomingData()
+void AuthSocket::DoRecvIncomingData()
 {
     std::shared_ptr<eAuthCmd> cmd = std::make_shared<eAuthCmd>();
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ProcessIncomingData() Reading... Ready for next opcode");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DoRecvIncomingData() Reading... Ready for next opcode");
     Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd](IO::NetworkError const& error) -> void
     {
         if (error)
         {
             if (error.GetErrorType() != IO::NetworkError::ErrorType::SocketClosed)
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] ProcessIncomingData Read(cmd) error: %s", error.ToString().c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] DoRecvIncomingData Read(cmd) error: %s", error.ToString().c_str());
             return;
         }
 
@@ -282,7 +281,7 @@ void AuthSocket::ProcessIncomingData()
 
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Got data for cmd %u", *cmd);
 
-            // this handler will async call Read and Write, and hopefully will call ProcessIncomingData or CloseSocket when done.
+            // this handler will async call Read and Write, and hopefully will call DoRecvIncomingData or CloseSocket when done.
             ((*self).*table[i].asyncHandler)();
 
             break;
@@ -465,7 +464,7 @@ void AuthSocket::_HandleLogonChallenge()
                             if (error)
                                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write(): ERROR");
                             else
-                                self->ProcessIncomingData();
+                                self->DoRecvIncomingData();
                         });
                         return; // TODO refactor?
                     }
@@ -601,7 +600,7 @@ void AuthSocket::_HandleLogonChallenge()
                 if (error)
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write(): ERROR");
                 else
-                    self->ProcessIncomingData();
+                    self->DoRecvIncomingData();
             });
         });
     });
@@ -685,7 +684,7 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
                 self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
                 return;
             }
-            self->ProcessIncomingData();
+            self->DoRecvIncomingData();
         });
     }
     else
@@ -712,7 +711,7 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
 
         Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
         {
-            self->ProcessIncomingData();
+            self->DoRecvIncomingData();
         });
     }
 }
@@ -790,7 +789,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
             Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
             {
-                self->ProcessIncomingData();
+                self->DoRecvIncomingData();
             });
             return;
         }
@@ -819,7 +818,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
                 *pkt << (uint8) WOW_FAIL_DB_BUSY;
                 Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
                 {
-                    self->ProcessIncomingData();
+                    self->DoRecvIncomingData();
                 });
                 return;
             }
@@ -853,7 +852,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             *pkt << (uint8) WOW_FAIL_PARENTCONTROL;
             Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
             {
-                self->ProcessIncomingData();
+                self->DoRecvIncomingData();
             });
             return;
         }
@@ -883,7 +882,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
 
         Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
         {
-            self->ProcessIncomingData();
+            self->DoRecvIncomingData();
         });
     }
     else
@@ -939,7 +938,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         }
         Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
         {
-            self->ProcessIncomingData();
+            self->DoRecvIncomingData();
         });
     }
 }
@@ -1048,7 +1047,7 @@ void AuthSocket::_HandleReconnectChallenge()
             pkt->append(VersionChallenge.data(), VersionChallenge.size());
             self->Write(pkt, [self](IO::NetworkError const& error)
             {
-                self->ProcessIncomingData();
+                self->DoRecvIncomingData();
             });
         });
     });
@@ -1100,7 +1099,7 @@ void AuthSocket::_HandleReconnectProof()
             *pkt << uint8(WOW_SUCCESS);
             self->Write(pkt, [self](IO::NetworkError const& error)
             {
-                self->ProcessIncomingData();
+                self->DoRecvIncomingData();
             });
 
             self->m_status = STATUS_AUTHED;
@@ -1158,7 +1157,7 @@ void AuthSocket::_HandleRealmList()
 
         self->Write(pkt, [self](IO::NetworkError const& error)
         {
-            self->ProcessIncomingData();
+            self->DoRecvIncomingData();
         });
     });
 }

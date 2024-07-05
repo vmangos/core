@@ -7,13 +7,15 @@
 #include <thread>
 #include <vector>
 #include <cstddef>
+#include <set>
 #include <memory>
+#include "Platform/Define.h"
 
 class PlayerBroadcaster;
 
 class MovementBroadcaster final
 {
-    typedef std::set<std::shared_ptr<PlayerBroadcaster> > PlayersBCastSet;
+    typedef std::set<std::shared_ptr<PlayerBroadcaster>> PlayersBCastSet;
 
     std::size_t m_num_threads;
 

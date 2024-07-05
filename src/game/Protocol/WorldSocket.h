@@ -19,42 +19,85 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/** \addtogroup u2w User to World Communication
- * @{
- * \file WorldSocket.h
- * \author Derex <derex101@gmail.com>
- */
-
-#ifndef _WORLDSOCKET_H
-#define _WORLDSOCKET_H
-
-#include "MangosSocket.h"
+#include "IO/Networking/AsyncSocket.h"
 #include "Auth/AuthCrypt.h"
+#include "Auth/BigNumber.h"
+#include "WorldPacket.h"
 
-template <typename T>
-class ReactorRunnable;
-template <typename T>
-class MangosSocketMgr;
+#ifndef MANGOS_GAME_SERVER_WORLDSOCKET_H
+#define MANGOS_GAME_SERVER_WORLDSOCKET_H
 
-class WorldSocket: public MangosSocket<WorldSession, WorldSocket, AuthCrypt>
+class WorldSocket : public IO::Networking::AsyncSocket<WorldSocket>
 {
-    friend class MangosSocket<WorldSession, WorldSocket, AuthCrypt>;
-    friend class MangosSocketMgr<WorldSocket>;
-    friend class WorldSocketMgr;
-    friend class ReactorRunnable< WorldSocket >;
-    protected:
-        int OnSocketOpen();
-        int SendStartupPacket();
+private:
+    enum class HandlerResult
+    {
+        Okay,
+        Fail,
+    };
 
-        int ProcessIncoming (WorldPacket* new_pct);
+#if defined( __GNUC__ )
+#pragma pack(1)
+#else
+#pragma pack(push,1)
+#endif
+    struct ClientPktHeader
+    {
+        uint16 size;
+        uint32 cmd;
+    };
+#if defined( __GNUC__ )
+#pragma pack()
+#else
+#pragma pack(pop)
+#endif
 
-        // Called by ProcessIncoming() on CMSG_AUTH_SESSION.
-        int HandleAuthSession (WorldPacket& recvPacket);
+    /// Time in which the last ping was received
+    std::chrono::system_clock::time_point m_lastPingTime;
 
-        // Called by ProcessIncoming() on CMSG_PING.
-        int HandlePing (WorldPacket& recvPacket);
+    /// Keep track of over-speed pings, to prevent ping flood.
+    uint32 m_overSpeedPings;
+
+    /// Class used for managing encryption of the headers
+    AuthCrypt m_Crypt; // TODO: Rename me to m_crypt
+
+    /// Session to which received packets are routed
+    WorldSession* m_Session; // TODO: Rename me to m_session
+
+    /// Random seed used in SMSG_AUTH_CHALLENGE and CMSG_AUTH_SESSION
+    uint32 const m_authSeed;
+
+    /// Session key used to authenticate the client (value from db `account` table)
+    //BigNumber m_authSessionKey;
+
+    /// process one incoming packet.
+    void DoRecvIncomingData();
+
+    HandlerResult _HandleCompleteReceivedPacket(std::unique_ptr<WorldPacket> packet);
+
+    /// Called by ProcessIncoming() on CMSG_AUTH_SESSION.
+    HandlerResult _HandleAuthSession(WorldPacket& recvPacket);
+
+    /// Called by ProcessIncoming() on CMSG_PING.
+    HandlerResult _HandlePing(WorldPacket& recvPacket);
+
+    std::mutex m_worldSocketMutex{};
+
+    std::deque<uint32> m_opcodeHistoryOut{};
+    std::deque<uint32> m_opcodeHistoryInc{};
+
+public:
+    explicit WorldSocket(IO::Networking::SocketDescriptor const& socketDescriptor);
+    ~WorldSocket();
+
+    void Start() final;
+
+    void SendPacket(WorldPacket const& packet);
+
+    void FinalizeSession() { m_Session = nullptr; }
+
+    //static std::vector<uint32> m_packetCooldowns;
+    //std::map<uint32, TimePoint> m_lastPacket;
 };
 
-#endif  /* _WORLDSOCKET_H */
-
-// @}
+#endif // MANGOS_GAME_SERVER_WORLDSOCKET_H

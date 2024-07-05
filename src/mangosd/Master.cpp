@@ -23,11 +23,12 @@
     \ingroup mangosd
 */
 
+#include <memory>
+#include "IO/Networking/AsyncServerListener.h"
 #ifndef WIN32
     #include "PosixDaemon.h"
 #endif
 
-#include "WorldSocketMgr.h"
 #include "Common.h"
 #include "Master.h"
 #include "WorldSocket.h"
@@ -55,6 +56,7 @@
 
 #ifdef WIN32
 #include "ServiceWin32.h"
+
 extern volatile int m_ServiceStatus;
 #endif
 
@@ -284,26 +286,26 @@ int Master::Run()
         //freeze_thread->setPriority(ACE_Based::Highest);
     }
 
-    // Wait for clients ?
     // Launch the world listener socket
-    uint16 wsport = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
-    std::string bind_ip = sConfig.GetStringDefault("BindIP", "0.0.0.0");
+    uint16 bindPort = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
+    std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
 
-    // Start WorldSockets
-    sWorldSocketMgr->SetOutKBuff(sConfig.GetIntDefault("Network.OutKBuff", -1));
-    sWorldSocketMgr->SetOutUBuff(sConfig.GetIntDefault("Network.OutUBuff", 65536));
-    sWorldSocketMgr->SetThreads(sConfig.GetIntDefault("Network.Threads", 1) + 1);
-    sWorldSocketMgr->SetInterval(sConfig.GetIntDefault("Network.Interval", 10));
-    sWorldSocketMgr->SetTcpNodelay(sConfig.GetBoolDefault("Network.TcpNodelay", true));
-
-    if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
+    // Launch the listening network socket
+    std::unique_ptr<IO::Networking::AsyncServerListener<WorldSocket>> listener = IO::Networking::AsyncServerListener<WorldSocket>::CreateAndBindServer(bindIp, bindPort);
+    if (listener == nullptr)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to start WorldSocket network");
         Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
         // go down and shutdown the server
     }
-    sWorldSocketMgr->Wait();
+    else
+    {
+        while (!World::IsStopped())
+        {
+            listener->RunEventLoop(std::chrono::seconds(10));
+        }
+    }
 
     // Stop freeze protection before shutdown tasks
     if (freeze_thread)

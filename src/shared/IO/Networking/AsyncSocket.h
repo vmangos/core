@@ -38,11 +38,16 @@ namespace IO { namespace Networking {
             void Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback);
             void ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback);
 
+
+            /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
             void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
+            /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
             void Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
+            /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
             void Write(std::shared_ptr<uint8 const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback);
 
             void CloseSocket();
+            bool IsClosing() const;
 
             IO::Networking::IpEndpoint const& GetRemoteEndpoint() const;
             std::string GetRemoteIpString() const;
@@ -78,45 +83,50 @@ namespace IO { namespace Networking {
             std::size_t m_writeSrcBufferBytesLeft = 0;
 #endif
     };
-
-    template<typename SocketType>
-    AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
-    {
-        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
-        if (!m_disconnectRequest)
-            CloseSocket();
-
-        MANGOS_ASSERT(!HasPendingTransfers());
-    }
-
-    template<typename SocketType>
-    IO::Networking::IpEndpoint const& AsyncSocket<SocketType>::GetRemoteEndpoint() const
-    {
-        return m_socket.m_peerEndpoint;
-    }
-
-    template<typename SocketType>
-    std::string AsyncSocket<SocketType>::GetRemoteIpString() const
-    {
-        return GetRemoteEndpoint().ip.toString();
-    }
-
-    template<typename SocketType>
-    void AsyncSocket<SocketType>::ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback)
-    {
-        std::shared_ptr<std::vector<uint8_t>> skipBuffer(new std::vector<uint8_t>());
-        skipBuffer->resize(skipSize);
-        Read((char*)skipBuffer->data(), skipSize, [skipBuffer, callback](IO::NetworkError const& error)
-        {
-            // KEEP skipBuffer in scope!
-            // Do not remove skipBuffer before Read() is done, since we are transferring into it via async IO
-            // and since we are using a raw pointer, the Task has no knowledge about the lifetime of the std::vector
-            skipBuffer->clear();
-            callback(error);
-        });
-    }
 }} // namespace IO::Networking
 
+template<typename SocketType>
+IO::Networking::AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
+{
+    sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
+    if (!m_disconnectRequest)
+        CloseSocket();
+
+    MANGOS_ASSERT(!HasPendingTransfers());
+}
+
+template<typename SocketType>
+bool IO::Networking::AsyncSocket<SocketType>::IsClosing() const
+{
+    return m_disconnectRequest;
+}
+
+template<typename SocketType>
+IO::Networking::IpEndpoint const& IO::Networking::AsyncSocket<SocketType>::GetRemoteEndpoint() const
+{
+    return m_socket.m_peerEndpoint;
+}
+
+template<typename SocketType>
+std::string IO::Networking::AsyncSocket<SocketType>::GetRemoteIpString() const
+{
+    return GetRemoteEndpoint().ip.toString();
+}
+
+template<typename SocketType>
+void IO::Networking::AsyncSocket<SocketType>::ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback)
+{
+    std::shared_ptr<std::vector<uint8_t>> skipBuffer(new std::vector<uint8_t>());
+    skipBuffer->resize(skipSize);
+    Read((char*)skipBuffer->data(), skipSize, [skipBuffer, callback](IO::NetworkError const& error)
+    {
+        // KEEP skipBuffer in scope!
+        // Do not remove skipBuffer before Read() is done, since we are transferring into it via async IO
+        // and since we are using a raw pointer, the Task has no knowledge about the lifetime of the std::vector
+        skipBuffer->clear();
+        callback(error);
+    });
+}
 
 #if defined(WIN32)
 #include "./impl/windows/AsyncSocket_impl.h"

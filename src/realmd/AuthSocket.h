@@ -63,7 +63,7 @@ class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
 
         void Start() final;
 
-        void ProcessIncomingData();
+        void DoRecvIncomingData();
         std::shared_ptr<ByteBuffer> GenerateLogonProofResponse(Sha1Hash sha);
         void LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt);
         bool VerifyPinData(uint32 pin, PINData const& clientData);

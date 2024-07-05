@@ -81,13 +81,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_
     m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_clientPlatform(CLIENT_PLATFORM_UNKNOWN), m_gameBuild(0), m_verifiedEmail(true),
     m_charactersCount(10), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr)
 {
-    if (sock)
-    {
-        m_address = sock->GetRemoteAddress();
-        sock->AddReference();
-    }
-    else
-        m_address = "<BOT>";
+    m_remoteIpAddress = sock ? sock->GetRemoteIpString() : "<BOT>";
 }
 
 // WorldSession destructor
@@ -98,12 +92,7 @@ WorldSession::~WorldSession()
         LogoutPlayer(!m_bot || sPlayerBotMgr.IsSavingAllowed());
 
     // If have unclosed socket, close it
-    if (m_socket)
-    {
-        m_socket->CloseSocket();
-        m_socket->RemoveReference();
-        m_socket = nullptr;
-    }
+    m_socket = nullptr; // <-- technically this is unnecessary, since we are in the destructor that will destruct all other members soon anyway
 
     // empty incoming packet queue
     for (auto& i : m_recvQueue)
@@ -178,14 +167,13 @@ void WorldSession::SendPacketImpl(WorldPacket const* packet)
         sendLastPacketBytes = packet->wpos();               // wpos is real written size
     }
 
-#endif                                                  // !_DEBUG
+#endif // _DEBUG
 
     // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s]Send packet : %u|0x%x (%s)", GetPlayerName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
     if (m_sniffFile)
         m_sniffFile->WritePacket(*packet, false, time(nullptr));
 
-    if (m_socket->SendPacket(*packet) == -1)
-        m_socket->CloseSocket();
+    m_socket->SendPacket(*packet);
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
@@ -435,9 +423,8 @@ bool WorldSession::Update(PacketFilter& updater)
         }
 
         // Cleanup socket pointer if need
-        if (m_socket && m_socket->IsClosed())
+        if (m_socket && m_socket->IsClosing())
         {
-            m_socket->RemoveReference();
             m_socket = nullptr;
 
             if (m_warden)
@@ -494,7 +481,7 @@ bool WorldSession::Update(PacketFilter& updater)
 
 bool WorldSession::CanProcessPackets() const
 {
-    return ((m_socket && !m_socket->IsClosed()) || (_player && (m_bot || sPlayerBotMgr.IsChatBot(_player->GetGUIDLow()))));
+    return ((m_socket && !m_socket->IsClosing()) || (_player && (m_bot || sPlayerBotMgr.IsChatBot(_player->GetGUIDLow()))));
 }
 
 void WorldSession::ProcessPackets(PacketFilter& updater)
