@@ -2,12 +2,13 @@
 #define MANGOS_IO_NETWORKING_ASYNCSERVERLISTENER_H
 
 #include "../NativeAliases.h"
+#include "../IoContext.h"
 #include <cstddef>
 #include <chrono>
 #include <string>
 
 #if defined(WIN32)
-#include "./impl/windows/IocpOperationTask.h"
+#include "IO/Windows_IocpOperationTask.h"
 #endif
 
 namespace IO { namespace Networking {
@@ -22,21 +23,20 @@ namespace IO { namespace Networking {
         AsyncServerListener(AsyncServerListener&&) = delete;
         AsyncServerListener& operator=(AsyncServerListener&&) = delete;
 
-        static std::unique_ptr<AsyncServerListener<TClientSocket>> CreateAndBindServer(std::string const& bindIp, uint16_t port);
-        void RunEventLoop(std::chrono::milliseconds maxBlockingDuration);
+        static std::unique_ptr<AsyncServerListener<TClientSocket>> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port);
 
     private:
         void HandlePostAccept(std::shared_ptr<TClientSocket> newClient);
 
         IO::Native::SocketHandle m_acceptorNativeSocket;
+        IO::IoContext* m_ctx;
 
 #if defined(WIN32)
         void StartAcceptOperation();
 
-        explicit AsyncServerListener(IO::Native::SocketHandle acceptorNativeSocket, HANDLE completionPort)
-                : m_acceptorNativeSocket(acceptorNativeSocket), m_completionPort(completionPort) {}
+        explicit AsyncServerListener(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
+                : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket) {}
 
-        HANDLE m_completionPort;
         IocpOperationTask m_currentAcceptTask;
 #elif defined(__linux__)
         void OnNewClientToAcceptAvailable();

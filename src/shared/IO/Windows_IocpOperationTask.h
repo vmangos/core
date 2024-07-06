@@ -1,9 +1,9 @@
-#ifndef MANGOS_IO_NETWORKING_WIN32_IOCPOPERATIONEVENT_H
-#define MANGOS_IO_NETWORKING_WIN32_IOCPOPERATIONEVENT_H
+#ifndef MANGOS_IO_WIN32_IOCPOPERATIONEVENT_H
+#define MANGOS_IO_WIN32_IOCPOPERATIONEVENT_H
 
 #include <string>
 #include <functional>
-#include "../../../../Errors.h"
+#include "../Errors.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -39,4 +39,4 @@ public:
     std::function<void(DWORD errorCode)> m_callback = nullptr;
 };
 
-#endif //MANGOS_IO_NETWORKING_WIN32_IOCPOPERATIONEVENT_H
+#endif //MANGOS_IO_WIN32_IOCPOPERATIONEVENT_H

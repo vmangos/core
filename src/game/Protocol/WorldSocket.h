@@ -93,7 +93,7 @@ private:
     std::deque<uint32> m_opcodeHistoryInc{};
 
 public:
-    explicit WorldSocket(IO::Networking::SocketDescriptor const& socketDescriptor);
+    explicit WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor);
     ~WorldSocket();
 
     void Start() final;

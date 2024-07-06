@@ -59,8 +59,8 @@ struct ServerPktHeader
 #pragma pack(pop)
 #endif
 
-WorldSocket::WorldSocket(const IO::Networking::SocketDescriptor &socketDescriptor)
-    : IO::Networking::AsyncSocket<WorldSocket>(socketDescriptor), m_lastPingTime(std::chrono::system_clock::time_point::min()), m_overSpeedPings(0), m_Session(nullptr), m_authSeed(static_cast<uint32>(rand32()))
+WorldSocket::WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
+    : IO::Networking::AsyncSocket<WorldSocket>(ctx, socketDescriptor), m_lastPingTime(std::chrono::system_clock::time_point::min()), m_overSpeedPings(0), m_Session(nullptr), m_authSeed(static_cast<uint32>(rand32()))
 {
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpString().c_str());
 }

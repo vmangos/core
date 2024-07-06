@@ -101,6 +101,8 @@ set (shared_SRCS
     Database/SQLStorage.cpp
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
+    IO/IoContext.h
+    IO/IoContext.cpp
     IO/SystemErrorToString.h
     IO/SystemErrorToString.cpp
     IO/Networking/AsyncServerListener.h

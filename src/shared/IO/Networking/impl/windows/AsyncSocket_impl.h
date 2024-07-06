@@ -94,47 +94,21 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(IO::NetworkError const&)> const& callback)
 {
-    // TODO: THIS IS A HACK - We are currently piggy backing of the write implementation
-    // TODO: Need to PostQueuedCompletionStatus
-
-    std::unique_lock<std::mutex> lock(m_writeLock);
-    if (m_writeCallback != nullptr)
-    { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
+    std::unique_lock<std::mutex> lock(m_contextLock);
+    if (m_contextCallback != nullptr)
+    {
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
         return;
     }
-    m_writeCallback = callback;
+    m_contextCallback = callback;
 
-    m_currentWriteTask.InitNew([self = this->shared_from_this()](DWORD errorCode) {
-        auto tmpCallback = std::move(self->m_writeCallback);
-        self->m_currentWriteTask.Reset();
+    m_currentContextTask.InitNew([self = this->shared_from_this()](DWORD errorCode) {
+        auto tmpCallback = std::move(self->m_contextCallback);
+        self->m_currentContextTask.Reset();
         tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
     });
 
-    int const bufferCount = 1;
-    struct BufferCtx
-    {
-        WSABUF buffers[bufferCount];
-    };
-
-    std::shared_ptr<BufferCtx> bufferCtx(new BufferCtx{0});
-    bufferCtx->buffers[0].len = 0;
-    bufferCtx->buffers[0].buf = nullptr;
-
-    DWORD flags = 0;
-    int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
-    if (errorCode)
-    {
-        int err = WSAGetLastError();
-        if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
-        {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] EnterWriteIoContext -> ::WSASend(...) Error: %u", err);
-            auto tmpCallback = std::move(m_writeCallback);
-            m_currentWriteTask.Reset();
-            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
-            return;
-        }
-    }
+    m_ctx->PostCompletedTask(&m_currentContextTask);
 }
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!

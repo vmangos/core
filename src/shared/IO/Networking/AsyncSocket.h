@@ -8,10 +8,11 @@
 #include <cstdint>
 #include <functional>
 #include "ByteBuffer.h"
+#include "IO/IoContext.h"
 #include "IO/Networking/NetworkError.h"
 #include "IO/Networking/SocketDescriptor.h"
 #if defined(WIN32)
-#include "IO/Networking/impl/windows/IocpOperationTask.h"
+#include "IO/Windows_IocpOperationTask.h"
 #endif
 
 namespace IO { namespace Networking {
@@ -24,7 +25,7 @@ namespace IO { namespace Networking {
         friend class AsyncSocketListener<SocketType>;
 
         public:
-            explicit AsyncSocket(SocketDescriptor  socketDescriptor) : m_socket(std::move(socketDescriptor)) {}
+            explicit AsyncSocket(IO::IoContext* ctx, SocketDescriptor socketDescriptor) : m_ctx(ctx), m_socket(std::move(socketDescriptor)) {}
             ~AsyncSocket() noexcept(false); // this destructor will throw if there is a pending transaction
             AsyncSocket(AsyncSocket const&) = delete;
             AsyncSocket& operator=(AsyncSocket const&) = delete;
@@ -58,8 +59,12 @@ namespace IO { namespace Networking {
             bool HasPendingTransfers() const;
 
         private:
-            SocketDescriptor m_socket;
+            IO::IoContext* m_ctx;
+            IO::Networking::SocketDescriptor m_socket;
             bool m_disconnectRequest = false;
+
+            std::mutex m_contextLock;
+            std::function<void(IO::NetworkError)> m_contextCallback = nullptr; // <-- Callback into user code
 
             std::mutex m_readLock;
             // Read = the target buffer to write the network stream to
@@ -73,6 +78,7 @@ namespace IO { namespace Networking {
             std::shared_ptr<uint8_t const> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
 
 #if defined(WIN32)
+            IocpOperationTask m_currentContextTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
 #elif defined(__linux__)

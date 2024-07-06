@@ -6,7 +6,7 @@
 #include <string>
 #include <chrono>
 #include <WinSock2.h>
-#include "./IocpOperationTask.h"
+#include "IO/Windows_IocpOperationTask.h"
 #include "IO/Networking/IpAddress.h"
 #include "IO/Networking/SocketDescriptor.h"
 
@@ -14,11 +14,10 @@ template<typename TClientSocket>
 IO::Networking::AsyncServerListener<TClientSocket>::~AsyncServerListener()
 {
     ::closesocket(m_acceptorNativeSocket);
-    ::CloseHandle(m_completionPort);
 }
 
 template<typename TClientSocket>
-std::unique_ptr<IO::Networking::AsyncServerListener<TClientSocket>> IO::Networking::AsyncServerListener<TClientSocket>::CreateAndBindServer(const std::string &bindIp, uint16_t port)
+std::unique_ptr<IO::Networking::AsyncServerListener<TClientSocket>> IO::Networking::AsyncServerListener<TClientSocket>::CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port)
 {
     int errorCode;
 
@@ -33,14 +32,6 @@ std::unique_ptr<IO::Networking::AsyncServerListener<TClientSocket>> IO::Networki
         return nullptr;
     }
 
-    int const numberOfConcurrentThreads = 0; // If this parameter is zero, the system allows as many concurrently running threads as there are processors in the system.
-    HANDLE completionPort = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, (ULONG_PTR) 0, numberOfConcurrentThreads);
-    if (completionPort == nullptr)
-    {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::CreateIoCompletionPort(root, ...) Error: %u", GetLastError());
-        return nullptr;
-    }
-
     // Create an IPv4 TCP server where other clients can connect to
     SOCKET listenNativeSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listenNativeSocket == INVALID_SOCKET)
@@ -50,8 +41,7 @@ std::unique_ptr<IO::Networking::AsyncServerListener<TClientSocket>> IO::Networki
     }
 
     // Attach our listener socket to our completion port
-    HANDLE tmpCompletionPort = ::CreateIoCompletionPort((HANDLE) listenNativeSocket, completionPort, (u_long) 0, 0);
-    if (tmpCompletionPort != completionPort) {
+    if (::CreateIoCompletionPort((HANDLE) listenNativeSocket, ctx->GetWindowsCompletionPort(), (u_long) 0, 0) != ctx->GetWindowsCompletionPort()) {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(listen, ...) Error: %u", WSAGetLastError());
         return nullptr;
     }
@@ -73,7 +63,7 @@ std::unique_ptr<IO::Networking::AsyncServerListener<TClientSocket>> IO::Networki
         return nullptr;
     }
 
-    auto server = std::unique_ptr<AsyncServerListener<TClientSocket>>(new AsyncServerListener<TClientSocket>(listenNativeSocket, completionPort));
+    auto server = std::unique_ptr<AsyncServerListener<TClientSocket>>(new AsyncServerListener<TClientSocket>(ctx, listenNativeSocket));
     server->StartAcceptOperation();
     return server;
 }
@@ -89,8 +79,7 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
     }
 
     // Attach our acceptor socket to our completion port
-    HANDLE tmpCompletionPort = ::CreateIoCompletionPort((HANDLE) nativePeerSocket, m_completionPort, (u_long) 0, 0);
-    if (tmpCompletionPort != m_completionPort) {
+    if (::CreateIoCompletionPort((HANDLE) nativePeerSocket, m_ctx->GetWindowsCompletionPort(), (u_long) 0, 0) != m_ctx->GetWindowsCompletionPort()) {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(accept, ...) Error: %u", WSAGetLastError());
         return;
     }
@@ -120,7 +109,7 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
         IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
         IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
 
-        std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
+        std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(m_ctx, socketDescriptor);
         HandlePostAccept(client);
 
         m_currentAcceptTask.Reset();
@@ -145,21 +134,6 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
             return;
         }
     }
-}
-
-template<typename TClientSocket>
-void IO::Networking::AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds maxBlockingDuration)
-{
-    ULONG_PTR completionKey = 0;
-    IocpOperationTask* task = nullptr;
-
-    DWORD bytesWritten = 0;
-    bool booleanOkay = ::GetQueuedCompletionStatus(m_completionPort, &bytesWritten, &completionKey, reinterpret_cast<LPOVERLAPPED*>(&task), maxBlockingDuration.count());
-    DWORD errorCode = ::GetLastError();
-    if (task)
-        task->OnComplete(booleanOkay ? 0 : errorCode);
-    else if (errorCode != WAIT_TIMEOUT)
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Has no TASK!!! Error: %u", errorCode);
 }
 
 #endif //MANGOS_IO_NETWORKING_WIN32_ASYNCSERVERLISTENER_H
