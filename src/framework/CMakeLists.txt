@@ -29,10 +29,6 @@ set(framework_SRCS
   GameSystem/TypeContainerFunctions.h
   GameSystem/TypeContainerFunctionsPtr.h
   GameSystem/TypeContainerVisitor.h
-  Network/MangosSocket.h
-  Network/MangosSocketImpl.h
-  Network/MangosSocketMgr.h
-  Network/MangosSocketMgrImpl.h
   Platform/CompilerDefs.h
   Platform/Define.h
   Policies/CreationPolicy.h

@@ -46,6 +46,7 @@ set (shared_SRCS
     Auth/Sha1.h
     Config/Config.h
     Config/ConfigEnv.h
+    Containers/LockFree/RingBuffer.h
     Database/Database.h
     Database/DatabaseCallback.h
     Database/DatabaseEnv.h

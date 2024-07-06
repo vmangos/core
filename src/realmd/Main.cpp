@@ -286,7 +286,7 @@ extern int main(int argc, char **argv)
     uint16 bindPort = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
 
     // Launch the listening network socket
-    std::unique_ptr<AsyncServerListener<AuthSocket>> listener = AsyncServerListener<AuthSocket>::CreateAndBindServer(bindIp, bindPort);
+    std::unique_ptr<IO::Networking::AsyncServerListener<AuthSocket>> listener = IO::Networking::AsyncServerListener<AuthSocket>::CreateAndBindServer(bindIp, bindPort);
     if (listener == nullptr)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d  -  Is the port already in use?", bindIp.c_str(), bindPort);

@@ -8,6 +8,7 @@
 #include <WinSock2.h>
 #include "./IocpOperationTask.h"
 #include "IO/Networking/IpAddress.h"
+#include "IO/Networking/SocketDescriptor.h"
 
 template<typename TClientSocket>
 IO::Networking::AsyncServerListener<TClientSocket>::~AsyncServerListener()
@@ -88,7 +89,7 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
     }
 
     // Attach our acceptor socket to our completion port
-    HANDLE tmpCompletionPort = CreateIoCompletionPort((HANDLE) nativePeerSocket, m_completionPort, (u_long) 0, 0);
+    HANDLE tmpCompletionPort = ::CreateIoCompletionPort((HANDLE) nativePeerSocket, m_completionPort, (u_long) 0, 0);
     if (tmpCompletionPort != m_completionPort) {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(accept, ...) Error: %u", WSAGetLastError());
         return;

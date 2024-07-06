@@ -38,6 +38,9 @@ namespace IO { namespace Networking {
             void Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback);
             void ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback);
 
+            /// The callback is invoked in the IO thread
+            /// Useful for computational expensive operations (e.g. packing and encryption), that should be avoided in the main loop
+            void EnterIoContext(std::function<void(IO::NetworkError const&)> const& callback);
 
             /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
             void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
@@ -58,9 +61,11 @@ namespace IO { namespace Networking {
             SocketDescriptor m_socket;
             bool m_disconnectRequest = false;
 
+            std::mutex m_readLock;
             // Read = the target buffer to write the network stream to
             std::function<void(IO::NetworkError)> m_readCallback = nullptr; // <-- Callback into user code
 
+            std::mutex m_writeLock;
             // Write = the source buffer from where to read to be able to write to the network stream
             std::function<void(IO::NetworkError)> m_writeCallback = nullptr; // <-- Callback into user code
             std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer

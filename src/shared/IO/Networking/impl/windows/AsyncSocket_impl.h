@@ -89,6 +89,54 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     }
 }
 
+/// The callback is invoked in the IO thread
+/// Useful for computational expensive operations (e.g. packing and encryption), that should be avoided in the main loop
+template<typename SocketType>
+void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(IO::NetworkError const&)> const& callback)
+{
+    // TODO: THIS IS A HACK - We are currently piggy backing of the write implementation
+    // TODO: Need to PostQueuedCompletionStatus
+
+    std::unique_lock<std::mutex> lock(m_writeLock);
+    if (m_writeCallback != nullptr)
+    { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+    m_writeCallback = callback;
+
+    m_currentWriteTask.InitNew([self = this->shared_from_this()](DWORD errorCode) {
+        auto tmpCallback = std::move(self->m_writeCallback);
+        self->m_currentWriteTask.Reset();
+        tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
+    });
+
+    int const bufferCount = 1;
+    struct BufferCtx
+    {
+        WSABUF buffers[bufferCount];
+    };
+
+    std::shared_ptr<BufferCtx> bufferCtx(new BufferCtx{0});
+    bufferCtx->buffers[0].len = 0;
+    bufferCtx->buffers[0].buf = nullptr;
+
+    DWORD flags = 0;
+    int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
+    if (errorCode)
+    {
+        int err = WSAGetLastError();
+        if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] EnterWriteIoContext -> ::WSASend(...) Error: %u", err);
+            auto tmpCallback = std::move(m_writeCallback);
+            m_currentWriteTask.Reset();
+            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
+            return;
+        }
+    }
+}
+
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 /// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
 template<typename SocketType>
@@ -102,6 +150,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
+
+    std::unique_lock<std::mutex> lock(m_writeLock);
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
@@ -126,8 +176,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
     bufferCtx->buffers[0].len = source->size();
     bufferCtx->buffers[0].buf = (char*)(source->data());
 
-    m_currentWriteTask.InitNew([self = this->shared_from_this(), bufferCtx](IocpOperationTask* task, DWORD errorCode) {
-        uint64_t bytesProcessed = task->InternalHigh;
+    m_currentWriteTask.InitNew([self = this->shared_from_this(), bufferCtx](DWORD errorCode) {
+        uint64_t bytesProcessed = self->m_currentWriteTask.InternalHigh;
 
         IO::NetworkError errorResult(IO::NetworkError::ErrorType::InternalError, errorCode);
 
@@ -182,6 +232,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
+
+    std::unique_lock<std::mutex> lock(m_writeLock);
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
@@ -262,6 +314,8 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
+
+    std::unique_lock<std::mutex> lock(m_writeLock);
     if (m_writeCallback != nullptr)
     { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));

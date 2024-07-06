@@ -495,39 +495,78 @@ void WorldSocket::Start()
     DoRecvIncomingData();
 }
 
-void WorldSocket::SendPacket(WorldPacket const& packet)
+void WorldSocket::SendPacket(WorldPacket packet)
 {
-    if (IsClosing())
-        return;
-
-    // encrypt thread unsafe due to being executed from map contexts frequently - TODO by cMangos: move to post service context in future
-    std::lock_guard<std::mutex> guard(m_worldSocketMutex);
-
-    ServerPktHeader header {};
-
-    header.cmd = packet.GetOpcode();
-    EndianConvert(header.cmd);
-
-    header.size = static_cast<uint16>(packet.size() + 2);
-    EndianConvertReverse(header.size);
-
-    m_Crypt.EncryptSend(reinterpret_cast<uint8*>(&header), sizeof(header));
-
+    /*
     uint32 opcode = packet.GetOpcode();
-
     m_opcodeHistoryOut.push_front(uint32(opcode));
     if (m_opcodeHistoryOut.size() > 50)
         m_opcodeHistoryOut.resize(30);
+    */
 
-    // TODO: How can we ensure that not two pending Write() calls are made?
-    // TODO: I mean the buffer of Write() is insanely large, but what if the opposite side maliciously blocks packets, so our buffer runs full?
-    // TODO: How does cMangos handle this?
-    std::shared_ptr<ByteBuffer> fullMessage(new ByteBuffer(header.headerSize() + packet.size()));
-    fullMessage->append(header.data(), header.headerSize());
-    if (packet.size() > 0)
-        fullMessage->append(packet.contents(), packet.size());
+    if (IsClosing())
+        return;
 
-    Write(fullMessage, [self = shared_from_this()](IO::NetworkError const& error) {
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Send Packet, Err %s", error.ToString().c_str());
+    // We don't want to allocate or encrypt anything inside the world thread, so we move everything to the IO thread.
+    if (!m_sendQueue.Insert(std::move(packet)))
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Queue of client %s is full", (m_Session != nullptr ? m_Session->GetUsername() : this->GetRemoteIpString()).c_str());
+        CloseSocket();
+        return;
+    }
+
+    // Start AsyncProcessingSendQueue
+
+    if (m_sendQueueIsRunning)
+        return; // already running
+    m_sendQueueIsRunning = true;
+
+    EnterIoContext([self = shared_from_this()](IO::NetworkError const& error)
+    {
+        self->HandleResultOfAsyncWrite(error, std::make_shared<ByteBuffer>());
+    });
+}
+
+void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::shared_ptr<ByteBuffer> const& alreadyAllocatedBuffer)
+{
+    if (error)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to send packet %s", error.ToString().c_str());
+        m_sendQueueIsRunning = false;
+        return;
+    }
+
+    size_t packetCount = m_sendQueue.GetReadCountAvailable();
+    if (packetCount == 0)
+    {
+        m_sendQueueIsRunning = false;
+        return;
+    }
+    if (packetCount > 1)
+        sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "WORLDSOCKET_SEND_QUEUE_MULTI %d", packetCount);
+
+    // Combine all packets into alreadyAllocatedBuffer
+    alreadyAllocatedBuffer->clear();
+    for (size_t i = 0; i < packetCount; i++)
+    {
+        WorldPacket packet = m_sendQueue.ReadConsumeOne();
+
+        ServerPktHeader header{};
+
+        header.cmd = packet.GetOpcode();
+        EndianConvert(header.cmd);
+
+        header.size = static_cast<uint16>(packet.size() + 2);
+        EndianConvertReverse(header.size);
+
+        m_Crypt.EncryptSend(reinterpret_cast<uint8*>(&header), sizeof(header)); // in vanilla versions of the game only the header is encrypted
+
+        alreadyAllocatedBuffer->append(header.data(), header.headerSize());
+        if (packet.size() > 0)
+            alreadyAllocatedBuffer->append(packet.contents(), packet.size());
+    }
+
+    Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error) {
+        self->HandleResultOfAsyncWrite(error, alreadyAllocatedBuffer);
     });
 }

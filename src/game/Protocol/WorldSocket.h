@@ -20,6 +20,7 @@
  */
 
 #include "IO/Networking/AsyncSocket.h"
+#include "Containers/LockFree/RingBuffer.h"
 #include "Auth/AuthCrypt.h"
 #include "Auth/BigNumber.h"
 #include "WorldPacket.h"
@@ -73,6 +74,9 @@ private:
     /// process one incoming packet.
     void DoRecvIncomingData();
 
+    /// Encrypt and write to queue
+    void HandleResultOfAsyncWrite(IO::NetworkError const& error, std::shared_ptr<ByteBuffer> const& alreadyAllocatedBuffer);
+
     HandlerResult _HandleCompleteReceivedPacket(std::unique_ptr<WorldPacket> packet);
 
     /// Called by ProcessIncoming() on CMSG_AUTH_SESSION.
@@ -81,7 +85,9 @@ private:
     /// Called by ProcessIncoming() on CMSG_PING.
     HandlerResult _HandlePing(WorldPacket& recvPacket);
 
-    std::mutex m_worldSocketMutex{};
+    static constexpr size_t MAX_BUFFERED_PACKET_COUNT = 1024;
+    MaNGOS::Containers::RingBuffer<WorldPacket, MAX_BUFFERED_PACKET_COUNT> m_sendQueue;
+    bool m_sendQueueIsRunning;
 
     std::deque<uint32> m_opcodeHistoryOut{};
     std::deque<uint32> m_opcodeHistoryInc{};
@@ -92,7 +98,7 @@ public:
 
     void Start() final;
 
-    void SendPacket(WorldPacket const& packet);
+    void SendPacket(WorldPacket packet);
 
     void FinalizeSession() { m_Session = nullptr; }
 
