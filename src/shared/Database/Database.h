@@ -71,6 +71,8 @@ class SqlConnection
         //methods to work with prepared statements
         bool ExecuteStmt(int nIndex, SqlStmtParameters const& id);
 
+        std::string const& DatabaseName() const { return m_database; }
+
         //SqlConnection object lock
         /// TODO make SqlConnection a shared_ptr?
         class Lock

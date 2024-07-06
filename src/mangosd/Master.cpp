@@ -48,6 +48,8 @@
 #include "MassMailMgr.h"
 #include "DBCStores.h"
 #include "migrations_list.h"
+#include "IO/IoContext.h"
+#include "IO/Multithreading/CreateThread.h"
 
 #include <ace/OS_NS_signal.h>
 #include <ace/TP_Reactor.h>
@@ -196,7 +198,7 @@ int Master::Run()
     _HookSignals();
 
     // Launch WorldRunnable thread
-    std::thread world_thread{WorldRunnable()};
+    std::thread world_thread = IO::Multithreading::CreateThread("WorldRunnable", WorldRunnable());
     // world_thread.setPriority(ACE_Based::Highest);
 
     // set realmbuilds depend on mangosd expected builds, and set server online
@@ -207,7 +209,7 @@ int Master::Run()
         LoginDatabase.PExecute("UPDATE `realmlist` SET `realmflags` = `realmflags` & ~(%u), `population` = 0, `realmbuilds` = '%s'  WHERE `id` = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
     }
 
-    std::thread* cliThread = nullptr;
+    std::unique_ptr<std::thread> cliThread = nullptr;
 
 #ifdef WIN32
     if (sConfig.GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -216,12 +218,12 @@ int Master::Run()
 #endif
     {
         // Launch CliRunnable thread
-        cliThread = new std::thread(CliRunnable());
+        cliThread = IO::Multithreading::CreateThreadPtr("CLI", CliRunnable());
     }
 
-    std::thread* rar_thread = nullptr;
+    std::unique_ptr<std::thread> remoteAccessThread = nullptr;
     if (sConfig.GetBoolDefault ("Ra.Enable", false))
-        rar_thread = new std::thread(&remoteAccess);
+        remoteAccessThread = IO::Multithreading::CreateThreadPtr("RemoteAccess", &remoteAccess);
 
     // Handle affinity for multiple processors and process priority on Windows
     #ifdef WIN32
@@ -267,11 +269,11 @@ int Master::Run()
     #endif
 
     // Start soap serving thread
-    std::thread* soap_thread = nullptr;
+    std::unique_ptr<std::thread> soap_thread = nullptr;
 
     if(sConfig.GetBoolDefault("SOAP.Enabled", false))
     {
-        soap_thread = new std::thread([](){
+        soap_thread = IO::Multithreading::CreateThreadPtr("SOAP", [](){
             MaNGOSsoapRunnable runnable;
             runnable.setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
             runnable.run();
@@ -279,11 +281,10 @@ int Master::Run()
     }
 
     // Start up freeze catcher thread
-    std::thread* freeze_thread = nullptr;
+    std::unique_ptr<std::thread> freeze_thread = nullptr;
     if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {
-        freeze_thread = new std::thread(std::bind(&freezeDetector,freeze_delay*1000));
-        //freeze_thread->setPriority(ACE_Based::Highest);
+        freeze_thread = IO::Multithreading::CreateThreadPtr("FreezeDetector", std::bind(&freezeDetector,freeze_delay*1000));
     }
 
     // Launch the world listener socket
@@ -309,17 +310,11 @@ int Master::Run()
 
     // Stop freeze protection before shutdown tasks
     if (freeze_thread)
-    {
         freeze_thread->join();
-        delete freeze_thread;
-    }
 
     // Stop soap thread
     if(soap_thread)
-    {
         soap_thread->join();
-        delete soap_thread;
-    }
 
     // Set server offline in realmlist
     //LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%u'", REALM_FLAG_OFFLINE, realmID);
@@ -331,11 +326,8 @@ int Master::Run()
     // since worldrunnable uses them, it will crash if unloaded after master
     world_thread.join();
 
-    if(rar_thread)
-    {
-        rar_thread->join();
-        delete rar_thread;
-    }
+    if (remoteAccessThread)
+        remoteAccessThread->join();
 
     // Clean account database before leaving
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Cleaning character database...");
@@ -397,8 +389,6 @@ int Master::Run()
 #endif
         if (cliThread->joinable())
             cliThread->join();
-
-        delete cliThread;
     }
 
     // Exit the process with specified return value

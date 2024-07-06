@@ -24,6 +24,7 @@
 #include "DatabaseEnv.h"
 #include "Config/Config.h"
 #include "Database/SqlOperations.h"
+#include "IO/Multithreading/CreateThread.h"
 
 #include <ctime>
 #include <iostream>
@@ -224,14 +225,14 @@ bool Database::InitDelayThread(std::string const& infoString)
     //New delay thread for delay execute
 
     SqlConnection* threadConnection = CreateConnection();
-    if(!threadConnection->Initialize(infoString.c_str()))
+    if(!threadConnection->Initialize(infoString))
         return false;
 
     std::shared_ptr<SqlDelayThread> tbody = std::make_shared<SqlDelayThread>(this, threadConnection);
     m_threadsBodies.emplace_back(tbody);
-    m_delayThreads.emplace_back([tbody](){
+    m_delayThreads.emplace_back(IO::Multithreading::CreateThread("DB:" + threadConnection->DatabaseName(), [tbody](){
         tbody->run();
-    });
+    }));
 
     return true;
 }

@@ -18,6 +18,7 @@
 
 #include "ThreadPool.h"
 #include "Log.h"
+#include "IO/Multithreading/CreateThread.h"
 #include <mysql.h>
 
 #ifdef WIN32
@@ -25,8 +26,8 @@
 #undef IGNORE
 #endif
 
-ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
-    m_errorHandling(mode), m_size(numThreads), m_clearMode(when), m_active(0)
+ThreadPool::ThreadPool(std::string const& name, int numThreads, ClearMode when, ErrorHandling mode) :
+     m_poolName(name), m_errorHandling(mode), m_size(numThreads), m_clearMode(when), m_active(0)
 {
     m_workers.reserve(m_size);
 }
@@ -114,7 +115,7 @@ void ThreadPool::clearWorkload()
 }
 
 ThreadPool::worker::worker(ThreadPool *pool, int id, ThreadPool::ErrorHandling mode) :
-    id(id), errorHandling(mode), pool(pool), thread([this](){this->loop_wrapper();})
+    id(id), errorHandling(mode), pool(pool), thread(IO::Multithreading::CreateThread(pool->m_poolName + "[" + std::to_string(id) + "]", [this](){this->loop_wrapper();}))
 {
 }
 

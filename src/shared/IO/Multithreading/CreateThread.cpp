@@ -8,6 +8,15 @@
 #include <pthread.h>
 #endif
 
+std::unique_ptr<std::thread> IO::Multithreading::CreateThreadPtr(std::string const& name, std::function<void()> entryFunction)
+{
+    return std::make_unique<std::thread>([name, entryFunction = std::move(entryFunction)]()
+    {
+       IO::Multithreading::RenameCurrentThread(name);
+       entryFunction();
+    });
+}
+
 std::thread IO::Multithreading::CreateThread(std::string const& name, std::function<void()> entryFunction)
 {
     return std::thread([name, entryFunction = std::move(entryFunction)]()
