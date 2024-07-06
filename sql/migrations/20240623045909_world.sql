@@ -70,6 +70,17 @@ UPDATE `gameobject` SET `patch_min`=7 WHERE `guid`=49394;
 -- Cooking Brazier
 UPDATE `gameobject` SET `patch_min`=7 WHERE `guid`=49395;
 
+-- Cenarion Hold Infantry with waypoints should be mounted pre 1.9.
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES 
+(42895, 6, 0, 14330, -1, 0, 1, 0, NULL),
+(42898, 6, 0, 14330, -1, 0, 1, 0, NULL),
+(42895, 7, 0, 0, -1, 0, 1, 0, NULL),
+(42898, 7, 0, 0, -1, 0, 1, 0, NULL),
+(42897, 6, 0, 14330, -1, 0, 1, 0, NULL),
+(60006, 6, 0, 14330, -1, 0, 1, 0, NULL),
+(42897, 7, 0, 0, -1, 0, 1, 0, NULL),
+(60006, 7, 0, 0, -1, 0, 1, 0, NULL);
+
 -- Several Cenarion Hold Infantry NPCs shouldn't be spawned pre 1.9.
 UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42772;
 UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42784;
@@ -79,6 +90,11 @@ UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42773;
 UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42776;
 UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42777;
 UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42768;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42884;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42782;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42783;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42766;
+UPDATE `creature` SET `patch_min`=7 WHERE `guid`=42767;
 
 
 -- End of migration.
