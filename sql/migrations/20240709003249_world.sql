@@ -20,7 +20,7 @@ UPDATE `gameobject_template` SET `name`='Doodad_Ahn_Qiraj_DoorRunes01', `patch`=
 
 -- Update old Gate of Ahn'Qiraj according to sniff
 DELETE FROM `game_event_gameobject` WHERE `guid`=66334 AND `event`=83;
-UPDATE `gameobject` SET `position_x`=-8133.61, `position_y`=1525.3, `position_z`=17.9576, `orientation`=-0.0261799, `rotation2`=-0.0130896, `rotation3`=0.999914, `patch_min`=0, `patch_max`=6 WHERE `entry`=176146;
+UPDATE `gameobject` SET `position_x`=-8133.61, `position_y`=1525.3, `position_z`=17.9576, `orientation`=-0.0261799, `rotation2`=-0.0130896, `rotation3`=0.999914, `patch_min`=0, `patch_max`=6 WHERE `id`=176146;
 
 -- Update old Ahn'Qiraj Gate Roots pre 1.9
 -- It should not be involved in any event
