@@ -195,7 +195,10 @@ set (game_SRCS
     PlayerBots/PlayerBotAI.cpp
     PlayerBots/PlayerBotMgr.cpp
     Protocol/Opcodes.cpp
+    Protocol/WorldSocket.h
     Protocol/WorldSocket.cpp
+    Protocol/WorldSocketMgr.h
+    Protocol/WorldSocketMgr.cpp
     Spells/Spell.cpp
     Spells/SpellAuras.cpp
     Spells/SpellEffects.cpp
@@ -393,7 +396,6 @@ set (game_SRCS
     PlayerBots/PlayerBotAI.h
     PlayerBots/PlayerBotMgr.h
     Protocol/Opcodes.h
-    Protocol/WorldSocket.h
     Spells/Spell.h
     Spells/SpellAuraDefines.h
     Spells/SpellAuras.h

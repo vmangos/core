@@ -3,6 +3,7 @@
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
  * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
+ * Copyright (C) 2017-2024 VMaNGOS Project <https://github.com/vmangos>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +35,7 @@
 #include "Database/DatabaseEnv.h"
 #include "DBCStores.h"
 #include "ace/OS_NS_netdb.h"
+#include "WorldSocketMgr.h"
 
 #if defined( __GNUC__ )
 #pragma pack(1)
@@ -159,6 +161,13 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
                     return HandlerResult::Fail;
                 }
+
+#ifdef _DEBUG
+                m_opcodeHistoryInc.push_front(uint32(opcode));
+                if (m_opcodeHistoryInc.size() > 50)
+                    m_opcodeHistoryInc.resize(30);
+#endif
+
                 m_Session->QueuePacket(std::move(packet));
                 return HandlerResult::Okay;
         }
@@ -486,6 +495,11 @@ WorldSocket::HandlerResult WorldSocket::_HandlePing(WorldPacket& recvPacket)
 
 void WorldSocket::Start()
 {
+    sWorldSocketMgr.OnNewClientConnected(shared_from_this());
+}
+
+void WorldSocket::SendInitialPacketAndStartRecvLoop()
+{
     // Send startup packet.
     WorldPacket packet(SMSG_AUTH_CHALLENGE, 4);
     packet << m_authSeed;
@@ -497,13 +511,6 @@ void WorldSocket::Start()
 
 void WorldSocket::SendPacket(WorldPacket packet)
 {
-    /*
-    uint32 opcode = packet.GetOpcode();
-    m_opcodeHistoryOut.push_front(uint32(opcode));
-    if (m_opcodeHistoryOut.size() > 50)
-        m_opcodeHistoryOut.resize(30);
-    */
-
     if (IsClosing())
         return;
 
@@ -551,6 +558,11 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
     {
         WorldPacket packet = m_sendQueue.ReadConsumeOne();
 
+        uint32 opcode = packet.GetOpcode();
+#ifdef _DEBUG
+        m_opcodeHistoryOut.push_front(uint32(opcode));
+#endif
+
         ServerPktHeader header{};
 
         header.cmd = packet.GetOpcode();
@@ -565,6 +577,11 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
         if (packet.size() > 0)
             alreadyAllocatedBuffer->append(packet.contents(), packet.size());
     }
+
+#ifdef _DEBUG
+    if (m_opcodeHistoryOut.size() > 50)
+        m_opcodeHistoryOut.resize(30);
+#endif
 
     Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error) {
         self->HandleResultOfAsyncWrite(error, alreadyAllocatedBuffer);

@@ -58,6 +58,7 @@
 
 #ifdef WIN32
 #include "ServiceWin32.h"
+#include "WorldSocketMgr.h"
 
 extern volatile int m_ServiceStatus;
 #endif
@@ -298,38 +299,30 @@ int Master::Run()
         // Launch the world listener socket
         uint16 bindPort = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
         std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
-        int networkThreadCount = sConfig.GetIntDefault("Network.Threads", 1);
-        if (networkThreadCount <= 0)
+        int ioNetworkThreadCount = sConfig.GetIntDefault("Network.Threads", 1);
+        if (ioNetworkThreadCount <= 0)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Config 'Network.Threads' must be greater than 0");
             World::StopNow(ERROR_EXIT_CODE);
             return 1;
         }
+        int socketOutByteBufferSize = sConfig.GetIntDefault("Network.SystemSendBuffer", -1);
+        bool doExplicitTcpNoDelay = sConfig.GetBoolDefault("Network.TcpNoDelay", true);
 
-        // Launch the listening network socket
-        std::unique_ptr<IO::Networking::AsyncServerListener<WorldSocket>> listener = IO::Networking::AsyncServerListener<WorldSocket>::CreateAndBindServer(ioCtx.get(), bindIp, bindPort);
-        if (listener == nullptr)
+        WorldSocketMgrOptions socketOptions
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to start WorldSocket network");
+            bindIp,
+            bindPort,
+            ioNetworkThreadCount,
+            socketOutByteBufferSize,
+            doExplicitTcpNoDelay,
+        };
+
+        if (!sWorldSocketMgr.StartWorldNetworking(ioCtx.get(), socketOptions)) // TODO: When will this stop? The threads are looping while ioCtx is running
+        {
             Log::WaitBeforeContinueIfNeed();
             World::StopNow(ERROR_EXIT_CODE);
-            // go down and shutdown the server
-        }
-        else
-        {
-            std::vector<std::thread> threads;
-            for (int32 i = 0; i < networkThreadCount; ++i)
-            {
-                threads.emplace_back(IO::Multithreading::CreateThread("IO[" + std::to_string(i) + "]", [&ioCtx]()
-                {
-                    ioCtx->Run();
-                }));
-            }
-
-            world_thread.join();
-            ioCtx->Shutdown();
-            for (std::thread &thread: threads)
-                thread.join();
+            return 1;
         }
     }
 

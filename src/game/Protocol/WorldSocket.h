@@ -3,6 +3,7 @@
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
  * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
+ * Copyright (C) 2017-2024 VMaNGOS Project <https://github.com/vmangos>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +29,12 @@
 #ifndef MANGOS_GAME_SERVER_WORLDSOCKET_H
 #define MANGOS_GAME_SERVER_WORLDSOCKET_H
 
+class WorldSocketMgr;
+
 class WorldSocket : public IO::Networking::AsyncSocket<WorldSocket>
 {
+    friend WorldSocketMgr;
+
 private:
     enum class HandlerResult
     {
@@ -71,6 +76,9 @@ private:
     /// Session key used to authenticate the client (value from db `account` table)
     //BigNumber m_authSessionKey;
 
+    /// Called by WorldSocketMgr when a new connection is made
+    void SendInitialPacketAndStartRecvLoop();
+
     /// process one incoming packet.
     void DoRecvIncomingData();
 
@@ -86,11 +94,13 @@ private:
     HandlerResult _HandlePing(WorldPacket& recvPacket);
 
     static constexpr size_t MAX_BUFFERED_PACKET_COUNT = 1024;
-    MaNGOS::Containers::RingBuffer<WorldPacket, MAX_BUFFERED_PACKET_COUNT> m_sendQueue;
+    MaNGOS::Containers::RingBuffer<WorldPacket, MAX_BUFFERED_PACKET_COUNT> m_sendQueue; // TODO make it WorldPacket* to be a trivial data type, in the ~WorldSocket we have to free the rest
     bool m_sendQueueIsRunning;
 
+#ifdef _DEBUG
     std::deque<uint32> m_opcodeHistoryOut{};
     std::deque<uint32> m_opcodeHistoryInc{};
+#endif
 
 public:
     explicit WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor);

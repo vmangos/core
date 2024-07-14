@@ -34,6 +34,9 @@ namespace IO { namespace Networking {
 
             virtual void Start() = 0;
 
+            IO::NetworkError SetNativeSocketOption_NoDelay(bool doNoDelay);
+            IO::NetworkError SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes);
+
             /// Keep in mind to keep the source buffer in scope of the callback, otherwise random memory might get overwritten
             /// Most of the time this is not an issue, since you want to process the incoming buffer
             void Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback);

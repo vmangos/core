@@ -2,6 +2,26 @@
 #define MANGOS_IO_NETWORKING_WIN32_ASYNCSOCKET_IMPL_H
 
 template<typename SocketType>
+IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_NoDelay(bool doNoDelay)
+{
+    int optionValue = doNoDelay ? 1 : 0;
+    int result = ::setsockopt(m_socket._nativeSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&optionValue, sizeof(optionValue));
+    if (result != 0)
+        return IO::NetworkError(NetworkError::ErrorType::InternalError, ::WSAGetLastError());
+    return IO::NetworkError(NetworkError::ErrorType::NoError);
+}
+
+template<typename SocketType>
+IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes)
+{
+    int optionValue = bytes;
+    int result = ::setsockopt(m_socket._nativeSocket, SOL_SOCKET, SO_SNDBUF, (char*)&optionValue, sizeof(optionValue));
+    if (result != 0)
+        return IO::NetworkError(NetworkError::ErrorType::InternalError, ::WSAGetLastError());
+    return IO::NetworkError(NetworkError::ErrorType::NoError);
+}
+
+template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback)
 {
     if (m_disconnectRequest)
