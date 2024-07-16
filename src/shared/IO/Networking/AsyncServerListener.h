@@ -2,14 +2,11 @@
 #define MANGOS_IO_NETWORKING_ASYNCSERVERLISTENER_H
 
 #include "../NativeAliases.h"
-#include "../IoContext.h"
+#include "IO/Context/IoContext.h"
+#include "IO/Context/AsyncIoOperation.h"
 #include <cstddef>
 #include <chrono>
 #include <string>
-
-#if defined(WIN32)
-#include "IO/Windows_IocpOperationTask.h"
-#endif
 
 namespace IO { namespace Networking {
 

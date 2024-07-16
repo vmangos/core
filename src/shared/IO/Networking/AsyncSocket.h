@@ -8,12 +8,10 @@
 #include <cstdint>
 #include <functional>
 #include "ByteBuffer.h"
-#include "IO/IoContext.h"
+#include "IO/Context/IoContext.h"
 #include "IO/Networking/NetworkError.h"
 #include "IO/Networking/SocketDescriptor.h"
-#if defined(WIN32)
-#include "IO/Windows_IocpOperationTask.h"
-#endif
+#include "IO/Context/AsyncIoOperation.h"
 
 namespace IO { namespace Networking {
     template<typename SocketType>

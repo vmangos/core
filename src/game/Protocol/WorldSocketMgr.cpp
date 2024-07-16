@@ -46,7 +46,7 @@ bool WorldSocketMgr::StartWorldNetworking(IO::IoContext* ioCtx, WorldSocketMgrOp
     {
         m_runningThreads.emplace_back(IO::Multithreading::CreateThread("IO[" + std::to_string(i) + "]", [&ioCtx]()
         {
-            ioCtx->Run();
+            ioCtx->RunUntilShutdown();
         }));
     }
 

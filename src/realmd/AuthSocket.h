@@ -58,7 +58,7 @@ struct sAuthLogonProof_C;
 class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
 {
     public:
-        explicit AuthSocket(IO::Networking::SocketDescriptor const& clientAddress);
+        explicit AuthSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& clientAddress);
         ~AuthSocket();
 
         void Start() final;

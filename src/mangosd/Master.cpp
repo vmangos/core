@@ -48,7 +48,7 @@
 #include "MassMailMgr.h"
 #include "DBCStores.h"
 #include "migrations_list.h"
-#include "IO/IoContext.h"
+#include "IO/Context/IoContext.h"
 #include "IO/Multithreading/CreateThread.h"
 
 #include <ace/OS_NS_signal.h>
@@ -59,6 +59,7 @@
 #ifdef WIN32
 #include "ServiceWin32.h"
 #include "WorldSocketMgr.h"
+#include "IO/Timer/AsyncSystemTimer.h"
 
 extern volatile int m_ServiceStatus;
 #endif
@@ -268,6 +269,9 @@ int Master::Run()
         }
     }
     #endif
+
+    (void) sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
+    IO::Multithreading::RenameCurrentThread("Main");
 
     // Start soap serving thread
     std::unique_ptr<std::thread> soap_thread = nullptr;

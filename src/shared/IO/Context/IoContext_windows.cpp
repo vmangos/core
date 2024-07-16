@@ -14,7 +14,7 @@ std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
     return std::unique_ptr<IoContext>(new IoContext(completionPort));
 }
 
-IO::IoContext::IoContext(HANDLE completionPort) : m_completionPort(completionPort)
+IO::IoContext::IoContext(HANDLE completionPort) : m_completionPort(completionPort), m_isRunning{true}
 {
 }
 
@@ -26,8 +26,7 @@ IO::IoContext::~IoContext()
     }
 }
 
-
-void IO::IoContext::Run()
+void IO::IoContext::RunUntilShutdown()
 {
     ULONG_PTR completionKey = 0;
     IocpOperationTask* task = nullptr;
@@ -54,6 +53,11 @@ void IO::IoContext::Run()
     }
 }
 
+bool IO::IoContext::IsRunning() const
+{
+    return m_isRunning;
+}
+
 void IO::IoContext::Shutdown()
 {
     if (m_isRunning)
@@ -64,7 +68,7 @@ void IO::IoContext::Shutdown()
     }
 }
 
-void IO::IoContext::PostCompletedTask(IocpOperationTask* task)
+void IO::IoContext::PostOperationForImmediateExecution(IO::AsyncIoOperation* task)
 {
     ULONG_PTR completionKey = 0;
     bool isOkay = ::PostQueuedCompletionStatus(m_completionPort, 0, completionKey, task);

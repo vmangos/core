@@ -26,7 +26,7 @@
 #include <vector>
 #include <memory>
 #include "Policies/Singleton.h"
-#include "IO/IoContext.h"
+#include "IO/Context/IoContext.h"
 #include "IO/Networking/AsyncServerListener.h"
 
 class WorldSocket;

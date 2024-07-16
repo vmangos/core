@@ -101,8 +101,8 @@ set (shared_SRCS
     Database/SQLStorage.cpp
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
-    IO/IoContext.h
-    IO/IoContext.cpp
+    IO/Context/IoContext.h
+    IO/Context/IoContext_windows.cpp
     IO/SystemErrorToString.h
     IO/SystemErrorToString.cpp
     IO/Networking/AsyncServerListener.h
@@ -172,6 +172,7 @@ else()
     IO/Timer/impl/windows/TimerHandle.cpp
     IO/Filesystem/impl/windows/FileSystem.cpp
     IO/Filesystem/impl/windows/FileHandle.cpp
+    IO/Context/IoContext_windows.cpp
   )
 endif()
 

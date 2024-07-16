@@ -274,6 +274,8 @@ extern int main(int argc, char **argv)
     }
 
     (void) sRealmdPatchCache; // <-- This will initialize the singleton. Which will preload all known patches.
+    (void) sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
+    IO::Multithreading::RenameCurrentThread("Main");
 
     // cleanup query
     // set expired bans to inactive
@@ -285,17 +287,16 @@ extern int main(int argc, char **argv)
     std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
     uint16 bindPort = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
 
+    std::unique_ptr<IO::IoContext> ioCtx = IO::IoContext::CreateIoContext();
+
     // Launch the listening network socket
-    std::unique_ptr<IO::Networking::AsyncServerListener<AuthSocket>> listener = IO::Networking::AsyncServerListener<AuthSocket>::CreateAndBindServer(bindIp, bindPort);
+    std::unique_ptr<IO::Networking::AsyncServerListener<AuthSocket>> listener = IO::Networking::AsyncServerListener<AuthSocket>::CreateAndBindServer(ioCtx.get(), bindIp, bindPort);
     if (listener == nullptr)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d  -  Is the port already in use?", bindIp.c_str(), bindPort);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
-
-    (void) sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
-    IO::Multithreading::RenameCurrentThread("Main/IO");
 
     // Catch termination signals
     HookSignals();
@@ -350,13 +351,18 @@ extern int main(int argc, char **argv)
     uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / 100000)); // TODO make this loop like mangosd
     uint32 loopCounter = 0;
 
+    auto ioThread = IO::Multithreading::CreateThread("MainIoCtx", [&ioCtx]()
+    {
+        ioCtx->RunUntilShutdown();
+    });
+
     #ifndef WIN32
     detachDaemon();
     #endif
     // Wait for termination signal
     while (!stopEvent)
     {
-        listener->RunEventLoop(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
         if( (++loopCounter) == numLoops ) // TODO make this loop like mangosd
         {
@@ -370,6 +376,10 @@ extern int main(int argc, char **argv)
         while (m_ServiceStatus == 2) Sleep(1000);
 #endif
     }
+
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Waiting for IO thread to finish");
+    ioCtx->Shutdown();
+    ioThread.join();
 
     // Wait for the delay thread to exit
     LoginDatabase.HaltDelayThread();
