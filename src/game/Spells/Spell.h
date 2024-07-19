@@ -37,8 +37,6 @@
 
 #include <memory>
 
-#define MAX_SPELL_ID 40000
-
 class WorldSession;
 class WorldPacket;
 class DynamicObj;
