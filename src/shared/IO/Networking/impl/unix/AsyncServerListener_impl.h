@@ -6,15 +6,20 @@
 #include <string>
 #include <chrono>
 #include <sys/epoll.h>
+#include "Log.h"
+#include "IO/Utils_Unix.h"
+#include "IO/Context/IoContext.h"
+#include "IO/Networking/SocketDescriptor.h"
+#include "IO/Networking/IpAddress.h"
 #include "IO/SystemErrorToString.h"
 
 template<typename TClientSocket>
-AsyncServerListener<TClientSocket>::~AsyncServerListener()
+IO::Networking::AsyncServerListener<TClientSocket>::~AsyncServerListener()
 {
 }
 
 template<typename TClientSocket>
-std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientSocket>::CreateAndBindServer(std::string const& bindIp, uint16_t port)
+std::unique_ptr<IO::Networking::AsyncServerListener<TClientSocket>> IO::Networking::AsyncServerListener<TClientSocket>::CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port)
 {
     IO::Native::SocketHandle listenNativeSocket = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listenNativeSocket == -1)
@@ -47,82 +52,25 @@ std::unique_ptr<AsyncServerListener<TClientSocket>> AsyncServerListener<TClientS
         return nullptr;
     }
 
-    int const epollSizeHint = 50; // <-- hint, how many epoll targets we have. But in modern kernels this is ignored anyway
-    int epollDescriptor = ::epoll_create(epollSizeHint);
-    if (epollDescriptor == -1)
-    {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] CreateAndBindServer -> ::epoll_create(...) Error: %s", SystemErrorToCString(errno));
-        return nullptr;
-    }
+    auto server = std::unique_ptr<AsyncServerListener<TClientSocket>>(new AsyncServerListener<TClientSocket>(ctx, listenNativeSocket));
 
     // Add server socket to epoll (needed for ::accept(..))
     struct epoll_event event;
     event.events = EPOLLIN | EPOLLERR; // Don't use EdgeTrigger here, since if multiple ::accepts are in the queue, we one get notified for one
-    event.data.fd = listenNativeSocket;
-    if (::epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, listenNativeSocket, &event) == -1)
+    event.data.u32 = static_cast<uint32_t>(IoContextEpollTargetType::EpollReceiverFunction);
+    static_assert(std::is_base_of<IO::UnixEpollEventReceiver, typename std::pointer_traits<decltype(server)>::element_type>::value, "Must implement UnixEpollEventReceiver interface!");
+    event.data.ptr = server.get(); // note static_assert above
+    if (::epoll_ctl(ctx->GetUnixEpollDescriptor(), EPOLL_CTL_ADD, listenNativeSocket, &event) == -1)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] CreateAndBindServer -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
         return nullptr;
     }
 
-    auto server = std::unique_ptr<AsyncServerListener<TClientSocket>>(new AsyncServerListener<TClientSocket>(listenNativeSocket, epollDescriptor));
     return server;
 }
 
 template<typename TClientSocket>
-void AsyncServerListener<TClientSocket>::RunEventLoop(std::chrono::milliseconds maxBlockingDuration)
-{
-    int const maxEvents = 100;
-
-    struct epoll_event events[maxEvents];
-    int numEvents = ::epoll_wait(m_epollDescriptor, events, maxEvents, maxBlockingDuration.count());
-    if (numEvents == -1)
-    {
-        if (errno != EINTR) // ignore interrupted system call
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] RunEventLoop -> ::epoll_wait(...) Error: %s", SystemErrorToCString(errno));
-        return;
-    }
-    if (numEvents == 0)
-        return; // no events
-
-    sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "numEvents = %d", numEvents);
-
-    for (int i = 0; i < numEvents; i++)
-    {
-        auto const& event = events[i];
-
-        if (event.data.fd == m_acceptorNativeSocket)
-        {
-            this->OnNewClientToAcceptAvailable();
-        }
-        else
-        {
-            TClientSocket* client = (TClientSocket*) event.data.ptr;
-            if (event.events & EPOLLERR)
-            {
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Epoll ERR");
-                client->StopPendingTransactionsAndForceClose();
-            }
-            else if (event.events & EPOLLRDHUP)
-            {
-                sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "EPOLLRDHUP -> Going to disconnect.");
-                client->StopPendingTransactionsAndForceClose();
-            }
-            else
-            {
-                if (event.events & EPOLLIN)
-                    client->PerformNonBlockingRead();
-
-                if (event.events & EPOLLOUT)
-                    client->PerformNonBlockingWrite();
-            }
-        }
-
-    }
-}
-
-template<typename TClientSocket>
-void AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvailable()
+void IO::Networking::AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvailable()
 {
     struct sockaddr_in peerAddress;
     socklen_t client_len = sizeof(peerAddress);
@@ -141,18 +89,35 @@ void AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvailable()
     IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
     IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
 
-    std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(socketDescriptor);
+
+    auto xx = new TClientSocket(m_ctx, socketDescriptor);
+    std::shared_ptr<TClientSocket> client(xx);
+    //std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>();
 
     struct epoll_event event;
     event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLRDHUP | EPOLLET;
-    event.data.ptr = client.get();
-    if (::epoll_ctl(m_epollDescriptor, EPOLL_CTL_ADD, nativePeerSocket, &event) == -1)
+    static_assert(std::is_base_of<IO::UnixEpollEventReceiver, typename std::pointer_traits<decltype(client)>::element_type>::value, "Must implement UnixEpollEventReceiver interface!");
+    event.data.ptr = client.get(); // note static_assert above
+    if (::epoll_ctl(m_ctx->GetUnixEpollDescriptor(), EPOLL_CTL_ADD, nativePeerSocket, &event) == -1)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] OnNewClientToAcceptAvailable -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
         return;
     }
 
+    IO::NetworkError err = IO::Utils::SetFdStatusFlag(nativePeerSocket, O_NONBLOCK);
+    if (err)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] OnNewClientToAcceptAvailable -> ::IO::Utils::SetFdStatusFlag(...) Error: %s", err.ToString().c_str());
+        return;
+    }
+
     HandlePostAccept(client);
+}
+
+template<typename TClientSocket>
+void IO::Networking::AsyncServerListener<TClientSocket>::OnEpollEvent(uint32_t epollEvents)
+{
+    OnNewClientToAcceptAvailable();
 }
 
 #endif //MANGOS_IO_NETWORKING_WIN32_ASYNCSERVERLISTENER_H

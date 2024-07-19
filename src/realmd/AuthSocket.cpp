@@ -217,6 +217,9 @@ void AuthSocket::Start()
             this->CloseSocket();
         });
     }
+    EnterIoContext([](IO::NetworkError error) {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Hello From IO Thread!!!: %s", error.ToString().c_str());
+    });
     DoRecvIncomingData();
 }
 
@@ -462,7 +465,7 @@ void AuthSocket::_HandleLogonChallenge()
 
                         self->Write(pkt, [self](IO::NetworkError const& error) {
                             if (error)
-                                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write(): ERROR");
+                                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write() Error: %s", error.ToString().c_str());
                             else
                                 self->DoRecvIncomingData();
                         });
@@ -598,7 +601,7 @@ void AuthSocket::_HandleLogonChallenge()
             self->Write(pkt, [self](IO::NetworkError const& error)
             {
                 if (error)
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write(): ERROR");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write() Error: %s", error.ToString().c_str());
                 else
                     self->DoRecvIncomingData();
             });

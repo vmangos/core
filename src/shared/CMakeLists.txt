@@ -102,7 +102,9 @@ set (shared_SRCS
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
     IO/Context/IoContext.h
+    IO/Utils_Unix.h
     IO/Context/IoContext_windows.cpp
+    IO/Context/IoContext_unix.cpp
     IO/SystemErrorToString.h
     IO/SystemErrorToString.cpp
     IO/Networking/AsyncServerListener.h
@@ -146,6 +148,8 @@ if(WIN32)
     PosixDaemon.cpp
     revision.h
     migrations_list.h
+    IO/Utils_Unix.h
+    IO/Context/IoContext_unix.cpp
     IO/Timer/impl/unix/AsyncSystemTimer.cpp
     IO/Timer/impl/unix/TimerHandle.cpp
     IO/Filesystem/impl/unix/FileSystem.cpp
@@ -168,11 +172,11 @@ else()
     ServiceWin32.h
     revision.h
     migrations_list.h
+    IO/Context/IoContext_windows.cpp
     IO/Timer/impl/windows/AsyncSystemTimer.cpp
     IO/Timer/impl/windows/TimerHandle.cpp
     IO/Filesystem/impl/windows/FileSystem.cpp
     IO/Filesystem/impl/windows/FileHandle.cpp
-    IO/Context/IoContext_windows.cpp
   )
 endif()
 

@@ -1,6 +1,8 @@
 #ifndef MANGOS_IO_IOOPERATION_H
 #define MANGOS_IO_IOOPERATION_H
 
+#include <cinttypes>
+#if defined(WIN32)
 #include <string>
 #include <functional>
 #include "../../Errors.h"
@@ -8,9 +10,11 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
+#endif
 
 namespace IO
 {
+#if defined(WIN32)
     class IocpOperationTask : public OVERLAPPED
     {
     public:
@@ -42,6 +46,14 @@ namespace IO
     };
 
     typedef IocpOperationTask AsyncIoOperation;
+#endif
+
+    class UnixEpollEventReceiver
+    {
+    public:
+        virtual void OnEpollEvent(uint32_t epollEvents) = 0;
+    };
+    typedef UnixEpollEventReceiver AsyncIoOperation;
 }
 
 #endif //MANGOS_IO_IOOPERATION_H

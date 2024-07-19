@@ -98,8 +98,8 @@ private:
     bool m_sendQueueIsRunning;
 
 #ifdef _DEBUG
-    std::deque<uint32> m_opcodeHistoryOut{};
-    std::deque<uint32> m_opcodeHistoryInc{};
+    //std::deque<uint32> m_opcodeHistoryOut{};
+    //std::deque<uint32> m_opcodeHistoryInc{};
 #endif
 
 public:

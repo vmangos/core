@@ -11,7 +11,7 @@
 namespace IO { namespace Networking {
 
     template<typename TClientSocket>
-    class AsyncServerListener {
+    class AsyncServerListener : IO::UnixEpollEventReceiver {
 
     public:
         ~AsyncServerListener();
@@ -21,6 +21,10 @@ namespace IO { namespace Networking {
         AsyncServerListener& operator=(AsyncServerListener&&) = delete;
 
         static std::unique_ptr<AsyncServerListener<TClientSocket>> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port);
+
+#if defined(__linux__)
+        void OnEpollEvent(uint32_t epollEvents) final; // used for ::accept
+#endif
 
     private:
         void HandlePostAccept(std::shared_ptr<TClientSocket> newClient);
@@ -38,10 +42,8 @@ namespace IO { namespace Networking {
 #elif defined(__linux__)
         void OnNewClientToAcceptAvailable();
 
-        explicit AsyncServerListener(IO::Native::SocketHandle acceptorNativeSocket, int epollDescriptor)
-                : m_acceptorNativeSocket(acceptorNativeSocket), m_epollDescriptor(epollDescriptor) {}
-
-        int m_epollDescriptor;
+        explicit AsyncServerListener(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
+                : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket) {}
 #endif
     };
 

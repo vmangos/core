@@ -288,6 +288,12 @@ extern int main(int argc, char **argv)
     uint16 bindPort = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
 
     std::unique_ptr<IO::IoContext> ioCtx = IO::IoContext::CreateIoContext();
+    if (ioCtx == nullptr)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to create IoContext");
+        Log::WaitBeforeContinueIfNeed();
+        return 1;
+    }
 
     // Launch the listening network socket
     std::unique_ptr<IO::Networking::AsyncServerListener<AuthSocket>> listener = IO::Networking::AsyncServerListener<AuthSocket>::CreateAndBindServer(ioCtx.get(), bindIp, bindPort);

@@ -70,7 +70,7 @@ void WorldSocketMgr::OnNewClientConnected(std::shared_ptr<WorldSocket> const& so
         IO::NetworkError error = socket->SetNativeSocketOption_SystemOutgoingSendBuffer(m_settings.socketOutByteBufferSize);
         if (error)
         { // We don't close the socket, since its basically just a "warning" I guess.
-            sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Failed to set NoDelay option on socket for IP %s Error: %s", socket->GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set NoDelay option on socket for IP %s Error: %s", socket->GetRemoteIpString().c_str(), error.ToString().c_str());
         }
     }
 
@@ -79,7 +79,7 @@ void WorldSocketMgr::OnNewClientConnected(std::shared_ptr<WorldSocket> const& so
         IO::NetworkError error = socket->SetNativeSocketOption_NoDelay(true);
         if (error)
         { // We don't close the socket, since its basically just a "warning" I guess.
-            sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Failed to set NoDelay option on socket for IP %s Error: %s", socket->GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set NoDelay option on socket for IP %s Error: %s", socket->GetRemoteIpString().c_str(), error.ToString().c_str());
         }
     }
 

@@ -425,7 +425,11 @@ bool WorldSession::Update(PacketFilter& updater)
         // Cleanup socket pointer if need
         if (m_socket && m_socket->IsClosing())
         {
-            m_socket = nullptr;
+            auto socket = std::move(m_socket);
+            socket->EnterIoContext([socket](IO::NetworkError error)
+            {
+                socket.unique(); // Since this is a shared ptr, we want to call the destructor in the IO thread
+            });
 
             if (m_warden)
             {

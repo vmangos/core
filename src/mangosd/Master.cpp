@@ -48,8 +48,10 @@
 #include "MassMailMgr.h"
 #include "DBCStores.h"
 #include "migrations_list.h"
+#include "WorldSocketMgr.h"
 #include "IO/Context/IoContext.h"
 #include "IO/Multithreading/CreateThread.h"
+#include "IO/Timer/AsyncSystemTimer.h"
 
 #include <ace/OS_NS_signal.h>
 #include <ace/TP_Reactor.h>
@@ -58,9 +60,6 @@
 
 #ifdef WIN32
 #include "ServiceWin32.h"
-#include "WorldSocketMgr.h"
-#include "IO/Timer/AsyncSystemTimer.h"
-
 extern volatile int m_ServiceStatus;
 #endif
 

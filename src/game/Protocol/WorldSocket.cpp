@@ -76,8 +76,7 @@ void WorldSocket::DoRecvIncomingData()
 {
     std::shared_ptr<ClientPktHeader> header = std::make_shared<ClientPktHeader>();
 
-    auto self(shared_from_this());
-    Read((char*)header.get(), sizeof(ClientPktHeader), [self, header](IO::NetworkError const& error) -> void
+    Read((char*)header.get(), sizeof(ClientPktHeader), [self = shared_from_this(), header](IO::NetworkError const& error) -> void
     {
         if (error)
         {
@@ -163,9 +162,9 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
                 }
 
 #ifdef _DEBUG
-                m_opcodeHistoryInc.push_front(uint32(opcode));
-                if (m_opcodeHistoryInc.size() > 50)
-                    m_opcodeHistoryInc.resize(30);
+                //m_opcodeHistoryInc.push_front(uint32(opcode));
+                //if (m_opcodeHistoryInc.size() > 50)
+                //    m_opcodeHistoryInc.resize(30);
 #endif
 
                 m_Session->QueuePacket(std::move(packet));
@@ -528,7 +527,7 @@ void WorldSocket::SendPacket(WorldPacket packet)
         return; // already running
     m_sendQueueIsRunning = true;
 
-    EnterIoContext([self = shared_from_this()](IO::NetworkError const& error)
+    EnterIoContext([self = shared_from_this()](IO::NetworkError error)
     {
         self->HandleResultOfAsyncWrite(error, std::make_shared<ByteBuffer>());
     });
@@ -560,7 +559,7 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
 
         uint32 opcode = packet.GetOpcode();
 #ifdef _DEBUG
-        m_opcodeHistoryOut.push_front(uint32(opcode));
+        //m_opcodeHistoryOut.push_front(uint32(opcode));
 #endif
 
         ServerPktHeader header{};
@@ -579,8 +578,8 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
     }
 
 #ifdef _DEBUG
-    if (m_opcodeHistoryOut.size() > 50)
-        m_opcodeHistoryOut.resize(30);
+    //if (m_opcodeHistoryOut.size() > 50)
+    //    m_opcodeHistoryOut.resize(30);
 #endif
 
     Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error) {

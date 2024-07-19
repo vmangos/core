@@ -1,4 +1,5 @@
 #include "./NetworkError.h"
+#include "../SystemErrorToString.h"
 
 std::string const& GetErrorBaseString(IO::NetworkError::ErrorType errorType)
 {
@@ -34,7 +35,7 @@ std::string IO::NetworkError::ToString() const
 {
     std::string result = GetErrorBaseString(this->GetErrorType());
     if (m_additionalOsErrorCode)
-        result += " (Code: " + std::to_string(m_additionalOsErrorCode) + ")";
+        result += " (Code " + std::to_string(m_additionalOsErrorCode) + ": " + SystemErrorToString(m_additionalOsErrorCode) + ")";
 
     return result;
 }

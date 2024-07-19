@@ -19,7 +19,7 @@ namespace IO { namespace Networking {
 
     // this socket is different in that it does not block on reads
     template<typename SocketType>
-    class AsyncSocket : public std::enable_shared_from_this<SocketType> {
+    class AsyncSocket : public std::enable_shared_from_this<SocketType>, public IO::UnixEpollEventReceiver {
         friend class AsyncSocketListener<SocketType>;
 
         public:
@@ -42,7 +42,7 @@ namespace IO { namespace Networking {
 
             /// The callback is invoked in the IO thread
             /// Useful for computational expensive operations (e.g. packing and encryption), that should be avoided in the main loop
-            void EnterIoContext(std::function<void(IO::NetworkError const&)> const& callback);
+            void EnterIoContext(std::function<void(IO::NetworkError)> const& callback);
 
             /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
             void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
@@ -57,22 +57,24 @@ namespace IO { namespace Networking {
             IO::Networking::IpEndpoint const& GetRemoteEndpoint() const;
             std::string GetRemoteIpString() const;
 
-            bool HasPendingTransfers() const;
+#if defined(__linux__)
+            void OnEpollEvent(uint32_t epollEvents) final;
+#endif
 
         private:
             IO::IoContext* m_ctx;
             IO::Networking::SocketDescriptor m_socket;
             bool m_disconnectRequest = false;
 
-            std::mutex m_contextLock;
+            std::atomic_flag m_contextCallbackPresent{false};
             std::function<void(IO::NetworkError)> m_contextCallback = nullptr; // <-- Callback into user code
 
-            std::mutex m_readLock;
             // Read = the target buffer to write the network stream to
+            std::atomic_flag m_readCallbackPresent;
             std::function<void(IO::NetworkError)> m_readCallback = nullptr; // <-- Callback into user code
 
-            std::mutex m_writeLock;
             // Write = the source buffer from where to read to be able to write to the network stream
+            std::atomic_flag m_writeCallbackPresent;
             std::function<void(IO::NetworkError)> m_writeCallback = nullptr; // <-- Callback into user code
             std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
@@ -104,7 +106,13 @@ IO::Networking::AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
     if (!m_disconnectRequest)
         CloseSocket();
 
-    MANGOS_ASSERT(!HasPendingTransfers());
+    // All of theses should be false, since they usually have references via shared_from_this()
+    if (m_contextCallbackPresent.test_and_set())
+            MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description
+    if (m_readCallbackPresent.test_and_set())
+            MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description
+    if (m_writeCallbackPresent.test_and_set())
+            MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description
 }
 
 template<typename SocketType>
