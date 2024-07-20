@@ -3892,10 +3892,6 @@ void Spell::cancel()
 
 void Spell::cast(bool skipCheck)
 {
-    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(m_spellInfo->Id);
-    if (!spellInfo)
-        return;
-
     SetExecutedCurrently(true);
 
     if (!m_caster->CheckAndIncreaseCastCounter())
