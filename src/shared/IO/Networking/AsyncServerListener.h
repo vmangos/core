@@ -11,7 +11,11 @@
 namespace IO { namespace Networking {
 
     template<typename TClientSocket>
-    class AsyncServerListener : IO::UnixEpollEventReceiver {
+    class AsyncServerListener
+#if defined(__linux__)
+            : public IO::UnixEpollEventReceiver
+#endif
+    {
 
     public:
         ~AsyncServerListener();

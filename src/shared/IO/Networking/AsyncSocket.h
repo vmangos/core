@@ -19,7 +19,11 @@ namespace IO { namespace Networking {
 
     // this socket is different in that it does not block on reads
     template<typename SocketType>
-    class AsyncSocket : public std::enable_shared_from_this<SocketType>, public IO::UnixEpollEventReceiver {
+    class AsyncSocket : public std::enable_shared_from_this<SocketType>
+#if defined(__linux__)
+            , public IO::UnixEpollEventReceiver
+#endif
+    {
         friend class AsyncSocketListener<SocketType>;
 
         public:
@@ -82,6 +86,8 @@ namespace IO { namespace Networking {
             std::shared_ptr<uint8_t const> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
 
 #if defined(WIN32)
+            std::mutex m_writeLock;
+            std::mutex m_contextLock;
             IocpOperationTask m_currentContextTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code

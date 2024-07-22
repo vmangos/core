@@ -46,7 +46,8 @@ namespace IO
     };
 
     typedef IocpOperationTask AsyncIoOperation;
-#endif
+
+#elif defined(__linux__)
 
     class UnixEpollEventReceiver
     {
@@ -55,6 +56,7 @@ namespace IO
         virtual void OnEpollEvent(uint32_t epollEvents) = 0;
     };
     typedef UnixEpollEventReceiver AsyncIoOperation;
+#endif
 }
 
 #endif //MANGOS_IO_IOOPERATION_H

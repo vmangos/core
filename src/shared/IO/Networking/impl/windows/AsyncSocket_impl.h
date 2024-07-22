@@ -112,7 +112,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
 /// The callback is invoked in the IO thread
 /// Useful for computational expensive operations (e.g. packing and encryption), that should be avoided in the main loop
 template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(IO::NetworkError)> const& callback)
 {
     std::unique_lock<std::mutex> lock(m_contextLock);
     if (m_contextCallback != nullptr)
@@ -128,7 +128,7 @@ void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(
         tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
     });
 
-    m_ctx->PostCompletedTask(&m_currentContextTask);
+    m_ctx->PostOperationForImmediateExecution(&m_currentContextTask);
 }
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
@@ -386,12 +386,6 @@ void IO::Networking::AsyncSocket<SocketType>::CloseSocket()
 
     sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "CloseSocket(): Disconnect request");
     ::closesocket(m_socket._nativeSocket);
-}
-
-template<typename SocketType>
-bool IO::Networking::AsyncSocket<SocketType>::HasPendingTransfers() const
-{
-    return m_currentWriteTask.m_callback || m_currentReadTask.m_callback;
 }
 
 #endif //MANGOS_IO_NETWORKING_WIN32_ASYNCSOCKET_IMPL_H
