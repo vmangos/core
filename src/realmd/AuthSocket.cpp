@@ -217,9 +217,6 @@ void AuthSocket::Start()
             this->CloseSocket();
         });
     }
-    EnterIoContext([](IO::NetworkError error) {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Hello From IO Thread!!!: %s", error.ToString().c_str());
-    });
     DoRecvIncomingData();
 }
 

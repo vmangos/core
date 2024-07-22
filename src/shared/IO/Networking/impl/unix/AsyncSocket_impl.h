@@ -31,16 +31,13 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     int alreadyRead = ::recv(m_socket._nativeSocket, target, size, 0);
     if (alreadyRead == -1)
     {
-        if (errno == EWOULDBLOCK)
-        {
-            alreadyRead = 0; // no buffer available
-        }
-        else
+        if (errno != EWOULDBLOCK)
         {
             m_readCallbackPresent.clear();
             callback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errno));
             return;
         }
+        alreadyRead = 0; // Would block, so we need to queue it for later
     }
     if (alreadyRead == size)
     { // oh wow, we already have the whole buffer, no need to set up variables

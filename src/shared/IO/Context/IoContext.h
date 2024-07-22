@@ -12,6 +12,8 @@
 
 #if defined(__linux__)
 #include "../NativeAliases.h"
+#include "mutex"
+#include "queue"
 
 enum class IoContextEpollTargetType // this is used in `(epoll_event).data.u32` to decide what to do with it
 {
@@ -57,13 +59,13 @@ namespace IO
         explicit IoContext(HANDLE completionPort);
         HANDLE m_completionPort;
 #elif defined(__linux__)
-        IO::Native::FileHandle m_epollDescriptor;
-        struct PipeFileDescriptors {
-            IO::Native::FileHandle readHead;
-            IO::Native::FileHandle writeHead;
-        } m_contextSwitchRequestPipe;
+        IO::Native::FileHandle const m_epollDescriptor;
+        IO::Native::FileHandle const m_contextSwitchNotifyEventFd;
 
-        explicit IoContext(IO::Native::FileHandle epollDescriptor, PipeFileDescriptors contextSwitchRequestPipe);
+        std::mutex m_contextSwitchQueueLock;
+        std::queue<IO::UnixEpollEventReceiver*> m_contextSwitchQueue;
+
+        explicit IoContext(IO::Native::FileHandle epollDescriptor, IO::Native::FileHandle contextSwitchEventFd);
 #endif
 
     };

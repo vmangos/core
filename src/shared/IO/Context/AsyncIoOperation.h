@@ -51,6 +51,7 @@ namespace IO
     class UnixEpollEventReceiver
     {
     public:
+        /// @param epollEvents will be 0 for immediate events or a bitmask or epoll events (e.g. EPOLLIN, EPOLLOUT, ...)
         virtual void OnEpollEvent(uint32_t epollEvents) = 0;
     };
     typedef UnixEpollEventReceiver AsyncIoOperation;

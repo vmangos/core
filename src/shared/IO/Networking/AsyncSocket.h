@@ -64,8 +64,9 @@ namespace IO { namespace Networking {
         private:
             IO::IoContext* m_ctx;
             IO::Networking::SocketDescriptor m_socket;
-            bool m_disconnectRequest = false;
+            bool m_disconnectRequest = false; // "Soft Shutdown Request", dont allow new transactions
 
+            // TODO make std::atomic<int> this way I can check if shutdown is present and if there is a pending transaction a the same time
             std::atomic_flag m_contextCallbackPresent{false};
             std::function<void(IO::NetworkError)> m_contextCallback = nullptr; // <-- Callback into user code
 
@@ -106,7 +107,9 @@ IO::Networking::AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
     if (!m_disconnectRequest)
         CloseSocket();
 
-    // All of theses should be false, since they usually have references via shared_from_this()
+    // Logic behind these checks:
+    // If the destructor is called there should be no more std::shared_ptr<> references to this object
+    // Every Read() or Write should use `shared_from_this()` if this is not the case one of these checks will fail
     if (m_contextCallbackPresent.test_and_set())
             MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description
     if (m_readCallbackPresent.test_and_set())

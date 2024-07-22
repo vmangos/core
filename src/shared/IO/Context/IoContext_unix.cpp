@@ -1,34 +1,26 @@
 #include <unistd.h>
 #include <sys/epoll.h>
+#include <sys/eventfd.h>
 #include <thread>
 #include "Log.h"
 #include "IoContext.h"
-#include "IO/Utils_Unix.h"
 #include "IO/SystemErrorToString.h"
 
-IO::IoContext::IoContext(IO::Native::FileHandle epollDescriptor, PipeFileDescriptors contextSwitchRequestPipe)
-        : m_epollDescriptor(epollDescriptor), m_contextSwitchRequestPipe(contextSwitchRequestPipe), m_isRunning{true}
+IO::IoContext::IoContext(IO::Native::FileHandle epollDescriptor, IO::Native::FileHandle contextSwitchEventFd)
+        : m_epollDescriptor(epollDescriptor), m_contextSwitchNotifyEventFd(contextSwitchEventFd), m_isRunning{true}
 {
 }
 
-
 IO::IoContext::~IoContext()
 {
+    ::close(m_contextSwitchNotifyEventFd);
+    ::close(m_epollDescriptor);
 }
 
 std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
 {
-    PipeFileDescriptors pipeFds{}; // we just hope that those two ints are aligned like int[2]
-    if (::pipe(reinterpret_cast<int*>(&pipeFds)) != 0)
-    {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] CreateIoContext() -> ::pipe(...) : %s", SystemErrorToCString(errno));
-        return nullptr;
-    }
-
-    MANGOS_ASSERT(!IO::Utils::SetFdStatusFlag(pipeFds.readHead, O_NONBLOCK));
-    MANGOS_ASSERT(!IO::Utils::SetFdStatusFlag(pipeFds.writeHead, O_NONBLOCK));
-
-    int const epollSizeHint = 50; // <-- hint, how many epoll space we want to have initially. But in modern kernels this is ignored anyway
+    // Initialize our main epoll queue
+    int const epollSizeHint = 50; // <-- hint, how much initial epoll space we want to have. But in modern kernels this is ignored anyway.
     int epollDescriptor = ::epoll_create(epollSizeHint);
     if (epollDescriptor == -1)
     {
@@ -36,28 +28,37 @@ std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
         return nullptr;
     }
 
+    // Add eventfd, where we can listen to incoming context switch events
+    uint32_t constexpr initialCounter = 0;
+    IO::Native::FileHandle contextSwitchEventFd = ::eventfd(initialCounter, 0);
+    if (contextSwitchEventFd == -1)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] CreateIoContext() -> ::eventfd(...) : %s", SystemErrorToCString(errno));
+        return nullptr;
+    }
+
+    // Add our contextSwitchEventFd to the epoll set
     struct epoll_event event{};
-    event.events = EPOLLIN; // dont use EDGE here, since we might not be able to process all context switch requests in one loop
+    event.events = EPOLLIN | EPOLLET; // We are using edge here, since we are just using it as a "once" signalling process system
     event.data.u32 = static_cast<uint32_t>(IoContextEpollTargetType::ContextSwitchRequest);
-    if (::epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, pipeFds.readHead, &event) == -1)
+    if (::epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, contextSwitchEventFd, &event) == -1)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] CreateIoContext() -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
         return nullptr;
     }
 
-    return std::unique_ptr<IO::IoContext>(new IO::IoContext(epollDescriptor, pipeFds));
+    return std::unique_ptr<IO::IoContext>(new IO::IoContext(epollDescriptor, contextSwitchEventFd));
 }
 
 void IO::IoContext::RunUntilShutdown()
 {
-    int const maxEvents = 100;
+    int const maxEventsPerLoop = 250;
 
-    struct epoll_event events[maxEvents];
-    IO::UnixEpollEventReceiver* contextSwitchPtrs[500]; // max 500 requests per loop (we might have multiple threads and don't want to imbalance them)
+    struct epoll_event events[maxEventsPerLoop];
 
     while (m_isRunning)
     {
-        int numEvents = ::epoll_wait(m_epollDescriptor, events, maxEvents, 50);
+        int numEvents = ::epoll_wait(m_epollDescriptor, events, maxEventsPerLoop, 500);
         if (numEvents == -1)
         {
             if (errno != EINTR) // ignore interrupted system call
@@ -72,28 +73,21 @@ void IO::IoContext::RunUntilShutdown()
 
         for (int i = 0; i < numEvents; i++)
         {
-            struct epoll_event const &event = events[i];
+            struct epoll_event const& event = events[i];
 
             if (event.data.u32 == static_cast<uint32_t>(IoContextEpollTargetType::ContextSwitchRequest))
             {
-                static_assert(sizeof(contextSwitchPtrs) < 0x7FFFF000);
-                ssize_t bytesRead = ::read(m_contextSwitchRequestPipe.readHead, contextSwitchPtrs, (int) sizeof(contextSwitchPtrs));
-                if (bytesRead == -1)
+                while (!m_contextSwitchQueue.empty())
                 {
-                    if (errno != EWOULDBLOCK)
+                    IO::UnixEpollEventReceiver* eventReceiver;
+                    m_contextSwitchQueueLock.lock();
+                    if (!m_contextSwitchQueue.empty())
                     {
-                        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Error reading context switch pipe: %s", SystemErrorToCString(errno));
+                        eventReceiver = m_contextSwitchQueue.front();
+                        m_contextSwitchQueue.pop();
                     }
-                }
-                else
-                {
-                    MANGOS_ASSERT(bytesRead % sizeof(contextSwitchPtrs[0]) == 0);// If this is not aligned, something terribly went wrong.
-
-                    int amountOfContextSwitches = ((int)bytesRead) / sizeof(contextSwitchPtrs[0]);
-                    for (int switchIdx = 0; switchIdx < amountOfContextSwitches; switchIdx++)
-                    {
-                        (contextSwitchPtrs[switchIdx])->OnEpollEvent(0); // the task wanted to be executed in the IO thread
-                    }
+                    m_contextSwitchQueueLock.unlock();
+                    eventReceiver->OnEpollEvent(0);
                 }
             }
             else
@@ -104,17 +98,20 @@ void IO::IoContext::RunUntilShutdown()
     }
 }
 
+bool IO::IoContext::IsRunning() const
+{
+    return m_isRunning;
+}
+
 void IO::IoContext::Shutdown()
 {
-    throw std::runtime_error("TODO, not implemented");
+    m_isRunning = false;
 }
 
 void IO::IoContext::PostEpollEventForImmediateExecution(IO::UnixEpollEventReceiver* eventReceiver)
 {
-    ssize_t amountWritten = ::write(m_contextSwitchRequestPipe.writeHead, &(eventReceiver), sizeof(IO::UnixEpollEventReceiver*));
-    if (amountWritten != sizeof(IO::UnixEpollEventReceiver*))
-    {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[FATAL] Unable to write to context switch pipe");
-        MANGOS_ASSERT(amountWritten == sizeof(IO::UnixEpollEventReceiver*));
-    }
+    m_contextSwitchQueueLock.lock();
+    m_contextSwitchQueue.push(eventReceiver);
+    m_contextSwitchQueueLock.unlock();
+    ::eventfd_write(m_contextSwitchNotifyEventFd, 1);
 }
