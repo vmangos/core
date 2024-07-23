@@ -119,6 +119,7 @@ void WorldSocket::DoRecvIncomingData()
                     return;
                 }
 
+                // by std::moving the content of the shared_ptr, we will seperate the unique_ptr out of the shared_ptr.
                 if (self->_HandleCompleteReceivedPacket(std::move(*packetTmpSharedPtr)) == HandlerResult::Okay)
                     self->DoRecvIncomingData();
             });
@@ -411,7 +412,7 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
     }
 
     // TODO: cMangos has session->RequestNewSocket() and can attach to an exising session
-    m_Session = new WorldSession(accountId, this, security, mutetime, locale);
+    m_Session = new WorldSession(accountId, this->shared_from_this(), security, mutetime, locale);
 
     m_Crypt.SetKey(K.AsByteArray());
     m_Crypt.Init();

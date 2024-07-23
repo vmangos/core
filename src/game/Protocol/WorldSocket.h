@@ -105,6 +105,10 @@ private:
 public:
     explicit WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor);
     ~WorldSocket();
+    WorldSocket(WorldSocket const&) = delete;
+    WorldSocket& operator=(WorldSocket const&) = delete;
+    WorldSocket(WorldSocket&&) = delete;
+    WorldSocket& operator=(WorldSocket&&) = delete;
 
     void Start() final;
 

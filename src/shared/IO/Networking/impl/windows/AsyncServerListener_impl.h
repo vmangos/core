@@ -100,6 +100,7 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
             return;
         }
 
+        // TODO use inet_ntop to be thread safe
         std::string peerIpAddressStr(inet_ntoa(addrBuffer->peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
         delete addrBuffer;
         auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(peerIpAddressStr);

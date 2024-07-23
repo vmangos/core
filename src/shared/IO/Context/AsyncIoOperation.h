@@ -20,7 +20,7 @@ namespace IO
     public:
         void InitNew(const std::function<void(DWORD errorCode)>& callback)
         {
-            MANGOS_ASSERT(m_callback == nullptr);
+            MANGOS_ASSERT(m_callback == nullptr && callback != nullptr);
 
             Internal = 0;
             InternalHigh = 0;
