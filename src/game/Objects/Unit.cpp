@@ -267,7 +267,16 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
                     if (!IsCharmerOrOwnerPlayerOrPlayerItself() && static_cast<Creature const*>(this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
                         OnLeaveCombat();
                     else
+                    {
+                        // World of Warcraft Client Patch 1.6.1 (2005-08-02)
+                        // - Spell casting is no longer interrupted when leaving combat. 
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
+                        if (IsNonMeleeSpellCasted(false))
+                            InterruptNonMeleeSpells(false);
+#endif
+
                         ClearInCombat();
+                    }
                 }
             }
         }
