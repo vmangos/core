@@ -62,7 +62,11 @@ struct ServerPktHeader
 #endif
 
 WorldSocket::WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
-    : IO::Networking::AsyncSocket<WorldSocket>(ctx, socketDescriptor), m_lastPingTime(std::chrono::system_clock::time_point::min()), m_overSpeedPings(0), m_Session(nullptr), m_authSeed(static_cast<uint32>(rand32()))
+    : IO::Networking::AsyncSocket<WorldSocket>(ctx, socketDescriptor),
+            m_lastPingTime(std::chrono::system_clock::time_point::min()),
+            m_overSpeedPings(0),
+            m_Session(nullptr),
+            m_authSeed(static_cast<uint32>(rand32()))
 {
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpString().c_str());
 }
@@ -525,8 +529,8 @@ void WorldSocket::SendPacket(WorldPacket packet)
     // Start AsyncProcessingSendQueue
 
     if (m_sendQueueIsRunning)
+    if (m_sendQueueIsRunning.test_and_set())
         return; // already running
-    m_sendQueueIsRunning = true;
 
     EnterIoContext([self = shared_from_this()](IO::NetworkError error)
     {
@@ -539,14 +543,14 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
     if (error)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to send packet %s", error.ToString().c_str());
-        m_sendQueueIsRunning = false;
+        m_sendQueueIsRunning.clear();
         return;
     }
 
     size_t packetCount = m_sendQueue.GetReadCountAvailable();
     if (packetCount == 0)
     {
-        m_sendQueueIsRunning = false;
+        m_sendQueueIsRunning.clear();
         return;
     }
     if (packetCount > 1)

@@ -114,7 +114,7 @@ IO::Networking::AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
         CloseSocket();
 
     // Logic behind these checks:
-    // If the destructor is called there should be no more std::shared_ptr<> references to this object
+    // If the destructor is called, there should be no more std::shared_ptr<> references to this object
     // Every Read() or Write should use `shared_from_this()` if this is not the case one of these checks will fail
     if (m_contextCallbackPresent.test_and_set())
             MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description

@@ -95,7 +95,7 @@ private:
 
     static constexpr size_t MAX_BUFFERED_PACKET_COUNT = 1024;
     MaNGOS::Containers::RingBuffer<WorldPacket, MAX_BUFFERED_PACKET_COUNT> m_sendQueue; // TODO make it WorldPacket* to be a trivial data type, in the ~WorldSocket we have to free the rest
-    bool m_sendQueueIsRunning;
+    std::atomic_flag m_sendQueueIsRunning;
 
 #ifdef _DEBUG
     //std::deque<uint32> m_opcodeHistoryOut{};
