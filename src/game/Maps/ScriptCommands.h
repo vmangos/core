@@ -336,6 +336,7 @@ enum eScriptCommand
     SCRIPT_COMMAND_START_SCRIPT_ON_ZONE     = 92,           // source = Map
                                                             // datalong = generic_script_id
                                                             // datalong2 = zone_id
+                                                            // datalong3 = (bool) with_pets
 
     SCRIPT_COMMAND_MAX,
 
@@ -1074,6 +1075,7 @@ struct ScriptInfo
         {
             uint32 scriptId;                                // datalong
             uint32 zoneId;                                  // datalong2
+            uint32 withPets;                                // datalong3
         } startScriptOnZone;
 
         struct

@@ -576,6 +576,13 @@ void Warden::HandlePacket(WorldPacket& recvData)
                 uint32 checksum;
                 recvData >> length >> checksum;
 
+                if (length > (recvData.size() - (recvData.rpos() + 1)))
+                {
+                    recvData.rpos(recvData.wpos());
+                    ApplyPenalty("wrong checksum length", WARDEN_ACTION_KICK);
+                    return;
+                }
+
                 if (BuildChecksum(recvData.contents() + recvData.rpos(), length) != checksum)
                 {
                     recvData.rpos(recvData.wpos());

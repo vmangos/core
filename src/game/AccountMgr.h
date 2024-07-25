@@ -37,6 +37,7 @@ enum AccountOpResult
     AOR_DB_INTERNAL_ERROR
 };
 
+class AccountMgr;
 class WorldSession;
 class ChatHandler;
 class MasterPlayer;
@@ -48,8 +49,10 @@ class QueryResult;
 
 class AccountPersistentData
 {
-// WHISP FLOOD
+    friend class AccountMgr;
 public:
+
+    // WHISP FLOOD
     struct WhisperData
     {
         WhisperData() : first_whisp(time(nullptr)), score(0), whispers_count(0) {}
@@ -63,15 +66,20 @@ public:
     uint32 GetWhisperScore(MasterPlayer* from, MasterPlayer* player) const;
     uint32 CountDifferentWhispTargets() const { return m_whisperTargets.size(); }
 
+    // MAIL FLOOD
+    void JustMailed(uint32 toAccount);
+    bool CanMail(uint32 targetAccount);
+
+protected:
+    std::string m_username;
+    std::string m_email;
+    bool m_verifiedEmail = true;
+    AccountTypes m_security = SEC_PLAYER;
+
     typedef std::map<uint32 /*lowguid*/, WhisperData> WhispersMap;
     WhispersMap m_whisperTargets;
 
-// MAIL FLOOD
-public:
-    void JustMailed(uint32 toAccount);
-    bool CanMail(uint32 targetAccount);
-protected:
-    typedef std::map<uint32, time_t> MailsSentMap;
+    typedef std::map<uint32 /*account*/, time_t> MailsSentMap;
     MailsSentMap m_mailsSent;
 };
 
@@ -86,19 +94,22 @@ class AccountMgr
         AccountOpResult ChangeUsername(uint32 accid, std::string new_uname, std::string new_passwd);
         AccountOpResult ChangePassword(uint32 accid, std::string new_passwd, std::string username="");
         bool CheckPassword(uint32 accid, std::string passwd, std::string username="");
-
-        uint32 GetId(std::string username);
-
-        void Load();
-        AccountTypes GetSecurity(uint32 acc_id);
-        void SetSecurity(uint32 accId, AccountTypes sec);
-
-        bool GetName(uint32 acc_id, std::string &name);
-        uint32 GetCharactersCount(uint32 acc_id);
         std::string CalculateShaPassHash(std::string& name, std::string& password);
 
+        void Load();
+        void LoadAccountData();
+        AccountPersistentData& GetAccountPersistentData(uint32 accountId);
+        void UpdateAccountData(uint32 accountId, std::string const& username, std::string const& email, bool verifiedEmail, AccountTypes security);
+
+        uint32 GetId(std::string username);
+        AccountTypes GetSecurity(uint32 accountId);
+        void SetSecurity(uint32 accountId, AccountTypes security);
+        bool GetName(uint32 accountId, std::string &name);
+        uint32 GetCharactersCount(uint32 acc_id);
+        bool HasTrialRestrictions(uint32 accountId);
+
         static bool normalizeString(std::string& utf8str);
-        // Nostalrius
+
         void Update(uint32 diff);
         void LoadIPBanList(std::unique_ptr<QueryResult> result, bool silent=false);
         void LoadAccountBanList(bool silent=false);
@@ -122,11 +133,8 @@ class AccountMgr
         // Max instance reset per account per hour
         bool CheckInstanceCount(uint32 accountId, uint32 instanceId, uint32 maxCount);
         void AddInstanceEnterTime(uint32 accountId, uint32 instanceId, time_t enterTime);
-
-        AccountPersistentData& GetAccountPersistentData(uint32 accountId) { return m_accountPersistentData[accountId]; }
     protected:
         std::map<uint32, std::string> m_accountWarnings;
-        std::map<uint32, AccountTypes> m_accountSecurity;
         uint32 m_banlistUpdateTimer;
         std::map<std::string, uint32> m_ipBanned;
         mutable std::shared_timed_mutex m_ipBannedMutex;
@@ -135,7 +143,9 @@ class AccountMgr
         typedef std::map<uint32 /* accountId */, InstanceEnterTimesMap> AccountInstanceEnterTimesMap;
         AccountInstanceEnterTimesMap m_instanceEnterTimes;
         std::map<uint32, AccountPersistentData> m_accountPersistentData;
+        std::shared_timed_mutex m_accountPersistentDataMutex;
 };
 
 #define sAccountMgr MaNGOS::Singleton<AccountMgr>::Instance()
+
 #endif

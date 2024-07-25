@@ -25,6 +25,7 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
+#include <memory>
 
 struct AreaTriggerTeleport;
 struct AreaTriggerEntry;
