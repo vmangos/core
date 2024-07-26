@@ -527,8 +527,6 @@ void WorldSocket::SendPacket(WorldPacket packet)
     }
 
     // Start AsyncProcessingSendQueue
-
-    if (m_sendQueueIsRunning)
     if (m_sendQueueIsRunning.test_and_set())
         return; // already running
 
