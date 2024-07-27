@@ -66,11 +66,6 @@ void IO::IoContext::RunUntilShutdown()
             continue;
         }
 
-        if (numEvents == 0)
-            continue; // no events
-
-        sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "numEvents = %d", numEvents);
-
         for (int i = 0; i < numEvents; i++)
         {
             struct epoll_event const& event = events[i];

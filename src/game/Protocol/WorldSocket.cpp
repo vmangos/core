@@ -547,8 +547,6 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
         m_sendQueueIsRunning.clear();
         return;
     }
-    if (m_sendQueue.size() > 1)
-        sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "WORLDSOCKET_SEND_QUEUE_MULTI %d", m_sendQueue.size());
 
     // Combine all packets into `alreadyAllocatedBuffer`
     alreadyAllocatedBuffer->clear();

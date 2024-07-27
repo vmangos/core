@@ -292,8 +292,9 @@ void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingWrite()
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClose()
 {
-    // We cannot abort a pending context switch, since it's randomly writing our pointer to the pipe
+    CloseSocket();
 
+    // We cannot abort a pending context switch, since it's randomly writing our pointer to the scheduler queue
     auto tmpReadCallback = std::move(m_readCallback);
     auto tmpWriteCallback = std::move(m_writeCallback);
     m_writeSrcBufferBytesLeft = 0;
@@ -304,7 +305,6 @@ void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClo
         tmpReadCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
     if (tmpWriteCallback)
         tmpWriteCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
-    CloseSocket();
 
     m_readCallbackPresent.clear();
     m_writeCallbackPresent.clear();

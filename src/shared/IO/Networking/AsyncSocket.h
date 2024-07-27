@@ -70,16 +70,15 @@ namespace IO { namespace Networking {
             IO::Networking::SocketDescriptor m_socket;
             bool m_disconnectRequest = false; // "Soft Shutdown Request", dont allow new transactions
 
-            // TODO make std::atomic<int> this way I can check if shutdown is present and if there is a pending transaction a the same time
             std::atomic_flag m_contextCallbackPresent{false};
             std::function<void(IO::NetworkError)> m_contextCallback = nullptr; // <-- Callback into user code
 
             // Read = the target buffer to write the network stream to
-            std::atomic_flag m_readCallbackPresent;
+            std::atomic_flag m_readCallbackPresent{false};
             std::function<void(IO::NetworkError)> m_readCallback = nullptr; // <-- Callback into user code
 
             // Write = the source buffer from where to read to be able to write to the network stream
-            std::atomic_flag m_writeCallbackPresent;
+            std::atomic_flag m_writeCallbackPresent{false};
             std::function<void(IO::NetworkError)> m_writeCallback = nullptr; // <-- Callback into user code
             std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
@@ -110,8 +109,7 @@ template<typename SocketType>
 IO::Networking::AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
 {
     sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
-    if (!m_disconnectRequest)
-        CloseSocket();
+    CloseSocket();
 
     // Logic behind these checks:
     // If the destructor is called, there should be no more std::shared_ptr<> references to this object
