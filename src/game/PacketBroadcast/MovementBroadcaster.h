@@ -7,9 +7,7 @@
 #include <thread>
 #include <vector>
 #include <cstddef>
-#include <set>
 #include <memory>
-#include "Platform/Define.h"
 
 class PlayerBroadcaster;
 

@@ -1,6 +1,5 @@
 #include "PlayerBroadcaster.h"
 
-#include <utility>
 #include "MovementBroadcaster.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
