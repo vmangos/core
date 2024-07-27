@@ -24,22 +24,35 @@ IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback)
 {
-    if (m_disconnectRequest)
+    int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
+    if (state & SocketStateFlags::READ_PENDING_SET)
     {
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
-        return;
-    }
-    if (m_readCallback != nullptr)
-    { // We already have a buffer. Just like ASIO, only one Read can be queued at the same time
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
         return;
     }
+
+    if (state & SocketStateFlags::SHUTDOWN_PENDING)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+        return;
+    }
+
+    if (state & SocketStateFlags::READ_PRESENT)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+
     if (size == 0)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
     }
+
     m_readCallback = callback;
 
     int const bufferCount = 1;
@@ -60,6 +73,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
             self->CloseSocket();
             auto tmpCallback = std::move(self->m_readCallback);
             self->m_currentReadTask.Reset();
+            self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
             return;
         }
@@ -80,6 +94,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
                     sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
                     auto tmpCallback = std::move(self->m_readCallback);
                     self->m_currentReadTask.Reset();
+                    self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
                     tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
                     return;
                 }
@@ -89,9 +104,12 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
         {
             auto tmpCallback = std::move(self->m_readCallback);
             self->m_currentReadTask.Reset();
+            self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
         }
     });
+
+    m_atomicState.fetch_or(SocketStateFlags::READ_PRESENT);
 
     DWORD flags = 0;
     int errorCode = ::WSARecv(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
@@ -103,32 +121,12 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
             auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
+            m_atomicState.fetch_and(~(SocketStateFlags::READ_PENDING_SET | SocketStateFlags::READ_PRESENT));
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
         }
     }
-}
-
-/// The callback is invoked in the IO thread
-/// Useful for computational expensive operations (e.g. packing and encryption), that should be avoided in the main loop
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(IO::NetworkError)> const& callback)
-{
-    std::unique_lock<std::mutex> lock(m_contextLock);
-    if (m_contextCallback != nullptr)
-    {
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
-        return;
-    }
-    m_contextCallback = callback;
-
-    m_currentContextTask.InitNew([self = this->shared_from_this()](DWORD errorCode) {
-        auto tmpCallback = std::move(self->m_contextCallback);
-        self->m_currentContextTask.Reset();
-        tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
-    });
-
-    m_ctx->PostOperationForImmediateExecution(&m_currentContextTask);
+    m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
 }
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
@@ -139,24 +137,35 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
     if (source->size() > 8*1024*1024)
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source->size());
 
-    if (m_disconnectRequest)
+    int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
+    if (state & SocketStateFlags::WRITE_PENDING_SET)
     {
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+
+    if (state & SocketStateFlags::SHUTDOWN_PENDING)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
 
-    std::unique_lock<std::mutex> lock(m_writeLock);
-    if (m_writeCallback != nullptr)
-    { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
+    if (state & SocketStateFlags::WRITE_PRESENT)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
         return;
     }
+
     if (source->size() == 0)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
     }
+
     m_writeCallback = callback;
     m_writeSrcBufferDummyHolder_u8Vector = source;
 
@@ -181,7 +190,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
             errorResult = IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed);
         }
         else if (bytesProcessed < bufferCtx->buffers[0].len || errorCode != 0)
-        {
+        { // Compared to Read(...), the Write(...) system call should be able to transfer the whole buffer in one
             self->CloseSocket();
             errorResult = IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errorCode);
         }
@@ -193,8 +202,11 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
         auto tmpCallback = std::move(self->m_writeCallback);
         self->m_writeSrcBufferDummyHolder_u8Vector = nullptr;
         self->m_currentWriteTask.Reset();
+        self->m_atomicState.fetch_and(~SocketStateFlags::WRITE_PRESENT);
         tmpCallback(errorResult);
     });
+
+    m_atomicState.fetch_or(SocketStateFlags::WRITE_PRESENT);
 
     DWORD flags = 0;
     int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
@@ -207,10 +219,12 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
             auto tmpCallback = std::move(m_writeCallback);
             m_writeSrcBufferDummyHolder_u8Vector = nullptr;
             m_currentWriteTask.Reset();
+            m_atomicState.fetch_and(~(SocketStateFlags::WRITE_PENDING_SET | SocketStateFlags::WRITE_PRESENT));
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
         }
     }
+    m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
 }
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
@@ -221,24 +235,35 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
     if (source->size() > 8*1024*1024)
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source->size());
 
-    if (m_disconnectRequest)
+    int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
+    if (state & SocketStateFlags::WRITE_PENDING_SET)
     {
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+
+    if (state & SocketStateFlags::SHUTDOWN_PENDING)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
 
-    std::unique_lock<std::mutex> lock(m_writeLock);
-    if (m_writeCallback != nullptr)
-    { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
+    if (state & SocketStateFlags::WRITE_PRESENT)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
         return;
     }
+
     if (source->size() == 0)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
     }
+
     m_writeCallback = callback;
     m_writeSrcBufferDummyHolder_ByteBuffer = source;
 
@@ -263,7 +288,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
             errorResult = IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed);
         }
         else if (bytesProcessed < bufferCtx->buffers[0].len || errorCode != 0)
-        {
+        { // Compared to Read(...), the Write(...) system call should be able to transfer the whole buffer in one
             self->CloseSocket();
             errorResult = IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errorCode);
         }
@@ -275,8 +300,11 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
         auto tmpCallback = std::move(self->m_writeCallback);
         self->m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
         self->m_currentWriteTask.Reset();
+        self->m_atomicState.fetch_and(~SocketStateFlags::WRITE_PRESENT);
         tmpCallback(errorResult);
     });
+
+    m_atomicState.fetch_or(SocketStateFlags::WRITE_PRESENT);
 
     DWORD flags = 0;
     int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
@@ -289,10 +317,12 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
             auto tmpCallback = std::move(m_writeCallback);
             m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
             m_currentWriteTask.Reset();
+            m_atomicState.fetch_and(~(SocketStateFlags::WRITE_PENDING_SET | SocketStateFlags::WRITE_PRESENT));
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
         }
     }
+    m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
 }
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
@@ -303,24 +333,35 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
     if (size > 8*1024*1024)
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", size);
 
-    if (m_disconnectRequest)
+    int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
+    if (state & SocketStateFlags::WRITE_PENDING_SET)
     {
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+
+    if (state & SocketStateFlags::SHUTDOWN_PENDING)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
         return;
     }
 
-    std::unique_lock<std::mutex> lock(m_writeLock);
-    if (m_writeCallback != nullptr)
-    { // We already have a buffer. Just like ASIO, only one Write can be queued at the same time
+    if (state & SocketStateFlags::WRITE_PRESENT)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
         return;
     }
+
     if (size == 0)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
     }
+
     m_writeCallback = callback;
     m_writeSrcBufferDummyHolder_rawArray = source;
 
@@ -345,7 +386,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
             errorResult = IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed);
         }
         else if (bytesProcessed < bufferCtx->buffers[0].len || errorCode != 0)
-        {
+        { // Compared to Read(...), the Write(...) system call should be able to transfer the whole buffer in one
             self->CloseSocket();
             errorResult = IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errorCode);
         }
@@ -357,8 +398,11 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
         auto tmpCallback = std::move(self->m_writeCallback);
         self->m_writeSrcBufferDummyHolder_rawArray = nullptr;
         self->m_currentWriteTask.Reset();
+        self->m_atomicState.fetch_and(~SocketStateFlags::WRITE_PRESENT);
         tmpCallback(errorResult);
     });
+
+    m_atomicState.fetch_or(SocketStateFlags::WRITE_PRESENT);
 
     DWORD flags = 0;
     int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
@@ -371,21 +415,63 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
             auto tmpCallback = std::move(m_writeCallback);
             m_writeSrcBufferDummyHolder_rawArray = nullptr;
             m_currentWriteTask.Reset();
+            m_atomicState.fetch_and(~(SocketStateFlags::WRITE_PENDING_SET | SocketStateFlags::WRITE_PRESENT));
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
         }
     }
+    m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
 }
 
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::CloseSocket()
 {
-    if (m_disconnectRequest)
-        return;
-    m_disconnectRequest = true;
+    // set SHUTDOWN_PENDING flag, and check if there was already a previous one
+    if (m_atomicState.fetch_or(SocketStateFlags::SHUTDOWN_PENDING) & SocketStateFlags::SHUTDOWN_PENDING)
+        return; // there was already a ::close()
 
     sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "CloseSocket(): Disconnect request");
-    ::closesocket(m_socket._nativeSocket);
+    ::closesocket(m_socket._nativeSocket); // will interrupt and fail all pending IOCP events and post them to the queue
+}
+
+/// The callback is invoked in the IO thread
+/// Useful for computational expensive operations (e.g. packing and encryption), that should be avoided in the main loop
+template<typename SocketType>
+void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(IO::NetworkError)> const& callback)
+{
+    int state = m_atomicState.fetch_or(SocketStateFlags::CONTEXT_PENDING_SET);
+    if (state & SocketStateFlags::CONTEXT_PENDING_SET)
+    {
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+
+    if (state & SocketStateFlags::SHUTDOWN_PENDING)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::CONTEXT_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+        return;
+    }
+
+    if (state & SocketStateFlags::CONTEXT_PRESENT)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::CONTEXT_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        return;
+    }
+
+    m_contextCallback = callback;
+
+    m_currentContextTask.InitNew([self = this->shared_from_this()](DWORD errorCode) {
+        auto tmpCallback = std::move(self->m_contextCallback);
+        self->m_currentContextTask.Reset();
+        self->m_atomicState.fetch_and(~SocketStateFlags::CONTEXT_PRESENT);
+        tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
+    });
+
+    m_atomicState.fetch_xor(SocketStateFlags::CONTEXT_PRESENT | SocketStateFlags::CONTEXT_PENDING_SET); // set PRESENT and unset PENDING_SET
+
+    m_ctx->PostOperationForImmediateExecution(&m_currentContextTask);
 }
 
 #endif //MANGOS_IO_NETWORKING_WIN32_ASYNCSOCKET_IMPL_H
