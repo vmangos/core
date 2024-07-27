@@ -21,7 +21,6 @@
  */
 
 #include "IO/Networking/AsyncSocket.h"
-#include "Containers/LockFree/RingBuffer.h"
 #include "Auth/AuthCrypt.h"
 #include "Auth/BigNumber.h"
 #include "WorldPacket.h"
@@ -93,8 +92,8 @@ private:
     /// Called by ProcessIncoming() on CMSG_PING.
     HandlerResult _HandlePing(WorldPacket& recvPacket);
 
-    static constexpr size_t MAX_BUFFERED_PACKET_COUNT = 1024;
-    MaNGOS::Containers::RingBuffer<WorldPacket, MAX_BUFFERED_PACKET_COUNT> m_sendQueue; // TODO make it WorldPacket* to be a trivial data type, in the ~WorldSocket we have to free the rest
+    std::mutex m_sendQueueLock;
+    std::queue<WorldPacket> m_sendQueue;
     std::atomic_flag m_sendQueueIsRunning;
 
 #ifdef _DEBUG

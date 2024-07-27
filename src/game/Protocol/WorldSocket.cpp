@@ -519,14 +519,11 @@ void WorldSocket::SendPacket(WorldPacket packet)
         return;
 
     // We don't want to allocate or encrypt anything inside the world thread, so we move everything to the IO thread.
-    if (!m_sendQueue.Insert(std::move(packet)))
-    {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Queue of client %s is full", (m_Session != nullptr ? m_Session->GetUsername() : this->GetRemoteIpString()).c_str());
-        CloseSocket();
-        return;
-    }
+    m_sendQueueLock.lock();
+    m_sendQueue.push(std::move(packet));
+    m_sendQueueLock.unlock();
 
-    // Start AsyncProcessingSendQueue
+    // Start AsyncProcessingSendQueue which take things from the queue
     if (m_sendQueueIsRunning.test_and_set())
         return; // already running
 
@@ -545,20 +542,22 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
         return;
     }
 
-    size_t packetCount = m_sendQueue.GetReadCountAvailable();
-    if (packetCount == 0)
+    if (m_sendQueue.empty())
     {
         m_sendQueueIsRunning.clear();
         return;
     }
-    if (packetCount > 1)
-        sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "WORLDSOCKET_SEND_QUEUE_MULTI %d", packetCount);
+    if (m_sendQueue.size() > 1)
+        sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "WORLDSOCKET_SEND_QUEUE_MULTI %d", m_sendQueue.size());
 
-    // Combine all packets into alreadyAllocatedBuffer
+    // Combine all packets into `alreadyAllocatedBuffer`
     alreadyAllocatedBuffer->clear();
-    for (size_t i = 0; i < packetCount; i++)
+    while (!m_sendQueue.empty())
     {
-        WorldPacket packet = m_sendQueue.ReadConsumeOne();
+        m_sendQueueLock.lock();
+        WorldPacket packet = m_sendQueue.front();
+        m_sendQueue.pop();
+        m_sendQueueLock.unlock();
 
         uint32 opcode = packet.GetOpcode();
 #ifdef _DEBUG
