@@ -66,7 +66,8 @@ WorldSocket::WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor co
             m_lastPingTime(std::chrono::system_clock::time_point::min()),
             m_overSpeedPings(0),
             m_Session(nullptr),
-            m_authSeed(static_cast<uint32>(rand32()))
+            m_authSeed(static_cast<uint32>(rand32())),
+            m_sendQueueIsRunning(false)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpString().c_str());
 }

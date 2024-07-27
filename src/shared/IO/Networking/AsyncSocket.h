@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdint>
 #include <functional>
+#include <atomic>
 #include "ByteBuffer.h"
 #include "IO/Context/IoContext.h"
 #include "IO/Networking/NetworkError.h"
@@ -34,6 +35,7 @@ namespace IO { namespace Networking {
             AsyncSocket(AsyncSocket&&) = delete;
             AsyncSocket& operator=(AsyncSocket&&) = delete;
 
+            /// Must be overwritten by the subclass. Will be executed after socket is setup. Should start a Read(...) or something.
             virtual void Start() = 0;
 
             IO::NetworkError SetNativeSocketOption_NoDelay(bool doNoDelay);
@@ -68,31 +70,47 @@ namespace IO { namespace Networking {
         private:
             IO::IoContext* m_ctx;
             IO::Networking::SocketDescriptor m_socket;
-            bool m_disconnectRequest = false; // "Soft Shutdown Request", dont allow new transactions
 
-            std::atomic_flag m_contextCallbackPresent{false};
+            // We are doing all this atomic stuff, just so we don't have to std::mutex everything
+            enum SocketStateFlags : int
+            {
+                SHUTDOWN_PENDING     = (1 << 0), // stop all new transaction requests. There should never be a new _INUSE when this is present
+                IGNORE_TRANSFERS     = (1 << 1), // Like SHUTDOWN_PENDING but the event receives `PerformNonBlockingRead` and `PerformNonBlockingWrite` will ignore the event
+
+                // PRESENT: Stuff that is present and set
+                // PENDING: Stuff that is currently being used, if you want to close the socket you must spinwait it.
+
+                WRITE_PENDING_SET    = (1 << 2),
+                WRITE_PRESENT        = (1 << 3),
+                WRITE_PENDING_LOAD   = (1 << 4),
+
+                READ_PENDING_SET     = (1 << 5),
+                READ_PRESENT         = (1 << 6),
+                READ_PENDING_LOAD    = (1 << 7),
+
+                CONTEXT_PENDING_SET  = (1 << 8),
+                CONTEXT_PRESENT      = (1 << 9),
+            };
+            std::atomic<int> m_atomicState{0};
+
             std::function<void(IO::NetworkError)> m_contextCallback = nullptr; // <-- Callback into user code
 
             // Read = the target buffer to write the network stream to
-            std::atomic_flag m_readCallbackPresent{false};
             std::function<void(IO::NetworkError)> m_readCallback = nullptr; // <-- Callback into user code
 
             // Write = the source buffer from where to read to be able to write to the network stream
-            std::atomic_flag m_writeCallbackPresent{false};
             std::function<void(IO::NetworkError)> m_writeCallback = nullptr; // <-- Callback into user code
             std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
             std::shared_ptr<uint8_t const> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
 
 #if defined(WIN32)
-            std::mutex m_writeLock;
-            std::mutex m_contextLock;
             IocpOperationTask m_currentContextTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
 #elif defined(__linux__)
 
-        public: // TODO: Make me private again. Why does friend not work?
+        public: // TODO: Make me private again. Why does `AsyncSocketListener<SocketType>` not work?
             void PerformNonBlockingRead();
             void PerformNonBlockingWrite();
             void StopPendingTransactionsAndForceClose();
@@ -111,21 +129,25 @@ IO::Networking::AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
     sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
     CloseSocket();
 
+//#ifdef DEBUG
     // Logic behind these checks:
     // If the destructor is called, there should be no more std::shared_ptr<> references to this object
     // Every Read() or Write should use `shared_from_this()` if this is not the case one of these checks will fail
-    if (m_contextCallbackPresent.test_and_set())
+    int state = m_atomicState.load(std::memory_order::memory_order_relaxed);
+    if (state & SocketStateFlags::CONTEXT_PRESENT)
             MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description
-    if (m_readCallbackPresent.test_and_set())
+    if (state & SocketStateFlags::WRITE_PRESENT)
             MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description
-    if (m_writeCallbackPresent.test_and_set())
+    if (state & SocketStateFlags::READ_PRESENT)
             MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description
+//#endif // _DEBUG
 }
 
 template<typename SocketType>
 bool IO::Networking::AsyncSocket<SocketType>::IsClosing() const
 {
-    return m_disconnectRequest;
+    bool isClosing = m_atomicState.load(std::memory_order::memory_order_relaxed) & SHUTDOWN_PENDING;
+    return isClosing;
 }
 
 template<typename SocketType>
