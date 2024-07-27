@@ -132,7 +132,7 @@ IO::Networking::AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
 //#ifdef DEBUG
     // Logic behind these checks:
     // If the destructor is called, there should be no more std::shared_ptr<> references to this object
-    // Every Read() or Write should use `shared_from_this()` if this is not the case one of these checks will fail
+    // Every Read(...) or Write(...) should use `shared_from_this()` if this is not the case, one of the following checks will fail
     int state = m_atomicState.load(std::memory_order::memory_order_relaxed);
     if (state & SocketStateFlags::CONTEXT_PRESENT)
             MANGOS_ASSERT(false); // TODO: allow MANGOS_ASSERT to accept a string description

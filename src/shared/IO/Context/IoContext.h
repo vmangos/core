@@ -36,7 +36,7 @@ namespace IO
         IoContext(IoContext&&) = delete;
         IoContext& operator=(IoContext&&) = delete;
 
-        /// Will will run the IO loop until .Shutdown() is called.
+        /// Will run the IO loop until .Shutdown() is called.
         /// It is allowed to execute this function from multiple threads at the same time.
         /// But try to limit this to a reasonable amount and not have more threads than (V)Cores on your CPU.
         void RunUntilShutdown();

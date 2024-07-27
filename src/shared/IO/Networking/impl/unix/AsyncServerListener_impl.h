@@ -89,10 +89,7 @@ void IO::Networking::AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvai
     IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
     IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
 
-
-    auto xx = new TClientSocket(m_ctx, socketDescriptor);
-    std::shared_ptr<TClientSocket> client(xx);
-    //std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>();
+    std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(m_ctx, socketDescriptor);
 
     struct epoll_event event;
     event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLRDHUP | EPOLLET;

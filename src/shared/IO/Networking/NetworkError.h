@@ -31,8 +31,6 @@ namespace IO
         ErrorType m_error;
         /// internal variable for toString(), might be os and situation dependent (On windows there is ::GetLastError()/errno and ::WSAGetLastError())
         int m_additionalOsErrorCode;
-
-    public:
     };
 
 } // namespace IO
