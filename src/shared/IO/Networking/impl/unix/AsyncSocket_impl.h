@@ -101,7 +101,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
         return;
     }
 
-    // Check if we can write into memory buffered
+    // Check if we can write into memory buffer
     int alreadySent = ::send(m_socket._nativeSocket, ptr, size, 0);
     if (alreadySent == -1)
     {
@@ -164,7 +164,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
         return;
     }
 
-    // Check if we can write into memory buffered
+    // Check if we can write into memory buffer
     int alreadySent = ::send(m_socket._nativeSocket, ptr, size, 0);
     if (alreadySent == -1)
     {
@@ -226,7 +226,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
         return;
     }
 
-    // Check if we can write into memory buffered
+    // Check if we can write into memory buffer
     int alreadySent = ::send(m_socket._nativeSocket, ptr, size, 0);
     if (alreadySent == -1)
     {
@@ -474,7 +474,7 @@ void IO::Networking::AsyncSocket<SocketType>::OnEpollEvent(uint32_t epollEvents)
     }
 
     if (m_atomicState.load(std::memory_order_relaxed) & SocketStateFlags::IGNORE_TRANSFERS)
-        return; // This is just an initial check. Must be check in `PerformNonBlockingRead` and `PerformNonBlockingWrite` while setting PENDING_LOAD
+        return; // This is just an initial check. Must be checked in `PerformNonBlockingRead` and `PerformNonBlockingWrite` while setting PENDING_LOAD
 
     if (epollEvents & EPOLLERR)
     {
@@ -512,7 +512,7 @@ template<typename SocketType>
 IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes)
 {
     MANGOS_ASSERT(!IsClosing());
-    MANGOS_ASSERT(bytes > 1); // although 1 is already pretty low...
+    MANGOS_ASSERT(bytes > 1); // although a buffer of size 1 is already pretty low...
 
     int optionValue = bytes;
     if (::setsockopt(m_socket._nativeSocket, SOL_SOCKET, SO_SNDBUF, (char*) &optionValue, sizeof(optionValue)) != 0)

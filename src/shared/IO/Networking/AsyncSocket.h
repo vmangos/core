@@ -75,7 +75,7 @@ namespace IO { namespace Networking {
             enum SocketStateFlags : int
             {
                 SHUTDOWN_PENDING     = (1 << 0), // stop all new transaction requests. There should never be a new _INUSE when this is present
-                IGNORE_TRANSFERS     = (1 << 1), // Like SHUTDOWN_PENDING but the event receives `PerformNonBlockingRead` and `PerformNonBlockingWrite` will ignore the event
+                IGNORE_TRANSFERS     = (1 << 1), // Like SHUTDOWN_PENDING but the event receivers `PerformNonBlockingRead` and `PerformNonBlockingWrite` will ignore the event
 
                 // PRESENT: Stuff that is present and set
                 // PENDING: Stuff that is currently being used, if you want to close the socket you must spinwait it.
