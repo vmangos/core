@@ -2,7 +2,7 @@
 #include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 #include "IO/SystemErrorToString.h"
-#include <limits.h>
+#include <climits>
 #include <unistd.h>
 #include <dirent.h>
 
@@ -19,14 +19,35 @@ std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileR
         return nullptr;
     }
 
-    if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_WILLNEED) != 0) // Tell Kernel: we might need the file in the near future, please preload it into mem
+#if defined(__linux__)
+    // Tell Kernel: we might need the file in the near future, please preload it into mem
+    if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_WILLNEED) != 0)
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to set WILLNEED hint for file");
 
     if (flags.HasFlag(FileOpenFlags::HintSequentialRead))
     {
-        if (posix_fadvise(fileHandle, 0, 0, POSIX_FADV_SEQUENTIAL) != 0) // Tell Kernel: to preallocate and load memory pages while reading
+        // Tell Kernel: to preallocate and load memory pages while reading
+        if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to set SEQUENTIAL hint for file");
     }
+#elif defined(__APPLE__)
+    { // Tell Kernel: we might need the file in the near future, please preload it into mem
+        struct radvisory radv;
+        radv.ra_offset = 0; // 0 = start of file
+        radv.ra_count = 0;  // 0 = means read whole file if possible
+        if (::fcntl(fileHandle, F_RDADVISE, &radv) == -1)
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to set RDADVISE hint for file");
+    }
+
+    if (flags.HasFlag(FileOpenFlags::HintSequentialRead))
+    {
+        // Tell Kernel: to preallocate and load memory pages while reading
+        if (::fcntl(fileHandle, F_RDAHEAD, 1) == -1)
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to set SEQUENTIAL hint for file");
+    }
+#else
+#warning "IO::Filesystem::TryOpenFileReadonly(...) hints are not supported on your platform"
+#endif
 
     return std::unique_ptr<FileHandleReadonly>(new FileHandleReadonly(fileHandle));
 }

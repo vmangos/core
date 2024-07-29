@@ -11,11 +11,15 @@ thread_local char g_threadLocalStorage[MAX_ERROR_TEXT_LENGTH];
 char const* SystemErrorToCString(int nativeSystemErrorCode) {
 #if defined(WIN32)
     if (::strerror_s(g_threadLocalStorage, sizeof(g_threadLocalStorage), nativeSystemErrorCode) != 0)
-        return "<Unable to genereate error text>";
+        return "<Unable to generate error text>";
     return g_threadLocalStorage;
 #elif defined(__linux__)
     // Linux might not actually need our buffer in all cases, sometimes it has a pointer to the text already
     return ::strerror_r(nativeSystemErrorCode, g_threadLocalStorage, sizeof(g_threadLocalStorage));
+#elif defined(__APPLE__)
+    if (::strerror_r(nativeSystemErrorCode, g_threadLocalStorage, sizeof(g_threadLocalStorage)) != 0)
+        return "<Unable to generate error text>";
+    return g_threadLocalStorage;
 #else
 #error "IO::SystemErrorToCString(...) not supported on your platform"
 #endif

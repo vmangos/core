@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
 #include <pthread.h>
 #endif
 
