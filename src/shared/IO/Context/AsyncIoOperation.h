@@ -46,16 +46,15 @@ namespace IO
     };
 
     typedef IocpOperationTask AsyncIoOperation;
-
-#elif defined(__linux__)
-
-    class UnixEpollEventReceiver
+#elif defined(__linux__) || defined(__APPLE__)
+    class SystemIoEventReceiver
     {
     public:
-        /// @param epollEvents will be 0 for immediate events or a bitmask or epoll events (e.g. EPOLLIN, EPOLLOUT, ...)
-        virtual void OnEpollEvent(uint32_t epollEvents) = 0;
+        /// @param event On Linux: EPOLL flags, will be 0 for immediate events or a bitmask (multiple) of epoll events (e.g. EPOLLIN, EPOLLOUT, ...)
+        /// @param event On Macos: kqueue filter, will be EVFILT_USER for immediate events one of kqueue filter (e.g. EVFILT_READ, EVFILT_WRITE, ...)
+        virtual void OnIoEvent(uint32_t event) = 0;
     };
-    typedef UnixEpollEventReceiver AsyncIoOperation;
+    typedef SystemIoEventReceiver AsyncIoOperation;
 #endif
 }
 

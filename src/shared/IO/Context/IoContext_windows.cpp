@@ -68,11 +68,10 @@ void IO::IoContext::Shutdown()
     }
 }
 
-void IO::IoContext::PostOperationForImmediateExecution(IO::AsyncIoOperation* task)
+void IO::IoContext::PostOperationForImmediateInvocation(IO::AsyncIoOperation* task)
 {
     ULONG_PTR completionKey = 0;
-    bool isOkay = ::PostQueuedCompletionStatus(m_completionPort, 0, completionKey, task);
-    if (!isOkay)
+    if (!::PostQueuedCompletionStatus(m_completionPort, 0, completionKey, task))
     {
         DWORD error = ::GetLastError();
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::PostQueuedCompletionStatus(...) Error: %u", error);

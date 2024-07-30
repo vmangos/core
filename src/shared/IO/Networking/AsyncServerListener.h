@@ -12,8 +12,8 @@ namespace IO { namespace Networking {
 
     template<typename TClientSocket>
     class AsyncServerListener
-#if defined(__linux__)
-            : public IO::UnixEpollEventReceiver
+#if defined(__linux__) || defined(__APPLE__)
+            : public IO::SystemIoEventReceiver
 #endif
     {
 
@@ -26,8 +26,8 @@ namespace IO { namespace Networking {
 
         static std::unique_ptr<AsyncServerListener<TClientSocket>> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port);
 
-#if defined(__linux__)
-        void OnEpollEvent(uint32_t epollEvents) final; // used for ::accept
+#if defined(__linux__) || defined(__APPLE__)
+        void OnIoEvent(uint32_t event) final; // used for ::accept
 #endif
 
     private:
@@ -43,7 +43,7 @@ namespace IO { namespace Networking {
                 : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket) {}
 
         IocpOperationTask m_currentAcceptTask;
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
         void OnNewClientToAcceptAvailable();
 
         explicit AsyncServerListener(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
@@ -61,7 +61,7 @@ namespace IO { namespace Networking {
 
 #if defined(WIN32)
 #include "./impl/windows/AsyncServerListener_impl.h"
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
 #include "./impl/unix/AsyncServerListener_impl.h"
 #else
 #error "IO::Networking not supported on your platform"

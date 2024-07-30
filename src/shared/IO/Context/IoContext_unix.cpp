@@ -74,7 +74,7 @@ void IO::IoContext::RunUntilShutdown()
             {
                 while (!m_contextSwitchQueue.empty())
                 {
-                    IO::UnixEpollEventReceiver* eventReceiver;
+                    IO::SystemIoEventReceiver* eventReceiver;
                     m_contextSwitchQueueLock.lock();
                     if (!m_contextSwitchQueue.empty())
                     {
@@ -82,12 +82,12 @@ void IO::IoContext::RunUntilShutdown()
                         m_contextSwitchQueue.pop();
                     }
                     m_contextSwitchQueueLock.unlock();
-                    eventReceiver->OnEpollEvent(0);
+                    eventReceiver->OnIoEvent(0);
                 }
             }
             else
             {
-                ((UnixEpollEventReceiver*)(event.data.ptr))->OnEpollEvent(event.events);
+                ((SystemIoEventReceiver*)(event.data.ptr))->OnIoEvent(event.events);
             }
         }
     }
@@ -103,7 +103,7 @@ void IO::IoContext::Shutdown()
     m_isRunning = false;
 }
 
-void IO::IoContext::PostEpollEventForImmediateExecution(IO::UnixEpollEventReceiver* eventReceiver)
+void IO::IoContext::PostForImmediateInvocation(IO::SystemIoEventReceiver* eventReceiver)
 {
     m_contextSwitchQueueLock.lock();
     m_contextSwitchQueue.push(eventReceiver);

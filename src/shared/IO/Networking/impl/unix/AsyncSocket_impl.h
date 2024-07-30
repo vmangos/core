@@ -1,7 +1,11 @@
 #ifndef MANGOS_IO_NETWORKING_UNIX_ASYNCSOCKET_IMPL_H
 #define MANGOS_IO_NETWORKING_UNIX_ASYNCSOCKET_IMPL_H
 
+#if defined(__linux__)
 #include <sys/epoll.h>
+#elif defined(__APPLE__)
+#include <sys/event.h>
+#endif
 #include <netinet/tcp.h>
 #include <thread>
 #include "IO/SystemErrorToString.h"
@@ -40,7 +44,15 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
 
     // Check if there is already something for us buffered in memory
     int alreadyRead = ::recv(m_socket._nativeSocket, target, size, 0);
-    if (alreadyRead == -1)
+    if (alreadyRead == 0)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[ERROR] Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+        StopPendingTransactionsAndForceClose();
+        return;
+    }
+    else if (alreadyRead == -1)
     {
         if (errno != EWOULDBLOCK)
         {
@@ -61,7 +73,6 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     m_readDstBufferBytesLeft = size - alreadyRead;
     m_readCallback = callback;
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "READ BUFFER SET");
     m_atomicState.fetch_xor(SocketStateFlags::READ_PRESENT | SocketStateFlags::READ_PENDING_SET); // set PRESENT and unset PENDING_SET
 }
 
@@ -297,8 +308,9 @@ void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingRead()
     int newWrittenBytes = ::recv(m_socket._nativeSocket, m_readDstBuffer, m_readDstBufferBytesLeft, 0);
     if (newWrittenBytes == 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[Performance] Unnecessary call to PerformNonBlockingRead()");
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_LOAD);
+        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[ERROR] ::recv() returned 0, which means the socket is half-closed.");
+        StopPendingTransactionsAndForceClose();
         return;
     }
     if (newWrittenBytes < 0)
@@ -404,8 +416,11 @@ void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClo
 
     // we must wait for the other threads to finish
     int const pendingTransferMask = SocketStateFlags::WRITE_PENDING_SET | SocketStateFlags::WRITE_PENDING_LOAD | SocketStateFlags::READ_PENDING_LOAD | SocketStateFlags::READ_PENDING_LOAD;
-    while ((state = m_atomicState.load()) & pendingTransferMask)
-        std::this_thread::yield(); // :( atomic::wait() was implemented in C++20
+    if (state & pendingTransferMask)
+    {
+        while ((state = m_atomicState.load()) & pendingTransferMask)
+            std::this_thread::yield(); // :( atomic::wait() was implemented in C++20
+    }
 
     if (state & SocketStateFlags::WRITE_PRESENT)
     {
@@ -455,16 +470,25 @@ void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(
         return;
     }
 
-    m_contextCallback = std::move(callback);
+    m_contextCallback = callback;
     m_atomicState.fetch_xor(SocketStateFlags::CONTEXT_PRESENT | SocketStateFlags::CONTEXT_PENDING_SET); // set PRESENT and unset PENDING_SET
 
-    m_ctx->PostEpollEventForImmediateExecution(this);
+    m_ctx->PostForImmediateInvocation(this);
 }
 
 template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::OnEpollEvent(uint32_t epollEvents)
+void IO::Networking::AsyncSocket<SocketType>::OnIoEvent(uint32_t event)
 {
-    if (epollEvents == 0)
+    int const CALLBACK_EVENT_FLAG =
+#if defined(__linux__)
+        0;
+#elif defined(__APPLE__)
+        EVFILT_USER;
+#else
+    #error "Unsupported"
+#endif
+
+    if (event == CALLBACK_EVENT_FLAG)
     {
         auto tmpCallback = std::move(m_contextCallback);
         MANGOS_DEBUG_ASSERT(tmpCallback);
@@ -476,24 +500,62 @@ void IO::Networking::AsyncSocket<SocketType>::OnEpollEvent(uint32_t epollEvents)
     if (m_atomicState.load(std::memory_order_relaxed) & SocketStateFlags::IGNORE_TRANSFERS)
         return; // This is just an initial check. Must be checked in `PerformNonBlockingRead` and `PerformNonBlockingWrite` while setting PENDING_LOAD
 
-    if (epollEvents & EPOLLERR)
+#if defined(__linux__)
+    if (event & EPOLLERR)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Epoll ERR");
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "epoll reported socket error");
         StopPendingTransactionsAndForceClose();
     }
-    else if (epollEvents & EPOLLRDHUP)
+    else if (event & EPOLLRDHUP)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "EPOLLRDHUP -> Going to disconnect.");
         StopPendingTransactionsAndForceClose();
     }
     else
     {
-        if (epollEvents & EPOLLIN)
+        if (event & EPOLLIN)
             PerformNonBlockingRead();
 
-        if (epollEvents & EPOLLOUT)
+        if (event & EPOLLOUT)
             PerformNonBlockingWrite();
     }
+#elif defined(__APPLE__)
+    switch ((int)event) // it's a "filter" from kqueue
+    {
+        case EVFILT_EXCEPT:
+        {
+            int error = 0;
+            socklen_t errlen = sizeof(error);
+            if (::getsockopt(m_socket._nativeSocket, SOL_SOCKET, SO_ERROR, (void*)&error, &errlen) == 0)
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "kqueue reported socket exception: Error: %s", SystemErrorToCString(error));
+
+                if (error == 0)
+                    break;
+            }
+            else
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "kqueue reported socket exception: Internal error");
+            }
+            StopPendingTransactionsAndForceClose();
+            break;
+        }
+        case EVFILT_READ:
+        {
+            PerformNonBlockingRead();
+            break;
+        }
+        case EVFILT_WRITE:
+        {
+            PerformNonBlockingWrite();
+            break;
+        }
+        default:
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Unhandled event %d", (int)event);
+    }
+#else
+    #error "Unsupported"
+#endif
 }
 
 template<typename SocketType>

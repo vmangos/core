@@ -21,8 +21,8 @@ namespace IO { namespace Networking {
     // this socket is different in that it does not block on reads
     template<typename SocketType>
     class AsyncSocket : public std::enable_shared_from_this<SocketType>
-#if defined(__linux__)
-            , public IO::UnixEpollEventReceiver
+#if defined(__linux__) || defined(__APPLE__)
+            , public IO::SystemIoEventReceiver
 #endif
     {
         friend class AsyncSocketListener<SocketType>;
@@ -63,8 +63,8 @@ namespace IO { namespace Networking {
             IO::Networking::IpEndpoint const& GetRemoteEndpoint() const;
             std::string GetRemoteIpString() const;
 
-#if defined(__linux__)
-            void OnEpollEvent(uint32_t epollEvents) final;
+#if defined(__linux__) || defined(__APPLE__)
+            void OnIoEvent(uint32_t event) final;
 #endif
 
         private:
@@ -108,9 +108,8 @@ namespace IO { namespace Networking {
             IocpOperationTask m_currentContextTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
-#elif defined(__linux__)
-
-        public: // TODO: Make me private again. Why does `AsyncSocketListener<SocketType>` not work?
+#elif defined(__linux__) || defined(__APPLE__)
+        public: // TODO: Make me private again. Why does friend `AsyncSocketListener<SocketType>` not work?
             void PerformNonBlockingRead();
             void PerformNonBlockingWrite();
             void StopPendingTransactionsAndForceClose();
@@ -176,7 +175,7 @@ void IO::Networking::AsyncSocket<SocketType>::ReadSkip(std::size_t skipSize, std
 
 #if defined(WIN32)
 #include "./impl/windows/AsyncSocket_impl.h"
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
 #include "./impl/unix/AsyncSocket_impl.h"
 #else
 #error "IO::Networking not supported on your platform"

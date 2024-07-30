@@ -57,7 +57,9 @@ void IO::Multithreading::RenameCurrentThread(std::string const& name)
     {
     }
 #elif defined(__linux__)
-    pthread_setname_np(pthread_self(), name.c_str());
+    ::pthread_setname_np(pthread_self(), name.c_str());
+#elif defined(__APPLE__)
+    ::pthread_setname_np(name.c_str());
 #else
     // It's not too serisous if we cant rename a thread
     #warning "IO::Multithreading::_renameThisThread not supported on your platform"

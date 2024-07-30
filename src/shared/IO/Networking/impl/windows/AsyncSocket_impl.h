@@ -471,7 +471,7 @@ void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(
 
     m_atomicState.fetch_xor(SocketStateFlags::CONTEXT_PRESENT | SocketStateFlags::CONTEXT_PENDING_SET); // set PRESENT and unset PENDING_SET
 
-    m_ctx->PostOperationForImmediateExecution(&m_currentContextTask);
+    m_ctx->PostOperationForImmediateInvocation(&m_currentContextTask);
 }
 
 #endif //MANGOS_IO_NETWORKING_WIN32_ASYNCSOCKET_IMPL_H

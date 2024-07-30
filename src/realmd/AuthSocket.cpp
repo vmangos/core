@@ -184,19 +184,19 @@ typedef struct XFER_DATA_CHUNK
     uint8  data[4096]; // 4096 - page size on most arch // TODO: Is this a client limitation?
 } XferChunk;
 
-typedef struct AuthHandler
-{
-    eAuthCmd cmd;
-    uint32 status;
-    void (AuthSocket::*asyncHandler)();
-} AuthHandler;
-
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
 #if defined( __GNUC__ )
 #pragma pack()
 #else
 #pragma pack(pop)
 #endif
+
+typedef struct AuthHandler
+{
+    eAuthCmd cmd;
+    uint32 status;
+    void (AuthSocket::*asyncHandler)();
+} AuthHandler;
 
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
