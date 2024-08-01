@@ -445,11 +445,15 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
 WorldSocket::HandlerResult WorldSocket::_HandlePing(WorldPacket& recvPacket)
 {
     uint32 ping;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint32 latency;
+#endif
 
     // Get the ping packet content
     recvPacket >> ping;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     recvPacket >> latency;
+#endif
 
     if (m_lastPingTime == std::chrono::system_clock::time_point::min())
         m_lastPingTime = std::chrono::system_clock::now();              // for 1st ping
@@ -483,7 +487,11 @@ WorldSocket::HandlerResult WorldSocket::_HandlePing(WorldPacket& recvPacket)
     // critical section
     {
         if (m_Session)
+        {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             m_Session->SetLatency(latency);
+#endif
+        }
         else
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandlePing: peer sent CMSG_PING, but is not authenticated or got recently kicked, address = %s", GetRemoteIpString().c_str());
