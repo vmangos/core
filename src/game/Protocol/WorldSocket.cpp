@@ -47,11 +47,13 @@ struct ServerPktHeader
     uint16 size;
     uint16 cmd;
 
-    const char* data() const {
-        return reinterpret_cast<const char*>(this);
+    char const* data() const
+    {
+        return reinterpret_cast<char const*>(this);
     }
 
-    std::size_t headerSize() const {
+    std::size_t headerSize() const
+    {
         return sizeof(ServerPktHeader);
     }
 };
@@ -63,10 +65,10 @@ struct ServerPktHeader
 
 WorldSocket::WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
     : IO::Networking::AsyncSocket<WorldSocket>(ctx, socketDescriptor),
-            m_lastPingTime(std::chrono::system_clock::time_point::min()),
-            m_overSpeedPings(0),
-            m_Session(nullptr),
-            m_authSeed(static_cast<uint32>(rand32()))
+      m_lastPingTime(std::chrono::system_clock::time_point::min()),
+      m_overSpeedPings(0),
+      m_Session(nullptr),
+      m_authSeed(static_cast<uint32>(rand32()))
 {
     m_sendQueueIsRunning.clear(); // there is no atomic_flag::constructor on windows to initialize it with false by default (and if left out, linux is uninitialized and will fail randomly)
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpString().c_str());
@@ -177,7 +179,7 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
                 return HandlerResult::Okay;
         }
     }
-    catch (ByteBufferException &)
+    catch (ByteBufferException&)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i.", opcode, GetRemoteIpString().c_str(), m_Session ? m_Session->GetAccountId() : -1);
 
@@ -269,25 +271,25 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
     LoginDatabase.escape_string(safe_account);
     // No SQL injection, username escaped.
     auto accountQueryResult =
-            LoginDatabase.PQuery("SELECT "
-                                 "a.`id`, "             // 0
-                                 "aa.`gmLevel`, "       // 1
-                                 "a.`sessionkey`, "     // 2
-                                 "a.`last_ip`, "        // 3
-                                 "a.`v`, "              // 4
-                                 "a.`s`, "              // 5
-                                 "a.`mutetime`, "       // 6
-                                 "a.`locale`, "         // 7
-                                 "a.`os`, "             // 8
-                                 "a.`platform`, "       // 9
-                                 "a.`flags`, "          // 10
-                                 "a.`email`, "          // 11
-                                 "a.`email_verif`, "    // 12
-                                 "ab.`unbandate` > UNIX_TIMESTAMP() OR ab.`unbandate` = ab.`bandate` " // 13
-                                 "FROM `account` a "
-                                 "LEFT JOIN `account_access` aa ON a.`id` = aa.`id` AND aa.`RealmID` IN (-1, %u) "
-                                 "LEFT JOIN `account_banned` ab ON a.`id` = ab.`id` AND ab.`active` = 1 WHERE a.`username` = '%s' && DATEDIFF(NOW(), a.`last_login`) < 1 "
-                                 "ORDER BY aa.`RealmID` DESC LIMIT 1", realmID, safe_account.c_str());
+        LoginDatabase.PQuery("SELECT "
+                             "a.`id`, "             // 0
+                             "aa.`gmLevel`, "       // 1
+                             "a.`sessionkey`, "     // 2
+                             "a.`last_ip`, "        // 3
+                             "a.`v`, "              // 4
+                             "a.`s`, "              // 5
+                             "a.`mutetime`, "       // 6
+                             "a.`locale`, "         // 7
+                             "a.`os`, "             // 8
+                             "a.`platform`, "       // 9
+                             "a.`flags`, "          // 10
+                             "a.`email`, "          // 11
+                             "a.`email_verif`, "    // 12
+                             "ab.`unbandate` > UNIX_TIMESTAMP() OR ab.`unbandate` = ab.`bandate` " // 13
+                             "FROM `account` a "
+                             "LEFT JOIN `account_access` aa ON a.`id` = aa.`id` AND aa.`RealmID` IN (-1, %u) "
+                             "LEFT JOIN `account_banned` ab ON a.`id` = ab.`id` AND ab.`active` = 1 WHERE a.`username` = '%s' && DATEDIFF(NOW(), a.`last_login`) < 1 "
+                             "ORDER BY aa.`RealmID` DESC LIMIT 1", realmID, safe_account.c_str());
 
     // Stop if the account is not found
     if (!accountQueryResult)
@@ -324,7 +326,7 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
     if (K.AsByteArray().empty())
         return HandlerResult::Fail;
 
-    time_t mutetime = time_t (fields[6].GetUInt64());
+    time_t mutetime = time_t(fields[6].GetUInt64());
     locale = LocaleConstant(fields[7].GetUInt8());
     if (locale >= MAX_LOCALE)
         locale = LOCALE_enUS;
@@ -365,9 +367,9 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
     uint32 seed = m_authSeed;
 
     sha.UpdateData(account);
-    sha.UpdateData((uint8 *) & t, 4);
-    sha.UpdateData((uint8 *) & clientSeed, 4);
-    sha.UpdateData((uint8 *) & seed, 4);
+    sha.UpdateData((uint8*)&t, 4);
+    sha.UpdateData((uint8*)&clientSeed, 4);
+    sha.UpdateData((uint8*)&seed, 4);
     sha.UpdateBigNumbers(&K, nullptr);
     sha.Finalize();
 
@@ -416,7 +418,6 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
         return HandlerResult::Fail;
     }
 
-    // TODO: cMangos has session->RequestNewSocket() and can attach to an exising session
     m_Session = new WorldSession(accountId, this->shared_from_this(), security, mutetime, locale);
 
     m_Crypt.SetKey(K.AsByteArray());
@@ -467,9 +468,8 @@ WorldSocket::HandlerResult WorldSocket::_HandlePing(WorldPacket& recvPacket)
         {
             ++m_overSpeedPings;
 
-            const uint32 max_count = sWorld.getConfig(CONFIG_UINT32_MAX_OVERSPEED_PINGS);
-
-            if (max_count && m_overSpeedPings > max_count)
+            uint32 maxAllowedOverspeedPings = sWorld.getConfig(CONFIG_UINT32_MAX_OVERSPEED_PINGS);
+            if (maxAllowedOverspeedPings && m_overSpeedPings > maxAllowedOverspeedPings)
             {
                 if (m_Session && m_Session->GetSecurity() == SEC_PLAYER)
                 {
@@ -591,7 +591,8 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
     //    m_opcodeHistoryOut.resize(30);
 #endif
 
-    Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error) {
+    Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error)
+    {
         self->HandleResultOfAsyncWrite(error, alreadyAllocatedBuffer);
     });
 }
