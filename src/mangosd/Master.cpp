@@ -26,7 +26,7 @@
 #include <memory>
 #include "IO/Networking/AsyncServerListener.h"
 #ifndef WIN32
-    #include "PosixDaemon.h"
+#include "PosixDaemon.h"
 #endif
 
 #include "Common.h"
@@ -63,19 +63,19 @@
 extern volatile int m_ServiceStatus;
 #endif
 
-INSTANTIATE_SINGLETON_1( Master );
+INSTANTIATE_SINGLETON_1(Master);
 
 volatile uint32 Master::m_masterLoopCounter = 0;
 volatile bool Master::m_handleSigvSignals = false;
 
 void freezeDetector(uint32 _delaytime)
 {
-    if(!_delaytime)
+    if (!_delaytime)
         return;
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Starting up anti-freeze thread (%u seconds max stuck time)...",_delaytime/1000);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Starting up anti-freeze thread (%u seconds max stuck time)...", _delaytime / 1000);
     uint32 loops = 0;
     uint32 lastchange = 0;
-    while(!World::IsStopped())
+    while (!World::IsStopped())
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -103,44 +103,44 @@ void freezeDetector(uint32 _delaytime)
 
 void remoteAccess()
 {
-    #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
+#if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
 
     ACE_Dev_Poll_Reactor imp;
 
     imp.max_notify_iterations (128);
     imp.restart (1);
 
-    #else
+#else
 
     ACE_TP_Reactor imp;
-    imp.max_notify_iterations (128);
+    imp.max_notify_iterations(128);
 
-    #endif
+#endif
 
     ACE_Reactor reactor(&imp, 1 /* 1= delete implementation so we don't have to care */);
 
     RASocket::Acceptor acceptor;
 
-    uint16 raport = sConfig.GetIntDefault ("Ra.Port", 3443);
-    std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
+    uint16 raBindPort = sConfig.GetIntDefault("Ra.Port", 3443);
+    std::string raBindIp = sConfig.GetStringDefault("Ra.IP", "0.0.0.0");
 
-    ACE_INET_Addr listen_addr(raport, stringip.c_str());
+    ACE_INET_Addr listen_addr(raBindPort, raBindIp.c_str());
 
-    if (acceptor.open (listen_addr, &reactor, ACE_NONBLOCK) == -1)
+    if (acceptor.open(listen_addr, &reactor, ACE_NONBLOCK) == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raBindPort, raBindIp.c_str());
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting Remote access listner on port %d on %s", raBindPort, raBindIp.c_str());
 
     while (!reactor.reactor_event_loop_done())
     {
-        ACE_Time_Value interval (0, 10000);
+        ACE_Time_Value interval(0, 10000);
 
-        if (reactor.run_reactor_event_loop (interval) == -1)
+        if (reactor.run_reactor_event_loop(interval) == -1)
             break;
 
-        if(World::IsStopped())
+        if (World::IsStopped())
         {
             acceptor.close();
             break;
@@ -161,18 +161,18 @@ Master::~Master()
 int Master::Run()
 {
     // worldd PID file creation
-    std::string pidfile = sConfig.GetStringDefault("PidFile", "");
-    if(!pidfile.empty())
+    std::string pidFilePath = sConfig.GetStringDefault("PidFile", "");
+    if (!pidFilePath.empty())
     {
-        uint32 pid = CreatePIDFile(pidfile);
-        if( !pid )
+        uint32 pid = CreatePIDFile(pidFilePath);
+        if (!pid)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot create PID file %s.\n", pidfile.c_str() );
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot create PID file %s.\n", pidFilePath.c_str());
             Log::WaitBeforeContinueIfNeed();
             return 1;
         }
 
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Daemon PID: %u\n", pid );
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Daemon PID: %u\n", pid);
     }
 
     // Start the databases
@@ -185,9 +185,9 @@ int Master::Run()
     // Initialize the World
     sWorld.SetInitialWorldSettings();
 
-    #ifndef WIN32
+#ifndef WIN32
     detachDaemon();
-    #endif
+#endif
     // server loaded successfully => enable async DB requests
     // this is done to forbid any async transactions during server startup!
     CharacterDatabase.AllowAsyncTransactions();
@@ -223,34 +223,34 @@ int Master::Run()
     }
 
     std::unique_ptr<std::thread> remoteAccessThread = nullptr;
-    if (sConfig.GetBoolDefault ("Ra.Enable", false))
+    if (sConfig.GetBoolDefault("Ra.Enable", false))
         remoteAccessThread = IO::Multithreading::CreateThreadPtr("RemoteAccess", &remoteAccess);
 
     // Handle affinity for multiple processors and process priority on Windows
-    #ifdef WIN32
+#ifdef WIN32
     {
-        HANDLE hProcess = GetCurrentProcess();
+        HANDLE hProcess = ::GetCurrentProcess();
 
         uint32 Aff = sConfig.GetIntDefault("UseProcessors", 0);
-        if(Aff > 0)
+        if (Aff > 0)
         {
             ULONG_PTR appAff;
             ULONG_PTR sysAff;
 
-            if(GetProcessAffinityMask(hProcess,&appAff,&sysAff))
+            if (::GetProcessAffinityMask(hProcess, &appAff, &sysAff))
             {
                 ULONG_PTR curAff = Aff & appAff;            // remove non accessible processors
 
-                if(!curAff )
+                if (!curAff)
                 {
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Processors marked in UseProcessors bitmask (hex) %x not accessible for mangosd. Accessible processors bitmask (hex): %x",Aff,appAff);
                 }
                 else
                 {
-                    if(SetProcessAffinityMask(hProcess,curAff))
+                    if (::SetProcessAffinityMask(hProcess, curAff))
                         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using processors (bitmask, hex): %x", curAff);
                     else
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set used processors (hex): %x",curAff);
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set used processors (hex): %x", curAff);
                 }
             }
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -261,23 +261,24 @@ int Master::Run()
      // if(Prio && (m_ServiceStatus == -1)/* need set to default process priority class in service mode*/)
         if(Prio)
         {
-            if(SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
+            if (::SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "mangosd process priority class set to HIGH");
             else
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set mangosd process priority class.");
         }
     }
-    #endif
+#endif
 
-    (void) sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
+    (void)sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
     IO::Multithreading::RenameCurrentThread("Main");
 
     // Start soap serving thread
     std::unique_ptr<std::thread> soap_thread = nullptr;
 
-    if(sConfig.GetBoolDefault("SOAP.Enabled", false))
+    if (sConfig.GetBoolDefault("SOAP.Enabled", false))
     {
-        soap_thread = IO::Multithreading::CreateThreadPtr("SOAP", [](){
+        soap_thread = IO::Multithreading::CreateThreadPtr("SOAP", []()
+        {
             MaNGOSsoapRunnable runnable;
             runnable.setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
             runnable.run();
@@ -286,9 +287,9 @@ int Master::Run()
 
     // Start up freeze catcher thread
     std::unique_ptr<std::thread> freeze_thread = nullptr;
-    if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
+    if (uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {
-        freeze_thread = IO::Multithreading::CreateThreadPtr("FreezeDetector", std::bind(&freezeDetector,freeze_delay*1000));
+        freeze_thread = IO::Multithreading::CreateThreadPtr("FreezeDetector", std::bind(&freezeDetector, freeze_delay * 1000));
     }
 
     std::unique_ptr<IO::IoContext> ioCtx = IO::IoContext::CreateIoContext();
@@ -313,13 +314,13 @@ int Master::Run()
         bool doExplicitTcpNoDelay = sConfig.GetBoolDefault("Network.TcpNoDelay", true);
 
         WorldSocketMgrOptions socketOptions
-        {
-            bindIp,
-            bindPort,
-            ioNetworkThreadCount,
-            socketOutByteBufferSize,
-            doExplicitTcpNoDelay,
-        };
+            {
+                bindIp,
+                bindPort,
+                ioNetworkThreadCount,
+                socketOutByteBufferSize,
+                doExplicitTcpNoDelay,
+            };
 
         if (!sWorldSocketMgr.StartWorldNetworking(ioCtx.get(), socketOptions)) // TODO: When will this stop? The threads are looping while ioCtx is running
         {
@@ -334,7 +335,7 @@ int Master::Run()
         freeze_thread->join();
 
     // Stop soap thread
-    if(soap_thread)
+    if (soap_thread)
         soap_thread->join();
 
     // Set server offline in realmlist
@@ -375,7 +376,7 @@ int Master::Run()
         //_exit(1);
         // send keyboard input to safely unblock the CLI thread
         INPUT_RECORD b[5];
-        HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+        HANDLE hStdIn = ::GetStdHandle(STD_INPUT_HANDLE);
         b[0].EventType = KEY_EVENT;
         b[0].Event.KeyEvent.bKeyDown = TRUE;
         b[0].Event.KeyEvent.uChar.AsciiChar = 'X';
@@ -404,9 +405,9 @@ int Master::Run()
         b[3].Event.KeyEvent.wVirtualScanCode = 0x1c;
         b[3].Event.KeyEvent.wRepeatCount = 1;
         DWORD numb;
-        WriteConsoleInput(hStdIn, b, 4, &numb);
+        ::WriteConsoleInput(hStdIn, b, 4, &numb);
 #else
-        fclose(stdin);
+        ::fclose(stdin);
 #endif
         if (cliThread->joinable())
             cliThread->join();
@@ -416,7 +417,7 @@ int Master::Run()
     return World::GetExitCode();
 }
 
-bool StartDB(std::string name, DatabaseType& database, const char **migrations)
+bool StartDB(const std::string& name, DatabaseType& database, char const** migrations)
 {
     // Get database info from configuration file
     std::string dbstring = sConfig.GetStringDefault((name + "Database.Info").c_str(), "");
@@ -477,7 +478,7 @@ bool Master::_StartDB()
 {
     // Get the realm Id from the configuration file
     realmID = sConfig.GetIntDefault("RealmID", 0);
-    if(!realmID)
+    if (!realmID)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Realm ID not defined in configuration file");
         return false;
@@ -519,16 +520,16 @@ void Master::clearOnlineAccounts()
 
 #include "ObjectAccessor.h"
 #include "Language.h"
-void createdump(void)
+void CreateCrashDump()
 {
 #ifndef WIN32
-    if (!fork()) { //child process
-                   // Crash the app
-        abort();
+    if (!::fork()) // Create child process
+    {
+        ::abort(); // Crash the app immediately
     }
 #endif
-
 }
+
 // Handle termination signals
 void Master::SigvSignalHandler()
 {
@@ -536,6 +537,7 @@ void Master::SigvSignalHandler()
         _OnSignal(SIGSEGV);
     exit(1);
 }
+
 void Master::_OnSignal(int s)
 {
     switch (s)
@@ -544,71 +546,78 @@ void Master::_OnSignal(int s)
             World::StopNow(RESTART_EXIT_CODE);
             break;
         case SIGTERM:
-        #ifdef _WIN32
-        case SIGBREAK:
-        #endif
+#ifdef _WIN32
+            case SIGBREAK:
+#endif
             World::StopNow(SHUTDOWN_EXIT_CODE);
             break;
         case SIGSEGV:
-            signal(SIGSEGV, 0);
+            ::signal(SIGSEGV, nullptr);
             if (!m_handleSigvSignals)
                 return;
+            m_handleSigvSignals = false; // Disarm anti-crash
+
             std::exception_ptr exc = std::current_exception();
-            m_handleSigvSignals = false; // Desarm anticrash
             sWorld.SetAnticrashRearmTimer(sWorld.getConfig(CONFIG_UINT32_ANTICRASH_REARM_TIMER));
             uint32 anticrashOptions = sWorld.getConfig(CONFIG_UINT32_ANTICRASH_OPTIONS);
+
             // Log crash stack
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Received SIGSEGV");
-            ACE_Stack_Trace st;
+            ACE_Stack_Trace st; // TODO: Replace me with non ACE StackTrace
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str());
+
             if (anticrashOptions & ANTICRASH_GENERATE_COREDUMP)
-                createdump();
+                CreateCrashDump();
+
             if (anticrashOptions & ANTICRASH_OPTION_ANNOUNCE_PLAYERS)
             {
                 if (anticrashOptions & ANTICRASH_OPTION_SAVEALL)
                     sWorld.SendWorldText(LANG_SYSTEMMESSAGE, "Server has crashed. Now saving online players ...");
                 else
                     sWorld.SendWorldText(LANG_SYSTEMMESSAGE, "Crash server occurred :(");
+
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
+
             if (anticrashOptions & ANTICRASH_OPTION_SAVEALL)
             {
                 CharacterDatabase.ThreadStart();
                 sObjectAccessor.SaveAllPlayers();
                 std::this_thread::sleep_for(std::chrono::seconds(25));
             }
+
             std::rethrow_exception(exc); // Crash for real now.
             return;
     }
 
-    signal(s, _OnSignal);
+    ::signal(s, _OnSignal);
 }
 
 void Master::_HookSignals()
 {
-    signal(SIGINT, _OnSignal);
-    signal(SIGTERM, _OnSignal);
-    signal(SIGSEGV, _OnSignal);
-    #ifdef _WIN32
-    signal(SIGBREAK, _OnSignal);
-    #endif
+    ::signal(SIGINT, _OnSignal);
+    ::signal(SIGTERM, _OnSignal);
+    ::signal(SIGSEGV, _OnSignal);
+#ifdef _WIN32
+    ::signal(SIGBREAK, _OnSignal);
+#endif
     ArmAnticrash();
 }
 
 void Master::ArmAnticrash()
 {
-    //signal(SIGSEGV, _OnSignal);
+    //::signal(SIGSEGV, _OnSignal);
     m_handleSigvSignals = true;
 }
 
 // Unhook the signals before leaving
 void Master::_UnhookSignals()
 {
-    signal(SIGINT, 0);
-    signal(SIGTERM, 0);
-    signal(SIGSEGV, 0);
-    #ifdef _WIN32
-    signal(SIGBREAK, 0);
-    #endif
+    ::signal(SIGINT, nullptr);
+    ::signal(SIGTERM, nullptr);
+    ::signal(SIGSEGV, nullptr);
+#ifdef _WIN32
+    ::signal(SIGBREAK, nullptr);
+#endif
     m_handleSigvSignals = false;
 }
