@@ -193,7 +193,7 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
     }
 }
 
-bool MySQLConnection::_Query(char const* sql, MYSQL_RES** pResult, MYSQL_FIELD** pFields, uint64* pRowCount, uint32* pFieldCount)
+bool MySQLConnection::_Query(std::string const& sql, MYSQL_RES** pResult, MYSQL_FIELD** pFields, uint64* pRowCount, uint32* pFieldCount)
 {
     if (!mMysql && !Reconnect())
     {
@@ -203,11 +203,11 @@ bool MySQLConnection::_Query(char const* sql, MYSQL_RES** pResult, MYSQL_FIELD**
 
     uint32 _s = WorldTimer::getMSTime();
 
-    if (mysql_query(mMysql, sql))
+    if (mysql_query(mMysql, sql.c_str()))
     {
         uint32 lErrno = mysql_errno(mMysql);
 
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql.c_str());
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "[%u] %s", lErrno, mysql_error(mMysql));
 
         if (HandleMySQLError(lErrno)) // If error is handled, just try again
@@ -217,7 +217,7 @@ bool MySQLConnection::_Query(char const* sql, MYSQL_RES** pResult, MYSQL_FIELD**
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql);
+        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql.c_str());
     }
 
     *pResult = mysql_store_result(mMysql);
@@ -237,54 +237,54 @@ bool MySQLConnection::_Query(char const* sql, MYSQL_RES** pResult, MYSQL_FIELD**
     return true;
 }
 
-QueryResult* MySQLConnection::Query(char const* sql)
+std::unique_ptr<QueryResult> MySQLConnection::Query(std::string const& sql)
 {
     MYSQL_RES* result = nullptr;
     MYSQL_FIELD* fields = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
-    if(!_Query(sql,&result,&fields,&rowCount,&fieldCount))
+    if(!_Query(sql, &result, &fields, &rowCount, &fieldCount))
         return nullptr;
 
-    QueryResultMysql *queryResult = new QueryResultMysql(result, fields, rowCount, fieldCount);
+    std::unique_ptr<QueryResultMysql> queryResult(new QueryResultMysql(result, fields, rowCount, fieldCount));
 
     queryResult->NextRow();
     return queryResult;
 }
 
-QueryNamedResult* MySQLConnection::QueryNamed(char const* sql)
+std::unique_ptr<QueryNamedResult> MySQLConnection::QueryNamed(std::string const& sql)
 {
     MYSQL_RES* result = nullptr;
     MYSQL_FIELD* fields = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
-    if(!_Query(sql,&result,&fields,&rowCount,&fieldCount))
+    if(!_Query(sql, &result, &fields, &rowCount, &fieldCount))
         return nullptr;
 
     QueryFieldNames names(fieldCount);
     for (uint32 i = 0; i < fieldCount; i++)
         names[i] = fields[i].name;
 
-    QueryResultMysql *queryResult = new QueryResultMysql(result, fields, rowCount, fieldCount);
+    std::unique_ptr<QueryResultMysql> queryResult(new QueryResultMysql(result, fields, rowCount, fieldCount));
 
     queryResult->NextRow();
-    return new QueryNamedResult(queryResult,names);
+    return std::make_unique<QueryNamedResult>(std::move(queryResult), names);
 }
 
-bool MySQLConnection::Execute(char const* sql)
+bool MySQLConnection::Execute(std::string const& sql)
 {
     if (!mMysql)
         return false;
 
     uint32 _s = WorldTimer::getMSTime();
 
-    if (mysql_query(mMysql, sql))
+    if (mysql_query(mMysql, sql.c_str()))
     {
         uint32 lErrno = mysql_errno(mMysql);
 
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql.c_str());
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "[%u] %s", lErrno, mysql_error(mMysql));
 
         if (HandleMySQLError(lErrno)) // If error is handled, just try again
@@ -293,23 +293,23 @@ bool MySQLConnection::Execute(char const* sql)
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql);
+        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql.c_str());
     }
 
     return true;
 }
 
-bool MySQLConnection::_TransactionCmd(char const* sql)
+bool MySQLConnection::_TransactionCmd(std::string const& sql)
 {
-    if (mysql_query(mMysql, sql))
+    if (mysql_query(mMysql, sql.c_str()))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: %s", sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: %s", sql.c_str());
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_error(mMysql));
         return false;
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "SQL: %s", sql);
+        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "SQL: %s", sql.c_str());
     }
     return true;
 }

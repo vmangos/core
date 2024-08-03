@@ -113,7 +113,14 @@ template<class T>
 void FearMovementGenerator<T>::Initialize(T &owner)
 {
     owner.AddUnitState(UNIT_STAT_FLEEING | UNIT_STAT_FLEEING_MOVE);
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Fear will now cause creatures to flee immediately, even if they are
+    //   already moving.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     owner.StopMoving();
+#endif
+
     owner.UpdateControl();
 
     if (owner.GetTypeId() == TYPEID_UNIT)
@@ -121,6 +128,11 @@ void FearMovementGenerator<T>::Initialize(T &owner)
         owner.SetWalk(_forceWalking, false);
         owner.SetTargetGuid(0);
     }
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    if (!owner.movespline->Finalized())
+        return;
+#endif
 
     _setTargetLocation(owner);
 }

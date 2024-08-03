@@ -37,6 +37,9 @@
 // also see MAX_LEVEL and GT_MAX_LEVEL define
 #define PLAYER_STRONG_MAX_LEVEL 255
 
+// Max level for trial accounts.
+#define TRIAL_MAX_LEVEL 20
+
 // Max creature level in vanilla (included some bosses and elite) (no cls data above this level)
 #define CREATURE_MAX_LEVEL 63
 

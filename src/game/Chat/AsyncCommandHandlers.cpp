@@ -73,7 +73,7 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
     }
 }
 
-void PInfoHandler::HandlePlayerLookupResult(QueryResult* result, PInfoData *data)
+void PInfoHandler::HandlePlayerLookupResult(std::unique_ptr<QueryResult> result, PInfoData *data)
 {
     if (!result)
     {
@@ -89,12 +89,10 @@ void PInfoHandler::HandlePlayerLookupResult(QueryResult* result, PInfoData *data
     data->m_race = fields[4].GetUInt8();
     data->m_class = fields[5].GetUInt8();
 
-    delete result;
-
     HandleDataAfterPlayerLookup(data);
 }
 
-void PInfoHandler::HandleDataAfterPlayerLookup(PInfoData *data)
+void PInfoHandler::HandleDataAfterPlayerLookup(PInfoData* data)
 {
     SqlQueryHolder* charHolder = new SqlQueryHolder;
     charHolder->SetSize(2);
@@ -104,15 +102,15 @@ void PInfoHandler::HandleDataAfterPlayerLookup(PInfoData *data)
     CharacterDatabase.DelayQueryHolder(&PInfoHandler::HandleDelayedMoneyQuery, charHolder, data);
 }
 
-void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder, PInfoData *data)
+void PInfoHandler::HandleDelayedMoneyQuery(std::unique_ptr<QueryResult>, SqlQueryHolder* holder, PInfoData* data)
 {
     if (holder)
     {
-        QueryResult* result = holder->GetResult(PINFO_QUERY_GOLD_SENT);
+        std::unique_ptr<QueryResult> result = holder->TakeResult(PINFO_QUERY_GOLD_SENT);
         if (result)
             data->m_mailGoldOutbox = result->Fetch()[0].GetUInt32();
 
-        result = holder->GetResult(PINFO_QUERY_GOLD_RECEIVED);
+        result = holder->TakeResult(PINFO_QUERY_GOLD_RECEIVED);
         if (result)
             data->m_mailGoldInbox = result->Fetch()[0].GetUInt32();
 
@@ -131,14 +129,13 @@ void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder,
 }
 
 // Not threadsafe, executed in unsafe callback
-void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
+void PInfoHandler::HandleAccountInfoResult(std::unique_ptr<QueryResult> result, PInfoData* data)
 {
     WorldSession* session = sWorld.FindSession(data->m_ownAccountId);
     // Caller re-logged mid query. ChatHandler requires a player in the session
     if (!session || !session->GetPlayer())
     {
         delete data;
-        delete result;
         return;
     }
 
@@ -167,15 +164,13 @@ void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
         }
 
         data->m_hasAccount = true;
-
-        delete result;
     }
 
     HandleResponse(session, data);
 }
 
 // Not threadsafe, executed in thread unsafe callback
-void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
+void PInfoHandler::HandleResponse(WorldSession* session, PInfoData* data)
 {
     char const* raceName = GetUnitRaceName(data->m_race, session->GetSessionDbcLocale());
     char const* className = GetUnitClassName(data->m_class, session->GetSessionDbcLocale());
@@ -242,7 +237,7 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
 
 // Handles the query result and offloads display to an async task in
 // the world update
-void PlayerSearchHandler::HandlePlayerAccountSearchResult(QueryResult*, SqlQueryHolder* queryHolder, int)
+void PlayerSearchHandler::HandlePlayerAccountSearchResult(std::unique_ptr<QueryResult>, SqlQueryHolder* queryHolder, int)
 {
     sWorld.AddAsyncTask(PlayerAccountSearchDisplayTask((PlayerSearchQueryHolder*)queryHolder));
 }
@@ -273,7 +268,7 @@ void PlayerAccountSearchDisplayTask::operator ()()
     AccountTypes sessionAccess = session->GetSecurity();
     for (uint32 i = 0; i < holder->GetSize(); ++i)
     {
-        QueryResult* query = holder->GetResult(i);
+        std::unique_ptr<QueryResult> query = holder->TakeResult(i);
         if (!query)
             continue;
 
@@ -296,7 +291,7 @@ void PlayerAccountSearchDisplayTask::operator ()()
 
             cHandler.PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, acc_name.c_str(), acc_id);
 
-            PlayerSearchHandler::ShowPlayerListHelper(query, cHandler, count, holder->GetLimit(), true);
+            PlayerSearchHandler::ShowPlayerListHelper(std::move(query), cHandler, count, holder->GetLimit(), true);
         }
 
         // Don't show any further accounts now that we're at the limit
@@ -315,33 +310,33 @@ void PlayerAccountSearchDisplayTask::operator ()()
 
 void PlayerCharacterLookupDisplayTask::operator()()
 {
+    std::unique_ptr<QueryResult> result;
+    result.swap(*unsafeResult); // we are now the owner of this result. The unsafeResult is nullptr.
+
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
     {
-        delete query;
         return;
     }
 
     ChatHandler cHandler(session);
-    if (!query)
+    if (!result)
     {
         cHandler.PSendSysMessage(LANG_NO_PLAYERS_FOUND);
         return;
     }
 
     uint32 count = 0;
-    PlayerSearchHandler::ShowPlayerListHelper(query, cHandler, count, limit, true);
-
-    delete query;
+    PlayerSearchHandler::ShowPlayerListHelper(std::move(result), cHandler, count, limit, true);
 }
 
 // Handle the result and create a display task to run in the world update
-void PlayerSearchHandler::HandlePlayerCharacterLookupResult(QueryResult* result, uint32 accountId, uint32 limit)
+void PlayerSearchHandler::HandlePlayerCharacterLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
 {
-    sWorld.AddAsyncTask({PlayerCharacterLookupDisplayTask(result, accountId, limit)});
+    sWorld.AddAsyncTask(std::move(PlayerCharacterLookupDisplayTask(std::move(result), accountId, limit)));
 }
 
-void PlayerSearchHandler::ShowPlayerListHelper(QueryResult* result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
+void PlayerSearchHandler::ShowPlayerListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
 {
     if (!chatHandler.GetSession() && title)
     {
@@ -411,33 +406,33 @@ bool PlayerSearchQueryHolder::GetAccountInfo(uint32 queryIndex, std::pair<uint32
 
 void AccountSearchDisplayTask::operator ()()
 {
+    std::unique_ptr<QueryResult> result;
+    result.swap(*unsafeResult); // we are now the owner of this result. The unsafeResult is nullptr.
+
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
     {
-        delete query;
         return;
     }
 
     ChatHandler cHandler(session);
 
-    if (!query)
+    if (!result)
     {
         cHandler.SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
         return;
     }
 
     uint32 count = 0;
-    AccountSearchHandler::ShowAccountListHelper(query, cHandler, count, limit, true);
-
-    delete query;
+    AccountSearchHandler::ShowAccountListHelper(std::move(result), cHandler, count, limit, true);
 }
 
-void AccountSearchHandler::HandleAccountLookupResult(QueryResult* result, uint32 accountId, uint32 limit)
+void AccountSearchHandler::HandleAccountLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
 {
-    sWorld.AddAsyncTask({AccountSearchDisplayTask(result, accountId, limit)});
+    sWorld.AddAsyncTask(std::move(AccountSearchDisplayTask(std::move(result), accountId, limit)));
 }
 
-void AccountSearchHandler::ShowAccountListHelper(QueryResult* result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
+void AccountSearchHandler::ShowAccountListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
 {
     // Display the list of account/characters online
     if (!chatHandler.GetSession() && title)                                // not output header for online case
@@ -503,12 +498,11 @@ void AccountSearchHandler::ShowAccountListHelper(QueryResult* result, ChatHandle
 }
 
 // Not thread-safe. Executed inside thread-unsafe callback
-void PlayerGoldRemovalHandler::HandleGoldLookupResult(QueryResult* result, uint32 accountId, uint32 removeAmount)
+void PlayerGoldRemovalHandler::HandleGoldLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 removeAmount)
 {
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
     {
-        delete result;
         return;
     }
 
@@ -545,6 +539,4 @@ void PlayerGoldRemovalHandler::HandleGoldLookupResult(QueryResult* result, uint3
     chatHandler.PSendSysMessage("Removed %ug %us %uc from %s", removeAmount / GOLD, (removeAmount % GOLD) / SILVER, (removeAmount % GOLD) % SILVER, name.c_str());
     chatHandler.PSendSysMessage("%s previously had %ug %us %uc", name.c_str(), prevMoney / GOLD, (prevMoney % GOLD) / SILVER, (prevMoney % GOLD) % SILVER);
     chatHandler.PSendSysMessage("%s now has %ug %us %uc", name.c_str(), newMoney / GOLD, (newMoney % GOLD) / SILVER, (newMoney % GOLD) % SILVER);
-
-    delete result;
 }

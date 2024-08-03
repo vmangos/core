@@ -249,7 +249,7 @@ class ZoneScript
         virtual void OnUnitDeath(Unit* /*pKiller*/, Unit* /*pVictim*/, SpellEntry const* /*spellProto*/) {}
     protected:
 
-        PlayerSet m_players[2];
+        ObjectGuidSet m_players[2];
         Map* m_pMap;
 
         // world state stuff

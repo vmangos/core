@@ -300,10 +300,10 @@ struct npc_AQwar_collectorAI : CreatureAI
 
         switch (creature->GetFactionTemplateId())
         {
-            case 57:
-            case 11:
+            case 12:
+            case 55:
+            case 80:
             case 875:
-            case 79:
                 team = TEAM_ALLIANCE;
                 break;
             default:
@@ -540,6 +540,35 @@ struct npc_AQwar_collectorAI : CreatureAI
     {
         return GetActiveTransportEvent() == EVENT_WAR_EFFORT_TERMINATOR;
     }
+
+    void SendWorldStateUpdateToPlayer(Player* pPlayer)
+    {
+        for (uint8 i = 0; i < NUM_SHARED_OBJECTIVES; ++i)
+        {
+            if (resourceItemId == SharedObjectives[i].itemId)
+            {
+                uint32 stock = GetTeamStock(resourceItemId, team);
+                pPlayer->SendUpdateWorldState(team == TEAM_ALLIANCE ? SharedObjectives[i].wsAllianceCurrent : SharedObjectives[i].wsHordeCurrent, stock);
+                break;
+            }
+        }
+
+        for (uint8 i = 0; i < NUM_FACTION_OBJECTIVES; ++i)
+        {
+            if (resourceItemId == AllianceObjectives[i].itemId)
+            {
+                uint32 stock = sObjectMgr.GetSavedVariable(AllianceObjectives[i].currentVar, 0);
+                pPlayer->SendUpdateWorldState(AllianceObjectives[i].wsCurrent, stock);
+                break;
+            }
+            else if (resourceItemId == HordeObjectives[i].itemId)
+            {
+                uint32 stock = sObjectMgr.GetSavedVariable(HordeObjectives[i].currentVar, 0);
+                pPlayer->SendUpdateWorldState(HordeObjectives[i].wsCurrent, stock);
+                break;
+            }
+        }
+    }
 };
 
 bool GossipHello_npc_AQwar_collector(Player* pPlayer, Creature* pCreature)
@@ -552,6 +581,8 @@ bool GossipHello_npc_AQwar_collector(Player* pPlayer, Creature* pCreature)
         objectiveReached = collectorAI->ObjectiveReached();
         if (objectiveReached)
             collectorAI->RemoveQuestGiverFlag();
+        else
+            collectorAI->SendWorldStateUpdateToPlayer(pPlayer);
 
         questItemId = collectorAI->resourceItemId;
     }
@@ -648,76 +679,6 @@ bool GetWarEffortStockInfo(uint32 resourceId, WarEffortStockInfo &info, TeamId t
     }
 
     return found;
-}
-
-bool ChatHandler::HandleWarEffortGetResource(char* args)
-{
-    uint32 resourceId = 0;
-    uint32 team;
-
-    if (!ExtractUInt32(&args, resourceId))
-        return false;
-
-    if (!ExtractUInt32(&args, team))
-        team = 0;
-
-    if (team > 1)
-        return false;
-
-    auto PrintResources = [this](WarEffortStockInfo &info)
-    {
-        double Progress = (double)info.count / (double)info.required;
-        PSendSysMessage("\"%s\" [%u] Current [%u] Required [%u] Completed: %.03f", info.proto->Name1, info.proto->ItemId, info.count, info.required, Progress);
-    };
-
-    WarEffortStockInfo info;
-    if (!GetWarEffortStockInfo(resourceId, info, TeamId(team)))
-    {
-        PSendSysMessage("Error: resource with id \"%d\" not found", resourceId);
-        return false;
-    }
-
-    PrintResources(info);
-
-    return true;
-}
-
-bool ChatHandler::HandleWarEffortSetResource(char* args)
-{
-    uint32 resourceId = 0;
-    uint32 resourceAmount = 0;
-    uint32 team = 0;
-
-    if (!ExtractUInt32(&args, resourceId))
-    {
-        PSendSysMessage("Usage example .wareffortset 3575 1245");
-        return false;
-    }
-
-    if (!ExtractUInt32(&args, resourceAmount))
-    {
-        PSendSysMessage("Usage example .wareffortset 3575 1245");
-        return false;
-    }
-
-    if (!ExtractUInt32(&args, team))
-        team = 0;
-
-    if (team > 1)
-        return false;
-
-    WarEffortStockInfo info;
-    if (!GetWarEffortStockInfo(resourceId, info, TeamId(team)))
-    {
-        PSendSysMessage("Error: resource with id \"%d\" not found", resourceId);
-        return false;
-    }
-
-    uint32 PreviousResourceCount = info.count;
-    sObjectMgr.SetSavedVariable(info.currentVar, resourceAmount, true);
-    double Progress = (double)resourceAmount / (double)info.required;
-    PSendSysMessage("\"%s\" Previous count [%u] New count [%u] Completed: %.03f", info.proto->Name1, PreviousResourceCount, resourceAmount, Progress);
-    return true;
 }
 
 CreatureAI *GetAI_npc_AQwar_collector(Creature *pCreature)

@@ -399,7 +399,7 @@ void Opcodes::BuildOpcodeList()
     /*0x14D*/  StoreOpcode(SMSG_DAMAGE_TAKEN_OBSOLETE,        "SMSG_DAMAGE_TAKEN_OBSOLETE",       STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x14E*/  StoreOpcode(SMSG_CANCEL_COMBAT,                "SMSG_CANCEL_COMBAT",               STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x14F*/  StoreOpcode(SMSG_PLAYER_COMBAT_XP_GAIN_OBSOLETE,    "SMSG_PLAYER_COMBAT_XP_GAIN_OBSOLETE",     STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     /*0x150*/  StoreOpcode(SMSG_SPELLHEALLOG,                 "SMSG_SPELLHEALLOG",                STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x151*/  StoreOpcode(SMSG_SPELLENERGIZELOG,             "SMSG_SPELLENERGIZELOG",            STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
 #endif
@@ -410,7 +410,7 @@ void Opcodes::BuildOpcodeList()
     /*0x156*/  StoreOpcode(CMSG_GETDEATHBINDZONE,             "CMSG_GETDEATHBINDZONE",            STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x157*/  StoreOpcode(SMSG_BINDZONEREPLY,                "SMSG_BINDZONEREPLY",               STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x158*/  StoreOpcode(SMSG_PLAYERBOUND,                  "SMSG_PLAYERBOUND",                 STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     /*0x159*/  StoreOpcode(SMSG_CLIENT_CONTROL_UPDATE,        "SMSG_CLIENT_CONTROL_UPDATE",       STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
 #endif
     /*0x15A*/  StoreOpcode(CMSG_REPOP_REQUEST,                "CMSG_REPOP_REQUEST",               STATUS_LOGGEDIN,  PACKET_PROCESS_MAP,           &WorldSession::HandleRepopRequestOpcode);
@@ -819,6 +819,8 @@ void Opcodes::BuildOpcodeList()
     /*0x2E7*/  StoreOpcode(CMSG_WARDEN_DATA,                  "CMSG_WARDEN_DATA",                 STATUS_AUTHED,    PACKET_PROCESS_WORLD,         &WorldSession::HandleWardenDataOpcode);
     /*0x2E8*/  StoreOpcode(SMSG_GROUP_JOINED_BATTLEGROUND,    "SMSG_GROUP_JOINED_BATTLEGROUND",   STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2E9*/  StoreOpcode(MSG_BATTLEGROUND_PLAYER_POSITIONS, "MSG_BATTLEGROUND_PLAYER_POSITIONS", STATUS_LOGGEDIN,  PACKET_PROCESS_MAP,          &WorldSession::HandleBattleGroundPlayerPositionsOpcode);
+    /*0x2F2*/  StoreOpcode(SMSG_PARTY_MEMBER_STATS_FULL,      "SMSG_PARTY_MEMBER_STATS_FULL",     STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     /*0x2EA*/  StoreOpcode(CMSG_PET_STOP_ATTACK,              "CMSG_PET_STOP_ATTACK",             STATUS_LOGGEDIN,  PACKET_PROCESS_MAP,           &WorldSession::HandlePetStopAttack);
     /*0x2EB*/  StoreOpcode(SMSG_BINDER_CONFIRM,               "SMSG_BINDER_CONFIRM",              STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2EC*/  StoreOpcode(SMSG_BATTLEGROUND_PLAYER_JOINED,   "SMSG_BATTLEGROUND_PLAYER_JOINED",  STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
@@ -827,17 +829,19 @@ void Opcodes::BuildOpcodeList()
     /*0x2EF*/  StoreOpcode(SMSG_ADDON_INFO,                   "SMSG_ADDON_INFO",                  STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2F0*/  StoreOpcode(CMSG_PET_UNLEARN,                  "CMSG_PET_UNLEARN",                 STATUS_LOGGEDIN,  PACKET_PROCESS_MAP,           &WorldSession::HandlePetUnlearnOpcode);
     /*0x2F1*/  StoreOpcode(SMSG_PET_UNLEARN_CONFIRM,          "SMSG_PET_UNLEARN_CONFIRM",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
-    /*0x2F2*/  StoreOpcode(SMSG_PARTY_MEMBER_STATS_FULL,      "SMSG_PARTY_MEMBER_STATS_FULL",     STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2F3*/  StoreOpcode(CMSG_PET_SPELL_AUTOCAST,           "CMSG_PET_SPELL_AUTOCAST",          STATUS_LOGGEDIN,  PACKET_PROCESS_MAP,           &WorldSession::HandlePetSpellAutocastOpcode);
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     /*0x2F4*/  StoreOpcode(SMSG_WEATHER,                      "SMSG_WEATHER",                     STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2F5*/  StoreOpcode(SMSG_PLAY_TIME_WARNING,            "SMSG_PLAY_TIME_WARNING",           STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2F6*/  StoreOpcode(SMSG_MINIGAME_SETUP,               "SMSG_MINIGAME_SETUP",              STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2F7*/  StoreOpcode(SMSG_MINIGAME_STATE,               "SMSG_MINIGAME_STATE",              STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2F8*/  StoreOpcode(CMSG_MINIGAME_MOVE,                "CMSG_MINIGAME_MOVE",               STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x2F9*/  StoreOpcode(SMSG_MINIGAME_MOVE_FAILED,         "SMSG_MINIGAME_MOVE_FAILED",        STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     /*0x2FA*/  StoreOpcode(SMSG_RAID_INSTANCE_MESSAGE,        "SMSG_RAID_INSTANCE_MESSAGE",       STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2FB*/  StoreOpcode(SMSG_COMPRESSED_MOVES,             "SMSG_COMPRESSED_MOVES",            STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     /*0x2FC*/  StoreOpcode(CMSG_GUILD_INFO_TEXT,              "CMSG_GUILD_INFO_TEXT",             STATUS_LOGGEDIN,  PACKET_PROCESS_GUILD,         &WorldSession::HandleGuildChangeInfoTextOpcode);
     /*0x2FD*/  StoreOpcode(SMSG_CHAT_RESTRICTED,              "SMSG_CHAT_RESTRICTED",             STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x2FE*/  StoreOpcode(SMSG_SPLINE_SET_RUN_SPEED,         "SMSG_SPLINE_SET_RUN_SPEED",        STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
@@ -857,6 +861,8 @@ void Opcodes::BuildOpcodeList()
     /*0x30C*/  StoreOpcode(SMSG_SPLINE_MOVE_STOP_SWIM,        "SMSG_SPLINE_MOVE_STOP_SWIM",       STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x30D*/  StoreOpcode(SMSG_SPLINE_MOVE_SET_RUN_MODE,     "SMSG_SPLINE_MOVE_SET_RUN_MODE",    STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x30E*/  StoreOpcode(SMSG_SPLINE_MOVE_SET_WALK_MODE,    "SMSG_SPLINE_MOVE_SET_WALK_MODE",   STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     /*0x30F*/  StoreOpcode(CMSG_GM_NUKE_ACCOUNT,              "CMSG_GM_NUKE_ACCOUNT",             STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x310*/  StoreOpcode(MSG_GM_DESTROY_CORPSE,             "MSG_GM_DESTROY_CORPSE",            STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x311*/  StoreOpcode(CMSG_GM_DESTROY_ONLINE_CORPSE,     "CMSG_GM_DESTROY_ONLINE_CORPSE",    STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
@@ -871,6 +877,8 @@ void Opcodes::BuildOpcodeList()
     /*0x31A*/  StoreOpcode(SMSG_SPLINE_MOVE_ROOT,             "SMSG_SPLINE_MOVE_ROOT",            STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x31B*/  StoreOpcode(CMSG_SET_EXPLORATION_ALL,          "CMSG_SET_EXPLORATION_ALL",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x31C*/  StoreOpcode(SMSG_INVALIDATE_PLAYER,            "SMSG_INVALIDATE_PLAYER",           STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     /*0x31D*/  StoreOpcode(CMSG_RESET_INSTANCES,              "CMSG_RESET_INSTANCES",             STATUS_LOGGEDIN,  PACKET_PROCESS_WORLD,         &WorldSession::HandleResetInstancesOpcode);
     /*0x31E*/  StoreOpcode(SMSG_INSTANCE_RESET,               "SMSG_INSTANCE_RESET",              STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x31F*/  StoreOpcode(SMSG_INSTANCE_RESET_FAILED,        "SMSG_INSTANCE_RESET_FAILED",       STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
@@ -889,6 +897,8 @@ void Opcodes::BuildOpcodeList()
     /*0x32C*/  StoreOpcode(CMSG_IGNORE_KNOCKBACK_CHEAT,       "CMSG_IGNORE_KNOCKBACK_CHEAT",      STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x32D*/  StoreOpcode(SMSG_CHAT_PLAYER_AMBIGUOUS,        "SMSG_CHAT_PLAYER_AMBIGUOUS",       STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x32E*/  StoreOpcode(MSG_DELAY_GHOST_TELEPORT,          "MSG_DELAY_GHOST_TELEPORT",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     /*0x32F*/  StoreOpcode(SMSG_SPELLINSTAKILLLOG,            "SMSG_SPELLINSTAKILLLOG",           STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x330*/  StoreOpcode(SMSG_SPELL_UPDATE_CHAIN_TARGETS,   "SMSG_SPELL_UPDATE_CHAIN_TARGETS",  STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x331*/  StoreOpcode(CMSG_CHAT_FILTERED,                "CMSG_CHAT_FILTERED",               STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);

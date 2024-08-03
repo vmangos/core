@@ -37,8 +37,6 @@
 
 #include <memory>
 
-#define MAX_SPELL_ID 40000
-
 class WorldSession;
 class WorldPacket;
 class DynamicObj;
@@ -441,6 +439,7 @@ class Spell
         Unit* GetAffectiveCaster() const { return m_originalCasterGUID ? m_originalCaster : m_casterUnit; }
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
         SpellCaster* GetCastingObject() const;
+        ObjectGuid GetOriginalCasterGuid() const { return m_originalCasterGUID; }
 
         uint32 GetPowerCost() const { return m_powerCost; }
 

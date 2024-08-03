@@ -177,9 +177,10 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     std::string safe_account = account; // Duplicate, else will screw the SHA hash verification below
     LoginDatabase.escape_string(safe_account);
     // No SQL injection, username escaped.
-
+    //                                                                  0        1            2               3            4      5      6             7           8       9             10
     std::unique_ptr<QueryResult> result(LoginDatabase.PQuery("SELECT a.`id`, aa.`gmLevel`, a.`sessionkey`, a.`last_ip`, a.`v`, a.`s`, a.`mutetime`, a.`locale`, a.`os`, a.`platform`, a.`flags`, "
-        "ab.`unbandate` > UNIX_TIMESTAMP() OR ab.`unbandate` = ab.`bandate` FROM `account` a LEFT JOIN `account_access` aa ON a.`id` = aa.`id` AND aa.`RealmID` IN (-1, %u) "
+    //      11         12                13
+        "a.`email`, a.`email_verif`, ab.`unbandate` > UNIX_TIMESTAMP() OR ab.`unbandate` = ab.`bandate` FROM `account` a LEFT JOIN `account_access` aa ON a.`id` = aa.`id` AND aa.`RealmID` IN (-1, %u) "
         "LEFT JOIN `account_banned` ab ON a.`id` = ab.`id` AND ab.`active` = 1 WHERE a.`username` = '%s' && DATEDIFF(NOW(), a.`last_login`) < 1 ORDER BY aa.`RealmID` DESC LIMIT 1", realmID, safe_account.c_str()));
 
     // Stop if the account is not found
@@ -210,25 +211,25 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     id = fields[0].GetUInt32();
-    security = sAccountMgr.GetSecurity(id);
+    security = fields[1].GetString() ? fields[1].GetUInt32() : SEC_PLAYER;
     if (security > SEC_ADMINISTRATOR) // prevent invalid security settings in DB
         security = SEC_ADMINISTRATOR;
 
     K.SetHexStr(fields[2].GetString());
-
     if (K.AsByteArray().empty())
         return -1;
 
     time_t mutetime = time_t (fields[6].GetUInt64());
-
     locale = LocaleConstant(fields[7].GetUInt8());
     if (locale >= MAX_LOCALE)
         locale = LOCALE_enUS;
     os = fields[8].GetCppString();
     platform = fields[9].GetCppString();
     uint32 accFlags = fields[10].GetUInt32();
-    bool isBanned = fields[11].GetBool();
-    
+    std::string email = fields[11].GetCppString();
+    bool verifiedEmail = fields[12].GetBool() || email.empty(); // treat no email as verified (created from console)
+    bool isBanned = fields[13].GetBool();
+
     if (isBanned || sAccountMgr.IsIPBanned(GetRemoteAddress()))
     {
         packet.Initialize(SMSG_AUTH_RESPONSE, 1);
@@ -321,9 +322,11 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     m_Session->SetAccountFlags(accFlags);
     m_Session->SetOS(clientOs);
     m_Session->SetPlatform(clientPlatform);
+    m_Session->SetVerifiedEmail(verifiedEmail);
     m_Session->SetSessionKey(K);
     m_Session->LoadGlobalAccountData();
     m_Session->LoadTutorialsData();
+    sAccountMgr.UpdateAccountData(id, account, email, verifiedEmail, AccountTypes(security));
 
     sWorld.AddSession(m_Session);
 

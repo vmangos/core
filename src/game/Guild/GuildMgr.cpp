@@ -105,8 +105,8 @@ void GuildMgr::LoadGuilds()
 {
     uint32 count = 0;
 
-    //                                                     0           1       2              3               4               5               6
-    QueryResult* result = CharacterDatabase.Query("SELECT `guild_id`, `name`, `leader_guid`, `emblem_style`, `emblem_color`, `border_style`, `border_color`,"
+    //                                                                     0           1       2              3               4               5               6
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `guild_id`, `name`, `leader_guid`, `emblem_style`, `emblem_color`, `border_style`, `border_color`,"
                           //   7                8       9       10
                           "`background_Color`, `info`, `motd`, `create_date` FROM `guild` ORDER BY `guild_id` ASC");
 
@@ -122,12 +122,12 @@ void GuildMgr::LoadGuilds()
     }
 
     // load guild ranks
-    //                                                                 0           1     2       3
-    QueryResult* guildRanksResult   = CharacterDatabase.Query("SELECT `guild_id`, `id`, `name`, `rights` FROM `guild_rank` ORDER BY `guild_id` ASC, `id` ASC");
+    //                                                                                 0           1     2       3
+    std::unique_ptr<QueryResult> guildRanksResult   = CharacterDatabase.Query("SELECT `guild_id`, `id`, `name`, `rights` FROM `guild_rank` ORDER BY `guild_id` ASC, `id` ASC");
 
     // load guild members
-    //                                                                 0                          1       2       3              4
-    QueryResult* guildMembersResult = CharacterDatabase.Query("SELECT `guild_id`, `guild_member`.`guid`, `rank`, `player_note`, `officer_note`,"
+    //                                                                                 0                          1       2       3              4
+    std::unique_ptr<QueryResult> guildMembersResult = CharacterDatabase.Query("SELECT `guild_id`, `guild_member`.`guid`, `rank`, `player_note`, `officer_note`,"
                                       //             5                    6                     7                     8                    9                           10
                                       "`characters`.`name`, `characters`.`level`, `characters`.`class`, `characters`.`zone`, `characters`.`logout_time`, `characters`.`account` "
                                       "FROM `guild_member` LEFT JOIN `characters` ON `characters`.`guid` = `guild_member`.`guid` ORDER BY `guild_id` ASC");
@@ -157,10 +157,6 @@ void GuildMgr::LoadGuilds()
     }
     while (result->NextRow());
 
-    delete result;
-    delete guildRanksResult;
-    delete guildMembersResult;
-
     //delete unused log_guid records in guild_eventlog table
     //you can comment these lines if you don't plan to change CONFIG_UINT32_GUILD_EVENT_LOG_COUNT
     CharacterDatabase.PExecute("DELETE FROM `guild_eventlog` WHERE `log_guid` > '%u'", sWorld.getConfig(CONFIG_UINT32_GUILD_EVENT_LOG_COUNT));
@@ -174,8 +170,8 @@ void GuildMgr::LoadPetitions()
     CleanUpPetitions(); // for reload
     uint32 count = 0;
 
-    //                                                      0            1                2               3
-    QueryResult* result = CharacterDatabase.Query("SELECT `owner_guid`, `petition_guid`, `charter_guid`, `name` FROM `petition`");
+    //                                                                     0            1                2               3
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `owner_guid`, `petition_guid`, `charter_guid`, `name` FROM `petition`");
 
     if (!result)
     {
@@ -189,8 +185,8 @@ void GuildMgr::LoadPetitions()
     }
 
     // load signatures
-    //                                                                 0             1                2              3
-    QueryResult* petitionSignatures = CharacterDatabase.Query("SELECT `owner_guid`, `petition_guid`, `player_guid`, `player_account` FROM `petition_sign`");
+    //                                                                                         0             1                2              3
+    std::unique_ptr<QueryResult> petitionSignaturesDbResult = CharacterDatabase.Query("SELECT `owner_guid`, `petition_guid`, `player_guid`, `player_account` FROM `petition_sign`");
 
     BarGoLink bar(result->GetRowCount());
 
@@ -199,8 +195,8 @@ void GuildMgr::LoadPetitions()
         bar.step();
         ++count;
 
-        Petition *petition = new Petition;
-        if (!petition->LoadFromDB(result))
+        Petition* petition = new Petition();
+        if (!petition->LoadFromDB(std::move(result)))
         {
             petition->Delete();
             delete petition;
@@ -209,13 +205,12 @@ void GuildMgr::LoadPetitions()
 
         m_petitionMap[petition->GetId()] = petition;
     } while (result->NextRow());
-    delete result;
 
-    if (petitionSignatures)
+    if (petitionSignaturesDbResult)
     {
         do
         {
-            Field* fields = petitionSignatures->Fetch();
+            Field* fields = petitionSignaturesDbResult->Fetch();
 
             ObjectGuid ownerGuid = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
             uint32 petitionId = fields[1].GetUInt32();
@@ -244,8 +239,7 @@ void GuildMgr::LoadPetitions()
             PetitionSignature* signature = new PetitionSignature(petition, playerGuid, accountId);
             petition->AddSignature(signature);
 
-        } while (petitionSignatures->NextRow());
-        delete petitionSignatures;
+        } while (petitionSignaturesDbResult->NextRow());
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -328,7 +322,7 @@ void GuildMgr::DeletePetitionSignaturesByPlayer(ObjectGuid guid, uint32 exceptPe
     }
 }
 
-bool Petition::LoadFromDB(QueryResult* result)
+bool Petition::LoadFromDB(const std::unique_ptr<QueryResult>& result)
 {
     if (!result)
     {

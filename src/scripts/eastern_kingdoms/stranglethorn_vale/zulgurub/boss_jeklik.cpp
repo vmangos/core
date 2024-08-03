@@ -152,6 +152,7 @@ struct boss_jeklikAI : public ScriptedAI
 
         if (!PhaseTwo && m_creature->GetHealthPercent() < 50.0f)
         {
+            m_creature->SetInvincibilityHpThreshold(0);
             m_creature->RemoveAurasDueToSpell(SPELL_BAT_FORM);
             m_creature->SetFly(false);
             m_creature->SetObjectScale(1.5f);

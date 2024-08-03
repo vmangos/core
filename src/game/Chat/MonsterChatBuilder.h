@@ -88,21 +88,21 @@ namespace MaNGOS
         {
             char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_senderGender) : sObjectMgr.GetMangosString(i_textId, loc_idx);
 
-            std::string nameForLocale;
+            char const* nameForLocale = nullptr;
             if (loc_idx >= 0)
             {
                 CreatureLocale const* cl = sObjectMgr.GetCreatureLocale(i_cInfo->entry);
                 if (cl)
                 {
                     if (cl->Name.size() > (size_t)loc_idx && !cl->Name[loc_idx].empty())
-                        nameForLocale = cl->Name[loc_idx];
+                        nameForLocale = cl->Name[loc_idx].c_str();
                 }
             }
 
-            if (nameForLocale.empty())
-                nameForLocale = i_cInfo->name;
+            if (!nameForLocale)
+                nameForLocale = i_cInfo->name.c_str();
 
-            ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_senderGuid, nameForLocale.c_str(), i_target ? i_target->GetObjectGuid() : ObjectGuid(),
+            ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_senderGuid, nameForLocale, i_target ? i_target->GetObjectGuid() : ObjectGuid(),
                 i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
         }
 

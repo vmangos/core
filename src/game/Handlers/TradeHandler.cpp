@@ -664,6 +664,12 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (HasTrialRestrictions() || pOther->GetSession()->HasTrialRestrictions())
+    {
+        SendTradeStatus(TRADE_STATUS_TRIAL_ACCOUNT);
+        return;
+    }
+
     // OK start trade
     _player->m_trade = new TradeData(_player, pOther);
     pOther->m_trade = new TradeData(pOther, _player);

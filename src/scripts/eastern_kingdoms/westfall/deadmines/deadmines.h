@@ -17,8 +17,8 @@ enum
 
     /** Doors which need to be opened automatically once the boss before died */
     GO_DOOR1                = 13965,
-    GO_DOOR2                = 17153,
-    GO_DOOR3                = 26182,
+    GO_DOOR2                = 16400,
+    GO_DOOR3                = 16399,
 
     GUN_POWDER_EVENT        = 5000,
 

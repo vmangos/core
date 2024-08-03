@@ -88,6 +88,19 @@ enum TutorialDataState
     TUTORIALDATA_NEW       = 2
 };
 
+enum BillingPlanFlags
+{
+    BILLING_FLAG_NONE         = 0x00,
+    BILLING_FLAG_UNUSED       = 0x01,
+    BILLING_FLAG_RECURRING    = 0x02,
+    BILLING_FLAG_TRIAL        = 0x04,
+    BILLING_FLAG_IGR          = 0x08,
+    BILLING_FLAG_USAGE        = 0x10,
+    BILLING_FLAG_TIME_MIXTURE = 0x20,
+    BILLING_FLAG_RESTRICTED   = 0x40,
+    BILLING_FLAG_ENABLE_CAIS  = 0x80
+};
+
 enum PlayTimeLimit : uint32
 {
     PLAY_TIME_LIMIT_APPROACHING_PARTIAL = 2 * HOUR + 30 * MINUTE,
@@ -285,6 +298,9 @@ class WorldSession
         uint32 GetAccountMaxLevel() const { return m_characterMaxLevel; }
         void SetAccountFlags(uint32 f) { m_accountFlags = f; }
         uint32 GetAccountFlags() const { return m_accountFlags; }
+        void SetVerifiedEmail(bool verified) { m_verifiedEmail = verified; }
+        bool HasVerifiedEmail() const { return m_verifiedEmail; }
+        bool HasTrialRestrictions() const;
         Player* GetPlayer() const { return _player; }
         char const* GetPlayerName() const;
         void SetSecurity(AccountTypes security) { m_security = security; }
@@ -356,7 +372,6 @@ class WorldSession
         void SetLastPubChanMsgTime(time_t time) { m_lastPubChannelMsgTime = time; }
 
         // Bot system
-        std::stringstream m_chatBotHistory;
         PlayerBotEntry* GetBot() { return m_bot.get(); }
         void SetBot(std::shared_ptr<PlayerBotEntry> const& b) { m_bot = b; }
 
@@ -366,7 +381,7 @@ class WorldSession
         Warden* GetWarden() const { return m_warden; }
         void InitCheatData(Player* pPlayer);
         MovementAnticheat* GetCheatData();
-        void ProcessAnticheatAction(char const* detector, char const* reason, uint32 action, uint32 banTime = 0 /* Perm ban */);
+        void ProcessAnticheatAction(char const* detector, char const* reason, uint32 cheatAction, uint32 banSeconds = 0 /* Perm ban */);
         uint32 GetFingerprint() const { return 0; } // TODO
         void CleanupFingerprintHistory() {} // TODO
         bool HasUsedClickToMove() const;
@@ -375,7 +390,8 @@ class WorldSession
         Unit* GetMoverFromGuid(ObjectGuid const& guid) const;
         ObjectGuid const& GetClientMoverGuid() const { return m_clientMoverGuid; }
         bool HasClientMovementControl() const { return !m_clientMoverGuid.IsEmpty(); }
-        
+        void RejectMovementPacketsFor(uint32 ms);
+
         void SetReceivedWhoRequest(bool v) { m_who_recvd = v; }
         bool ReceivedWhoRequest() const { return m_who_recvd; }
         bool m_who_recvd;
@@ -407,7 +423,12 @@ class WorldSession
                 m_sniffFile.reset();
         }
 
+    private:
+        void SendPacketImpl(WorldPacket const* packet);
+
+    public:
         void SendPacket(WorldPacket const* packet);
+        void SendMovementPacket(WorldPacket const* packet);
         void SendNotification(char const* format, ...) ATTR_PRINTF(2, 3);
         void SendNotification(int32 string_id, ...);
         void SendPetNameInvalid(uint32 error, std::string const& name);
@@ -458,7 +479,7 @@ class WorldSession
         void SetAccountData(NewAccountData::AccountDataType type, const std::string& data);
         void SendAccountDataTimes();
         void LoadGlobalAccountData();
-        void LoadAccountData(QueryResult* result, uint32 mask);
+        void LoadAccountData(std::unique_ptr<QueryResult> result, uint32 mask);
 
         void LoadTutorialsData();
         void SendTutorialsData();
@@ -525,8 +546,8 @@ class WorldSession
         void HandleCharDeleteOpcode(WorldPacket& recvPacket);
         void HandleCharCreateOpcode(WorldPacket& recvPacket);
         void HandlePlayerLoginOpcode(WorldPacket& recvPacket);
-        void HandleCharEnum(QueryResult* result);
-        void HandlePlayerLogin(LoginQueryHolder * holder);
+        void HandleCharEnum(std::unique_ptr<QueryResult> result);
+        void HandlePlayerLogin(LoginQueryHolder* holder);
         void HandlePlayedTime(WorldPacket& recvPacket);
 
         // Movement
@@ -824,7 +845,7 @@ class WorldSession
         void HandleRequestPetInfoOpcode(WorldPacket& recv_data);
 
         void HandleCharRenameOpcode(WorldPacket& recv_data);
-        static void HandleChangePlayerNameOpcodeCallBack(QueryResult* result, uint32 accountId, std::string newname);
+        static void HandleChangePlayerNameOpcodeCallBack(std::unique_ptr<QueryResult> result, uint32 accountId, std::string newname);
 
         //BattleGround
         void HandleBattlefieldJoinOpcode(WorldPacket& recv_data);
@@ -877,9 +898,10 @@ class WorldSession
         uint32 m_accountFlags;
         LocaleConstant m_sessionDbcLocale;
         int m_sessionDbLocaleIndex;
-        ClientOSType    m_clientOS;
+        ClientOSType m_clientOS;
         ClientPlatformType m_clientPlatform;
-        uint32          m_gameBuild;
+        uint32 m_gameBuild;
+        bool m_verifiedEmail;
         std::shared_ptr<PlayerBotEntry> m_bot;
         std::unique_ptr<SniffFile> m_sniffFile;
 
@@ -905,6 +927,17 @@ class WorldSession
         AccountData m_accountData[NewAccountData::NUM_ACCOUNT_DATA_TYPES];
         uint32 m_tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;
+
+        // compressed moves packet does not exist in early clients
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        MovementData m_movementPacketCompressor;
+        std::mutex m_movementPacketCompressorMutex;
+        void SendCompressedMovementPackets();
+        // dynamically decide when to enable or disable compression
+        uint32 m_movePacketsSentLastInterval = 0;
+        uint32 m_movePacketsSentThisInterval = 0;
+        time_t m_movePacketTrackingIntervalStart = 0;
+#endif
         
         // Clustering system (TODO remove this)
     public:

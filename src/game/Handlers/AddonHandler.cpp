@@ -68,6 +68,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
     if (!uncompress(const_cast<uint8*>(AddOnPacked.contents()), &AddonRealSize, const_cast<uint8*>((*Source).contents() + CurrentPosition), (*Source).size() - CurrentPosition) != Z_OK)
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         Target->Initialize(SMSG_ADDON_INFO);
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
@@ -155,6 +156,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 #endif
             }
         }
+#endif
 #endif
     }
     else

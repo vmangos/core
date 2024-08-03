@@ -93,8 +93,11 @@ bool SqlQuery::Execute(SqlConnection* conn)
         return false;
 
     LOCK_DB_CONN(conn);
+
     // execute the query and store the result in the callback
-    m_callback->SetResult(conn->Query(m_sql));
+    std::unique_ptr<QueryResult> result = conn->Query(m_sql);
+    m_callback->SetResult(std::move(result));
+
     // add the callback to the sql result queue of the thread it originated from
     m_queue->add(m_callback);
 
@@ -181,23 +184,23 @@ bool SqlQueryHolder::Execute(MaNGOS::IQueryCallback* callback, Database* databas
     return true;
 }
 
-bool SqlQueryHolder::SetQuery(size_t index, char const* sql)
+bool SqlQueryHolder::SetQuery(size_t index, std::string const& sql)
 {
     if(m_queries.size() <= index)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Query index (" SIZEFMTD ") out of range (size: " SIZEFMTD ") for query: %s", index, m_queries.size(), sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Query index (" SIZEFMTD ") out of range (size: " SIZEFMTD ") for query: %s", index, m_queries.size(), sql.c_str());
         return false;
     }
 
-    if(m_queries[index].first != nullptr)
+    if(!m_queries[index].first.empty())
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt assign query to holder index (" SIZEFMTD ") where other query stored (Old: [%s] New: [%s])",
-            index,m_queries[index].first,sql);
+            index,m_queries[index].first.c_str(), sql.c_str());
         return false;
     }
 
     // not executed yet, just stored (it's not called a holder for nothing)
-    m_queries[index] = SqlResultPair(mangos_strdup(sql), (QueryResult*)nullptr);
+    m_queries[index] = SqlResultPair(sql, nullptr);
     return true;
 }
 
@@ -215,68 +218,47 @@ bool SqlQueryHolder::SetPQuery(size_t index, char const* format, ...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if(res==-1)
+    if(res == -1)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format);
         return false;
     }
 
-    return SetQuery(index,szQuery);
+    return SetQuery(index,std::string(szQuery)); // std::string ctor copies szQuery
 }
 
-QueryResult* SqlQueryHolder::GetResult(size_t index)
+/// When you are using this function, you are the new owner of the ptr. The query will be removed from the QueryHolder
+std::unique_ptr<QueryResult> SqlQueryHolder::TakeResult(size_t index)
 {
-    if(index < m_queries.size())
-    {
-        // the query strings are freed on the first GetResult or in the destructor
-        if(m_queries[index].first != nullptr)
-        {
-            delete [] (const_cast<char*>(m_queries[index].first));
-            m_queries[index].first = nullptr;
-        }
-        // when you get a result aways remember to delete it!
-        return m_queries[index].second;
-    }
-    else
+    if (index >= m_queries.size()) {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SqlQueryHolder: TakeResult(" SIZEFMTD ") out of range (size: " SIZEFMTD ")", index, m_queries.size());
         return nullptr;
+    }
+
+    auto& entry = m_queries[index];
+    if (entry.first.empty()) {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SqlQueryHolder: TakeResult(" SIZEFMTD ") is already empty", index);
+        return nullptr;
+    }
+
+    entry.first.clear();
+    return std::move(entry.second);
 }
 
-void SqlQueryHolder::SetResult(size_t index, QueryResult* result)
+void SqlQueryHolder::SetResult(size_t index, std::unique_ptr<QueryResult> result)
 {
     // store the result in the holder
     if(index < m_queries.size())
-        m_queries[index].second = result;
-}
-
-SqlQueryHolder::~SqlQueryHolder()
-{
-    for(size_t i = 0; i < m_queries.size(); i++)
-    {
-        // if the result was never used, free the resources
-        // results used already (getresult called) are expected to be deleted
-        if(m_queries[i].first != nullptr)
-        {
-            delete [] (const_cast<char*>(m_queries[i].first));
-            if(m_queries[i].second)
-            {
-                delete m_queries[i].second;
-                m_queries[i].second = nullptr;
-            }
-        }
-    }
+        m_queries[index].second = std::move(result);
 }
 
 void SqlQueryHolder::DeleteAllResults()
 {
-    for(size_t i = 0; i < m_queries.size(); i++)
+    for (size_t i = 0; i < m_queries.size(); i++)
     {
         // if the result was never used, free the resources
         // results used already (getresult called) are expected to be deleted
-        if (m_queries[i].second != nullptr)
-        {
-            delete m_queries[i].second;
-            m_queries[i].second = nullptr;
-        }
+        m_queries[i].second.reset();
     }
 }
 
@@ -293,13 +275,15 @@ bool SqlQueryHolderEx::Execute(SqlConnection* conn)
 
     LOCK_DB_CONN(conn);
     // we can do this, we are friends
-    std::vector<SqlQueryHolder::SqlResultPair> &queries = m_holder->m_queries;
-    for(size_t i = 0; i < queries.size(); i++)
+    std::vector<SqlQueryHolder::SqlResultPair>& queries = m_holder->m_queries;
+    for (size_t i = 0; i < queries.size(); i++)
     {
         // execute all queries in the holder and pass the results
-        char const *sql = queries[i].first;
-        if (sql)
-            m_holder->SetResult(i, conn->Query(sql));
+        std::string const& sql = queries[i].first;
+        if (!sql.empty()) {
+            std::unique_ptr<QueryResult> result = conn->Query(sql);
+            m_holder->SetResult(i, std::move(result));
+        }
     }
 
     // sync with the caller thread

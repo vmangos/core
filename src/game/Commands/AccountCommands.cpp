@@ -324,8 +324,8 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
         return false;
 
     // Get the list of accounts ID logged to the realm
-    //                                                  0     1           2          3          4
-    QueryResult* result = LoginDatabase.PQuery("SELECT `id`, `username`, `last_ip`, `gmlevel`, `expansion` FROM `account` WHERE `current_realm` = %u LIMIT %u", realmID, limit);
+    //                                                                  0     1           2          3          4
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id`, `username`, `last_ip`, `gmlevel`, `expansion` FROM `account` WHERE `current_realm` = %u LIMIT %u", realmID, limit);
     if (!result)
     {
         SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
@@ -334,8 +334,8 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
     }
 
     uint32 count = 0;
-    AccountSearchHandler::ShowAccountListHelper(result, *this, count, limit, true);
-    delete result;
+    AccountSearchHandler::ShowAccountListHelper(std::move(result), *this, count, limit, true);
+
     return true;
 }
 
@@ -543,7 +543,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
 
     std::string ip = ipStr;
     LoginDatabase.escape_string(ip);
-    QueryResult* result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `id` >= %u AND `last_ip` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), minId, ip.c_str());
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `id` >= %u AND `last_ip` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), minId, ip.c_str());
     if (!result)
     {
         PSendSysMessage("No account found on IP '%s'", ip.c_str());
@@ -563,7 +563,6 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
         accountsIdToName[fields[0].GetUInt32()] = fields[1].GetCppString();
     } while (result->NextRow());
 
-    delete result;
     if (result = CharacterDatabase.PQuery("SELECT `account` FROM `characters` WHERE `account` IN (%s) AND `level` > %u GROUP BY `account`", allAccounts.str().c_str(), maxLevel))
     {
         do
@@ -571,7 +570,6 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
             Field* fields = result->Fetch();
             accountsToBan.erase(fields[0].GetUInt32());
         } while (result->NextRow());
-        delete result;
     }
 
     uint32 bannedCount = 0;
@@ -769,7 +767,7 @@ bool ChatHandler::HandleBanInfoCharacterCommand(char* args)
 
 bool ChatHandler::HandleBanInfoHelper(uint32 accountid, char const* accountname)
 {
-    QueryResult* result = LoginDatabase.PQuery(
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery(
     "SELECT FROM_UNIXTIME(`bandate`), `unbandate`-`bandate`, `active`, `unbandate`,`banreason`,`bannedby`,COALESCE(`name`, \"NoRealm\") , `gmlevel` "
     "FROM `account_banned` LEFT JOIN `realmlist` ON `realmlist`.`id` = `realm` "
     "WHERE `account_banned`.`id` = '%u' ORDER BY `bandate` ASC", accountid);
@@ -800,8 +798,7 @@ bool ChatHandler::HandleBanInfoHelper(uint32 accountid, char const* accountname)
                         fields[0].GetString(), bantime.c_str(), active ? GetMangosString(LANG_BANINFO_YES) : GetMangosString(LANG_BANINFO_NO), banreason.c_str(), authorName.c_str());
     }
     while (result->NextRow());
-
-    delete result;
+;
     return true;
 }
 
@@ -820,7 +817,7 @@ bool ChatHandler::HandleBanInfoIPCommand(char* args)
     std::string IP = cIP;
 
     LoginDatabase.escape_string(IP);
-    QueryResult* result = LoginDatabase.PQuery("SELECT `ip`, FROM_UNIXTIME(`bandate`), FROM_UNIXTIME(`unbandate`), `unbandate`-UNIX_TIMESTAMP(), `banreason`,`bannedby`,`unbandate`-`bandate` FROM `ip_banned` WHERE `ip` = '%s'", IP.c_str());
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `ip`, FROM_UNIXTIME(`bandate`), FROM_UNIXTIME(`unbandate`), `unbandate`-UNIX_TIMESTAMP(), `banreason`,`bannedby`,`unbandate`-`bandate` FROM `ip_banned` WHERE `ip` = '%s'", IP.c_str());
     if (!result)
     {
         PSendSysMessage(LANG_BANINFO_NOIP);
@@ -832,7 +829,6 @@ bool ChatHandler::HandleBanInfoIPCommand(char* args)
     PSendSysMessage(LANG_BANINFO_IPENTRY,
                     fields[0].GetString(), fields[1].GetString(), permanent ? GetMangosString(LANG_BANINFO_NEVER) : fields[2].GetString(),
                     permanent ? GetMangosString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].GetUInt64(), true).c_str(), fields[4].GetString(), fields[5].GetString());
-    delete result;
     return true;
 }
 
@@ -846,14 +842,14 @@ bool ChatHandler::HandleBanListCharacterCommand(char* args)
 
     std::string filter = cFilter;
     CharacterDatabase.escape_string(filter);
-    QueryResult* result = CharacterDatabase.PQuery("SELECT `account` FROM `characters` WHERE `name` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), filter.c_str());
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `account` FROM `characters` WHERE `name` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), filter.c_str());
     if (!result)
     {
         PSendSysMessage(LANG_BANLIST_NOCHARACTER);
         return true;
     }
 
-    return HandleBanListHelper(result);
+    return HandleBanListHelper(std::move(result));
 }
 
 bool ChatHandler::HandleBanListAccountCommand(char* args)
@@ -864,7 +860,7 @@ bool ChatHandler::HandleBanListAccountCommand(char* args)
     std::string filter = cFilter ? cFilter : "";
     LoginDatabase.escape_string(filter);
 
-    QueryResult* result;
+    std::unique_ptr<QueryResult> result;
 
     if (filter.empty())
     {
@@ -884,10 +880,10 @@ bool ChatHandler::HandleBanListAccountCommand(char* args)
         return true;
     }
 
-    return HandleBanListHelper(result);
+    return HandleBanListHelper(std::move(result));
 }
 
-bool ChatHandler::HandleBanListHelper(QueryResult* result)
+bool ChatHandler::HandleBanListHelper(std::unique_ptr<QueryResult> result)
 {
     PSendSysMessage(LANG_BANLIST_MATCHINGACCOUNT);
 
@@ -899,12 +895,11 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
             Field* fields = result->Fetch();
             uint32 accountid = fields[0].GetUInt32();
 
-            QueryResult* banresult = LoginDatabase.PQuery("SELECT `account`.`username` FROM `account`,`account_banned` WHERE `account_banned`.`id`='%u' AND `account_banned`.`id`=`account`.`id`", accountid);
+            std::unique_ptr<QueryResult> banresult = LoginDatabase.PQuery("SELECT `account`.`username` FROM `account`,`account_banned` WHERE `account_banned`.`id`='%u' AND `account_banned`.`id`=`account`.`id`", accountid);
             if (banresult)
             {
                 Field* fields2 = banresult->Fetch();
                 PSendSysMessage("%s", fields2[0].GetString());
-                delete banresult;
             }
         }
         while (result->NextRow());
@@ -931,7 +926,7 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
                 sAccountMgr.GetName(account_id, account_name);
 
             // No SQL injection. id is uint32.
-            QueryResult* banInfo = LoginDatabase.PQuery("SELECT `bandate`,`unbandate`,`bannedby`,`banreason` FROM `account_banned` WHERE `id` = %u ORDER BY `unbandate`", account_id);
+            std::unique_ptr<QueryResult> banInfo = LoginDatabase.PQuery("SELECT `bandate`,`unbandate`,`bannedby`,`banreason` FROM `account_banned` WHERE `id` = %u ORDER BY `unbandate`", account_id);
             if (banInfo)
             {
                 Field* fields2 = banInfo->Fetch();
@@ -957,14 +952,12 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
                     }
                 }
                 while (banInfo->NextRow());
-                delete banInfo;
             }
         }
         while (result->NextRow());
         SendSysMessage("===============================================================================");
     }
 
-    delete result;
     return true;
 }
 
@@ -976,7 +969,7 @@ bool ChatHandler::HandleBanListIPCommand(char* args)
     std::string filter = cFilter ? cFilter : "";
     LoginDatabase.escape_string(filter);
 
-    QueryResult* result;
+    std::unique_ptr<QueryResult> result;
 
     if (filter.empty())
     {
@@ -1040,7 +1033,6 @@ bool ChatHandler::HandleBanListIPCommand(char* args)
         SendSysMessage("===============================================================================");
     }
 
-    delete result;
     return true;
 }
 

@@ -3087,7 +3087,7 @@ void CombatBotBaseAI::SendBattlefieldPortPacket()
 
 void CombatBotBaseAI::SendBattlemasterJoinPacket(uint8 battlegroundId)
 {
-    WorldPacket data(CMSG_BATTLEMASTER_JOIN);
+    WorldPacket data(CMSG_BATTLEFIELD_JOIN);
     data << me->GetObjectGuid();                       // battlemaster guid, or player guid if joining queue from BG portal
 
     switch (battlegroundId)

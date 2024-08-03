@@ -190,6 +190,9 @@ enum MangosStrings
     LANG_XP_RATE_SET                    = 179,
     LANG_ALLIANCE_BATTLEBOT_ADDED       = 180,
     LANG_HORDE_BATTLEBOT_ADDED          = 181,
+    LANG_CAN_ONLY_WHISPER_FRIENDS       = 182,
+    LANG_CANT_USE_PUBLIC_CHANNELS       = 183,
+    LANG_RESTRICTED_ACCOUNT             = 184,
     // Room for more level 1              182-199 not used
 
     // level 2 chat
@@ -641,6 +644,10 @@ enum MangosStrings
     LANG_COMMAND_SOUND_LIST             = 602,
 
     // cheat commands
+    LANG_YOU_SET_FIXED_Z                = 611,
+    LANG_YOUR_FIXED_Z_SET               = 612,
+    LANG_CHEAT_FIXED_Z_ON               = 613,
+    LANG_CHEAT_FIXED_Z_OFF              = 614,
     LANG_YOU_SET_FLY                    = 615,
     LANG_YOUR_FLY_SET                   = 616,
     LANG_CHEAT_FLY_ON                   = 617,

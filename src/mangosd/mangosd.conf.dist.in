@@ -55,8 +55,9 @@ ConfVersion=2010100901
 #        Amount of async threads (with dedicated connection) which will be used for async SELECT, executes, and transactions.
 #        Default: 1 async worker
 #
-#    MaxPingTime
-#        Settings for maximum database-ping interval (minutes between pings)
+#    Database.AliveCheckInternal - in seconds
+#        The interval in seconds to check the reachability of the database
+#        Default: 600 (10 min)
 #
 #    WorldServerPort
 #        Port on which the server will listen
@@ -85,7 +86,7 @@ CharacterDatabase.WorkerThreads = 1
 LogsDatabase.Info               = "127.0.0.1;3306;mangos;mangos;logs"
 LogsDatabase.Connections        = 1
 LogsDatabase.WorkerThreads      = 1
-MaxPingTime = 30
+Database.AliveCheckInternal     = 600
 WorldServerPort = 8085
 BindIP = "0.0.0.0"
 
@@ -102,10 +103,18 @@ BindIP = "0.0.0.0"
 #        Default: 1 (HIGH)
 #                 0 (Normal)
 #
-#    Compression
-#        Compression level for update packages sent to client (1..9)
+#    Compression.Level
+#        Compression level for update packets sent to client (1..9)
 #        Default: 1 (speed)
 #                 9 (best compression)
+#
+#    Compression.Update.Size
+#        Maxmimum size of update object packets allowed to be sent uncompressed.
+#        Default: 128
+#
+#    Compression.Movement.Count
+#        Amount of movement packets that need to be sent to a session within 10 seconds before compression is enabled.
+#        Default: 300
 #
 #    PlayerLimit
 #        Initial realm capacity. Excluding Mods, GM's and Admins
@@ -242,7 +251,9 @@ BindIP = "0.0.0.0"
 
 UseProcessors = 0
 ProcessPriority = 1
-Compression = 1
+Compression.Level = 1
+Compression.Update.Size = 128
+Compression.Movement.Count = 300
 PlayerLimit = 100
 PlayerHardLimit = 0
 LoginQueue.GracePeriodSecs = 0
@@ -823,6 +834,19 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 0 (Disabled)
 #                 1 (Enabled)
 #
+#    RestrictUnverifiedAccounts
+#        Treat accounts with an unverified email as trial accounts, which are not allowed to do the following:
+#        - Join a guild
+#        - Whisper someone who has not added you to their friends list
+#        - Trade
+#        - Talk in General, Trade or LocalDefense channels
+#        - Level above level 20
+#        - Receive mail other than from Game Masters
+#        - Have more then 10 gold
+#        - May not level higher than 100 in your two main professions, or 150 in secondary professions
+#        Default: 0 (Disabled)
+#                 1 (Enabled)
+#
 #    SkipCinematics
 #        Disable in-game intro cinematic on first login of character (allows to prevent buggy intro when using custom start location)
 #        Default: 0 - show intro for each new character
@@ -1081,6 +1105,7 @@ CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
 LimitPlayTime = 0
+RestrictUnverifiedAccounts = 0
 SkipCinematics = 0
 ShowHealthValues = 0
 MaxPlayerLevel = 60
@@ -1762,18 +1787,13 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.NoFallTime.Enable
-#        Description: Check for players that walking in the air.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.NoFallTime.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Description: Check for consecutive movements with falling flag but no fall time.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.NoFallTime.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     5
+#        Default:     1
 #
 #    Anticheat.NoFallTime.Penalty
 #        Description: Action to take upon failing this check.
@@ -1789,6 +1809,32 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     1
 #
 #    Anticheat.BadFallReset.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Kick
+#
+#    Anticheat.BadFallStop.Enable
+#        Description: Check for falling flag being removed without sending land opcode.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.BadFallStop.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.BadFallStop.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Kick
+#
+#    Anticheat.BadMoveStart.Enable
+#        Description: Check for starting movement with wrong opcode.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.BadMoveStart.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.BadMoveStart.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
@@ -2108,12 +2154,17 @@ Anticheat.FlyHack.Reject = 1
 Anticheat.FlyHack.Threshold = 3
 Anticheat.FlyHack.Penalty = 11
 Anticheat.NoFallTime.Enable = 1
-Anticheat.NoFallTime.Reject = 1
-Anticheat.NoFallTime.Threshold = 5
+Anticheat.NoFallTime.Threshold = 1
 Anticheat.NoFallTime.Penalty = 11
 Anticheat.BadFallReset.Enable = 1
 Anticheat.BadFallReset.Threshold = 1
 Anticheat.BadFallReset.Penalty = 11
+Anticheat.BadFallStop.Enable = 1
+Anticheat.BadFallStop.Threshold = 1
+Anticheat.BadFallStop.Penalty = 11
+Anticheat.BadMoveStart.Enable = 1
+Anticheat.BadMoveStart.Threshold = 1
+Anticheat.BadMoveStart.Penalty = 11
 Anticheat.Teleport.Enable = 1
 Anticheat.Teleport.Reject = 1
 Anticheat.Teleport.Distance = 40.0
@@ -2666,15 +2717,20 @@ Alterac.InitMaxPlayers = 0
 ###################################################################################################################
 # OUTDOOR PVP CONFIG
 #
-#    OutdoorPvp.SIEnabled               #Enable Silithus Outdoor pvp
-#    OutdoorPvp.EPEnabled               #Enable Eastern Plaguelands Outdoor pvp
+#    OutdoorPvP.SI.Enable
+#        Enable Silithus Outdoor PvP
+#        Default: 1 (enable)
+#                 0 (disable)
+#
+#    OutdoorPvP.EP.Enable
+#        Enable Eastern Plaguelands Outdoor PvP
 #        Default: 1 (enable)
 #                 0 (disable)
 #
 ###################################################################################################################
 
-OutdoorPvp.SIEnabled = 1
-OutdoorPvp.EPEnabled = 1
+OutdoorPvP.SI.Enable = 1
+OutdoorPvP.EP.Enable = 1
 
 ###################################################################################################################
 # MEETING STONE LFG CONFIG

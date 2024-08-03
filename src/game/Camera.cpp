@@ -23,7 +23,6 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "Log.h"
-#include "Errors.h"
 #include "Player.h"
 
 Camera::Camera(Player* pl) : m_owner(*pl), m_source(pl)

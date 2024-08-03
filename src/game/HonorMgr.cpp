@@ -79,7 +79,7 @@ void HonorMaintenancer::LoadWeeklyScores()
         "  SELECT `guid` AS `guid`, 0 AS `hk`, 0 AS `dk`, 0 AS `cp` FROM `characters` WHERE `honor_rank_points` > 0"
         ") AS `scores` INNER JOIN `characters` AS `c` ON `scores`.`guid` = `c`.`guid` GROUP BY `guid` ORDER BY `guid` ";
 
-    QueryResult* result = CharacterDatabase.Query(query.str().c_str());
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query(query.str().c_str());
 
     if (result)
     {
@@ -97,7 +97,6 @@ void HonorMaintenancer::LoadWeeklyScores()
             m_weeklyScores[fields[0].GetUInt32()] = score;
         }
         while (result->NextRow());
-        delete result;
     }
 }
 
@@ -200,7 +199,7 @@ void HonorMaintenancer::SetCityRanks()
 
     for (uint8 i = 1; i < MAX_RACES; ++i)
     {
-        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honor_standing` FROM `characters` WHERE `honor_standing` > 0 and `race` = %u ORDER BY `honor_standing` ASC LIMIT 1", i);
+        std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `guid`, `honor_standing` FROM `characters` WHERE `honor_standing` > 0 and `race` = %u ORDER BY `honor_standing` ASC LIMIT 1", i);
 
         if (result)
         {
@@ -213,7 +212,6 @@ void HonorMaintenancer::SetCityRanks()
                 highestStandingInRace[i] = std::make_pair(guid, honorStanding);
             }
             while (result->NextRow());
-            delete result;
         }
     }
 
@@ -617,14 +615,13 @@ void HonorMaintenancer::Initialize()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Initialize Honor Maintenance system...");
 
-    QueryResult* result = CharacterDatabase.Query("SELECT `honor_last_maintenance_day`, `honor_next_maintenance_day`, `honor_maintenance_marker` FROM `saved_variables`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `honor_last_maintenance_day`, `honor_next_maintenance_day`, `honor_maintenance_marker` FROM `saved_variables`");
     if (result)
     {
         Field* fields = result->Fetch();
         m_lastMaintenanceDay = fields[0].GetUInt32();
         m_nextMaintenanceDay = fields[1].GetUInt32();
         m_markerToStart = fields[2].GetBool();
-        delete result;
     }
 
     if (!m_lastMaintenanceDay)
@@ -726,7 +723,7 @@ void HonorMgr::SaveStoredData()
             finiteAlways(m_lastWeekCP), m_storedHK, m_storedDK, m_owner->GetGUIDLow());
 }
 
-void HonorMgr::Load(QueryResult* result)
+void HonorMgr::Load(std::unique_ptr<QueryResult> result)
 {
     if (result)
     {
@@ -752,14 +749,14 @@ void HonorMgr::Load(QueryResult* result)
     }
 }
 
-bool HonorMgr::Add(float cp, uint8 type, Unit* source)
+bool HonorMgr::Add(float cp, uint8 type, Unit const* source)
 {
     // Prevent give fake records to db with 0 honor
     if (!cp || !m_owner)
         return false;
 
     // If not source, then give yourself
-    Unit* realSource = source;
+    Unit const* realSource = source;
     if (!source)
         source = m_owner;
 
@@ -775,7 +772,7 @@ bool HonorMgr::Add(float cp, uint8 type, Unit* source)
 
     // get IP if source is player
     std::string ip;
-    if (Player* victim = source->ToPlayer())
+    if (Player const* victim = source->ToPlayer())
         ip = victim->GetSession()->GetRemoteAddress();
 
     bool plr = source->GetTypeId() == TYPEID_PLAYER;
@@ -1025,7 +1022,7 @@ float HonorMgr::HonorableKillPoints(Player* killer, Player* victim, uint32 group
     return MaNGOS::Honor::GetHonorGain(killerLevel, victimLevel, victimRank, totalKills, groupSize);
 }
 
-void HonorMgr::SendPVPCredit(Unit* victim, float honor)
+void HonorMgr::SendPVPCredit(Unit const* victim, float honor)
 {
     if (!m_owner)
         return;
@@ -1056,7 +1053,7 @@ void HonorMgr::SendPVPCredit(Unit* victim, float honor)
             // we need to send first rank instead.
             // https://youtu.be/hef06Cs6Q34?t=191
             // New classic client does this on its own.
-            int32 rank = ((Player*)victim)->GetHonorMgr().GetRank().rank;
+            int32 rank = ((Player const*)victim)->GetHonorMgr().GetRank().rank;
             if (!rank)
                 rank = (HONOR_RANK_COUNT - POSITIVE_HONOR_RANK_COUNT) + 1;
             data << uint32(rank);

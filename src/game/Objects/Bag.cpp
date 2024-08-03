@@ -188,7 +188,7 @@ Item* Bag::GetItemByEntry(uint32 item) const
     return nullptr;
 }
 
-uint32 Bag::GetItemCount(uint32 item, Item* eItem) const
+uint32 Bag::GetItemCount(uint32 item, Item const* eItem) const
 {
     uint32 count = 0;
 

@@ -370,6 +370,7 @@ set (game_SRCS
     Objects/GameObjectDefines.h
     Objects/Item.h
     Objects/ItemPrototype.h
+    Objects/MovementInfo.h
     Objects/Object.h
     Objects/ObjectDefines.h
     Objects/Pet.h

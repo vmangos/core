@@ -83,7 +83,7 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket& recv_data)
     uint32 mapId;
     recv_data >> mapId;
 
-    WorldPacket data(CMSG_BATTLEMASTER_JOIN);
+    WorldPacket data(recv_data.GetOpcode());
     data << uint64(0);
     data << uint32(mapId);
     data << uint32(0);
@@ -428,6 +428,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
     // bg template might and must be used in case of leaving queue, when instance is not created yet
     if (!bg && action == 0)
         bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
+
     if (!bg)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattlegroundHandler: bgTemplate not found for type id %u.", bgTypeId);
@@ -447,6 +448,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
             action = 0;
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Battleground: player %s (%u) has a deserter debuff, do not port him to battleground!", _player->GetName(), _player->GetGUIDLow());
         }
+
         //if player don't match battleground max level, then do not allow him to enter! (this might happen when player leveled up during his waiting in queue
         if (_player->GetLevel() > bg->GetMaxLevel())
         {
@@ -454,7 +456,16 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
                           _player->GetName(), _player->GetGUIDLow(), _player->GetLevel(), bg->GetMaxLevel(), bg->GetTypeID());
             action = 0;
         }
+
+        // do not allow entering bg which is already over
+        if (bg->GetStatus() == STATUS_WAIT_LEAVE)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground: Player %s (%u) is attempting to enter battleground (%u) which has already ended!",
+                _player->GetName(), _player->GetGUIDLow(), bg->GetTypeID());
+            action = 0;
+        }
     }
+
     uint32 queueSlot = _player->GetBattleGroundQueueIndex(bgQueueTypeId);
     WorldPacket data;
     switch (action)

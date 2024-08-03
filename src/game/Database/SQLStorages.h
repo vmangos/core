@@ -25,7 +25,6 @@
 #include "Common.h"
 #include "Database/SQLStorage.h"
 
-extern SQLStorage sCreatureStorage;
 extern SQLStorage sCreatureDataAddonStorage;
 extern SQLStorage sCreatureDisplayInfoAddonStorage;
 extern SQLStorage sGameObjectDisplayInfoAddonStorage;

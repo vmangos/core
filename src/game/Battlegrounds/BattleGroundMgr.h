@@ -199,8 +199,10 @@ class BattleGroundMgr
         void Update(uint32 diff);
 
         /* Packet Building */
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         void BuildPlayerJoinedBattleGroundPacket(WorldPacket* data, Player* player);
         void BuildPlayerLeftBattleGroundPacket(WorldPacket* data, ObjectGuid guid);
+#endif
         void BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattleGroundTypeId bgTypeId);
         void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, int32 status);
         void BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value);

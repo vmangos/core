@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <cstdlib>
 #include "MMapCommon.h"
 #include "MapBuilder.h"
 #ifdef _WIN32
@@ -236,22 +237,22 @@ int main(int argc, char** argv)
                                  debug, silent, quick, buildOnlyGameobjectModels, offMeshInputPath, configInputPath);
 
     if (!validParam)
-        return silent ? -1 : finish("You have specified invalid parameters (use -? for more help)", -1);
+        return silent ? EXIT_FAILURE : finish("You have specified invalid parameters (use -? for more help)", EXIT_FAILURE);
 
     if (mapId == -1 && debug && !buildOnlyGameobjectModels)
     {
         if (silent)
-            return -2;
+            return EXIT_FAILURE;
 
         printf("You have specified debug output, but didn't specify a map to generate.\n");
         printf("This will generate debug output for ALL maps.\n");
         printf("Are you sure you want to continue? (y/n) ");
         if (getchar() != 'y')
-            return 0;
+            return EXIT_SUCCESS;
     }
 
     if (!checkDirectories(debug))
-        return silent ? -3 : finish("Press any key to close...", -3);
+        return silent ? EXIT_FAILURE : finish("Press any key to close...", EXIT_FAILURE);
 
     MapBuilder builder(configInputPath, skipLiquid, skipContinents, skipJunkMaps,
                        skipBattlegrounds, debug, quick, offMeshInputPath);
@@ -267,5 +268,5 @@ int main(int argc, char** argv)
         builder.buildAllMaps();
         builder.buildTransports();
     }
-    return silent ? 1 : finish("Movemap build is complete!", 1);
+    return silent ? EXIT_SUCCESS : finish("Movemap build is complete!", EXIT_SUCCESS);
 }

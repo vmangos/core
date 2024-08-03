@@ -78,8 +78,14 @@ bool BuildRawData(std::string const& hexData, std::vector<uint8>& out)
 
 void WardenScanMgr::LoadFromDB()
 {
-    //                                         0     1       2      3       4          5         6         7        8          9            10           11
-    auto result = WorldDatabase.Query("SELECT `id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `build_min`, `build_max`, `comment` FROM `warden_scans`");
+    //                                                               0     1       2      3       4          5         6         7        8          9            10           11
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `build_min`, `build_max`, `comment` FROM `warden_scans`"));
+
+    if (!result)
+    {
+        sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Table `warden_scans` is empty!");
+        return;
+    }
 
     // copy any non-database scans into a placeholder
     std::vector<std::shared_ptr<Scan const> > new_scans;

@@ -30,6 +30,10 @@ int BasicAI::Permissible(Creature const* creature)
 
 bool BasicAI::IsProximityAggroAllowedFor(Unit* pTarget) const
 {
+    if (m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_ONLY_ATTACK_PVP_ENABLING) &&
+        !pTarget->IsPvP() && pTarget->IsCharmerOrOwnerPlayerOrPlayerItself())
+        return false;
+
     if (!m_creature->GetVictim())
         return true;
 

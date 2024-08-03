@@ -1029,8 +1029,9 @@ void OutdoorPvPEP::OnPlayerLeave(Player* pPlayer)
 
 void OutdoorPvPEP::BuffTeams()
 {
-    for (const auto pPlayer : m_players[0])
+    for (auto const& guid : m_players[0])
     {
+        if (Player* pPlayer = GetMap()->GetPlayer(guid))
         {
             for (uint32 i : EP_AllianceBuffs)
                 pPlayer->RemoveAurasDueToSpell(i);
@@ -1039,8 +1040,9 @@ void OutdoorPvPEP::BuffTeams()
                 pPlayer->CastSpell(pPlayer, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
         }
     }
-    for (const auto pPlayer : m_players[1])
+    for (auto const& guid : m_players[1])
     {
+        if (Player* pPlayer = GetMap()->GetPlayer(guid))
         {
             for (uint32 i : EP_HordeBuffs)
                 pPlayer->RemoveAurasDueToSpell(i);

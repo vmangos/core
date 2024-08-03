@@ -28,7 +28,6 @@
 #include "ProgressBar.h"
 
 #include <stdarg.h>
-#include <fstream>
 #include <iostream>
 
 #include "ace/OS_NS_unistd.h"

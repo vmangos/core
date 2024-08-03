@@ -821,8 +821,19 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 
                     // when no faction required but rank > 0 will be used faction id from the vendor faction template to compare the rank
                     if (!pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
-                            ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->GetFactionId()))
+                        ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->GetFactionId()))
                         continue;
+
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // - Argent Dawn, Timbermaw, Zandalar and Arathi Basin vendors now show
+                    //   you their entire inventory regardless of current reputation, allowing
+                    //   players to peruse their full range of wares.The items in question
+                    //   now require the appropriate reputation level to make use of them.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+                    if (pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
+                        ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pProto->RequiredReputationFaction))
+                        continue;
+#endif
 
                     if (crItem->conditionId && !IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
                         continue;

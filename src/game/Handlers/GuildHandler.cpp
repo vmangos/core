@@ -30,6 +30,7 @@
 #include "GuildMgr.h"
 #include "GossipDef.h"
 #include "SocialMgr.h"
+#include "Language.h"
 
 void WorldSession::HandleGuildQueryOpcode(WorldPacket& recvPacket)
 {
@@ -52,6 +53,12 @@ void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
 
     if (GetPlayer()->GetGuildId())                          // already in guild
         return;
+
+    if (HasTrialRestrictions())
+    {
+        SendNotification(LANG_RESTRICTED_ACCOUNT);
+        return;
+    }
 
     Guild *guild = new Guild;
     if (!guild->Create(GetPlayer(), gname))
@@ -86,9 +93,19 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (player->GetSession()->HasTrialRestrictions())
+    {
+        SendNotification(LANG_RESTRICTED_ACCOUNT);
+        return;
+    }
+
     // OK result but not send invite
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
+    {
+        plname = player->GetName();
+        SendGuildCommandResult(GUILD_INVITE_S, plname, ERR_GUILD_IGNORING_YOU_S);
         return;
+    }
 
     // not let enemies sign guild charter
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GUILD) && player->GetTeam() != GetPlayer()->GetTeam())

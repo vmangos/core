@@ -2,6 +2,8 @@ name: Windows Development Release
 
 on:
   push:
+    branches:
+      - development
     paths-ignore:
       - '.github/ISSUE_TEMPLATE/**'
       - '.github/ISSUE_TEMPLATE.md'

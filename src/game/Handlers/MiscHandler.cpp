@@ -760,7 +760,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         if ((pPlayer->GetLevel() < bg->GetMinLevel() || pPlayer->GetLevel() > bg->GetMaxLevel()) ||
             (pPlayer->GetTeam() != pBgEntrance->team))
         {
-            SendAreaTriggerMessage("You must be in the %s and at least %u%s level to enter.", pPlayer->GetTeam() == ALLIANCE ? "Alliance" : "Horde", bg->GetMinLevel(), bg->GetMinLevel() % 2 ? "st" : "th");
+            SendAreaTriggerMessage("You must be in the %s and at least %u%s level to enter.", pPlayer->GetTeam() == ALLIANCE ? "Horde" : "Alliance", bg->GetMinLevel(), bg->GetMinLevel() % 2 ? "st" : "th");
             return;
         }
 
@@ -1244,7 +1244,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     uint32 accid = plr->GetSession()->GetAccountId();
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT `username`, `email`, `last_ip` FROM `account` WHERE `id`=%u", accid);
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `username`, `email`, `last_ip` FROM `account` WHERE `id`=%u", accid);
     if (!result)
     {
         SendNotification(LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, charname.c_str());
@@ -1267,8 +1267,6 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_WHOIS, msg.size() + 1); // max CString length allowed: 256
     data << msg;
     _player->GetSession()->SendPacket(&data);
-
-    delete result;
 }
 
 void WorldSession::HandleFarSightOpcode(WorldPacket& recv_data)

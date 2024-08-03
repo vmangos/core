@@ -415,12 +415,7 @@ void Warden::EncryptData(uint8* buffer, size_t size)
 
 void Warden::BeginTimeoutClock()
 {
-#ifdef _DEBUG
-    m_timeoutClock = 0;
-#else
-    // we will expect a reply eventually
-    m_timeoutClock = WorldTimer::getMSTime() + IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY);
-#endif
+    m_timeoutClock = WorldTimer::getMSTime() + (IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY));
 }
 
 void Warden::StopTimeoutClock()
@@ -435,7 +430,7 @@ bool Warden::TimeoutClockStarted() const
 
 void Warden::BeginScanClock()
 {
-    m_scanClock = WorldTimer::getMSTime() + 1000 * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY);
+    m_scanClock = WorldTimer::getMSTime() + (IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY));
 }
 
 void Warden::StopScanClock()
@@ -576,6 +571,13 @@ void Warden::HandlePacket(WorldPacket& recvData)
                 uint32 checksum;
                 recvData >> length >> checksum;
 
+                if (length > (recvData.size() - recvData.rpos()))
+                {
+                    recvData.rpos(recvData.wpos());
+                    ApplyPenalty("wrong checksum length", WARDEN_ACTION_KICK);
+                    return;
+                }
+
                 if (BuildChecksum(recvData.contents() + recvData.rpos(), length) != checksum)
                 {
                     recvData.rpos(recvData.wpos());
@@ -673,12 +675,14 @@ void Warden::Update()
         }
     }
 
+#ifndef _DEBUG // Ignore timeout when in debug mode (we might single step though code, which takes a long time)
     if (!!m_timeoutClock && WorldTimer::getMSTime() > m_timeoutClock)
     {
         sLog.OutWarden(this, LOG_LVL_BASIC, "Client response timeout.  Kicking.");
         KickSession();
         return;
     }
+#endif
 
     if (m_pendingScans.empty())
     {

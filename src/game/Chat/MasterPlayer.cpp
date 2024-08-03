@@ -211,7 +211,7 @@ void MasterPlayer::AddNewMailDeliverTime(time_t deliver_time)
 
 
 // load mailed item which should receive current player
-void MasterPlayer::LoadMailedItems(QueryResult* result)
+void MasterPlayer::LoadMailedItems(std::unique_ptr<QueryResult> result)
 {
     // data needs to be at first place for Item::LoadFromDB
     // 0             1                  2      3         4        5      6             7                   8           9     10       11         12       13
@@ -264,7 +264,7 @@ void MasterPlayer::LoadMailedItems(QueryResult* result)
     while (result->NextRow());
 }
 
-void MasterPlayer::LoadMails(QueryResult* result)
+void MasterPlayer::LoadMails(std::unique_ptr<QueryResult> result)
 {
     m_mail.clear();
     Player* player = GetSession()->GetPlayer();
@@ -362,11 +362,11 @@ void MasterPlayer::removeActionButton(uint8 button)
         buttonItr->second.uState = ACTIONBUTTON_DELETED;    // saved, will deleted at next save
 }
 
-void MasterPlayer::LoadActions(QueryResult* result)
+void MasterPlayer::LoadActions(std::unique_ptr<QueryResult> result)
 {
     m_actionButtons.clear();
 
-    //QueryResult* result = CharacterDatabase.PQuery("SELECT button,action,type FROM character_action WHERE guid = '%u' ORDER BY button",GetGUIDLow());
+    //std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT button,action,type FROM character_action WHERE guid = '%u' ORDER BY button",GetGUIDLow());
 
     if (result)
     {
@@ -438,9 +438,9 @@ void MasterPlayer::SaveActions()
 }
 
 
-void MasterPlayer::LoadSocial(QueryResult* result)
+void MasterPlayer::LoadSocial(std::unique_ptr<QueryResult> result)
 {
-    m_social = sSocialMgr.LoadFromDB(result, GetObjectGuid());
+    m_social = sSocialMgr.LoadFromDB(std::move(result), GetObjectGuid());
     m_social->SetMasterPlayer(this);
 }
 

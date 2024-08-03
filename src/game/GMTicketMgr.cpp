@@ -343,7 +343,7 @@ void TicketMgr::LoadTickets()
     _lastTicketId = 0;
     _openTicketCount = 0;
 
-    QueryResult* result = CharacterDatabase.Query("SELECT " TICKET_TABLE_FIELDS " FROM `gm_tickets`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT " TICKET_TABLE_FIELDS " FROM `gm_tickets`");
     if (!result)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
@@ -371,7 +371,6 @@ void TicketMgr::LoadTickets()
         _ticketList[id] = ticket;
         ++count;
     } while (result->NextRow());
-    delete result;
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u GM tickets in %u ms", count, WorldTimer::getMSTimeDiffToNow(oldMSTime));
 }
@@ -382,10 +381,9 @@ void TicketMgr::LoadSurveys()
     _lastSurveyId = 0;
 
     uint32 oldMSTime = WorldTimer::getMSTime();
-    if (QueryResult* result = CharacterDatabase.Query("SELECT MAX(`survey_id`) FROM `gm_surveys`"))
+    if (std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT MAX(`survey_id`) FROM `gm_surveys`"))
     {
         _lastSurveyId = (*result)[0].GetUInt32();
-        delete result;
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded GM Survey count from database in %u ms", WorldTimer::getMSTimeDiffToNow(oldMSTime));
@@ -457,12 +455,12 @@ void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
     session->SendPacket(&data);
 }
 
-void TicketMgr::ReloadTicketCallback(QueryResult* holder)
+void TicketMgr::ReloadTicketCallback(std::unique_ptr<QueryResult> result)
 {
-    if (!holder)
+    if (!result)
         return;
     GmTicket* newTicket = new GmTicket();
-    newTicket->LoadFromDB(holder->Fetch());
+    newTicket->LoadFromDB(result->Fetch());
     GmTicket* currentTicket = GetTicket(newTicket->GetId());
     if (!currentTicket)
     {
@@ -489,7 +487,6 @@ void TicketMgr::ReloadTicketCallback(QueryResult* holder)
             sWorld.SendGMTicketText(msg.c_str());
         }
     }
-    delete holder;
 }
 
 void TicketMgr::ReloadTicket(uint32 ticketId)

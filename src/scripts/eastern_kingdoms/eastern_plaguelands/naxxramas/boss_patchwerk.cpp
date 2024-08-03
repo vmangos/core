@@ -34,7 +34,8 @@ enum PatchwerkData
     EMOTE_BERSERK         = 4428,
     EMOTE_ENRAGE          = 2384,
 
-    SPELL_HATEFULSTRIKE   = 28308,
+    SPELL_SUMMON_PLAYER   = 20477,
+    SPELL_HATEFUL_STRIKE  = 28308,
     SPELL_ENRAGE          = 28131, // 5% enrage soft enrage
     SPELL_BERSERK         = 27680, // 7min hard enrage
     SPELL_SLIMEBOLT       = 32309  // Added in patch 1.12
@@ -71,14 +72,16 @@ struct boss_patchwerkAI : public ScriptedAI
 
     bool   m_bEnraged;
     bool   m_bBerserk;
-    ObjectGuid previousTarget;
+    uint32 m_failedStrikes;
+    ObjectGuid m_previousTarget;
 
     void Reset() override
     {
         m_events.Reset();
         m_bEnraged = false;
         m_bBerserk = false;
-        previousTarget = 0;
+        m_failedStrikes = 0;
+        m_previousTarget.Clear();
     }
 
     void KilledUnit(Unit* pVictim) override
@@ -124,11 +127,19 @@ struct boss_patchwerkAI : public ScriptedAI
         
         // todo: can it hit anything other than players?
 
+        SpellEntry const* pHatefulStrike = sSpellMgr.GetSpellEntry(SPELL_HATEFUL_STRIKE);
+        if (!pHatefulStrike)
+        {
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Patchwerk - Hateful Strike spell does not exist?!");
+            return;
+        }
+
         Unit* mainTank = m_creature->GetVictim();
         
         // Shouldnt really be possible, but hey, weirder things have happened
         if (!mainTank)
             return;
+
         ObjectGuid const& mainTankGuid = mainTank->GetObjectGuid();
 
         Unit* pTarget = nullptr;
@@ -155,6 +166,9 @@ struct boss_patchwerkAI : public ScriptedAI
             if (!m_creature->CanReachWithMeleeSpellAttack(pTempTarget))
                 continue;
 
+            if (pTempTarget->IsImmuneToSpell(pHatefulStrike, false))
+                continue;
+
             // Skipping maintank, only using him if there is no other viable target 
             // todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
             if (iter->getUnitGuid() != mainTankGuid)
@@ -174,13 +188,24 @@ struct boss_patchwerkAI : public ScriptedAI
         if (!pTarget)
             pTarget = mainTank;
 
-        if (pTarget->GetObjectGuid() != previousTarget)
+        if (pTarget->GetObjectGuid() != m_previousTarget)
         {
             m_creature->SetInFront(pTarget);
             m_creature->SetTargetGuid(pTarget->GetObjectGuid());
-            previousTarget = pTarget->GetObjectGuid();
+            m_previousTarget = pTarget->GetObjectGuid();
         }
-        DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
+
+        if (m_creature->CastSpell(pTarget, pHatefulStrike, false) == SPELL_FAILED_OUT_OF_RANGE)
+        {
+            if (++m_failedStrikes >= 3)
+            {
+                if (Player* pPlayer = pTarget->ToPlayer())
+                    if (!pPlayer->IsBeingTeleported())
+                        m_creature->CastSpell(pPlayer, SPELL_SUMMON_PLAYER, true);
+            }
+        }
+        else
+            m_failedStrikes = 0;
     }
 
     bool CustomGetTarget()
@@ -203,11 +228,11 @@ struct boss_patchwerkAI : public ScriptedAI
                 if (!m_creature->IsAttackReady(BASE_ATTACK) && m_creature->CanReachWithMeleeAutoAttack(target)) // he does not have offhand attack
                     return true;
 
-                if (target->GetObjectGuid() != previousTarget)
+                if (target->GetObjectGuid() != m_previousTarget)
                 {
                     m_creature->SetInFront(target);
                     m_creature->SetTargetGuid(target->GetObjectGuid());
-                    previousTarget = target->GetObjectGuid();
+                    m_previousTarget = target->GetObjectGuid();
                 }
                 AttackStart(target);
             }

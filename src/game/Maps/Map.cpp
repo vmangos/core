@@ -124,7 +124,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       i_id(id), i_InstanceId(InstanceId), m_unloadTimer(0),
       m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), m_persistentState(nullptr),
       m_activeNonPlayersIter(m_activeNonPlayers.end()), m_transportsUpdateIter(m_transports.end()),
-      i_gridExpiry(expiry), m_TerrainData(sTerrainMgr.LoadTerrain(id)),
+      m_createTime(time(nullptr)), i_gridExpiry(expiry), m_TerrainData(sTerrainMgr.LoadTerrain(id)),
       i_data(nullptr), i_script_id(0), m_unloading(false), m_crashed(false),
       _processingSendObjUpdates(false), _processingUnitsRelocation(false),
       m_updateFinished(false), m_updateDiffMod(0), m_GridActivationDistance(DEFAULT_VISIBILITY_DISTANCE),
@@ -156,14 +156,14 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState->SetUsedByMapState(this);
     m_weatherSystem = new WeatherSystem(this);
 
-    int numObjThreads = (int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
-    if (numObjThreads > 1)
-    {
-        m_objectThreads.reset(new ThreadPool(numObjThreads -1));
-        m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
-    }
     if (IsContinent())
     {
+        int numObjThreads = (int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
+        if (numObjThreads > 1)
+        {
+            m_objectThreads.reset(new ThreadPool(numObjThreads -1));
+            m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
+        }
         m_motionThreads.reset(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS)));
         m_visibilityThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1,0)));
         m_cellThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) - 1, 0)));
@@ -821,9 +821,12 @@ inline void Map::UpdateCells(uint32 map_diff)
 {
     uint32 now = WorldTimer::getMSTime();
     uint32 diff = WorldTimer::getMSTimeDiff(_lastCellsUpdate, now);
+
     if (diff < sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_UPDATE_CELLS_DIFF))
         return;
+
     _lastCellsUpdate = now;
+    m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
 
     // update active cells around players and active objects
     if (IsContinent() && m_cellThreads->status() == ThreadPool::Status::READY)
@@ -846,22 +849,27 @@ inline void Map::UpdateCells(uint32 map_diff)
 
 void Map::ProcessSessionPackets(PacketProcessing type)
 {
-    uint32 beginTime = WorldTimer::getMSTime();
+    TimePoint beginTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
+
     // update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
         Player* plr = m_mapRefIter->getSource();
         if (plr && plr->IsInWorld())
         {
+            if (type == PACKET_PROCESS_SPELLS)
+                plr->UpdateCooldowns(beginTime);
+
             WorldSession* pSession = plr->GetSession();
             MapSessionFilter updater(pSession);
             updater.SetProcessType(type);
             pSession->ProcessPackets(updater);
         }
     }
-    beginTime = WorldTimer::getMSTimeDiffToNow(beginTime);
-    if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS) && beginTime > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS))
-        sLog.Out(LOG_PERFORMANCE, LOG_LVL_BASIC, "Map %u inst %u: %3ums to update packets type %u", GetId(), GetInstanceId(), beginTime, type);
+
+    auto elapsedTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now()) - beginTime;
+    if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS) && elapsedTime.count() > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS))
+        sLog.Out(LOG_PERFORMANCE, LOG_LVL_BASIC, "Map %u inst %u: %3ums to update packets type %u", GetId(), GetInstanceId(), elapsedTime.count(), type);
 }
 
 void Map::UpdateSessionsMovementAndSpellsIfNeeded()
@@ -884,6 +892,8 @@ void Map::UpdatePlayers()
 
     if (diff < sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_UPDATE_PLAYERS_DIFF))
         return;
+
+    m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
 
     ++_inactivePlayersSkippedUpdates;
     bool updateInactivePlayers = _inactivePlayersSkippedUpdates > sWorld.getConfig(CONFIG_UINT32_INACTIVE_PLAYERS_SKIP_UPDATES);
@@ -923,6 +933,7 @@ void Map::DoUpdate(uint32 maxDiff)
 void Map::Update(uint32 t_diff)
 {
     uint32 updateMapTime = WorldTimer::getMSTime();
+    m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
     _dynamicTree.update(t_diff);
 
     UpdateSessionsMovementAndSpellsIfNeeded();
@@ -1829,7 +1840,7 @@ bool Map::SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const
 
 void Map::SendDefenseMessage(int32 textId, uint32 zoneId) const
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     for (const auto& itr : m_mapRefManager)
     {
         Player* pPlayer = itr.getSource();
@@ -1962,7 +1973,7 @@ void Map::CreateInstanceData(bool load)
     if (load)
     {
         // TODO: make a global storage for this
-        QueryResult* result;
+        std::unique_ptr<QueryResult> result;
 
         if (Instanceable())
             result = CharacterDatabase.PQuery("SELECT data FROM instance WHERE id = '%u'", i_InstanceId);
@@ -1980,8 +1991,6 @@ void Map::CreateInstanceData(bool load)
             }
             else
                 i_data->Create();
-
-            delete result;
         }
         else
         {
@@ -2416,6 +2425,7 @@ void BattleGroundMap::Update(uint32 diff)
 {
     if (!GetBG())
         return;
+
     Map::Update(diff);
 
     GetBG()->Update(diff);

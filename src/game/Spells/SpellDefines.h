@@ -824,18 +824,23 @@ enum SpellAttributesEx3
 {
     SPELL_ATTR_EX3_PVP_ENABLING                 = 0x00000001,            // 0 Spell landed counts as hostile action against enemy even if it doesn't trigger combat state, propagates PvP flags
     SPELL_ATTR_EX3_NO_PROC_EQUIP_REQUIREMENT    = 0x00000002,            // 1
+    // Attributes below first added in patch 1.3.
     SPELL_ATTR_EX3_NO_CASTING_BAR_TEXT          = 0x00000004,            // 2
     SPELL_ATTR_EX3_COMPLETELY_BLOCKED           = 0x00000008,            // 3 All effects prevented on block
     SPELL_ATTR_EX3_NO_RES_TIMER                 = 0x00000010,            // 4 Corpse reclaim delay does not apply to accepting resurrection (only Rebirth has it)
     SPELL_ATTR_EX3_NO_DURABILITY_LOSS           = 0x00000020,            // 5
+    // Attributes below first added in patch 1.5.
     SPELL_ATTR_EX3_NO_AVOIDANCE                 = 0x00000040,            // 6 Persistent Area Aura not removed on leaving radius
     SPELL_ATTR_EX3_DOT_STACKING_RULE            = 0x00000080,            // 7 Create a separate (de)buff stack for each caster
+    // Attributes below first added in patch 1.6.
     SPELL_ATTR_EX3_ONLY_ON_PLAYER               = 0x00000100,            // 8 Can target only players
     SPELL_ATTR_EX3_NOT_A_PROC                   = 0x00000200,            // 9 Aura periodic trigger is not evaluated as triggered
     SPELL_ATTR_EX3_REQUIRES_MAIN_HAND_WEAPON    = 0x00000400,            // 10
     SPELL_ATTR_EX3_ONLY_BATTLEGROUNDS           = 0x00000800,            // 11
+    // Attributes below first added in patch 1.7.
     SPELL_ATTR_EX3_ONLY_ON_GHOSTS               = 0x00001000,            // 12
     SPELL_ATTR_EX3_HIDE_CHANNEL_BAR             = 0x00002000,            // 13 Client will not display channeling bar
+    // Attributes below first added in patch 1.9.
     SPELL_ATTR_EX3_HIDE_IN_RAID_FILTER          = 0x00004000,            // 14 Only "Honorless Target" has this flag
     SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK         = 0x00008000,            // 15 Spells with this attribute are processed as ranged attacks in client
     SPELL_ATTR_EX3_SUPPRESS_CASTER_PROCS        = 0x00010000,            // 16
@@ -846,11 +851,13 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_ONLY_PROC_OUTDOORS           = 0x00200000,            // 21
     SPELL_ATTR_EX3_CASTING_CANCELS_AUTOREPEAT   = 0x00400000,            // 22 NYI (only Shoot with Wand has it)
     SPELL_ATTR_EX3_NO_DAMAGE_HISTORY            = 0x00800000,            // 23 NYI
+    // Attributes below first added in patch 1.10.
     SPELL_ATTR_EX3_REQUIRES_OFFHAND_WEAPON      = 0x01000000,            // 24
     SPELL_ATTR_EX3_TREAT_AS_PERIODIC            = 0x02000000,            // 25 Does not cause spell pushback
     SPELL_ATTR_EX3_CAN_PROC_FROM_PROCS          = 0x04000000,            // 26 Auras with this attribute can proc off procced spells (periodic triggers etc)
     SPELL_ATTR_EX3_ONLY_PROC_ON_CASTER          = 0x08000000,            // 27
     SPELL_ATTR_EX3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS = 0x10000000,   // 28 Skips all cast checks, moved from AttributesEx after 1.10 (100% correlation)
+    // Attributes below first added in patch 1.11.
     SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS      = 0x20000000,            // 29
     SPELL_ATTR_EX3_DO_NOT_DISPLAY_RANGE         = 0x40000000,            // 30
     SPELL_ATTR_EX3_NOT_ON_AOE_IMMUNE            = 0x80000000             // 31
@@ -858,6 +865,7 @@ enum SpellAttributesEx3
 
 enum SpellAttributesEx4
 {
+    // Attributes below first added in patch 1.12.
     SPELL_ATTR_EX4_IGNORE_RESISTANCES           = 0x00000001,            // 0 From TC 3.3.5, but not present in 1.12 native DBCs. Add it with spell_mod to prevent a spell from being resisted.
     SPELL_ATTR_EX4_CLASS_TRIGGER_ONLY_ON_TARGET = 0x00000002,            // 1
     SPELL_ATTR_EX4_AURA_EXPIRES_OFFLINE         = 0x00000004,            // 2 Aura continues to expire while player is offline

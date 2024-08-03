@@ -293,6 +293,9 @@ void BattleGround::Update(uint32 diff)
         // BattleGround Template instance cannot be updated, because it would be deleted
         if (!GetInvitedCount(HORDE) && !GetInvitedCount(ALLIANCE))
             delete this;
+        // update queue to avoid bg remaining indefinitely until player logs back in if he logs out after it pops
+        else if (GetStatus() <= STATUS_WAIT_JOIN && (GetBgMap()->GetCreateTime() + 2 * MINUTE) < time(nullptr))
+            sBattleGroundMgr.ScheduleQueueUpdate(BattleGroundMgr::BgQueueTypeId(GetTypeID()), GetTypeID(), GetBracketId());
 
         return;
     }
@@ -741,6 +744,10 @@ void BattleGround::EndBattleGround(Team winner)
 #else
         DoOrSimulateScriptTextForMap(winTextId, GetHeraldEntry(), GetBgMap());
 #endif
+
+    // remove any invited players from the queue when bg ends
+    if (GetInvitedCount(HORDE) || GetInvitedCount(ALLIANCE))
+        sBattleGroundMgr.ScheduleQueueUpdate(BattleGroundMgr::BgQueueTypeId(GetTypeID()), GetTypeID(), GetBracketId());
 }
 
 uint32 BattleGround::GetBonusHonorFromKill(uint32 kills) const
@@ -953,9 +960,11 @@ void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool transport, bool sen
             sBattleGroundMgr.ScheduleQueueUpdate(bgQueueTypeId, bgTypeId, GetBracketId());
 
             // Let others know
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             WorldPacket data;
             sBattleGroundMgr.BuildPlayerLeftBattleGroundPacket(&data, guid);
             SendPacketToTeam(team, &data, pPlayer, false);
+#endif
         }
     }
 
@@ -1030,9 +1039,11 @@ void BattleGround::AddPlayer(Player* pPlayer)
 
     UpdatePlayersCountByTeam(team, false);                  // +1 player
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     WorldPacket data;
     sBattleGroundMgr.BuildPlayerJoinedBattleGroundPacket(&data, pPlayer);
     SendPacketToTeam(team, &data, pPlayer, false);
+#endif
 
     // setup BG group membership
     PlayerAddedToBGCheckIfBGIsRunning(pPlayer);
@@ -1158,6 +1169,63 @@ uint32 BattleGround::GetFreeSlotsForTeam(Team team) const
     if (GetStatus() == STATUS_WAIT_JOIN || GetStatus() == STATUS_IN_PROGRESS)
         return (GetInvitedCount(team) < GetMaxPlayersPerTeam()) ? GetMaxPlayersPerTeam() - GetInvitedCount(team) : 0;
 
+    return 0;
+}
+
+void BattleGround::DecreaseInvitedCount(Team team)
+{
+    switch (team)
+    {
+        case ALLIANCE:
+        {
+            MANGOS_ASSERT(m_invitedAlliance-- > 0);
+            break;
+        }
+        case HORDE:
+        {
+            MANGOS_ASSERT(m_invitedHorde-- > 0);
+            break;
+        }
+        default:
+        {
+            sLog.Out(LOG_BG, LOG_LVL_ERROR, "BattleGround::DecreaseInvitedCount - Unknown player team %u.", team);
+            break;
+        }
+    }
+}
+void BattleGround::IncreaseInvitedCount(Team team)
+{ 
+    switch (team)
+    {
+        case ALLIANCE:
+        {
+            ++m_invitedAlliance;
+            break;
+        }
+        case HORDE:
+        {
+            ++m_invitedHorde;
+            break;
+        }
+        default:
+        {
+            sLog.Out(LOG_BG, LOG_LVL_ERROR, "BattleGround::IncreaseInvitedCount - Unknown player team %u.", team);
+            break;
+        }
+    }
+}
+
+uint32 BattleGround::GetInvitedCount(Team team) const
+{
+    switch (team)
+    {
+        case ALLIANCE:
+            return m_invitedAlliance;
+        case HORDE:
+            return m_invitedHorde;
+    }
+
+    sLog.Out(LOG_BG, LOG_LVL_ERROR, "BattleGround::GetInvitedCount - Unknown player team %u.", team);
     return 0;
 }
 

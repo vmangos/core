@@ -247,10 +247,10 @@ class Guild
         uint32 GetMemberSize() const { return members.size(); }
         uint32 GetAccountsNumber();
 
-        bool LoadGuildFromDB(QueryResult* guildDataResult);
+        bool LoadGuildFromDB(const std::unique_ptr<QueryResult>& guildDataResult);
         bool CheckGuildStructure();
-        bool LoadRanksFromDB(QueryResult* guildRanksResult);
-        bool LoadMembersFromDB(QueryResult* guildMembersResult);
+        bool LoadRanksFromDB(const std::unique_ptr<QueryResult>& guildRanksResult);
+        bool LoadMembersFromDB(const std::unique_ptr<QueryResult>& guildMembersResult);
 
         void BroadcastToGuild(WorldSession* session, char const* msg, uint32 language = LANG_UNIVERSAL);
         void BroadcastToOfficers(WorldSession* session, char const* msg, uint32 language = LANG_UNIVERSAL);

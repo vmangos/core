@@ -65,7 +65,7 @@ void InstanceStatisticsMgr::LoadFromDB()
     m_instanceCreatureKills.clear();
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "> Loading table `instance_creature_kills`");
     count = 0;
-    result.reset(LogsDatabase.Query("SELECT `mapId`, `creatureEntry`, `spellEntry`, `count` FROM `instance_creature_kills`"));
+    result = LogsDatabase.Query("SELECT `mapId`, `creatureEntry`, `spellEntry`, `count` FROM `instance_creature_kills`");
     if (!result)
     {
         BarGoLink bar(1);
@@ -111,7 +111,7 @@ void InstanceStatisticsMgr::LoadFromDB()
     m_instanceCustomCounters.clear();
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "> Loading table `instance_custom_counters`");
     count = 0;
-    result.reset(LogsDatabase.Query("SELECT `index`, `count` FROM `instance_custom_counters`"));
+    result = LogsDatabase.Query("SELECT `index`, `count` FROM `instance_custom_counters`");
     if (!result)
     {
         BarGoLink bar(1);

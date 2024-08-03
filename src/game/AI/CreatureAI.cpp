@@ -28,7 +28,11 @@
 #include "ScriptMgr.h"
 #include "Group.h"
 
-CreatureAI::CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_bMeleeAttack(true), m_bCombatMovement(true), m_uiCastingDelay(0), m_uLastAlertTime(0)
+CreatureAI::CreatureAI(Creature* creature) :
+    m_creature(creature), m_bUseAiAtControl(false),
+    m_bMeleeAttack(!creature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_MELEE)),
+    m_bCombatMovement(!creature->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE)),
+    m_uiCastingDelay(0), m_uLastAlertTime(0)
 {
     SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
 }
@@ -43,8 +47,8 @@ void CreatureAI::JustRespawned()
     SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     // Reset combat movement and melee attack.
-    m_bCombatMovement = true;
-    m_bMeleeAttack = true;
+    m_bCombatMovement = !m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE);
+    m_bMeleeAttack = !m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_MELEE);
 }
 
 void CreatureAI::AttackedBy(Unit* attacker)
@@ -304,8 +308,8 @@ void CreatureAI::OnCombatStop()
     SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     // Reset combat movement and melee attack.
-    m_bCombatMovement = true;
-    m_bMeleeAttack = true;
+    m_bCombatMovement = !m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE);
+    m_bMeleeAttack = !m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_MELEE);
 }
 
 void CreatureAI::EnterEvadeMode()

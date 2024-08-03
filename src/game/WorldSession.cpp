@@ -78,7 +78,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_
     m_exhaustionState(0), m_createTime(time(nullptr)), m_previousPlayTime(0), m_logoutTime(0), m_inQueue(false),
     m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false), m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
-    m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_clientPlatform(CLIENT_PLATFORM_UNKNOWN), m_gameBuild(0),
+    m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_clientPlatform(CLIENT_PLATFORM_UNKNOWN), m_gameBuild(0), m_verifiedEmail(true),
     m_charactersCount(10), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr)
 {
     if (sock)
@@ -136,41 +136,14 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     {
         if (GetBot() && GetBot()->ai)
             GetBot()->ai->OnPacketReceived(packet);
-
-        if (packet->GetOpcode() == SMSG_MESSAGECHAT)
-        {
-            WorldPacket packet2(*packet);
-            packet2.rpos(0);
-            uint8 msgtype;
-            uint32 lang;
-            ObjectGuid guid1;
-            std::string name1;
-            packet2 >> msgtype >> lang;
-            // Channels
-            if (msgtype == CHAT_MSG_CHANNEL)
-            {
-                std::string chanName, message;
-                uint32 unused;
-                packet2 >> chanName >> unused >> guid1 >> unused;
-                packet2 >> message;
-                if (sObjectMgr.GetPlayerNameByGUID(guid1, name1))
-                    m_chatBotHistory << uint32(msgtype) << " " << name1 << " " << chanName << " " << message << std::endl;
-                return;
-            }
-            ObjectGuid guid2;
-            uint32 textLen;
-            std::string message;
-            uint8 chatTag;
-            packet2 >> guid1;
-            if (msgtype == CHAT_MSG_SAY || msgtype == CHAT_MSG_YELL || msgtype == CHAT_MSG_PARTY)
-                packet2 >> guid2;
-            packet2 >> textLen >> message >> chatTag;
-            if (guid1.IsEmpty() || sObjectMgr.GetPlayerNameByGUID(guid1, name1))
-                m_chatBotHistory << uint32(msgtype) << " " << name1 << " NULL " << message << std::endl;
-        }
         return;
     }
 
+    SendPacketImpl(packet);
+}
+
+void WorldSession::SendPacketImpl(WorldPacket const* packet)
+{
 #ifdef _DEBUG
 
     // Code for network use statistic
@@ -214,6 +187,61 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (m_socket->SendPacket(*packet) == -1)
         m_socket->CloseSocket();
 }
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+void WorldSession::SendMovementPacket(WorldPacket const* packet)
+{
+    // There is a maximum size packet.
+    if (packet->size() > 0x8000)
+    {
+        // Packet will be rejected by client
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[NETWORK] Packet %s size %u is too large. Not sent [Account %u Player %s]", LookupOpcodeName(packet->GetOpcode()), packet->size(), GetAccountId(), GetPlayerName());
+        return;
+    }
+
+    if (!m_socket)
+    {
+        if (GetBot() && GetBot()->ai)
+            GetBot()->ai->OnPacketReceived(packet);
+        return;
+    }
+
+    if (++m_movePacketsSentThisInterval < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT) &&
+        m_movePacketsSentLastInterval < sWorld.getConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT))
+    {
+        SendPacketImpl(packet);
+        return;
+    }
+        
+    std::lock_guard<std::mutex> guard(m_movementPacketCompressorMutex);
+    if (m_movementPacketCompressor.CanAddPacket(*packet))
+        m_movementPacketCompressor.AddPacket(*packet);
+    else
+    {
+        // send batched packets first to maintain order of packets
+        SendCompressedMovementPackets();
+        SendPacketImpl(packet);
+    }
+}
+
+void WorldSession::SendCompressedMovementPackets()
+{
+    if (m_movementPacketCompressor.HasData())
+    {
+        WorldPacket packet;
+        if (m_movementPacketCompressor.BuildPacket(packet))
+            SendPacket(&packet);
+        else
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Movement packet compression failed! Packets lost!");
+        m_movementPacketCompressor.ClearBuffer();
+    }
+}
+#else
+void WorldSession::SendMovementPacket(WorldPacket const* packet)
+{
+    SendPacket(packet);
+}
+#endif
 
 uint32 GetChatPacketProcessingType(uint32 chatType)
 {
@@ -294,6 +322,11 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
                   LookupOpcodeName(packet->GetOpcode()),
                   packet->GetOpcode(),
                   packet->rpos(), packet->wpos());
+}
+
+bool WorldSession::HasTrialRestrictions() const
+{
+    return !HasVerifiedEmail() && GetSecurity() <= SEC_PLAYER && sWorld.getConfig(CONFIG_BOOL_RESTRICT_UNVERIFIED_ACCOUNTS);
 }
 
 void WorldSession::CheckPlayedTimeLimit(time_t now)
@@ -417,7 +450,21 @@ bool WorldSession::Update(PacketFilter& updater)
             return ForcePlayerLogoutDelay();
         }
 
-        time_t currTime = time(nullptr);
+        time_t const currTime = time(nullptr);
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        // send these out every world update
+        SendCompressedMovementPackets();
+
+        // only enable compression when there's a lot of movement around us
+        if (m_movePacketTrackingIntervalStart + 10 < currTime)
+        {
+            m_movePacketTrackingIntervalStart = currTime;
+            m_movePacketsSentLastInterval = m_movePacketsSentThisInterval;
+            m_movePacketsSentThisInterval = 0;
+        }
+#endif
+        
         if (sWorld.getConfig(CONFIG_BOOL_LIMIT_PLAY_TIME) &&
             GetPlayer() && GetPlayer()->IsInWorld())
             CheckPlayedTimeLimit(currTime);
@@ -758,6 +805,10 @@ void WorldSession::LogoutPlayer(bool Save)
             Map::DeleteFromWorld(_player);
         }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        m_movementPacketCompressor.ClearBuffer();
+#endif
+
         SetPlayer(nullptr);                                    // deleted in Remove/DeleteFromWorld call
 
         // Send the 'logout complete' packet to the client
@@ -904,16 +955,14 @@ void WorldSession::SendAuthWaitQue(uint32 position)
 
 void WorldSession::LoadGlobalAccountData()
 {
-    QueryResult* result = CharacterDatabase.PQuery("SELECT `type`, `time`, `data` FROM `account_data` WHERE `account`=%u", GetAccountId());
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `type`, `time`, `data` FROM `account_data` WHERE `account`=%u", GetAccountId());
     LoadAccountData(
-        result,
+        std::move(result),
         NewAccountData::GLOBAL_CACHE_MASK
     );
-    if (result)
-        delete result;
 }
 
-void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
+void WorldSession::LoadAccountData(std::unique_ptr<QueryResult> result, uint32 mask)
 {
     for (uint32 i = 0; i < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++i)
         if (mask & (1 << i))
@@ -1024,7 +1073,7 @@ void WorldSession::LoadTutorialsData()
     for (uint32 & tutorial : m_tutorials)
         tutorial = 0;
 
-    QueryResult* result = CharacterDatabase.PQuery("SELECT `tut0`, `tut1`, `tut2`, `tut3`, `tut4`, `tut5`, `tut6`, `tut7` FROM `character_tutorial` WHERE `account` = '%u'", GetAccountId());
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `tut0`, `tut1`, `tut2`, `tut3`, `tut4`, `tut5`, `tut6`, `tut7` FROM `character_tutorial` WHERE `account` = '%u'", GetAccountId());
 
     if (!result)
     {
@@ -1040,8 +1089,6 @@ void WorldSession::LoadTutorialsData()
             m_tutorials[iI] = fields[iI].GetUInt32();
     }
     while (result->NextRow());
-
-    delete result;
 
     m_tutorialState = TUTORIALDATA_UNCHANGED;
 }
@@ -1189,7 +1236,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
         (cheatAction >= CHEAT_ACTION_KICK))
     {
         std::stringstream oss;
-        oss << "|r[|c1f40af20Announce by |cffff0000" << detector << "|r]: Player " << _player->GetName() << ", Cheat: " << reason << ", Penalty: " << action;
+        oss << "|r[|c1f40af20Announce by |cffff0000" << detector << "|r]: Player " << playerDesc << ", Cheat: " << reason << ", Penalty: " << action;
         sWorld.SendGlobalText(oss.str().c_str(), this);
     }
 
@@ -1291,7 +1338,7 @@ bool WorldSession::CharacterScreenIdleKick(uint32 currTime)
     if (!maxIdle) // disabled
         return false;
 
-    if ((currTime - m_idleTime) >= (maxIdle * 1000))
+    if (currTime > m_idleTime && (currTime - m_idleTime) >= (maxIdle * 1000))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: Kicking session [%s] from character selection", GetRemoteAddress().c_str());
         return true;

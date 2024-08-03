@@ -154,7 +154,7 @@ class SocialMgr
         void SendFriendStatus(MasterPlayer* player, FriendsResult result, ObjectGuid friend_guid, bool broadcast);
         void BroadcastToFriendListers(MasterPlayer* player, WorldPacket* packet);
         // Loading
-        PlayerSocial* LoadFromDB(QueryResult* result, ObjectGuid guid);
+        PlayerSocial* LoadFromDB(std::unique_ptr<QueryResult> result, ObjectGuid guid);
     private:
         SocialMap m_socialMap;
 

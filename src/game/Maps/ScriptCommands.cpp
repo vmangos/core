@@ -879,7 +879,7 @@ bool Map::ScriptCommand_Morph(ScriptInfo const& script, WorldObject* source, Wor
         pSource->SetDisplayId(script.morph.creatureOrModelEntry);
     else
     {
-        CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(script.morph.creatureOrModelEntry);
+        CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(script.morph.creatureOrModelEntry);
         uint32 display_id = Creature::ChooseDisplayId(ci);
 
         pSource->SetDisplayId(display_id);
@@ -905,7 +905,7 @@ bool Map::ScriptCommand_Mount(ScriptInfo const& script, WorldObject* source, Wor
         return ShouldAbortScript(script);
     }
 
-    uint32 displayId = script.mount.isDisplayId || !script.mount.creatureOrModelEntry ? script.mount.creatureOrModelEntry : Creature::ChooseDisplayId(ObjectMgr::GetCreatureTemplate(script.mount.creatureOrModelEntry));
+    uint32 displayId = script.mount.isDisplayId || !script.mount.creatureOrModelEntry ? script.mount.creatureOrModelEntry : Creature::ChooseDisplayId(sObjectMgr.GetCreatureTemplate(script.mount.creatureOrModelEntry));
 
     if (pSource->IsAlive())
     {
@@ -2531,6 +2531,10 @@ bool Map::ScriptCommand_StartScriptOnZone(ScriptInfo const& script, WorldObject*
         if (itr.getSource()->GetCachedZoneId() == script.startScriptOnZone.zoneId)
         {
             ScriptsStart(sGenericScripts, script.startScriptOnZone.scriptId, itr.getSource()->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+
+            if (script.startScriptOnZone.withPets)
+                if (Pet* pPet = itr.getSource()->GetPet())
+                    ScriptsStart(sGenericScripts, script.startScriptOnZone.scriptId, pPet->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
         }
     }
 

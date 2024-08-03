@@ -320,7 +320,8 @@ void World::AddSession_(WorldSession* s)
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4);
     packet << uint8(AUTH_OK);
     packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(0);                                     // BillingPlanFlags
+                                                            // BillingPlanFlags
+    packet << uint8(s->HasTrialRestrictions() ? (BILLING_FLAG_TRIAL | BILLING_FLAG_RESTRICTED) : BILLING_FLAG_NONE); 
     packet << uint32(0);                                    // BillingTimeRested
     s->SendPacket(&packet);
 
@@ -366,7 +367,8 @@ void World::AddQueuedSession(WorldSession* sess)
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 4);
     packet << uint8(AUTH_WAIT_QUEUE);
     packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(0);                                     // BillingPlanFlags
+                                                            // BillingPlanFlags
+    packet << uint8(sess->HasTrialRestrictions() ? (BILLING_FLAG_TRIAL | BILLING_FLAG_RESTRICTED) : BILLING_FLAG_NONE); 
     packet << uint32(0);                                    // BillingTimeRested
     packet << uint32(GetQueuedSessionPos(sess));            // position in queue
     sess->SendPacket(&packet);
@@ -561,7 +563,9 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_LOGIN_QUEUE_GRACE_PERIOD_SECS, "LoginQueue.GracePeriodSecs", 0);
     setConfig(CONFIG_UINT32_CHARACTER_SCREEN_MAX_IDLE_TIME, "CharacterScreenMaxIdleTime", 0);
     setConfig(CONFIG_UINT32_ASYNC_QUERIES_TICK_TIMEOUT, "AsyncQueriesTickTimeout", 0);
-    setConfigMinMax(CONFIG_UINT32_COMPRESSION, "Compression", 1, 1, 9);
+    setConfigMinMax(CONFIG_UINT32_COMPRESSION_LEVEL, "Compression.Level", 1, 1, 9);
+    setConfig(CONFIG_UINT32_COMPRESSION_UPDATE_SIZE, "Compression.Update.Size", 128);
+    setConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT, "Compression.Movement.Count", 300);
     setConfig(CONFIG_BOOL_ADDON_CHANNEL, "AddonChannel", true);
     setConfig(CONFIG_BOOL_CLEAN_CHARACTER_DB, "CleanCharacterDB", true);
     setConfig(CONFIG_BOOL_GRID_UNLOAD, "GridUnload", true);
@@ -615,6 +619,7 @@ void World::LoadConfigSettings(bool reload)
     setConfigMinMax(CONFIG_UINT32_CHARACTERS_PER_REALM, "CharactersPerRealm", 10, 1, 10);
     setConfigMin(CONFIG_UINT32_CHARACTERS_PER_ACCOUNT, "CharactersPerAccount", 50, getConfig(CONFIG_UINT32_CHARACTERS_PER_REALM));
     setConfig(CONFIG_BOOL_LIMIT_PLAY_TIME, "LimitPlayTime", false);
+    setConfig(CONFIG_BOOL_RESTRICT_UNVERIFIED_ACCOUNTS, "RestrictUnverifiedAccounts", false);
 
     setConfig(CONFIG_BOOL_SKIP_CINEMATICS, "SkipCinematics", false);
     setConfig(CONFIG_BOOL_OBJECT_HEALTH_VALUE_SHOW, "ShowHealthValues", false);
@@ -1143,12 +1148,17 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_THRESHOLD, "Anticheat.FlyHack.Threshold", 3);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY, "Anticheat.FlyHack.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED, "Anticheat.NoFallTime.Enable", true);
-    setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT, "Anticheat.NoFallTime.Reject", true);
-    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_THRESHOLD, "Anticheat.NoFallTime.Threshold", 5);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_THRESHOLD, "Anticheat.NoFallTime.Threshold", 1);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_PENALTY, "Anticheat.NoFallTime.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED, "Anticheat.BadFallReset.Enable", true);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_THRESHOLD, "Anticheat.BadFallReset.Threshold", 1);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_PENALTY, "Anticheat.BadFallReset.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
+    setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_ENABLED, "Anticheat.BadFallStop.Enable", true);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_THRESHOLD, "Anticheat.BadFallStop.Threshold", 1);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_PENALTY, "Anticheat.BadFallStop.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
+    setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_MOVE_START_ENABLED, "Anticheat.BadMoveStart.Enable", true);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_MOVE_START_THRESHOLD, "Anticheat.BadMoveStart.Threshold", 1);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_MOVE_START_PENALTY, "Anticheat.BadMoveStart.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED, "Anticheat.Teleport.Enable", true);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_REJECT, "Anticheat.Teleport.Reject", true);
     setConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE, "Anticheat.Teleport.Distance", 40.0f);
@@ -2247,6 +2257,48 @@ void World::SendWorldText(int32 string_id, ...)
     va_end(ap);
 }
 
+// Send a System Message to all players in the same battleground or queue (except self if mentioned)
+void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel, uint32 queueType, ...)
+{
+    auto queueTypeId = static_cast<BattleGroundQueueTypeId>(queueType);
+    BattleGroundTypeId bgTypeId = BattleGroundMgr::BgTemplateId(queueTypeId);
+    BattleGroundBracketId queuedPlayerBracket = Player::GetBattleGroundBracketIdFromLevel(bgTypeId, queuedPlayerLevel);
+
+    va_list ap;
+    va_start(ap, queueType);
+
+    MaNGOS::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    MaNGOS::LocalizedPacketListDo<MaNGOS::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (const auto& itr : m_sessions)
+    {
+        if (WorldSession* session = itr.second)
+        {
+            Player* player = session->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                // Always announce it to all GMs.
+                if (session->GetSecurity() > SEC_PLAYER)
+                {
+                    wt_do(player);
+                    continue;
+                }
+
+                // If player is queued or already inside a BG matching the BG type.
+                if (player->InBattleGroundQueueForBattleGroundQueueType(queueTypeId) ||
+                    (player->InBattleGround() && player->GetBattleGroundTypeId() == bgTypeId))
+                {
+                    // If player bracket matches the queued player bracket.
+                    if (player->GetBattleGroundBracketIdFromLevel(bgTypeId) == queuedPlayerBracket)
+                        wt_do(player);
+                }
+
+            }
+        }
+    }
+
+    va_end(ap);
+}
+
 void World::SendBroadcastTextToWorld(uint32 textId)
 {
     MaNGOS::WorldBroadcastTextBuilder wt_builder(textId);
@@ -2464,9 +2516,9 @@ private:
 class BanAccountHandler
 {
 public:
-    void HandleAccountSelectResult(QueryResult*, SqlQueryHolder* queryHolder)
+    void HandleAccountSelectResult(std::unique_ptr<QueryResult>, SqlQueryHolder* queryHolder)
     {
-        BanQueryHolder* holder = static_cast<BanQueryHolder*>(queryHolder);
+        BanQueryHolder* holder = dynamic_cast<BanQueryHolder*>(queryHolder);
         if (!holder)
             return;
 
@@ -2474,7 +2526,7 @@ public:
 
         WorldSession* session = sWorld.FindSession(holder->GetAuthorAccountId());
 
-        QueryResult* result = holder->GetResult(0);
+        std::unique_ptr<QueryResult> result = holder->TakeResult(0);
         if (!result)
         {
             if (session)
@@ -2835,13 +2887,12 @@ void World::UpdateRealmCharCount(uint32 accountId)
                                   "SELECT COUNT(`guid`) FROM `characters` WHERE `account` = '%u'", accountId);
 }
 
-void World::_UpdateRealmCharCount(QueryResult* resultCharCount, uint32 accountId)
+void World::_UpdateRealmCharCount(std::unique_ptr<QueryResult> resultCharCount, uint32 accountId)
 {
     if (resultCharCount)
     {
         Field* fields = resultCharCount->Fetch();
         uint32 charCount = fields[0].GetUInt32();
-        delete resultCharCount;
 
         LoginDatabase.PExecute("REPLACE INTO `realmcharacters` (`numchars`, `acctid`, `realmid`) VALUES (%u, %u, %u)", charCount, accountId, realmID);
     }
@@ -3033,7 +3084,7 @@ bool World::configNoReload(bool reload, eConfigBoolValues index, char const* fie
 
 void World::InvalidatePlayerDataToAllClient(ObjectGuid guid)
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
     data << guid;
     SendGlobalMessage(&data);
@@ -3055,7 +3106,7 @@ void World::SetSessionDisconnected(WorldSession* sess)
 
 void World::AddAsyncTask(std::function<void()> task) {
     std::lock_guard<std::mutex> lock(m_asyncTaskQueueMutex);
-    _asyncTasks.push_back(task);
+    _asyncTasks.push_back(std::move(task));
 }
 
 void World::LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, const char* type, uint32 dataInt)
