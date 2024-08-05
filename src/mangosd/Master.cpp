@@ -292,6 +292,7 @@ int Master::Run()
         freeze_thread = IO::Multithreading::CreateThreadPtr("FreezeDetector", std::bind(&freezeDetector, freeze_delay * 1000));
     }
 
+    std::vector<std::thread> ioCtxRunners;
     std::unique_ptr<IO::IoContext> ioCtx = IO::IoContext::CreateIoContext();
     if (ioCtx == nullptr)
     {
@@ -301,33 +302,40 @@ int Master::Run()
     else
     {
         // Launch the world listener socket
-        uint16 bindPort = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
         std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
-        int ioNetworkThreadCount = sConfig.GetIntDefault("Network.Threads", 1);
-        if (ioNetworkThreadCount <= 0)
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Config 'Network.Threads' must be greater than 0");
-            World::StopNow(ERROR_EXIT_CODE);
-            return 1;
-        }
+        uint16 bindPort = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
         int socketOutByteBufferSize = sConfig.GetIntDefault("Network.SystemSendBuffer", -1);
         bool doExplicitTcpNoDelay = sConfig.GetBoolDefault("Network.TcpNoDelay", true);
 
         WorldSocketMgrOptions socketOptions
-            {
-                bindIp,
-                bindPort,
-                ioNetworkThreadCount,
-                socketOutByteBufferSize,
-                doExplicitTcpNoDelay,
-            };
+        {
+            bindIp,
+            bindPort,
+            socketOutByteBufferSize,
+            doExplicitTcpNoDelay,
+        };
 
-        if (!sWorldSocketMgr.StartWorldNetworking(ioCtx.get(), socketOptions)) // TODO: When will this stop? The threads are looping while ioCtx is running
+        if (!sWorldSocketMgr.StartWorldNetworking(ioCtx.get(), socketOptions))
         {
             Log::WaitBeforeContinueIfNeed();
             World::StopNow(ERROR_EXIT_CODE);
             return 1;
         }
+    }
+
+    int ioNetworkThreadCount = sConfig.GetIntDefault("Network.Threads", 1);
+    if (ioNetworkThreadCount <= 0)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Config 'Network.Threads' must be greater than 0");
+        World::StopNow(ERROR_EXIT_CODE);
+        return 1;
+    }
+    for (int32 i = 0; i < ioNetworkThreadCount; ++i)
+    {
+        ioCtxRunners.emplace_back(IO::Multithreading::CreateThread("IO[" + std::to_string(i) + "]", [&ioCtx]()
+        {
+            ioCtx->RunUntilShutdown();
+        }));
     }
 
     // Stop freeze protection before shutdown tasks
@@ -348,8 +356,16 @@ int Master::Run()
     // since worldrunnable uses them, it will crash if unloaded after master
     world_thread.join();
 
+    sWorldSocketMgr.StopWorldNetworking();
+
     if (remoteAccessThread)
         remoteAccessThread->join();
+
+    sAsyncSystemTimer.RemoveAllTimersAndStopThread();
+
+    ioCtx->Shutdown();
+    for (std::thread& thread : ioCtxRunners)
+        thread.join();
 
     // Clean account database before leaving
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Cleaning character database...");

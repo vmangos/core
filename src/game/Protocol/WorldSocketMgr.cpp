@@ -30,8 +30,6 @@ INSTANTIATE_SINGLETON_1(WorldSocketMgr);
 
 bool WorldSocketMgr::StartWorldNetworking(IO::IoContext* ioCtx, WorldSocketMgrOptions const& options)
 {
-    MANGOS_ASSERT(!m_running);
-    m_running = true;
     m_settings = options;
 
     // Launch the listening network socket
@@ -42,24 +40,13 @@ bool WorldSocketMgr::StartWorldNetworking(IO::IoContext* ioCtx, WorldSocketMgrOp
         return false;
     }
 
-    for (int32 i = 0; i < options.ioNetworkThreadCount; ++i)
-    {
-        m_runningThreads.emplace_back(IO::Multithreading::CreateThread("IO[" + std::to_string(i) + "]", [&ioCtx]()
-        {
-            ioCtx->RunUntilShutdown();
-        }));
-    }
-
     return true;
 }
 
 void WorldSocketMgr::StopWorldNetworking()
 {
-    m_running = false;
-
-    for (std::thread& thread : m_runningThreads)
-        thread.join();
-
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stop world networking...");
+    m_listener->ClosePortAndStopAcceptingNewConnections();
     m_listener = nullptr;
 }
 

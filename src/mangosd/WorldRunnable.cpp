@@ -116,9 +116,6 @@ void WorldRunnable::operator()()
     // unload battleground templates before different singletons destroyed
     sBattleGroundMgr.DeleteAllBattleGrounds();
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stopping network threads...");
-    //sWorldSocketMgr->StopNetwork();
-
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Unloading all maps...");
     sMapMgr.UnloadAll();                                    // unload all grids (including locked in memory)
 

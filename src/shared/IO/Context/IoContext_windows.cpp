@@ -45,7 +45,7 @@ void IO::IoContext::RunUntilShutdown()
         else
         {
             DWORD errorCode = ::GetLastError();
-            if (errorCode != WAIT_TIMEOUT)
+            if (errorCode != WAIT_TIMEOUT && m_isRunning)
             {
                 sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Has no TASK!!! Error: %u", errorCode);
             }

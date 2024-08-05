@@ -35,7 +35,6 @@ struct WorldSocketMgrOptions
 {
     std::string bindIp;
     uint16 bindPort;
-    int ioNetworkThreadCount;
     int socketOutByteBufferSize;
     bool doExplicitTcpNoDelay;
 };
@@ -52,8 +51,6 @@ public:
 
 private:
     std::unique_ptr<IO::Networking::AsyncServerListener<WorldSocket>> m_listener{nullptr};
-    volatile bool m_running = false;
-    std::vector<std::thread> m_runningThreads{};
     WorldSocketMgrOptions m_settings{};
 };
 

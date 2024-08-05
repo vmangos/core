@@ -21,6 +21,15 @@
 template<typename TClientSocket>
 IO::Networking::AsyncServerListener<TClientSocket>::~AsyncServerListener()
 {
+    MANGOS_ASSERT(m_wasClosed);
+}
+
+template<typename TClientSocket>
+void IO::Networking::AsyncServerListener<TClientSocket>::ClosePortAndStopAcceptingNewConnections()
+{
+    m_wasClosed = true;
+
+    ::close(m_acceptorNativeSocket);
 }
 
 template<typename TClientSocket>

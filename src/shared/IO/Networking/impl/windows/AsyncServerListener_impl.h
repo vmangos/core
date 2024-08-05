@@ -11,9 +11,20 @@
 #include "IO/Networking/SocketDescriptor.h"
 
 template<typename TClientSocket>
-IO::Networking::AsyncServerListener<TClientSocket>::~AsyncServerListener()
+IO::Networking::AsyncServerListener<TClientSocket>::~AsyncServerListener() noexcept(false)
 {
+    MANGOS_ASSERT(m_wasClosed);
+}
+
+template<typename TClientSocket>
+void IO::Networking::AsyncServerListener<TClientSocket>::ClosePortAndStopAcceptingNewConnections()
+{
+    m_wasClosed = true;
+
     ::closesocket(m_acceptorNativeSocket);
+
+    while (m_currentAcceptTask.m_callback != nullptr)
+        std::this_thread::yield(); // I think it's fine to "busy" wait here instead of adding complex .wait() logic to the hot `StartAcceptOperation` code.
 }
 
 template<typename TClientSocket>
@@ -41,7 +52,8 @@ std::unique_ptr<IO::Networking::AsyncServerListener<TClientSocket>> IO::Networki
     }
 
     // Attach our listener socket to our completion port
-    if (::CreateIoCompletionPort((HANDLE) listenNativeSocket, ctx->GetWindowsCompletionPort(), (u_long) 0, 0) != ctx->GetWindowsCompletionPort()) {
+    if (::CreateIoCompletionPort((HANDLE) listenNativeSocket, ctx->GetWindowsCompletionPort(), (u_long) 0, 0) != ctx->GetWindowsCompletionPort())
+    {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(listen, ...) Error: %u", WSAGetLastError());
         return nullptr;
     }
@@ -79,12 +91,14 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
     }
 
     // Attach our acceptor socket to our completion port
-    if (::CreateIoCompletionPort((HANDLE) nativePeerSocket, m_ctx->GetWindowsCompletionPort(), (u_long) 0, 0) != m_ctx->GetWindowsCompletionPort()) {
+    if (::CreateIoCompletionPort((HANDLE) nativePeerSocket, m_ctx->GetWindowsCompletionPort(), (u_long)0, 0) != m_ctx->GetWindowsCompletionPort())
+    {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(accept, ...) Error: %u", WSAGetLastError());
         return;
     }
 
-    struct Addresses {
+    struct Addresses
+    {
         sockaddr_in localAddress;
         uint8_t __pad1[16];
         sockaddr_in peerAddress;
@@ -92,10 +106,14 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
     };
 
     Addresses* addrBuffer = new Addresses();
-    m_currentAcceptTask.InitNew([nativePeerSocket, this, addrBuffer](DWORD errorCode) {
+    m_currentAcceptTask.InitNew([nativePeerSocket, this, addrBuffer](DWORD errorCode)
+    {
         if (errorCode)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::AcceptEx(...) Task Error: %u", errorCode);
+            if (errorCode != ERROR_OPERATION_ABORTED || !m_wasClosed)
+            { // ignore aborted error when we are in a closing state
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::AcceptEx(...) Task Error: %u", errorCode);
+            }
             m_currentAcceptTask.Reset();
             return;
         }
@@ -108,7 +126,7 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
 
         uint16_t peerPort = ntohs(addrBuffer->peerAddress.sin_port);
         IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
-        IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
+        IO::Networking::SocketDescriptor socketDescriptor{ peerEndpoint, nativePeerSocket };
 
         std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(m_ctx, socketDescriptor);
         HandlePostAccept(client);

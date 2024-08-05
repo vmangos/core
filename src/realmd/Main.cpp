@@ -383,6 +383,10 @@ extern int main(int argc, char** argv)
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Waiting for IO thread to finish");
+
+    listener->ClosePortAndStopAcceptingNewConnections();
+    sAsyncSystemTimer.RemoveAllTimersAndStopThread();
+
     ioCtx->Shutdown();
     ioThread.join();
 

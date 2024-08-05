@@ -18,13 +18,14 @@ namespace IO { namespace Networking {
     {
 
     public:
-        ~AsyncServerListener();
+        ~AsyncServerListener() noexcept(false); // this destructor will throw if ClosePortAndStopAcceptingNewConnections was not called
         AsyncServerListener(AsyncServerListener const&) = delete;
         AsyncServerListener& operator=(AsyncServerListener const&) = delete;
         AsyncServerListener(AsyncServerListener&&) = delete;
         AsyncServerListener& operator=(AsyncServerListener&&) = delete;
 
         static std::unique_ptr<AsyncServerListener<TClientSocket>> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port);
+        void ClosePortAndStopAcceptingNewConnections();
 
 #if defined(__linux__) || defined(__APPLE__)
         void OnIoEvent(uint32_t event) final; // used for ::accept
@@ -35,12 +36,13 @@ namespace IO { namespace Networking {
 
         IO::Native::SocketHandle m_acceptorNativeSocket;
         IO::IoContext* m_ctx;
+        bool m_wasClosed;
 
 #if defined(WIN32)
         void StartAcceptOperation();
 
         explicit AsyncServerListener(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
-                : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket) {}
+                : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket), m_wasClosed(false) {}
 
         IocpOperationTask m_currentAcceptTask;
 #elif defined(__linux__) || defined(__APPLE__)
