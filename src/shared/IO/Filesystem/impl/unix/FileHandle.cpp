@@ -3,13 +3,8 @@
 #include "IO/SystemErrorToString.h"
 #include <sys/param.h>
 
-IO::Filesystem::FileHandle::FileHandle(IO::Native::FileHandle nativeFileHandle) : m_nativeFileHandle(nativeFileHandle)
-{
-}
-
 IO::Filesystem::FileHandle::~FileHandle()
 {
-    sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~FileHandle: No references left");
     ::close(m_nativeFileHandle);
 }
 
@@ -36,29 +31,9 @@ std::chrono::system_clock::time_point IO::Filesystem::FileHandle::GetLastModifyD
     return result;
 }
 
-std::string IO::Filesystem::FileHandle::GetAbsoluteFilePath() const
+std::string IO::Filesystem::FileHandle::GetFilePath() const
 {
-    char filePath[PATH_MAX];
-#if defined(__linux__)
-    // I really hate LINUX, there is no universal way to get a file path
-    // Everyone on the internet recommends the following approach.
-    // (Which can fail if we dont have access to the virtual-"/proc"-fs).
-
-    char pathToLink[PATH_MAX];
-    snprintf(pathToLink, sizeof(pathToLink), "/proc/self/fd/%d", m_nativeFileHandle);
-
-    ssize_t len = ::readlink(pathToLink, filePath, sizeof(filePath) - 1);
-    if (len == -1)
-        throw std::runtime_error("GetAbsoluteFilePath -> ::readlink() Failed: " + SystemErrorToString(errno));
-    filePath[len] = '\0';
-#elif defined(__APPLE__)
-    if (::fcntl(m_nativeFileHandle, F_GETPATH, filePath) == -1)
-        throw std::runtime_error("::fstat(GetLastModifyDate) Failed: " + SystemErrorToString(errno));
-#else
-#error "How to implement FileHandle::GetAbsoluteFilePath() on your OS?"
-#endif
-
-    return filePath;
+    return m_filePath;
 }
 
 uint64_t IO::Filesystem::FileHandleReadonly::ReadSync(uint8_t* dest, uint64_t amountToRead)
@@ -91,5 +66,5 @@ std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::FileHandleRe
     if (newNativeFileHandle == -1)
         throw std::runtime_error("DuplicateFileHandle -> ::dup() Failed: " + SystemErrorToString(errno));
 
-    return std::make_unique<FileHandleReadonly>(newNativeFileHandle);
+    return std::make_unique<FileHandleReadonly>(m_filePath, newNativeFileHandle);
 }

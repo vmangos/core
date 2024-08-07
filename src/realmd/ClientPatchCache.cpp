@@ -38,7 +38,7 @@ void ClientPatchCache::LoadPatchesInfo()
 
 Md5HashDigest ClientPatchCache::GetOrCalculateHash(std::unique_ptr<IO::Filesystem::FileHandleReadonly> const& fileHandle)
 {
-    auto filePath = fileHandle->GetAbsoluteFilePath();
+    auto filePath = fileHandle->GetFilePath();
     auto lastModifyDate = fileHandle->GetLastModifyDate();
     auto fileSize = fileHandle->GetTotalFileSize();
 
@@ -80,7 +80,7 @@ Md5HashDigest ClientPatchCache::CalculateAndCacheHash(std::unique_ptr<IO::Filesy
     } while (true);
 
     PatchCacheEntry entry;
-    entry.filePath = fileHandle->GetAbsoluteFilePath();
+    entry.filePath = fileHandle->GetFilePath();
     entry.lastModifyDate = fileHandle->GetLastModifyDate();
     entry.fileSize = fileHandle->GetTotalFileSize();
     MD5_Final(entry.md5Hash.digest.data(), &ctx);

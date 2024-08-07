@@ -1,14 +1,8 @@
 #include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 
-IO::Filesystem::FileHandle::FileHandle(IO::Native::FileHandle nativeFileHandle) : m_nativeFileHandle(nativeFileHandle)
-{
-
-}
-
 IO::Filesystem::FileHandle::~FileHandle()
 {
-    sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~FileHandle: No references left");
     ::CloseHandle(m_nativeFileHandle);
 }
 
@@ -43,30 +37,9 @@ std::chrono::system_clock::time_point IO::Filesystem::FileHandle::GetLastModifyD
     return result;
 }
 
-std::string IO::Filesystem::FileHandle::GetAbsoluteFilePath() const
+std::string IO::Filesystem::FileHandle::GetFilePath() const
 {
-    CHAR filePathRaw[MAX_PATH];
-
-    // VOLUME_NAME_DOS means that it stars with a Drive Letter like "\\?\C:\"
-    bool isOkay = ::GetFinalPathNameByHandleA(m_nativeFileHandle, filePathRaw, MAX_PATH, VOLUME_NAME_DOS);
-    if (!isOkay)
-        throw std::runtime_error("GetAbsoluteFilePath -> ::GetFileTime() Failed, ErrorCode = " + std::to_string(GetLastError()));
-
-    std::string filePathStr(filePathRaw);
-
-    // Windows adds a \\?\ before each file. See: https://stackoverflow.com/a/52861283
-    if (filePathStr.substr(0, 8) == R"(\\?\UNC\)")
-    {
-        // In case of a network path, replace `\\?\UNC\` with `\\`.
-        filePathStr = "\\" + filePathStr.substr(7);
-    }
-    else if (filePathStr.substr(0, 4) == R"(\\?\)")
-    {
-        // In case of a local path, crop `\\?\`.
-        filePathStr = filePathStr.substr(4);
-    }
-
-    return filePathStr;
+    return m_filePath;
 }
 
 uint64_t IO::Filesystem::FileHandleReadonly::ReadSync(uint8_t* dest, uint64_t amountToRead)
@@ -108,5 +81,5 @@ std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::FileHandleRe
     if (!isOkay)
         throw std::runtime_error("DuplicateFileHandle -> ::DuplicateHandle() Failed, ErrorCode = " + std::to_string(GetLastError()));
 
-    return std::make_unique<FileHandleReadonly>(newNativeFileHandle);
+    return std::make_unique<FileHandleReadonly>(m_filePath, newNativeFileHandle);
 }
