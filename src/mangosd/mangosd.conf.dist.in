@@ -3,7 +3,7 @@
 #####################################
 
 [MangosdConf]
-ConfVersion=2010100901
+ConfVersion=2024071601
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -2758,13 +2758,9 @@ LFG.MatchmakingTimer = 600
 #         Number of threads for network, recommend 1 thread per 1000 connections.
 #         Default: 1
 #
-#    Network.OutKBuff
+#    Network.SystemSendBuffer
 #         The size of the output kernel buffer used ( SO_SNDBUF socket option, tcp manual ).
 #         Default: -1 (Use system default setting)
-#
-#    Network.OutUBuff
-#         Userspace buffer for output. This is amount of memory reserved per each connection.
-#         Default: 65536
 #
 #    Network.TcpNoDelay:
 #         TCP Nagle algorithm setting
@@ -2784,21 +2780,15 @@ LFG.MatchmakingTimer = 600
 #         How often packet broadcasting threads run in milliseconds.
 #         Default: 50
 #
-#    Network.Interval
-#         How often ACE will transmit the client's outbound packet buffer in milliseconds.
-#         Default: 10
-#
 ###################################################################################################################
 
 Network.Threads = 1
-Network.OutKBuff = -1
-Network.OutUBuff = 65536
+Network.SystemSendBuffer = -1
 Network.TcpNodelay = 1
 Network.KickOnBadPacket = 0
 Network.PacketBroadcast.Threads = 0
 Network.PacketBroadcast.Frequency = 50
 Network.PacketBroadcast.ReduceVisDistance.DiffAbove = 0
-Network.Interval = 10
 
 ###################################################################################################################
 # CONSOLE, REMOTE ACCESS AND SOAP

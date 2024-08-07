@@ -68,12 +68,13 @@ bool StartDB();
 void UnhookSignals();
 void HookSignals();
 
-bool stopEvent = false;                                     // Setting it to true stops the server
-
-DatabaseType LoginDatabase;                                 // Accessor to the realm server database
+// Global initialization
+char const* g_mainLogFileName = "Realmd.log";   // Log file path for sLog
+volatile bool stopEvent = false;                // Setting it to true stops the server
+DatabaseType LoginDatabase;                     // Accessor to the realm server database
 
 // Print out the usage string for this program on the console.
-void usage(const char *prog)
+void usage(char const* prog)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Usage: \n %s [<options>]\n"
         "    -v, --version            print version and exist\n\r"
@@ -91,15 +92,13 @@ void usage(const char *prog)
         ,prog);
 }
 
-char const* g_mainLogFileName = "Realmd.log";
-
 // Launch the realm server
-extern int main(int argc, char **argv)
+extern int main(int argc, char** argv)
 {
     // Command line parsing
     char const* cfg_file = _REALMD_CONFIG;
 
-    char const *options = ":c:s:";
+    char const* options = ":c:s:";
 
     ACE_Get_Opt cmd_opts(argc, argv, options);
     cmd_opts.long_option("version", 'v');
@@ -120,7 +119,7 @@ extern int main(int argc, char **argv)
 
             case 's':
             {
-                const char *mode = cmd_opts.opt_arg();
+                char const* mode = cmd_opts.opt_arg();
 
                 if (!strcmp(mode, "run"))
                     serviceDaemonMode = 'r';
@@ -155,7 +154,7 @@ extern int main(int argc, char **argv)
         }
     }
 
-#ifdef WIN32                                                // windows service command need execute before config read
+#ifdef WIN32    // windows service command need execute before config read
     switch (serviceDaemonMode)
     {
         case 'i':
@@ -179,7 +178,7 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
-#ifndef WIN32                                               // posix daemon commands need apply after config read
+#ifndef WIN32   // posix daemon commands need apply after config read
     switch (serviceDaemonMode)
     {
         case 'r':
@@ -192,7 +191,7 @@ extern int main(int argc, char **argv)
 #endif
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [realm-daemon]", _FULLVERSION);
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "<Ctrl-C> to stop.\n" );
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "<Ctrl-C> to stop.\n");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s.", cfg_file);
 
     // Check the version of the configuration file
@@ -208,7 +207,7 @@ extern int main(int argc, char **argv)
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-    if (SSLeay() < 0x009080bfL )
+    if (SSLeay() < 0x009080bfL)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Minimal required version [OpenSSL 0.9.8k]");
@@ -226,21 +225,21 @@ extern int main(int argc, char **argv)
 
     // realmd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
-    if(!pidfile.empty())
+    if (!pidfile.empty())
     {
         uint32 pid = CreatePIDFile(pidfile);
-        if( !pid )
+        if (!pid)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot create PID file %s.\n", pidfile.c_str() );
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot create PID file %s.\n", pidfile.c_str());
             Log::WaitBeforeContinueIfNeed();
             return 1;
         }
 
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Daemon PID: %u\n", pid );
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Daemon PID: %u\n", pid);
     }
 
     // Initialize the database connection
-    if(!StartDB())
+    if (!StartDB())
     {
         Log::WaitBeforeContinueIfNeed();
         return 1;
@@ -273,7 +272,9 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
-    (void) sRealmdPatchCache; // <-- This will initialize the singleton. Which will preload all known patches.
+    (void)sRealmdPatchCache; // <-- This will initialize the singleton. Which will preload all known patches.
+    (void)sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
+    IO::Multithreading::RenameCurrentThread("Main");
 
     // cleanup query
     // set expired bans to inactive
@@ -285,8 +286,16 @@ extern int main(int argc, char **argv)
     std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
     uint16 bindPort = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
 
+    std::unique_ptr<IO::IoContext> ioCtx = IO::IoContext::CreateIoContext();
+    if (ioCtx == nullptr)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to create IoContext");
+        Log::WaitBeforeContinueIfNeed();
+        return 1;
+    }
+
     // Launch the listening network socket
-    std::unique_ptr<AsyncServerListener<AuthSocket>> listener = AsyncServerListener<AuthSocket>::CreateAndBindServer(bindIp, bindPort);
+    std::unique_ptr<IO::Networking::AsyncServerListener<AuthSocket>> listener = IO::Networking::AsyncServerListener<AuthSocket>::CreateAndBindServer(ioCtx.get(), bindIp, bindPort);
     if (listener == nullptr)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d  -  Is the port already in use?", bindIp.c_str(), bindPort);
@@ -294,34 +303,31 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
-    (void) sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
-    IO::Multithreading::RenameCurrentThread("Main/IO");
-
     // Catch termination signals
     HookSignals();
 
     // Handle affinity for multiple processors and process priority on Windows
-    #ifdef WIN32
+#ifdef WIN32
     {
-        HANDLE hProcess = GetCurrentProcess();
+        HANDLE hProcess = ::GetCurrentProcess();
 
         uint32 Aff = sConfig.GetIntDefault("UseProcessors", 0);
-        if(Aff > 0)
+        if (Aff > 0)
         {
             ULONG_PTR appAff;
             ULONG_PTR sysAff;
 
-            if(GetProcessAffinityMask(hProcess,&appAff,&sysAff))
+            if (::GetProcessAffinityMask(hProcess, &appAff, &sysAff))
             {
                 ULONG_PTR curAff = Aff & appAff;            // remove non accessible processors
 
-                if(!curAff )
+                if (!curAff)
                 {
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Processors marked in UseProcessors bitmask (hex) %x not accessible for realmd. Accessible processors bitmask (hex): %x",Aff,appAff);
                 }
                 else
                 {
-                    if(SetProcessAffinityMask(hProcess,curAff))
+                    if (::SetProcessAffinityMask(hProcess, curAff))
                         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using processors (bitmask, hex): %x", curAff);
                     else
                         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set used processors (hex): %x", curAff);
@@ -332,33 +338,38 @@ extern int main(int argc, char **argv)
 
         bool Prio = sConfig.GetBoolDefault("ProcessPriority", false);
 
+     // if(Prio && (m_ServiceStatus == -1)/* need set to default process priority class in service mode*/)
         if(Prio)
         {
-            if(SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
+            if (::SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "realmd process priority class set to HIGH");
             else
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set realmd process priority class.");
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         }
     }
-    #endif
+#endif
 
     //server has started up successfully => enable async DB requests
     LoginDatabase.AllowAsyncTransactions();
 
     // maximum counter for next ping
-    uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / 100000)); // TODO make this loop like mangosd
+    uint32 numLoops = (sConfig.GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000)); // TODO make this loop like mangosd
     uint32 loopCounter = 0;
 
-    #ifndef WIN32
+    auto ioThread = IO::Multithreading::CreateThread("MainIoCtx", [&ioCtx]()
+    {
+        ioCtx->RunUntilShutdown();
+    });
+
+#ifndef WIN32
     detachDaemon();
-    #endif
+#endif
     // Wait for termination signal
     while (!stopEvent)
     {
-        listener->RunEventLoop(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-        if( (++loopCounter) == numLoops ) // TODO make this loop like mangosd
+        if ((++loopCounter) == numLoops) // TODO make this loop like mangosd
         {
             loopCounter = 0;
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Ping MySQL to keep connection alive");
@@ -371,13 +382,21 @@ extern int main(int argc, char **argv)
 #endif
     }
 
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Waiting for IO thread to finish");
+
+    listener->ClosePortAndStopAcceptingNewConnections();
+    sAsyncSystemTimer.RemoveAllTimersAndStopThread();
+
+    ioCtx->Shutdown();
+    ioThread.join();
+
     // Wait for the delay thread to exit
     LoginDatabase.HaltDelayThread();
 
     // Remove signal handling before leaving
     UnhookSignals();
 
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Halting process..." );
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Halting process...");
     return 0;
 }
 
@@ -391,21 +410,21 @@ void OnSignal(int s)
         case SIGTERM:
             stopEvent = true;
             break;
-        #ifdef _WIN32
-        case SIGBREAK:
-            stopEvent = true;
-            break;
-        #endif
+#ifdef _WIN32
+            case SIGBREAK:
+                stopEvent = true;
+                break;
+#endif
     }
 
-    signal(s, OnSignal);
+    ::signal(s, OnSignal);
 }
 
 // Initialize connection to the database
 bool StartDB()
 {
     std::string dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
-    if(dbstring.empty())
+    if (dbstring.empty())
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Database not specified");
         return false;
@@ -444,8 +463,8 @@ bool StartDB()
         return false;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Database: %s", dbStringLog.c_str() );
-    if(!LoginDatabase.Initialize(dbstring.c_str()))
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Database: %s", dbStringLog.c_str());
+    if (!LoginDatabase.Initialize(dbstring.c_str()))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot connect to database");
         return false;
@@ -464,21 +483,21 @@ bool StartDB()
 // Define hook 'OnSignal' for all termination signals
 void HookSignals()
 {
-    signal(SIGINT, OnSignal);
-    signal(SIGTERM, OnSignal);
-    #ifdef _WIN32
-    signal(SIGBREAK, OnSignal);
-    #endif
+    ::signal(SIGINT, OnSignal);
+    ::signal(SIGTERM, OnSignal);
+#ifdef _WIN32
+    ::signal(SIGBREAK, OnSignal);
+#endif
 }
 
 // Unhook the signals before leaving
 void UnhookSignals()
 {
-    signal(SIGINT, 0);
-    signal(SIGTERM, 0);
-    #ifdef _WIN32
-    signal(SIGBREAK, 0);
-    #endif
+    ::signal(SIGINT, nullptr);
+    ::signal(SIGTERM, nullptr);
+#ifdef _WIN32
+    ::signal(SIGBREAK, nullptr);
+#endif
 }
 
 // @}

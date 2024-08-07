@@ -4,9 +4,18 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
 #include <pthread.h>
 #endif
+
+std::unique_ptr<std::thread> IO::Multithreading::CreateThreadPtr(std::string const& name, std::function<void()> entryFunction)
+{
+    return std::make_unique<std::thread>([name, entryFunction = std::move(entryFunction)]()
+    {
+       IO::Multithreading::RenameCurrentThread(name);
+       entryFunction();
+    });
+}
 
 std::thread IO::Multithreading::CreateThread(std::string const& name, std::function<void()> entryFunction)
 {
@@ -48,7 +57,9 @@ void IO::Multithreading::RenameCurrentThread(std::string const& name)
     {
     }
 #elif defined(__linux__)
-    pthread_setname_np(pthread_self(), name.c_str());
+    ::pthread_setname_np(pthread_self(), name.c_str());
+#elif defined(__APPLE__)
+    ::pthread_setname_np(name.c_str());
 #else
     // It's not too serisous if we cant rename a thread
     #warning "IO::Multithreading::_renameThisThread not supported on your platform"

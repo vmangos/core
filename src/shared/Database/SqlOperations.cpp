@@ -153,7 +153,7 @@ using SqlResultQueueWorker = ThreadPool::SingleQueue;
 #endif
 
 SqlResultQueue::SqlResultQueue() :
-    numUnsafeQueries(0), m_callbackThreads(new ThreadPool(6))
+    numUnsafeQueries(0), m_callbackThreads(new ThreadPool("SqlResult", 6))
 {
     m_callbackThreads->start<SqlResultQueueWorker>();
 }

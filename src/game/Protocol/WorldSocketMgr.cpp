@@ -3,6 +3,7 @@
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
  * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
+ * Copyright (C) 2017-2024 VMaNGOS Project <https://github.com/vmangos>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,18 +20,55 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/** \file WorldSocketMgr.cpp
-*  \ingroup u2w
-*  \author Derex <derex101@gmail.com>
-*/
-
-#include "WorldSocket.h"
 #include "WorldSocketMgr.h"
-#include "MangosSocketMgrImpl.h"
+#include "WorldSocket.h"
+#include "Policies/SingletonImp.h"
+#include "IO/Networking/AsyncServerListener.h"
+#include "IO/Multithreading/CreateThread.h"
 
-template class MangosSocketMgr<WorldSocket>;
+INSTANTIATE_SINGLETON_1(WorldSocketMgr);
 
-WorldSocketMgr* WorldSocketMgr::Instance()
+bool WorldSocketMgr::StartWorldNetworking(IO::IoContext* ioCtx, WorldSocketMgrOptions const& options)
 {
-    return ACE_Singleton<WorldSocketMgr, ACE_Thread_Mutex>::instance();
+    m_settings = options;
+
+    // Launch the listening network socket
+    m_listener = IO::Networking::AsyncServerListener<WorldSocket>::CreateAndBindServer(ioCtx, options.bindIp, options.bindPort);
+    if (m_listener == nullptr)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to start WorldSocket network");
+        return false;
+    }
+
+    return true;
+}
+
+void WorldSocketMgr::StopWorldNetworking()
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stop world networking...");
+    m_listener->ClosePortAndStopAcceptingNewConnections();
+    m_listener = nullptr;
+}
+
+void WorldSocketMgr::OnNewClientConnected(std::shared_ptr<WorldSocket> const& socket)
+{
+    if (m_settings.socketOutByteBufferSize >= 0)
+    {
+        IO::NetworkError error = socket->SetNativeSocketOption_SystemOutgoingSendBuffer(m_settings.socketOutByteBufferSize);
+        if (error)
+        { // We don't close the socket, since its basically just a "warning" I guess.
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set SystemOutgoingSendBuffer option on socket for IP %s Error: %s", socket->GetRemoteIpString().c_str(), error.ToString().c_str());
+        }
+    }
+
+    if (m_settings.doExplicitTcpNoDelay) // Set TCP_NODELAY.
+    {
+        IO::NetworkError error = socket->SetNativeSocketOption_NoDelay(true);
+        if (error)
+        { // We don't close the socket, since its basically just a "warning" I guess.
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set NoDelay option on socket for IP %s Error: %s", socket->GetRemoteIpString().c_str(), error.ToString().c_str());
+        }
+    }
+
+    socket->SendInitialPacketAndStartRecvLoop();
 }

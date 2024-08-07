@@ -17,7 +17,7 @@ uint64_t IO::Filesystem::FileHandle::GetTotalFileSize() const
 {
     struct stat file_stat;
 
-    if (fstat(m_nativeFileHandle, &file_stat) == -1)
+    if (::fstat(m_nativeFileHandle, &file_stat) == -1)
         throw std::runtime_error("GetTotalFileSize -> ::fstat() Failed: " + SystemErrorToString(errno));
 
     return file_stat.st_size;
@@ -27,7 +27,7 @@ std::chrono::system_clock::time_point IO::Filesystem::FileHandle::GetLastModifyD
 {
     struct stat file_stat;
 
-    if (fstat(m_nativeFileHandle, &file_stat) == -1)
+    if (::fstat(m_nativeFileHandle, &file_stat) == -1)
         throw std::runtime_error("GetLastModifyDate -> ::fstat() Failed: " + SystemErrorToString(errno));
 
     uint64_t unixSecs = file_stat.st_mtime;
@@ -51,9 +51,8 @@ std::string IO::Filesystem::FileHandle::GetAbsoluteFilePath() const
     if (len == -1)
         throw std::runtime_error("GetAbsoluteFilePath -> ::readlink() Failed: " + SystemErrorToString(errno));
     filePath[len] = '\0';
-
-#elif defined(MACOS)
-    if (fcntl(m_nativeFileHandle, F_GETPATH, filePath) == -1)
+#elif defined(__APPLE__)
+    if (::fcntl(m_nativeFileHandle, F_GETPATH, filePath) == -1)
         throw std::runtime_error("::fstat(GetLastModifyDate) Failed: " + SystemErrorToString(errno));
 #else
 #error "How to implement FileHandle::GetAbsoluteFilePath() on your OS?"

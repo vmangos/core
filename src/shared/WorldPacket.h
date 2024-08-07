@@ -40,6 +40,7 @@ class WorldPacket : public ByteBuffer
         {
         }
 
+        // TODO this std::move() is technically illegal when we want to access packet.m_opcode and m_recvdTime. (maybe make a protected .ctor with just a reference but it std::std move(buf._storage))
         WorldPacket(WorldPacket&& packet) : ByteBuffer(std::move(packet)), m_opcode(packet.m_opcode), m_recvdTime(packet.m_recvdTime)
         {
         }

@@ -100,6 +100,11 @@ set (shared_SRCS
     Database/SQLStorage.cpp
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
+    IO/Context/IoContext.h
+    IO/Utils_Unix.h
+    IO/Context/IoContext_macos.cpp
+    IO/Context/IoContext_unix.cpp
+    IO/Context/IoContext_windows.cpp
     IO/SystemErrorToString.h
     IO/SystemErrorToString.cpp
     IO/Networking/AsyncServerListener.h
@@ -136,13 +141,16 @@ if(USE_LIBCURL)
   )
 endif()
 
-# Exclude Win32 files
-if(WIN32)
+
+if(WIN32) # For window build: Exclude Unix/MacOS files
   list(REMOVE_ITEM shared_SRCS
     PosixDaemon.h
     PosixDaemon.cpp
     revision.h
     migrations_list.h
+    IO/Utils_Unix.h
+    IO/Context/IoContext_unix.cpp
+    IO/Context/IoContext_macos.cpp
     IO/Timer/impl/unix/AsyncSystemTimer.cpp
     IO/Timer/impl/unix/TimerHandle.cpp
     IO/Filesystem/impl/unix/FileSystem.cpp
@@ -165,11 +173,23 @@ else()
     ServiceWin32.h
     revision.h
     migrations_list.h
+    IO/Context/IoContext_windows.cpp
     IO/Timer/impl/windows/AsyncSystemTimer.cpp
     IO/Timer/impl/windows/TimerHandle.cpp
     IO/Filesystem/impl/windows/FileSystem.cpp
     IO/Filesystem/impl/windows/FileHandle.cpp
   )
+  if(APPLE)
+    # Remove Linux specific stuff
+    list(REMOVE_ITEM shared_SRCS
+      IO/Context/IoContext_unix.cpp
+    )
+  else()
+    # Remove macOS specific stuff
+    list(REMOVE_ITEM shared_SRCS
+      IO/Context/IoContext_macos.cpp
+    )
+  endif()
 endif()
 
 source_group("Util"
