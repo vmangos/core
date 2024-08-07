@@ -2486,6 +2486,12 @@ Visibility.ForceActiveObjects      = 1
 #         Reputation Gain rate
 #         Default: 1
 #
+#    Rate.Reputation.Gain.Threshold
+#         The player needs to have at least the reputation specified here for the reputation gain rate to be applied (otherwise rate 1 is used).
+#         Reputation ranks: -42000 (hated), -6000 (hostile), -3000 (unfriendly), 0 (neutral), 3000 (friendly), 9000 (honored), 21000 (revered), 42000 (exalted)
+#         If the reputation gain rate is >1, 9000 would be a good value which causes less interference with the introduction to new factions.
+#         Default: -42000
+#
 #    Rate.Reputation.LowLevel.Kill
 #         Reputation Gain form low level kill (grey creture)
 #         Default: 0.2
@@ -2614,6 +2620,7 @@ Rate.RespecMultiplicativeCost = 5
 Rate.RespecMaxMultiplier = 10
 Rate.RespecMinMultiplier = 2
 Rate.Reputation.Gain = 1
+Rate.Reputation.Gain.Threshold = -42000
 Rate.Reputation.LowLevel.Kill    = 0.2
 Rate.Reputation.LowLevel.Quest   = 1
 Rate.InstanceResetTime = 1
