@@ -18,7 +18,7 @@ namespace IO
     class IocpOperationTask : public OVERLAPPED
     {
     public:
-        void InitNew(const std::function<void(DWORD errorCode)>& callback)
+        void InitNew(std::function<void(DWORD errorCode)> const& callback)
         {
             MANGOS_ASSERT(m_callback == nullptr && callback != nullptr);
 
