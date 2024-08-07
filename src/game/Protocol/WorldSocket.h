@@ -108,7 +108,10 @@ public:
 
     void SendPacket(WorldPacket packet);
 
-    void FinalizeSession() { m_Session = nullptr; }
+    void FinalizeSession()
+    {
+        m_Session = nullptr;
+    }
 };
 
 #endif // MANGOS_GAME_SERVER_WORLDSOCKET_H
