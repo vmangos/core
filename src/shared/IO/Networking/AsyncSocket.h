@@ -109,11 +109,11 @@ namespace IO { namespace Networking {
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
 #elif defined(__linux__) || defined(__APPLE__)
-        public: // TODO: Make me private again. Why does friend `AsyncSocketListener<SocketType>` not work?
+        private:
             void PerformNonBlockingRead();
             void PerformNonBlockingWrite();
             void StopPendingTransactionsAndForceClose();
-        private:
+
             char* m_readDstBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_readDstBufferBytesLeft for space
             std::size_t m_readDstBufferBytesLeft = 0;
             char const* m_writeSrcBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_writeSrcBufferBytesLeft for space
