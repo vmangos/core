@@ -118,13 +118,14 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
             return;
         }
 
-        // TODO use inet_ntop to be thread safe
-        std::string peerIpAddressStr(inet_ntoa(addrBuffer->peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
+        char ipv4AddressString[INET_ADDRSTRLEN];
+        ::inet_ntop(AF_INET, &(addrBuffer->peerAddress.sin_addr), ipv4AddressString, INET_ADDRSTRLEN);
+        auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
+        uint16_t peerPort = ntohs(addrBuffer->peerAddress.sin_port);
+
         delete addrBuffer;
-        auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(peerIpAddressStr);
         MANGOS_ASSERT(peerIpAddress.has_value());
 
-        uint16_t peerPort = ntohs(addrBuffer->peerAddress.sin_port);
         IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
         IO::Networking::SocketDescriptor socketDescriptor{ peerEndpoint, nativePeerSocket };
 
