@@ -90,6 +90,7 @@ namespace IO { namespace Networking {
 
                 CONTEXT_PENDING_SET  = (1 << 8),
                 CONTEXT_PRESENT      = (1 << 9),
+                CONTEXT_PENDING_LOAD = (1 << 10),
             };
             std::atomic<int> m_atomicState{0};
 
@@ -112,6 +113,7 @@ namespace IO { namespace Networking {
         private:
             void PerformNonBlockingRead();
             void PerformNonBlockingWrite();
+            void PerformContextSwitch();
             void StopPendingTransactionsAndForceClose();
 
             char* m_readDstBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_readDstBufferBytesLeft for space

@@ -406,6 +406,27 @@ void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingWrite()
 }
 
 template<typename SocketType>
+void IO::Networking::AsyncSocket<SocketType>::PerformContextSwitch()
+{
+    int state = m_atomicState.fetch_or(SocketStateFlags::CONTEXT_PENDING_LOAD);
+
+    if (state & SocketStateFlags::CONTEXT_PENDING_LOAD)
+        return; // Someone else uses it
+
+    if (state & SocketStateFlags::IGNORE_TRANSFERS)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::CONTEXT_PENDING_LOAD);
+        return; // We are not allowed to react to it
+    }
+
+    auto tmpCallback = std::move(m_contextCallback);
+    m_atomicState.fetch_and(~(SocketStateFlags::CONTEXT_PENDING_LOAD | SocketStateFlags::CONTEXT_PRESENT));
+
+    MANGOS_DEBUG_ASSERT(tmpCallback);
+    tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
+}
+
+template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClose()
 {
     CloseSocket(); // this guarantees SHUTDOWN_PENDING to be set
@@ -415,7 +436,12 @@ void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClo
     int state = m_atomicState.fetch_or(SocketStateFlags::IGNORE_TRANSFERS);
 
     // we must wait for the other threads to finish
-    int const pendingTransferMask = SocketStateFlags::WRITE_PENDING_SET | SocketStateFlags::WRITE_PENDING_LOAD | SocketStateFlags::READ_PENDING_LOAD | SocketStateFlags::READ_PENDING_LOAD;
+    int const pendingTransferMask = SocketStateFlags::WRITE_PENDING_SET |
+                                    SocketStateFlags::WRITE_PENDING_LOAD |
+                                    SocketStateFlags::READ_PENDING_SET |
+                                    SocketStateFlags::READ_PENDING_LOAD |
+                                    SocketStateFlags::CONTEXT_PENDING_SET |
+                                    SocketStateFlags::CONTEXT_PENDING_LOAD;
     if (state & pendingTransferMask)
     {
         while ((state = m_atomicState.load()) & pendingTransferMask)
@@ -443,7 +469,12 @@ void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClo
         tmpReadCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
     }
 
-    // btw. we cannot abort a pending context switch, since it's randomly writing our pointer to the scheduler queue // TODO: This is not true anymore, just make a load() where epollevents == 0
+    if (state & SocketStateFlags::CONTEXT_PRESENT)
+    {
+        auto tmpContextCallback = std::move(m_contextCallback);
+        m_atomicState.fetch_and(~SocketStateFlags::CONTEXT_PRESENT);
+        tmpContextCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+    }
 }
 
 template<typename SocketType>
@@ -488,17 +519,14 @@ void IO::Networking::AsyncSocket<SocketType>::OnIoEvent(uint32_t event)
     #error "Unsupported"
 #endif
 
+    if (m_atomicState.load(std::memory_order_relaxed) & SocketStateFlags::IGNORE_TRANSFERS)
+        return; // This is just an initial check, must be atomically checked in the handlers later.
+
     if (event == CALLBACK_EVENT_FLAG)
     {
-        auto tmpCallback = std::move(m_contextCallback);
-        MANGOS_DEBUG_ASSERT(tmpCallback);
-        m_atomicState.fetch_and(~SocketStateFlags::CONTEXT_PRESENT);
-        tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
+        PerformContextSwitch();
         return;
     }
-
-    if (m_atomicState.load(std::memory_order_relaxed) & SocketStateFlags::IGNORE_TRANSFERS)
-        return; // This is just an initial check. Must be checked in `PerformNonBlockingRead` and `PerformNonBlockingWrite` while setting PENDING_LOAD
 
 #if defined(__linux__)
     if (event & EPOLLERR)
