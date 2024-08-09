@@ -118,8 +118,13 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
             return;
         }
 
-        char ipv4AddressString[INET_ADDRSTRLEN];
-        ::inet_ntop(AF_INET, &(addrBuffer->peerAddress.sin_addr), ipv4AddressString, INET_ADDRSTRLEN);
+        // We cant use ::inet_ntoa(...) because it's not thread safe. We cant use ::inet_ntop(...) because it's not WinXP compatible, so we have to do it ourselves.
+        int constexpr MAX_IPV4_LENGTH = 16; // "255.255.255.255" = length 15 + 1 for null-terminator
+        char ipv4AddressString[MAX_IPV4_LENGTH];
+        { // impl was taken from ACE, should be universal
+            uint8_t const* const p = reinterpret_cast<uint8_t const*>(&addrBuffer->peerAddress.sin_addr);
+            snprintf(ipv4AddressString, MAX_IPV4_LENGTH, "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
+        }
         auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
         uint16_t peerPort = ntohs(addrBuffer->peerAddress.sin_port);
 
