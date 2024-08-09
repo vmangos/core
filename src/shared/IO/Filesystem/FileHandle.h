@@ -24,18 +24,20 @@ namespace IO { namespace Filesystem {
         [[nodiscard]]
         std::chrono::system_clock::time_point GetLastModifyDate() const;
 
+        /// Returns the file path used to open this file
         [[nodiscard]]
-        std::string GetAbsoluteFilePath() const;
+        std::string GetFilePath() const;
 
     protected:
-        explicit FileHandle(IO::Native::FileHandle nativeFileHandle);
+        explicit FileHandle(std::string filePath, IO::Native::FileHandle nativeFileHandle) : m_filePath(std::move(filePath)), m_nativeFileHandle(nativeFileHandle) {};
+        std::string m_filePath;
         IO::Native::FileHandle m_nativeFileHandle;
     };
 
     class FileHandleReadonly : public FileHandle
     {
     public:
-        explicit FileHandleReadonly(IO::Native::FileHandle nativeFileHandle) : FileHandle(nativeFileHandle) {};
+        explicit FileHandleReadonly(std::string const& filePath, IO::Native::FileHandle nativeFileHandle) : FileHandle(filePath, nativeFileHandle) {};
         FileHandleReadonly(FileHandleReadonly const&) = delete;
         FileHandleReadonly& operator=(FileHandleReadonly const&) = delete;
         FileHandleReadonly(FileHandleReadonly&&) = delete;

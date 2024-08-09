@@ -32,7 +32,7 @@ std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileR
         return nullptr;
     }
 
-    return std::unique_ptr<FileHandleReadonly>(new FileHandleReadonly(nativeFileHandle));
+    return std::unique_ptr<FileHandleReadonly>(new FileHandleReadonly(filePath, nativeFileHandle));
 }
 
 /// Will convert a partial path like "./data/myCoolFile.txt" to a complete absolute path like "/home/user/data/myCoolFile.txt"

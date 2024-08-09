@@ -49,7 +49,7 @@ std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileR
 #warning "IO::Filesystem::TryOpenFileReadonly(...) hints are not supported on your platform"
 #endif
 
-    return std::unique_ptr<FileHandleReadonly>(new FileHandleReadonly(fileHandle));
+    return std::unique_ptr<FileHandleReadonly>(new FileHandleReadonly(filePath, fileHandle));
 }
 
 /// Will convert a partial path like "./data/myCoolFile.txt" to a complete absolute path like "/home/user/data/myCoolFile.txt"

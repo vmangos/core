@@ -90,6 +90,7 @@ namespace IO { namespace Networking {
 
                 CONTEXT_PENDING_SET  = (1 << 8),
                 CONTEXT_PRESENT      = (1 << 9),
+                CONTEXT_PENDING_LOAD = (1 << 10),
             };
             std::atomic<int> m_atomicState{0};
 
@@ -109,11 +110,12 @@ namespace IO { namespace Networking {
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
 #elif defined(__linux__) || defined(__APPLE__)
-        public: // TODO: Make me private again. Why does friend `AsyncSocketListener<SocketType>` not work?
+        private:
             void PerformNonBlockingRead();
             void PerformNonBlockingWrite();
+            void PerformContextSwitch();
             void StopPendingTransactionsAndForceClose();
-        private:
+
             char* m_readDstBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_readDstBufferBytesLeft for space
             std::size_t m_readDstBufferBytesLeft = 0;
             char const* m_writeSrcBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_writeSrcBufferBytesLeft for space

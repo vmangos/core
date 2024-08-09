@@ -108,11 +108,13 @@ void IO::Networking::AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvai
         return;
     }
 
-    std::string peerIpAddressStr(inet_ntoa(peerAddress.sin_addr)); // inet_ntoa will "free" (reuse) the char* on its own
-    auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(peerIpAddressStr);
+    char ipv4AddressString[INET_ADDRSTRLEN];
+    ::inet_ntop(AF_INET, &(peerAddress.sin_addr), ipv4AddressString, INET_ADDRSTRLEN);
+    auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
+    uint16_t peerPort = ntohs(peerAddress.sin_port);
+
     MANGOS_ASSERT(peerIpAddress.has_value());
 
-    uint16_t peerPort = ntohs(peerAddress.sin_port);
     IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
     IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
 

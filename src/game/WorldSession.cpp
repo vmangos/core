@@ -93,7 +93,11 @@ WorldSession::~WorldSession()
         LogoutPlayer(!m_bot || sPlayerBotMgr.IsSavingAllowed());
 
     // If have unclosed socket, close it
-    m_socket = nullptr; // <-- technically this is unnecessary, since we are in the destructor that will destruct all other members soon anyway
+    if (m_socket)
+    {
+        m_socket->FinalizeSession();
+        m_socket = nullptr; // <-- technically this is unnecessary, since we are in the destructor that will destruct all other members soon anyway
+    }
 
     // empty incoming packet queue
     for (auto& i : m_recvQueue)
@@ -426,6 +430,7 @@ bool WorldSession::Update(PacketFilter& updater)
         // Cleanup socket pointer if need
         if (m_socket && m_socket->IsClosing())
         {
+            m_socket->FinalizeSession();
             m_socket = nullptr;
 
             if (m_warden)

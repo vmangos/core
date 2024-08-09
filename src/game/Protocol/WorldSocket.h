@@ -96,11 +96,6 @@ private:
     std::queue<WorldPacket> m_sendQueue;
     std::atomic_flag m_sendQueueIsRunning;
 
-#ifdef _DEBUG
-    //std::deque<uint32> m_opcodeHistoryOut{};
-    //std::deque<uint32> m_opcodeHistoryInc{};
-#endif
-
 public:
     explicit WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor);
     ~WorldSocket();
@@ -113,10 +108,10 @@ public:
 
     void SendPacket(WorldPacket packet);
 
-    void FinalizeSession() { m_Session = nullptr; }
-
-    //static std::vector<uint32> m_packetCooldowns;
-    //std::map<uint32, TimePoint> m_lastPacket;
+    void FinalizeSession()
+    {
+        m_Session = nullptr;
+    }
 };
 
 #endif // MANGOS_GAME_SERVER_WORLDSOCKET_H

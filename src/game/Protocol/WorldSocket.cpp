@@ -169,12 +169,6 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
                     return HandlerResult::Fail;
                 }
 
-#ifdef _DEBUG
-                //m_opcodeHistoryInc.push_front(uint32(opcode));
-                //if (m_opcodeHistoryInc.size() > 50)
-                //    m_opcodeHistoryInc.resize(30);
-#endif
-
                 m_Session->QueuePacket(std::move(packet));
                 return HandlerResult::Okay;
         }
@@ -567,9 +561,6 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
         m_sendQueueLock.unlock();
 
         uint32 opcode = packet.GetOpcode();
-#ifdef _DEBUG
-        //m_opcodeHistoryOut.push_front(uint32(opcode));
-#endif
 
         ServerPktHeader header{};
 
@@ -585,11 +576,6 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
         if (packet.size() > 0)
             alreadyAllocatedBuffer->append(packet.contents(), packet.size());
     }
-
-#ifdef _DEBUG
-    //if (m_opcodeHistoryOut.size() > 50)
-    //    m_opcodeHistoryOut.resize(30);
-#endif
 
     Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error)
     {
