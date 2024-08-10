@@ -523,6 +523,12 @@ void WorldSocket::SendPacket(WorldPacket packet)
 
     // We don't want to allocate or encrypt anything inside the world thread, so we move everything to the IO thread.
     m_sendQueueLock.lock();
+    if (m_sendQueue.size() > 1024) // There should never be so many packets queued up. The socket is probably not responding.
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Send queue is full. Disconnect IP: ", GetRemoteIpString().c_str());
+        CloseSocket();
+        return;
+    }
     m_sendQueue.push(std::move(packet));
     m_sendQueueLock.unlock();
 
