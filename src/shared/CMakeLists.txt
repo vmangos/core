@@ -17,6 +17,7 @@
 
 # Glob only and not recurse, there are other libs for that
 set (shared_SRCS 
+    backward.hpp
     ByteBuffer.h
     Common.h
     DelayExecutor.h

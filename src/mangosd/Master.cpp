@@ -579,8 +579,7 @@ void Master::_OnSignal(int s)
 
             // Log crash stack
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Received SIGSEGV");
-            ACE_Stack_Trace st; // TODO: Replace me with non ACE StackTrace
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str());
+            PRINT_STACK_TRACE(32);
 
             if (anticrashOptions & ANTICRASH_GENERATE_COREDUMP)
                 CreateCrashDump();

@@ -10071,9 +10071,8 @@ void Unit::CleanupDeletedAuras()
             // - Player::SetDeathState
             // - Pet::AddObjectToRemoveList
             // Seen happening with spells like [Health Funnel], [Tainted Blood]
-            ACE_Stack_Trace st;
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Crash/Auras] Deleting aura holder %u in use (%s)", iter->GetId(), GetObjectGuid().GetString().c_str());
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str());
+            PRINT_STACK_TRACE(32);
         }
         else
             delete iter;
@@ -10085,9 +10084,8 @@ void Unit::CleanupDeletedAuras()
     {
         if (iter->IsInUse())
         {
-            ACE_Stack_Trace st;
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Crash/Auras] Deleting aura %u in use (%s)", iter->GetId(), GetObjectGuid().GetString().c_str());
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str());
+            PRINT_STACK_TRACE(32);
         }
         else
             delete iter;
