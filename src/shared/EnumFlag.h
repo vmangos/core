@@ -31,32 +31,32 @@ namespace EnumTraits
     using IsFlag = std::integral_constant<bool, IsEnumFlag(T{})>;
 }
 
-template<typename T, std::enable_if_t<EnumTraits::IsFlag<T>::value, std::nullptr_t> = nullptr>
-inline constexpr T operator&(T left, T right)
+template<typename T>
+inline constexpr auto operator&(T left, T right) -> typename std::enable_if<EnumTraits::IsFlag<T>::value, T>::type
 {
     return static_cast<T>(static_cast<std::underlying_type_t<T>>(left) & static_cast<std::underlying_type_t<T>>(right));
 }
 
-template<typename T, std::enable_if_t<EnumTraits::IsFlag<T>::value, std::nullptr_t> = nullptr>
-inline constexpr T& operator&=(T& left, T right)
+template<typename T>
+inline constexpr auto operator&=(T& left, T right) -> typename std::enable_if<EnumTraits::IsFlag<T>::value, T&>::type
 {
     return left = left & right;
 }
 
-template<typename T, std::enable_if_t<EnumTraits::IsFlag<T>::value, std::nullptr_t> = nullptr>
-inline constexpr T operator|(T left, T right)
+template<typename T>
+inline constexpr auto operator|(T left, T right) -> typename std::enable_if<EnumTraits::IsFlag<T>::value, T>::type
 {
     return static_cast<T>(static_cast<std::underlying_type_t<T>>(left) | static_cast<std::underlying_type_t<T>>(right));
 }
 
-template<typename T, std::enable_if_t<EnumTraits::IsFlag<T>::value, std::nullptr_t> = nullptr>
-inline constexpr T& operator|=(T& left, T right)
+template<typename T>
+inline constexpr auto operator|=(T& left, T right) -> typename std::enable_if<EnumTraits::IsFlag<T>::value, T&>::type
 {
     return left = left | right;
 }
 
-template<typename T, std::enable_if_t<EnumTraits::IsFlag<T>::value, std::nullptr_t> = nullptr>
-inline constexpr T operator~(T value)
+template<typename T>
+inline constexpr auto operator~(T value) -> typename std::enable_if<EnumTraits::IsFlag<T>::value, T>::type
 {
     return static_cast<T>(~static_cast<std::underlying_type_t<T>>(value));
 }
@@ -71,7 +71,7 @@ public:
     {
     }
 
-    constexpr EnumFlag& operator&=(EnumFlag right)
+    EnumFlag& operator&=(EnumFlag right)
     {
         _value &= right._value;
         return *this;
@@ -82,7 +82,7 @@ public:
         return left &= right;
     }
 
-    constexpr EnumFlag& operator|=(EnumFlag right)
+    EnumFlag& operator|=(EnumFlag right)
     {
         _value |= right._value;
         return *this;
@@ -98,7 +98,7 @@ public:
         return static_cast<T>(~static_cast<std::underlying_type_t<T>>(_value));
     }
 
-    constexpr void RemoveFlag(EnumFlag flag)
+    void RemoveFlag(EnumFlag flag)
     {
         _value &= ~flag._value;
     }

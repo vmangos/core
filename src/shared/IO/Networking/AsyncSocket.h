@@ -157,7 +157,7 @@ IO::Networking::IpEndpoint const& IO::Networking::AsyncSocket<SocketType>::GetRe
 template<typename SocketType>
 std::string IO::Networking::AsyncSocket<SocketType>::GetRemoteIpString() const
 {
-    return GetRemoteEndpoint().ip.toString();
+    return GetRemoteEndpoint().ip.toString(); // Just gets the IP part e.g. "192.168.13.37"
 }
 
 template<typename SocketType>

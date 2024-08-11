@@ -39,7 +39,7 @@ void IO::Timer::AsyncSystemTimer::RemoveAllTimersAndStopThread()
     m_pendingTimers_mutex.unlock();
 }
 
-void IO::Timer::AsyncSystemTimer::_timerQueueTimeoutCallback(PVOID opaquePointer, BOOLEAN _thisVariableIsNotUsedInTimers)
+void CALLBACK IO::Timer::AsyncSystemTimer::_timerQueueTimeoutCallback(PVOID opaquePointer, BOOLEAN _thisVariableIsNotUsedInTimers)
 {
     (void)_thisVariableIsNotUsedInTimers;
 

@@ -39,7 +39,7 @@ namespace IO { namespace Timer {
         std::shared_ptr<IO::Timer::TimerHandle> _ScheduleFunctionOnceMs(uint64_t milliseconds, std::function<void()> const& function);
 
 #if defined(WIN32)
-        static void _timerQueueTimeoutCallback(PVOID opaquePointer, BOOLEAN _thisVariableIsNotUsedInTimers);
+        static void CALLBACK _timerQueueTimeoutCallback(PVOID opaquePointer, BOOLEAN _thisVariableIsNotUsedInTimers);
         std::mutex m_pendingTimers_mutex;
         std::unordered_set<std::shared_ptr<IO::Timer::TimerHandle>> m_pendingTimers;
         HANDLE m_nativeTimerQueueHandle;
