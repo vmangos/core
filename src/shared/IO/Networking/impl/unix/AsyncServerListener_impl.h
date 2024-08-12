@@ -6,6 +6,7 @@
 #include <string>
 #include <chrono>
 #include "Log.h"
+#include "Errors.h"
 #include "IO/Utils_Unix.h"
 #include "IO/Context/IoContext.h"
 #include "IO/Networking/SocketDescriptor.h"

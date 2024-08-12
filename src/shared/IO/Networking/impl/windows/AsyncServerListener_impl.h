@@ -6,6 +6,7 @@
 #include <string>
 #include <chrono>
 #include <WinSock2.h>
+#include "Errors.h"
 #include "IO/Context/AsyncIoOperation.h"
 #include "IO/Networking/IpAddress.h"
 #include "IO/Networking/SocketDescriptor.h"
