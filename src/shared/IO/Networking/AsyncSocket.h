@@ -9,6 +9,7 @@
 #include <functional>
 #include <atomic>
 #include "ByteBuffer.h"
+#include "Errors.h"
 #include "IO/Context/IoContext.h"
 #include "IO/Networking/NetworkError.h"
 #include "IO/Networking/SocketDescriptor.h"

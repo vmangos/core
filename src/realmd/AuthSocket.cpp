@@ -29,6 +29,7 @@
 #include "Database/DatabaseEnv.h"
 #include "Config/Config.h"
 #include "Log.h"
+#include "Errors.h"
 #include "RealmList.h"
 #include "AuthSocket.h"
 #include "AuthCodes.h"

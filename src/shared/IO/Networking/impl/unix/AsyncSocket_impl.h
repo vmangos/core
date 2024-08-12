@@ -9,6 +9,7 @@
 #include <netinet/tcp.h>
 #include <thread>
 #include "IO/SystemErrorToString.h"
+#include "Errors.h"
 
 template<typename SocketType>
 void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback)
