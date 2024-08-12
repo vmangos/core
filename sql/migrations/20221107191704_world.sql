@@ -8,6 +8,8 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20221107191704');
 -- Add your query below.
 
+UPDATE `object_template` SET `flags` = 0, `data0` = 14 WHERE `entry` = 177226 -- Enables object gossip for Book "Soothsaying for Dummies" 
+
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
 (10994, 8, 3639, 0, 0, 0, 0), -- Condition for completing Show Your Work (goblin engineering)
 (10995, 8, 3641, 0, 0, 0, 0), -- Condition for completing Show Your Work (gnomish engineering - alliance side) 
@@ -76,11 +78,11 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (2865, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking');
 
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(7058, 1, 0, 'I am 100% confident that I wish to learn in the ways of goblin engineering.', 11876, 1, 1, -1, 0, 2861, 0, 0, '', 0, 11005),
-(7058, 2, 0, 'I am 100% confident that I wish to learn in the ways of gnomish engineering.', 11878, 1, 1, -1, 0, 2862, 0, 0, '', 0, 11005),
+(7058, 1, 0, 'I am 100% confident that I wish to learn in the ways of goblin engineering.', 11876, 1, 1, -1, 0, 2861, 0, 0, '', 0, 11002),
+(7058, 2, 0, 'I am 100% confident that I wish to learn in the ways of gnomish engineering.', 11878, 1, 1, -1, 0, 2862, 0, 0, '', 0, 11002),
 (7058, 3, 0, 'I am absolutely certain that I want to learn dragonscale leatherworking.', 11889, 1, 1, -1, 0, 2863, 0, 0, '', 0, 11023),
 (7058, 4, 0, 'I am absolutely certain that I want to learn elemental leatherworking.', 11890, 1, 1, -1, 0, 2864, 0, 0, '', 0, 11023),
-(7058, 5, 0, 'I am absolutely certain that I want to learn tribal leatherworking.', 11876, 1, 1, -1, 0, 2865, 0, 0, '', 0, 11023),
+(7058, 5, 0, 'I am absolutely certain that I want to learn tribal leatherworking.', 11891, 1, 1, -1, 0, 2865, 0, 0, '', 0, 11023),
 (3067, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 0, 0, 0, '', 0, 11023),
 (3068, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 0, 0, 0, '', 0, 11023),
 (3069, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22001, 0, 0, 0, 0, '', 0, 11023),
@@ -205,24 +207,6 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318
 UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6089 AND `id` = 0;
 UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6090 AND `id` = 0;
 UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6091 AND `id` = 0;
-
--- Correct Reward spells for quest templates for specialisations
-UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `entry` = 5283; -- Armorsmithing (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 9788, `RewSpellCast` = 9790 WHERE `entry` = 5301; -- Armorsmithing (Horde)
-UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `entry` = 5284; -- Weaponsmithing (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 9787, `RewSpellCast` = 9789  WHERE `entry` = 5302; -- Weaponsmithing (Horde)
-UPDATE `quest_template` SET `RewSpell` = 17040, `RewSpellCast` = 17044  WHERE `entry` = 5305; -- Hammersmithing
-UPDATE `quest_template` SET `RewSpell` = 17041, `RewSpellCast` = 17043  WHERE `entry` = 5306; -- Axesmithing
-UPDATE `quest_template` SET `RewSpell` = 17039, `RewSpellCast` = 17042  WHERE `entry` = 5307; -- Swordsmithing
-UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `entry` = 5143; -- Tribal Leatherworking (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 10660  WHERE `entry` = 5148; -- Tribal Leatherworking (Horde)
-UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `entry` = 5144; -- Elemental Leatherworking (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 10658  WHERE `entry` = 5146; -- Elemental Leatherworking (Horde)
-UPDATE `quest_template` SET `RewSpell` = 10656  WHERE `entry` = 5141; -- Dragonscale Leatherworking (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 10656  WHERE `entry` = 5145; -- Dragonscale Leatherworking (Horde)
-UPDATE `quest_template` SET `RewSpell` = 20222  WHERE `entry` = 3639; -- Goblin Engineering
-UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `entry` = 3641; -- Gnomish Engineering (Alliance)
-UPDATE `quest_template` SET `RewSpell` = 20219  WHERE `entry` = 3639; -- Gnomish Engineering (Horde)
 
 -- Correct specialisations teaching artisan of profession
 UPDATE `spell_chain` SET `prev_spell` = 3538, `rank` = 4 WHERE `spell_id` = 9787; -- Correct for Weaponsmithing
