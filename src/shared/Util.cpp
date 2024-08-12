@@ -26,12 +26,9 @@
 #include "utf8cpp/utf8.h"
 #include "mersennetwister/MersenneTwister.h"
 
-#include <ace/TSS_T.h>
 #include <ace/OS_NS_arpa_inet.h>
 
-typedef ACE_TSS<MTRand> MTRandTSS;
-static MTRandTSS mtRand;
-
+thread_local MTRand mtRand;
 
 Tokenizer::Tokenizer(std::string const& src, char const sep, uint32 vectorReserve)
 {
@@ -110,42 +107,42 @@ uint32 WorldTimer::getMSTime_internal()
 //////////////////////////////////////////////////////////////////////////
 int32 irand (int32 min, int32 max)
 {
-    return int32 (mtRand->randInt (max - min)) + min;
+    return int32 (mtRand.randInt(max - min)) + min;
 }
 
 uint32 urand (uint32 min, uint32 max)
 {
-    return mtRand->randInt (max - min) + min;
+    return mtRand.randInt(max - min) + min;
 }
 
 float frand (float min, float max)
 {
-    return mtRand->randExc (max - min) + min;
+    return mtRand.randExc (max - min) + min;
 }
 
 int32 rand32 ()
 {
-    return mtRand->randInt ();
+    return mtRand.randInt ();
 }
 
 double rand_norm(void)
 {
-    return mtRand->randExc ();
+    return mtRand.randExc ();
 }
 
 float rand_norm_f(void)
 {
-    return (float)mtRand->randExc ();
+    return (float)mtRand.randExc ();
 }
 
 double rand_chance (void)
 {
-    return mtRand->randExc (100.0);
+    return mtRand.randExc (100.0);
 }
 
 float rand_chance_f(void)
 {
-    return (float)mtRand->randExc (100.0);
+    return (float)mtRand.randExc (100.0);
 }
 
 Milliseconds randtime(Milliseconds const& min, Milliseconds const& max)
