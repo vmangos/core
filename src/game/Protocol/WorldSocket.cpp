@@ -525,6 +525,7 @@ void WorldSocket::SendPacket(WorldPacket packet)
     m_sendQueueLock.lock();
     if (m_sendQueue.size() > 1024) // There should never be so many packets queued up. The socket is probably not responding.
     {
+        m_sendQueueLock.unlock();
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Send queue is full. Disconnect IP: ", GetRemoteIpString().c_str());
         CloseSocket();
         return;
