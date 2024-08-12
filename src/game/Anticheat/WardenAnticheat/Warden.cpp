@@ -15,10 +15,10 @@
  */
 
 /*
- * 
+ *
  * This code was written by namreeb (legal@namreeb.org) and is released with
  * permission as part of vmangos (https://github.com/vmangos/core)
- * 
+ *
  */
 
 #include "WardenModule.hpp"
@@ -62,7 +62,7 @@ void Log::OutWarden(Warden const* warden, LogLevel logLevel, char const* format,
         SetColor(stdout, g_logColors[logLevel]);
 
         if (m_includeTime)
-            outTime(stdout);
+            OutTime(stdout);
 
         // Append tag to console warden messages.
         printf("[Warden] (Name %s, Id %u, IP %s) ", warden->GetAccountName(), warden->GetAccountId(), warden->GetSessionIP());
@@ -80,7 +80,7 @@ void Log::OutWarden(Warden const* warden, LogLevel logLevel, char const* format,
 
     if (logFiles[LOG_ANTICHEAT] && m_fileLevel >= logLevel)
     {
-        outTimestamp(logFiles[LOG_ANTICHEAT]);
+        OutTimestamp(logFiles[LOG_ANTICHEAT]);
         fprintf(logFiles[LOG_ANTICHEAT], "[Warden] (Name %s, Id %u, IP %s) ", warden->GetAccountName(), warden->GetAccountId(), warden->GetSessionIP());
 
         va_list ap;
@@ -323,7 +323,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
     if (m_clientOS == CLIENT_OS_WIN && !m_maiev)
     {
         // indicates to the client that there are no further requests in this packet
-        buff << m_xor;
+        buff << uint8(m_module->scanTerminator ^ m_xor);
     }
 
     BeginTimeoutClock();
@@ -341,7 +341,7 @@ void Warden::ReadScanResults(ByteBuffer& buff)
     {
         sLog.OutWarden(this, LOG_LVL_DEBUG, "Checking result for %s", s->comment.c_str());
 
-        // checks return true when they have discovered a hack 
+        // checks return true when they have discovered a hack
         if (s->Check(this, buff))
         {
             // if this scan requires being in the world and they are not in the world (meaning they left
@@ -415,12 +415,7 @@ void Warden::EncryptData(uint8* buffer, size_t size)
 
 void Warden::BeginTimeoutClock()
 {
-#ifdef _DEBUG
-    m_timeoutClock = 0;
-#else
-    // we will expect a reply eventually
-    m_timeoutClock = WorldTimer::getMSTime() + IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY);
-#endif
+    m_timeoutClock = WorldTimer::getMSTime() + (IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY));
 }
 
 void Warden::StopTimeoutClock()
@@ -435,7 +430,7 @@ bool Warden::TimeoutClockStarted() const
 
 void Warden::BeginScanClock()
 {
-    m_scanClock = WorldTimer::getMSTime() + 1000 * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY);
+    m_scanClock = WorldTimer::getMSTime() + (IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY));
 }
 
 void Warden::StopScanClock()
@@ -576,6 +571,13 @@ void Warden::HandlePacket(WorldPacket& recvData)
                 uint32 checksum;
                 recvData >> length >> checksum;
 
+                if (length > (recvData.size() - recvData.rpos()))
+                {
+                    recvData.rpos(recvData.wpos());
+                    ApplyPenalty("wrong checksum length", WARDEN_ACTION_KICK);
+                    return;
+                }
+
                 if (BuildChecksum(recvData.contents() + recvData.rpos(), length) != checksum)
                 {
                     recvData.rpos(recvData.wpos());
@@ -652,7 +654,7 @@ void Warden::Update()
 {
     {
         std::vector<WorldPacket> packetQueue;
-    
+
         {
             std::lock_guard<std::mutex> lock(m_packetQueueMutex);
             std::swap(packetQueue, m_packetQueue);
@@ -673,12 +675,14 @@ void Warden::Update()
         }
     }
 
+#ifndef _DEBUG // Ignore timeout when in debug mode (we might single step though code, which takes a long time)
     if (!!m_timeoutClock && WorldTimer::getMSTime() > m_timeoutClock)
     {
         sLog.OutWarden(this, LOG_LVL_BASIC, "Client response timeout.  Kicking.");
         KickSession();
         return;
     }
+#endif
 
     if (m_pendingScans.empty())
     {

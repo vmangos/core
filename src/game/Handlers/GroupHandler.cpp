@@ -83,8 +83,6 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (GetPlayer()->GetMapId() > 1 && GetPlayer()->GetInstanceId() && player->GetInstanceId() && GetPlayer()->GetInstanceId() != player->GetInstanceId() && GetPlayer()->GetMapId() == player->GetMapId())
-        return;
     // Just ignore us
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {
@@ -309,13 +307,24 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recv_data)
 void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     recv_data >> guid;
+#else
+    std::string name;
+    recv_data >> name;
+#endif
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     Player* player = sObjectMgr.GetPlayer(guid);
+#else
+    Player* player = sObjectMgr.GetPlayer(name.c_str());
+    if (player)
+        guid = player->GetObjectGuid();
+#endif
 
     /** error handling **/
     if (!player || !group->IsLeader(GetPlayer()->GetObjectGuid()) || player->GetGroup() != group)
@@ -445,10 +454,18 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
     data << uint32(maximum);
     data << uint32(roll);
     data << GetPlayer()->GetObjectGuid();
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Using /random will now send the text to your party or raid wherever
+    //   they are instead of the local area around the player that used /random.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (GetPlayer()->GetGroup())
         GetPlayer()->GetGroup()->BroadcastPacket(&data, false);
     else
         SendPacket(&data);
+#else
+    GetPlayer()->SendObjectMessageToSet(&data, true);
+#endif
 }
 
 void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recv_data)
@@ -471,7 +488,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recv_data)
     else                                                    // target icon update
     {
         if (!group->IsLeader(GetPlayer()->GetObjectGuid()) &&
-                !group->IsAssistant(GetPlayer()->GetObjectGuid()))
+            !group->IsAssistant(GetPlayer()->GetObjectGuid()))
             return;
 
         ObjectGuid guid;
@@ -575,7 +592,12 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     uint8 flag;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     recv_data >> guid;
+#else
+    std::string name;
+    recv_data >> name;
+#endif
     recv_data >> flag;
 
     Group* group = GetPlayer()->GetGroup();
@@ -587,13 +609,20 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
         return;
     /********************/
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
+    if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
+        guid = player->GetObjectGuid();
+    else
+        return;
+#endif
+
     // everything is fine, do it
     group->SetAssistant(guid, (flag != 0));
 }
 
 void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recv_data)
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     if (recv_data.empty())                                  // request
     {
         Group* group = GetPlayer()->GetGroup();

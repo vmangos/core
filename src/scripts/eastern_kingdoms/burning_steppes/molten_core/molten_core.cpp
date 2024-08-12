@@ -260,8 +260,13 @@ CreatureAI* GetAI_mob_ancient_core_hound(Creature* pCreature)
 
 enum
 {
+    SPELL_FULL_HEAL         = 17683,
     SPELL_SERRATED_BITE     = 19771,
     SPELL_FIRE_NOVA_VISUAL  = 19823,
+    SPELL_PACIFY_SELF       = 19951,
+
+    BCT_FAKE_DEATH          = 7866,
+    BCT_REVIVE              = 7867,
 };
 
 struct mob_core_houndAI : public ScriptedAI
@@ -279,15 +284,17 @@ struct mob_core_houndAI : public ScriptedAI
     uint32 m_uiResurrectTimer;
 
     bool m_bDead;
-    bool m_bResurrectionOkay;
 
     void ResurrectSelf()
     {
-        m_creature->SetHealth(m_creature->GetMaxHealth());
+        m_creature->RemoveAurasDueToSpell(SPELL_PACIFY_SELF);
+        m_creature->CastSpell(m_creature, SPELL_FULL_HEAL, true);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
         m_creature->AttackStop();
-        
+        SetMeleeAttack(true);
+        SetCombatMovement(true);
+
         m_bDead = false;
     }
 
@@ -296,19 +303,24 @@ struct mob_core_houndAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        m_creature->MonsterTextEmote("Core Hound collapses and begins to smolder.");
-        m_creature->SetHealth(0);
+        m_creature->MonsterTextEmote(BCT_FAKE_DEATH, m_creature);
+        m_creature->SetHealth(1);
         m_creature->RemoveAllAuras();
+        m_creature->CastSpell(m_creature, SPELL_PACIFY_SELF, true);
         m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MoveIdle();
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
         m_creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        SetMeleeAttack(false);
+        SetCombatMovement(false);
+
         m_uiResurrectTimer = 10000;
         m_bDead = true;
     }
     
     void Kill_Self()
     {
+        m_creature->SetInvincibilityHpThreshold(0);
         m_creature->DealDamage(m_creature, 1, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
         m_creature->ForcedDespawn();
     }
@@ -331,8 +343,6 @@ struct mob_core_houndAI : public ScriptedAI
         if (m_creature->GetHealth() < uiDamage)
         {
             // time to fake death
-            uiDamage = 0;
-
             if (!m_bDead)
                 FeignDeath();
             return;
@@ -350,7 +360,7 @@ struct mob_core_houndAI : public ScriptedAI
         {
             if (m_uiResurrectTimer < uiDiff)
             {
-                m_bResurrectionOkay = false;
+                bool m_bResurrectionOkay = false;
 
                 std::list<Creature*> m_CoreHoundList;
                 GetCreatureListWithEntryInGrid(m_CoreHoundList, m_creature, NPC_CORE_HOUND, 100.0f);
@@ -358,7 +368,7 @@ struct mob_core_houndAI : public ScriptedAI
                 {
                     if (itr && itr->IsInCombat())
                     {
-                        if (itr->GetHealth() > 0)
+                        if (itr->GetHealth() > 1)
                             m_bResurrectionOkay = true;
                     }
                 }
@@ -367,7 +377,7 @@ struct mob_core_houndAI : public ScriptedAI
                 {
                     ResurrectSelf();
                     DoCastSpellIfCan(m_creature, SPELL_FIRE_NOVA_VISUAL, CF_TRIGGERED);
-                    m_creature->MonsterTextEmote("Core Hound reignites from the heat of another Core Hound!");
+                    m_creature->MonsterTextEmote(BCT_REVIVE, m_creature);
                 }
                 else
                     Kill_Self();

@@ -9,12 +9,13 @@ enum
 {
     ZULGURUB_MAX_ENCOUNTER  = 13,
 
-    SPELL_HAKKAR_POWER      = 24692,
-    SPELL_HAKKAR_POWER_DOWN = 24693,
+    SPELL_THEKAL_RESURRECTION = 24173,
+    SPELL_HAKKAR_POWER        = 24692,
+    SPELL_HAKKAR_POWER_DOWN   = 24693,
 
     NPC_LORKHAN             = 11347,
     NPC_ZATH                = 11348,
-    NPC_THEKAL              = 14599,
+    NPC_THEKAL              = 14509,
     NPC_JINDO               = 11380,
     NPC_HAKKAR              = 14834,
     NPC_VENOXIS             = 14507,
@@ -26,6 +27,7 @@ enum
     NPC_RAZZASHI_BROODWIDOW = 11370,
     NPC_GAHZRANKA           = 15114,
     NPC_JEKLIK              = 14517,
+    NPC_NIGHTMARE_ILLUSION  = 15163,
     
     TYPE_HAKKAR_POWER       = 0, // set data triggered by spell 24693
     TYPE_ARLOKK             = 1,
@@ -34,8 +36,8 @@ enum
     TYPE_MARLI              = 4,
     TYPE_OHGAN              = 5,
     TYPE_THEKAL             = 6,
-    TYPE_ZATH               = 7,
-    TYPE_LORKHAN            = 8,
+    TYPE_THEKAL_DEATH_TIME  = 7, // set to last time someone fake died
+    TYPE_THEKAL_REZ_TIME    = 8, // set to last time someone started rezzing
     TYPE_HAKKAR             = 9,
     TYPE_RANDOM_BOSS        = 10,
     TYPE_JINDO              = 11,
@@ -46,7 +48,8 @@ enum
     DATA_THEKAL             = 15,
     DATA_ZATH               = 16,
     DATA_HAKKAR             = 17,
-    DATA_GAHZRANKA          = 18
+    DATA_GAHZRANKA          = 18,
+    DATA_THEKAL_NEED_REZ    = 19
 };
 
 class instance_zulgurub : public ScriptedInstance
@@ -67,10 +70,13 @@ class instance_zulgurub : public ScriptedInstance
 
         uint32 GetData(uint32 uiType) override;
         uint64 GetData64(uint32 uiData) override;
+        bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const override;
 
         // each time High Priest dies lower Hakkar's HP
         void UpdateHakkarPowerStacks();
-        Unit* Thekal_GetUnitThatCanRez();
+        Unit* Thekal_GetUnitThatCanRez() const;
+        Unit* Thekal_GetUnitThatNeedsRez() const;
+        Unit* Thekal_GetUnitCastingRez() const;
         uint32 GenerateRandomBoss();
         void SpawnRandomBoss();
 

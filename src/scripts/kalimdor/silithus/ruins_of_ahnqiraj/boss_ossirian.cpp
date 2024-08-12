@@ -355,7 +355,7 @@ struct ossirian_crystalAI : public GameObjectAI
 
         if (!pInstance)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[OSSIRIAN/Crystal][Inst %03u] ERROR: No instance", user->GetInstanceId());
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[OSSIRIAN/Crystal][Inst %03u] ERROR: No instance", user->GetInstanceId());
             return false;
         }
 
@@ -370,7 +370,7 @@ struct ossirian_crystalAI : public GameObjectAI
 
         if (!ossirian)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[OSSIRIAN/Crystal][Inst %03u] ERROR: No Ossirian found (guid %u)", user->GetInstanceId(), pInstance->GetData64(DATA_OSSIRIAN));
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[OSSIRIAN/Crystal][Inst %03u] ERROR: No Ossirian found (guid %u)", user->GetInstanceId(), pInstance->GetData64(DATA_OSSIRIAN));
             return false;
         }
 

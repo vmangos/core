@@ -97,10 +97,28 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 
             bool ok_loot = pCreature && pCreature->IsAlive() == (player->GetClass() == CLASS_ROGUE && pCreature->lootForPickPocketed);
 
-            if (!ok_loot || !pCreature->IsWithinDistInMap(_player, _player->GetMaxLootDistance(pCreature), true, SizeFactor::None))
+            if (!ok_loot)
             {
-                player->SendLootRelease(lguid);
+                player->SendLootError(lguid, LOOT_ERROR_DIDNT_KILL);
                 return;
+            }
+
+            // skinning uses the spell range which is 5 yards
+            if (pCreature->lootForSkin)
+            {
+                if (!pCreature->IsWithinCombatDistInMap(player, INTERACTION_DISTANCE + 1.25f))
+                {
+                    player->SendLootError(lguid, LOOT_ERROR_TOO_FAR);
+                    return;
+                }
+            }
+            else
+            {
+                if (!pCreature->IsWithinDistInMap(_player, _player->GetMaxLootDistance(pCreature), true, SizeFactor::None))
+                {
+                    player->SendLootError(lguid, LOOT_ERROR_TOO_FAR);
+                    return;
+                }
             }
 
             loot = &pCreature->loot;
@@ -127,15 +145,28 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 
     if (!item->AllowedForPlayer(player, loot->GetLootTarget()))
     {
-        player->SendLootRelease(lguid);
+        player->SendLootError(lguid, LOOT_ERROR_DIDNT_KILL);
         return;
     }
 
     // questitems use the blocked field for other purposes
     if (!qitem && item->is_blocked)
     {
-        player->SendLootRelease(lguid);
+        player->SendLootError(lguid, LOOT_ERROR_DIDNT_KILL);
         return;
+    }
+
+    // prevent stealing items if using master loot
+    if (lguid.IsCreature() && !item->is_underthreshold && !qitem && !ffaitem)
+    {
+        if (Group* pGroup = player->GetGroup())
+        {
+            if (pGroup->GetLootMethod() == MASTER_LOOT)
+            {
+                player->SendLootError(lguid, LOOT_ERROR_DIDNT_KILL);
+                return;
+            }
+        }
     }
 
     if (pItem)
@@ -277,14 +308,16 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
             for (const auto i : playersNear)
             {
                 i->LootMoney(moneyPerPlayer, pLoot);
-                
-                WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
-                data << uint32(moneyPerPlayer);
-                i->GetSession()->SendPacket(&data);
+                i->SendLootMoneyNotify(moneyPerPlayer);
             }
         }
         else
+        {
             player->LootMoney(pLoot->gold, pLoot);
+
+            // in wotlk and after this should be sent for solo looting too
+            //player->SendLootMoneyNotify(pLoot->gold);
+        }
 
         pLoot->gold = 0;
 
@@ -657,6 +690,12 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
         sLog.Player(this, LOG_BASIC, LOG_LVL_BASIC,
             "AutoLootItem: Player %s might be using a hack! (slot %d, size %lu)",
             GetPlayer()->GetName(), slotid, (unsigned long)pLoot->items.size());
+        return;
+    }
+
+    if (!pLoot->IsAllowedLooter(playerGuid, false))
+    {
+        _player->SendLootError(lootGuid, LOOT_ERROR_MASTER_OTHER);
         return;
     }
 

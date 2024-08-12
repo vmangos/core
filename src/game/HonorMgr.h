@@ -142,6 +142,15 @@ typedef std::list<HonorCP> HonorCPMap;
 #define POSITIVE_HONOR_RANK_COUNT 15
 #define HONOR_RANK_COUNT 19
 
+// World of Warcraft Client Patch 1.7.0 (2005-09-13)
+// - Racial "Leaders" have been strengthened, and are now worth slightly
+//   less honor.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#define RACIAL_LEADER_HONOR 488.0f
+#else
+#define RACIAL_LEADER_HONOR 500.0f // guess
+#endif
+
 class HonorMgr
 {
     public:
@@ -150,9 +159,9 @@ class HonorMgr
 
         void Save();
         void SaveStoredData();
-        void Load(QueryResult* result);
+        void Load(std::unique_ptr<QueryResult> result);
 
-        bool Add(float CP, uint8 type, Unit* source = nullptr);
+        bool Add(float CP, uint8 type, Unit const* source = nullptr);
         void Update();
         void Reset();
         void ClearHonorData();
@@ -195,7 +204,7 @@ class HonorMgr
         
         HonorCPMap& GetHonorCP() { return m_honorCP; }
 
-        void SendPVPCredit(Unit* victim, float honor);
+        void SendPVPCredit(Unit const* victim, float honor);
 
     private:
         HonorCPMap m_honorCP;

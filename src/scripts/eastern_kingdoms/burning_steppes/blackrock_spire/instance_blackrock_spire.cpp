@@ -167,7 +167,6 @@ instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance
     m_uiFatherFlameGUID(0),
     m_uiFatherFlame_timer(0),
     m_uiFatherFlame_WaveCount(0),
-    m_uiSolakarTriggerGUID(0),
 
     m_uiUBRSDoorGUID(0),
     m_uiBrazier01GUID(0),
@@ -200,7 +199,7 @@ void instance_blackrock_spire::Initialize()
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
     memset(&m_auiRoomRuneGUID, 0, sizeof(m_auiRoomRuneGUID));
 #ifdef DEBUG_ON
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Instance BlackRockSpire : Initialize");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Instance BlackRockSpire : Initialize");
 #endif
 }
 
@@ -345,9 +344,6 @@ void instance_blackrock_spire::OnCreatureCreate(Creature* pCreature)
         case NPC_BLACKHAND_INCANCERATOR:
             m_lIncanceratorGUIDList.push_back(pCreature->GetGUID());
             break;
-        case NPC_SOLAKAR_TRIGGER:
-            m_uiSolakarTriggerGUID = pCreature->GetGUID();
-            break;
         case NPC_FIREBRAND_GRUNT:
             // 14.26% chance to spawn Bannok Grimaxe instead of one of his 3 placeholders
             switch (pCreature->GetGUIDLow())
@@ -421,7 +417,7 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[TYPE_EVENT_DOOR_UBRS] = uiData;
             break;
         case TYPE_SOLAKAR:
-            if ((uiData == FAIL && m_uiFatherFlame_timer != 0) || uiData == SPECIAL)
+            if (uiData == FAIL && m_uiFatherFlame_timer != 0)
             {
                 //DoRespawnGameObject(m_uiFatherFlameGUID, HOUR*IN_MILLISECONDS);
                 m_uiFatherFlame_timer = 0;
@@ -718,16 +714,14 @@ void instance_blackrock_spire::Update(uint32 uiDiff)
 
     if (GetData(TYPE_SOLAKAR) == IN_PROGRESS)
     {
-        if (Creature* Crea = GetCreature(m_uiSolakarTriggerGUID))
-        {
             if (m_uiFatherFlame_timer <= uiDiff)
             {
                 if (m_uiFatherFlame_WaveCount == 0) // First wave should be a Rookery Hatcher and there is a text that it has to say.
                 {
-                    Creature* pFirstHatcher = Crea->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                    if (pFirstHatcher)
+                    if (Creature* pFirstHatcher = GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS))
                         DoScriptText(SAY_ROOKERY_EVENT_START, pFirstHatcher);
-                    Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+
+                    GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                     m_uiFatherFlame_timer = urand(30000, 40000);
                     ++m_uiFatherFlame_WaveCount;
                 }
@@ -737,20 +731,20 @@ void instance_blackrock_spire::Update(uint32 uiDiff)
                     {
                         case 0:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_GUARDIAN, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                         case 1:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                         case 2:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            GetMap()->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                     }
@@ -759,14 +753,13 @@ void instance_blackrock_spire::Update(uint32 uiDiff)
                 }
                 else
                 {
-                    Crea->SummonCreature(NPC_SOLAKAR, 43.7685f, -259.82f, 91.6483f, 0, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                    GetMap()->SummonCreature(NPC_SOLAKAR, 43.7685f, -259.82f, 91.6483f, 0, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                     SetData(TYPE_SOLAKAR, DONE);
                     m_uiFatherFlame_timer = 0;
                 }
             }
             else
                 m_uiFatherFlame_timer -= uiDiff;
-        }
     }
 }
 
@@ -862,7 +855,7 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
     if (GetData(TYPE_ROOM_EVENT) != NOT_STARTED)
         return;
 #ifdef DEBUG_ON
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "instance_blackrock_spire::DoSortRoomEventMobs");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "instance_blackrock_spire::DoSortRoomEventMobs");
 #endif
     for (uint8 i = 0; i < MAX_ROOMS; i++)
     {
@@ -876,7 +869,7 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
                         m_alRoomEventMobGUIDSorted[i].push_back(guid);
                 }
 #ifdef DEBUG_ON
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Alcove %u : %u mobs", i,  m_alRoomEventMobGUIDSorted[i].size());
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Alcove %u : %u mobs", i,  m_alRoomEventMobGUIDSorted[i].size());
 #endif
             }
         }
@@ -947,241 +940,6 @@ GameObjectAI* GetAIgo_father_flame(GameObject *pGo)
     return new go_father_flameAI(pGo);
 }
 
-struct npc_solakar_triggerAI : public ScriptedAI
-{
-    npc_solakar_triggerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        instance = (instance_blackrock_spire*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* instance;
-
-    void Reset() override
-    {
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!instance)
-            return;
-
-        if (who->GetTypeId() == TYPEID_UNIT && m_creature->IsWithinDistInMap(who, 5.0f) && instance->GetData(TYPE_SOLAKAR) == IN_PROGRESS)
-        {
-            Creature* CreaGuardian = m_creature->FindNearestCreature(10258, 5.0f); // NPC_ROOKERY_GUARDIAN = 10258
-            Creature* CreaHatcher = m_creature->FindNearestCreature(10683, 5.0f); // NPC_ROOKERY_HATCHER = 10683
-            if (CreaGuardian || CreaHatcher)
-            {
-                instance->SetData(TYPE_SOLAKAR, SPECIAL);
-
-                std::list<Creature*> listHatcher;
-                GetCreatureListWithEntryInGrid(listHatcher, m_creature, 10683, 10.0f);
-                for (std::list<Creature*>::const_iterator itr = listHatcher.begin(); itr != listHatcher.end(); ++itr)
-                {
-                    if (listHatcher.empty())
-                        break;
-                    if (!(*itr)->IsAlive())
-                        continue;
-
-                    (*itr)->AI()->EnterEvadeMode();
-                }
-                listHatcher.clear();
-            }
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_solakar_trigger(Creature* pCreature)
-{
-    return new npc_solakar_triggerAI(pCreature);
-}
-
-/****************************************
-** Rookery Hatcher npc_rookery_hatcher **
-****************************************/
-
-enum
-{
-    SPELL_SUNDER_ARMOR       = 15572,
-    SPELL_STRIKE             = 15580,
-    SPELL_HATCH_ROOKERY_EGG  = 15746
-};
-
-struct npc_rookery_hatcherAI : public ScriptedAI
-{
-    npc_rookery_hatcherAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (instance_blackrock_spire*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 SunderArmor_Timer;
-    uint32 Strike_Timer;
-    uint32 HatchRookeryEgg_Timer;
-
-    void Reset() override
-    {
-        SunderArmor_Timer = urand(8000, 12000);
-        Strike_Timer = urand(5000, 7000);
-        HatchRookeryEgg_Timer = urand(5000, 10000);
-    }
-
-    void JustReachedHome() override
-    {
-        if (m_pInstance->GetData(TYPE_SOLAKAR) == SPECIAL)
-            HatchRookeryEgg();
-        else
-            m_pInstance->SetData(TYPE_SOLAKAR, FAIL);
-        m_creature->ForcedDespawn();
-    }
-
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-        // Do not aggro players in the Hall of Binding.
-        if (pWho->GetPositionX() > 110.0f)
-            return;
-
-        ScriptedAI::MoveInLineOfSight(pWho);
-    }
-
-    void HatchRookeryEgg()
-    {
-        uint8 uiHatchedEgg = 0;
-        uint8 uiMaxHatchedEgg = 4;
-        std::list<GameObject*> listRookeryEgg;
-        GetGameObjectListWithEntryInGrid(listRookeryEgg, m_creature, 175124, 50.0f);
-        for (std::list<GameObject*>::const_iterator itr = listRookeryEgg.begin(); itr != listRookeryEgg.end(); ++itr)
-        {
-            if (listRookeryEgg.empty())
-                break;
-            if (!(*itr)->isSpawned())
-                continue;
-
-            if (uiHatchedEgg < uiMaxHatchedEgg)
-            {
-                (*itr)->SetLootState(GO_JUST_DEACTIVATED);
-                if (m_pInstance->GetData(TYPE_SOLAKAR) == SPECIAL)
-                {
-                    m_creature->SummonCreature(160015, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
-                    uiMaxHatchedEgg = 24;
-                }
-                else
-                    m_creature->SummonCreature(10161, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
-
-                uiHatchedEgg++;
-            }
-            else
-                break;
-        }
-        listRookeryEgg.clear();
-    }
-
-    void JustSummoned(Creature* pSummoned) override
-    {
-        if (pSummoned->GetEntry() == 10161)
-        {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                pSummoned->AI()->AttackStart(pTarget);
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        //  Sunder Armor
-        if (SunderArmor_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
-                SunderArmor_Timer = urand(10000, 15000);
-        }
-        else
-            SunderArmor_Timer -= uiDiff;
-
-        //  Strike
-        if (Strike_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE) == CAST_OK)
-                Strike_Timer = urand(4000, 6000);
-        }
-        else
-            Strike_Timer -= uiDiff;
-
-        //  Hatch Rookery Egg
-        if (HatchRookeryEgg_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_HATCH_ROOKERY_EGG) == CAST_OK)
-            {
-                HatchRookeryEgg();
-                HatchRookeryEgg_Timer = urand(15000, 20000);
-            }
-        }
-        else
-            HatchRookeryEgg_Timer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_rookery_hatcher(Creature* pCreature)
-{
-    return new npc_rookery_hatcherAI(pCreature);
-}
-
-/*struct go_rookey_eggAI : public GameObjectAI
-{
-    go_rookey_eggAI(GameObject* pGo) : GameObjectAI(pGo) {}
-
-    bool OnUse(Unit* pUser)
-    {
-        if (me->isSpawned())
-        {
-            me->SetLootState(GO_JUST_DEACTIVATED);
-            float x,y,z;
-            me->GetPosition(x,y,z);
-            ((Creature *)pUser)->SummonCreature(160015, x, y, z, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
-        }
-    }
-
-    void SummonWelp()
-    {
-        Map::PlayerList const &liste = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-        {
-            if (me->GetDistance(i->getSource()) <= 4.0f)
-            {
-                me->SetLootState(GO_JUST_DEACTIVATED);
-                float x,y,z;
-                me->GetPosition(x,y,z);
-                i->getSource()->SummonCreature(10161, x, y, z, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
-                Actif = true;
-            }
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff)
-    {
-        if (!Actif && me->isSpawned())
-        {
-            if (CheckTimer <= uiDiff)
-            {
-                SummonWelp();
-                CheckTimer = 500;
-            }
-            else
-                CheckTimer -= uiDiff;
-        }
-    }
-};
-
-GameObjectAI* GetAIgo_rookey_egg(GameObject *pGo)
-{
-    return new go_rookey_eggAI(pGo);
-}*/
-
 bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pPlayer->IsDead())
@@ -1214,22 +972,7 @@ void AddSC_instance_blackrock_spire()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_solakar_trigger";
-    pNewScript->GetAI = &GetAI_npc_solakar_trigger;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_rookery_hatcher";
-    pNewScript->GetAI = &GetAI_npc_rookery_hatcher;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
     pNewScript->Name = "at_ubrs_the_beast";
     pNewScript->pAreaTrigger = &AreaTrigger_at_ubrs_the_beast;
     pNewScript->RegisterSelf();
-
-    /*    pNewScript = new Script;
-        pNewScript->Name = "go_rookey_egg";
-        pNewScript->GOGetAI = &GetAIgo_rookey_egg;
-        pNewScript->RegisterSelf();*/
 }

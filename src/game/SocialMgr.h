@@ -25,6 +25,7 @@
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include <shared_mutex>
 
 class SocialMgr;
 class PlayerSocial;
@@ -153,11 +154,11 @@ class SocialMgr
         void SendFriendStatus(MasterPlayer* player, FriendsResult result, ObjectGuid friend_guid, bool broadcast);
         void BroadcastToFriendListers(MasterPlayer* player, WorldPacket* packet);
         // Loading
-        PlayerSocial* LoadFromDB(QueryResult* result, ObjectGuid guid);
+        PlayerSocial* LoadFromDB(std::unique_ptr<QueryResult> result, ObjectGuid guid);
     private:
         SocialMap m_socialMap;
 
-        std::mutex _socialMapLock;
+        std::shared_timed_mutex _socialMapLock;
 };
 
 #define sSocialMgr MaNGOS::Singleton<SocialMgr>::Instance()

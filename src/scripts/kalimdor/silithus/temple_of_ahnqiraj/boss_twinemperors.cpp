@@ -217,7 +217,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         instance_temple_of_ahnqiraj* tmpPTr = dynamic_cast<instance_temple_of_ahnqiraj*>(pCreature->GetInstanceData());
         if (!tmpPTr) {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_twinemperorsAI attempted to cast instance to type instance_temple_of_ahnqiraj, but failed.");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_twinemperorsAI attempted to cast instance to type instance_temple_of_ahnqiraj, but failed.");
             m_pInstance = nullptr;
         }
         else {
@@ -383,7 +383,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                     m_creature->GetThreatManager().addThreat(closestPlayer, AFTER_TELEPORT_THREAT);
                 }
                 else {
-                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Twins unable to select closest target during TP stun");
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "Twins unable to select closest target during TP stun");
                 }
             }
 
@@ -459,7 +459,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             AttackStart(closestPlayer);
         }
         else {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Twins unable to select closest target after TP stun end");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "Twins unable to select closest target after TP stun end");
         }
         
 

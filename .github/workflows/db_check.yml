@@ -25,11 +25,12 @@ jobs:
         sudo docker pull mysql
         sudo docker run --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql:5.6 --max_allowed_packet=128M
         sudo docker start mysqldb
+        until nc -z localhost 3306 ; do sleep 5 ; echo "Waiting for database availability..." ; done
 
-    
+
     - name: Checkout update sql
-      uses: actions/checkout@v2
-      
+      uses: actions/checkout@v4
+
     - name: Checkout base sql
       run: |
         cd ${{github.workspace}}
@@ -66,11 +67,11 @@ jobs:
         docker exec mysqldb sh -c 'exec mysqldump -u root -proot realmd' > ${{github.workspace}}/dbexport/db_dump/logon.sql
         docker exec mysqldb sh -c 'exec mysqldump -u root -proot logs' > ${{github.workspace}}/dbexport/db_dump/logs.sql
         docker exec mysqldb sh -c 'exec mysqldump -u root -proot characters' > ${{github.workspace}}/dbexport/db_dump/characters.sql
-        
-        
+
+
         # cd db_dump
         # mkdir update_check_only_do_not_import
-        # cp ${{github.workspace}}/sql/migrations/world_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/world_db_updates.sql 
+        # cp ${{github.workspace}}/sql/migrations/world_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/world_db_updates.sql
         # cp ${{github.workspace}}/sql/migrations/logon_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/logon_db_updates.sql
         # cp ${{github.workspace}}/sql/migrations/logs_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/logs_db_updates.sql
         # cp ${{github.workspace}}/sql/migrations/characters_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/characters_db_updates.sql
@@ -81,7 +82,7 @@ jobs:
         docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS characters2 DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
         docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS mangos2 DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
         docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS logs2 DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
-        
+
     - name: Import data back in to verify the dump data
       run: |
         docker exec -i mysqldb sh -c 'exec mysql -u root -proot realmd2' < ${{github.workspace}}/dbexport/db_dump/logon.sql

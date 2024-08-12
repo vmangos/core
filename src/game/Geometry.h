@@ -100,6 +100,13 @@ namespace Geometry
             o += M_PI_F * 2.0f;
         return o;
     }
+
+    template<class A, class B>
+    inline bool IsPointLeftOfLine(A lineStart, A lineEnd, B point)
+    {
+        return (lineEnd.x - lineStart.x) * (point.y - lineStart.y) - (lineEnd.y - lineStart.y) * (point.x - lineStart.x) > 0;
+    }
+
 }
 
 #endif

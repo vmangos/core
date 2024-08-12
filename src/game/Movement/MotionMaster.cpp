@@ -38,8 +38,6 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 
-#include <cassert>
-
 inline bool isStatic(MovementGenerator* mv)
 {
     return (mv == &si_idleMovement);
@@ -378,7 +376,7 @@ void MotionMaster::MoveTargetedHome()
 
     Clear(false);
 
-    if (m_owner->IsCreature() && !((Creature*)m_owner)->GetCharmerOrOwnerGuid())
+    if (m_owner->IsCreature() && (!((Creature*)m_owner)->GetCharmerOrOwnerGuid() || ((Creature*)m_owner)->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE)))
     {
         // Manual exception for linked mobs
         if (m_owner->IsLinkingEventTrigger() && m_owner->GetMap()->GetCreatureLinkingHolder()->TryFollowMaster((Creature*)m_owner))
@@ -868,15 +866,16 @@ void MotionMaster::MoveJump(float x, float y, float z, float horizontalSpeed, fl
     Mutate(new EffectMovementGenerator(id));*/
 }
 
-void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack)
+void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack, bool useCombatReach)
 {
+    float meleeReach = useCombatReach ? (m_owner->GetCombatReachToTarget(target, false, 0.0f, true) - 0.5f) : 0.0f;
     if (m_owner->IsPlayer())
-        Mutate(new ChargeMovementGenerator<Player>(*(m_owner->ToPlayer()), *target, delay, triggerAutoAttack));
+        Mutate(new ChargeMovementGenerator<Player>(*(m_owner->ToPlayer()), *target, delay, triggerAutoAttack, 0.0f, meleeReach));
     else
-        Mutate(new ChargeMovementGenerator<Creature>(*(m_owner->ToCreature()), *target, delay, triggerAutoAttack));
+        Mutate(new ChargeMovementGenerator<Creature>(*(m_owner->ToCreature()), *target, delay, triggerAutoAttack, 0.0f, meleeReach));
 }
 
-bool MotionMaster::MoveDistance(Unit* pTarget, float distance)
+bool MotionMaster::MoveDistance(Unit const* pTarget, float distance)
 {
     if (m_owner->GetTransport())
         return false;

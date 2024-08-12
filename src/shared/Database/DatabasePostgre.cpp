@@ -80,27 +80,27 @@ bool PostgreSQLConnection::OpenConnection(bool reconnect)
     return true;
 }
 
-bool PostgreSQLConnection::_Query(char const* sql, PGresult** pResult, uint64* pRowCount, uint32* pFieldCount)
+bool PostgreSQLConnection::_Query(std::string const& sql, PGresult** pResult, uint64* pRowCount, uint32* pFieldCount)
 {
     if (!mPGconn)
         return false;
 
     uint32 _s = WorldTimer::getMSTime();
     // Send the query
-    *pResult = PQexec(mPGconn, sql);
+    *pResult = PQexec(mPGconn, sql.c_str());
     if(!*pResult)
         return false;
 
     if (PQresultStatus(*pResult) != PGRES_TUPLES_OK)
     {
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL : %s", sql);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL : %s", sql.c_str());
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL %s", PQerrorMessage(mPGconn));
         PQclear(*pResult);
         return false;
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql);
+        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql.c_str());
     }
 
     *pRowCount = PQntuples(*pResult);
@@ -116,7 +116,7 @@ bool PostgreSQLConnection::_Query(char const* sql, PGresult** pResult, uint64* p
     return true;
 }
 
-QueryResult* PostgreSQLConnection::Query(char const* sql)
+std::unique_ptr<QueryResult> PostgreSQLConnection::Query(std::string const& sql)
 {
     if (!mPGconn)
         return nullptr;
@@ -125,16 +125,16 @@ QueryResult* PostgreSQLConnection::Query(char const* sql)
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
-    if(!_Query(sql,&result,&rowCount,&fieldCount))
+    if(!_Query(sql, &result, &rowCount, &fieldCount))
         return nullptr;
 
-    QueryResultPostgre * queryResult = new QueryResultPostgre(result, rowCount, fieldCount);
+    std::unique_ptr<QueryResultPostgre> queryResult(new QueryResultPostgre(result, rowCount, fieldCount));
 
     queryResult->NextRow();
     return queryResult;
 }
 
-QueryNamedResult* PostgreSQLConnection::QueryNamed(char const* sql)
+std::unique_ptr<QueryNamedResult> PostgreSQLConnection::QueryNamed(std::string const& sql)
 {
     if (!mPGconn)
         return nullptr;
@@ -143,57 +143,57 @@ QueryNamedResult* PostgreSQLConnection::QueryNamed(char const* sql)
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
-    if(!_Query(sql,&result,&rowCount,&fieldCount))
+    if(!_Query(sql, &result, &rowCount, &fieldCount))
         return nullptr;
 
     QueryFieldNames names(fieldCount);
     for (uint32 i = 0; i < fieldCount; i++)
         names[i] = PQfname(result, i);
 
-    QueryResultPostgre * queryResult = new QueryResultPostgre(result, rowCount, fieldCount);
+    std::unique_ptr<QueryResultPostgre> queryResult(new QueryResultPostgre(result, rowCount, fieldCount));
 
     queryResult->NextRow();
-    return new QueryNamedResult(queryResult,names);
+    return std::make_unique<QueryNamedResult>(std::move(queryResult), names);
 }
 
-bool PostgreSQLConnection::Execute(char const* sql)
+bool PostgreSQLConnection::Execute(std::string const& sql)
 {
     if (!mPGconn)
         return false;
 
     uint32 _s = WorldTimer::getMSTime();
 
-    PGresult* res = PQexec(mPGconn, sql);
+    PGresult* res = PQexec(mPGconn, sql.c_str());
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL: %s", sql.c_str());
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "SQL %s", PQerrorMessage(mPGconn));
         return false;
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql);
+        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql.c_str());
     }
 
     PQclear(res);
     return true;
 }
 
-bool PostgreSQLConnection::_TransactionCmd(char const* sql)
+bool PostgreSQLConnection::_TransactionCmd(std::string const& sql)
 {
     if (!mPGconn)
         return false;
 
-    PGresult* res = PQexec(mPGconn, sql);
+    PGresult* res = PQexec(mPGconn, sql.c_str());
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: %s", sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: %s", sql.c_str());
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", PQerrorMessage(mPGconn));
         return false;
     }
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SQL: %s", sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SQL: %s", sql.c_str());
     }
     return true;
 }

@@ -102,8 +102,8 @@ class ChargeMovementGenerator
 : public MovementGeneratorMedium< T, ChargeMovementGenerator<T> >
 {
     public:
-        ChargeMovementGenerator(T& attacker, Unit& victim, uint32 extrapolationDelay = 0, bool triggerAttack = false, float speed = 0.0f) :
-            path(&attacker), m_victimGuid(victim.GetObjectGuid()), m_recalculateSpeed(false), m_triggerAttack(triggerAttack), m_extrapolateDelay(extrapolationDelay), m_scheduleStopMoving(false), m_speed(speed)
+        ChargeMovementGenerator(T& attacker, Unit& victim, uint32 extrapolationDelay = 0, bool triggerAttack = false, float speed = 0.0f, float meleeReach = 0.0f) :
+            path(&attacker), m_victimGuid(victim.GetObjectGuid()), m_recalculateSpeed(false), m_triggerAttack(triggerAttack), m_extrapolateDelay(extrapolationDelay), m_scheduleStopMoving(false), m_speed(speed), m_meleeReach(meleeReach)
         {
             ComputePath(attacker, victim);
         }
@@ -125,6 +125,7 @@ class ChargeMovementGenerator
         uint32 m_extrapolateDelay;
         bool m_scheduleStopMoving;
         float m_speed;
+        float m_meleeReach;
 };
 
 #endif

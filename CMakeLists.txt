@@ -32,11 +32,13 @@ set(CMAKE_MODULE_PATH
 
 set(SUPPORTED_CLIENT_BUILD "CLIENT_BUILD_1_12_1" CACHE STRING "Client version the core will support")
 option(USE_STD_MALLOC "Use standard malloc instead of TBB" OFF)
+option(BUILD_FOR_HOST_CPU "Build specifically for the host CPU via `-march=native` (might not run on different machines)" ON)
 option(TBB_DEBUG "Use TBB debug librairies" OFF)
 option(USE_ANTICHEAT "Use anticheat" OFF)
 option(USE_SCRIPTS "Compile scripts" ON)
 option(USE_EXTRACTORS "Compile extractors" OFF)
 option(USE_LIBCURL "Compile with libcurl for email support" OFF)
+option(USE_REALMMERGE "Compile helper tool for merging character databases" OFF)
 
 if(UNIX)
   option(DEBUG_SYMBOLS "Include Debug Symbols" ON)
@@ -78,7 +80,7 @@ if(WIN32)
       message(FATAL_ERROR "Only Visual Studio 2015 or newer is supported")
     endif()
   endif()
-  
+
   # Added by Giperion, in WIN32 output all compiled files in one directory
   set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
   set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib )
@@ -196,13 +198,13 @@ if(NOT USE_STD_MALLOC)
       ${TBB_LIBRARIES}
     )
   endif()
-  
+
   if (WIN32)
     list (GET TBB_LIBRARIES 1 TBB_SINGLE_FILEDIRECTORY)
     get_filename_component(TBB_LIB_DIRECTORY "${TBB_SINGLE_FILEDIRECTORY}" DIRECTORY)
     link_directories(${TBB_LIB_DIRECTORY})
   endif()
-  
+
 endif()
 
 # Win32 delifered packages
@@ -254,7 +256,7 @@ else()
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ERROR_QUIET
   )
-  
+
   if(NOT rev_hash)
     # No valid ways available to find/set the revision/hash, so let's force some defaults
     message(STATUS "
@@ -263,7 +265,7 @@ else()
     set(rev_date "1970-01-01 00:00:00 +0000")
     set(rev_hash "unknown")
   endif()
-  
+
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/revision.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/shared/revision.h)
 endif()
 
@@ -316,6 +318,12 @@ endif()
 message(STATUS "Memory allocation     : ${ALLOC_LIB_INFO_STRING} ${TBB_LIBRARIES}")
 message(STATUS "Detected compiler     : ${CMAKE_CXX_COMPILER_ID}")
 
+if(BUILD_FOR_HOST_CPU)
+  message(STATUS "Build for host CPU    : Yes (default)")
+else()
+  message(STATUS "Build for host CPU    : No")
+endif()
+
 message(STATUS "Build type            : ${CMAKE_BUILD_TYPE}")
 
 if(USE_ANTICHEAT)
@@ -338,7 +346,7 @@ if(UNIX)
   else()
     message(STATUS "Debug symbols         : Disabled")
   endif()
-  
+
   if(GCC_SANITIZE)
     set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
     set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fsanitize=address")
@@ -353,7 +361,10 @@ if(UNIX)
     #set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fsanitize=unsigned-integer-overflow")
   endif()
 
-  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} --no-warnings -fexceptions -fnon-call-exceptions -march=native -pipe ")
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} --no-warnings -fexceptions -fnon-call-exceptions -pipe")
+  if(BUILD_FOR_HOST_CPU)
+    set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -march=native")
+  endif()
   set(CMAKE_CXX_STANDARD 14)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     if(PROFILE_GENERATE)
@@ -392,7 +403,7 @@ if(MSVC)
   #if(PLATFORM MATCHES X86)
   #  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
   #endif()
-  
+
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
 
@@ -478,6 +489,6 @@ message(STATUS "Build flags (DEBUG)   : ${CMAKE_CXX_FLAGS_DEBUG}")
 add_subdirectory(src)
 add_subdirectory(dep)
 
-if (USE_EXTRACTORS)
+if (USE_EXTRACTORS OR USE_REALMMERGE)
     add_subdirectory(contrib)
 endif()

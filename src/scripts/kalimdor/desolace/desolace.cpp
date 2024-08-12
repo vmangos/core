@@ -653,7 +653,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
             }
             else
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Desolace.GizeltonCaravan] Failed to summon caravan. Self-despawn.");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[Desolace.GizeltonCaravan] Failed to summon caravan. Self-despawn.");
                 DespawnCaravan();
             }
         }

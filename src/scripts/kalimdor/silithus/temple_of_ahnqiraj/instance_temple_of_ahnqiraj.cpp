@@ -87,7 +87,7 @@ void TwinsIntroDialogue::Start()
 {
     m_StartedOrDone = true;
     if (!m_pInstance) {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "TwinsIntroDialogue missing instance. Cannot start.");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "TwinsIntroDialogue missing instance. Cannot start.");
         return;
     }
     Creature* pEye = m_pInstance->GetSingleCreatureFromStorage(NPC_MASTERS_EYE);
@@ -96,7 +96,7 @@ void TwinsIntroDialogue::Start()
 
     // If we're missing one of the creatures needed in this little event, we just skip it.
     if (!pEye || !pVL || !pVN) {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Missing one or more of the required creatures to start TwinsIntroDialogue. Not starting.");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Missing one or more of the required creatures to start TwinsIntroDialogue. Not starting.");
         if (pEye)
             pEye->ForcedDespawn(1000);
         return;
@@ -121,7 +121,7 @@ void TwinsIntroDialogue::JustDidDialogueStep(int32 iEntry)
     Creature* pVN = m_pInstance->GetSingleCreatureFromStorage(NPC_VEKNILASH);
     // If we at any point are missing one of the creatures we skip to the end and stop.
     if (!pEye || !pVL || !pVN) {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Missing one or more of the required creatures in TwinsIntroDialogue::JustDidDialogueStep()");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Missing one or more of the required creatures in TwinsIntroDialogue::JustDidDialogueStep()");
         return;
     }
     switch (iEntry) {
@@ -568,7 +568,7 @@ void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
         float x = -8578.0f + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
         float y = 1986.8f + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
         pPlayer->NearTeleportTo(x, y, 100.4f, pPlayer->GetOrientation());
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
             AREATRIGGER_CTHUN_KNOCKBACK);
     }
 }
@@ -641,7 +641,7 @@ bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
     for (auto iter = playersInStomach.begin(); iter != playersInStomach.end();) {
         if (Player* p = GetMap()->GetPlayer(iter->first)) {
             // Not killing people with god on, makes debugging easier
-            if (p->IsGod()) {
+            if (p->GetInvincibilityHpThreshold()) {
                 ++iter;
                 continue;
             }

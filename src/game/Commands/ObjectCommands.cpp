@@ -32,7 +32,7 @@
 bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 {
     Player* pl = m_session->GetPlayer();
-    QueryResult* result;
+    std::unique_ptr<QueryResult> result;
     GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr.GetActiveEventList();
     if (*args)
     {
@@ -112,8 +112,6 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
     }
     while (result->NextRow() && (!found));
 
-    delete result;
-
     if (!found)
     {
         PSendSysMessage(LANG_GAMEOBJECT_NOT_EXIST, id);
@@ -171,7 +169,18 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
         return false;
     }
     
-    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u, Flags: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
+    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u",
+        pGameObject->GetEntry(),
+        pGameObject->GetGUIDLow(),
+        pGameObject->GetGOInfo()->name,
+        pGameObject->GetGoType(),
+        pGameObject->GetDisplayId(),
+        pGameObject->GetGoState(),
+        pGameObject->getLootState());
+    if (pGameObject->GetUInt32Value(GAMEOBJECT_FLAGS))
+        PSendSysMessage("Flags: %s", FlagsToString(pGameObject->GetUInt32Value(GAMEOBJECT_FLAGS), GameObjectFlagToString).c_str());
+    if (pGameObject->GetUInt32Value(GAMEOBJECT_DYN_FLAGS))
+        PSendSysMessage("Dynamic Flags: %s", FlagsToString(pGameObject->GetUInt32Value(GAMEOBJECT_DYN_FLAGS), GameObjectDynamicFlagToString).c_str());
     if (pGameObject->GetVisibilityModifier())
         PSendSysMessage("Visibility Modifier: %g", pGameObject->GetVisibilityModifier());
     if (pGameObject->isActiveObject())
@@ -184,7 +193,6 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
         std::tm* pTime = std::localtime(&respawnTime);
         PSendSysMessage("Not spawned. Respawns in %u seconds (%u:%u:%u).", pGameObject->GetRespawnDelay(), pTime->tm_hour, pTime->tm_min, pTime->tm_sec);
     }
-    
 
     return true;
 }
@@ -506,7 +514,7 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
     uint32 count = 0;
 
     Player* pl = m_session->GetPlayer();
-    QueryResult* result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
+    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
                           "(POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ "
                           "FROM gameobject WHERE map='%u' AND (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) <= '%f' ORDER BY order_",
                           pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(),
@@ -534,8 +542,6 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
     }
 
     PSendSysMessage(LANG_COMMAND_NEAROBJMESSAGE, distance, count);

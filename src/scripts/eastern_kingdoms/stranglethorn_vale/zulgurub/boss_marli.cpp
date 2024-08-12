@@ -99,7 +99,7 @@ struct boss_marliAI : public ScriptedAI
         std::list<GameObject*> lSpiderEggs;
         GetGameObjectListWithEntryInGrid(lSpiderEggs, m_creature, GO_EGG, DEFAULT_VISIBILITY_INSTANCE);
         if (lSpiderEggs.empty())
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "boss_marli, no Eggs with the entry %u were found", GO_EGG);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "boss_marli, no Eggs with the entry %u were found", GO_EGG);
         else
         {
             for (const auto& pGo : lSpiderEggs)
@@ -158,7 +158,7 @@ struct boss_marliAI : public ScriptedAI
         std::list<GameObject*> lEggs;
         GetGameObjectListWithEntryInGrid(lEggs, m_creature, GO_EGG, DEFAULT_VISIBILITY_INSTANCE);
         if (lEggs.empty())
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "boss_marli, no Eggs with the entry %i were found", GO_EGG);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "boss_marli, no Eggs with the entry %i were found", GO_EGG);
         else
         {
             lEggs.sort(ObjectDistanceOrder(m_creature));

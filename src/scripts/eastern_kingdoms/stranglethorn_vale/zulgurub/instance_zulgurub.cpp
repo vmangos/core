@@ -97,10 +97,10 @@ void instance_zulgurub::OnCreatureCreate(Creature* pCreature)
     switch (pCreature->GetEntry())
     {
         case NPC_LORKHAN:
-            HandleLoadCreature(TYPE_LORKHAN, m_uiLorKhanGUID, pCreature);
+            HandleLoadCreature(TYPE_THEKAL, m_uiLorKhanGUID, pCreature);
             break;
         case NPC_ZATH:
-            m_uiZathGUID = pCreature->GetGUID();
+            HandleLoadCreature(TYPE_THEKAL, m_uiZathGUID, pCreature);
             break;
         case NPC_THEKAL:
             HandleLoadCreature(TYPE_THEKAL, m_uiThekalGUID, pCreature);
@@ -186,11 +186,17 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
         case TYPE_THEKAL:
             m_auiEncounter[4] = uiData;
             break;
-        case TYPE_LORKHAN:
-            m_auiEncounter[5] = uiData;
+        case TYPE_THEKAL_DEATH_TIME:
+            if (uiData == SPECIAL)
+                m_auiEncounter[5] = sWorld.GetGameTime();
+            else
+                m_auiEncounter[5] = uiData;
             break;
-        case TYPE_ZATH:
-            m_auiEncounter[6] = uiData;
+        case TYPE_THEKAL_REZ_TIME:
+            if (uiData == SPECIAL)
+                m_auiEncounter[6] = sWorld.GetGameTime();
+            else
+                m_auiEncounter[6] = uiData;
             break;
         case TYPE_OHGAN:
             m_auiEncounter[7] = uiData;
@@ -273,9 +279,9 @@ uint32 instance_zulgurub::GetData(uint32 uiType)
             return m_auiEncounter[3];
         case TYPE_THEKAL:
             return m_auiEncounter[4];
-        case TYPE_LORKHAN:
+        case TYPE_THEKAL_DEATH_TIME:
             return m_auiEncounter[5];
-        case TYPE_ZATH:
+        case TYPE_THEKAL_REZ_TIME:
             return m_auiEncounter[6];
         case TYPE_OHGAN:
             return m_auiEncounter[7];
@@ -309,8 +315,30 @@ uint64 instance_zulgurub::GetData64(uint32 uiData)
             return m_uiHakkarGUID;
         case DATA_GAHZRANKA:
             return m_uiGahzrankaGUID;
+        case DATA_THEKAL_NEED_REZ:
+            if (Unit* pTarget = Thekal_GetUnitThatNeedsRez())
+                return pTarget->GetGUID();
+            return 0;
     }
     return 0;
+}
+
+bool instance_zulgurub::CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const
+{
+    if (map_id != 309)
+        return false;
+
+    switch (instance_condition_id)
+    {
+        case 1: // Thekal Encounter - Has Unit That Can Rez
+            return Thekal_GetUnitThatCanRez() != nullptr;
+        case 2: // Thekal Encounter - Has Unit That Needs Rez
+            return Thekal_GetUnitThatNeedsRez() != nullptr && Thekal_GetUnitCastingRez() == nullptr &&
+                   (((instance_zulgurub*)this)->GetData(TYPE_THEKAL_DEATH_TIME) + 10 < sWorld.GetGameTime()) &&
+                   (((instance_zulgurub*)this)->GetData(TYPE_THEKAL_REZ_TIME) + 10 < sWorld.GetGameTime());
+    }
+
+    return false;
 }
 
 void instance_zulgurub::Create()
@@ -324,11 +352,11 @@ void instance_zulgurub::Create()
 
 void instance_zulgurub::OnCreatureDeath(Creature * pCreature)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OnCreatureDeath %u", pCreature->GetEntry());
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "OnCreatureDeath %u", pCreature->GetEntry());
     if (pCreature->GetEntry() >= 15082 && pCreature->GetEntry() <= 15085)
         SetData(TYPE_RANDOM_BOSS, DONE);
 
-    if (pCreature->GetEntry() ==  15163)
+    if (pCreature->GetEntry() == NPC_NIGHTMARE_ILLUSION)
     {
         pCreature->ForcedDespawn(3000);
         pCreature->SetRespawnTime(345600000);
@@ -342,7 +370,7 @@ uint32 instance_zulgurub::GenerateRandomBoss()
     uint32 weekmod = ((dayCount - (dayCount % 14)) / 14) % 3;
     uint32 bossId = 15082 + weekmod;
     randomBossEntry = bossId;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "GenerateRandomBoss %u -> %u", weekmod, bossId);
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "GenerateRandomBoss %u -> %u", weekmod, bossId);
     return bossId;
 }
 
@@ -361,17 +389,48 @@ void instance_zulgurub::SpawnRandomBoss()
     m_randomBossSpawned = true;
 }
 
-Unit* instance_zulgurub::Thekal_GetUnitThatCanRez()
+Unit* instance_zulgurub::Thekal_GetUnitThatCanRez() const
 {
-    if (Unit *pLorKhan = instance->GetUnit(GetData64(DATA_LORKHAN)))
-        if (pLorKhan->IsAlive())
+    if (Unit* pLorKhan = instance->GetUnit(m_uiLorKhanGUID))
+        if (pLorKhan->IsAlive() && pLorKhan->GetStandState() != UNIT_STAND_STATE_DEAD)
             return pLorKhan;
-    if (Unit *pZath = instance->GetUnit(GetData64(DATA_ZATH)))
-        if (pZath->IsAlive())
+    if (Unit* pZath = instance->GetUnit(m_uiZathGUID))
+        if (pZath->IsAlive() && pZath->GetStandState() != UNIT_STAND_STATE_DEAD)
             return pZath;
-    if (Unit *pThekal = instance->GetUnit(GetData64(DATA_THEKAL)))
-        if (pThekal->IsAlive())
+    if (Unit* pThekal = instance->GetUnit(m_uiThekalGUID))
+        if (pThekal->IsAlive() && pThekal->GetStandState() != UNIT_STAND_STATE_DEAD)
             return pThekal;
+    return nullptr;
+}
+
+Unit* instance_zulgurub::Thekal_GetUnitThatNeedsRez() const
+{
+    if (Unit* pLorKhan = instance->GetUnit(m_uiLorKhanGUID))
+        if (pLorKhan->IsAlive() && pLorKhan->GetStandState() == UNIT_STAND_STATE_DEAD)
+            return pLorKhan;
+    if (Unit* pZath = instance->GetUnit(m_uiZathGUID))
+        if (pZath->IsAlive() && pZath->GetStandState() == UNIT_STAND_STATE_DEAD)
+            return pZath;
+    if (Unit* pThekal = instance->GetUnit(m_uiThekalGUID))
+        if (pThekal->IsAlive() && pThekal->GetStandState() == UNIT_STAND_STATE_DEAD)
+            return pThekal;
+    return nullptr;
+}
+
+Unit* instance_zulgurub::Thekal_GetUnitCastingRez() const
+{
+    if (Unit* pLorKhan = instance->GetUnit(m_uiLorKhanGUID))
+        if (Spell* pSpell = pLorKhan->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+            if (pSpell->m_spellInfo->Id == SPELL_THEKAL_RESURRECTION)
+                return pLorKhan;
+    if (Unit* pZath = instance->GetUnit(m_uiZathGUID))
+        if (Spell* pSpell = pZath->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+            if (pSpell->m_spellInfo->Id == SPELL_THEKAL_RESURRECTION)
+                return pZath;
+    if (Unit* pThekal = instance->GetUnit(m_uiThekalGUID))
+        if (Spell* pSpell = pThekal->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+            if (pSpell->m_spellInfo->Id == SPELL_THEKAL_RESURRECTION)
+                return pThekal;
     return nullptr;
 }
 

@@ -24,6 +24,7 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 #include "InstanceStatistics.h"
+#include "Geometry.h"
 
 enum NaxxEvents
 {
@@ -107,6 +108,9 @@ uint8 instance_naxxramas::GetNumEndbossDead()
     return ret;
 }
 
+static const G3D::Vector2 DK_DOOR_A(2600.15f, -3008.61f);
+static const G3D::Vector2 DK_DOOR_B(2579.34f, -3029.44f);
+
 bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
 {
     if (pWho->IsInEvadeMode())
@@ -135,7 +139,7 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         case NPC_HEIGAN:
         {
             // evade if brought out of room towards bat/grub/beast gauntlet
-            if (pWho->GetPositionX() > 2825.0f)
+            if (pWho->GetPositionX() > 2825.0f || pWho->GetPositionY() < -3737.0f)
             {
                 pWho->AI()->EnterEvadeMode();
                 return false;
@@ -165,31 +169,31 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         case NPC_MOGRAINE:
         case NPC_ZELIEK:
         case NPC_THANE:
-            dist = 115.0f;
-            break;
+        {
+            if (Geometry::IsPointLeftOfLine(DK_DOOR_A, DK_DOOR_B, pWho->GetPosition()))
+            {
+                if (Creature* pC = GetSingleCreatureFromStorage(NPC_BLAUMEUX))
+                    if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
+                if (Creature* pC = GetSingleCreatureFromStorage(NPC_MOGRAINE))
+                    if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
+                if (Creature* pC = GetSingleCreatureFromStorage(NPC_ZELIEK))
+                    if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
+                if (Creature* pC = GetSingleCreatureFromStorage(NPC_THANE))
+                    if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
+                return false;
+            }
+
+            return true;
+        }
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
             dist = 9999.0f;
             break;
     }
 
     if (pWho->GetDistance2d(pWho->GetHomePosition()) > dist)
     {
-        if (entry == NPC_BLAUMEUX || entry == NPC_MOGRAINE || entry == NPC_ZELIEK || entry == NPC_THANE)
-        {
-            if (Creature* pC = GetSingleCreatureFromStorage(NPC_BLAUMEUX))
-                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
-            if (Creature* pC = GetSingleCreatureFromStorage(NPC_MOGRAINE))
-                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
-            if (Creature* pC = GetSingleCreatureFromStorage(NPC_ZELIEK))
-                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
-            if (Creature* pC = GetSingleCreatureFromStorage(NPC_THANE))
-                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
-        }
-        else
-        {
-            pWho->AI()->EnterEvadeMode();
-        }
+        pWho->AI()->EnterEvadeMode();
         return false;
     }
     return true;
@@ -242,7 +246,7 @@ void instance_naxxramas::UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32
 
     if (!pGO)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateAutomaticBossEntranceDoor called with nullptr GO");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::UpdateAutomaticBossEntranceDoor called with nullptr GO");
         return;
     }
     if (uiData == IN_PROGRESS || uiData == SPECIAL)
@@ -285,7 +289,7 @@ void instance_naxxramas::UpdateBossGate(GameObject* pGO, uint32 uiData)
 {
     if (!pGO)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateBossGate called with nullptr GO");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::UpdateBossGate called with nullptr GO");
         return;
     }
     if (uiData == DONE)
@@ -341,7 +345,7 @@ void instance_naxxramas::UpdateTeleporters(uint32 uiType, uint32 uiData)
                 SetTeleporterState(pGO, uiData);
             break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
     }
 
     if (WingsAreCleared())
@@ -391,9 +395,6 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_SUB_BOSS_TRIGGER:
             if (m_auiEncounter[TYPE_GOTHIK] != IN_PROGRESS)
                 m_lGothTriggerList.push_back(pCreature->GetGUID());
-            break;
-        case NPC_ArchmageTarsis:
-            pCreature->SetStandState(UNIT_STAND_STATE_DEAD);
             break;
         case NPC_SewageSlime:
             pCreature->SetWanderDistance(30.0f);
@@ -893,7 +894,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 }
                 else
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "4hm just died. Unable to find Argent Dawn faction for reputation ");
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "4hm just died. Unable to find Argent Dawn faction for reputation ");
                 }
             }
             break;
@@ -1087,13 +1088,13 @@ uint32 instance_naxxramas::GetData(uint32 uiType)
     if (uiType < MAX_ENCOUNTER)
         return m_auiEncounter[uiType];
 
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::GetData() called with %d as param. %d is MAX_ENCOUNTERS", uiType, MAX_ENCOUNTER);
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::GetData() called with %d as param. %d is MAX_ENCOUNTERS", uiType, MAX_ENCOUNTER);
     return 0;
 }
 
 uint64 instance_naxxramas::GetData64(uint32 uiData)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "instance_naxxramas::GetData64 called. Not implemented");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "instance_naxxramas::GetData64 called. Not implemented");
     return 0;
 }
 
@@ -1102,7 +1103,7 @@ uint64 instance_naxxramas::GetGOUuid(NaxxGOs which)
     auto it = m_mNpcEntryGuidStore.find(which);
     if (it == m_mNpcEntryGuidStore.end())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::GetGOUuid called with param %d, not found", which);
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::GetGOUuid called with param %d, not found", which);
         return 0;
     }
     return it->second;
@@ -1173,7 +1174,7 @@ bool instance_naxxramas::IsInRightSideGothArea(Unit const* pUnit)
     if (GameObject* pCombatGate = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
         return (pCombatGate->GetPositionY() >= pUnit->GetPositionY());
 
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "left/right side check, Gothik combat area failed.");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "left/right side check, Gothik combat area failed.");
     return true;
 }
 
@@ -1772,13 +1773,6 @@ CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
     return new mob_dark_touched_warriorAI(pCreature);
 }
 
-bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->GetStandState() != UNIT_STAND_STATE_SIT)
-        pCreature->SetStandState(UNIT_STAND_STATE_SIT);
-    return false;
-}
-
 enum OmarionMisc
 {
     QUEST_OMARIONS_HANDBOOK = 9233,
@@ -2083,11 +2077,6 @@ void AddSC_instance_naxxramas()
     pNewScript = new Script;
     pNewScript->Name = "dark_touched_warriorAI";
     pNewScript->GetAI = &GetAI_dark_touched_warrior;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_archmage_tarsis";
-    pNewScript->pGossipHello = &GossipHello_npc_ArchmageTarsis;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;

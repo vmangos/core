@@ -27,7 +27,7 @@
 #include "adtfile.h"
 #undef min
 #undef max
-#include "mpq_libmpq04.h"
+#include "libmpq/mpq_libmpq.h"
 
 using namespace std;
 
@@ -142,7 +142,7 @@ bool WMORoot::open()
         {
         }
         */
-        f.seek((int)nextpos);
+        f.seek(nextpos);
     }
     f.close();
     return true;
@@ -264,7 +264,7 @@ bool WMOGroup::open()
             llog << "\nx-/yvert: " << hlq->xverts << "/" << hlq->yverts << " size: " << size << " expected size: " << 30 + hlq->xverts*hlq->yverts*8 + hlq->xtiles*hlq->ytiles << std::endl;
             llog.close(); */
         }
-        f.seek((int)nextpos);
+        f.seek(nextpos);
     }
     f.close();
     return true;

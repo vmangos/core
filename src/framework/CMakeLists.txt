@@ -41,7 +41,6 @@ set(framework_SRCS
   Policies/SingletonImp.h
   Policies/ThreadingModel.h
   Utilities/ByteConverter.h
-  Utilities/Callback.h
   Utilities/EventProcessor.h
   Utilities/EventMap.h
   Utilities/LinkedList.h

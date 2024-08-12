@@ -233,7 +233,6 @@ PoolObject* PoolGroup<T>::RollOne(SpawnedPoolData& spawns, uint32 triggerFrom)
 
     if (!EqualChanced.empty())
     {
-        uint32 index = urand(0, EqualChanced.size() - 1);
         // Fill a list of possible rolls
         std::vector<uint32> possible_rolls;
         for (int i = 0; i < EqualChanced.size(); ++i)
@@ -241,7 +240,7 @@ PoolObject* PoolGroup<T>::RollOne(SpawnedPoolData& spawns, uint32 triggerFrom)
                 possible_rolls.push_back(i);
         if (!possible_rolls.empty())
         {
-            index = urand(0, possible_rolls.size() - 1);
+            uint32 index = urand(0, possible_rolls.size() - 1);
             return &EqualChanced[possible_rolls[index]];
         }
     }
@@ -348,7 +347,7 @@ void PoolGroup<Pool>::RemoveOneRelation(uint16 child_pool_id)
 }
 
 template <class T>
-void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint32 triggerFrom, bool instantly)
+void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint32 triggerFrom, bool instantly, uint16 motherPool)
 {
     SpawnedPoolData& spawns = mapState.GetSpawnedPoolData();
     // GameObjects are processed differently than Creatures
@@ -356,6 +355,7 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
     bool isTriggerSpawned = spawns.IsSpawnedObject<T>(triggerFrom);
 
     uint32 lastDespawned = 0;
+    uint32 sub_pool = triggerFrom; // save sub pool for later use
     int count = limit - spawns.GetSpawnedObjects(poolId);
 
     // If triggered from some object respawn this object is still marked as spawned
@@ -399,6 +399,9 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
     // This will try to spawn the rest of pool, not guaranteed
     for (int i = 0; i < count; ++i)
     {
+        if (motherPool)
+            triggerFrom = motherPool;
+
         PoolObject* obj = RollOne(spawns, triggerFrom);
         if (!obj)
             continue;
@@ -419,6 +422,9 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
 
         if (triggerFrom && isTriggerSpawned)
         {
+            if (motherPool) // redirect trigger to the sub pool for disposal
+                triggerFrom = sub_pool;
+
             // One spawn one despawn no count increase
             DespawnObject(mapState, triggerFrom);
             lastDespawned = triggerFrom;
@@ -660,7 +666,7 @@ bool CheckPoolAndChance(char const* table, uint16 pool_id, float chance)
 
 void PoolManager::LoadFromDB()
 {
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(`entry`) FROM `pool_template` WHERE %u BETWEEN `patch_min` AND `patch_max`", sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT MAX(`entry`) FROM `pool_template` WHERE %u BETWEEN `patch_min` AND `patch_max`", sWorld.GetWowPatch());
     if (!result)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Table pool_template is empty.");
@@ -671,7 +677,6 @@ void PoolManager::LoadFromDB()
     {
         Field* fields = result->Fetch();
         max_pool_id = fields[0].GetUInt16();
-        delete result;
     }
 
     mPoolTemplate.resize(max_pool_id + 1);
@@ -710,7 +715,6 @@ void PoolManager::LoadFromDB()
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u objects pools", count);
-    delete result;
 
     PoolMapChecker mapChecker(mPoolTemplate);
 
@@ -792,7 +796,6 @@ void PoolManager::LoadFromDB()
         while (result->NextRow());
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creatures in pools from `pool_creature` and `pool_creature_template`", count);
-        delete result;
     }
 
     // Gameobjects (guids and entries)
@@ -880,7 +883,6 @@ void PoolManager::LoadFromDB()
         while (result->NextRow());
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobject in pools from `pool_gameobject` and `pool_gameobject_template`", count);
-        delete result;
     }
 
     // Pool of pools
@@ -980,7 +982,6 @@ void PoolManager::LoadFromDB()
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u pools in mother pools", count);
-        delete result;
     }
 
     // check chances integrity
@@ -1012,7 +1013,7 @@ template<>
 void PoolManager::SpawnPoolGroup<Creature>(MapPersistentState& mapState, uint16 pool_id, uint32 db_guid, bool instantly)
 {
     if (!mPoolCreatureGroups[pool_id].isEmpty())
-        mPoolCreatureGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), db_guid, instantly);
+        mPoolCreatureGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), db_guid, instantly, false);
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
@@ -1021,7 +1022,7 @@ template<>
 void PoolManager::SpawnPoolGroup<GameObject>(MapPersistentState& mapState, uint16 pool_id, uint32 db_guid, bool instantly)
 {
     if (!mPoolGameobjectGroups[pool_id].isEmpty())
-        mPoolGameobjectGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), db_guid, instantly);
+        mPoolGameobjectGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), db_guid, instantly, false);
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
@@ -1030,7 +1031,7 @@ template<>
 void PoolManager::SpawnPoolGroup<Pool>(MapPersistentState& mapState, uint16 pool_id, uint32 sub_pool_id, bool instantly)
 {
     if (!mPoolPoolGroups[pool_id].isEmpty())
-        mPoolPoolGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), sub_pool_id, instantly);
+        mPoolPoolGroups[pool_id].SpawnObject(mapState, mPoolTemplate[pool_id].GetSpawnCount(), sub_pool_id, instantly, pool_id);
 }
 
 /*!

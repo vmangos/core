@@ -156,7 +156,7 @@ enum GuardIds
     NPC_ARGENT_SENTRY           = 16378,
 };
 
-GuardMgr::GuardMgr()
+GuardMgr::GuardMgr() : m_uiRechargeTimer(GUARD_POST_RECHARGE_TIME)
 {
     // Area Id                                                       Alliance NPC                 Horde NPC
     m_mAreaGuardInfo.insert({ AREA_STORMWIND,          AreaGuardInfo(NPC_STORMWIND_CITY_GUARD,    NPC_NONE) });

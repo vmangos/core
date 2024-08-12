@@ -40,6 +40,7 @@
 #include "AutoBroadCastMgr.h"
 #include "SpellModMgr.h"
 #include "CreatureGroups.h"
+#include "HardcodedEvents.h"
 
 bool ChatHandler::HandleAnnounceCommand(char* args)
 {
@@ -1037,7 +1038,7 @@ bool ChatHandler::HandleReloadAreaTriggerTeleportCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadCommandCommand(char* /*args*/)
 {
-    load_command_table = true;
+    m_loadCommandTable = true;
     SendSysMessage("DB table `command` will be reloaded at next chat command use.");
     return true;
 }
@@ -1063,6 +1064,23 @@ bool ChatHandler::HandleReloadCreatureQuestInvRelationsCommand(char* /*args*/)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Quests Relations... (`creature_involvedrelation`)");
     sObjectMgr.LoadCreatureInvolvedRelations();
     SendSysMessage("DB table `creature_involvedrelation` (creature quest takers) reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadCreatureTemplatesCommand(char* args)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `creature_template` Table!");
+    uint32 entry;
+    if (ExtractUInt32(&args, entry))
+    {
+        sObjectMgr.LoadCreatureTemplate(entry);
+        PSendSysMessage("Creature template %u reloaded.", entry);
+    }
+    else
+    {
+        sObjectMgr.LoadCreatureTemplates();
+        SendSysMessage("DB table `creature_template` reloaded.");
+    }
     return true;
 }
 
@@ -1837,7 +1855,7 @@ bool ChatHandler::HandleReloadCreatureDisplayInfoAddon(char*)
 
 bool ChatHandler::HandleReloadIPBanList(char*)
 {
-    sAccountMgr.LoadIPBanList();
+    sAccountMgr.LoadIPBanList(LoginDatabase.Query(LOAD_IP_BANS_QUERY));
     SendSysMessage(">> Table `ip_banned` reloaded.");
     return true;
 }
@@ -1924,5 +1942,14 @@ bool ChatHandler::HandleReloadAnticheatCommand(char*)
 {
     sAnticheatMgr->LoadAnticheatData();
     SendSysMessage(">> Anticheat data reloaded");
+    return true;
+}
+
+bool ChatHandler::HandleListMapsCommand(char* /*args*/)
+{
+    SendSysMessage("Listing all currently created maps:");
+    for (auto const& itr : sMapMgr.Maps())
+        PSendSysMessage("%u-%u - %s - Players %u - Created %s ago", itr.first.nMapId, itr.first.nInstanceId, playerLink(itr.second->GetMapName()).c_str(), itr.second->GetPlayersCountExceptGMs(), secsToTimeString(time(nullptr) - itr.second->GetCreateTime(), true).c_str());
+
     return true;
 }

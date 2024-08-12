@@ -86,7 +86,7 @@ SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
     return pStmt;
 }
 
-bool SqlConnection::Initialize(char const* infoString)
+bool SqlConnection::Initialize(std::string const& infoString)
 {
     Tokens tokens = StrSplit(infoString, ";");
 
@@ -153,7 +153,7 @@ bool Database::Initialize(char const* infoString, int nConns /*= 1*/, int nWorke
             m_logsDir.append("/");
     }
 
-    m_pingIntervallms = sConfig.GetIntDefault ("MaxPingTime", 30) * (MINUTE * 1000);
+    m_pingIntervalMs = sConfig.GetIntDefault("Database.AliveCheckInternal", 600) * IN_MILLISECONDS;
 
     //create DB connections
 
@@ -295,17 +295,17 @@ SqlConnection* Database::getQueryConnection()
 
 void Database::Ping()
 {
-    char const* sql = "SELECT 1";
+    std::string const sql = "SELECT 1";
 
     {
         SqlConnection::Lock guard(m_pAsyncConn);
-        delete guard->Query(sql);
+        /* ignore result */ guard->Query(sql);
     }
 
     for (int i = 0; i < m_nQueryConnPoolSize; ++i)
     {
         SqlConnection::Lock guard(m_pQueryConnections[i]);
-        delete guard->Query(sql);
+        /* ignore result */ guard->Query(sql);
     }
 }
 
@@ -353,7 +353,7 @@ bool Database::PExecuteLog(char const* format,...)
     return Execute(szQuery);
 }
 
-QueryResult* Database::PQuery(char const* format,...)
+std::unique_ptr<QueryResult> Database::PQuery(char const* format,...)
 {
     if(!format) return nullptr;
 
@@ -372,7 +372,7 @@ QueryResult* Database::PQuery(char const* format,...)
     return Query(szQuery);
 }
 
-QueryNamedResult* Database::PQueryNamed(char const* format,...)
+std::unique_ptr<QueryNamedResult> Database::PQueryNamed(char const* format,...)
 {
     if(!format) return nullptr;
 
@@ -564,7 +564,7 @@ bool Database::CheckRequiredMigrations(char const** migrations)
 {
     std::set<std::string> appliedMigrations;
 
-    QueryResult* result = Query("SELECT * FROM `migrations`");
+    std::unique_ptr<QueryResult> result = Query("SELECT * FROM `migrations`");
 
     if (result)
     {
@@ -572,7 +572,6 @@ bool Database::CheckRequiredMigrations(char const** migrations)
         {
             appliedMigrations.insert(result->Fetch()[0].GetString());
         } while (result->NextRow());
-        delete result;
     }
 
     std::set<std::string> missingMigrations;
@@ -595,7 +594,6 @@ bool Database::CheckRequiredMigrations(char const** migrations)
         return false;
 
     std::string dbName = result->Fetch()[0].GetString();
-    delete result;
 
     if (!missingMigrations.empty())
     {

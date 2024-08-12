@@ -128,12 +128,14 @@ class SpellAuraHolder
         HeartBeatData* _pveHeartBeatData;
 
         // Debuff limit
+        void CalculateForBuffLimit();
         void CalculateForDebuffLimit();
-        bool IsAffectedByDebuffLimit() const { return m_debuffLimitAffected; }
-        void SetAffectedByDebuffLimit(bool isAffectedByDebuffLimit);
-        bool IsMoreImportantDebuffThan(SpellAuraHolder* other) const;
-        bool m_debuffLimitAffected;
-        uint32 m_debuffLimitScore; // + haut => + important
+        bool IsAffectedByVisibleSlotLimit() const { return m_visibleSlotLimitAffected; }
+        void SetAffectedByVisibleSlotLimit(bool isAffectedByDebuffLimit);
+        bool IsMoreImportantVisualAuraThan(SpellAuraHolder* other) const;
+        bool m_visibleSlotLimitAffected;
+        uint32 m_visibleSlotLimitScore; // higher means more important
+
         // Refresh de buff
         void Refresh(Unit* caster, Unit* target, SpellAuraHolder* pRefreshWithAura);
         bool CanBeRefreshedBy(SpellAuraHolder* other) const;
@@ -232,10 +234,12 @@ class SpellAuraHolder
         void SetTargetSecondaryThreatFocus(bool v) { m_makesTargetSecondaryFocus = v; }
         bool IsTargetSecondaryThreatFocus() const { return m_makesTargetSecondaryFocus; }
 
-        void SetTriggered(bool t) { m_spellTriggered = t; }
+        void SetTriggered(bool triggered) { m_spellTriggered = triggered; }
         bool IsTriggered() const { return m_spellTriggered; }
         void SetReflected(bool reflected) { m_isReflected = reflected; }
         bool IsReflected() const { return m_isReflected; }
+        void SetAddedBySpell(bool spell) { m_addedBySpell = spell; }
+        bool IsAddedBySpell() const { return m_addedBySpell; }
 
         ~SpellAuraHolder();
     private:
@@ -271,6 +275,7 @@ class SpellAuraHolder
         bool m_makesTargetSecondaryFocus;
         bool m_spellTriggered;                              // applied by a triggered spell (used in debuff priority computation)
         bool m_isReflected;                                 // applied by a reflected spell (used to prevent death in duel)
+        bool m_addedBySpell;                                // whether aura was applied by spell cast or added directly
 
         uint32 m_in_use;                                    // > 0 while in SpellAuraHolder::ApplyModifiers call/SpellAuraHolder::Update/etc
 };
@@ -371,7 +376,6 @@ class Aura
         void HandleAuraModBlockPercent(bool Apply, bool Real);
         void HandleAuraModCritPercent(bool Apply, bool Real);
         void HandlePeriodicLeech(bool Apply, bool Real);
-        void HandleModHitChance(bool Apply, bool Real);
         void HandleModSpellHitChance(bool Apply, bool Real);
         void HandleAuraModScale(bool Apply, bool Real);
         void HandlePeriodicManaLeech(bool Apply, bool Real);

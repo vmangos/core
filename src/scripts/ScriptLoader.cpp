@@ -43,7 +43,6 @@ void AddSC_scourge_invasion();
 void AddSC_instance_blackrock_spire();
 void AddSC_blackrock_depths();                       //blackrock_depths
 void AddSC_blackrock_depths_arena_challenge();
-void AddSC_boss_ambassador_flamelash();
 void AddSC_boss_anubshiah();
 void AddSC_boss_draganthaurissan();
 void AddSC_boss_general_angerforge();
@@ -113,7 +112,6 @@ void AddSC_boss_herod();
 void AddSC_boss_high_inquisitor_fairbanks();
 void AddSC_boss_houndmaster_loksey();
 void AddSC_boss_interrogator_vishas();
-void AddSC_boss_mograine_and_whitemane();
 void AddSC_instance_scarlet_monastery();
 void AddSC_boss_theolenkrastinov();
 void AddSC_boss_illuciabarov();
@@ -156,7 +154,6 @@ void AddSC_boss_mandokir();
 void AddSC_boss_marli();
 void AddSC_boss_ouro();
 void AddSC_boss_renataki();
-void AddSC_boss_thekal();
 void AddSC_boss_venoxis();
 //void AddSC_boss_wushoolay();
 void AddSC_instance_zulgurub();
@@ -283,7 +280,6 @@ void AddScripts()
     //eastern kingdoms
     AddSC_blackrock_depths();                               //blackrock_depths
     AddSC_blackrock_depths_arena_challenge();
-    AddSC_boss_ambassador_flamelash();
     AddSC_boss_anubshiah();
     AddSC_boss_draganthaurissan();
     AddSC_boss_general_angerforge();
@@ -352,7 +348,6 @@ void AddScripts()
     AddSC_boss_high_inquisitor_fairbanks();
     AddSC_boss_houndmaster_loksey();
     AddSC_boss_interrogator_vishas();
-    AddSC_boss_mograine_and_whitemane();
     AddSC_instance_scarlet_monastery();
     AddSC_boss_theolenkrastinov();
     AddSC_boss_illuciabarov();
@@ -395,7 +390,6 @@ void AddScripts()
     AddSC_boss_marli();
     AddSC_boss_ouro();
     AddSC_boss_renataki();
-    AddSC_boss_thekal();
     AddSC_boss_venoxis();
     //AddSC_boss_wushoolay();
     AddSC_instance_zulgurub();

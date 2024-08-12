@@ -166,11 +166,20 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             }
 
             pCharmedUnit->ClearUnitState(UNIT_STAT_MOVING);
-            auto result = pCharmedUnit->CastSpell(pUnitTarget, spellInfo, false);
-            if (result != SPELL_CAST_OK)
+            SpellCastResult result = pCharmedUnit->CastSpell(pUnitTarget, spellInfo, false);
+
+            if (result == SPELL_CAST_OK)
+            {
+                if (pCharmedUnit->IsPet())
+                    ((Pet*)pCharmedUnit)->CheckLearning(spellid);
+
+                if (pCharmedUnit->IsMoving() && pCharmedUnit->IsNoMovementSpellCasted())
+                    pCharmedUnit->StopMoving();
+            }
+            else
                 pCharmedUnit->SendPetCastFail(spellid, result);
-            else if (((Creature*)pCharmedUnit)->IsPet())
-                ((Pet*)pCharmedUnit)->CheckLearning(spellid);
+
+
             break;
         }
         default:
@@ -354,6 +363,13 @@ void WorldSession::HandlePetRename(WorldPacket& recv_data)
             !pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME) ||
             pet->GetOwnerGuid() != _player->GetObjectGuid() || !pet->GetCharmInfo())
         return;
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Hunters are now able to rename their pets while mounted.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    if (_player->IsMounted())
+        return;
+#endif
 
     PetNameInvalidReason res = ObjectMgr::CheckPetName(name);
     if (res != PET_NAME_SUCCESS)

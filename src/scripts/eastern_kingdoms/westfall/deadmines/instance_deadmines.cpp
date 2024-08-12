@@ -139,7 +139,7 @@ struct instance_deadmines : public ScriptedInstance
             m_uiDoor1GUID = pGo->GetGUID();
         if (pGo->GetEntry() == GO_DOOR2 && pGo->GetPositionX() > -291.0f && pGo->GetPositionX() < -290.0f)
             m_uiDoor2GUID = pGo->GetGUID();
-        if (pGo->GetEntry() == GO_DOOR2 && pGo->GetPositionX() > -169.0f && pGo->GetPositionX() < -168.0f)
+        if (pGo->GetEntry() == GO_DOOR3 && pGo->GetPositionX() > -169.0f && pGo->GetPositionX() < -168.0f)
             m_uiDoor3GUID = pGo->GetGUID();
 
         if (pGo->GetEntry() == GO_DMF_CHEST)
@@ -289,7 +289,7 @@ struct instance_deadmines : public ScriptedInstance
                             DoScriptText(INST_SAY_ALARM2, pMrSmite);
                             m_uiDoor_Step = 0;
                             m_uiIronDoor_Timer = 0;
-                            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Deadmines: Iron door event reached end.");
+                            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Deadmines: Iron door event reached end.");
                             break;
                     }
                 }

@@ -26,6 +26,7 @@
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
 #include "Anticheat.h"
+#include "MovementPacketSender.h"
 
 namespace Movement
 {
@@ -133,6 +134,7 @@ int32 MoveSplineInit::Launch()
     if (unit.IsPlayer() || unit.GetPossessorGuid().IsPlayer())
         unit.SetSplineDonePending(true);
 
+    unit.m_movementInfo.ctime = 0;
     unit.m_movementInfo.SetMovementFlags((MovementFlags)moveFlags);
     move_spline.SetMovementOrigin(movementType);
     move_spline.Initialize(args);
@@ -169,58 +171,18 @@ int32 MoveSplineInit::Launch()
     else
         move_spline.setLastPointSent(PacketBuilder::WriteMonsterMove(move_spline, data));
 
-    // Compress data or not ?
-    bool compress = false;
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    if (!args.flags.done && args.velocity > 4 * realSpeedRun)
-        compress = true;
-    else if ((data.wpos() + 2) > 0x10)
-        compress = true;
-    else if (oldMoveFlags & MOVEFLAG_ROOT)
-        compress = true;
-    // Since packet size is stored with an uint8, packet size is limited for compressed packets
-    if ((data.wpos() + 2) > 0xFF)
-        compress = false;
-#endif
-
-    MovementData mvtData(compress ? nullptr : &unit);
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    // Nostalrius: client has a hardcoded limit to spline movement speed : 4*runSpeed.
-    // We need to fix this, in case of charges for example (if character has movement slowing effects)
-    if (args.velocity > 4 * realSpeedRun && !args.flags.done) // From client
-        mvtData.SetUnitSpeed(SMSG_SPLINE_SET_RUN_SPEED, unit.GetObjectGuid(), args.velocity);
     if ((oldMoveFlags & MOVEFLAG_ROOT) && !args.flags.done)
-        mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_UNROOT, unit.GetObjectGuid());
+        MovementPacketSender::SendMovementFlagChangeToAll(&unit, MOVEFLAG_ROOT, false);
     if (oldMoveFlags & MOVEFLAG_WALK_MODE && !(moveFlags & MOVEFLAG_WALK_MODE)) // Switch to run mode
-        mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
+        MovementPacketSender::SendToggleRunWalkToAll(&unit, true);
     if (moveFlags & MOVEFLAG_WALK_MODE && !(oldMoveFlags & MOVEFLAG_WALK_MODE)) // Switch to walk mode
-        mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_SET_WALK_MODE, unit.GetObjectGuid());
-#endif
+        MovementPacketSender::SendToggleRunWalkToAll(&unit, false);
         
-    mvtData.AddPacket(data);
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    // Do not forget to restore velocity after movement !
-    if (args.velocity > 4 * realSpeedRun && !args.flags.done)
-        mvtData.SetUnitSpeed(SMSG_SPLINE_SET_RUN_SPEED, unit.GetObjectGuid(), realSpeedRun);
+    unit.SendMovementMessageToSet(std::move(data), true);
 
     // Restore correct walk mode for players
     if (unit.GetTypeId() == TYPEID_PLAYER && (moveFlags & MOVEFLAG_WALK_MODE) != (oldMoveFlags & MOVEFLAG_WALK_MODE))
-        mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
-
-    if (compress)
-    {
-        WorldPacket data2;
-        if (mvtData.BuildPacket(data2)) {
-            unit.SendMovementMessageToSet(std::move(data2), true);
-        }
-        else {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MoveSplineInit] Unable to compress move packet, move spline not sent");
-        }
-    }
-#endif
+        MovementPacketSender::SendToggleRunWalkToAll(&unit, !(oldMoveFlags & MOVEFLAG_WALK_MODE));
     
     return move_spline.Duration();
 }

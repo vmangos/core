@@ -183,6 +183,24 @@ struct DynamicTreeIntersectionCallback_WithLogger
     bool didHit() const { return did_hit; }
 };
 
+struct DynamicTreeIntersectionCallback_findCollisionObject
+{
+    bool did_hit;
+    GameObjectModel const* hitObj;
+    DynamicTreeIntersectionCallback_findCollisionObject() : did_hit(false), hitObj(nullptr) {}
+    bool operator()(G3D::Ray const &r, GameObjectModel const &obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
+    {
+        bool hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
+        if (hit)
+        {
+            hitObj = &obj;
+            did_hit = true;
+        }
+        return did_hit;
+    }
+    bool didHit() const { return did_hit; }
+};
+
 //=========================================================
 /**
 If intersection is found within pMaxDist, sets pMaxDist to intersection distance and returns true.
@@ -281,4 +299,17 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist) 
     if (callback.didHit())
         return v.z - maxSearchDist;
     return -G3D::inf();
+}
+
+GameObjectModel const* DynamicMapTree::getObjectHit(Vector3 const& pPos1, Vector3 const& pPos2) const
+{
+    float distance = (pPos2 - pPos1).magnitude();
+    Vector3 const dir = (pPos2 - pPos1) / distance;
+    G3D::Ray const ray(pPos1, dir);
+
+    DynamicTreeIntersectionCallback_findCollisionObject callback;
+    impl.intersectRay(ray, callback, distance, pPos2, false);
+    if (callback.hitObj)
+        return callback.hitObj;
+    return nullptr;
 }

@@ -318,6 +318,50 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleUnitMoveInfoCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Move info for %s", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("Server Time: %u", pTarget->m_movementInfo.stime);
+    PSendSysMessage("Client Time: %u", pTarget->m_movementInfo.ctime);
+    PSendSysMessage("Move Flags: %u (%s)", pTarget->m_movementInfo.moveFlags, FlagsToString(pTarget->m_movementInfo.moveFlags, MoveFlagToString).c_str());
+    PSendSysMessage("Position: %g %g %g %g", pTarget->m_movementInfo.pos.x, pTarget->m_movementInfo.pos.y, pTarget->m_movementInfo.pos.z, pTarget->m_movementInfo.pos.o);
+    if (!pTarget->m_movementInfo.t_guid.IsEmpty() || !pTarget->m_movementInfo.t_pos.IsEmpty())
+    {
+        PSendSysMessage("Transport Guid: %s", pTarget->m_movementInfo.t_guid.GetString().c_str());
+        PSendSysMessage("Transport Position: %g %g %g %g", pTarget->m_movementInfo.t_pos.x, pTarget->m_movementInfo.t_pos.y, pTarget->m_movementInfo.t_pos.z, pTarget->m_movementInfo.t_pos.o);
+    }
+    if (pTarget->m_movementInfo.s_pitch)
+        PSendSysMessage("Swim Pitch: %g", pTarget->m_movementInfo.s_pitch);
+    if (pTarget->m_movementInfo.fallTime)
+        PSendSysMessage("Fall Time: %u", pTarget->m_movementInfo.fallTime);
+    if (pTarget->m_movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))
+    {
+        PSendSysMessage("Jump Z Speed: %g", pTarget->m_movementInfo.jump.zspeed);
+        PSendSysMessage("Jump Cos Angle: %g", pTarget->m_movementInfo.jump.cosAngle);
+        PSendSysMessage("Jump Sin Angle: %g", pTarget->m_movementInfo.jump.sinAngle);
+        PSendSysMessage("Jump XY Speed: %g", pTarget->m_movementInfo.jump.xyspeed);
+        PSendSysMessage("Jump Start Time: %g", pTarget->m_movementInfo.jump.startClientTime);
+
+    }
+    if (pTarget->m_movementInfo.splineElevation)
+        PSendSysMessage("Spline Elevation: %g", pTarget->m_movementInfo.splineElevation);
+    if (pTarget->m_movementInfo.sourceSessionGuid)
+        PSendSysMessage("Source: Session %u", pTarget->m_movementInfo.sourceSessionGuid);
+    else
+        SendSysMessage("Source: Server");
+
+    return true;
+}
+
 bool ChatHandler::HandleUnitSpeedInfoCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();
@@ -402,12 +446,12 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Total shadow resist: %i", pTarget->GetResistance(SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Total arcane resist: %i", pTarget->GetResistance(SPELL_SCHOOL_ARCANE));
     PSendSysMessage("Attack power: %u", pTarget->GetUInt32Value(UNIT_FIELD_ATTACK_POWER));
-    PSendSysMessage("Attack power mods: %u", pTarget->GetUInt32Value(UNIT_FIELD_ATTACK_POWER_MODS));
+    PSendSysMessage("Attack power mods: %i / %i", pTarget->GetInt16Value(UNIT_FIELD_ATTACK_POWER_MODS, 0), pTarget->GetInt16Value(UNIT_FIELD_ATTACK_POWER_MODS, 1));
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     PSendSysMessage("Attack power multiplier: %u", pTarget->GetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER));
 #endif
     PSendSysMessage("Ranged attack power: %u", pTarget->GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER));
-    PSendSysMessage("Ranged attack power mods: %u", pTarget->GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS));
+    PSendSysMessage("Ranged attack power mods: %i / %i", pTarget->GetInt16Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 0), pTarget->GetInt16Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 1));
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     PSendSysMessage("Ranged attack power multiplier: %u", pTarget->GetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER));
 #endif
@@ -446,6 +490,9 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Frost spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_FROST));
     PSendSysMessage("Shadow spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Arcane spell crit chance: %g", pPlayer->GetSpellCritPercent(SPELL_SCHOOL_ARCANE));
+    PSendSysMessage("Melee hit chance: %g", pPlayer->GetWeaponBasedAuraModifier(BASE_ATTACK, SPELL_AURA_MOD_HIT_CHANCE));
+    PSendSysMessage("Ranged hit chance: %g", pPlayer->GetWeaponBasedAuraModifier(RANGED_ATTACK, SPELL_AURA_MOD_HIT_CHANCE));
+    PSendSysMessage("Spell hit chance: %g", pPlayer->m_modSpellHitChance);
     PSendSysMessage("Positive strength: %g", pPlayer->GetPosStat(STAT_STRENGTH));
     PSendSysMessage("Positive agility: %g", pPlayer->GetPosStat(STAT_AGILITY));
     PSendSysMessage("Positive stamina: %g", pPlayer->GetPosStat(STAT_STAMINA));
@@ -856,6 +903,45 @@ bool ChatHandler::HandleUnitShowCreateSpellCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleUnitShowCombatTimerCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Combat timer for %s:", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("%u", pTarget->GetCombatTimer());
+
+    return true;
+}
+
+bool ChatHandler::HandlePvPCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget)
+        return false;
+    
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (Player* pPlayer = pTarget->ToPlayer())
+        pPlayer->UpdatePvP(value, true);
+    else
+        pTarget->SetPvP(value);
+
+    return true;
+}
+
 bool ChatHandler::HandleFreezeCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();
@@ -876,13 +962,13 @@ bool ChatHandler::HandleUnfreezeCommand(char* args)
 
 bool ChatHandler::HandlePossessCommand(char *args)
 {
-    Unit* tar = GetSelectedUnit();
-    if (!tar)
+    Unit* target = GetSelectedUnit();
+    if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         return false;
     }
-    m_session->GetPlayer()->CastSpell(tar, 530, true);
+    m_session->GetPlayer()->CastCustomSpell(target, 530, 255, {}, {}, true);
     return true;
 }
 
@@ -2258,6 +2344,22 @@ bool ChatHandler::HandleModifyManaCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleDeplenishCommand(char* args)
+{
+    Unit* pUnit = GetSelectedUnit();
+    if (!pUnit || !pUnit->IsAlive())
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pUnit->SetHealth(1);
+    pUnit->SetPower(pUnit->GetPowerType(), 0);
+
+    return true;
+}
+
 bool ChatHandler::HandleReplenishCommand(char* args)
 {
     Unit* pUnit = GetSelectedUnit();
@@ -2575,7 +2677,7 @@ bool ChatHandler::HandleDieHelper(Unit* target)
         if (HasLowerSecurity((Player*)target, ObjectGuid(), false))
             return false;
 
-        if (player->IsGod())
+        if (player->GetInvincibilityHpThreshold())
             player->SetCheatGod(false);
     }
 

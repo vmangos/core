@@ -158,11 +158,11 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
     recv_data >> entry;
     recv_data >> guid;
 
-    CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(entry);
+    CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(entry);
     if (ci)
     {
-        char const* name = ci->name;
-        char const* subName = ci->subname;
+        std::string const* name = &ci->name;
+        std::string const* subName = &ci->subname;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
@@ -171,9 +171,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
             if (cl)
             {
                 if (cl->Name.size() > size_t(loc_idx) && !cl->Name[loc_idx].empty())
-                    name = cl->Name[loc_idx].c_str();
+                    name = &cl->Name[loc_idx];
                 if (cl->SubName.size() > size_t(loc_idx) && !cl->SubName[loc_idx].empty())
-                    subName = cl->SubName[loc_idx].c_str();
+                    subName = &cl->SubName[loc_idx];
             }
         }
 
@@ -196,19 +196,19 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
             sizeof(uint8) + // civilian
             sizeof(uint8); // racial_leader
 
-        size_t const nameLen = strlen(name);
-        size_t const subNameLen = strlen(subName);
+        size_t const nameLen = name->size();
+        size_t const subNameLen = subName->size();
 
         // guess size
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, fixedSize + nameLen + subNameLen);
         data << uint32(entry);                              // creature entry
-        data.append(name, nameLen + 1);
+        data.append(name->c_str(), nameLen + 1);
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
-        data.append(subName, subNameLen + 1);
+        data.append(subName->c_str(), subNameLen + 1);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        data << uint32(ci->type_flags);                     // flags
+        data << uint32(ci->GetTypeFlags());                 // flags
 #else
-        data << uint32(ci->type_flags << 20);               // flags
+        data << uint32(ci->static_flags1);                  // flags
 #endif
         data << uint32(ci->type);
 

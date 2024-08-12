@@ -371,14 +371,13 @@ bool AuthSocket::_HandleLogonChallenge()
     // No SQL injection possible (paste the IP address as passed by the socket)
     std::string address = get_remote_address();
     LoginDatabase.escape_string(address);
-    QueryResult *result = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` WHERE "
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` WHERE "
     //    permanent                    still banned
         "(`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP()) AND `ip` = '%s'", address.c_str());
     if (result)
     {
         pkt << (uint8)WOW_FAIL_DB_BUSY;
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", get_remote_address().c_str(), m_login.c_str());
-        delete result;
     }
     else
     {
@@ -458,11 +457,11 @@ bool AuthSocket::_HandleLogonChallenge()
             {
                 uint32 account_id = fields[0].GetUInt32();
                 // If the account is banned, reject the logon attempt
-                QueryResult *banresult = LoginDatabase.PQuery("SELECT `bandate`, `unbandate` FROM `account_banned` WHERE "
+                std::unique_ptr<QueryResult> banResult = LoginDatabase.PQuery("SELECT `bandate`, `unbandate` FROM `account_banned` WHERE "
                     "`id` = %u AND `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `unbandate` = `bandate`) LIMIT 1", account_id);
-                if (banresult)
+                if (banResult)
                 {
-                    if((*banresult)[0].GetUInt64() == (*banresult)[1].GetUInt64())
+                    if((*banResult)[0].GetUInt64() == (*banResult)[1].GetUInt64())
                     {
                         pkt << (uint8) WOW_FAIL_BANNED;
                         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!",m_login.c_str (), get_remote_address().c_str());
@@ -472,8 +471,6 @@ bool AuthSocket::_HandleLogonChallenge()
                         pkt << (uint8) WOW_FAIL_SUSPENDED;
                         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!",m_login.c_str (), get_remote_address().c_str());
                     }
-
-                    delete banresult;
                 }
                 else
                 {
@@ -535,7 +532,6 @@ bool AuthSocket::_HandleLogonChallenge()
                     m_status = STATUS_LOGON_PROOF;
                 }
             }
-            delete result;
         }
         else                                                // no account
         {
@@ -763,9 +759,9 @@ bool AuthSocket::_HandleLogonProof()
         const char* K_hex = srp.GetStrongSessionKey().AsHexStr();
         const char *os = reinterpret_cast<char *>(&m_os); // no injection as there are only two possible values
         const char *platform = reinterpret_cast<char *>(&m_platform); // no injection as there are only two possible values
-        auto result = LoginDatabase.PQuery("UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
+        std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
             K_hex, get_remote_address().c_str(), GetLocaleByName(m_localizationName), os, platform, m_safelogin.c_str() );
-        delete result;
+
         OPENSSL_free((void*)K_hex);
 
         // Finish SRP6 and send the final result to the client
@@ -796,9 +792,9 @@ bool AuthSocket::_HandleLogonProof()
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
             LoginDatabase.PExecute("UPDATE `account` SET `failed_logins` = `failed_logins` + 1 WHERE `username` = '%s'",m_safelogin.c_str());
 
-            if(QueryResult *loginfail = LoginDatabase.PQuery("SELECT `id`, `failed_logins` FROM `account` WHERE `username` = '%s'", m_safelogin.c_str()))
+            if(std::unique_ptr<QueryResult> failedLoginsDbResult = LoginDatabase.PQuery("SELECT `id`, `failed_logins` FROM `account` WHERE `username` = '%s'", m_safelogin.c_str()))
             {
-                Field* fields = loginfail->Fetch();
+                Field* fields = failedLoginsDbResult->Fetch();
                 uint32 failed_logins = fields[1].GetUInt32();
 
                 if( failed_logins >= MaxWrongPassCount )
@@ -825,7 +821,6 @@ bool AuthSocket::_HandleLogonProof()
                             current_ip.c_str(), WrongPassBanTime, m_login.c_str(), failed_logins);
                     }
                 }
-                delete loginfail;
             }
         }
     }
@@ -880,7 +875,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     m_safelogin = m_login;
     LoginDatabase.escape_string(m_safelogin);
 
-    QueryResult *result = LoginDatabase.PQuery ("SELECT `sessionkey`, `id` FROM `account` WHERE `username` = '%s'", m_safelogin.c_str ());
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `sessionkey`, `id` FROM `account` WHERE `username` = '%s'", m_safelogin.c_str());
 
     // Stop if the account is not found
     if (!result)
@@ -893,7 +888,6 @@ bool AuthSocket::_HandleReconnectChallenge()
     Field* fields = result->Fetch ();
     srp.SetStrongSessionKey(fields[0].GetString());
     m_accountId = fields[1].GetUInt32();
-    delete result;
 
     // All good, await client's proof
     m_status = STATUS_RECON_PROOF;
@@ -1005,6 +999,22 @@ bool AuthSocket::_HandleRealmList()
     return true;
 }
 
+std::string AuthSocket::GetRealmAddress(Realm const& realm) const
+{
+    ACE_INET_Addr addr;
+    if (peer().get_remote_addr(addr) == 0)
+    {
+        ACE_INET_Addr localAddress;
+        if (localAddress.set(realm.localAddress.c_str()) == 0)
+        {
+            if ((addr.get_ip_address() & realm.localSubnetMask) == (localAddress.get_ip_address() & realm.localSubnetMask))
+                return realm.localAddress;
+        }
+    }
+
+    return realm.address;
+}
+
 void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
     if (m_build < 6299)        // before version 2.0.3 (exclusive)
@@ -1017,23 +1027,22 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             uint8 AmountOfCharacters;
 
             // No SQL injection. id of realm is controlled by the database.
-            QueryResult *result = LoginDatabase.PQuery("SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.m_ID, m_accountId);
+            std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.id, m_accountId);
             if (result)
             {
                 Field *fields = result->Fetch();
                 AmountOfCharacters = fields[0].GetUInt8();
-                delete result;
             }
             else
                 AmountOfCharacters = 0;
 
-            bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), m_build) != i->second.realmbuilds.end();
+            bool ok_build = std::find(i->second.realmBuilds.begin(), i->second.realmBuilds.end(), m_build) != i->second.realmBuilds.end();
 
             RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(m_build) : nullptr;
             if (!buildInfo)
                 buildInfo = &i->second.realmBuildInfo;
 
-            RealmFlags realmflags = i->second.realmflags;
+            RealmFlags realmflags = i->second.realmFlags;
 
             // 1.x clients not support explicitly REALM_FLAG_SPECIFYBUILD, so manually form similar name as show in more recent clients
             std::string name = i->first;
@@ -1045,16 +1054,16 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             }
 
             // Show offline state for unsupported client builds and locked realms (1.x clients not support locked state show)
-            if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.m_ID)))
+            if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.id)))
                 realmflags = RealmFlags(realmflags | REALM_FLAG_OFFLINE);
 
             pkt << uint32(i->second.icon);              // realm type
             pkt << uint8(realmflags);                   // realmflags
             pkt << name;                                // name
-            pkt << i->second.address;                   // address
+            pkt << GetRealmAddress(i->second);          // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
-            pkt << uint8(i->second.timezone);           // realm category
+            pkt << uint8(i->second.timeZone);           // realm category
             pkt << uint8(0x00);                         // unk, may be realm number/id?
         }
 
@@ -1070,25 +1079,24 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             uint8 AmountOfCharacters;
 
             // No SQL injection. id of realm is controlled by the database.
-            QueryResult *result = LoginDatabase.PQuery("SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.m_ID, m_accountId);
+            std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.id, m_accountId);
             if (result)
             {
                 Field *fields = result->Fetch();
                 AmountOfCharacters = fields[0].GetUInt8();
-                delete result;
             }
             else
                 AmountOfCharacters = 0;
 
-            bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), m_build) != i->second.realmbuilds.end();
+            bool ok_build = std::find(i->second.realmBuilds.begin(), i->second.realmBuilds.end(), m_build) != i->second.realmBuilds.end();
 
             RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(m_build) : nullptr;
             if (!buildInfo)
                 buildInfo = &i->second.realmBuildInfo;
 
-            uint8 lock = (i->second.allowedSecurityLevel > GetSecurityOn(i->second.m_ID)) ? 1 : 0;
+            uint8 lock = (i->second.allowedSecurityLevel > GetSecurityOn(i->second.id)) ? 1 : 0;
 
-            RealmFlags realmFlags = i->second.realmflags;
+            RealmFlags realmFlags = i->second.realmFlags;
 
             // Show offline state for unsupported client builds
             if (!ok_build)
@@ -1101,10 +1109,10 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             pkt << uint8(lock);                         // flags, if 0x01, then realm locked
             pkt << uint8(realmFlags);                   // see enum RealmFlags
             pkt << i->first;                            // name
-            pkt << i->second.address;                   // address
+            pkt << GetRealmAddress(i->second);          // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
-            pkt << uint8(i->second.timezone);           // realm category (Cfg_Categories.dbc)
+            pkt << uint8(i->second.timeZone);           // realm category (Cfg_Categories.dbc)
             pkt << uint8(0x2C);                         // unk, may be realm number/id?
 
             if (realmFlags & REALM_FLAG_SPECIFYBUILD)
@@ -1300,7 +1308,7 @@ void AuthSocket::InitPatch()
 
 void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
 {
-    QueryResult* result = LoginDatabase.PQuery("SELECT `gmlevel`, `RealmID` FROM `account_access` WHERE `id` = %u",
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `gmlevel`, `RealmID` FROM `account_access` WHERE `id` = %u",
         accountId);
     if (!result)
         return;
@@ -1315,8 +1323,6 @@ void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
         else
             m_accountSecurityOnRealm[realmId] = security;
     } while (result->NextRow());
-
-    delete result;
 }
 
 bool AuthSocket::GeographicalLockCheck()

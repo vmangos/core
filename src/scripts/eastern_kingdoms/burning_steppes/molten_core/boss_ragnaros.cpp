@@ -352,7 +352,7 @@ struct boss_ragnarosAI : ScriptedAI
                 return;
             }
 
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Cast %u impossible.", SPELL_EMERGE_VISUAL);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Cast %u impossible.", SPELL_EMERGE_VISUAL);
         }
         else if (IsBanished)
         {
@@ -537,12 +537,12 @@ struct boss_ragnarosAI : ScriptedAI
                     if (!canCastResult)
                         m_uiMagmaBlastTimer = 2500;
                     else
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Magma Blast failed with reason <%u>.", canCastResult);
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Magma Blast failed with reason <%u>.", canCastResult);
 
                     return;
                 }
 
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] No target to Magma Blast.");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] No target to Magma Blast.");
             }
             else
                 m_uiMagmaBlastTimer -= diff;
@@ -626,11 +626,11 @@ struct boss_ragnarosAI : ScriptedAI
                 m_creature->ResetAttackTimer();
             }
 
-            //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Target type #4 reached with name <%s> and entry <%u>.", pTarget->GetName(), pTarget->GetEntry());
+            //sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Target type #4 reached with name <%s> and entry <%u>.", pTarget->GetName(), pTarget->GetEntry());
         }
 
         // nothing in melee at all
-        //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] CheckForMelee hits the end. Nothing in melee.");
+        //sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] CheckForMelee hits the end. Nothing in melee.");
     }
 };
 

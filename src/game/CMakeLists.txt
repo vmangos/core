@@ -216,6 +216,7 @@ set (game_SRCS
     vmap/VMapFactory.cpp
     vmap/VMapManager2.cpp
     vmap/WorldModel.cpp
+    AccountData.h
     AccountMgr.h
     AuraRemovalMgr.h
     AutoBroadCastMgr.h
@@ -283,6 +284,7 @@ set (game_SRCS
     Battlegrounds/BattleGroundAB.h
     Battlegrounds/BattleGroundAV.h
     Battlegrounds/BattleGroundMgr.h
+    Battlegrounds/BattleGroundDefines.h
     Battlegrounds/BattleGroundWS.h
     Chat/Channel.h
     Chat/ChannelMgr.h
@@ -368,6 +370,7 @@ set (game_SRCS
     Objects/GameObjectDefines.h
     Objects/Item.h
     Objects/ItemPrototype.h
+    Objects/MovementInfo.h
     Objects/Object.h
     Objects/ObjectDefines.h
     Objects/Pet.h

@@ -260,39 +260,50 @@ struct mob_scarlet_traineeAI : ScriptedAI
 {
     explicit mob_scarlet_traineeAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        Start_Timer = urand(1000, 6000);
-        group1 = false;
-        group2 = false;
+        m_uiStartTimer = urand(1000, 6000);
+        m_bGroup1 = false;
+        m_bGroup2 = false;
         mob_scarlet_traineeAI::Reset();
     }
 
-    uint32 Start_Timer;
-    bool group1;
-    bool group2;
+    bool m_bHasFled;
+    uint32 m_uiStartTimer;
+    bool m_bGroup1;
+    bool m_bGroup2;
 
-    void Reset() override { }
+    void Reset() override
+    { 
+        m_bHasFled = false;
+    }
 
     void UpdateAI(uint32 const diff) override
     {
-        if (Start_Timer)
+        if (m_uiStartTimer)
         {
-            if (Start_Timer <= diff)
+            if (m_uiStartTimer <= diff)
             {
                 m_creature->SetSpeedRate(MOVE_WALK, 2.20f);
 
-                if (group1)
+                if (m_bGroup1)
                     m_creature->GetMotionMaster()->MovePoint(1, 1946.433594f, -435.955109f, 16.367277f);
-                else if (group2)
+                else if (m_bGroup2)
                     m_creature->GetMotionMaster()->MovePoint(101, 1940.257080f, -434.454315f, 17.094456f);
 
-                Start_Timer = 0;
+                m_uiStartTimer = 0;
             }
             else
-                Start_Timer -= diff;
+                m_uiStartTimer -= diff;
         }
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
+
+        if (!m_bHasFled && m_creature->GetHealthPercent() < 15.0f)
+        {
+            m_bHasFled = true;
+            m_creature->DoFlee();
+            return;
+        }
 
         DoMeleeAttackIfReady();
     }
@@ -304,10 +315,10 @@ struct mob_scarlet_traineeAI : ScriptedAI
             switch (id)
             {
                 case 0:
-                    group1 = true;
+                    m_bGroup1 = true;
                     break;
                 case 100:
-                    group2 = true;
+                    m_bGroup2 = true;
                     break;
                 case 1:
                     m_creature->GetMotionMaster()->MovePoint(2, 1952.834717f, -447.514130f, 13.804327f);

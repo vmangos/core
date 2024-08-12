@@ -79,7 +79,7 @@ void HonorMaintenancer::LoadWeeklyScores()
         "  SELECT `guid` AS `guid`, 0 AS `hk`, 0 AS `dk`, 0 AS `cp` FROM `characters` WHERE `honor_rank_points` > 0"
         ") AS `scores` INNER JOIN `characters` AS `c` ON `scores`.`guid` = `c`.`guid` GROUP BY `guid` ORDER BY `guid` ";
 
-    QueryResult* result = CharacterDatabase.Query(query.str().c_str());
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query(query.str().c_str());
 
     if (result)
     {
@@ -97,7 +97,6 @@ void HonorMaintenancer::LoadWeeklyScores()
             m_weeklyScores[fields[0].GetUInt32()] = score;
         }
         while (result->NextRow());
-        delete result;
     }
 }
 
@@ -200,7 +199,7 @@ void HonorMaintenancer::SetCityRanks()
 
     for (uint8 i = 1; i < MAX_RACES; ++i)
     {
-        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honor_standing` FROM `characters` WHERE `honor_standing` > 0 and `race` = %u ORDER BY `honor_standing` ASC LIMIT 1", i);
+        std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `guid`, `honor_standing` FROM `characters` WHERE `honor_standing` > 0 and `race` = %u ORDER BY `honor_standing` ASC LIMIT 1", i);
 
         if (result)
         {
@@ -213,7 +212,6 @@ void HonorMaintenancer::SetCityRanks()
                 highestStandingInRace[i] = std::make_pair(guid, honorStanding);
             }
             while (result->NextRow());
-            delete result;
         }
     }
 
@@ -549,7 +547,9 @@ float HonorMaintenancer::CalculateRpEarning(float cp, HonorScores sc)
 
 float HonorMaintenancer::CalculateRpDecay(float rpEarning, float rp)
 {
-    float decay = floor((0.2f * rp) + 0.5f);
+    float decayMultiplier = sWorld.getConfig(CONFIG_FLOAT_RP_DECAY);
+
+    float decay = floor((decayMultiplier * rp) + 0.5f);
     float delta = rpEarning - decay;
 
     if (delta < 0)
@@ -582,11 +582,11 @@ void HonorMaintenancer::CheckMaintenanceDay()
 {
     if (sWorld.GetGameDay() >= m_nextMaintenanceDay && !m_markerToStart)
     {
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
+
         // Restart 15 minutes after honor weekend by server time
         if (sWorld.getConfig(CONFIG_BOOL_AUTO_HONOR_RESTART))
             sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
-        else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
 
         ToggleMaintenanceMarker();
     }
@@ -615,14 +615,13 @@ void HonorMaintenancer::Initialize()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Initialize Honor Maintenance system...");
 
-    QueryResult* result = CharacterDatabase.Query("SELECT `honor_last_maintenance_day`, `honor_next_maintenance_day`, `honor_maintenance_marker` FROM `saved_variables`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `honor_last_maintenance_day`, `honor_next_maintenance_day`, `honor_maintenance_marker` FROM `saved_variables`");
     if (result)
     {
         Field* fields = result->Fetch();
         m_lastMaintenanceDay = fields[0].GetUInt32();
         m_nextMaintenanceDay = fields[1].GetUInt32();
         m_markerToStart = fields[2].GetBool();
-        delete result;
     }
 
     if (!m_lastMaintenanceDay)
@@ -724,7 +723,7 @@ void HonorMgr::SaveStoredData()
             finiteAlways(m_lastWeekCP), m_storedHK, m_storedDK, m_owner->GetGUIDLow());
 }
 
-void HonorMgr::Load(QueryResult* result)
+void HonorMgr::Load(std::unique_ptr<QueryResult> result)
 {
     if (result)
     {
@@ -750,14 +749,14 @@ void HonorMgr::Load(QueryResult* result)
     }
 }
 
-bool HonorMgr::Add(float cp, uint8 type, Unit* source)
+bool HonorMgr::Add(float cp, uint8 type, Unit const* source)
 {
     // Prevent give fake records to db with 0 honor
     if (!cp || !m_owner)
         return false;
 
     // If not source, then give yourself
-    Unit* realSource = source;
+    Unit const* realSource = source;
     if (!source)
         source = m_owner;
 
@@ -773,7 +772,7 @@ bool HonorMgr::Add(float cp, uint8 type, Unit* source)
 
     // get IP if source is player
     std::string ip;
-    if (Player* victim = source->ToPlayer())
+    if (Player const* victim = source->ToPlayer())
         ip = victim->GetSession()->GetRemoteAddress();
 
     bool plr = source->GetTypeId() == TYPEID_PLAYER;
@@ -864,11 +863,15 @@ void HonorMgr::Update()
     // RANK (Patent)
     m_owner->SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_HONOR_RANK, m_rank.rank);
 
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is now a progress bar on the Honor tab of your character window that displays how close you are to your next rank.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     uint32 honorBar = uint32(m_rankPoints >= 0.0f ? m_rankPoints : -1 * m_rankPoints);
     honorBar = uint8(((honorBar - m_rank.minRP) / (m_rank.maxRP - m_rank.minRP)) * (m_rank.positive ? 255 : -255));
 
     // PLAYER_FIELD_HONOR_BAR
     m_owner->SetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR, honorBar);
+#endif
 
     // TODAY
     m_owner->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0, todayHK);
@@ -878,9 +881,13 @@ void HonorMgr::Update()
     m_owner->SetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS, yesterdayKills);
     m_owner->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, uint32(yesterdayCP > 0.0f ? yesterdayCP : 0.0f));
 
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // THIS WEEK
     m_owner->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS, thisWeekKills);
     m_owner->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION, uint32(thisWeekCP > 0.0f ? thisWeekCP : 0.0f));
+#endif
 
     // LAST WEEK
     m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_KILLS, m_lastWeekHK);
@@ -1015,7 +1022,7 @@ float HonorMgr::HonorableKillPoints(Player* killer, Player* victim, uint32 group
     return MaNGOS::Honor::GetHonorGain(killerLevel, victimLevel, victimRank, totalKills, groupSize);
 }
 
-void HonorMgr::SendPVPCredit(Unit* victim, float honor)
+void HonorMgr::SendPVPCredit(Unit const* victim, float honor)
 {
     if (!m_owner)
         return;
@@ -1046,7 +1053,7 @@ void HonorMgr::SendPVPCredit(Unit* victim, float honor)
             // we need to send first rank instead.
             // https://youtu.be/hef06Cs6Q34?t=191
             // New classic client does this on its own.
-            int32 rank = ((Player*)victim)->GetHonorMgr().GetRank().rank;
+            int32 rank = ((Player const*)victim)->GetHonorMgr().GetRank().rank;
             if (!rank)
                 rank = (HONOR_RANK_COUNT - POSITIVE_HONOR_RANK_COUNT) + 1;
             data << uint32(rank);

@@ -262,8 +262,8 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
 
         // before GM
         float x, y, z;
-        pPlayer->GetClosePoint(x, y, z, pl->GetObjectBoundingRadius());
-        pl->TeleportTo(pPlayer->GetMapId(), x, y, z, pl->GetOrientation());
+        pPlayer->GetPosition(x, y, z);
+        pl->TeleportTo(pPlayer->GetMapId(), x, y, z, pPlayer->GetOrientation());
     }
 
     return true;
@@ -404,7 +404,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
         if (!tEntry)
             return false;
 
-        if (!ObjectMgr::GetCreatureTemplate(tEntry))
+        if (!sObjectMgr.GetCreatureTemplate(tEntry))
         {
             SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
             SetSentErrorMessage(true);
@@ -458,7 +458,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
         {
             std::string name = pParam1;
             WorldDatabase.escape_string(name);
-            QueryResult* result = WorldDatabase.PQuery("SELECT guid FROM creature, creature_template WHERE creature.id = creature_template.entry AND creature_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
+            std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT guid FROM creature, creature_template WHERE creature.id = creature_template.entry AND creature_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
             if (!result)
             {
                 SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
@@ -480,8 +480,6 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
                 worker(*cr_data);
 
             } while (result->NextRow());
-
-            delete result;
 
             CreatureDataPair const* dataPair = worker.GetResult();
             if (!dataPair)
@@ -613,7 +611,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
         {
             std::string name = pParam1;
             WorldDatabase.escape_string(name);
-            QueryResult* result = WorldDatabase.PQuery("SELECT guid FROM gameobject, gameobject_template WHERE gameobject.id = gameobject_template.entry AND gameobject_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
+            std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT guid FROM gameobject, gameobject_template WHERE gameobject.id = gameobject_template.entry AND gameobject_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
             if (!result)
             {
                 SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);
@@ -635,8 +633,6 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
                 worker(*go_data);
 
             } while (result->NextRow());
-
-            delete result;
 
             GameObjectDataPair const* dataPair = worker.GetResult();
             if (!dataPair)
@@ -1179,8 +1175,8 @@ bool ChatHandler::HandleNamegoCommand(char* args)
 
         // before GM
         float x, y, z;
-        pPlayer->GetClosePoint(x, y, z, pTarget->GetObjectBoundingRadius());
-        pTarget->TeleportTo(pPlayer->GetMapId(), x, y, z, pTarget->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT);
+        pPlayer->GetPosition(x, y, z);
+        pTarget->TeleportTo(pPlayer->GetMapId(), x, y, z, pPlayer->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT);
     }
     else
     {

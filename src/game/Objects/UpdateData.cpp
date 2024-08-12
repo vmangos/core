@@ -50,7 +50,7 @@ void UpdateData::AddOutOfRangeGUID(ObjectGuid const& guid)
     m_outOfRangeGUIDs.insert(guid);
 }
 
-void UpdateData::AddUpdateBlock(ByteBuffer const& block)
+ByteBuffer& UpdateData::AddUpdateBlockAndGetBuffer()
 {
     if (m_datas.empty())
         m_datas.push_back(UpdatePacket());
@@ -62,8 +62,8 @@ void UpdateData::AddUpdateBlock(ByteBuffer const& block)
         it = m_datas.end();
         --it;
     }
-    it->data.append(block);
     ++it->blockCount;
+    return it->data;
 }
 
 void PacketCompressor::Compress(void* dst, uint32* dst_size, void* src, int src_size)
@@ -75,7 +75,7 @@ void PacketCompressor::Compress(void* dst, uint32* dst_size, void* src, int src_
     c_stream.opaque = (voidpf)0;
 
     // default Z_BEST_SPEED (1)
-    int z_res = deflateInit(&c_stream, sWorld.getConfig(CONFIG_UINT32_COMPRESSION));
+    int z_res = deflateInit(&c_stream, sWorld.getConfig(CONFIG_UINT32_COMPRESSION_LEVEL));
     if (z_res != Z_OK)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't compress update packet (zlib: deflateInit) Error code: %i (%s)", z_res, zError(z_res));
@@ -158,7 +158,8 @@ bool UpdateData::BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket,
 
     size_t pSize = buf.wpos();                              // use real used data size
 
-    if (pSize > 100)                                       // compress large packets
+    // compress large packets
+    if (pSize > sWorld.getConfig(CONFIG_UINT32_COMPRESSION_UPDATE_SIZE))
     {
         if (pSize >= 900000)
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH-CLIENT] Too large packet: %u", pSize);
@@ -208,40 +209,32 @@ void UpdateData::Clear()
     m_outOfRangeGUIDs.clear();
 }
 
-void MovementData::SetSplineOpcode(uint32 opcode, ObjectGuid const& unit)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+bool MovementData::CanAddPacket(WorldPacket const& data)
 {
-    WorldPacket data(opcode, 9);
-    data << unit.WriteAsPacked();
-    AddPacket(data);
+    // Since packet size is stored with an uint8, packet size is limited for compressed packets
+    if ((data.wpos() + 2) > 0xFF)
+        return false;
+
+    if ((m_buffer.wpos() + (data.wpos() + 2)) >= 900000)
+        return false;
+
+    return true;
 }
 
-void MovementData::SetUnitSpeed(uint32 opcode, ObjectGuid const& unit, float value)
+void MovementData::AddPacket(WorldPacket const& data)
 {
-    WorldPacket data(opcode, 9 + 4);
-    data << unit.WriteAsPacked();
-    data << float(value);
-    AddPacket(data);
-}
-
-void MovementData::AddPacket(WorldPacket& data)
-{
-    if (_owner) // Do not compress data
-    {
-        _owner->SendMovementMessageToSet(std::move(data), true);
-        return;
-    }
     ASSERT(data.wpos() + 2 <= 0xFF); // Max packet size to be stored on uint8. Client crash else.
-    _buffer << uint8(data.wpos() + 2); // Packet + opcode size
-    _buffer << uint16(data.GetOpcode());
-    _buffer.append(data.contents(), data.wpos());
+    m_buffer << uint8(data.wpos() + 2); // Packet + opcode size
+    m_buffer << uint16(data.GetOpcode());
+    m_buffer.append(data.contents(), data.wpos());
 }
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
 bool MovementData::BuildPacket(WorldPacket& packet)
 {
     MANGOS_ASSERT(packet.empty()); // We want a clean packet !
 
-    size_t pSize = _buffer.wpos();                              // use real used data size
+    size_t pSize = m_buffer.wpos();                              // use real used data size
 
     if (pSize >= 900000)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH-CLIENT] Too large packet size %u (SMSG_COMPRESSED_MOVES)", pSize);
@@ -249,7 +242,7 @@ bool MovementData::BuildPacket(WorldPacket& packet)
     uint32 destsize = compressBound(pSize);
     packet.resize(destsize + sizeof(uint32));
     packet.put<uint32>(0, pSize);
-    PacketCompressor::Compress(const_cast<uint8*>(packet.contents()) + sizeof(uint32), &destsize, (void*)_buffer.contents(), pSize);
+    PacketCompressor::Compress(const_cast<uint8*>(packet.contents()) + sizeof(uint32), &destsize, (void*)m_buffer.contents(), pSize);
     if (destsize == 0)
         return false;
 

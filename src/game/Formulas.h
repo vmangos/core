@@ -25,6 +25,7 @@
 #include "World.h"
 #include "Creature.h"
 #include "Player.h"
+#include "Map.h"
 
 namespace MaNGOS
 {
@@ -99,7 +100,7 @@ namespace MaNGOS
             return (ownerLevel * 5 + nBaseExp) * BaseGainLevelFactor(unitLevel, mob_level);
         }
 
-        inline uint32 Gain(Unit* pUnit, Creature* pCreature)
+        inline uint32 Gain(Unit const* pUnit, Creature const* pCreature)
         {
             if (pCreature->GetUInt32Value(UNIT_CREATED_BY_SPELL) &&
                ((pCreature->GetCreatureInfo()->type == CREATURE_TYPE_CRITTER) ||
@@ -109,6 +110,9 @@ namespace MaNGOS
                 return 0;
 
             if (pCreature->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
+                return 0;
+
+            if (pCreature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_XP))
                 return 0;
             
             uint32 ownerLevel = pUnit->GetLevel();
@@ -150,7 +154,7 @@ namespace MaNGOS
             xp_gain *= pCreature->GetCreatureInfo()->xp_multiplier;
             xp_gain *= pCreature->GetXPModifierDueToDamageOrigin();
 
-            Player* pPlayer = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
+            Player const* pPlayer = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
             float personalRate = pPlayer ? pPlayer->GetPersonalXpRate() : -1.0f;
 
             if (personalRate >= 0.0f)

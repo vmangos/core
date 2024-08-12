@@ -37,7 +37,10 @@
 #include "InstanceData.h"
 #include "ProgressBar.h"
 
-INSTANTIATE_SINGLETON_1(MapPersistentStateManager);
+typedef MaNGOS::ClassLevelLockable<MapPersistentStateManager, std::mutex> MapPersistanceStateManagerLock;
+INSTANTIATE_SINGLETON_2(MapPersistentStateManager, MapPersistanceStateManagerLock);
+INSTANTIATE_CLASS_MUTEX(MapPersistentStateManager, std::mutex);
+
 
 static uint32 resetEventTypeDelay[MAX_RESET_EVENT_TYPE] = { 0,                      // not used
                                                             3600, 900, 300, 60,     // (seconds) normal and official timer delay to inform player about instance reset
@@ -329,7 +332,7 @@ void DungeonResetScheduler::LoadResetTimes()
     // _____BAD_____
     ResetTimeMapType InstResetTime;
 
-    QueryResult* result = CharacterDatabase.Query("SELECT `id`, `map`, `reset_time` FROM `instance`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `id`, `map`, `reset_time` FROM `instance`");
     if (result)
     {
         do
@@ -355,7 +358,6 @@ void DungeonResetScheduler::LoadResetTimes()
                 resetTime ? resetTime : now + 2 * HOUR);
         }
         while (result->NextRow());
-        delete result;
 
         // update reset time for normal instances with the max creature respawn time + X hours
         result = CharacterDatabase.Query("SELECT MAX(`respawn_time`), `instance` FROM `creature_respawn` WHERE `instance` > 0 GROUP BY `instance`");
@@ -374,7 +376,6 @@ void DungeonResetScheduler::LoadResetTimes()
                 }
             }
             while (result->NextRow());
-            delete result;
         }
     }
 
@@ -407,7 +408,6 @@ void DungeonResetScheduler::LoadResetTimes()
             SetResetTimeFor(mapId, newresettime);
         }
         while (result->NextRow());
-        delete result;
     }
 
     // clean expired instances, references to them will be deleted in CleanupInstances
@@ -425,7 +425,7 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
     // Reset times have already been updated and set in LoadResetTimes(). We just need to start
     // the initial reset events based on them. Since LoadResetTimes() is called before
     // PackInstances(), it cannot be done there.
-    QueryResult* result = CharacterDatabase.Query("SELECT `id`, `map`, `reset_time` FROM `instance`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `id`, `map`, `reset_time` FROM `instance`");
     if (result)
     {
         do
@@ -441,7 +441,6 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
 
             InstResetTime[id] = std::pair<uint32, time_t>(mapId, resetTime);
         } while (result->NextRow());
-        delete result;
     }
 
     for (const auto& itr : InstResetTime)
@@ -742,7 +741,7 @@ void MapPersistentStateManager::_DelHelper(DatabaseType &db, char const* fields,
     vsnprintf(szQueryTail, MAX_QUERY_LEN, queryTail, ap);
     va_end(ap);
 
-    QueryResult* result = db.PQuery("SELECT %s FROM %s %s", fields, table, szQueryTail);
+    std::unique_ptr<QueryResult> result = db.PQuery("SELECT %s FROM %s %s", fields, table, szQueryTail);
     if (result)
     {
         do
@@ -758,7 +757,6 @@ void MapPersistentStateManager::_DelHelper(DatabaseType &db, char const* fields,
             db.PExecute("DELETE FROM %s WHERE %s", table, ss.str().c_str());
         }
         while (result->NextRow());
-        delete result;
     }
 }
 
@@ -813,7 +811,7 @@ void MapPersistentStateManager::PackInstances()
         CharacterDatabase.PExecute("UPDATE `group_instance` SET `instance` = `instance` + %u WHERE `instance` >= 0 ORDER BY `instance` DESC", RESERVED_INSTANCES_LAST, RESERVED_INSTANCES_LAST);
         CharacterDatabase.Execute("DELETE FROM `instance` WHERE `map` <= 1");
     CharacterDatabase.CommitTransaction();
-    QueryResult* result = CharacterDatabase.Query("SELECT `id` FROM `instance`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `id` FROM `instance`");
     if (result)
     {
         do
@@ -822,7 +820,6 @@ void MapPersistentStateManager::PackInstances()
             InstanceSet.insert(fields[0].GetUInt32());
         }
         while (result->NextRow());
-        delete result;
     }
 
     BarGoLink bar(InstanceSet.size() + 1);
@@ -1015,7 +1012,7 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
 
     uint32 count = 0;
 
-    QueryResult* result = CharacterDatabase.Query("SELECT `guid`, `respawn_time`, `creature_respawn`.`map`, `instance`, `reset_time` FROM `creature_respawn` LEFT JOIN `instance` ON `instance` = `id`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `guid`, `respawn_time`, `creature_respawn`.`map`, `instance`, `reset_time` FROM `creature_respawn` LEFT JOIN `instance` ON `instance` = `id`");
     if (!result)
     {
         BarGoLink bar(1);
@@ -1083,8 +1080,6 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creature respawn times", count);
 }
@@ -1096,7 +1091,7 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
 
     uint32 count = 0;
 
-    QueryResult* result = CharacterDatabase.Query("SELECT `guid`, `respawn_time`, `gameobject_respawn`.`map`, `instance`, `reset_time` FROM `gameobject_respawn` LEFT JOIN `instance` ON `instance` = id");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `guid`, `respawn_time`, `gameobject_respawn`.`map`, `instance`, `reset_time` FROM `gameobject_respawn` LEFT JOIN `instance` ON `instance` = id");
 
     if (!result)
     {
@@ -1161,8 +1156,6 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobject respawn times", count);

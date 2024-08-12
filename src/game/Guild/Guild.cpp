@@ -232,6 +232,9 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank, uint32 petitio
         PlayerCacheData const* data = sObjectMgr.GetPlayerDataByGUID(lowguid);
         if (!data)
             return GuildAddStatus::UNKNOWN_PLAYER;
+        if (data->sName.empty())
+            return GuildAddStatus::UNKNOWN_PLAYER;
+
         newmember.Name   = data->sName;
         newmember.Level  = data->uiLevel;
         newmember.Class  = data->uiClass;
@@ -239,7 +242,7 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank, uint32 petitio
         newmember.accountId = data->uiAccount;
 
         if (newmember.Level < 1 || newmember.Level > PLAYER_STRONG_MAX_LEVEL ||
-                !((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE))
+          !((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE))
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters` table, cannot add him to guild.", plGuid.GetString().c_str());
             return GuildAddStatus::PLAYER_DATA_ERROR;
@@ -292,7 +295,7 @@ void Guild::SetGINFO(std::string ginfo)
     CharacterDatabase.PExecute("UPDATE `guild` SET `info`='%s' WHERE `guild_id`='%u'", ginfo.c_str(), m_Id);
 }
 
-bool Guild::LoadGuildFromDB(QueryResult* guildDataResult)
+bool Guild::LoadGuildFromDB(const std::unique_ptr<QueryResult>& guildDataResult)
 {
     if (!guildDataResult)
         return false;
@@ -347,7 +350,7 @@ bool Guild::CheckGuildStructure()
     return true;
 }
 
-bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
+bool Guild::LoadRanksFromDB(const std::unique_ptr<QueryResult>& guildRanksResult)
 {
     if (!guildRanksResult)
     {
@@ -424,7 +427,7 @@ bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
     return true;
 }
 
-bool Guild::LoadMembersFromDB(QueryResult* guildMembersResult)
+bool Guild::LoadMembersFromDB(const std::unique_ptr<QueryResult>& guildMembersResult)
 {
     if (!guildMembersResult)
         return false;
@@ -483,6 +486,12 @@ bool Guild::LoadMembersFromDB(QueryResult* guildMembersResult)
         if (!((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE)) // can be at broken `class` field
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters`.`class`, deleting him from guild!", newmember.guid.GetString().c_str());
+            CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guid` = '%u'", lowguid);
+            continue;
+        }
+        if (newmember.Name.empty()) // no deleted characters
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has no name, deleting him from guild!", newmember.guid.GetString().c_str());
             CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guid` = '%u'", lowguid);
             continue;
         }
@@ -898,7 +907,7 @@ void Guild::DisplayGuildEventLog(WorldSession* session)
 void Guild::LoadGuildEventLogFromDB()
 {
     //                                                      0           1             2               3               4           5
-    QueryResult* result = CharacterDatabase.PQuery("SELECT `log_guid`, `event_type`, `player_guid1`, `player_guid2`, `new_rank`, `timestamp` FROM `guild_eventlog` WHERE `guild_id`=%u ORDER BY `timestamp` DESC,`log_guid` DESC LIMIT %u", m_Id, GUILD_EVENTLOG_MAX_RECORDS);
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `log_guid`, `event_type`, `player_guid1`, `player_guid2`, `new_rank`, `timestamp` FROM `guild_eventlog` WHERE `guild_id`=%u ORDER BY `timestamp` DESC,`log_guid` DESC LIMIT %u", m_Id, GUILD_EVENTLOG_MAX_RECORDS);
     if (!result)
         return;
     bool isNextLogGuidSet = false;
@@ -929,7 +938,6 @@ void Guild::LoadGuildEventLogFromDB()
 
     }
     while (result->NextRow());
-    delete result;
 }
 
 // Add entry to guild eventlog

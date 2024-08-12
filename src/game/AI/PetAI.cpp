@@ -20,7 +20,6 @@
  */
 
 #include "PetAI.h"
-#include "Errors.h"
 #include "Pet.h"
 #include "Player.h"
 #include "Spell.h"
@@ -30,6 +29,7 @@
 #include "Util.h"
 #include "Group.h"
 #include "SpellAuraDefines.h"
+#include "Map.h"
 
 int PetAI::Permissible(Creature const* creature)
 {
@@ -42,8 +42,17 @@ int PetAI::Permissible(Creature const* creature)
 PetAI::PetAI(Creature* c) : CreatureAI(c), m_updateAlliesTimer(0)
 {
     UpdateAllies();
+
     // Warlock imp has no melee attack
     m_bMeleeAttack = (c->GetEntry() != 416);
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    //- If you call a tamed Deepmoss Hatchling, you are no longer notified
+    //  that you hatched.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    if (c->GetEntry() == 4263)
+        DoScriptText(1413, c);
+#endif
 }
 
 bool PetAI::_needToStop() const
@@ -116,6 +125,10 @@ void PetAI::MoveInLineOfSight(Unit* pWho)
     if (pWho->IsCreature() && static_cast<Creature*>(pWho)->IsCivilian())
         return;
 #endif
+
+    if (m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_ONLY_ATTACK_PVP_ENABLING) &&
+        !pWho->IsPvP() && pWho->IsCharmerOrOwnerPlayerOrPlayerItself())
+        return;
 
     if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature))
     {

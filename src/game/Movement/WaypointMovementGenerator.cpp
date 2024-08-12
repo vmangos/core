@@ -27,6 +27,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "CreatureGroups.h"
+#include "Map.h"
 
 #include <cassert>
 
@@ -255,6 +256,21 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
         return true;
     }
 
+    // prevent movement while casting spells with cast time or channel time
+    // don't stop creature movement for spells without interrupt movement flags
+    if (creature.IsNoMovementSpellCasted())
+    {
+        if (!creature.IsStopped())
+        {
+            creature.StopMoving();
+            i_nextMoveTime.Reset(1);
+            m_isArrivalDone = false;
+        }
+
+        creature.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
+        return true;
+    }
+
     if (Stopped())
     {
         if (CanMove(diff))
@@ -337,7 +353,7 @@ void FlightPathMovementGenerator::Initialize(Player &player)
 void FlightPathMovementGenerator::Finalize(Player & player)
 {
     // Reset fall information to prevent fall dmg at arrive
-    player.SetFallInformation(0, player.GetPositionZ());
+    player.SetFallInformation(0);
 
     // remove flag to prevent send object build movement packets for flight state and crash (movement generator already not at top of stack)
     player.ClearUnitState(UNIT_STAT_TAXI_FLIGHT);
@@ -506,8 +522,20 @@ bool PatrolMovementGenerator::Update(Creature &creature, uint32 const& diff)
         return true;
     }
 
+    // prevent movement while casting spells with cast time or channel time
+    // don't stop creature movement for spells without interrupt movement flags
+    if (creature.IsNoMovementSpellCasted())
+    {
+        if (!creature.IsStopped())
+            creature.StopMoving();
+
+        creature.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
+        return true;
+    }
+
     if (creature.movespline->Finalized())
         StartMove(creature);
+
     return true;
 }
 
@@ -557,6 +585,10 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     uint32 totalLeaderPoints = leader->movespline->CountSplinePoints();
     Vector3 last = leader->movespline->GetPoint(totalLeaderPoints);
     Vector3 direction = last - leader->movespline->GetPoint(totalLeaderPoints - 1);
+
+    if (direction.isZero())
+        return;
+
     float angle = atan2(direction.y, direction.x);
     float x, y, z;
     m_groupMember.ComputeRelativePosition(angle, x, y);

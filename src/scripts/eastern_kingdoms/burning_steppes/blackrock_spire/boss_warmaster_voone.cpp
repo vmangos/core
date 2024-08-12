@@ -65,14 +65,14 @@ struct boss_warmastervooneAI : public ScriptedAI
             {
                 case 0:
                 {
-                    m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 12348);
-                    m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
+                    m_creature->SetVirtualItem(BASE_ATTACK, 12348);
+                    m_creature->SetVirtualItem(OFF_ATTACK, 0);
                     break;
                 }
                 case 1:
                 {
-                    m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
-                    m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
+                    m_creature->SetVirtualItem(BASE_ATTACK, 0);
+                    m_creature->SetVirtualItem(OFF_ATTACK, 0);
                     m_creature->CastSpell(m_creature, SPELL_UNARMED_PASSIVE, true);
                     break;
                 }
