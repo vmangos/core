@@ -18,6 +18,7 @@
 
 #include "Common.h"
 #include "Log.h"
+#include "Errors.h"
 #include "Auth/HMACSHA1.h"
 #include "Auth/base32.h"
 #include "SRP6.h"

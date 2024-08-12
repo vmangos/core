@@ -377,7 +377,8 @@ if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= l
 
 void Log::Out(LogType logType, LogLevel logLevel, char const* format, ...)
 {
-    ASSERT(logType >= 0 && logType < LOG_TYPE_MAX&& logLevel >= 0 && logLevel <= LOG_LVL_DEBUG);
+    if (!(logType >= 0 && logType < LOG_TYPE_MAX&& logLevel >= 0 && logLevel <= LOG_LVL_DEBUG))
+        return;
 
     if (!format)
         return;

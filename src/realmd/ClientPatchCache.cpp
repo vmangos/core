@@ -1,6 +1,7 @@
 #include "./ClientPatchCache.h"
 #include "Policies/SingletonImp.h"
 #include "Log.h"
+#include "Errors.h"
 #include "Config/Config.h"
 #include "IO/Filesystem/FileSystem.h"
 #include "IO/Filesystem/FileHandle.h"

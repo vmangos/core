@@ -21,6 +21,7 @@
 
 #include "Util.h"
 #include "Log.h"
+#include "Errors.h"
 #include "DatabaseEnv.h"
 #include "Config/Config.h"
 #include "Database/SqlOperations.h"

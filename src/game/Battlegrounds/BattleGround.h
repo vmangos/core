@@ -30,6 +30,7 @@
 #include "WorldStates.h"
 #include "SpellDefines.h"
 #include "BattleGroundDefines.h"
+#include "Errors.h"
 
 class Creature;
 class GameObject;

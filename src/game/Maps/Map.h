@@ -38,6 +38,7 @@
 #include "SQLStorages.h"
 #include "ScriptCommands.h"
 #include "CreatureLinkingMgr.h"
+#include "Errors.h"
 
 #include <bitset>
 #include <list>

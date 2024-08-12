@@ -19,7 +19,8 @@
  */
 
 #include "EventProcessor.h"
-#include "Log.h" // Zerix: For MANGOS_ASSERT. No idea.
+#include "Log.h"
+#include "Errors.h"
 
 void BasicEvent::ScheduleAbort()
 {
