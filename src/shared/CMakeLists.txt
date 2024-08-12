@@ -33,6 +33,8 @@ set (shared_SRCS
     ServiceWin32.h
     SystemConfig.h
     ThreadPool.h
+    ThreadSpecificPtr.h
+    ThreadSpecificPtr.cpp
     Timer.h
     Util.h
     WheatyExceptionReport.h
