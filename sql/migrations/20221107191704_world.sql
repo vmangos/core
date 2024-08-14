@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20221107191704');
 -- Add your query below.
 
-UPDATE `object_template` SET `flags` = 0, `data0` = 14 WHERE `entry` = 177226; -- Enables object gossip for Book "Soothsaying for Dummies" 
+UPDATE `gameobject_template` SET `flags` = 0, `data0` = 14 WHERE `entry` = 177226; -- Enables object gossip for Book "Soothsaying for Dummies" 
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
 (10994, 8, 3639, 0, 0, 0, 0), -- Condition for completing Show Your Work (goblin engineering)
