@@ -7,6 +7,7 @@
 #include <chrono>
 #include <WinSock2.h>
 #include "Errors.h"
+#include "IO/Networking/Internal.h"
 #include "IO/Context/AsyncIoOperation.h"
 #include "IO/Networking/IpAddress.h"
 #include "IO/Networking/SocketDescriptor.h"
@@ -119,20 +120,11 @@ void IO::Networking::AsyncServerListener<TClientSocket>::StartAcceptOperation()
             return;
         }
 
-        // We cant use ::inet_ntoa(...) because it's not thread safe. We cant use ::inet_ntop(...) because it's not WinXP compatible, so we have to do it ourselves.
-        int constexpr MAX_IPV4_LENGTH = 16; // "255.255.255.255" = length 15 + 1 for null-terminator
-        char ipv4AddressString[MAX_IPV4_LENGTH];
-        { // impl was taken from ACE, should be universal
-            uint8_t const* const p = reinterpret_cast<uint8_t const*>(&addrBuffer->peerAddress.sin_addr);
-            snprintf(ipv4AddressString, MAX_IPV4_LENGTH, "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
-        }
-        auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
+        IO::Networking::IpAddress peerIpAddress = IO::Networking::Internal::inet_ntop(&(addrBuffer->peerAddress.sin_addr));
         uint16_t peerPort = ntohs(addrBuffer->peerAddress.sin_port);
-
         delete addrBuffer;
-        MANGOS_ASSERT(peerIpAddress.has_value());
 
-        IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
+        IO::Networking::IpEndpoint peerEndpoint(peerIpAddress, peerPort);
         IO::Networking::SocketDescriptor socketDescriptor{ peerEndpoint, nativePeerSocket };
 
         std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(m_ctx, socketDescriptor);

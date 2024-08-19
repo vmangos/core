@@ -35,6 +35,7 @@
 #include "Database/DatabaseEnv.h"
 #include "DBCStores.h"
 #include "ace/OS_NS_netdb.h"
+#include "IO/Networking/DNS.h"
 #include "WorldSocketMgr.h"
 
 #if defined( __GNUC__ )
@@ -197,25 +198,21 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
     MANGOS_ASSERT(false); // This should never be reached
 }
 
+/// This function will resolve the ip-addresse of the current host
+/// For example if you hostname is called "world.mycoolserver.com" and it points to 123.45.66.7 it will be added to the server list
+/// Also 127.0.0.1 will be added as a fallback
+/// This list is later used to determine if clients try to connect to this server without registering at realmd first
 static std::set<std::string> GetServerAddresses()
 {
     std::set<std::string> addresses;
-    char hostName[MAXHOSTNAMELEN] = {};
-
-    if (ACE_OS::hostname(hostName, MAXHOSTNAMELEN) != -1)
-    {
-        if (hostent* hp = ACE_OS::gethostbyname(hostName))
-        {
-            for (int i = 0; hp->h_addr_list[i] != 0; ++i)
-            {
-                in_addr addr;
-                memcpy(&addr, hp->h_addr_list[i], sizeof(in_addr));
-                addresses.insert(ACE_OS::inet_ntoa(addr));
-            }
-        }
-    }
-
     addresses.insert("127.0.0.1");
+
+    std::string myHostname = IO::Networking::DNS::GetOwnHostname();
+    std::vector<IO::Networking::IpAddress> ipAddresses = IO::Networking::DNS::ResolveDomain(myHostname, IO::Networking::IpAddress::Type::IPv4);
+    for (auto const& ipAddress : ipAddresses)
+    {
+        addresses.insert(ipAddress.toString());
+    }
 
     return addresses;
 }
