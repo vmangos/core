@@ -36,7 +36,7 @@ bool Config::Reload()
     std::lock_guard<std::shared_timed_mutex> guard(m_configLock);
     m_configMap.clear();
 
-    char buffer[255];
+    char buffer[1024];
     while (fgets(buffer, sizeof(buffer), pFile))
     {
         ProcessLine(buffer);
