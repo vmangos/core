@@ -157,7 +157,7 @@ extern int main(int argc, char **argv)
     }
 #endif
 
-    if (!sConfig.SetSource(cfg_file))
+    if (!sConfig.LoadFromFile(cfg_file))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find configuration file %s.", cfg_file);
         Log::WaitBeforeContinueIfNeed();

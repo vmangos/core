@@ -20,10 +20,9 @@
 INSTANTIATE_SINGLETON_2(Config, Config::Lock);
 INSTANTIATE_CLASS_MUTEX(Config, std::shared_timed_mutex);
 
-bool Config::SetSource(char const* file)
+bool Config::LoadFromFile(std::string const& filename)
 {
-    m_fileName = file;
-
+    m_fileName = filename;
     return Reload();
 }
 

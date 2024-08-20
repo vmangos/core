@@ -29,13 +29,13 @@ class Config
 public:
     using Lock = MaNGOS::ClassLevelLockable<Config, std::shared_timed_mutex>;
 
-    bool SetSource(char const* file);
+    bool LoadFromFile(std::string const& filename);
     bool Reload();
 
     std::string GetStringDefault(char const* name, char const* def);
-    bool GetBoolDefault(char const* name, bool const def = false);
-    int32 GetIntDefault(char const* name, int32 const def);
-    float GetFloatDefault(char const* name, float const def);
+    bool GetBoolDefault(char const* name, bool def = false);
+    int32 GetIntDefault(char const* name, int32 def);
+    float GetFloatDefault(char const* name, float def);
 
     std::string GetFilename() const { return m_fileName; }
     bool GetValueHelper(char const* name, std::string &result);
