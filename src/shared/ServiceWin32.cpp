@@ -275,7 +275,7 @@ bool WinServiceRun()
     SERVICE_TABLE_ENTRY serviceTable[] =
     {
         { serviceName, ServiceMain },
-        { 0, 0 }
+        { nullptr, nullptr }
     };
 
     if (!StartServiceCtrlDispatcher(serviceTable))
