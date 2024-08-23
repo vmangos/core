@@ -137,6 +137,8 @@ set (shared_SRCS
     IO/Filesystem/impl/windows/FileHandle.cpp
     IO/Filesystem/impl/unix/FileSystem.cpp
     IO/Filesystem/impl/unix/FileHandle.cpp
+    ArgparserForServer.h
+    ArgparserForServer.cpp
 )
 
 if(USE_LIBCURL)

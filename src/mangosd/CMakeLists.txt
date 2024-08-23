@@ -32,7 +32,6 @@ set(EXECUTABLE_SRCS
   soapC.cpp
   soapServer.cpp
   WorldRunnable.cpp
-
 )
 
 
