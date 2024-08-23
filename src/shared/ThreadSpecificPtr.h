@@ -38,7 +38,8 @@ namespace MaNGOS
         ThreadSpecificPtr& operator=(ThreadSpecificPtr&&) = delete;
 
         ThreadSpecificPtr() = default;
-        ~ThreadSpecificPtr() {
+        ~ThreadSpecificPtr()
+        {
             reset();
 
             // Finally, remove the class instance from the map
@@ -53,17 +54,20 @@ namespace MaNGOS
             return nullptr;
         }
 
-        T* operator->() const {
+        T* operator->() const
+        {
             return get();
         }
         /*
-        T& operator*() const {
+        T& operator*() const
+        {
             return *(get()); // I hope its not nullptr
         }
         */
 
         /// Releases the pointer. You have ownership and have to delete it!
-        T* release() {
+        T* release()
+        {
             auto it = thread_specific_ptr_data.find(this);
             if (it == thread_specific_ptr_data.end())
                 return nullptr;
@@ -74,7 +78,8 @@ namespace MaNGOS
         }
 
         /// This function will delete the exising pointer
-        void reset(T* new_value = nullptr) {
+        void reset(T* new_value = nullptr)
+        {
             auto it = thread_specific_ptr_data.find(this);
             if (it != thread_specific_ptr_data.end() && it->second != nullptr)
                 delete static_cast<T*>(it->second);
