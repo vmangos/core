@@ -26,6 +26,7 @@
 #include "Config/Config.h"
 #include "Database/SqlOperations.h"
 #include "IO/Multithreading/CreateThread.h"
+#include "Database.h"
 
 #include <ctime>
 #include <iostream>
@@ -403,16 +404,16 @@ bool Database::Execute(DbExecMode mode, char const* sql)
     if (!m_pAsyncConn)
         return false;
 
-    SqlTransaction * pTrans = m_TransStorage->get();
-    if(pTrans)
+    SqlTransaction* pTrans = m_currentTransaction.get();
+    if (pTrans)
     {
-        //add SQL request to trans queue
+        // add SQL request to trans queue
         pTrans->DelayExecute(new SqlPlainRequest(sql));
     }
     else
     {
-        //if async execution is not available
-        if(!m_bAllowAsyncTransactions || mode == DbExecMode::MustBeSync)
+        // if async execution is not available
+        if (!m_bAllowAsyncTransactions || mode == DbExecMode::MustBeSync)
             return DirectExecute(sql);
 
         // Simple sql statement
@@ -486,23 +487,22 @@ bool Database::BeginTransaction(uint32 serialId)
 {
     if (!m_pAsyncConn)
         return false;
-    //ASSERT(!m_TransStorage->get());
-    if (m_TransStorage->get())
-        return false;
 
-    //initiate transaction on current thread
-    m_TransStorage->init(serialId);
+    MANGOS_ASSERT(!m_currentTransaction.get()); // if we will get a nested transaction request - we MUST fix code!!!
+
+    m_currentTransaction.reset(new SqlTransaction(serialId));
+
     return true;
 }
 
 bool Database::InTransaction()
 {
-    return m_TransStorage->get() != nullptr;
+    return m_currentTransaction.get() != nullptr;
 }
 
 uint32 Database::GetTransactionSerialId()
 {
-    if (SqlTransaction *trans = m_TransStorage->get())
+    if (SqlTransaction *trans = m_currentTransaction.get())
         return trans->GetSerialId();
 
     return 0;
@@ -510,21 +510,17 @@ uint32 Database::GetTransactionSerialId()
 
 bool Database::CommitTransaction()
 {
-    if (!m_pAsyncConn)
+    // We must have a pending transaction
+    if (!m_pAsyncConn || !m_currentTransaction.get())
         return false;
 
-    //check if we have pending transaction
-    //ASSERT(m_TransStorage->get());
-    if (!m_TransStorage->get())
-        return false;
-
-    //if async execution is not available
-    if(!m_bAllowAsyncTransactions)
+    // if async execution is not available
+    if (!m_bAllowAsyncTransactions)
         return CommitTransactionDirect();
 
-    //add SqlTransaction to the async queue
+    // add SqlTransaction to the async queue
     // if serial ID > 0, add to the serial delay queue
-    SqlTransaction *trans = m_TransStorage->detach();
+    SqlTransaction* trans = m_currentTransaction.release();
     if (trans->GetSerialId() > 0)
         AddToSerialDelayQueue(trans);
     else
@@ -537,11 +533,12 @@ bool Database::CommitTransactionDirect()
     if (!m_pAsyncConn)
         return false;
 
-    //check if we have pending transaction
-    ASSERT (m_TransStorage->get());
+    // check if we have pending transaction
+    if (!m_currentTransaction.get())
+        return false;
 
-    //directly execute SqlTransaction
-    SqlTransaction * pTrans = m_TransStorage->detach();
+    // directly execute SqlTransaction
+    SqlTransaction* pTrans = m_currentTransaction.release();
     pTrans->Execute(m_pAsyncConn);
     delete pTrans;
 
@@ -553,11 +550,11 @@ bool Database::RollbackTransaction()
     if (!m_pAsyncConn)
         return false;
 
-    if(!m_TransStorage->get())
+    if (!m_currentTransaction.get())
         return false;
 
-    //remove scheduled transaction
-    m_TransStorage->reset();
+    // remove scheduled transaction
+    m_currentTransaction.reset();
 
     return true;
 }
@@ -648,15 +645,15 @@ bool Database::ExecuteStmt(SqlStatementID const& id, SqlStmtParameters* params)
     if (!m_pAsyncConn)
         return false;
 
-    SqlTransaction * pTrans = m_TransStorage->get();
-    if(pTrans)
+    SqlTransaction* pTrans = m_currentTransaction.get();
+    if (pTrans)
     {
-        //add SQL request to trans queue
+        // add SQL request to trans queue
         pTrans->DelayExecute(new SqlPreparedRequest(id.ID(), params));
     }
     else
     {
-        //if async execution is not available
+        // if async execution is not available
         if(!m_bAllowAsyncTransactions)
             return DirectExecuteStmt(id, params);
 
@@ -719,34 +716,4 @@ std::string Database::GetStmtString(int const stmtId) const
     }
 
     return std::string();
-}
-
-//HELPER CLASSES AND FUNCTIONS
-Database::TransHelper::~TransHelper()
-{
-    reset();
-}
-
-SqlTransaction * Database::TransHelper::init(uint32 serialId)
-{
-    MANGOS_ASSERT(!m_pTrans);   //if we will get a nested transaction request - we MUST fix code!!!
-    m_pTrans = new SqlTransaction(serialId);
-
-    return m_pTrans;
-}
-
-SqlTransaction * Database::TransHelper::detach()
-{
-    SqlTransaction * pRes = m_pTrans;
-    m_pTrans = nullptr;
-    return pRes;
-}
-
-void Database::TransHelper::reset()
-{
-    if(m_pTrans)
-    {
-        delete m_pTrans;
-        m_pTrans = nullptr;
-    }
 }

@@ -25,8 +25,8 @@
 #include <unordered_map>
 #include "Database/SqlDelayThread.h"
 #include "Policies/ThreadingModel.h"
-#include <ace/TSS_T.h>
 #include "SqlPreparedStatement.h"
+#include "ThreadSpecificPtr.h"
 #include <memory>
 #include <thread>
 #include <atomic>
@@ -296,30 +296,8 @@ class Database
         //factory method to create SqlConnection objects
         virtual SqlConnection* CreateConnection() = 0;
 
-        class TransHelper
-        {
-            public:
-                TransHelper() : m_pTrans(nullptr) {}
-                ~TransHelper();
-
-                //initializes new SqlTransaction object
-                SqlTransaction * init(uint32 serialId);
-                //gets pointer on current transaction object. Returns nullptr if transaction was not initiated
-                SqlTransaction * get() const { return m_pTrans; }
-                //detaches SqlTransaction object allocated by init() function
-                //next call to get() function will return nullptr!
-                //do not forget to destroy obtained SqlTransaction object!
-                SqlTransaction * detach();
-                //destroyes SqlTransaction allocated by init() function
-                void reset();
-
-            private:
-                SqlTransaction * m_pTrans;
-        };
-
-        //per-thread based storage for SqlTransaction object initialization - no locking is required
-        typedef ACE_TSS<Database::TransHelper> DBTransHelperTSS;
-        Database::DBTransHelperTSS m_TransStorage;
+        // per-thread based storage for SqlTransaction object initialization - no locking is required
+        MaNGOS::ThreadSpecificPtr<SqlTransaction> m_currentTransaction;
 
         // DB connections
 
