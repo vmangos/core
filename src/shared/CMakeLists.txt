@@ -70,6 +70,7 @@ set (shared_SRCS
     Database/SQLStorageImpl.h
     Multithreading/Messager.h
     SRP6/SRP6.h
+    nonstd/expected.hpp
     nonstd/optional.hpp
     ByteBuffer.cpp
     Common.cpp
