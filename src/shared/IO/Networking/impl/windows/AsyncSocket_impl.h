@@ -22,26 +22,26 @@ IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_
 }
 
 template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
     if (state & SocketStateFlags::READ_PENDING_SET)
     {
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
         return;
     }
 
     if (state & SocketStateFlags::SHUTDOWN_PENDING)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         return;
     }
 
     if (state & SocketStateFlags::READ_PRESENT)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
         return;
     }
 
@@ -49,7 +49,115 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), 0); // technically not an error, we are just done with the buffer
+        return;
+    }
+
+    m_readCallback = callback;
+
+    int const bufferCount = 1;
+    struct BufferCtx
+    {
+        WSABUF buffers[bufferCount];
+    };
+
+    std::shared_ptr<BufferCtx> bufferCtx(new BufferCtx{0});
+    bufferCtx->buffers[0].len = size;
+    bufferCtx->buffers[0].buf = target;
+
+    m_currentReadTask.InitNew([self = this->shared_from_this(), bufferCtx, size](DWORD errorCode) {
+        uint64_t bytesProcessed = self->m_currentReadTask.InternalHigh;
+        if (bytesProcessed == 0)
+        { // 0 means the socket is already closed on the other side
+            sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Empty response -> Going to disconnect.");
+            self->CloseSocket();
+            auto tmpCallback = std::move(self->m_readCallback);
+            self->m_currentReadTask.Reset();
+            self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
+            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
+            return;
+        }
+
+        if (bytesProcessed < bufferCtx->buffers[0].len)
+        { // We are not done yet. We need to requeue our task
+            bufferCtx->buffers[0].buf += bytesProcessed;
+            bufferCtx->buffers[0].len -= bytesProcessed;
+
+            int const bufferCount = 1;
+            DWORD flags = 0;
+            int errorCode = ::WSARecv(self->m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &(self->m_currentReadTask), nullptr);
+            if (errorCode)
+            {
+                int err = WSAGetLastError();
+                if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
+                {
+                    sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
+                    auto tmpCallback = std::move(self->m_readCallback);
+                    self->m_currentReadTask.Reset();
+                    self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
+                    tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err), 0);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            auto tmpCallback = std::move(self->m_readCallback);
+            self->m_currentReadTask.Reset();
+            self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
+            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), size);
+        }
+    });
+
+    m_atomicState.fetch_or(SocketStateFlags::READ_PRESENT);
+
+    DWORD flags = 0;
+    int errorCode = ::WSARecv(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
+    if (errorCode)
+    {
+        int err = WSAGetLastError();
+        if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
+            auto tmpCallback = std::move(m_readCallback);
+            m_currentReadTask.Reset();
+            m_atomicState.fetch_and(~(SocketStateFlags::READ_PENDING_SET | SocketStateFlags::READ_PRESENT));
+            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err), 0);
+            return;
+        }
+    }
+    m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+}
+
+template<typename SocketType>
+void IO::Networking::AsyncSocket<SocketType>::ReadSome(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
+{
+    int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
+    if (state & SocketStateFlags::READ_PENDING_SET)
+    {
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
+        return;
+    }
+
+    if (state & SocketStateFlags::SHUTDOWN_PENDING)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
+        return;
+    }
+
+    if (state & SocketStateFlags::READ_PRESENT)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
+        return;
+    }
+
+    if (size == 0)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), 0); // technically not an error, we are just done with the buffer
         return;
     }
 
@@ -74,39 +182,14 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
             auto tmpCallback = std::move(self->m_readCallback);
             self->m_currentReadTask.Reset();
             self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
-            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
             return;
         }
 
-        if (bytesProcessed < bufferCtx->buffers[0].len)
-        { // We are not done yet. We need to requeue our task
-            bufferCtx->buffers[0].buf += bytesProcessed;
-            bufferCtx->buffers[0].len -= bytesProcessed;
-
-            int const bufferCount = 1;
-            DWORD flags = 0;
-            int errorCode = ::WSARecv(self->m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &(self->m_currentReadTask), nullptr);
-            if (errorCode)
-            {
-                int err = WSAGetLastError();
-                if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
-                {
-                    sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
-                    auto tmpCallback = std::move(self->m_readCallback);
-                    self->m_currentReadTask.Reset();
-                    self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
-                    tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
-                    return;
-                }
-            }
-        }
-        else
-        {
-            auto tmpCallback = std::move(self->m_readCallback);
-            self->m_currentReadTask.Reset();
-            self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
-            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
-        }
+        auto tmpCallback = std::move(self->m_readCallback);
+        self->m_currentReadTask.Reset();
+        self->m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
+        tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), bytesProcessed);
     });
 
     m_atomicState.fetch_or(SocketStateFlags::READ_PRESENT);
@@ -122,7 +205,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
             auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
             m_atomicState.fetch_and(~(SocketStateFlags::READ_PENDING_SET | SocketStateFlags::READ_PRESENT));
-            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
+            tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err), 0);
             return;
         }
     }
