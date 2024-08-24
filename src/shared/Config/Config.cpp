@@ -169,6 +169,12 @@ bool Config::GetValueHelper(char const* name, std::string &result) const
     return true;
 }
 
+bool Config::IsSet(char const* name) const
+{
+    std::string val; // we are not interested in the value
+    return GetValueHelper(name, val);
+}
+
 std::string Config::GetStringDefault(char const* name, char const* def) const
 {
     std::string val;

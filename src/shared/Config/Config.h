@@ -32,6 +32,8 @@ class Config
     bool LoadFromFile(std::string const& filename);
     bool Reload();
 
+    bool IsSet(char const* name) const;
+
     std::string GetStringDefault(char const* name, char const* def) const;
     bool GetBoolDefault(char const* name, bool def) const;
     int32 GetIntDefault(char const* name, int32 def) const;
