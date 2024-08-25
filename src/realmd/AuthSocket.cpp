@@ -38,6 +38,7 @@
 #include "IO/Filesystem/FileSystem.h"
 #include "ClientPatchCache.h"
 #include "IO/Networking/Utils.h"
+#include "Utils/ArrayDeleter.h"
 
 #include <ace/INET_Addr.h>
 
@@ -1461,15 +1462,6 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
         self->RepeatInternalXferLoop(std::move(rawChunk));
     });
 }
-
-template< typename T >
-struct array_deleter
-{
-    void operator ()(T const * p)
-    {
-        delete[] p;
-    }
-};
 
 void AuthSocket::InitAndHandOverControlToPatchHandler()
 {
