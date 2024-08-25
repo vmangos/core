@@ -101,52 +101,21 @@ void freezeDetector(uint32 _delaytime)
     //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Anti-freeze thread exiting without problems.");
 }
 
-void remoteAccess()
+std::unique_ptr<IO::Networking::AsyncServerListener<RASocket>> SetupRemoteAccessServer(IO::IoContext* ioCtx)
 {
-#if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-
-    ACE_Dev_Poll_Reactor imp;
-
-    imp.max_notify_iterations (128);
-    imp.restart (1);
-
-#else
-
-    ACE_TP_Reactor imp;
-    imp.max_notify_iterations(128);
-
-#endif
-
-    ACE_Reactor reactor(&imp, 1 /* 1= delete implementation so we don't have to care */);
-
-    RASocket::Acceptor acceptor;
-
-    uint16 raBindPort = sConfig.GetIntDefault("Ra.Port", 3443);
     std::string raBindIp = sConfig.GetStringDefault("Ra.IP", "0.0.0.0");
+    uint16 raBindPort = sConfig.GetIntDefault("Ra.Port", 3443);
 
-    ACE_INET_Addr listen_addr(raBindPort, raBindIp.c_str());
-
-    if (acceptor.open(listen_addr, &reactor, ACE_NONBLOCK) == -1)
+    std::unique_ptr<IO::Networking::AsyncServerListener<RASocket>> raServer = IO::Networking::AsyncServerListener<RASocket>::CreateAndBindServer(ioCtx, raBindIp, raBindPort);
+    if (!raServer)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raBindPort, raBindIp.c_str());
+        return nullptr;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting Remote access listner on port %d on %s", raBindPort, raBindIp.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting Remote access listener on %s:%d", raBindIp.c_str(), raBindPort);
 
-    while (!reactor.reactor_event_loop_done())
-    {
-        ACE_Time_Value interval(0, 10000);
-
-        if (reactor.run_reactor_event_loop(interval) == -1)
-            break;
-
-        if (World::IsStopped())
-        {
-            acceptor.close();
-            break;
-        }
-    }
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "RARunnable thread ended");
+    return raServer;
 }
 
 Master::Master()
@@ -173,6 +142,24 @@ int Master::Run()
         }
 
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Daemon PID: %u\n", pid);
+    }
+
+    std::unique_ptr<IO::IoContext> ioCtxUniquePtr = IO::IoContext::CreateIoContext();
+    IO::IoContext* ioCtx = ioCtxUniquePtr.get();
+    std::vector<std::thread> ioCtxRunners;
+    int ioNetworkThreadCount = sConfig.GetIntDefault("Network.Threads", 1);
+    if (ioNetworkThreadCount <= 0)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Config 'Network.Threads' must be greater than 0");
+        World::StopNow(ERROR_EXIT_CODE);
+        return 1;
+    }
+    for (int32 i = 0; i < ioNetworkThreadCount; ++i)
+    {
+        ioCtxRunners.emplace_back(IO::Multithreading::CreateThread("IO[" + std::to_string(i) + "]", [ioCtx]()
+        {
+            ioCtx->RunUntilShutdown();
+        }));
     }
 
     // Start the databases
@@ -222,9 +209,9 @@ int Master::Run()
         cliThread = IO::Multithreading::CreateThreadPtr("CLI", CliRunnable());
     }
 
-    std::unique_ptr<std::thread> remoteAccessThread = nullptr;
+    std::unique_ptr<IO::Networking::AsyncServerListener<RASocket>> remoteAccessServer = nullptr;
     if (sConfig.GetBoolDefault("Ra.Enable", false))
-        remoteAccessThread = IO::Multithreading::CreateThreadPtr("RemoteAccess", &remoteAccess);
+        remoteAccessServer = SetupRemoteAccessServer(ioCtx);
 
     // Handle affinity for multiple processors and process priority on Windows
 #ifdef WIN32
@@ -292,50 +279,25 @@ int Master::Run()
         freeze_thread = IO::Multithreading::CreateThreadPtr("FreezeDetector", std::bind(&freezeDetector, freeze_delay * 1000));
     }
 
-    std::vector<std::thread> ioCtxRunners;
-    std::unique_ptr<IO::IoContext> ioCtx = IO::IoContext::CreateIoContext();
-    if (ioCtx == nullptr)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to create IoContext");
-        World::StopNow(ERROR_EXIT_CODE);
-    }
-    else
-    {
-        // Launch the world listener socket
-        std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
-        uint16 bindPort = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
-        int socketOutByteBufferSize = sConfig.GetIntDefault("Network.SystemSendBuffer", -1);
-        bool doExplicitTcpNoDelay = sConfig.GetBoolDefault("Network.TcpNoDelay", true);
+    // Launch the world listener socket
+    std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
+    uint16 bindPort = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
+    int socketOutByteBufferSize = sConfig.GetIntDefault("Network.SystemSendBuffer", -1);
+    bool doExplicitTcpNoDelay = sConfig.GetBoolDefault("Network.TcpNoDelay", true);
 
-        WorldSocketMgrOptions socketOptions
-        {
-            bindIp,
-            bindPort,
-            socketOutByteBufferSize,
-            doExplicitTcpNoDelay,
-        };
-
-        if (!sWorldSocketMgr.StartWorldNetworking(ioCtx.get(), socketOptions))
-        {
-            Log::WaitBeforeContinueIfNeed();
-            World::StopNow(ERROR_EXIT_CODE);
-            return 1;
-        }
-    }
-
-    int ioNetworkThreadCount = sConfig.GetIntDefault("Network.Threads", 1);
-    if (ioNetworkThreadCount <= 0)
+    WorldSocketMgrOptions socketOptions
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Config 'Network.Threads' must be greater than 0");
+        bindIp,
+        bindPort,
+        socketOutByteBufferSize,
+        doExplicitTcpNoDelay,
+    };
+
+    if (!sWorldSocketMgr.StartWorldNetworking(ioCtx, socketOptions))
+    {
+        Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
         return 1;
-    }
-    for (int32 i = 0; i < ioNetworkThreadCount; ++i)
-    {
-        ioCtxRunners.emplace_back(IO::Multithreading::CreateThread("IO[" + std::to_string(i) + "]", [&ioCtx]()
-        {
-            ioCtx->RunUntilShutdown();
-        }));
     }
 
     // Stop freeze protection before shutdown tasks
@@ -358,8 +320,11 @@ int Master::Run()
 
     sWorldSocketMgr.StopWorldNetworking();
 
-    if (remoteAccessThread)
-        remoteAccessThread->join();
+    if (remoteAccessServer)
+    {
+        remoteAccessServer->ClosePortAndStopAcceptingNewConnections();
+        remoteAccessServer.reset();
+    }
 
     sAsyncSystemTimer.RemoveAllTimersAndStopThread();
 

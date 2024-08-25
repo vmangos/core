@@ -1,9 +1,4 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
- * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
- * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
- * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -19,10 +14,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/** \file
-    \ingroup mangosd
-*/
-
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
@@ -33,296 +24,245 @@
 #include "AccountMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
+#include "Utils/ArrayDeleter.h"
 
-// RASocket constructor
-RASocket::RASocket()
-:RAHandler(),
-pendingCommands(0, USYNC_THREAD, "pendingCommands"),
-outActive(false),
-inputBufferLen(0),
-outputBufferLen(0),
-stage(NONE)
+#include <utility>
+#include <vector>
+#include <string>
+
+static std::string const NEWLINE = "\r\n";
+static std::string const PROMPT = "mangos>";
+
+RASocket::RASocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
+  : IO::Networking::AsyncSocket<RASocket>(ctx, socketDescriptor),
+    m_connectionState(ConnectionState::FreshConnection),
+    m_accountId(0),
+    m_username(),
+    m_accountLevel(AccountTypes::SEC_PLAYER)
 {
-    // Get the config parameters
-    bSecure = sConfig.GetBoolDefault( "RA.Secure", true );
-    bStricted = sConfig.GetBoolDefault( "RA.Stricted", false );
-    iMinLevel = AccountTypes(sConfig.GetIntDefault( "RA.MinLevel", SEC_ADMINISTRATOR ));
-    reference_counting_policy ().value (ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
+    if (sConfig.IsSet("Ra.Stricted"))
+    {
+        sLog.Out(LOG_RA, LOG_LVL_ERROR, "Deprecated config option Ra.Stricted being used. Use Ra.Restricted instead.");
+        m_restricted = sConfig.GetBoolDefault("Ra.Stricted", true);
+    }
+    else
+        m_restricted = sConfig.GetBoolDefault("Ra.Restricted", true);
 }
 
-// RASocket destructor
 RASocket::~RASocket()
 {
-    peer().close();
-    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "Connection was closed.");
+    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Connection was closed", GetRemoteIpString().c_str());
 }
 
-// Accept an incoming connection
-int RASocket::open(void* )
+void RASocket::Start()
 {
-    if (reactor ()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK) == -1)
+    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Incoming RA connection", GetRemoteIpString().c_str());
+
+    std::string welcomeMessage;
+    welcomeMessage += sWorld.GetMotd(); // <-- technically, we should replace all '\n' in MOTD with NEWLINE
+    welcomeMessage += NEWLINE;
+    welcomeMessage += sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER);
+
+    SendAndRecvNextInput(welcomeMessage);
+}
+
+void RASocket::DoRecvIncomingData()
+{
+    sLog.Out(LOG_RA, LOG_LVL_DEBUG, "RASocket::DoRecvIncomingData");
+
+    // Check if we got a full line in our buffer first
+    std::string::size_type newLinePos = m_pendingInputBuffer.find_first_of(NEWLINE);
+    if (newLinePos != std::string::npos)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::open: unable to register client handler errno = %s", ACE_OS::strerror (errno));
-        return -1;
+        // remove newline from buffer and forward line
+        std::string line = m_pendingInputBuffer.substr(0, newLinePos);
+        m_pendingInputBuffer.erase(0, newLinePos + NEWLINE.size());
+
+        if (line.size() == 4095) // Exact length match of the terminal limit. Maybe the user tries to execute a really long command.
+            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] A default telnet terminal only allows 4096 characters per line. This command could be executed incorrectly!", GetRemoteIpString().c_str());
+
+        HandleInput(line); // This function must ensure that DoRecvIncomingData() is executed when done
+        return;
     }
 
-    ACE_INET_Addr remote_addr;
-
-    if (peer ().get_remote_addr (remote_addr) == -1)
+    if (m_connectionState != ConnectionState::Authenticated && m_pendingInputBuffer.size() > MAX_INPUT_BUFFER_SIZE_WHILE_UNAUTHENTICATED)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::open: peer ().get_remote_addr errno = %s", ACE_OS::strerror (errno));
-        return -1;
+        sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Unauthenticated connection had too large buffer", GetRemoteIpString().c_str());
+        return; // implicit socket close
     }
 
-
-    sLog.Out(LOG_RA, LOG_LVL_BASIC, "Incoming connection from %s.",remote_addr.get_host_addr());
-
-    // print Motd
-    sendf(sWorld.GetMotd());
-    sendf("\r\n");
-    sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
-
-    return 0;
-}
-
-int RASocket::close(int)
-{
-    if(closing_)
-        return -1;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "RASocket::close");
-    shutdown();
-
-    closing_ = true;
-
-    remove_reference();
-    return 0;
-}
-
-int RASocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
-{
-    if(closing_)
-        return -1;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "RASocket::handle_close");
-    std::unique_lock<std::mutex> lock (outBufferLock);
-
-    closing_ = true;
-
-    if (h == ACE_INVALID_HANDLE)
-        peer ().close_writer ();
-    remove_reference();
-    return 0;
-}
-
-int RASocket::handle_output (ACE_HANDLE)
-{
-    std::unique_lock<std::mutex> lock (outBufferLock);
-
-    if(closing_)
-        return -1;
-
-    if (!outputBufferLen)
+    // we need more data to process this message
+    std::shared_ptr<std::vector<char>> recvBuffer(new std::vector<char>(1024));
+    ReadSome(recvBuffer->data(), recvBuffer->size(), [self = shared_from_this(), recvBuffer](IO::NetworkError const& error, std::size_t amountRead)
     {
-        if(reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK) == -1)
+        if (error)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::handle_output: error while cancel_wakeup");
-            return -1;
+            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Connection had error: %s", self->GetRemoteIpString().c_str(), error.ToString().c_str());
+            return; // implicit socket close
         }
-        outActive = false;
-        return 0;
-    }
-#ifdef MSG_NOSIGNAL
-    ssize_t n = peer ().send (outputBuffer, outputBufferLen, MSG_NOSIGNAL);
-#else
-    ssize_t n = peer ().send (outputBuffer, outputBufferLen);
-#endif // MSG_NOSIGNAL
 
-    if(n<=0)
-        return -1;
-
-    ACE_OS::memmove(outputBuffer, outputBuffer+n, outputBufferLen-n);
-
-    outputBufferLen -= n;
-
-    return 0;
+        self->m_pendingInputBuffer.append(recvBuffer->data(), amountRead);
+        self->DoRecvIncomingData(); // reprocesses our pending buffer
+    });
 }
 
-// Read data from the network
-int RASocket::handle_input(ACE_HANDLE)
+void RASocket::HandleInput(std::string const& line)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "RASocket::handle_input");
-    if(closing_)
+    switch (m_connectionState)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Called RASocket::handle_input with closing_ = true");
-        return -1;
-    }
-
-    size_t readBytes = peer().recv(inputBuffer+inputBufferLen, RA_BUFF_SIZE-inputBufferLen-1);
-
-    if(readBytes <= 0)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "read %u bytes in RASocket::handle_input", readBytes);
-        return -1;
-    }
-
-    // Discard data after line break or line feed
-    bool gotenter=false;
-    for(; readBytes > 0 ; --readBytes)
-    {
-        char c = inputBuffer[inputBufferLen];
-        if (c=='\r'|| c=='\n')
-        {
-            gotenter=true;
+        // If the input is '<username>'
+        case ConnectionState::FreshConnection:
+            HandleInput_FreshConnection(line);
             break;
-        }
-        ++inputBufferLen;
+
+        // If the input is '<password>' (and the user already gave his username)
+        case ConnectionState::GotUsername:
+            HandleInput_GotUsername(line);
+            break;
+
+        // If user is logged in: parse and execute the command
+        case ConnectionState::Authenticated:
+            HandleInput_Authenticated(line);
+            break;
+
+        default:
+            MANGOS_ASSERT(false);
     }
-
-    if (gotenter)
-    {
-        inputBuffer[inputBufferLen]=0;
-        inputBufferLen=0;
-        switch(stage)
-        {
-            // <ul> <li> If the input is '<username>'
-            case NONE:
-            {
-                std::string szLogin=inputBuffer;
-
-                accId = sAccountMgr.GetId(szLogin);
-
-                // If the user is not found, deny access
-                if(!accId)
-                {
-                    sendf("-No such user.\r\n");
-                    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "User %s does not exist.",szLogin.c_str());
-                    if(bSecure)
-                    {
-                        handle_output();
-                        return -1;
-                    }
-                    sendf("\r\n");
-                    sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
-                    break;
-                }
-
-                accAccessLevel = sAccountMgr.GetSecurity(accId);
-
-                // - if gmlevel is too low, deny access
-                if (accAccessLevel < iMinLevel)
-                {
-                    sendf("-Not enough privileges.\r\n");
-                    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "User %s has no privilege.",szLogin.c_str());
-                    if(bSecure)
-                    {
-                        handle_output();
-                        return -1;
-                    }
-                    sendf("\r\n");
-                    sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
-                    break;
-                }
-
-                // - allow by remotely connected admin use console level commands dependent from config setting
-                if (accAccessLevel >= SEC_ADMINISTRATOR && !bStricted)
-                    accAccessLevel = SEC_CONSOLE;
-
-                stage=LG;
-                sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_PASS));
-                break;
-            }
-            // <li> If the input is '<password>' (and the user already gave his username)
-            case LG:
-            {                                               //login+pass ok
-                std::string pw = inputBuffer;
-
-                if (sAccountMgr.CheckPassword(accId, pw))
-                {
-                    stage=OK;
-
-                    sendf("+Logged in.\r\n");
-                    sLog.Out(LOG_RA, LOG_LVL_BASIC, "User account %u has logged in.", accId);
-                    sendf("mangos>");
-                }
-                else
-                {
-                    // Else deny access
-                    sendf("-Wrong pass.\r\n");
-                    sLog.Out(LOG_RA, LOG_LVL_BASIC, "User account %u has failed to log in.", accId);
-                    if(bSecure)
-                    {
-                        handle_output();
-                        return -1;
-                    }
-                    sendf("\r\n");
-                    sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_PASS));
-                }
-                break;
-            }
-            // <li> If user is logged, parse and execute the command
-            case OK:
-                if (strlen(inputBuffer))
-                {
-                    sLog.Out(LOG_RA, LOG_LVL_BASIC, "Got '%s' cmd.",inputBuffer);
-                    if (strncmp(inputBuffer,"quit",4)==0)
-                        return -1;
-                    else
-                    {
-                        CliCommandHolder* cmd = new CliCommandHolder(accId, accAccessLevel, this, inputBuffer, &RASocket::zprint, &RASocket::commandFinished);
-                        sWorld.QueueCliCommand(cmd);
-                        pendingCommands.acquire();
-                    }
-                }
-                else
-                    sendf("mangos>");
-                break;
-            // </ul>
-        };
-
-    }
-    // no enter yet? wait for next input...
-    return 0;
 }
 
-// Output function
-void RASocket::zprint(void* callbackArg, const char * szText )
+void RASocket::HandleInput_FreshConnection(std::string const& line)
 {
-    if( !szText )
+    m_username = line;
+    m_connectionState = ConnectionState::GotUsername;
+    SendAndRecvNextInput(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_PASS));
+}
+
+void RASocket::HandleInput_GotUsername(std::string const& line)
+{
+    AccountTypes minRequiredAccLevel = static_cast<AccountTypes>(sConfig.GetIntDefault("Ra.MinLevel", AccountTypes::SEC_ADMINISTRATOR));
+
+    bool loginSuccessful = true;
+
+    if (loginSuccessful) // check username
+    {
+        m_accountId = sAccountMgr.GetId(m_username);
+        if (!m_accountId)
+        {
+            sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Account '%s' does not exist", GetRemoteIpString().c_str(), m_username.c_str());
+            loginSuccessful = false;
+        }
+    }
+
+    if (loginSuccessful) // check password
+    {
+        if (!sAccountMgr.CheckPassword(m_accountId, line))
+        {
+            sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Wrong password for account %s", GetRemoteIpString().c_str(), m_username.c_str());
+            loginSuccessful = false;
+        }
+    }
+
+    if (loginSuccessful) // check account level
+    {
+        m_accountLevel = sAccountMgr.GetSecurity(m_accountId);
+
+        if (m_accountLevel < minRequiredAccLevel)
+        {
+            sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has no privilege for RA", GetRemoteIpString().c_str(), m_username.c_str());
+            loginSuccessful = false;
+        }
+        else
+        {
+            // allow by remotely connected admin use console level commands dependent from config setting
+            if (m_accountLevel >= SEC_ADMINISTRATOR && !m_restricted)
+                m_accountLevel = SEC_CONSOLE;
+        }
+    }
+
+    if (loginSuccessful)
+    {
+        sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has logged in", GetRemoteIpString().c_str(), m_username.c_str());
+        m_connectionState = ConnectionState::Authenticated;
+        SendAndRecvNextInput("+Logged in." + NEWLINE + " " + PROMPT);
+    }
+    else
+    {
+        SendAndDisconnect("-Authentication failed. Verify username, password and required accountLevel." + NEWLINE);
+        sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has failed to log in", GetRemoteIpString().c_str(), m_username.c_str());
+    }
+}
+
+void RASocket::HandleInput_Authenticated(std::string const& line)
+{
+    if (line.empty())
+    {
+        SendAndRecvNextInput(" " + PROMPT);
+        return;
+    }
+
+    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s/%s] Received command: %s", GetRemoteIpString().c_str(), m_username.c_str(), line.c_str());
+
+    // handle quit, exit and logout commands to terminate connection
+    if (line == "quit" || line == "exit" || line == "logout")
         return;
 
-    ((RASocket*)callbackArg)->sendf(szText);
-}
-
-void RASocket::commandFinished(void* callbackArg, bool /*sucess*/)
-{
-    RASocket* raSocket = (RASocket*)callbackArg;
-    raSocket->sendf("mangos>");
-    raSocket->pendingCommands.release();
-}
-
-int RASocket::sendf(const char* msg)
-{
-    std::unique_lock<std::mutex> lock (outBufferLock);
-
-    if(closing_)
-        return -1;
-
-    int msgLen = strlen(msg);
-
-    if(msgLen+outputBufferLen > RA_BUFF_SIZE)
-        return -1;
-
-    ACE_OS::memcpy(outputBuffer+outputBufferLen, msg, msgLen);
-    outputBufferLen += msgLen;
-
-    if(!outActive)
+    // TODO: Make CliCommandHolder able to use std::function
+    struct InvokeOutputEnvironment
     {
-        if (reactor ()->schedule_wakeup
-            (this, ACE_Event_Handler::WRITE_MASK) == -1)
+        std::shared_ptr<RASocket> self;
+        std::string output;
+    };
+    auto* invokeEnvironmentPtr = new InvokeOutputEnvironment
+    {
+        shared_from_this(),
+        "",
+    };
+
+    sWorld.QueueCliCommand(new CliCommandHolder(
+        m_accountId,
+        m_accountLevel,
+        invokeEnvironmentPtr,
+        line.c_str(),
+        [](void* opaquePointer, const char* buffer)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::sendf error while schedule_wakeup");
-            return -1;
+            auto* invokeEnvironmentPtr = static_cast<InvokeOutputEnvironment*>(opaquePointer);
+            invokeEnvironmentPtr->output.append(buffer);
+        },
+        [](void* opaquePointer, bool commandWasSuccessful)
+        {
+            char const* statusSymbol = commandWasSuccessful ? "+" : "-";
+
+            auto* invokeEnvironmentPtr = static_cast<InvokeOutputEnvironment*>(opaquePointer);
+            invokeEnvironmentPtr->output.append(statusSymbol + PROMPT);
+            invokeEnvironmentPtr->self->SendAndRecvNextInput(invokeEnvironmentPtr->output);
+            delete invokeEnvironmentPtr;
         }
-        outActive = true;
-    }
-    return 0;
+    ));
+}
+
+
+void RASocket::SendAndDisconnect(std::string const& message)
+{
+    std::shared_ptr<uint8_t> rawMessage = std::shared_ptr<uint8_t>(new uint8_t[message.size()], array_deleter<uint8_t>());
+    memcpy(rawMessage.get(), message.c_str(), message.size());
+    Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
+    {
+        if (error)
+            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Sending message failed: %s", self->GetRemoteIpString().c_str(), error.ToString().c_str());
+    });
+}
+
+void RASocket::SendAndRecvNextInput(std::string const& message)
+{
+    std::shared_ptr<uint8_t> rawMessage = std::shared_ptr<uint8_t>(new uint8_t[message.size()], array_deleter<uint8_t>());
+    memcpy(rawMessage.get(), message.c_str(), message.size());
+    Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
+    {
+        if (error)
+        {
+            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Sending message failed: %s", self->GetRemoteIpString().c_str(), error.ToString().c_str());
+            return;
+        }
+        self->DoRecvIncomingData();
+    });
 }
