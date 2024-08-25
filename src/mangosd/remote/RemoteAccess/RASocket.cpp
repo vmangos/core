@@ -36,6 +36,7 @@ static std::string const PROMPT = "mangos>";
 RASocket::RASocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
   : IO::Networking::AsyncSocket<RASocket>(ctx, socketDescriptor),
     m_connectionState(ConnectionState::FreshConnection),
+    m_atLeastOnePacketWasReceived(false),
     m_accountId(0),
     m_username(),
     m_accountLevel(AccountTypes::SEC_PLAYER)
@@ -99,6 +100,19 @@ void RASocket::DoRecvIncomingData()
         {
             sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Connection had error: %s", self->GetRemoteIpString().c_str(), error.ToString().c_str());
             return; // implicit socket close
+        }
+
+        if (!self->m_atLeastOnePacketWasReceived)
+        {
+            // Some terminals send a negotiation packet in the very first message
+            self->m_atLeastOnePacketWasReceived = true;
+            if (amountRead >= 1 && (static_cast<uint8>(recvBuffer->at(0)) == 0xFF))
+            {
+                // We got a telnet protocol packet, most likely the terminal wants us to tell the capabilities it has, but we are not really interested in it
+                std::vector<uint8> const endOfNegotiationResponse = { 0xFF, 0xF0 };
+                self->Write(std::make_shared<std::vector<uint8>>(endOfNegotiationResponse), [self](IO::NetworkError const& error) { self->DoRecvIncomingData(); });
+                return;
+            }
         }
 
         self->m_pendingInputBuffer.append(recvBuffer->data(), amountRead);

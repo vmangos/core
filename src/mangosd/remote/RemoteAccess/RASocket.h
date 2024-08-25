@@ -48,6 +48,7 @@ class RASocket : public IO::Networking::AsyncSocket<RASocket>
     std::size_t static constexpr MAX_INPUT_BUFFER_SIZE_WHILE_UNAUTHENTICATED = 128;
 
     ConnectionState m_connectionState;
+    bool m_atLeastOnePacketWasReceived;
     std::string m_username;
     uint32 m_accountId;
     AccountTypes m_accountLevel;
