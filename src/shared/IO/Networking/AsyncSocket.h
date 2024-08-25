@@ -119,6 +119,7 @@ namespace IO { namespace Networking {
             void StopPendingTransactionsAndForceClose();
 
             char* m_readDstBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_readDstBufferBytesLeft for space
+            std::size_t m_readDstBufferSize = 0; // will be 0 if ReadSome(), otherwise the original buffer size
             std::size_t m_readDstBufferBytesLeft = 0;
             char const* m_writeSrcBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_writeSrcBufferBytesLeft for space
             std::size_t m_writeSrcBufferBytesLeft = 0;
