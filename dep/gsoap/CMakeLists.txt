@@ -1,6 +1,3 @@
-# Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
-# Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -15,19 +12,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-set (gsoap_SRCS 
+set(gsoap_SRCS
+	stdsoap2.h
 	stdsoap2.cpp
-
+	soapC.cpp
+	soapH.h
+	soapStub.h
+	soapServer.cpp
 )
 
+add_library(gsoap STATIC ${gsoap_SRCS})
 
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/dep/include/gsoap
-)
+set_target_properties(gsoap PROPERTIES LINKER_LANGUAGE CXX)
 
-add_library(gsoap STATIC
-  ${gsoap_SRCS}
-)
+target_include_directories(gsoap PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(gsoap PUBLIC ${OPENSSL_LIBRARIES})
+SET_TARGET_PROPERTIES (gsoap PROPERTIES FOLDER "dep")
 
-SET_TARGET_PROPERTIES (gsoap PROPERTIES FOLDER "3rd Party")
