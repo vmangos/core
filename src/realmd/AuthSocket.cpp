@@ -40,8 +40,6 @@
 #include "IO/Networking/Utils.h"
 #include "Utils/ArrayDeleter.h"
 
-#include <ace/INET_Addr.h>
-
 #ifdef USE_SENDGRID
 #include "MailerService.h"
 #include "SendgridMail.h"
