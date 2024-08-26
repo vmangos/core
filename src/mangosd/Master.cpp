@@ -24,10 +24,6 @@
 */
 
 #include <memory>
-#include "IO/Networking/AsyncServerListener.h"
-#ifndef WIN32
-#include "PosixDaemon.h"
-#endif
 
 #include "Common.h"
 #include "Master.h"
@@ -38,24 +34,26 @@
 #include "Timer.h"
 #include "Policies/SingletonImp.h"
 #include "SystemConfig.h"
-#include "revision.h"
 #include "Config/Config.h"
 #include "Database/DatabaseEnv.h"
 #include "CliRunnable.h"
 #include "remote/RemoteAccess/RASocket.h"
-#include "Util.h"
 #include "remote/soap/MaNGOSsoap.h"
+#include "Util.h"
 #include "MassMailMgr.h"
 #include "DBCStores.h"
-#include "migrations_list.h"
 #include "WorldSocketMgr.h"
 #include "IO/Context/IoContext.h"
 #include "IO/Multithreading/CreateThread.h"
+#include "IO/Networking/AsyncServerListener.h"
 #include "IO/Timer/AsyncSystemTimer.h"
 
-#include <ace/OS_NS_signal.h>
-#include <ace/TP_Reactor.h>
-#include <ace/Dev_Poll_Reactor.h>
+#include "revision.h"
+#include "migrations_list.h"
+
+#ifndef WIN32
+#include "PosixDaemon.h"
+#endif
 #include <signal.h>
 
 #ifdef WIN32
