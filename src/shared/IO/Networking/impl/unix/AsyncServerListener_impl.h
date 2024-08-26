@@ -11,6 +11,7 @@
 #include "IO/Context/IoContext.h"
 #include "IO/Networking/SocketDescriptor.h"
 #include "IO/Networking/IpAddress.h"
+#include "IO/Networking/Internal.h"
 #include "IO/SystemErrorToString.h"
 
 #if defined(__linux__)
@@ -109,14 +110,10 @@ void IO::Networking::AsyncServerListener<TClientSocket>::OnNewClientToAcceptAvai
         return;
     }
 
-    char ipv4AddressString[INET_ADDRSTRLEN];
-    ::inet_ntop(AF_INET, &(peerAddress.sin_addr), ipv4AddressString, INET_ADDRSTRLEN);
-    auto peerIpAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
+    IO::Networking::IpAddress peerIpAddress = IO::Networking::Internal::inet_ntop(&(peerAddress.sin_addr));
     uint16_t peerPort = ntohs(peerAddress.sin_port);
 
-    MANGOS_ASSERT(peerIpAddress.has_value());
-
-    IO::Networking::IpEndpoint peerEndpoint(peerIpAddress.value(), peerPort);
+    IO::Networking::IpEndpoint peerEndpoint(peerIpAddress, peerPort);
     IO::Networking::SocketDescriptor socketDescriptor{peerEndpoint, nativePeerSocket};
 
     std::shared_ptr<TClientSocket> client = std::make_shared<TClientSocket>(m_ctx, socketDescriptor);

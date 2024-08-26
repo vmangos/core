@@ -110,6 +110,8 @@ set (shared_SRCS
     IO/Context/IoContext_windows.cpp
     IO/SystemErrorToString.h
     IO/SystemErrorToString.cpp
+    IO/Networking/Internal.h
+    IO/Networking/Internal.cpp
     IO/Networking/AsyncServerListener.h
     IO/Networking/AsyncSocket.h
     IO/Networking/NetworkError.h
@@ -119,6 +121,8 @@ set (shared_SRCS
     IO/Networking/Utils.cpp
     IO/Networking/IpAddress.h
     IO/Networking/IpAddress.cpp
+    IO/Networking/DNS.h
+    IO/Networking/DNS.cpp
     IO/Multithreading/CreateThread.h
     IO/Multithreading/CreateThread.cpp
     IO/Timer/impl/windows/AsyncSystemTimer.cpp
