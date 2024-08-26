@@ -33,7 +33,6 @@
 #include "revision.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
-#include <ace/Version.h>
 #include "ArgparserForServer.h"
 
 #ifdef WIN32
@@ -136,8 +135,6 @@ extern int main(int argc, char **argv)
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using ACE: %s", ACE_VERSION);
 
     // Set progress bars show mode
     BarGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));

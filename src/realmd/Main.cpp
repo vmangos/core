@@ -145,8 +145,6 @@ extern int main(int argc, char** argv)
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using ACE: %s", ACE_VERSION);
-
 #ifdef USE_SENDGRID
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using CURL version %s", curl_version());
 
