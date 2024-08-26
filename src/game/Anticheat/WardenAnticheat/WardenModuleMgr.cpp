@@ -30,7 +30,7 @@
 #include "World.h"
 #include "Log.h"
 
-#include <ace/OS_NS_dirent.h>
+#include "IO/Filesystem/FileSystem.h"
 
 #include <vector>
 #include <string>
@@ -38,31 +38,16 @@
 
 INSTANTIATE_SINGLETON_1(WardenModuleMgr);
 
-namespace
-{
 std::vector<std::string> GetModuleNames(std::string const& moduleDir)
 {
-    ACE_DIR* dirp = ACE_OS::opendir(ACE_TEXT(moduleDir.c_str()));
+    // Get all the files in warden folder, might also include ".cr" or ".key" files
+    std::vector<std::string> result = IO::Filesystem::GetAllFilesInFolder(moduleDir, IO::Filesystem::OutputFilePath::FullFilePath);
 
-    std::vector<std::string> results;
+    // Remove all elements that don't end with ".bin"
+    std::function<bool(std::string const& filePath)> MustEndWithBin = [](const std::string &s) { return s.size() < 4 || s.substr(s.size() - 4) != ".bin"; };
+    result.erase(std::remove_if(result.begin(), result.end(), MustEndWithBin), result.end());
 
-    if (dirp)
-    {
-        ACE_DIRENT* dp;
-
-        // look only for .bin files, and assume (for now) that the corresponding .key and .cr files exist
-        while (!!(dp = ACE_OS::readdir(dirp)))
-            if (!memcmp(&dp->d_name[strlen(dp->d_name) - 4], ".bin", 4))
-                results.emplace_back(moduleDir + "/" + dp->d_name);
-
-#ifndef _WIN32
-        // this causes a crash on Windows, so just accept a minor memory leak for now
-        ACE_OS::closedir(dirp);
-#endif
-    }
-
-    return results;
-}
+    return result;
 }
 
 WardenModuleMgr::WardenModuleMgr()
