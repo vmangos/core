@@ -20,7 +20,6 @@ set (shared_SRCS
     backward.hpp
     ByteBuffer.h
     Common.h
-    DelayExecutor.h
     EnumFlag.h
     Errors.h
     LockedQueue.h
@@ -74,7 +73,6 @@ set (shared_SRCS
     nonstd/optional.hpp
     ByteBuffer.cpp
     Common.cpp
-    DelayExecutor.cpp
     Log.cpp
     PosixDaemon.cpp
     ProgressBar.cpp
