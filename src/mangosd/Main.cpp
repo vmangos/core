@@ -109,7 +109,7 @@ extern int main(int argc, char **argv)
 #endif
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [realm-daemon]", _FULLVERSION);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [world-daemon]", _FULLVERSION);
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "<Ctrl-C> to stop." );
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "\n\n"
         "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
