@@ -7,6 +7,8 @@
 #if defined(WIN32)
 #include <WinSock2.h>
 #include <ws2tcpip.h>
+#elif defined(__linux__) || defined(__APPLE__)
+#include <netdb.h>
 #endif
 
 std::string IO::Networking::DNS::GetOwnHostname()
