@@ -90,7 +90,6 @@
 typedef std::chrono::system_clock Clock;
 typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> TimePoint;
 
-#include "LockedQueue.h"
 
 #include <ace/Basic_Types.h>
 #include <ace/Guard_T.h>
