@@ -90,21 +90,6 @@ typedef off_t ACE_OFF_T;
 #  endif
 #endif
 
-#if PLATFORM == PLATFORM_WINDOWS
-#  if !defined (FD_SETSIZE)
-#    define FD_SETSIZE 4096
-#  endif
-#  include <ace/config-all.h>
-#  include <ws2tcpip.h>
-#else
-#  include <sys/types.h>
-#  include <sys/ioctl.h>
-#  include <sys/socket.h>
-#  include <netinet/in.h>
-#  include <unistd.h>
-#  include <netdb.h>
-#endif
-
 #if COMPILER == COMPILER_MICROSOFT
 
 #  include <float.h>
