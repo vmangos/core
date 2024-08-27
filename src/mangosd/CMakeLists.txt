@@ -26,10 +26,6 @@ set(EXECUTABLE_SRCS
   WorldRunnable.cpp
   remote/RemoteAccess/RASocket.h
   remote/RemoteAccess/RASocket.cpp
-  remote/soap/soapH.h
-  remote/soap/soapC.cpp
-  remote/soap/soapStub.h
-  remote/soap/soapServer.cpp
   remote/soap/MaNGOSsoap.h
   remote/soap/MaNGOSsoap.cpp
 )
