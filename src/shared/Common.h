@@ -78,26 +78,12 @@
 typedef std::chrono::system_clock Clock;
 typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> TimePoint;
 
-
-#include <ace/Basic_Types.h>
-#include <ace/Guard_T.h>
-#include <ace/OS_NS_arpa_inet.h>
-
-// Old ACE versions (pre-ACE-5.5.4) not have this type (add for allow use at Unix side external old ACE versions)
-#if PLATFORM != PLATFORM_WINDOWS
-#  ifndef ACE_OFF_T
-typedef off_t ACE_OFF_T;
-#  endif
-#endif
-
 #if COMPILER == COMPILER_MICROSOFT
 
-#  include <float.h>
+#  include <cfloat>
 
 #  define I32FMT "%08I32X"
 #  define I64FMT "%016I64X"
-//#  define snprintf _snprintf
-#  define vsnprintf _vsnprintf
 
 #else
 
@@ -120,6 +106,7 @@ typedef off_t ACE_OFF_T;
 
 #define SIZEFMTD "%zu"
 
+/// Will always return a finite float. If the provided float is infinite it will return 0
 inline float finiteAlways(float f) { return std::isfinite(f) ? f : 0.0f; }
 
 #define atol(a) strtoul(a, nullptr, 10)
